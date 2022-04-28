@@ -1,0 +1,71 @@
+#!/usr/bin/make
+#
+.SILENT :
+
+Build = Release
+BaseName = scribe-linux-v
+# OutFile = $(BaseName)$(shell python ./Code/Py/linux_get_version.py)
+OutFile = $(BaseName)2.4.18
+LgiPath = ../../lgi/trunk
+
+ifeq ($(Build),Debug)
+	Tag = "d"
+else
+	Tag = ""
+endif
+
+$(OutFile).tar.bz2 : ./scribe
+	@echo "Creating folders..."
+	mkdir -p $(OutFile)/Help
+	mkdir -p $(OutFile)/Help/scripting
+	mkdir -p $(OutFile)/Scripts
+	mkdir -p $(OutFile)/Resources
+	mkdir -p $(OutFile)/Aspell
+	mkdir -p $(OutFile)/Aspell/data
+	@echo "Creating DOM documentation..."
+	python Code/Py/DomScan.py > $(OutFile)/Scripts/Dom.txt
+	@echo "Copying binaries..."
+	cp ./scribe $(OutFile)
+	chmod +x $(OutFile)/scribe
+	echo "./scribe" > $(OutFile)/run-scribe
+	chmod +x $(OutFile)/run-scribe
+	cp ../libs/aspell-0.60.6.1/linux/$(Build)/libaspell-dist-060$(Tag).so $(OutFile)
+	cp $(LgiPath)/$(Build)/liblgi-gtk3$(Tag).so $(OutFile)
+	# @echo "Striping binaries..."
+	# strip $(OutFile)/scribe
+	# strip $(OutFile)/*.so
+	@echo "Copying scripts..."
+	cp ./Scripts/*.script $(OutFile)/Scripts
+	cp ./Scripts/Api.html $(OutFile)/Scripts
+	@echo "Copying resources..."
+	cp ./Resources/resdefs.h $(OutFile)/Scripts
+	cp ./Resources/Scribe.lr8 $(OutFile)/Resources
+	cp ./Resources/Flags.png $(OutFile)/Resources
+	cp ./Resources/Icons-16.png $(OutFile)/Resources
+	cp ./Resources/xgate-icons-32.png $(OutFile)/Resources
+	cp ./Resources/About.html $(OutFile)/Resources
+	cp ./Resources/About64px.png $(OutFile)/Resources
+	cp ./Resources/Title.html $(OutFile)/Resources
+	cp ./Resources/Title.png $(OutFile)/Resources
+	cp ./Resources/NoFace*.png $(OutFile)/Resources
+	cp ./Resources/EmojiMap.png $(OutFile)/Resources
+	cp ./Resources/Preview*.html $(OutFile)/Resources
+	cp ./Resources/tray_*.png $(OutFile)/Resources
+	@echo "Copying aspell data..."
+	cp ./Resources/aspell-languages.csv $(OutFile)/Aspell
+	cp ../libs/aspell-0.60.6.1/data/*.cmap $(OutFile)/Aspell/data
+	cp ../libs/aspell-0.60.6.1/data/*.cset $(OutFile)/Aspell/data
+	cp ../libs/aspell-0.60.6.1/data/*.kbd $(OutFile)/Aspell/data
+	cp ./Help/*.html $(OutFile)/Help
+	cp ./Help/*.css $(OutFile)/Help
+	cp $(LgiPath)/docs/scripting/*.html $(OutFile)/Help/scripting
+	cp $(LgiPath)/docs/scripting/*.css $(OutFile)/Help/scripting
+	@echo "Compressing..."
+	tar -cvjSf $(OutFile).tar.bz2 $(OutFile)
+	@echo "Cleanup..."
+	rm -rf $(OutFile)
+	@echo "Done."
+	
+scribe :
+	make -f Makefile.linux
+

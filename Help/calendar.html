@@ -1,0 +1,66 @@
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>Calendar</h2></center>
+
+		<div class=helpheading>Calendar</div>
+			To open the calendar click the calendar button on the main window's toolbar. This opens 
+			the Calendar View window, which displays the current month in a grid view. You can switch
+			to Week and Year view using the Calendar View's toolbar.<br>
+			<br>
+			By default the main mail store's calendar folder will be listed as a event source in the list
+			on the bottom left. You can add other calendar folders as event sources by right clicking in
+			that area and selecting "Add Calendar". For existing calendar's you can also right click on
+			them to change their colour, or path or even delete them. Deleting a calendar doesn't delete
+			the folder in the mail store, just remove it from displaying in the calendar view.<br>
+			<br>			
+			To create a new appointment, single click on the cell you want the appointment to start in,
+			and then a new window to edit the details of the appointment will appear. If you are in the week
+			view you can click and then drag the mouse to change the end time of the event.<br>
+			<br>
+			You can move an appointment to another time or day using drag and drop. In the week view you
+			can drag the top or bottom edge to change the start or end time.<br>
+			<br>
+			You can also attach an
+			appointment to an email by dragging it onto a mail window. The appointment is saved as
+			a <a href='http://www.imc.org/pdi/'>vCal</a> file and attached to the email. 
+			vCal files can be used by most other calendaring software. Likewise, dragging a vCal file
+			from an email to the calendar view or a calendar folder in the main window will import that
+			appointment into your calendar. Note: Currently no facility exists to merge this with an existing
+			copy of the same appointment.
+
+		<div class=helpheading><a name="datetime">Date/Time</a></div>
+			The start/end date fields are formatted according to the 
+			<a href='install.html#appear'>Appearence options</a>. If "auto" is selected and you're running
+			on Windows then the regional settings date format is used. Otherwise if you're not running Windows
+			then 'auto' means "d/m/yyyy h:m:s", because that is the default where I live ;)
+			<p/>
+			If you enter the start or end date directly, then you must adhere to the format otherwise
+			things will not work. However there are drop down boxes to edit the date and time parts
+			separately to the right of the start and end fields. The first drop down allows you to select
+			the date, and the 2nd drop down changes the time part.
+			<p/>
+
+		<div class=helpheading><a name="alarms">Alarms</a></div>
+			To give yourself warning of an upcoming event, you can set an alarm in the calendar event window by
+			selecting "Popup" or "Email" next to the Reminders label, setting the number of minutes before the
+			event and clicking "Add". After you save the event Scribe will notify the user if Scribe is running.
+			However if Scribe is started after an Alarm was due then it will appear immediately.
+			<p/>
+
+		<br>
+		<center>&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a></center>
+	</div>
+
+</body>
+</html>

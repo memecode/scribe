@@ -1,0 +1,63 @@
+#!/usr/bin/make
+#
+.SILENT :
+
+CODELIB=../../../codelib
+LGI=../../lgi/trunk
+DEPLOY=$(CODELIB)/appimagetool-x86_64.AppImage
+VERSION=$(shell python ./Utils/getversion.py)
+APPIMG=$(VERSION).AppImage
+APPDIR=$(VERSION).AppDir
+BINDIR=$(APPDIR)/usr/bin
+LIBDIR=$(APPDIR)/usr/lib
+RESDIR=$(APPDIR)/usr/share/applications
+
+$(APPIMG) : ./scribe
+	rm -rf $(APPDIR)
+	@echo "Building AppDir..."
+	mkdir -p $(BINDIR)
+	mkdir -p $(LIBDIR)
+	mkdir -p $(RESDIR)
+	@echo "Creating DOM documentation..."
+	python Code/Py/DomScan.py > $(RESDIR)/Dom.txt
+	@echo "Copying binaries..."
+	cp ./scribe $(BINDIR)
+	cp $(LGI)/Release/liblgi-gtk3.so $(LIBDIR)
+	cp ../libs/aspell-0.60.6.1/linux/Release/libaspell-dist-060.so $(LIBDIR)
+	cp ../libs/build-x64/libchardet/libchardet.so $(LIBDIR)
+	@echo "Copy resources..."
+	chmod 700 ./Resources/AppRun
+	cp ./Resources/AppRun $(APPDIR)
+	cp ./Resources/Linux/scribe.desktop $(APPDIR)
+	cp ./Resources/About64px.png $(APPDIR)
+	cp ./Resources/Scribe.lr8 $(RESDIR)/scribe.lr8
+	cp ./Resources/Flags.png $(RESDIR)
+	cp ./Resources/Icons-16.png $(RESDIR)
+	cp ./Resources/xgate-icons-32.png $(RESDIR)
+	cp ./Resources/About.html $(RESDIR)
+	cp ./Resources/About64px.png $(RESDIR)
+	cp ./Resources/Title.html $(RESDIR)
+	cp ./Resources/Title.png $(RESDIR)
+	cp ./Resources/NoFace*.png $(RESDIR)
+	cp ./Resources/EmojiMap.png $(RESDIR)
+	cp ./Resources/Preview*.html $(RESDIR)
+	cp ./Resources/tray_*.png $(RESDIR)
+	mkdir -p $(RESDIR)/Help/scripting
+	cp ./Help/*.html $(RESDIR)/Help
+	cp ./Help/*.css $(RESDIR)/Help
+	cp $(LGI)/docs/scripting/*.html $(RESDIR)/Help/scripting
+	cp $(LGI)/docs/scripting/*.css $(RESDIR)/Help/scripting
+	mkdir -p $(RESDIR)/Scripts
+	cp ./Scripts/*.script $(RESDIR)/Scripts
+	cp ./Resources/resdefs.h $(RESDIR)/Scripts
+	mkdir -p $(RESDIR)/Aspell/data
+	cp ./Resources/aspell-languages.csv $(RESDIR)/Aspell
+	cp ../libs/aspell-0.60.6.1/data/*.cmap $(RESDIR)/Aspell/data
+	cp ../libs/aspell-0.60.6.1/data/*.cset $(RESDIR)/Aspell/data
+	cp ../libs/aspell-0.60.6.1/data/*.kbd $(RESDIR)/Aspell/data
+	@echo "Building AppImage..."
+	$(DEPLOY) $(APPDIR)
+
+scribe :
+	make -f Makefile.linux
+

@@ -1,0 +1,256 @@
+<html>
+<head>
+	<link href="scripting.css" rel="stylesheet" type="text/css">
+	<title>Lgi Scripting Syntax</title>
+	<style>
+		pre {
+			border: 1px solid green;
+			background: #f0f8f0;
+			color: green;
+			padding: .5em;
+			margin-left: 2em;
+		}
+		.output {
+			border: 1px solid gray;
+			background: #f0f0f0;
+			color: gray;
+			padding: .5em;
+			margin-left: 2em;
+		}
+	</style>
+</head>
+<body>
+
+	<h1>Lgi Scripting Syntax</h1>
+	<div class=menu>
+			<span><a href="..">Up</a></span>
+			<span><a href="index.html">Index</a></span>
+			<span>Syntax</span>
+			<span><a href="library.html">Library</a></span>
+	</div>
+
+	<div>
+		<h2>Variables</h2>
+		Variables are created on demand and don't need to be explicitly declared. Sometimes the host will insert
+		known global variables before the script is run, but that usage pattern is declining as "Main" functions
+		are now used, that allow parameters from outside the script to be passed in via explicit method arguments.
+		<p/>
+		The variables themselves are based on a variant data type, that can contain integers, strings and various
+		pointer types. There is no dereference operator needed to use a pointer type variable. Pointer arithmetic 
+		is not supported, as generally the pointers are to single class objects, not arrays of objects. That said
+		there are List and HashTable sub-types to the variables, but no array as such.
+
+		<h2>Scope</h2>
+		There are 3 fixed scopes: global, local, register. Although in practice when writting code you only ever
+		deal with global and local. Unlike C, there are no extra scope levels inside { } blocks inside a function.
+		Variables defined in that function (including it's arguments) are visible throughout that function.
+		Global variables are defined outside of a function scope and are visible everywhere.
+
+		<h2>Constructs</h2>
+		Scripts are constructed from these primitives:
+		<pre>if (<span class=exp>expression</span>) { <span class=state>statements</span>; }
+<span class=opt1>[else if (<span class=exp>expression</span>) { <span class=state>statements</span>; }]</span>
+<span class=opt2>[else { <span class=state>statements</span>; }]</span></pre>
+				
+		<pre>while (<span class=exp>expression</span>)
+{
+    <span class=state>statements</span>;
+}</pre>
+		<pre>for (<span class=exp>initial_expression</span>; <span class=exp>condition_expression</span>; <span class=exp>iterate_expression</span>)
+{
+    <span class=state>statements</span>;
+}</pre>
+		<pre>function <span class=name>method_name</span>([<span class=exp>arg1</span>, <span class=exp>arg2</span>, ...])
+{
+    <span class=state>statements</span>;
+}</pre>
+		<pre>struct <span class=name>structure_name</span>
+{
+    <span class=state>type member1</span>;
+    <span class=opt1>[type member2; ... ]</span>
+};</pre>
+		<pre>extern "dynamic_library" return_type <span class=name>method_name</span>([<span class=exp>type arg1</span>, <span class=exp>type arg2</span>, ...]);</pre>
+		<pre>return <span class=exp>expression</span>;</pre>
+		<pre><span class=exp>expression</span>;</pre>
+		
+
+		<h2>Operators</h2>
+		These operators can be used in expressions:
+		<table>
+			<tr><td class=op>=<td>Assign
+			<tr><td class=op>+<td>Plus
+			<tr><td class=op>-<td>Minus
+			<tr><td class=op>*<td>Multiply
+			<tr><td class=op>/<td>Divide
+			<tr><td class=op>%<td>Mod
+			<tr><td class=op>&lt;<td>LessThan
+			<tr><td class=op>&lt;=<td>LessThanEqual
+			<tr><td class=op>&gt;<td>GreaterThan
+			<tr><td class=op>&gt;=<td>GreaterThanEqual
+			<tr><td class=op>==<td>Equals
+			<tr><td class=op>!=<td>Not Equals
+			<tr><td class=op>+=<td>Plus Equals
+			<tr><td class=op>-=<td>Minus Equals
+			<tr><td class=op>*=<td>Multiply Equals
+			<tr><td class=op>/=<td>Divide Equals
+			<tr><td class=op>++<td>Post Increment
+			<tr><td class=op>--<td>Post Decrement
+			<tr><td class=op>++<td>Pre Increment
+			<tr><td class=op>--<td>Pre Decrement
+			<tr><td class=op>&&<td>And
+			<tr><td class=op>||<td>Or
+			<tr><td class=op>!<td>Not
+			<tr><td class=op>.<td>Object member reference
+		</table>
+		
+		<h2>Objects</h2>
+		Some variant types allow the referencing of object members or methods via the '.' operator. 
+		The available members depends on the variant type:
+		<ul>
+			<li>DOM:
+				<ul>
+					<li>"member_name" - depends on the object, they all have different member names.
+						For example see the <a href="http://www.memecode.com/scribe/dom.php">Scribe Object Model</a>.
+				</ul>
+			<li>String:
+				<ul>
+					<li>Length - the length of the string in bytes (strings are utf-8).
+					<li>Int - the string as an int (atoi).
+					<li>Float - the string as a double (atof).
+					<li>Split(&lt;separator&gt;[, &lt;max_split&gt;]) - Splits the string into a list.
+					<li>Join(&lt;list&gt;) - Joins all the elements in 'list' using the string as a separator.
+					<li>Find(&lt;sub-string&gt;[, &lt;start&gt;[, &lt;end&gt;]]) - Finds a sub-string.
+					<li>Strip() - Removes all leading and trailing whitespace.
+					<li>Upper() - Converts all alpha characters to upper case.
+					<li>Lower() - Converts all alpha characters to lower case.
+				</ul>
+			<li>List:
+				<ul>
+					<li>Length - the number of objects in the container.
+					<li>Add(&lt;element&gt;) - Add a new element to the end of the list.
+					<li>Delete(&lt;index&gt;) - Deletes the entry at 'index'.
+				</ul>
+			<li>HashTable:
+				<ul>
+					<li>Length - the number of objects in the container.
+					<li>Add(&lt;key&gt;, &lt;element&gt;) - Add a new element using the string 'key'.
+					<li>Delete(&lt;key&gt;) - Deletes the element at using the string 'key'.
+				</ul>
+			<li>DateTime:
+				<ul>
+					<li>Year - just the year as an int.
+					<li>Month - just the month as an int.
+					<li>Day - just the day as an int.
+					<li>Hour - just the hour as an int.
+					<li>Minute - just the minute as an int.
+					<li>Second - just the second as an int.
+					<li>Date - the date part as a string.
+					<li>Time - the time part as a string.
+					<li>DateTime - the date and time as a string.
+				</ul>
+			<li>Image (GSurface):
+				<ul>
+					<li>x - The width in pixels.
+					<li>y - The height in pixels.
+					<li>Bits - The bit depth.
+					<li>ColourSpace - The surface's colour space (a GColourSpace variable as a uint32)
+				</ul>
+
+		</ul>
+
+		<h3>List</h3>
+		The list object type allows you to store a bunch of objects in a variable (of the same variant type).
+		To get the length of the list, use <span class=name>var_name</span>.length, and to access the various
+		members use <span class=name>var_name</span>[<span class=exp>index_expression</span>] where the exp
+		evaluates to an integer. If you don't specify an <b>integer</b> then you'll get back a NULL variable as the
+		result.
+
+		<h3>HashTable</h3>
+		HashTable's are very similar to lists, in that they allow you to store a objects in a variable.
+		To get the number of objects in the hash table, use <span class=name>var_name</span>.length,
+		and to access the various members use <span class=name>var_name</span>[<span class=exp>index_expression</span>]
+		where the exp evaluates to an <b>string</b>. If you don't specify a string then you'll get back a NULL 
+		variable as the result.
+
+		<h3>Built In Types</h3>
+		These types can be used in defining structures and parameters to external functions:<br>
+		<br>
+		<ul>
+			<li> int </li>
+			<li> short </li>
+			<li> long </li>
+			<li> int8 </li>
+			<li> int16 </li>
+			<li> int32 </li>
+			<li> int64 </li>
+			<li> uint8 </li>
+			<li> uint16 </li>
+			<li> uint32 </li>
+			<li> uint64 </li>
+			<li> bool/boolean </li>
+			<li> double </li>
+			<li> float </li>
+			<li> char* </li>
+			<li> GDom </li>
+			<li> void* </li>
+			<li> GDateTime </li>
+			<li> GHashTable </li>
+			<li> GOperator </li>
+			<li> GView </li>
+			<li> GMouse </li>
+			<li> GKey </li>
+			<li> GVariant </li>
+		</ul><br>
+		Some of these types don't have any implementation or testing done. Integers and strings should work fine though.
+
+		<h3>Custom Types</h3>
+		You can define structures in a similar fashion to C code using the <span class=name>struct</span> keyword. For 
+		example:
+		<pre>struct PxRgb24 {
+    uint8 r;
+    uint8 g;
+    uint8 b;
+};
+struct Image
+{
+    uint32 Width;
+    uint32 Height;
+    PxRgb24 Pixels[16 * 16];
+};</pre>
+		Packing of structures is currently on 1 byte boundaries, but it would be possible to implement other settings later.
+		The <span class=name>typeid(...)</span> keyword is supported for custom types. e.g.
+<pre>Obj = New("Image");
+if (Obj)
+{
+    Type = typeid(Obj);
+    Print("TypeName=" + Type.Name + ", sizeof=" + Type.Length + "\n");
+    Delete(Obj);
+}</pre>
+<pre class=output>TypeName=Image, sizeof=772</pre>
+
+		
+		<h3>Calling extern functions</h3>
+		To call methods in dynamic libraries you first have to declare the method using the extern keyword:
+		<pre>extern "dynamic_library" type method([type arg1, type arg2, ...]);</pre>
+		The types for extern functions are somewhat limited to these keywords:
+		<ul>
+			<li> char*
+			<li> int, int32, uint32, int64, uint64
+			<li> double
+			<li> void*
+			<li> _out_ (specifies that the argument is an output, rather than an input)
+		</ul>
+		More type support will be added as needed. All non-char pointers will become "void*". The dynamic_library will
+		be passed to "dlopen" or "LoadLibrary" pretty much unchanged.<br>
+		<br>
+		Windows based example:
+				<pre>extern "Kernel32.dll" uint32 GetWindowsDirectoryA(_out_ char *buffer, int size);
+buf = New(256); // Allocate a buffer for the return value
+r = GetWindowsDirectoryA(buf, buf.Length);
+Print("Dir='"+buf+"'");</pre>
+				<pre class=output>Dir='c:\Windows'</pre>
+
+	</div>
+
+</body>
+</html>

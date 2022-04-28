@@ -1,0 +1,9 @@
+GToolBar {
+	background-image: url("material-texture.jpg");
+}
+GToolButton {
+	color: white;
+}
+GPanel, ScribeWnd, MailUi, MailUiGpg {
+	background-image: url("material3.jpg");
+}

@@ -1,0 +1,401 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		342D52A50F0CBA2F002A1C7C /* LgiMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 342D52A40F0CBA2F002A1C7C /* LgiMain.cpp */; };
+		34D20B831CB289C600730172 /* GHtml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D20B821CB289C600730172 /* GHtml.cpp */; };
+		34D84C691B6F916600F77AF9 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D84C681B6F916600F77AF9 /* Main.cpp */; };
+		34D84C6B1B6F923100F77AF9 /* Lgi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D84C671B6F5EA900F77AF9 /* Lgi.framework */; };
+		34D84C6C1B6F923400F77AF9 /* Lgi.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34D84C671B6F5EA900F77AF9 /* Lgi.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34D84C6E1B6F925300F77AF9 /* Png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D84C6D1B6F925300F77AF9 /* Png.cpp */; };
+		34D84C721B6F975F00F77AF9 /* GDocView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D84C6F1B6F975F00F77AF9 /* GDocView.cpp */; };
+		34D84C731B6F975F00F77AF9 /* GHtmlCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D84C701B6F975F00F77AF9 /* GHtmlCommon.cpp */; };
+		34D84C741B6F975F00F77AF9 /* GHtmlParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D84C711B6F975F00F77AF9 /* GHtmlParser.cpp */; };
+		34D84C781B6F98F600F77AF9 /* GdcTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D84C771B6F98F600F77AF9 /* GdcTools.cpp */; };
+		34D84C7A1B6F990E00F77AF9 /* IHttp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D84C791B6F990E00F77AF9 /* IHttp.cpp */; };
+		34D84C7C1B6F992500F77AF9 /* OpenSSLSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D84C7B1B6F992500F77AF9 /* OpenSSLSocket.cpp */; };
+		8D0C4E8D0486CD37000505A6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0867D6AAFE840B52C02AAC07 /* InfoPlist.strings */; };
+		8D0C4E8E0486CD37000505A6 /* main.nib in Resources */ = {isa = PBXBuildFile; fileRef = 02345980000FD03B11CA0E72 /* main.nib */; };
+		8D0C4E920486CD37000505A6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20286C33FDCF999611CA2CEA /* Carbon.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		34D84C661B6F5EA900F77AF9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 348335CE1AA190D1006BD4F9 /* LgiCarbon.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = Lgi;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		34640D3212D5D8AB00B207F4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				34D84C6C1B6F923400F77AF9 /* Lgi.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0867D6ABFE840B52C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1870340FFE93FCAF11CA0CD7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/main.nib; sourceTree = "<group>"; };
+		20286C33FDCF999611CA2CEA /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		32DBCF6D0370B57F00C91783 /* EmojiMapper_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmojiMapper_Prefix.pch; sourceTree = "<group>"; };
+		342D52A40F0CBA2F002A1C7C /* LgiMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LgiMain.cpp; path = ../../../../Lgi/trunk/src/common/Lgi/LgiMain.cpp; sourceTree = SOURCE_ROOT; };
+		348335CE1AA190D1006BD4F9 /* LgiCarbon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LgiCarbon.xcodeproj; path = ../../../../Lgi/trunk/src/mac/carbon/LgiCarbon.xcodeproj; sourceTree = "<group>"; };
+		34D20B821CB289C600730172 /* GHtml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GHtml.cpp; path = ../../../../Lgi/trunk/src/common/Text/GHtml.cpp; sourceTree = "<group>"; };
+		34D84C681B6F916600F77AF9 /* Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
+		34D84C6D1B6F925300F77AF9 /* Png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Png.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Filters/Png.cpp; sourceTree = "<group>"; };
+		34D84C6F1B6F975F00F77AF9 /* GDocView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GDocView.cpp; path = ../../../../Lgi/trunk/src/common/Text/GDocView.cpp; sourceTree = "<group>"; };
+		34D84C701B6F975F00F77AF9 /* GHtmlCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GHtmlCommon.cpp; path = ../../../../Lgi/trunk/src/common/Text/GHtmlCommon.cpp; sourceTree = "<group>"; };
+		34D84C711B6F975F00F77AF9 /* GHtmlParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GHtmlParser.cpp; path = ../../../../Lgi/trunk/src/common/Text/GHtmlParser.cpp; sourceTree = "<group>"; };
+		34D84C771B6F98F600F77AF9 /* GdcTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GdcTools.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Tools/GdcTools.cpp; sourceTree = "<group>"; };
+		34D84C791B6F990E00F77AF9 /* IHttp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IHttp.cpp; path = ../../../../Lgi/trunk/src/common/INet/IHttp.cpp; sourceTree = "<group>"; };
+		34D84C7B1B6F992500F77AF9 /* OpenSSLSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OpenSSLSocket.cpp; path = ../../../../Lgi/trunk/src/common/INet/OpenSSLSocket.cpp; sourceTree = "<group>"; };
+		34D84C7D1B6F9E8000F77AF9 /* IHttp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IHttp.h; path = ../../../../Lgi/trunk/include/common/IHttp.h; sourceTree = "<group>"; };
+		4A9504C8FFE6A3BC11CA0CBA /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
+		4A9504CAFFE6A41611CA0CBA /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
+		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D0C4E970486CD37000505A6 /* EmojiMapper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmojiMapper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D0C4E910486CD37000505A6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D0C4E920486CD37000505A6 /* Carbon.framework in Frameworks */,
+				34D84C6B1B6F923100F77AF9 /* Lgi.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		195DF8CFFE9D517E11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D0C4E970486CD37000505A6 /* EmojiMapper.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		20286C29FDCF999611CA2CEA /* i.Hex */ = {
+			isa = PBXGroup;
+			children = (
+				20286C2AFDCF999611CA2CEA /* Sources */,
+				20286C2CFDCF999611CA2CEA /* Resources */,
+				20286C32FDCF999611CA2CEA /* External Frameworks and Libraries */,
+				195DF8CFFE9D517E11CA2CBB /* Products */,
+			);
+			name = i.Hex;
+			sourceTree = "<group>";
+		};
+		20286C2AFDCF999611CA2CEA /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				34D84C681B6F916600F77AF9 /* Main.cpp */,
+				342D52A30F0CBA07002A1C7C /* Lgi */,
+				32DBCF6D0370B57F00C91783 /* EmojiMapper_Prefix.pch */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		20286C2CFDCF999611CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8D0C4E960486CD37000505A6 /* Info.plist */,
+				0867D6AAFE840B52C02AAC07 /* InfoPlist.strings */,
+				02345980000FD03B11CA0E72 /* main.nib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		20286C32FDCF999611CA2CEA /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				348335CE1AA190D1006BD4F9 /* LgiCarbon.xcodeproj */,
+				20286C33FDCF999611CA2CEA /* Carbon.framework */,
+				4A9504CAFFE6A41611CA0CBA /* CoreServices.framework */,
+				4A9504C8FFE6A3BC11CA0CBA /* ApplicationServices.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		342D52A30F0CBA07002A1C7C /* Lgi */ = {
+			isa = PBXGroup;
+			children = (
+				34D20B821CB289C600730172 /* GHtml.cpp */,
+				34D84C7D1B6F9E8000F77AF9 /* IHttp.h */,
+				34D84C7B1B6F992500F77AF9 /* OpenSSLSocket.cpp */,
+				34D84C791B6F990E00F77AF9 /* IHttp.cpp */,
+				34D84C771B6F98F600F77AF9 /* GdcTools.cpp */,
+				34D84C6F1B6F975F00F77AF9 /* GDocView.cpp */,
+				34D84C701B6F975F00F77AF9 /* GHtmlCommon.cpp */,
+				34D84C711B6F975F00F77AF9 /* GHtmlParser.cpp */,
+				34D84C6D1B6F925300F77AF9 /* Png.cpp */,
+				342D52A40F0CBA2F002A1C7C /* LgiMain.cpp */,
+			);
+			name = Lgi;
+			sourceTree = "<group>";
+		};
+		34D84C631B6F5EA900F77AF9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				34D84C671B6F5EA900F77AF9 /* Lgi.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D0C4E890486CD37000505A6 /* EmojiMapper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0E91AC508A95435008D54AB /* Build configuration list for PBXNativeTarget "EmojiMapper" */;
+			buildPhases = (
+				8D0C4E8C0486CD37000505A6 /* Resources */,
+				8D0C4E8F0486CD37000505A6 /* Sources */,
+				8D0C4E910486CD37000505A6 /* Frameworks */,
+				34640D3212D5D8AB00B207F4 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EmojiMapper;
+			productInstallPath = "$(HOME)/Applications";
+			productName = i.Hex;
+			productReference = 8D0C4E970486CD37000505A6 /* EmojiMapper.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		20286C28FDCF999611CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+			};
+			buildConfigurationList = C0E91AC908A95435008D54AB /* Build configuration list for PBXProject "EmojiMapper" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 20286C29FDCF999611CA2CEA /* i.Hex */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 34D84C631B6F5EA900F77AF9 /* Products */;
+					ProjectRef = 348335CE1AA190D1006BD4F9 /* LgiCarbon.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				8D0C4E890486CD37000505A6 /* EmojiMapper */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		34D84C671B6F5EA900F77AF9 /* Lgi.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Lgi.framework;
+			remoteRef = 34D84C661B6F5EA900F77AF9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D0C4E8C0486CD37000505A6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D0C4E8D0486CD37000505A6 /* InfoPlist.strings in Resources */,
+				8D0C4E8E0486CD37000505A6 /* main.nib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D0C4E8F0486CD37000505A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34D84C6E1B6F925300F77AF9 /* Png.cpp in Sources */,
+				34D84C781B6F98F600F77AF9 /* GdcTools.cpp in Sources */,
+				34D84C731B6F975F00F77AF9 /* GHtmlCommon.cpp in Sources */,
+				34D84C7A1B6F990E00F77AF9 /* IHttp.cpp in Sources */,
+				34D84C721B6F975F00F77AF9 /* GDocView.cpp in Sources */,
+				34D84C691B6F916600F77AF9 /* Main.cpp in Sources */,
+				34D84C7C1B6F992500F77AF9 /* OpenSSLSocket.cpp in Sources */,
+				342D52A50F0CBA2F002A1C7C /* LgiMain.cpp in Sources */,
+				34D20B831CB289C600730172 /* GHtml.cpp in Sources */,
+				34D84C741B6F975F00F77AF9 /* GHtmlParser.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		02345980000FD03B11CA0E72 /* main.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1870340FFE93FCAF11CA0CD7 /* English */,
+			);
+			name = main.nib;
+			sourceTree = "<group>";
+		};
+		0867D6AAFE840B52C02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0867D6ABFE840B52C02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C0E91AC608A95435008D54AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = EmojiMapper_Prefix.pch;
+				HEADER_SEARCH_PATHS = (
+					../../../../Lgi/trunk/include/common,
+					../../../../Lgi/trunk/include/mac/carbon,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = EmojiMapper;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		C0E91AC708A95435008D54AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = EmojiMapper_Prefix.pch;
+				HEADER_SEARCH_PATHS = (
+					../../../../Lgi/trunk/include/common,
+					../../../../Lgi/trunk/include/mac/carbon,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = EmojiMapper;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		C0E91ACA08A95435008D54AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC,
+					_DEBUG,
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../Lgi/trunk/include/common,
+					../../Lgi/trunk/include/mac/carbon,
+					/opt/local/include,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-DMAC";
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = /opt/local/include;
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		C0E91ACB08A95435008D54AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_PREPROCESSOR_DEFINITIONS = MAC;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../Lgi/trunk/include/common,
+					../../Lgi/trunk/include/mac/carbon,
+					/opt/local/include,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				OTHER_CFLAGS = "-DMAC";
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = /opt/local/include;
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C0E91AC508A95435008D54AB /* Build configuration list for PBXNativeTarget "EmojiMapper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0E91AC608A95435008D54AB /* Debug */,
+				C0E91AC708A95435008D54AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C0E91AC908A95435008D54AB /* Build configuration list for PBXProject "EmojiMapper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0E91ACA08A95435008D54AB /* Debug */,
+				C0E91ACB08A95435008D54AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 20286C28FDCF999611CA2CEA /* Project object */;
+}

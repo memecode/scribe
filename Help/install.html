@@ -1,0 +1,655 @@
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+	<style>
+		.param {
+			background: #ddf;
+			color: #88f;
+			font-style: italic;
+			padding: 1px 2px;
+		}
+	</style>
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>Installation and Configuration</h2></center>
+
+		<div class=helpheading><a name="mode">Install Mode</a></div>
+			There are two types of installation:
+			<table cellpadding="10" style="margin: 1em;">
+				<tr>
+					<th>Desktop
+					<td>-or-
+					<th>Portable
+				<tr>
+					<td>The desktop mode is for installation that integrates with the operating system.
+						<div class="win_specific">
+							You will automatically get the desktop mode if you install on windows with the
+							default install location:
+							<pre>c:\Program Files (x86)\Memecode\Scribe</pre>
+						</div>
+					<td>&nbsp;
+					<td>You can also elect to install Scribe to a USB drive and use the mail client at
+						whatever machine you happen to be at. Also no installer is written to the operating
+						system registry during a portable install.
+			</table>
+			When you run the program for the first time Scribe won't find any local storage
+			for email and contacts, so it will prompt you to create them. If you don't have existing
+			folders then you should click "Ok". If you do have an existing installation with mail
+			folders select "Open an existing folder", then use "..." to browse to the location of the
+			folders.<br>
+			<br>
+			Now you should be able to see a folder tree on the left, a menu along the top and a toolbar
+			beneath. At this point you'll want to start configuring
+			your identity and accounts. To start this process click File &#9654; Options. Enter your
+			identity on the first tab and then move on to the accounts tab to configure your
+			mail server settings.
+
+		<div class=helpheading><a name="args">Command Line Options</a></div>
+			When you have installed the application there are some command line options
+			you can use the start Scribe with. These are completely optional, and most users
+			will not need to use any command line parameters. This is just for reference sake:<br>
+			<br>
+			<table style="margin: 1em;" cellspacing="0" cellpadding="10" class="bordered">
+				<tr>
+					<td style="width: 30%">-portable
+					<td>Sets the application to store settings and mail folders in the same folder as the executable.
+				<tr>
+					<td>-desktop
+					<td>Sets the application to store settings and mail folders in the system appropriate location for
+						the current user. This will be in the application data section of the user's home folder.
+						The -o setting can bypass this being used.
+				<tr>
+					<td>-m&nbsp;<span class="param">address[,address]</span><br>
+						  <br>
+							-t&nbsp;<span class="param">address[,address]</span>
+					<td>New email, specify the primary addressee of the message
+				<tr>
+					<td>-f&nbsp;<span class="param">filename</span>
+					<td>New email, specify the file which should be sent as the body of the message
+				<tr>
+					<td>-b
+					<td>If present, indicates that the file is binary and should be attached.
+				<tr>
+					<td>-c&nbsp;<span class="param">address[,address]</span>
+					<td>New email, specify Carbon Copy (CC:) recipients of the message
+				<tr>
+					<td>-s&nbsp;<span class="param">subject</span>
+					<td>New email, specify the message subject (must appear in quotes). e.g.:
+						<pre>Scribe.exe -msomeone@domain.com -s"Message Subject" -bd:\temp\body.txt</pre>
+				<tr>
+					<td>-n
+					<td>Send any email created with -m, -t, -c and -s immediately.
+				<tr>
+					<td>-p&nbsp;<span class="param">max-pages</span>
+					<td>Prints max-pages of the .eml on the command line, or the whole file if
+						max-pages is 0. The printer used is configured in File &#9654; Print Setup. e.g.:
+						<pre>Scribe.exe -p1 d:\temp\message.eml</pre>
+				<tr>
+					<td>-noreg
+					<td>[Windows] Don't write anything to the registry. This disables the ability to use
+						Scribe as the default mail client. But it's useful for users putting Scribe on
+						a portable disk for use on public computers.
+				<tr>
+					<td>-send&nbsp;<span class="param">send-now</span>
+					<td>If this value is '0' any .eml file also on the command line is shown in editable form.
+						Otherwise it's sent immediately using the default SMTP server. This is part of the MAPI support
+						under Windows, but works just the same on any other platform.
+				<tr>
+					<td>-noskin
+					<td>Don't load the skinning library.
+				<tr>
+					<td>-nch
+					<td>[Linux] Don't use the KDE crash handler.
+			</table>
+			<p/>
+
+		<div class=helpheading><a name="config">Configuration</a></div>
+			Once Scribe is running you can at any time open a different set of folders using the File &#9654;
+			Open Folders menu. This closes the currently selected folder if any. You can create new folders
+			with the File &#9654; Create Folders menu.
+			<p/>
+			Every couple of weeks, depending on usage you should backup the folders (by copying them in
+			your file manager) and compact the folder using File &#9654; Compact Folders to remove unused space.
+			Otherwise your folders will just get bigger and bigger, even if you delete things.
+			<p/>
+			Then once you have the folders setup you need to configure the accounts and options.
+			Click File &#9654; Options
+			and begin filling out your identification details. The following is a 
+			description of the different options:<br>
+
+			<table class="options" cellspacing=1>
+				<tr>
+					<th colspan=2>
+						<a name="id">Identity Tab</a>
+				<tr>
+					<td class=fld>Name
+					<td>Enter your name. This is mainly used for the title bar. Your identity used in emailing
+						is enter in the Account settings window.
+						
+						<div class=inscribe>InScribe: Use the name that you registered the product with.</div>
+				
+				<tr>
+					<th colspan=2><a name="accounts">Accounts Tab</a>
+				<tr>
+					<td class="fld">Properties
+					<td>This tab has a list of accounts, which is limited to one item in i.Scribe. Click
+						properties to edit the details of the account.<br>
+						<br>
+						There is no provision in Scribe for dialing up to the internet. If you need to manually
+						connect to the internet then you should do so before sending or receiving email in Scribe.
+
+				<tr>
+					<td class="fld-inscribe">Add (InScribe)
+					<td class="inscribe">
+								InScribe: Click this to add a new account.
+				<tr>
+					<td class="fld-inscribe">Delete (InScribe)
+					<td class="inscribe">
+								InScribe: Deletes an existing account.
+				<tr>
+					<td class="fld-inscribe">Default Send Account (InScribe)
+					<td class="inscribe">
+								InScribe: Sets the default send account for all email not associated with an account
+								that has "Only send through this account" set.<br>
+								<br>
+								The "Default Send Account" should be set to the account with your main SMTP server.
+								This option will not set the default identity used to create email with; to set that use
+								the main window's Identity menu.<br>
+								<br>
+								You can send using another accounts SMTP server by opening
+								the status panel on the main window, selecting the account, right click and "Send"
+
+				<!-------------------------------------------------------------------------->
+				<tr>
+					<th colspan=2><a name="general">General Tab</a>
+				<tr>
+					<td class="fld">Quote when replying with ???
+					<td>This option allows you to quote the contents of the incoming mail when 
+							replying. This adds the specified characters to the start of each line. 
+							Typically the string "> " if used for quoting.
+						
+				<tr>
+					<td class="fld">Append signatures to replies and forwards
+					<td>Automatically adds your signature to the bottom of a reply or forward.
+				
+				<tr>
+					<td class="fld">Reply/Forward Format
+					<td>Click the "..." button to edit the format of replies and forwarded email.
+							Click "Reset" to revert your changes to the default configuration.
+							Currently the formatting is duplicated for plain text and HTML email.
+							To put actual HTML tags in the HTML reply/forward template you will have
+							to turn the markup into entities, i.e. instead of &lt;b&gt; put
+							&amp;lt;b&amp;gt;. (One day there will be a HTML editor, and this will be 
+							more simple).<br>
+							<br>				
+							Signatures can contain commands that are executed when
+							the signature is added to an email. Otherwise they are plain text, in utf-8 format.
+							These commands are formatted in XML and
+							are inserted amongst the text of the signature. The following commands are 
+							available:
+							<ul>
+								<li> Print a random paragraph from the file specified:
+									<pre>&lt;random-line filename="filename.ext"&gt;</pre>
+								<li> Insert the file specified:
+									<pre>&lt;include-file filename="filename.ext"&gt;</pre>				
+								<li> Set the cursor position:
+									<pre>&lt;cursor&gt;</pre>
+							</ul>
+				<tr>
+					<td class="fld">Default To/Cc/Bcc
+					<td>This changes the default addressing mode for reply all messages.
+				
+				<tr>
+					<td class="fld">Populate recipients from clipboard
+					<td>If this option if switched on Scribe checks the clipboard when a new email
+							is created. If a string with a '@' symbol less than 100 characters long is
+							present it assumes its an email address and puts it in the recipient's field
+							by default. This is really useful for emailing to an address without a hyperlink.
+							Copy the address to the clipboard, hit new mail... and off you go. Sometimes 
+							you'll have an email address in the clipboard that's not who you want to send
+							to, in which case you have to delete the recipient. Or turn off the option.
+				
+				<tr>
+					<td class="fld">Minimize to tray icon
+					<td>This just hides the main window while minimized, so the window doesn't clutter 
+							the start bar.
+				
+				<tr>
+					<td class="fld">Check default email client on startup
+					<td>Win32 supports a default email client for mailto: URL's. If this option is set
+							then Scribe will monitor that setting on startup and prompt you if it doesn't 
+							point to Scribe.
+							
+				<tr>
+					<td class="fld">Confirm item delete
+					<td>Switches on confirmation dialogs for deleting items.
+					
+				<tr>
+					<td class="fld">New Email Sound
+					<td>If this points to a wav file then that sound will be played when new email 
+					arrives.
+				
+				<tr>
+					<td class="fld">Popup notifcation when new mail arrives
+					<td>When new mail arrives you can optionally have a small window listing the items
+							display itself.
+				
+				<tr>
+					<td class="fld">Mark mail read after
+					<td>Automatically marks email read after 'x' number of seconds. Where zero will mark
+							the item read immediately.
+				
+				<tr>
+					<td class="fld">Automatically delete executable attachments
+					<td>This option tells Scribe to remove attachments that contain native executable
+							code. Commonly the only time you receive this in an email is when you receive
+							a virus. This option allows you to head it off at the pass and never have to
+							worry about it again. Esp. useful option for people that know enough to be
+							dangerous (i.e. can save and execute an attachment) but not know it's a virus. If
+							you call someone else for tech support that means you!
+				
+				<tr>
+					<td class="fld">New mail icon in the system tray should blink
+					<td>This option makes the new mail icon blick in the system trak. So you'll notice it
+							sooner.
+				
+				<!-------------------------------------------------------------------------->
+				<tr>
+					<th colspan=2><a name="connect">Connection Tab</a>
+			
+				<tr>
+					<td class="fld">SOCKS5 server/username/password
+					<td>If you access the internet through a firewall running socks5 then set this
+						to the address of the firewall, otherwise leave it blank. The 
+						username/password is only required for authenticated access. Use if required.
+				
+				<tr>
+					<td class="fld">Check for dialup connection before receive
+					<td>If you use a dialup connection to the internet this option will stop Scribe
+						from automatically checking email while there is no dialup. If you access
+						the mail server over a LAN or broadband connection this switch this off.
+				
+				<tr>
+					<td class="fld">Download mail on startup
+					<td>This option will make Scribe check mail as soon as it has loaded.
+				
+				<tr>
+					<td class="fld">HTTP Proxy
+					<td>This is your HTTP proxy in the form:
+							<pre>&lt;server&gt;[:&lt;port&gt;]</pre>
+							(Or blank if you have direct internet access). The shared calendaring
+							and <a href='#popoverhttp'>PopOverHttp</a> protocols use this field.
+				
+				<tr>
+					<td class="fld-inscribe">Default receive action
+					<td class="inscribe">InScribe: Specify what the "receive mail" button does.</div>
+			
+
+				<!-------------------------------------------------------------------------->
+				<tr>
+					<th colspan=2><a name="appear">Appearance Tab</a>
+
+				<tr>
+					<td class="fld">Editor Font
+					<td>Select the font to use in the preview pane and the mail compose/view window.
+				
+				<tr>
+					<td class="fld">Wrap lines at ??
+					<td>Wraps the text in the mail window at a specific column or at the edge of the
+						window if no value is supplied. Replies are wrapped to the column value 
+						specified or the default of 76 if nothing is specified.
+				
+				<tr>
+					<td class="fld">Default Alternative
+					<td>This sets the preferred alternative part of the email to view, either text or
+							HTML.
+				
+				<tr>
+					<td class="fld">Interface Language
+					<td>This overrides the operating system's language setting.
+				
+				<tr>
+					<td class="fld">Interface Font Size
+					<td>This adjusts the size of the main font used by Scribe.
+				
+				<tr>
+					<td class="fld">Use Glyph Substitution when displaying text
+					<td>When displaying international charsets it's often the case that the character to
+							be displayed is not actually in the font being used. So by switching this option
+							on Scribe will find the character in another font and use that instead. This has
+							the effect of displaying more accents and strange characters at the cost of more
+							memory usage and a small speed hit when a new character is needed. Some systems,
+							like Windows 95, 98 and NT don't have great fonts and will display characters out
+							of alignment, and some computers are too old and slow to do this sort of thing.
+							So you have the option to turn it off. Btw Windows XP does Glyph Sub. by default
+							so you can't turn it off under XP.
+				<tr>
+					<td class="fld">Show unread in bold
+					<td>Shows the message as bold in the main list view when still unread.
+					
+				<tr>
+					<td class="fld">Preview first lines of email
+					<td>Shows the first few lines of an email in the main window's list. The text is
+							in a smaller font coloured blue. Often you can tell the basic content of the
+							message from the first few lines and decide whether to read the email or discard
+							it.
+					
+				<tr>
+					<td class="fld">Show text on toolbars
+					<td>Puts little text labels under the toolbar buttons.
+				
+				<tr>
+					<td class="fld">Draw grid
+					<td>Draws a grid in the main windows's item list.
+				
+				<tr>
+					<td class="fld">Date format
+					<td>Choose a format you want to see your dates in. Under windows "auto" uses the system
+							settings. Under other OS's that don't have a system setting for this auto does
+							"d/m/yyyy" which is the default in my country ;) However all the other settings
+							override any default.
+				<tr>
+					<th colspan=2><a name="other">Other Tab</a>
+				
+				<tr>
+					<td class="fld">Connection log file format
+					<td>Sets the type of data to store when logging the data transfered between the
+						client and the mail server. Usually "bytes only" is ok. But sometimes when non-
+						ascii data is being transfered the "hex dump" format is useful.
+
+				<tr>
+					<td class="fld">Log file
+					<td>If you need to see the client/server dialog that Scribe goes through when 
+							connected to a server then set this to a file name (it doesn't have to exist
+							by default). Then as Scribe sends and receives information it will write a
+							copy to this file. However nowadays the status window contains a visual log
+							of the transaction so it's easier to see whats going on. So this option is 
+							not really needed anymore.
+
+				<tr>
+					<td class="fld">Account connection debug logging
+					<td>If you're having connection issues this will log lots of information during the
+							online phase, which may help to diagnose connection related issues. Between
+							sessions you should delete the Scribe.txt file as it accumulates a lot of information,
+							and if left unchecked would balloon out to many MB's.
+							
+				<tr>
+					<td class="fld">SSL connection debug logging
+					<td>This adds an extra layer of logging in the SSL code. The output goes into the
+						system log (available though the console and also 'scribe.txt' in the same folder
+						as the options).
+							
+				<tr>
+					<td class="fld">Spell Check
+					<td>This turns on the spell checker. Dictionaries will be installed on demand, however
+						an internet connection is required to download the new dictionary. Once installed the
+						spell check will work offline.
+					
+				<tr>
+					<td class="fld">Language
+					<td>This section lets you set the dictionary used for spell checking. On Windows and Linux
+						dictionaries will be installed on demand if you have an internet connection. On Mac the
+						native spell check is used, and any available dictionaries are listed here.							
+						
+				<tr>
+					<td class="fld">Dictionary
+					<td>(unused?)
+						
+				<tr>
+					<td class="fld">Check online for new versions
+					<td>Allows you to update the software every so often to the latest build.
+					
+				<tr>
+					<td class="fld">Every
+					<td>Sets the frequency to check for new builds.
+					
+				<tr>
+					<td class="fld">Check for beta releases too
+					<td>If selected then you will also be notified of beta releases.
+
+				<tr>
+					<td class="fld">Don't adjust dates to the local time zone
+					<td>Scribe attempts to display dates in the current time zone. If this is a problem or
+							you don't like that, then you can switch it off here.
+
+				<tr>
+					<td class="fld">Don't show Emoji
+					<td>Turns of <a href="https://en.wikipedia.org/wiki/Emoji">Emoji</a> display. When viewing 
+							text or HTML email that contains Emoji unicode
+							Scribe by default will insert image representations of those characters. If this is
+							causing problems then you can switch it off here.
+
+				<tr>
+					<td class="fld">Use Growl
+					<td>Turns on support for <a href="http://growl.info/">Growl</a> notifications.
+
+				<tr>
+					<td class="fld">Resize image attachments
+					<td>Turns on support for resizing images before sending as attachments.
+							Files will be turned into JPEGs using the following quality and size restrictions.
+							Requires the libjpeg component to be installed.
+
+			</table>
+
+			The settings for each account:
+
+			<table class="options" cellspacing=1>
+
+
+				<!-------------------------------------------------------------------------->
+				<tr>
+					<th colspan=2><a name="acc_id">Identity</a>
+				<tr>
+					<td class="fld">Name
+					<td>Enter a descriptive name for the account.							
+				<tr>
+					<td class="fld-inscribe">Identity Name (InScribe)
+					<td class="inscribe">
+								InScribe: Enter a name to associated with this account.
+				<tr>
+					<td class="fld-inscribe">Email Address (InScribe)
+					<td class="inscribe">
+								InScribe: Enter the email to associated with this account.
+				<tr>
+					<td class="fld-inscribe">Reply To (InScribe)
+					<td class="inscribe">
+								InScribe: Enter the account specific reply to addres -or- leave blank to use
+								the email address above.
+				<tr>
+					<td class="fld-inscribe">Only Send Through This Account (InScribe)
+					<td class="inscribe">The "Only Send Through This Account" option forces replies to email received
+							on this account to go through the Send server settings for this account as well.
+							Otherwise they will be sent through the default outgoing server.
+				<tr>
+					<td class="fld-inscribe">Signature XML (InScribe)
+					<td class="inscribe">
+							Enter an account specific signature.
+
+
+				<!-------------------------------------------------------------------------->
+				<tr>
+					<th colspan=2><a name="acc_send">Send</a></b>
+				<tr>
+					<td class="fld">Server
+					<td>Configure your outgoing SMTP server host name.
+							
+				<tr>
+					<td class="fld">Port
+					<td>Enter a non default port for your SMTP server if needed. Leave blank for
+							the default port.
+				<tr>
+					<td class="fld">Domain
+					<td>The optional domain is used to sign on to the SMTP server. In most cases leaving it
+							blank is ok. But some SMTP servers are finicky about it, so in that case you
+							should enter the domain of your connection, which is usually the part of your
+							email address after the '@' sign.
+							
+				<tr>
+					<td class="fld">Authenticate
+					<td>If your SMTP server requires authentication, switch on <fld>Authenticate</fld>				
+				
+				<tr>
+					<td class="fld">Username
+					<td>Enter your <fld>Username</fld> if required.
+				
+				<tr>
+					<td class="fld">Password
+					<td> Enter your <fld>Password</fld> if required.
+
+				<tr>
+					<td class="fld">Authentication Type
+					<td> If the default auth type doesn't work you can override it here.
+				
+				<tr>
+					<td class="fld">Preferred charsets for sending
+					<td>If you want to override the default charset used in sending, you can configure one or
+							two on the send tab. Scribe searches through the available charsets when encoding an
+							outgoing message looking for charsets that can encode all the characters in the message.
+							The <fld>prefered charset</fld> just forces this process to look at the specified charsets first
+							before checking through the list of all installed charsets. Thus if the message can be
+							displayed in one of your prefered charsets it will be encoded in that rather than one
+							of the other charsets available.<br>
+							<br>
+							If the charset you want to send with is not in the list then it's not 
+							available for outgoing messages.
+
+				<tr>
+					<td class="fld">SSL
+					<td> Chose which type of security layer to use on the connection.
+							None, STARTTLS or direct SSL.
+							
+							Note: Any connection requiring SSL may cause Scribe to
+							request a download of the SSL libraries if they are not present in your system. This
+							will appear as a red bar in the main window with an "Install" button.
+
+				<!-------------------------------------------------------------------------->
+				<tr>
+					<th colspan=2><a name="acc_receive">Receive</a>
+
+				<tr>
+					<td class="fld">Mail Box Type
+					<td>Set the mail box type to the <fld>protocol</fld> that you use to receive mail. Usually this is 
+							POP3, which you should try if you're not sure.
+							The IMAP4 support comes in 2 flavours, "fetch" which retrieves email from the 
+							server in much the same way that POP3 does. It doesn't allow managing of mail 
+							on the server. And full IMAP which is for managing your mail on the server, while being able
+							to read it locally via caching.
+							The "Calendar" protocol is a deprecated method of connecting to the MemeCode
+							<a href='http://www.memecode.com/scribe/server.php'>Groupware Server</a>. For users
+							stuck behind a HTTP only firewall there is a protocol for accessing
+							<a href='#popoverhttp'>POP over HTTP</a>. On windows you can also fetch mail from
+							a MAPI source. There is no support for MAPI on non-Windows platforms (complain to
+							Microsoft not me).
+				
+				<tr>
+					<td class="fld">Server
+					<td>Enter in the address of your <fld>server</fld>.
+							Most servers are similar to:
+							<pre>mail.isp.com</pre>
+				
+				<tr>
+					<td class="fld">Port
+					<td>You can specify a non-default port here. Otherwise leave blank for the default port.
+
+				<tr>
+					<td class="fld">Username
+					<td>Enter your <fld>User Name</fld>.
+					
+				<tr>
+					<td class="fld">Password
+					<td>Enter your <fld>Password</fld>. If you don't enter a password then
+							each time you run Scribe you will be asked to enter the password once, and then
+							it will remain in memory until Scribe exits.<br>
+							<br>
+							When you open the settings pane again the password will appear as "(Password saved)".
+							This is to protect it from other applications which can read the contents of the field.
+				
+				<tr>
+					<td class="fld">Leave on server
+					<td>Means that new email will be downloaded but not deleted from
+							the server. All email currently on the server is stored as a list of unique 
+							identifiers in the Scribe options file. That way scribe can track the old mail on
+							the server and download ones it hasn't seen yet. If the options file goes missing
+							all mail will be considered "new" and be downloaded at the next connection.<br>
+
+				<tr>
+					<td class="fld">Delete After
+					<td>This option if selected will delete email on the server after a set number of days.
+					
+				<tr>
+					<td class="fld">Delete after download is larger than ?? KB's.
+					<td>This setting allows you to delete large email off the server after they have been downloaded.
+							Leaving space for new email. While keeping smaller emails on the server as well.
+					
+				<tr>
+					<td class="fld">Check every
+					<td>Defines how many minutes between an automatic check for new email.
+							
+				<tr>
+					<td class="fld">Don't download email larger than ?? KB's
+					<td>Limits the size of incoming email. If some email is larger than 
+							this it will remain on the server until you do something about it using the "Preview on Server" 
+							feature.
+							
+				<tr>
+					<td class="fld">Destination folder
+					<td>Configures a non-default inbox for this account. If this is blank 
+							then by default the email goes into the /Inbox folder specified in the sub folder
+							locations dialog.
+
+				<tr>
+					<td class="fld">Authentication Type
+					<td>Allows you to request a non-default authentication type.
+				
+				<tr>
+					<td class="fld">SSL
+					<td>Allows you to chose which type of security layer to use on the connection.
+							None, STARTTLS or SSL from the start.<br>
+
+				<tr>
+					<td class="fld">Use secure authentication
+					<td>(Not implemented at the moment)
+						
+			</table>
+						
+		<div class=helpheading><a name="uninstall">Uninstalling</a></div>
+			How you uninstalling Scribe is dependent on which method you used to install it. If you used
+			the zip file to install Scribe with then you can just delete the directory containing Scribe
+			and you're done.
+			<p>
+			If you used the self contained install exe then go into Scribe's entry in the Start Menu and
+			select "uninstall".
+			<p>
+			Only a few unavoidable settings are left in the registry and no dll's or other files 
+			are put into system directories. If you want to keep your folders and email then don't 
+			delete the folders.mail file in Scribe's directory.
+			<p>
+			The registry settings left behind are:
+			<ul>
+				<li> HKEY_CURRENT_USER\SOFTWARE\Memecode\Scribe
+				<li> HKEY_CURRENT_USER\SOFTWARE\Clients\Mail\Scribe (IE intergration)
+				<li> HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Mail\Scribe (IE intergration)
+				<li> HKEY_CLASSES_ROOT\mailto (If you have selected Scribe as the default client)
+			</ul>
+			These are unavoidable for system intergration and don't impact system performance 
+			after you remove Scribe. HKEY_CLASSES_ROOT\mailto can be set to something else by
+			changing Control Panel &#9654; Internet Options &#9654; Programs &#9654; Email.
+
+			<center>
+				&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a>
+			</center>
+
+	</div>
+
+
+</font>
+</body>
+</html>

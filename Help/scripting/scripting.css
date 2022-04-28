@@ -1,0 +1,77 @@
+h1 {
+	width: 100%;
+	background: #447;
+	color: white;
+	text-align: center;
+	margin: 0px;
+	padding: 0.5em;
+}
+
+body {
+	margin: 0px;
+}
+
+td {
+	vertical-align: top;
+}
+
+div {
+	padding: 1em;
+}
+
+div.menu {
+	padding: 0.2em 0px 0.2em 0px;
+	background: #aac;
+	text-align: center;
+}
+
+div.menu a {
+	color: white;
+	padding: 0px 0.5em 0px 0.5em;
+}
+
+div.menu a:hover {
+	background: #bbd;
+}
+
+span.exp {
+	color: #a00;
+}
+
+span.state {
+	color: #0a0;
+}
+
+span.name {
+	color: #00a;
+}
+
+span.opt1 {
+	color: #888;
+}
+
+span.opt2 {
+	color: #888;
+}
+
+.op {
+	padding-right: 1em;
+	text-align: center;
+}
+
+ul {
+	margin: 0px;
+}
+
+h4 {
+	margin: 1em 0 0 0;
+}
+
+table.idx {
+	margin: 2em;
+}
+
+table.idx td {
+	padding: 0.5em;
+	background: #eef;
+}

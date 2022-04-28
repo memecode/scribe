@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1052.3622"
+   height="744.09448"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="Email.svg"
+   inkscape:export-filename="/Users/matthew/Code/Scribe-Branches/v2.00/Resources/Icons/Email.png"
+   inkscape:export-xdpi="38.262558"
+   inkscape:export-ydpi="38.262558">
+  <defs
+     id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3856">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0"
+         id="stop3858" />
+      <stop
+         style="stop-color:#f7f3e7;stop-opacity:1"
+         offset="1"
+         id="stop3860" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3838">
+      <stop
+         style="stop-color:#bdbdbd;stop-opacity:1"
+         offset="0"
+         id="stop3840" />
+      <stop
+         style="stop-color:#dbdbdb;stop-opacity:1"
+         offset="1"
+         id="stop3842" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3830">
+      <stop
+         style="stop-color:#f7f7f7;stop-opacity:1"
+         offset="0"
+         id="stop3832" />
+      <stop
+         style="stop-color:#dcdcdc;stop-opacity:1"
+         offset="1"
+         id="stop3834" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3822">
+      <stop
+         style="stop-color:#f9f9f9;stop-opacity:1"
+         offset="0"
+         id="stop3824" />
+      <stop
+         style="stop-color:#e8e8e8;stop-opacity:1"
+         offset="1"
+         id="stop3826" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3822"
+       id="linearGradient3828"
+       x1="511.33478"
+       y1="817.5191"
+       x2="511.1109"
+       y2="1000.9293"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-40.95648,-108.41421)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3838"
+       id="linearGradient3844"
+       x1="543.64294"
+       y1="868.43365"
+       x2="542.97333"
+       y2="675.6485"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-40.95648,-108.41421)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3830"
+       id="linearGradient3848"
+       gradientUnits="userSpaceOnUse"
+       x1="503.6579"
+       y1="780.01691"
+       x2="502.98825"
+       y2="1002.7908"
+       gradientTransform="matrix(0.98282127,0,0,0.96597629,-32.150567,-80.911788)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3856"
+       id="linearGradient3862"
+       x1="381.09857"
+       y1="158.91991"
+       x2="400.83774"
+       y2="538.81488"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.91443421,0,0,0.95325962,31.156244,291.1509)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3830"
+       id="linearGradient3896"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.98282127,0,0,0.96597629,-32.150567,-80.911788)"
+       x1="503.6579"
+       y1="780.01691"
+       x2="502.98825"
+       y2="1002.7908" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3830"
+       id="linearGradient4154"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.98282127,0,0,0.96597629,-32.150567,-80.911788)"
+       x1="503.6579"
+       y1="780.01691"
+       x2="502.98825"
+       y2="1002.7908" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3830"
+       id="linearGradient4156"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.98282127,0,0,0.96597629,-32.150567,-80.911788)"
+       x1="503.6579"
+       y1="780.01691"
+       x2="502.98825"
+       y2="1002.7908" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3830"
+       id="linearGradient4160"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.98282127,0,0,0.96597629,-165.91974,-591.14471)"
+       x1="503.6579"
+       y1="780.01691"
+       x2="502.98825"
+       y2="1002.7908" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.0025792"
+     inkscape:cx="533.10949"
+     inkscape:cy="383.60277"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     inkscape:window-width="1293"
+     inkscape:window-height="956"
+     inkscape:window-x="151"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Back"
+     style="display:inline">
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#5f5f5f;stroke-width:5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 472.51118,71.612711 c -27.78283,0.0014 -69.99392,30.642749 -69.99392,30.642749 l -233.37629,156.21486 0,4.04358 0,326.23474 606.83528,0 0,-330.27832 -234.9254,-157.19416 c 0,0 -40.75684,-29.664459 -68.53967,-29.663449 z"
+       id="path4146"
+       inkscape:connector-curvature="0" />
+    <g
+       transform="translate(0,-308.2677)"
+       id="g3870">
+      <path
+         style="fill:#ffffff;fill-opacity:1;stroke:#b8b8b8;stroke-width:3.54330707;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+         d="M 171.72523,566.39531 402.43671,411.87167 c 0,0 41.71549,-30.33207 69.17823,-30.33351 27.46274,-0.001 67.7324,29.35488 67.7324,29.35488 l 232.22512,155.50227 0,326.72598 -599.84723,0 z"
+         id="path3872"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cczccccc" />
+      <path
+         sodipodi:nodetypes="cczccccc"
+         inkscape:connector-curvature="0"
+         id="path3874"
+         d="M 176.87754,570.93821 403.62568,421.67204 c 0,0 40.99888,-29.30006 67.98984,-29.30145 26.99096,-9.7e-4 66.56884,28.35612 66.56884,28.35612 l 228.23579,150.2115 0,315.60956 -589.54261,0 z"
+         style="fill:url(#linearGradient3848);fill-opacity:1;stroke:#b8b8b8;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         style="fill:none;stroke:#aeaeae;stroke-width:0.99804121px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 192.99285,560.0319 558.27931,0"
+         id="path3876"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+  <g
+     inkscape:label="Inside"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-308.2677)"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <path
+       sodipodi:nodetypes="cczcccc"
+       inkscape:connector-curvature="0"
+       id="path3797"
+       d="m 171.72523,571.84733 230.71148,154.52365 c 0,0 41.71549,30.3321 69.17823,30.3335 27.46274,0 67.7324,-29.3549 67.7324,-29.3549 l 230.66948,-159.45801 -598.29159,1.22972 z"
+       style="fill:url(#linearGradient3844);fill-opacity:1;stroke:none" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Paper"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <path
+       transform="translate(0,-308.2677)"
+       style="fill:url(#linearGradient3862);fill-opacity:1;stroke:#000000;stroke-width:0.93364513px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       d="m 257.03698,802.34549 c 0,0 -1.5578,-141.28276 -4.67339,-185.12913 -3.1156,-43.84638 -18.69358,-168.88973 -18.69358,-168.88973 0,0 160.45324,-4.87183 236.78539,-9.74364 76.3321,-4.87182 210.3027,-17.86333 210.3027,-17.86333 0,0 -4.6734,133.16304 -4.6734,193.24882 0,60.08576 15.578,188.37701 15.578,188.37701 l 0,0 z"
+       id="path3854"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:4px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       x="263.52716"
+       y="177.62192"
+       id="text3946"
+       sodipodi:linespacing="125%"
+       transform="matrix(0.9989476,-0.04586607,0.04586607,0.9989476,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3948"
+         x="263.52716"
+         y="177.62192"
+         style="font-size:10px">Thanks for the replly... actually I am using the 1.90 version and I put in a </tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="190.12192"
+         style="font-size:10px"
+         id="tspan4008">html dll from your site. It is showing images now, but it doesnt keep them </tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="202.62192"
+         style="font-size:10px"
+         id="tspan4010">in cache, ie keeps downloading them everytime I open it and its darn slow. </tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="215.12192"
+         style="font-size:10px"
+         id="tspan4012">Also tried to install all other plugins from ur site (especially aspell) but it </tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="227.62192"
+         style="font-size:10px"
+         id="tspan4014">shows loaded, and &quot;aspell doesnt seem to be installed&quot; message??? Also </tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="240.12192"
+         style="font-size:10px"
+         id="tspan4016">its there a way to show the send/recieve progress bar on the top itself?</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="252.62192"
+         id="tspan3950"
+         style="font-size:10px" /><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="265.12192"
+         id="tspan3952"
+         style="font-size:10px">Cheers</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="277.62192"
+         id="tspan3954"
+         style="font-size:10px" /><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="290.12192"
+         id="tspan3956"
+         style="font-size:10px">user</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="302.62192"
+         id="tspan3958"
+         style="font-size:10px" /><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="315.12192"
+         id="tspan3960"
+         style="font-size:10px"> ---------- Original Message ----------</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="327.62192"
+         id="tspan3962"
+         style="font-size:10px">From: Matthew Allen (fret@memecode.com)</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="340.12192"
+         id="tspan3964"
+         style="font-size:10px">Subject: Re: Feedback</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="352.62192"
+         id="tspan3966"
+         style="font-size:10px">Date: 10/31/2011 2:13:04a</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="365.12192"
+         id="tspan3968"
+         style="font-size:10px" /><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="377.62192"
+         id="tspan3970"
+         style="font-size:10px">---------- Original Message ----------</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="390.12192"
+         id="tspan3972"
+         style="font-size:10px">To:  (fret@memecode.com)</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="402.62192"
+         id="tspan3974"
+         style="font-size:10px">From: Arun (arungn@dr.com)</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="415.12192"
+         id="tspan3976"
+         style="font-size:10px">Subject: Feedback</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="427.62192"
+         id="tspan3978"
+         style="font-size:10px">Date: 30/10/2011 9:05:02p</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="440.12192"
+         id="tspan3980"
+         style="font-size:10px" /><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="452.62192"
+         id="tspan3982"
+         style="font-size:10px">&gt; The easiest and fastest email client I have used, great work!! Although I </tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="465.12192"
+         id="tspan3984"
+         style="font-size:10px">&gt; cant get it to show inline images in mails, although it is downloading </tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="477.62192"
+         id="tspan3986"
+         style="font-size:10px">&gt; them, am i missing someting?</tspan><tspan
+         sodipodi:role="line"
+         x="263.52716"
+         y="490.12192"
+         id="tspan4006"
+         style="font-size:10px" /></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Fore"
+     style="display:inline">
+    <path
+       transform="translate(0,-308.2677)"
+       style="fill:#ffffff;fill-opacity:1;stroke:#b8b8b8;stroke-width:3.54330707;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;display:inline"
+       d="M 171.72523,570.39531 C 299.38028,657.20312 359.5382,696.01558 471.7574,772.87668 592.23679,691.98358 653.69818,647.17396 770.79464,569.5433 l 0.77782,323.57799 -599.84723,0 z"
+       id="rect2985"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       transform="translate(0,-308.2677)"
+       sodipodi:nodetypes="cccccc"
+       inkscape:connector-curvature="0"
+       id="path3846"
+       d="M 176.87754,576.93821 C 300.70862,659.88365 379.83901,709.15385 468.6383,778.17924 567.37462,709.96875 677.62232,633.45427 764.99942,575.45325 l 1.42073,311.09452 -589.54261,0 z"
+       style="fill:url(#linearGradient3896);fill-opacity:1;stroke:#b8b8b8;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+    <path
+       transform="translate(0,-308.2677)"
+       style="fill:#ffffff;fill-opacity:1;stroke:#b8b8b8;stroke-width:3.54330707;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;display:inline"
+       d="M 171.72523,889.97844 402.43671,735.45479 c 0,0 41.71549,-30.3321 69.17823,-30.3335 27.46274,0 67.7324,29.3549 67.7324,29.3549 l 232.22512,155.50225 0,2.72605 -599.84723,0 z"
+       id="path3799"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cczccccc" />
+    <path
+       transform="translate(0,-308.2677)"
+       sodipodi:nodetypes="czcccc"
+       inkscape:connector-curvature="0"
+       id="path3801"
+       d="m 406.45408,739.12681 c 0,0 39.29414,-28.57692 65.16283,-28.57824 25.86868,0 63.80092,27.65627 63.80092,27.65627 l 228.43705,153.01636 -584.56644,0 z"
+       style="fill:url(#linearGradient3828);fill-opacity:1;stroke:#b8b8b8;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+  </g>
+  <flowRoot
+     xml:space="preserve"
+     id="flowRoot3938"
+     style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Sans;font-style:normal;font-weight:normal;font-size:4px;line-height:125%;letter-spacing:0px;word-spacing:0px"><flowRegion
+       id="flowRegion3940"><rect
+         id="rect3942"
+         width="48.524113"
+         height="10.4917"
+         x="280.65295"
+         y="172.29684" /></flowRegion><flowPara
+       id="flowPara3944"></flowPara></flowRoot></svg>

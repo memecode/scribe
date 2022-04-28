@@ -1,0 +1,6 @@
+cd Code\Py
+"c:\program files\python27\python"  win32_pre_build_step.py
+cd ..
+rc $(InputName)
+cd ..
+copy Code\$(InputName).res $(OutDir)

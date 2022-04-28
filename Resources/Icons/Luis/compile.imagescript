@@ -1,0 +1,85 @@
+IconPx = 32;
+Cwd = PathJoin(CurrentScript(), "..");
+Files = 
+{
+	"scribe-new-mail.png",
+	"scribe-new-contact.png",
+	"scribe-send-mail.png",
+	"scribe-receive-mail.png",
+	"scribe-reply.png",
+	"scribe-reply-all.png",
+	"scribe-forward.png",
+	"scribe-print.png",
+
+	"scribe-prev.png",
+	"scribe-next.png",
+
+	"scribe-trash.png",
+	"scribe-save.png",
+	"scribe-save-close.png",
+	"scribe-attach-file.png",
+	"scribe-preview-mail.png",
+	"scribe-calendar.png",
+	"scribe-spam.png",
+	"scribe-search.png",
+	
+	"scribe-high-priority.png",
+	"scribe-low-priority.png",
+	"scribe-read-receipt.png",
+	"scribe-threads.png",
+	
+	"scribe-cal-day.png",
+	"scribe-cal-week.png",
+	"scribe-cal-month.png",
+	"scribe-cal-year.png",
+	"### scribe-cal-undefined.png",
+	"scribe-cal-prev.png",
+	"scribe-cal-back.png",
+	"scribe-cal-today.png",
+	"scribe-cal-forward.png",
+	"scribe-cal-next.png",
+	"scribe-config.png",
+
+	"scribe-bounce.png",
+	"scribe-cal-todo.png",
+	"scribe-xgate.png",
+	"scribe-console-nomsg.png",
+	"scribe-console.png",
+};
+
+Create(IconPx*Files.Length, IconPx, 32);
+
+Print("Compiling " + Files.Length + " icons\n");
+
+x = 0;
+for (i=0; i<Files.Length; i++)
+{
+	File = Files[i];
+	FullPath = PathJoin(Cwd, File);
+	if (PathExists(FullPath))
+	{
+		Icon = Load(FullPath);
+		if (Icon)
+		{
+			Print("Loaded '"+File+"' @ "+x+"px (Index="+i+")\n");
+			Blt(GetDocument(), x, 0, Icon);
+			x += IconPx;
+		}
+		else
+		{
+			Print("Failed to load '"+File+"'\n");
+			i = 1000;
+		}
+	}
+	else
+	{
+		Print("Skipping '"+File+"' @ "+x+"px (Index="+i+")\n");
+		x += IconPx;
+	}
+}
+
+OutPath = PathJoin(Cwd, "..", "..", "xgate-icons-32.png");
+if (Save(OutPath, "Transparent=0"))
+{
+	Print("Saved to '"+OutPath+"'\n");
+}

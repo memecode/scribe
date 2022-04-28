@@ -1,0 +1,141 @@
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>Plugins</h2></center>
+
+		<div class=helpheading>Plugins</div>
+			Scribe has a reasonable plugin interface for a few of the common things that plugins
+			are useful for. The main reason that some things come as plugins and are not built 
+			directly into Scribe is that they would increase the size of the main download 
+			significantly. Currently Scribe is quite a small download, and I'd like to keep it that
+			way, without limiting the functionality too much.
+			<p/>
+			That said, the plugins are not the most stable of things. They will usually only work
+			with the very latest build of Scribe, so you have to upgrade them every time you
+			update the main executable file. I don't 
+			increment version numbers until I actually change the functionality of the plugin, but
+			I do recompile them against the latest Scribe/Lgi and upload them.
+			<p/>
+			I'm working towards a more stable C++ ABI but it's not there yet. Mostly you'll 
+			find that it will break every other version of Scribe rather than EVERY version. By
+			v2 it should remain stable over many builds.
+			<p/>
+			If your plugin doesn't load, i.e. the plugins window says "not a plugin", then chances
+			are that you need to grab the latest .dll/.so/.dylib. All your settings remain during this 
+			period so once the plugin is updated, everything will start working again. I'm looking
+			into an auto update function for downloading the latest build of the plugins being used.
+			<p/>
+
+		<div class=helpheading><a name="install">Installing/Uninstalling</a></div>
+			To install a plugin, download the distribution archive from the website and unzip it 
+			into the Scribe directory. Generally they create their own little sub folder to keep
+			things neat. Then open the plugins window using the File -> Plugins menu. Then click
+			"Add" and a list of local plugins should be displayed. Pick the new plugin from the list
+			and a status message will appear.
+			<p/>
+			To uninstall the plugin, open the plugins window, select the plugin and click "Remove".
+			Then you can delete the plugins sub-directory.
+			<p/>
+			Some plugins have properties that you can edit. To access these just double click the
+			plugin in the plugins window.
+			<p/>
+
+		<div class=helpheading><a name="autozip">AutoZip</a></div>
+			The autozip plugin automatically zips outgoing attachments to email. This saves on network
+			bandwidth and folder storage requirements. You can specify a set of file types that are
+			not zipped, typically files that are already heavily compressed, like JPEG, PNG and video
+			data. The format of this property is a space or colon separated list of file maskes. e.g:
+			<pre>*.zip *.png *.jpg</pre>
+			would make a good default setting.
+			<p/>
+			All zipped attachments are stored in the same zip, called "Attachments.zip".
+			<p/>
+
+		<div class=helpheading><a name="gpg">GnuPG/AutoGPG</a></div>
+			These plug-ins integrate <a target='_top' href='http://www.gnupg.org'>GnuPG</a> 
+			into Scribe to allow encryption, signing and decryption support.
+			<p/>
+			Both these plugins will need to find the location of the gpg executable before they
+			can function. The places that the plugin looks for gpg are:
+			<ul>
+				<li> [Win32] HKEY_CURRENT_USER\Software\GNU\GNUPG for a key 'gpgProgram'
+				<li> The system path
+				<li> ../GnuPG relative to Scribe's exe file.
+			</ul>
+			This allows some flexibility in where you install GnuPG, even on systems where it is
+			not installed at all but merely next to Scribe in the directory tree, like on a key
+			chain drive. The "Home Dir" folder should point to the folder containing your key ring
+			files. It can be a relative path to the location of the scribe executable.
+			<p/>
+			Both of these plugins operate solely on the text body of the message and don't affect 
+			the attachments of the message. This is a limitation of Scribe's architecture and should
+			be removed after v2.
+			<p/>
+			The GnuPG plugin is a text pipe plugin that appears in the mail window to provide manual
+			encryption functions.
+			<p/>
+			The AutoGPG plugin is an automated encrypt/decrypt that has to be associated with a 
+			contact record to do anything. It automatically encrypts outgoing messages to that contact
+			and decrypts the incoming messages. You will need to install the contact's public key in
+			your gpg keyring for this to work. Then open the contact and click on the plugins tab, 
+			there you will see "AutoGPG" (if it's loaded) and an empty checkbox. Turn on the checkbox
+			to associate AutoGPG with the contact.
+			<p/>
+			
+		<div class=helpheading><a name="html">Html</a></div>
+			The html plugin loads Windows Internet Explorer's HTML control to render HTML email. This
+			requires you to set the default alternative in the <a href='install.html#appear'>Appearence 
+			Options</a> to 'text/html' before it will do anything.
+			<p/>
+			Because IE will execute any script in the email I don't suggest you use this plugin, as it
+			could mean a virus could embed itself in some HTML and then get IE to run itself when it
+			arrives in your inbox, in much the same manner that Outlook and Outlook Express are 
+			vunerable to viri.
+			<p/>
+
+		<div class=helpheading><a name="spell">Aspell</a></div>
+			In earlier version there was an Aspell plugin, but that functionality is now part of the
+			core Scribe release. On Windows and Linux you will still need to have Aspell installed 
+			along with your dictionaries of choice. On MacOS Scribe will use the built in spell
+			checker.
+			<p/>
+
+		<div class=helpheading><a name="script">Scripting/Forms</a></div>
+			The scripting functionality that used to be in a plugin is now part of the code Scribe
+			package.
+			<p/>
+
+		<div class=helpheading><a name="ldap">LDAP Client and Server</a></div>
+			<a target='_top' href='http://www.ietf.org/rfc/rfc2251.txt'>LDAP</a> is a standard 
+			sometimes used to maintain shared contact information. Scribe can connect to an LDAP
+			server and retreive contact information, and also be a server that exports contacts
+			to others.
+			<p/>
+			The LDAP client plugin once installed and configured will allow the user to type in
+			names in the main window recipient entry box which is then matched against all the LDAP
+			contacts as well as any locally stored contacts. You also get an LDAP tab in the "Add
+			Contact" window off the mail window which lists all the contacts returned from the
+			LDAP server so that you can browse for an entry.
+			<p/>
+			The LDAP server exports all the contacts in /Contacts and all it's sub-directories.
+			It is however read-only. If you want to keep some contacts private then you'll have to
+			move them into a directory outside the /Contacts folder.
+			<p>
+			
+		<br>
+		<center>
+			&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a>
+		</center>
+	</div>
+</body>
+</html>

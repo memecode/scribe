@@ -1,0 +1,9 @@
+/*	This is a script version of the ldap plugin 
+	Author: Matthew Allen <fret@memecode.com> */
+
+extern "openldap.dll" LDAP *ldap_open(char *host, int port);
+extern "openldap.dll" int ldap_set_option(LDAP *ld, int option, void *invalue);
+extern "openldap.dll" int ldap_simple_bind_s(LDAP *ld, char *who, char *passwd);
+extern "openldap.dll" int ldap_unbind(LDAP *ld);
+
+

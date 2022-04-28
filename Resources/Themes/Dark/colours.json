@@ -1,0 +1,21 @@
+{
+	"colors": [
+
+		{"L_SHADOW": "#000"},
+		{"L_LOW": "#222"},
+		{"L_MED": "#444"},
+		{"L_HIGH": "#666"},
+		{"L_LIGHT": "#888"},
+		
+		{"L_DIALOG": "#444"},
+		{"L_WORKSPACE": "#111"},
+		{"L_TEXT": "#bbb"},
+		{"L_FOCUS_SEL_BACK": "#0bb"},
+		{"L_FOCUS_SEL_FORE": "#fff"},
+		{"L_MENU_BACKGROUND": "#444"},
+		{"L_MENU_TEXT": "#bbb"},
+		{"L_NON_FOCUS_SEL_BACK": "#333"},
+		{"L_NON_FOCUS_SEL_FORE": "#eee"},
+		{"L_TOOL_TIP": "#111"}
+	]
+}

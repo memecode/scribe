@@ -1,0 +1,671 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+DEFAULT DIALOG DISCARDABLE  0, 0, 180, 175
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Default"
+FONT 8, "MS Sans Serif"
+BEGIN
+END
+
+IDENTITY DIALOG DISCARDABLE  0, 0, 180, 175
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Name:",IDC_STATIC,15,20,24,10
+    EDITTEXT        IDC_NAME,61,18,105,12,ES_AUTOHSCROLL
+    GROUPBOX        "Identity",IDC_STATIC,7,7,166,80
+    LTEXT           "Email:",IDC_STATIC,15,36,20,8
+    EDITTEXT        IDC_EMAIL,61,34,105,12,ES_AUTOHSCROLL
+    LTEXT           "Reply to:",IDC_STATIC,15,52,29,8
+    EDITTEXT        IDC_REPLY_TO,61,50,105,12,ES_AUTOHSCROLL
+    LTEXT           "Signature:",IDC_STATIC,15,69,33,8
+    EDITTEXT        IDC_SIG,61,66,89,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSE_SIG,153,66,13,12
+    GROUPBOX        "Folders",IDC_STATIC,7,90,166,78
+    LTEXT           "Mail folders:",IDC_STATIC,16,102,38,8
+    EDITTEXT        IDC_FOLDERS,61,100,89,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSE_FOLDERS,153,100,13,12
+END
+
+SMTP DIALOG DISCARDABLE  0, 0, 180, 175
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SMTP"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Server:",IDC_STATIC,7,9,24,8
+    EDITTEXT        IDC_SMTP_SERVER,42,7,92,13,ES_AUTOHSCROLL
+    LTEXT           "Name:",IDC_STATIC,7,24,22,8
+    EDITTEXT        IDC_SMTP_NAME,42,22,92,13,ES_AUTOHSCROLL
+END
+
+POP3 DIALOG DISCARDABLE  0, 0, 180, 175
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "POP3"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Server:",IDC_STATIC,7,9,24,8
+    EDITTEXT        IDC_POP3_SERVER,42,7,92,13,ES_AUTOHSCROLL
+    LTEXT           "Name:",IDC_STATIC,7,24,22,8
+    EDITTEXT        IDC_POP3_NAME,42,22,92,13,ES_AUTOHSCROLL
+    LTEXT           "Password:",IDC_STATIC,7,40,34,8
+    EDITTEXT        IDC_POP3_PASSWORD,42,38,92,13,ES_PASSWORD | 
+                    ES_AUTOHSCROLL
+    LTEXT           "Check every",IDC_STATIC,7,63,41,8
+    EDITTEXT        IDC_POP3_CHECK,51,60,33,13,ES_AUTOHSCROLL
+    LTEXT           "minutes",IDC_STATIC,88,63,25,8
+    CONTROL         "Leave messages on server",IDC_POP3_LEAVE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,82,101,10
+    LTEXT           "Currently",IDC_STATIC,7,98,28,8
+    EDITTEXT        IDC_SERVER_MSGS,38,96,25,12,ES_AUTOHSCROLL
+    LTEXT           "messages are still on the server",IDC_STATIC,66,98,99,8
+END
+
+CONTACT DIALOG DISCARDABLE  0, 0, 270, 266
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Contact"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_FIRST,54,7,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_LAST,54,21,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EMAIL,54,35,200,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_NICK,54,49,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SPOUSE,174,49,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STREET,54,78,200,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SUBURB,54,92,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_POSTCODE,174,92,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STATE,54,106,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_COUNTRY,174,106,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WORK,54,142,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_MOBILE,174,142,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_HOME,54,156,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_FAX,174,156,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_ICQ,54,170,80,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WEBPAGE,54,184,200,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,211,7,43,12
+    PUSHBUTTON      "Cancel",IDCANCEL,211,21,43,11
+    LTEXT           "First:",IDC_STATIC,35,9,16,8
+    LTEXT           "Last:",IDC_STATIC,35,23,16,8
+    LTEXT           "Email:",IDC_STATIC,31,37,20,8
+    GROUPBOX        "Address:",IDC_STATIC,7,65,255,62
+    LTEXT           "Street:",IDC_STATIC,29,81,22,8
+    LTEXT           "Suburb:",IDC_STATIC,25,94,26,8
+    LTEXT           "PostCode:",IDC_STATIC,139,94,34,8
+    LTEXT           "State:",IDC_STATIC,31,108,20,8
+    LTEXT           "Country:",IDC_STATIC,146,109,27,8
+    GROUPBOX        "Contact:",IDC_STATIC,7,130,256,74
+    LTEXT           "Work:",IDC_STATIC,30,142,20,8
+    LTEXT           "Home:",IDC_STATIC,28,156,22,8
+    LTEXT           "Mobile:",IDC_STATIC,148,142,24,8
+    LTEXT           "Fax:",IDC_STATIC,157,156,14,8
+    LTEXT           "ICQ:",IDC_STATIC,34,172,15,8
+    LTEXT           "Webpage:",IDC_STATIC,15,185,34,8
+    LTEXT           "Nickname:",IDC_STATIC,16,51,35,8
+    LTEXT           "Spouse:",IDC_STATIC,144,51,27,8
+    LTEXT           "Note:",IDC_STATIC,32,208,18,8
+    EDITTEXT        IDC_NOTE,54,207,200,52,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_WANTRETURN | WS_VSCROLL
+END
+
+ADDCONTACT DIALOG DISCARDABLE  0, 0, 205, 198
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Add Contact"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,155,7,43,12
+    PUSHBUTTON      "Cancel",IDCANCEL,155,21,43,12
+    CONTROL         "List1",IDC_CONTACTS,"SysListView32",WS_BORDER | 
+                    WS_TABSTOP,7,40,191,151
+    LTEXT           "Search:",IDC_STATIC,7,9,26,8
+    EDITTEXT        IDC_SEARCH,39,7,85,12,ES_AUTOHSCROLL
+END
+
+FOLDERNAME DIALOG DISCARDABLE  0, 0, 153, 44
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Folder Name"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,42,25,30,12
+    PUSHBUTTON      "Cancel",IDCANCEL,76,25,30,12
+    LTEXT           "Rename folder to:",IDC_STATIC,6,9,57,8
+    EDITTEXT        IDC_NAME,68,7,78,12,ES_AUTOHSCROLL
+END
+
+OPTIONS DIALOG DISCARDABLE  0, 0, 180, 175
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Log file:",IDC_STATIC,7,159,28,9
+    EDITTEXT        IDC_LOG_FILE,41,156,106,12,ES_AUTOHSCROLL
+    CONTROL         "Quote when replying with",IDC_QUOTE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,8,95,10
+    EDITTEXT        IDC_QUOTE_STR,103,7,27,12,ES_AUTOHSCROLL
+    CONTROL         "Append signature to replies and forwards",
+                    IDC_REPLYWITHSIG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,
+                    22,144,10
+    CONTROL         "Minimize to tray icon",IDC_TRAY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,37,81,10
+    CONTROL         "Check for dialup connection before auto-receive",
+                    IDC_CHECKDIALUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,
+                    50,166,10
+END
+
+CREATESUBFOLDER DIALOG DISCARDABLE  0, 0, 119, 97
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Create Sub Folder"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_NAME,35,7,72,12,ES_AUTOHSCROLL
+    GROUPBOX        "Contains:",IDC_TYPE,14,25,89,44
+    DEFPUSHBUTTON   "OK",IDC_OK,7,76,50,14
+    PUSHBUTTON      "Cancel",IDC_CANCEL,62,76,50,14
+    LTEXT           "Name:",IDC_STATIC,7,8,24,10
+    CONTROL         "Mail messages",IDC_MAIL,"Button",BS_AUTORADIOBUTTON,23,
+                    38,62,10
+    CONTROL         "Contacts",IDC_CONTACTS,"Button",BS_AUTORADIOBUTTON,23,
+                    51,44,10
+END
+
+MAIL DIALOG DISCARDABLE  0, 0, 235, 234
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Mail Message"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_TO,44,7,104,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_ADDR_TO,151,7,12,12
+    EDITTEXT        IDC_CC,44,21,104,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_ADDR_CC,151,21,12,12
+    EDITTEXT        IDC_SUBJECT,44,35,104,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TEXT,7,49,221,178,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Send",IDC_SEND,178,7,50,14
+    PUSHBUTTON      "Close",IDC_CLOSE,178,24,50,14
+    LTEXT           "To:",IDC_STATIC,7,8,14,9
+    LTEXT           "Cc:",IDC_STATIC,7,20,18,11
+    LTEXT           "Subject:",IDC_STATIC,7,34,27,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    "DEFAULT", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 173
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+
+    "IDENTITY", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 173
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+
+    "SMTP", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 173
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+
+    "POP3", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 173
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+
+    "CONTACT", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 263
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 259
+    END
+
+    "ADDCONTACT", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 198
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 191
+    END
+
+    "FOLDERNAME", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 146
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 37
+    END
+
+    "OPTIONS", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 173
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+
+    "CREATESUBFOLDER", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 112
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 90
+    END
+
+    "MAIL", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 227
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+MAIL                    ICON    DISCARDABLE     "..\\resources\\mail.ico"
+BLANK                   ICON    DISCARDABLE     "..\\resources\\blank.ico"
+SMALL                   ICON    DISCARDABLE     "..\\resources\\small.ico"
+APP                     ICON    DISCARDABLE     "..\\resources\\app.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open Folders",               IDM_OPEN_FOLDERS
+        MENUITEM "Create &Folders",             IDM_CREATE_FOLDERS
+        MENUITEM "Com&pact Folders",            IDM_COMPACT_FOLDERS
+        MENUITEM SEPARATOR
+        MENUITEM "&Options",                    IDM_OPTIONS
+        MENUITEM SEPARATOR
+        MENUITEM "&Print",                      IDM_PRINT
+        MENUITEM "Print &Setup",                IDM_PRINTSETUP
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_EXIT
+    END
+    POPUP "&Mail"
+    BEGIN
+        MENUITEM "New &Message",                IDM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "&Reply",                      IDM_REPLY
+        MENUITEM "Reply &All",                  IDM_REPLY_ALL
+        MENUITEM "&Forward",                    IDM_FORWARD
+        MENUITEM SEPARATOR
+        MENUITEM "&Send Mail",                  IDM_SEND_MAIL
+        MENUITEM "R&eceive Mail",               IDM_RECEIVE_MAIL
+    END
+    POPUP "&Contacts"
+    BEGIN
+        MENUITEM "New &Contact",                IDM_NEW_CONTACT
+        MENUITEM SEPARATOR
+        POPUP "Import"
+        BEGIN
+            MENUITEM "&i.Scribe contacts",          IDM_IMPORT_CONTACTS
+            MENUITEM "&Outlook Contacts",           IDM_IMPORT_OUTLOOK_CONTACTS
+
+        END
+        MENUITEM "&Export Contacts",            IDM_EXPORT_CONTACTS
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Help",                       IDM_HELP
+        MENUITEM SEPARATOR
+        MENUITEM "&About",                      IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_APPNAME             "i.Scribe"
+    IDS_SIZE                "Size"
+    IDS_DATE                "Date"
+    IDS_FIRST               "First"
+    IDS_SURNAME             "Surname"
+    IDS_EMAIL               "Email"
+    IDS_OK                  "Ok"
+    IDS_CANCEL              "Cancel"
+    IDS_SEND                "Send"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SAVE                "Save"
+    IDS_REPLY               "Reply"
+    IDS_REPLYALL            "Reply All"
+    IDS_FORWARD             "Forward"
+    IDS_REMOVE              "Remove"
+    IDS_NONREFLOWWORDWRAP   "Non-reflow word wrap"
+    IDS_TO                  "To"
+    IDS_CC                  "Cc"
+    IDS_RECIPIENTS          "Recipients"
+    IDS_TEXT                "Text"
+    IDS_ATTACHMENTS         "Attachments"
+    IDS_INTERNETHEADER      "Internet Header"
+    IDS_FOLDER_PROPERTIES_DLG 
+                            "%s Folder\n\n   Mail: %i\n   Contacts: %i\n   Folders: %i\n   Size: %s"
+    IDS_DELETE_FOLDER_DLG   "Do you want to delete the '%s' folder?"
+    IDS_CANT_FIND_FOLDERS_DLG 
+                            "Could not find or open the mail folders file.\nWould you like to create one?"
+    IDS_COMPACT_TESTING_DLG "Curently the folder compaction feature is still in testing.\n\t\tPlease make a backup of you mail folder file before compacting.\n\nDo you want to continue?\n"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FOLDER_COMPACT_ERR_DLG "An error occured compacting the mail folders."
+    IDS_COULDNT_OPEN        "Couldn't open '%s'"
+    IDS_ATTACH_FILE         "&Attach File"
+    IDS_EDIT                "&Edit"
+    IDS_DELETE              "&Delete"
+    IDS_ADD_CONTACTS        "&Add to contacts"
+    IDS_ATTACH_WARNING_DLG  "A file by this name already exists, do you still want to attach it?"
+    IDS_MAIL_PROPS_DLG      "Mail Message\r\n\r\n   Size: %s\r\n   Date: %s\r\n   Flags: %X"
+    IDS_MAIL_PROPS          "Mail Properties"
+    IDS_ADD                 "&Add"
+    IDS_OPEN                "&Open"
+    IDS_SET_READ            "Set Read"
+    IDS_SET_UNREAD          "Set Unread"
+    IDS_PROPERTIES          "&Properties"
+    IDS_SUBJECT             "Subject"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MAIL_MESSAGE        "Mail Message"
+    IDS_FROM                "From"
+    IDS_IDENTITY            "Identity"
+    IDS_OPTIONS             "Options"
+    IDS_SMTP                "Smtp"
+    IDS_POP3                "Pop3"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// French (France) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
+#ifdef _WIN32
+LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDENTITY DIALOG DISCARDABLE  0, 0, 180, 175
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Nom:",IDC_STATIC,15,20,24,10
+    EDITTEXT        IDC_NAME,61,18,105,12,ES_AUTOHSCROLL
+    GROUPBOX        "Identité",IDC_STATIC,7,7,166,80
+    LTEXT           "Email:",IDC_STATIC,15,36,20,8
+    EDITTEXT        IDC_EMAIL,61,34,105,12,ES_AUTOHSCROLL
+    LTEXT           "Répondre à:",IDC_STATIC,15,52,29,8
+    EDITTEXT        IDC_REPLY_TO,61,50,105,12,ES_AUTOHSCROLL
+    LTEXT           "Signature:",IDC_STATIC,15,69,33,8
+    EDITTEXT        IDC_SIG,61,66,89,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSE_SIG,153,66,13,12
+    GROUPBOX        "Dossiers",IDC_STATIC,7,90,166,78
+    LTEXT           "Dossiers mails:",IDC_STATIC,16,102,38,8
+    EDITTEXT        IDC_FOLDERS,61,100,89,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSE_FOLDERS,153,100,13,12
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    "IDENTITY", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 173
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Ouvrir dossier",             IDM_OPEN_FOLDERS
+        MENUITEM "Créer &dossier",              IDM_CREATE_FOLDERS
+        MENUITEM "Com&pacter dossier"           IDM_COMPACT_FOLDERS
+        MENUITEM SEPARATOR
+        MENUITEM "&Options",                    IDM_OPTIONS
+        MENUITEM SEPARATOR
+        MENUITEM "&Imprimer",                   IDM_PRINT
+        MENUITEM "&Config impression",          IDM_PRINTSETUP
+        MENUITEM SEPARATOR
+        MENUITEM "&Quitter",                    IDM_EXIT
+    END
+    POPUP "&E-mail"
+    BEGIN
+        MENUITEM "Nouveau &Message",            IDM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "&Répondre",                   IDM_REPLY
+        MENUITEM "Répondre à &tous",            IDM_REPLY_ALL
+        MENUITEM "Re&diriger",                  IDM_FORWARD
+        MENUITEM SEPARATOR
+        MENUITEM "&Envoyer e-mail",             IDM_SEND_MAIL
+        MENUITEM "R&ecevoir e-mail",            IDM_RECEIVE_MAIL
+    END
+    POPUP "&Contacts"
+    BEGIN
+        MENUITEM "Nouveau &Contact",            IDM_NEW_CONTACT
+        MENUITEM SEPARATOR
+        POPUP "Importer"
+        BEGIN
+            MENUITEM "Contacts &i.Scribe",      IDM_IMPORT_CONTACTS
+            MENUITEM "Contacts &Outlook",       IDM_IMPORT_OUTLOOK_CONTACTS
+
+        END
+        MENUITEM "&Export Contacts",            IDM_EXPORT_CONTACTS
+    END
+    POPUP "&Aide"
+    BEGIN
+        MENUITEM "&Aide",                       IDM_HELP
+        MENUITEM SEPARATOR
+        MENUITEM "A &propos",                   IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_APPNAME             "i.Scribe"
+    IDS_SIZE                "Taille"
+    IDS_DATE                "Date"
+    IDS_FIRST               "Prénom"
+    IDS_SURNAME             "Surnom"
+    IDS_EMAIL               "Email"
+    IDS_OK                  "Ok"
+    IDS_CANCEL              "Annuler"
+    IDS_SEND                "Envoyer"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SAVE                "Sauver"
+    IDS_REPLY               "Répondre"
+    IDS_REPLYALL            "Répondre à tous"
+    IDS_FORWARD             "Rediriger"
+    IDS_REMOVE              "Enlever"
+    IDS_NONREFLOWWORDWRAP   "Coupure des mots"
+    IDS_TO                  "A"
+    IDS_CC                  "Cc"
+    IDS_RECIPIENTS          "Destinaires"
+    IDS_TEXT                "Text"
+    IDS_ATTACHMENTS         "Attachements"
+    IDS_INTERNETHEADER      "En-tête Internet"
+    IDS_FOLDER_PROPERTIES_DLG 
+                            "Dossier %s\n\n   E-mail: %i\n   Contacts: %i\n   Folders: %i\n   Taille: %s"
+    IDS_DELETE_FOLDER_DLG   "Voulez vous supprimer le dossier '%s'?"
+    IDS_CANT_FIND_FOLDERS_DLG 
+                            " Fichier folders.mail introuvable.\nVoulez vous le créer?"
+    IDS_COMPACT_TESTING_DLG "Le compactage des dossiers en en phase de test.\n\t\tFaites une sauvegarde de votre fichier .MAIL avant de compacter.\n\nVoulez vous continuer?\n"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FOLDER_COMPACT_ERR_DLG "Une erreur s'est produite durant le compactage."
+    IDS_COULDNT_OPEN        "Impossible d'ouvrir '%s'"
+    IDS_ATTACH_FILE         "&Attacher fichier"
+    IDS_EDIT                "&Editer"
+    IDS_DELETE              "&Supprimer"
+    IDS_ADD_CONTACTS        "&Ajouter aux contacts"
+    IDS_ATTACH_WARNING_DLG  "Un fichier porte déjà ce nom, voulez vous toujours l'y attacher?"
+    IDS_MAIL_PROPS_DLG      "Message e-mail\r\n\r\n   Taille: %s\r\n   Date: %s\r\n   Flags: %X"
+    IDS_MAIL_PROPS          "Propriétés de l'e-mail"
+    IDS_ADD                 "&Ajouter"
+    IDS_OPEN                "&Ouvrir"
+    IDS_SET_READ            "Considéré lu"
+    IDS_SET_UNREAD          "Considéré non-lu"
+    IDS_PROPERTIES          "&Propriétés"
+    IDS_SUBJECT             "Sujet"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MAIL_MESSAGE        "Message e-mail"
+    IDS_FROM                "De"
+    IDS_IDENTITY            "Identité"
+    IDS_OPTIONS             "Options"
+    IDS_SMTP                "Smtp"
+    IDS_POP3                "Pop3"
+END
+
+#endif    // French (France) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

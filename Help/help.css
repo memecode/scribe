@@ -1,0 +1,210 @@
+body
+{
+	font-size: 13pt;
+	font-family: Sans-Serif;
+	color: #101040;
+	margin: 0px;
+	padding: 0px;
+	height: 100%;
+}
+
+table
+{
+	font-family: Sans-Serif;
+}
+
+td {
+	vertical-align: top;
+    padding-right: 0.8em;
+}
+
+th {
+	font-weight: bold;
+	font-size: larger;
+	background: #e0e0e8;
+}
+
+iframe {
+	display:block;
+	width:100%;
+	height:100%;
+	border:none;
+}
+
+ul {
+	padding-top: 0px;
+}
+
+pre {
+    color: #1010c0;
+    margin: 1em;
+    padding: 0.4em;
+    border-radius: 0.5em;
+    background: #f0f3f6;
+    border-bottom: 1px solid #a0b0a0;
+    border-right: 1px solid #a0b0a0;
+}
+
+a:link, a:visited
+{
+	color: #800000;
+}
+
+a:hover
+{
+	color: #800000;
+	background-color: #f0e0f0;
+}
+
+ul
+{
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+
+.menu
+{
+	background-color: #f0f0ff;
+}
+
+.content
+{
+	margin-left: 190px;
+	padding: 8px;
+	background-color: #fafaff;
+	border-style: dotted;
+	border-left-width: 2px;
+	border-right-width: 0px;
+	border-top-width: 0px;
+	border-bottom-width: 2px;
+	border-color: #d0d0ff;
+}
+
+.alt-line {
+	background-color: #f2f2ff;
+}
+
+.helpheading
+{
+	background-color: #444499;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	padding: 0.3em;
+	margin-top: 0.8em;
+	margin-bottom: 0.3em;
+}
+
+.inscribe
+{
+	color: #009;
+	background: #eef;
+	margin: 0.5em 0px;
+	border-radius: 9px;
+	padding: 9px;
+}
+
+.action
+{
+	font-style: italic;
+	color: #66c;
+}
+
+kbd
+{
+    display: inline-block;
+    margin: 0 .1em;
+    padding: 0px 3px;
+    color: #242729;
+    text-shadow: 0 1px 0 #FFF;
+    background-color: #E6E7E9;
+    border: 1px solid #adb3b9;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 rgba(12,13,14,0.2),0 0 0 1px #FFF inset;
+    white-space: nowrap;
+}
+
+fld
+{
+	background: #e0e0ff;
+}
+
+.desc {
+	margin: 0px 0px 0.5em 2em;
+	color: #999;
+}
+
+method {
+	display:inline;
+	color: #008;
+	font-weight: bold;
+}
+
+arg {
+	display:inline;
+    color: #c01010;
+}
+
+.desc method {
+	color: #889;
+	font-weight: bold;
+}
+
+.desc arg {
+	color: #b99;
+}
+
+.win_specific 
+{
+	padding: 0.5em;
+	border: 1px solid #e0e0ff;
+	background-color: #f0f0ff;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.bordered td, .bordered th {
+	border-left: 1px solid #ddd;	
+	border-top: 1px solid #ddd;
+}
+
+table.bordered {
+	border-right: 1px solid #ddd;	
+	border-bottom: 1px solid #ddd;
+}
+
+table.options {
+	margin: 1em;
+	background: #888;
+}
+
+table.options td, table.options th {
+	padding: 0.5em;
+	background: white;
+}
+
+table.options th {
+	color: #444;
+	background: #ddd;
+}
+
+table.options td.fld {
+	background: #aaa;
+	color: white;
+	font-weight: bold;
+}
+
+
+table.options td.fld-inscribe {
+	background: #aaf;
+	color: white;
+	font-weight: bold;
+}
+
+table.options td.inscribe
+{
+	color: #009;
+	background: #eef;
+	margin: 0.5em 0px;
+	border-radius: 0px;
+}

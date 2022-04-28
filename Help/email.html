@@ -1,0 +1,340 @@
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>Working With Email</h2></center>
+
+		<div class=helpheading><a name="compose">Composing New Email</a></div>
+			To create a new email:
+			<ul>
+				<li> Click the New Mail button on the toolbar, or
+				<li> Press <kbd>Ctrl</kbd>+<kbd>N</kbd>, or
+				<li> Click Mail &#9654; New Message.
+			</ul>
+			To the left of the toolbar you will see panels for the "To" and/or the "From"
+			fields. These can be collapsed to leave more room on the window. When collapsed
+			they appear next to the toolbar. To show them again, click on the "+" sign.
+			<p/>
+			<div class=inscribe>InScribe: The From panel has a drop down to select a different 
+			sending identity from a available list configured in the
+			<a href='install.html#acc'>accounts</a>. To set a 
+			default identity use the identity menu in the main window.</div>
+			<p/>
+			Under the toolbar is where the "To" and "From" will appear. Depending on the 
+			context these windows will be made visible. Also, addresses in the "To" or "From"
+			panels has a right click context menu that allows certain commands to be 
+			executed on that address.
+			<p/>
+			The "To" panel contains a list of recipients that the email was/is 
+			sent to. To add another recipient, type an email address into the
+			space above the list and hit enter. Alternatively if the address is in
+			the contacts database you can just type the first, last or nick name of the contact,
+			and it will be looked up automatically. You can also browse the contacts
+			and directory services plugins by clicking the "..." button to show the
+			"Add contact" windows.<br>
+			<p/>
+			To set a recipient to CC or BCC select them in the list and use the 
+			right click menu.
+			<p/>
+			You can open the associated contact record by double clicking the recipient. Otherwise
+			if the recipient is not in your contact database, there is a right click menu that allows
+			you to add a contact. This also works on the From panel, handy for adding someone who just emailed
+			you.
+			<p/>
+			The "From" panel shows who the email is from.
+			<p/>
+			Underneath the addressing panels is the subject bar and tabs for the email's content.
+			The first tab displays the text of the email where you can compose your message. The
+			second tab displays a list of files that are attached to the email. If there are attachments
+			present then the tab is bolded. The Internet Headers tab displays the raw headers of the
+			email. The fields tab has a few extra pieces of information not displayed elsewhere. The
+			label on this tab can be used to store custom data and is accessable via the Scribe
+			<a href='http://www.memecode.com/scribe/dom.php'>DOM</a>.
+			<p/>
+			The text compose area seems rather Sparten, as there is no "rich text" editing facility.
+			There are quite a few options hidden away in the right click menu of the compose control,
+			to set various parameters and even run some actions.
+			<p/>
+			Using the "remove" sub menu you can strip out leading ">"s that some email client has
+			added along the way. Also cleaning all the HTML tags out of the text is useful for HTML
+			email that is incorrectly marked as "plain/text".
+			<p/>
+			The Filter sub menu lets you execute a particular filter's actions on the current email. The
+			conditions on the filter are ignored, as the email has already been implicitly "selected"
+			by the user. See the <a href='filters.html'>filters</a> section to see what you can do with that.
+			<p/>
+			The Convert Selection menu allows you to convert the selection of the control to and from
+			base64, in the case that some content is encoded, or you want to encode something.
+			<p/>
+			If the message is not being displayed in the correct charset, then use the right click menu's
+			"change charset" submenu to reload the message in a different charset. This charset will be saved
+			with the message if you hit "save" on the toolbar. It has no effect on email you are composing
+			but it's useful for viewing incorrectly encoded incoming email.
+			<p/>
+
+		<div class=helpheading><a name="attach">Using Attachments</a></div>
+			To attach files to an email you are composing, either click the Attach Files button
+			on the toolbar or right click in the attachment list (away from existing entries) and
+			browse to the file you want to attach. Or you can drag the file onto the mail
+			window from the explorer/tracker window.
+			<p/>
+			To view an attachment sent to you, double click the entry in the attachment list.
+			It will save the file to a tempory directory and open it using the program
+			associated in the operating system with the attachment's MIME type.
+			<p/>
+			If you edit the attachment after openning it, the changes are not saved back into
+			the email.
+			<p/>
+			If the attachment is an executable program, Scribe will warn you about viri and the
+			possibility of infecting your machine. There is every chance that the attachment IS
+			actually a virus, even though someone you know sent it to you. The From information
+			of an email is easily forged, so you can't trust anything. Heed the warning and
+			don't run the attachment.
+			<p/>
+
+		<div class=helpheading><a name="reply">Reply [All] And Forwarding</a></div>
+			You reply to an email to send a response back to the sender. Sometimes an email is
+			sent to a lot of people at once. If you want to reply to all of the people the email
+			is sent to then use "Reply All". Otherwise "Reply" sends just to the author of the
+			email.
+			<p/>
+			It is considered bad form to Reply All when the message really only needs to go to
+			the email's author. And some people that received the original email 
+			might not want their addresses distributed to everyone. To hide someone's address from
+			being distributed via a group email set it to "BCC" in the recipients list. Unless you
+			specifically want everyone to whom you're sending email to know who else is getting the same
+			email, you should probably set your recipients to BCC.
+			<p/>
+			When replying to a message it is standard internet procedure to "quote" the old message
+			with ">" signs at the start of every line. Scribe can do this for you. Then as you
+			respond to various parts of the message you add your own messages below the original
+			text, obviously without any ">" signs. This way people can follow who said what as 
+			email goes back and forth. The ">" signs can be nested several levels deep. e.g:
+<pre style="color: black;">
+<span style="color: #080;">>> How much memory does Scribe need?</span>
+<span style="color: #800;">>
+> About 5 mb's with a basic folder loaded.</span>
+
+That sounds good.
+
+<span style="color: #080;">>> Is it possible to use Scribe on a USB drive? I've got one and
+>> I want to take Scribe around with me.</span>
+<span style="color: #800;">>
+> Yes it's quite portable, and tries to use relative paths where
+> possible.</span>
+
+Ok great, thanks!
+</pre>
+			So you can see the original author's text is in green, then my replies to that are in red. And
+			finally their responses to my reply are in black. Any text that isn't relevant to the topic
+			you're talking about in your reply should be omitted from your response, to keep the email
+			breif and to the point.
+			<p/>
+			Forwarding a message typically means sending an email on to someone other than the
+			original author. In this case you may or may not want to retain the attachments to
+			the original email, Scribe will ask you whether to copy the attachments across to the
+			new email when you forward an email with attachments.
+			<p/>
+
+		<div class=helpheading><a name="bounce">Bounce</a></div>
+			Bouncing a message is useful when you aren't the right person to respond to the email.
+			It's like forwarding a message but it has the extra behaviour of removing you as the source
+			of the message so that when the next recipient of the message replies to the bounced 
+			email it goes to the original sender instead of you. Bounce also maintains more of the
+			message's formatting than forwarding does. Some loss of formatting on forwarding is a 
+			shortcoming of the current architecture of Scribe.
+			<p/>
+
+		<div class=helpheading><a name="manage">Managing Email</a></div>
+			Each folder in the main view contains object of one type only. So if you create 
+			more folders you have to decide what they contain up front. When you drag and drop
+			email/contacts between folders only items that match the destination folders type
+			will be moved.
+			<p/>
+			To move an email into another folder, drag it from the main list onto the 
+			destination folder on the left. You can select multiple email and move them in one
+			hit.
+			<p/>
+			Right clicking on an email shows a list of actions and properties that you can use.
+			The Mark colour allows grouping of similar emails by category by setting them all to
+			the same colour. The marking of colour can be done automatically by 
+			<a href='filters.html'>filters</a>. By using the Select Marked submenu you can select
+			all the email of a certain colour for furthur processing.
+			<p/>
+			The main toolbar menu has a filter icon that, once activated, adds a filter field above
+			every column in the list view. You can use this to narrow down the list using various
+			criteria. Items are matched against criteria using a sub-string search, but the wildcards
+			'*' and '?' are supported as well. e.g:
+<pre>
+Criteria:
+	"ma"
+Matches:
+	"matthew"
+	"armagedon"
+	"Mills, Martin"
+</pre>	
+			This is less useful on dates, but I will improve on that later.
+			<p/>
+			Also on the main window's toolbar there is a button to thread the messages in the list.
+			This is useful for following conversations. Once the view is in threaded mode you can
+			choose to ignore a whole thread by right clicking on it and setting the thread mode to
+			"ignore". Then any incoming mail that joins that thread is automatically marked as
+			"read". So that it doesn't show up as new mail. This is handy for mailing lists where
+			you don't want to follow certain threads.
+			<p/>
+
+		<div class=helpheading><a name="sendreceive">Sending and Receiving</a></div>
+			You can receive mail in Scribe using several methods. Manually by clicking
+			Receive mail on the toolbar, or Mail &#9654; Receive mail and it's shortcut keys, also
+			automatically by going into the <a href='install.html#acc'>Account Options</a>
+			and on the Receive tab set the "check every &lt;field> minutes".
+			Also in the main window's status panel you can right click on an account and tell
+			it to receive now.
+			<p/>
+			New mail appears in the "/Inbox" folder by default and a "New mail" icon appears in
+			the system tray. Clicking on this icon opens the first new mail in the
+			/Inbox folder (or sub-folders). You can specify a non-default destination folder
+			in the Receive account options.
+			<p/>
+			Sending mail using Scribe can be done from the mail message by clicking
+			Send, clicking Send on the toolbar or clicking Mail &#9654; Send Mail. Sending
+			sends all unsent mail in the /Outbox folder. Once a mail is sent successfully
+			it is marked as sent and placed in the sent mail folder. To resend a mail,
+			open it up and click "send" again. It's that simple
+			(try doing that in Outlook).
+			<p/>
+			The status panel in the main window has a wealth of information about the state
+			of the send(s) and receive(s) in progress. To view this information click on the
+			account in the list and the most recent send or receive will display in the Progress
+			tab. The progress through the items being processed is shown and the current number
+			of KB's sent or received with a data rate is also shown.
+			The Close Connection button will stop the transfer, the email 
+			currently being transmitted will be sent or received on the next connection.
+			<p/>
+			The Log tab next to the process has a history of commands and responses going
+			between the client and the server. In the case that you are having trouble connecting
+			to the server, this log usually has a readable error message and is invaluable in
+			troubleshooting. If you don't understand the messages and you want to email the
+			<a href='mailto:fret@memecode.com'>author</a> about
+			it please right click on the log messages and "Copy to clipboard" so that you can include
+			it in any correspondence.
+			<p/>
+
+		<div class=helpheading><a name="preview">Preview Mail on Server</a></div>
+
+			To view the messages while still on the server click Mail &#9654; Preview Mail on Server.
+			<p/>
+			The client will attach to the server, query the server for the size and number of email
+			still on the server and then present a list of items to you. Then by selecting the items
+			and clicking "delete" or "download" you can decide how to process each email individually
+			before you receive them. This allows you to skip large messages or delete them when they
+			get in the way. The selected delete or download action is carried out when you click Ok.
+			If an item hasn't been assigned an action (delete or download) then it is ignored and left
+			on the server. Beware that if you have the Leave Mail On Server option set to 'on' then
+			you will see all the mail currently on the server not just the "new" mail.
+			<p/>
+			<div class=inscribe>Multiple accounts can be previewed at the same time by selecting them
+			in the status panel (using <kbd>Ctrl</kbd>+<kbd>Left Click</kbd>), right clicking and selecting
+			preview. The 'to' field shows which account the email came from.</div>
+			<p/>
+			If you cancel the preview (or the connection is dropped) while still connected to the server, all 
+			the remaining email that
+			hasn't been loaded will appear as entries missing all their fields except their size. This allows
+			you to process large messages without loading the entire list. The message "(Not Loaded)" appears
+			in the subject field in this case.
+			<p/>
+			An opened envelope icon shows you which email have already been downloaded and have been left
+			on the server. An unopened icon represents new email that hasn't been downloaded yet. From this window
+			you can download mail that has already been downloaded. This is handy if you have Leave
+			Mail On Server switched on and you deleted email by accident and would like to download it again.
+			<p/>
+			If you're downloading mail and you notice a really huge email that you don't really want to download,
+			cancel the download (the bottom
+			"request abort" button on the status panel) and then open up the preview mail on server window to
+			either download the email on either side of the large one and leave it for later or 
+			delete the large email altogether.
+			<p/>
+			There are buttons for the following functions:
+			<ul>
+				<li> <b>Refresh</b><br>
+					Fetchs the current contents of the server.
+				<li> <b>Undelete</b><br>
+					Scribe can mark messages for deletion during the next connection with the server. In the
+					case that a message has been marked for deletion the "delete" flag will automatically be
+					selected when previewing mail on the server. If you don't want to delete the message
+					clicking "Undelete" will remove it from the "delete on next connect" list.
+				<li> <b>Set Unread</b><br>
+					Marks the selected messages as unread, which changes the envelope icons to closed. These
+					messages will be fetched again during the next normal receive.
+				<li> <b>Set Read</b><br>
+					Marks the selected messages as read, causing these messages to be skipped during a normal
+					mail receive connection.
+			</ul>
+			<p/>
+
+		<div class=helpheading><a name="merge">Mail Merge</a></div>
+			If you would like to create customized email messages to a mailing list then Scribe has a mail
+			merge feature. To use the mail merge, firstly select the contacts you want to send to by placing or
+			copying them into a single folder. All the contacts in the source folder will receive the merged
+			email. Then prepare the email itself, either by creating a new email in the templates folder or creating
+			a .EML file in Scribe or a 3rd party application. To create an email in a particular folder (in this
+			case the /Templates folder), right click on the folder and select "New Mail". When editing the body of
+			the message you can insert fields that will be substituted with the relevant data when being sent. These
+			fields are based on the Scribe <a href='http://www.memecode.com/scribe/dom.php' target=_top>DOM</a>. The objects
+			available during mail merge are:
+			<ul>
+				<li> Object::Scribe Scribe
+				<li> Object::Contact Contact
+			</ul>
+			Scribe points to the application object, and Contact points to the current recipient Contact. So what
+			this looks like in practice is:
+		<pre>Dear &lt;? contact.FirstName ?> &lt;? contact.SurName ?>,
+
+We would like to let you know that the address we have on file for you is:
+	Street: &lt;? contact.Street ?>, &lt;? contact.Suburb ?> &lt;? contact.PostCode ?>
+		&lt;? contact.State ?> &lt;? contact.Country ?>
+	Phone: &lt;? contact.Home ?> &lt;? contact.Mobile ?>
+
+This email was generated on &lt;? scribe.now ?> for &lt;? contact.email ?>
+
+Regards</pre>
+			The custom data fields in the contact records could be used here to extend the types of data available for
+			mail merging. You could name one of the custom fields 'CustNum' and put your customer's number in there. Then
+			when you merge you can use that field like this:
+			<pre>&lt;? contact.CustNum ?></pre>
+			If any of the contacts don't have that custom field the value returned is just an empty string.
+			<p/>
+			Once you have an email template for the mail merge, select the folder of contacts to send to and right click.
+			Select either 'Mail Merge with Template...' or 'Mail Merge with File'. Select the template email and a question
+			dialog will pop up. One of the options allows you to preview the first merged email to test the results before
+			you send. When you're happy with the result, go online, repeat and select 'Send'. The mail will be merged against
+			all the source contacts and sent immediatedly. These mails don't go via the outbox; they are just sent straight
+			to the SMTP server.
+			<p/>
+			You can create file templates by editing the email in Scribe and then <a href='import.html#email'>exporting</a> it to
+			file by dragging it to the desktop or file manager. Then you can edit it in a text editor, allowing you to make
+			changes beyond what Scribe editor is capable of. If you change the MIME type from text/plain to text/html you
+			could create a HTML based mail merge email. All the parameters for editing .eml files directly is beyond the scope
+			of this document, but this comment was to explain the possibilities. I suggest if you want to edit .eml files
+			in a graphical editor you use Outlook Express and then export the email from there. Then add the custom fields
+			in a text editor, and then merge using Scribe.
+			<p/>
+
+		<br>
+		<center>&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a></center>
+
+	</div>
+
+
+</font>
+</body>
+</html>

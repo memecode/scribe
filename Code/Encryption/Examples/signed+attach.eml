@@ -1,0 +1,100 @@
+Return-Path: <memecode@gmail.com>
+Delivered-To: unknown
+Received: from mail2.memecode.com (208.86.227.138:110) by Intelmini.local
+  with POP3; 08 Aug 2016 03:48:40 -0000
+X-GMN-ID: XID-1470627909-83211
+X-Original-To: fret@globalmarinenet.com
+Delivered-To: fret@globalmarinenet.com
+Received: from sea.spamstick.net (sea.spamstick.net [204.109.57.196])
+	by vmmail2.gmn-usa.com (Postfix) with ESMTP id A0AD716A438
+	for <fret@globalmarinenet.com>; Mon,  8 Aug 2016 03:45:09 +0000 (UTC)
+Received: from mail-pa0-f54.google.com ([209.85.220.54])
+	by sea.spamstick.net with esmtps (TLSv1.2:AES128-SHA:128)
+	(Exim 4.85)
+	(envelope-from <memecode@gmail.com>)
+	id 1bWbUy-0008NL-D4
+	for fret@globalmarinenet.com; Sun, 07 Aug 2016 23:45:09 -0400
+Received: by mail-pa0-f54.google.com with SMTP id iw10so109394369pac.2
+        for <fret@memecode.com>; Sun, 07 Aug 2016 20:45:08 -0700 (PDT)
+Received: from [192.168.1.190] (106-69-215-24.dyn.iinet.net.au. [106.69.215.24])
+        by smtp.gmail.com with ESMTPSA id 18sm43510812pfn.33.2016.08.07.20.45.05
+        for <fret@memecode.com>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 07 Aug 2016 20:45:06 -0700 (PDT)
+To: Matthew Allen <fret@memecode.com>
+From: Matthew Allen <memecode@gmail.com>
+Subject: signed + attachment
+Message-ID: <b5be582e-deca-91e5-3430-c4e62e964e52@gmail.com>
+Date: Mon, 8 Aug 2016 13:45:01 +1000
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.1.1
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="h9FihQP1AmGaEMxk5ALLq8wmjgsEBoFGf"
+Received-SPF: pass (sea.spamstick.net: domain of gmail.com designates 209.85.220.54 as permitted sender) client-ip=209.85.220.54; envelope-from=memecode@gmail.com; helo=mail-pa0-f54.google.com;
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+
+--h9FihQP1AmGaEMxk5ALLq8wmjgsEBoFGf
+Content-Type: multipart/mixed; boundary="6oWpvRgwGLEjhOmbr9ddkhEDGPXS0nFfb"
+From: Matthew Allen <memecode@gmail.com>
+To: Matthew Allen <fret@memecode.com>
+Message-ID: <b5be582e-deca-91e5-3430-c4e62e964e52@gmail.com>
+Subject: signed + attachment
+
+--6oWpvRgwGLEjhOmbr9ddkhEDGPXS0nFfb
+Content-Type: multipart/mixed;
+ boundary="------------7757DE59DB0B2C30C2DC24E0"
+
+This is a multi-part message in MIME format.
+--------------7757DE59DB0B2C30C2DC24E0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+This body
+
+
+--------------7757DE59DB0B2C30C2DC24E0
+Content-Type: text/plain; charset=UTF-8;
+ name="application.ini"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="application.ini"
+
+OyBUaGlzIGZpbGUgaXMgbm90IHVzZWQuIElmIHlvdSBtb2RpZnkgaXQgYW5kIHdhbnQgdGhl
+IGFwcGxpY2F0aW9uIHRvIHVzZQo7IHlvdXIgbW9kaWZpY2F0aW9ucywgc3RhcnQgd2l0aCB0
+aGUgIi1hcHAgL3BhdGgvdG8vYXBwbGljYXRpb24uaW5pIgo7IGFyZ3VtZW50LgpbQXBwXQpW
+ZW5kb3I9Ck5hbWU9VGh1bmRlcmJpcmQKUmVtb3RpbmdOYW1lPXRodW5kZXJiaXJkClZlcnNp
+b249NDUuMS4xCkJ1aWxkSUQ9MjAxNjA1MjYxNDA5NTAKU291cmNlUmVwb3NpdG9yeT1odHRw
+czovL2hnLm1vemlsbGEub3JnL3JlbGVhc2VzL2NvbW0tZXNyNDUKU291cmNlU3RhbXA9OTYy
+YjJkNWYwNmU1ZTgzNmFjNzMzYmQwOWUxZjUzYjFhYTZlMmEwZQpJRD17MzU1MGY3MDMtZTU4
+Mi00ZDA1LTlhMDgtNDUzZDA5YmRmZGM2fQoKW0dlY2tvXQpNaW5WZXJzaW9uPTQ1LjEuMQpN
+YXhWZXJzaW9uPTQ1LjEuMQoKW1hSRV0KRW5hYmxlUHJvZmlsZU1pZ3JhdG9yPTEKCltDcmFz
+aCBSZXBvcnRlcl0KRW5hYmxlZD0xClNlcnZlclVSTD1odHRwczovL2NyYXNoLXJlcG9ydHMu
+bW96aWxsYS5jb20vc3VibWl0P2lkPXszNTUwZjcwMy1lNTgyLTRkMDUtOWEwOC00NTNkMDli
+ZGZkYzZ9JnZlcnNpb249NDUuMS4xJmJ1aWxkaWQ9MjAxNjA1MjYxNDA5NTAK
+--------------7757DE59DB0B2C30C2DC24E0--
+
+--6oWpvRgwGLEjhOmbr9ddkhEDGPXS0nFfb--
+
+--h9FihQP1AmGaEMxk5ALLq8wmjgsEBoFGf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Gnu Privacy Tools
+Comment: Download at http://www.gnupt.de
+
+iQEcBAEBCAAGBQJXqAA9AAoJEKO90sYLI+lAicIH+gIxxBTBDvyIMk+XzT/ox8po
+bDMcLozmHJzDdeGIKO//plAR1rU8jkRX8Ry1pujjrg2ReK2iHip62sRJe3gmbrsV
+Dko/ywZ/pbQXwnC2Psc7jx3MaMA5s0V3JdyTDv8mNXcs7jnz8q0L40jNxncyUxDg
+4WMfhPg2I3MSeIaHNBopSy9KeZAotecM81Ym3zbYWBFDCP60yY9QtPzUECF4RNv2
+IVPomLBxeQpQoq4Aks03LTML9Fb0Uh0FzBCXQxEJ+G51TmZGfkWVeEJYdOZcLDGM
+7uV4vNcmtpwHvqoGgC+Sv/v8f77xetooPsmjMTgB/mTAHSLnQAnp2orK3qUnu5Q=
+=CV7X
+-----END PGP SIGNATURE-----
+
+--h9FihQP1AmGaEMxk5ALLq8wmjgsEBoFGf--

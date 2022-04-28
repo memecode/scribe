@@ -1,0 +1,564 @@
+#include "Mail3.h"
+#include "lgi/common/TextConvert.h"
+
+Mail3BlobStream::Mail3BlobStream(GMail3Store *store, int segid, int size, const char *file, int line, bool Write)
+{
+	Store = store;
+	File = file;
+	Line = line;
+	b = 0;
+	Pos = 0;
+	Size = size;
+	SegId = segid;
+	WriteAccess = Write;
+	
+	#if MAIL3_TRACK_OBJS
+	GMail3Store::SqliteObjs &_d = Store->All.New();
+	_d.Stream = this;
+	#endif
+
+	OpenBlob();
+}
+
+Mail3BlobStream::~Mail3BlobStream()
+{
+	CloseBlob();
+	#if MAIL3_TRACK_OBJS
+	Store->RemoveFromAll(this);
+	#endif
+}
+
+bool Mail3BlobStream::OpenBlob()
+{
+	bool Res = Store->Check(sqlite3_blob_open(Store->GetDb(),
+											NULL, // Database
+											"MailSegs",
+											"Data",
+											SegId,
+											WriteAccess,
+											&b), 0);
+	// if (b) LgiTrace("%s:%i - open blob %p\n", _FL, b);
+	return Res;
+}
+
+bool Mail3BlobStream::CloseBlob()
+{
+	if (!b)
+		return true;
+
+	// LgiTrace("%s:%i - close blob %p\n", _FL, b);
+	int Res = sqlite3_blob_close(b);
+	b = NULL;
+	return Store->Check(Res, 0);
+}
+
+int64 Mail3BlobStream::GetPos()
+{
+	return Pos;
+}
+
+int64 Mail3BlobStream::SetPos(int64 p)
+{
+	if (p < 0)
+		p = 0;
+	if (p > Size)
+		p = Size;
+	return Pos = p;
+}
+
+int64 Mail3BlobStream::GetSize()
+{
+	return Size;
+}
+
+int64 Mail3BlobStream::SetSize(int64 sz)
+{
+	LAssert(!"You can't set the size of a blob.");
+	return Size;
+}
+
+
+
+ssize_t Mail3BlobStream::Read(void *Buf, ssize_t Len, int Flags)
+{
+	if (!b)
+		return 0;
+
+	int64 Remain = Size - Pos;
+	int64 Copy = MIN(Remain, Len);
+	auto Res = sqlite3_blob_read(b, Buf, (int)Copy, (int)Pos);
+	if (Res == SQLITE_ABORT)
+	{
+		if (!CloseBlob())
+			return 0;	
+		if (!OpenBlob())
+			return 0;	
+		Res = sqlite3_blob_read(b, Buf, (int)Copy, (int)Pos);
+	}
+	
+	if (!Store->Check(Res, 0))
+		return 0;
+
+	Pos += Copy;
+	return (ssize_t) Copy;
+}
+
+ssize_t Mail3BlobStream::Write(const void *Buf, ssize_t Len, int Flags)
+{
+	if (!b)
+		return 0;
+
+	auto Res = sqlite3_blob_write(b, Buf, (int)Len, (int)Pos);
+	if (Res == SQLITE_ABORT)
+	{
+		if (!CloseBlob())
+			return 0;	
+		if (!OpenBlob())
+			return 0;	
+		Res = sqlite3_blob_write(b, Buf, (int)Len, (int)Pos);
+	}
+
+	if (!Store->Check(Res, 0))
+		return 0;
+	
+	Pos += Len;
+	return Len;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+GMail3Attachment::GMail3Attachment(GMail3Store *store) :
+	Store3Attachment<GMail3Store, GMail3Mail, GMail3Attachment>(store)
+{
+	SegId = -1;
+	BlobSize = 0;
+	InMemoryOnly = false;
+}
+
+GMail3Attachment::~GMail3Attachment()
+{
+	_Delete();
+}
+
+void GMail3Attachment::SetInMemoryOnly(bool b)
+{
+	InMemoryOnly = b;
+	for (unsigned i=0; i<Children.Length(); i++)
+	{
+		Children.a[i]->SetInMemoryOnly(b);
+	}
+}
+
+uint64 GMail3Attachment::Size()
+{
+	int64 HeaderSz = Headers ? strlen(Headers) : 0;
+	int64 NameSz = Name.Length();
+	int64 MimeSz = MimeType.Length();
+	int64 ContentIdSz = ContentId.Length();
+	int64 CharsetSz = Charset.Length();
+	int64 ImportSz = Import ? Import->GetSize() : 0;
+	
+	return	HeaderSz +
+			NameSz +
+			MimeSz +
+			ContentIdSz +
+			CharsetSz +
+			BlobSize +
+			sizeof(BlobSize) + 
+			sizeof(SegId) +
+			ImportSz;
+}
+
+uint64 GMail3Attachment::SizeChildren()
+{
+	uint64 s = 0;
+	for (unsigned i=0; i<Children.Length(); i++)
+	{
+		GMail3Attachment *c = Children.a[i];
+		s += c->Size();
+		s += c->SizeChildren();
+	}
+	return s;	
+}
+
+GMail3Attachment *GMail3Attachment::Find(int64 Id)
+{
+	if (SegId == Id)
+		return this;
+
+	for (unsigned i=0; i<Children.Length(); i++)
+	{
+		GMail3Attachment *r = Children.a[i]->Find(Id);
+		if (r)
+			return r;
+	}
+
+	return 0;
+}
+
+Store3CopyImpl(GMail3Attachment)
+{
+	Headers.Reset(NewStr(p.GetStr(FIELD_INTERNET_HEADER)));
+	if (Headers)
+	{
+		// Source supports headers...
+		ParseHeaders();
+	}
+	else
+	{
+		// Copy over whatever fields we can...
+		Name = p.GetStr(FIELD_NAME);
+		MimeType = p.GetStr(FIELD_MIME_TYPE);
+		ContentId = p.GetStr(FIELD_CONTENT_ID);
+		Charset = p.GetStr(FIELD_CHARSET);
+	}
+	
+	LDataI *Data = dynamic_cast<LDataI*>(&p);
+	if (Data)
+	{
+		LAutoStreamI tmp = Data->GetStream(_FL);
+		SetStream(tmp);
+	}
+	return true;
+}
+
+char *GMail3Attachment::GetHeaders()
+{
+	if (!Headers)
+	{
+		LStringPipe p;
+		LAssert(MimeType != NULL);
+		p.Print("Content-Type: %s", MimeType?MimeType.Get():(char*)"text/plain");
+		if (Charset)
+			p.Print("; charset=%s", Charset.Get());
+		if (Name)
+			p.Print("; name=\"%s\"", Name.Get());
+		p.Print("\r\n");
+		if (ContentId)
+		{
+			p.Print("Content-Id: <%s>\r\n", ContentId.Strip("<>").Get());
+			if (Name)
+				p.Print("Content-Disposition: inline; filename=\"%s\"\r\n", Name.Get());
+		}
+		Headers.Reset(p.NewStr());		
+	}
+
+	return Headers;
+}
+
+bool GMail3Attachment::ParseHeaders()
+{
+	LAutoString Ct(InetGetHeaderField(Headers, "Content-Type"));
+	char *Colon = Ct ? strchr(Ct, ';') : 0;
+	if (Colon)
+	{
+		while (Colon > Ct.Get() && strchr(" \t\r\n", Colon[-1])) Colon--;
+
+		LAutoString Cs(InetGetSubField(Colon, "charset"));
+		if (Cs)
+		{
+			Charset = Cs.Get();
+			LAssert(!strchr(Charset, '>'));
+		}
+		
+		*Colon = 0;
+	}
+
+	MimeType = Ct;
+	
+	return true;
+}
+
+bool GMail3Attachment::Load(GMail3Store::GStatement &s, int64 &ParentId)
+{
+	SegId = s.GetInt64(0);
+	ParentId = s.GetInt64(2);
+	
+	Headers.Reset(NewStr(s.GetStr(3)));
+	ParseHeaders();
+	
+	BlobSize = s.GetSize(4);
+	Dirty = false;
+
+	LAssert(!Mail || Kit == Mail->Store);
+
+	return true;
+}
+
+Store3Status GMail3Attachment::Save(LDataI *NewParent)
+{
+	if (NewParent)
+	{
+		// Check hierarchy
+		GMail3Attachment *NewSeg = dynamic_cast<GMail3Attachment*>(NewParent);
+		if (NewSeg)
+		{
+			// This propagates the in mem only setting down the tree of nodes
+			InMemoryOnly = NewSeg->InMemoryOnly;
+			if (NewSeg != Parent)
+				AttachTo(NewSeg);
+		}
+		else
+		{
+			GMail3Mail *NewMail = dynamic_cast<GMail3Mail*>(NewParent);
+			if (NewMail)
+			{
+				if (NewMail != Mail)
+					AttachTo(NewMail);
+			}
+		}
+	}
+
+	if (Mail)
+	{
+		// Mark the mail size dirty.
+		Mail->MailSize = -1;
+
+		LAssert(Kit == Mail->Store);
+	}
+
+	if (!InMemoryOnly)
+	{
+		if (Mail && Mail->Id > 0)
+		{
+			if (SegId <= 0)
+			{
+				GMail3Attachment *Parent = GetParent();
+
+				GMail3Store::GInsert Ins(Kit, MAIL3_TBL_MAILSEGS);
+				Ins.SetInt64(1, Mail->Id);
+				Ins.SetInt64(2, Parent ? Parent->SegId : -1);
+				Ins.SetStr(3, GetHeaders());
+				if (Import)
+					Ins.SetStream(4, "Data", Import);
+				if (!Ins.Exec())
+					return Store3Error;
+
+				SegId = Ins.LastInsertId();
+			}
+			else if (Dirty)
+			{
+				GMail3Attachment *Parent = GetParent();
+
+				GMail3Store::GUpdate Up(Kit, MAIL3_TBL_MAILSEGS, SegId, Import ? 0 : (char*)"Data");
+				Up.SetInt64(0, SegId);
+				Up.SetInt64(1, Mail->Id);
+				Up.SetInt64(2, Parent ? Parent->SegId : -1);
+				Up.SetStr(3, GetHeaders());
+				if (Import)
+					Up.SetStream(4, "Data", Import);
+				if (!Up.Exec())
+					return Store3Error;
+
+			}
+
+ 			Import.Reset();
+			Dirty = false;
+		}
+		else
+		{
+			Dirty = true;
+		}
+	}
+
+	return Store3Success;
+}
+
+void GMail3Attachment::OnSave()
+{
+	if (!Mail)
+	{
+		LAssert(!"Segment is not attached to a mail!");
+		return;
+	}
+
+	if (Dirty || SegId <= 0)
+	{
+		Save();
+	}
+
+	for (unsigned i=0; i<Children.Length(); i++)
+	{
+		Children.a[i]->OnSave();
+	}
+}
+
+const char *GMail3Attachment::GetStr(int id)
+{
+	switch (id)
+	{
+		case FIELD_CHARSET:
+		{
+		    if (!Charset)
+		    {
+			    // Maybe a parent segment has a charset?
+			    for (GMail3Attachment *p = GetParent(); p; p = p->GetParent())
+			    {
+			        auto Cs = p->GetStr(FIELD_CHARSET);
+			        if (Cs)
+			            return Cs;
+			    }
+			}
+
+			return Charset;
+		}
+		case FIELD_NAME:
+		{
+			if (!Name)
+			{
+				LAutoString t(InetGetHeaderField(Headers, "Content-Disposition"));
+				
+				LAutoString n(DecodeRfc2047(InetGetSubField(t, "filename")));
+				if (n)
+					Name = n.Get();
+				else
+				{
+					LAutoString ct(InetGetHeaderField(Headers, "Content-Type"));
+					if (ct)
+					{
+						if (n.Reset(DecodeRfc2047(InetGetSubField(ct, "name"))))
+							Name = n.Get();
+					}
+				}
+			}
+
+			return Name;
+			break;
+		}
+		case FIELD_MIME_TYPE:
+		{
+			if (!MimeType)
+			{
+				LAutoString t(InetGetHeaderField(Headers, "Content-Type"));
+				if (t)
+				{
+					char *c = strchr(t, ';');
+					if (c)
+					{
+						while (strchr(" \t\r\n", c[-1])) c--;
+						MimeType.Set(t, c ? c - t : -1);
+					}
+				}
+			}
+
+			return MimeType;
+			break;
+		}
+		case FIELD_CONTENT_ID:
+		{
+			if (!ContentId)
+			{
+				LAutoString Id(InetGetHeaderField(Headers, "Content-Id"));
+				ContentId = LString(Id.Get()).Strip("<>");
+			}
+
+			return ContentId;
+			break;
+		}
+		case FIELD_INTERNET_HEADER:
+			return Headers;
+	}
+
+	LAssert(!"Unknown id.");
+	return NULL;
+}
+
+Store3Status GMail3Attachment::SetStr(int id, const char *str)
+{
+	switch (id)
+	{
+		case FIELD_INTERNET_HEADER:
+        	Headers.Reset(NewStr(str));
+			ParseHeaders();
+			break;
+		case FIELD_NAME:
+			Name = str;
+			Headers.Reset();
+			break;
+		case FIELD_MIME_TYPE:
+			MimeType = str;
+
+			// FIXME: If we have headers from an incoming mail, this is an error to delete them here.
+			LAssert(Headers.Get() == NULL);
+
+			Headers.Reset();
+			break;
+		case FIELD_CONTENT_ID:
+			ContentId = LString(str).Strip("<>");
+			Headers.Reset();
+			break;
+		case FIELD_CHARSET:
+			Charset = str;
+			if (Charset.Find(">") >= 0)
+				LAssert(!"Invalid char");
+			
+			Headers.Reset();
+			break;
+		default:
+			LAssert(!"Unknown id.");
+			return Store3Error;
+	}
+
+	return Store3Success;
+}
+
+int64 GMail3Attachment::GetInt(int id)
+{
+	switch (id)
+	{
+		case FIELD_STORE_TYPE:
+			return Store3Sqlite;
+		case FIELD_SIZE:
+			return BlobSize;
+	}
+
+	LAssert(!"Unknown id.");
+	return false;
+}
+
+Store3Status GMail3Attachment::SetInt(int id, int64 i)
+{
+	LAssert(!"Unknown id.");
+	return Store3Error;
+}
+
+Store3Status GMail3Attachment::Delete(bool ToTrash)
+{
+	if (InMemoryOnly)
+		return Store3Success;
+
+	if (SegId <= 0)
+		return Store3Error;
+
+	LString Sql;
+	Sql.Printf("delete from " MAIL3_TBL_MAILSEGS " where Id=" LPrintfInt64, SegId);
+	GMail3Store::GStatement s(Kit, Sql);
+	if (!s.Exec())
+		return Store3Error;
+
+	SegId = -1;
+	return Store3Success;
+}
+
+LAutoStreamI GMail3Attachment::GetStream(const char *file, int line)
+{
+	LAutoStreamI Ret;
+
+	if (Import)
+		Ret.Reset(new LProxyStream(Import));
+	else if (SegId > 0 && BlobSize > 0)
+		Ret.Reset(new Mail3BlobStream(Kit, (int)SegId, (int)BlobSize, file, line));
+
+	return Ret;
+}
+
+bool GMail3Attachment::SetStream(LAutoStreamI s)
+{
+	Import = s;
+	Dirty = true;
+	BlobSize = Import ? Import->GetSize() : 0;
+	
+	if (Mail)
+		Mail->ResetCaches();
+	
+	return true;
+}

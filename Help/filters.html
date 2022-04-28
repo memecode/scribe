@@ -1,0 +1,265 @@
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>Filtering</h2></center>
+
+		<div class=helpheading>Filters</div>
+			Scribe has 2 filtering systems at the moment, one a user specified filter list and the other is
+			a bayesian spam filter. They mostly work separately, (if enabled) the bayesian filter 
+			runs first and checks incoming mail for spam. If it passes that stage then it's run through
+			the normal user specified filters. Which may sort, delete and mark or label email.
+			<p/>
+			To create a new user filter, use the Filters &#9654; New Filter menu. This opens a filter edit window
+			to allow you to set the conditions and actions of the filter. The first tab of the filter
+			window has a name, to describe what the filter does, and a couple of buttons to change the
+			order that the filters run in. If you select the filters folder in the main window and set
+			the sorting to "Index - Descending" then the buttons allow you to move the filter up and down.
+			Filters are executed in ascending order, from 1 through to the last number unless some filter
+			asks for furthur processing to stop. This means that multiple filters may match on the same
+			email and run their actions on it.
+			<p/>
+			<div class=inscribe>
+				i.Scribe: Only the first 5 filters run when you receive mail. This is just 
+				to demonstrate the feature that is in InScribe, enough so that you can 
+				see how it works. If you define more than that then they appear greyed out
+				in i.Scribe. However if you purchase InScribe and install it they will become
+				active.
+			</div>
+			<p/>
+			The user filtering system is based around the Scribe <a target="_top"
+			href='http://www.memecode.com/scribe/dom.php'>DOM</a>
+			which is a system for specifying fields within Scribe objects via text labels. It's quite
+			simple once you get the hang of it and the menus in the filter's user interface help you
+			with some shortcuts to get you started. For example you might want to write a filter that
+			checks against the value of an incoming email's "from" header. Well, you'd use a DOM field 
+			like this:
+			<pre>mail.From</pre>
+			Where "mail" is an object (of type Object::Mail), i.e. the incoming email, and "From" the 
+			field within the object. However, if you study the DOM, you'll see that the From field of
+			a mail object is of type Object::Address. Which itself has separate sub fields. So you could
+			then specify a more precise DOM field to achieve something like querying just the name of
+			the person sending the email like this:
+			<pre>mail.From.Name</pre>
+			<p>
+			This way of doing things is surprisingly powerful if you want to write some complicated
+			filters. Ok, so are a few examples of what can be done with DOM fields; firstly, you
+			can select a single header out of the incoming mail's headers using:
+			<pre>mail.InternetHeader[<arg>{header-name}</arg>]</pre>
+			which is useful if some upstream mail processor has added a header that you want to filter
+			on. Then there is the From field of the mail, which has a Contact sub field that links to 
+			the local Contact database if the address's email matches a local Contact. If someone in
+			your Contacts emails you, then you can access all their Contact record data from the filtering
+			system like this:
+			<pre>mail.From.Contact.Folder</pre>
+			Would return the path of the folder that the contact is stored in. So if you wanted, you could
+			put your contacts in different sub folders and then filter incoming mail based on which folder
+			the contact was in. I'm sure you can think of applications for that ;)
+			<p/>
+			The contact record even has a bunch of custom fields that you can name yourself and assign whatever
+			value to. These can then be used to filter with as well. This could be used to track customer
+			numbers or group contacts in ways specific to your own needs.
+
+		<div class=helpheading><a name="manage">Managing Mail with Filters</a></div>
+			There are several things that you can do with filters beyond just filtering the incoming
+			mail. Different things may be accomplished by using different sets of filters. In this case
+			it's useful to know that only the filters in /Filters are used in the filtering process, and
+			filters in sub-directories are not. This means that you can "switch off" filters by putting
+			them into a sub-directory of /Filters.
+			<p/>
+			If you have a folder of mail that you want to process using filters, you can do so by selecting
+			the folder in the tree view and then clicking the Filters &#9654; Filter the Current Folder menu.
+			This runs the filters over all the email in the current folder as if you had just received it.
+			Usually known as "filtering after the fact" in some other mail apps. This is handy if something
+			you just received ended up in your inbox instead of being filtered, then you can go and adjust 
+			the filter, and re-run the filters over the inbox.
+			<p/>
+			If you need to debug a problem you're having with filters you can switch on logging using the 
+			Filters &#9654; Log Filter Activity menu option. The output is written to a file called 'FilterLog.txt'
+			in the same folder as the Scribe executable.
+			<p/>
+			On a related note, there is another feature that may prove useful when filtering folders. If
+			you right click on a folder, there is an option to "Collect all mail from Sub-Folders". This
+			moves all email in the current folder's sub-folders into the currently selected folder.
+			<p/>
+
+		<div class=helpheading><a name="cond">Conditions</a></div>
+			Before the actions of a filter can run the conditions of the filter must be met. The filter
+			has a list of conditions, that are either OR'd together or AND'd together to return TRUE or
+			FALSE. The option to use AND or OR is at the bottom of the conditions tab in the filter
+			window.
+			<p/>
+			The conditions list is setup as a set of records, where you create and delete conditions with
+			the buttons "New" and "Delete". You can seek along the set of records with the scrollbar.
+			<p/>
+			To configure a condition, choose the field. This is any valid DOM field, and isn't limited
+			to the list in the drop down box.
+			<p/>
+			Then choose the operator. Most are self explanatory, but a few bear talking about. 'Like' does
+			a wildcard match, where the wildcard '*' matches any characters and '?' matches any single 
+			character. 'Contains' does a sub string search for the value.
+			<p/>
+			You can invert the logic of the condition by using the NOT operator.
+			<p/>
+			The drop down for the value field is entirely optional, it's just to help select values of
+			certain types. Most of the time you can just enter in values directly.
+			<p/>
+
+		<div class=helpheading><a name="actions">Actions</a></div>
+			Once all the conditions are met then the actions are executed, in order from first to last.
+			If you would like this filter to be the last filter processed on this email, set the 
+			"Stop further processing of filters" option.
+			<p/>
+			The available actions are:
+			<ul>
+				<li> <div class=action>Move to folder</div>
+					Moves the email to the specified folder. Select the destination folder with "...".
+				<li> <div class=action>Delete</div>
+					Deletes the email. Use the "..." button to configure where to delete from, either
+					local folders, the server or both.
+				<li> <div class=action>Print</div>
+					Prints the email using the current Printer setup (File &#9654; Print Setup).
+				<li> <div class=action>Play Sound</div>
+					Plays the specified sound. Select a sound with "...".
+				<li> <div class=action>Open Email</div>
+					Opens the email in it's own window.
+				<li> <div class=action>Execute Process</div>
+					Executes a program, optionally with parts of the email as arguments. The program
+					executed is given by the argument field. The format of the argument field is the same
+					as an email template, in that fields are enclosed by &lt;? field_name ?&gt;. Available
+					fields are specified in the <a href="http://www.memecode.com/scribe/dom.php">Scribe DOM</a>,
+					and the objects in the root namespace are "filter", "mail", "now" and "scribe". e.g.
+					<pre>"c:\Program Files\App\my_application.exe" -subject &lt;? mail.Subject ?&gt; -body &lt;? mail.Body ?&gt;</pre>
+					Alternatively if you want the content of a DOM field as a file instead of a literal value, 
+					which is useful in the case of large amounts of mail body data you can wrap the DOM field
+					name in 'file[...]' e.g.
+					<pre>"c:\Program Files\App\my_application.exe" -bodyfile &lt;? file["mail.Body"] ?&gt;</pre>
+					You have to quote the argument to 'file' or the DOM name parsing will turn into a literal before it gets
+					passed to the code that handles wrapping the value as a 'file'. Which is normally not what you want.
+					The file will remain at that location until Scribe is exited, at which point it will be deleted.
+				<li> <div class=action>Set Colour</div>
+					Sets the mark colour of the message.
+				<li> <div class=action>Set Read</div>
+					Set the message read. This will mean it doesn't show up in the new mail list.
+				<li> <div class=action>Set Label</div>
+					Sets the label of the message.
+				<li> <div class=action>Empty Folder</div>
+					Empties the folder given in the argument.
+				<li> <div class=action>Mark As Spam</div>
+					Deletes the email as spam. Which is the same as hitting the spam button on the main window's
+					toolbar.
+				<li> <div class=action>Reply</div>
+					Replies to the email with a given template. To setup a template, create a new mail in the 
+					/Templates folder by right clicking on the folder in the tree view and selecting "New Mail". 
+					Then fill out the body of the message you want to use as a reply and save the template. 
+					Then in the filter action click the "..." to set the template to use.
+					<p/>
+					You can use <a href='http://www.memecode.com/scribe/dom.php'>DOM fields</a> in the 
+					template to reference the source email, e.g.:
+		<pre>Dear &lt;? mail.from.name ?&gt;,
+I received your email on &lt;? mail.datereceived ?&gt;, thanks.
+</pre>
+				<li> <div class=action>Forward</div>
+					Forwards the email on to a new recipient. Click the "..." button to set optional parameters. Otherwise
+					just enter the email address to forward to. The forward action can also use a template and 
+					DOM fields like the reply action described above.
+				<li> <div class=action>Bounce</div>
+					Bounces the email to the address specified in the argument box as if the message had orginally come
+					from the first sender instead of yourself. Which means that any reply your recipient sends will go
+					to the original sender, not you.
+				<li> <div class=action>Save Attachment(s)</div>
+					Saves some or all of the attachments to a folder outside the mail storage. Click the "..." button
+					to specify the folder to save to and the types of files to save. Use "*" to match all files, or
+					use something like "*.gif *.jpg *.png" to match a subset of files.
+				<li> <div class=action>Delete Attachment(s)</div>
+					This action deletes attachments from an email. The argument specifies the types of files to 
+					delete. This can be "*" to match all files, or
+					something like "*.gif *.jpg *.png" to match a subset of files.
+			</ul>
+			<p/>
+
+		<div class=helpheading><a name="actions">Scripting</a></div>
+			The script tab overrides both the conditions and actions tab, in that if you enter a script there 
+			then Scribe assumes you want to check the conditions in script instead of use the limited filter
+			conditions.
+			<p/>
+            Filter scripts have 3 global variables defined:
+            <table style="margin: 1em;">
+                <tr><td> <arg>App</arg> <td> The main application object.
+                <tr><td> <arg>Filter</arg> <td> The filter being evaluated.
+                <tr><td> <arg>Mail</arg> <td> The mail being filtered.
+            </table>
+            <p/>
+			Further documentation on scripting is <a target="_top" href='scripting.html#filterscripting'>here</a>.
+			<p/>
+
+		<div class=helpheading><a name="bayes">Bayesian Spam Filter</a></div>
+			Firstly I'll refer to anything that isn't spam as "ham".
+			<p/>
+			Basically the first stage is to collect the spam as it arrives and "tag" it for what it 
+			is by using the "Delete As Spam" button in the toolbar. You should create a subdirectory 
+			off "Mailbox" called "Spam" if it doesn't already exist.
+			<p/>
+			Once you have a little bit of spam collected, switch the filtering into "Training mode" 
+			using the Filters &#9654; Bayesian Filtering Options dialog. I set the Probably directory to 
+			"/Spam/Probably" so I can check it easily for false positives.
+			<p/>
+			Then run the Filters &#9654; Build Word Lists command which will iterate through all your mail 
+			and build a database of words, both good and bad. As a side effect of this a whitelist 
+			is generated from the "from" address of all the email not in the Spam folder.
+			<p/>
+			Now as you begin to receive mail the filter will start classifing it into Spam and 
+			Ham. The Spam is put in the Probably folder (whatever you configured that to). The new 
+			mail functions are not triggered when you receive Spam. Which is nice, because it won't 
+			distract you from what you're doing.
+			<p/>
+			Every now and then go through your Probably folder and "delete as spam" the contents 
+			(minus any false positives of course).
+			<p/>
+			Also at this point the word database is not updated automatically, you have to re-run the 
+			Filters &#9654; Build Word Database every few days to keep it up to date. The problem with 
+			keeping the word database up to date is not adding the Spam mail to the spam word database 
+			but deciding when to add the Ham to the ham database. For instance if you receive a 
+			mail that is a false negative (i.e. a Spam classified as Ham) then you would read the 
+			email and then "Delete As Spam". If it's a Ham you leave it or move it into another 
+			folder. So sometime after the mail is read and hasn't been "Deleted as Spam" it needs 
+			to be added to the Ham word list. But there is no explict event that occurs to add this 
+			action to. I thought about using a timeout, i.e. if you havn't deleted it as spam 
+			within x minutes of reading the mail then it's probably Ham right? But I can think of 
+			reasons when that will fail. But what I don't want is having to classify every ham as 
+			"Ham". That's just adding too much work to the daily routine. Another option would be to 
+			automatically add every mail to the Ham db and then if the user clicks "Delete As Spam" 
+			on it the Ham db word counts are decremented and the Spam word counts are incremented. 
+			But that's double handling. Which is inefficent. So I am sticking with the manual "build 
+			word lists" for the moment until I can resolve this issue.
+			<p/>
+			Once your incoming mail is being sorted correctly, i.e. you're getting no false positives 
+			and the false negatives are quite low, put the filter into Live mode, and remove the Probably
+			folder. The filter will "delete as spam" anything that gets a spammy score of 0.9 or above.
+			From experience a few hundred spam is all that's necessary to make the filter work.
+			<p/>
+			The spam sitting in the spam folder needs to stay there in the current implementation. You can't
+			delete them because when the word database is rebuilt it will scan that folder, and if the
+			words aren't there then the spam word file will be empty, and thus the filter will stop working.
+			<p/>
+			Generally you should expect effiency in the order of about 98% or a little better with a
+			well populated folder and no viruses. Viruses tend to skew the results towards the "spam"
+			side of things. I find it often easier to filter out viruses by using user filters as they
+			don't have enough text in the message to effectively be filtered by the bayesian filter.
+			<p/>
+
+		<br>
+		<center>&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a></center>
+	</table>
+
+</body>
+</html>

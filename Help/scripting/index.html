@@ -1,0 +1,55 @@
+<html>
+<head>
+	<link href="scripting.css" rel="stylesheet" type="text/css">
+	<title>Lgi Scripting</title>
+</head>
+<body>
+
+	<h1>Lgi Scripting Language</h1>
+	<div class=menu>
+			<span><a href="..">Up</a></span>
+			<span>Index</span>
+			<span><a href="syntax.html">Syntax</a></span>
+			<span><a href="library.html">Library</a></span>
+	</div>
+
+	<div>
+		Lgi's scripting language is loosely based on the "C" syntax, but without a number of the
+		more difficult to implement parts of the language. Support for the language is broken into
+		2 parts; the compiler, which converts source code into binary byte code, and the virtual machine,
+		which executes the byte code in the context of the application.
+		<p/>
+		None of the parts of the compiler / VM system are particularly fast or modern, and if I my
+		choices again I would try harder to intergrate <a href="http://www.python.org/">Python</a> than 
+		write some weird little language.
+		The compiler is recursive, and the VM is based around a big switch statement. Both quite old
+		concepts.
+		<p/>
+		That said it does work ok, and it acheives some flexibility in the various host applications.
+		It's also very small, added very little overhead to the host and also comes with direct support
+		for using native Lgi types, including support for DOM tree's using the '.' operator.
+		<p/>
+		There is a <a href="library.html">default library</a> of methods that are normally included 
+		with the VM in the host application which provide some support for string manipulation and 
+		other utilities.
+		<p/>
+		The main applications that host Lgi's scripting language are 
+		<a href="http://www.memecode.com/image.php">i.Mage</a> (for drawing procedural images) and
+		<a href="http://www.memecode.com/scribe.php">i.Scribe</a> (for filters, custom menu commands and
+		utils/tools).
+
+		<h4>Source Documentation</h4>
+		<ul>
+			<li><a href="http://memecode.com/lgi/docs/classGScriptEngine.html">GScriptEngine</a> (base class for scripting engine)
+			<li><a href="http://memecode.com/lgi/docs/classGScriptEngine2.html">GScriptEngine2</a> (current impl of 
+								<a href="http://memecode.com/lgi/docs/classGScriptEngine.html">GScriptEngine</a>)
+			<li><a href="http://memecode.com/lgi/docs/classGCompiler.html">GCompiler</a>
+			<li><a href="http://memecode.com/lgi/docs/classGCompilerPriv.html">GCompilerPriv</a>
+			<li><a href="http://memecode.com/lgi/docs/classGVirtualMachine.html">GVirtualMachine</a>
+			<li><a href="http://memecode.com/lgi/docs/classSystemFunctions.html">SystemFunctions</a> (library functions)
+			<li><a href="http://memecode.com/lgi/docs/classGVarRef.html">GVarRef</a>
+			<li><a href="http://memecode.com/lgi/docs/classGCompiledCode.html">GCompiledCode</a>
+	</div>
+
+</body>
+</html>

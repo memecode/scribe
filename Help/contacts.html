@@ -1,0 +1,111 @@
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>Contacts</h2></center>
+
+		<div class=helpheading><a name="create">Creating</a></div>
+			To create a contact:
+			<ul>
+				<li> Click the new contact button on the toolbar.
+				<li> Click Contact &#9654; New Contact.
+				<li> Right click on a "To:" or "Cc:" address in a mail
+					window and click "Add to Contacts".
+			</ul>
+
+		<div class=helpheading><a name="fields">Fields</a></div>
+			Each contact can have multiple email addresses associated with the 
+			contact record. Different addresses can be selected in the right click
+			menu of the mail window's recipient list.
+			<p/>
+			The nick name is really useful for giving the record a unique "shortcut".
+			When adding recipients to an email, the nick name is searched after the
+			real name fields, so by putting some unique and short name in the nick
+			field it makes it really easy to type in the recipients entry box.
+			<p/>
+			The home and work tabs have all the usual information associated with
+			people.
+			<p/>
+			The plugins tab is where, if you have the right plugins loaded, you can
+			specifically associate a contact with a particular plugin. For instance
+			this is used  by the <a href='plugins.html#autogpg'>AutoGPG</a> plugin
+			to automatically encrypt and decrypt communications with that contact.
+			<p/>
+			The notes field is just free form text.
+			<p/>
+			Custom fields, which can be addressed via the Scribe 
+			<a href='http://www.memecode.com/scribe/dom.php'>DOM</a> are useful for
+			more complex scripting and filtering.
+			<p/>
+			The final tab, 'Other' contains a field for setting the timezone that
+			the contact is in. This then also displays the local time for the contact,
+			which can be really useful for not waking me up at 2am with an international
+			phone call! *hint hint* :) This local time is also displayed in the recipient
+			list IF the time zone is set in the contact record. Also if an incoming email
+			has timezone information for a contact record, then the timezone field will
+			be automatically updated. This means that if the timezone of the contact changes,
+			like for daylight savings, then the first email with the new timezone will
+			update things.
+			<p/>
+
+		<div class=helpheading><a name="groups">Using Groups of Contacts</a></div>
+			To create a group of contacts you use the Contacts &#9654; New Group menu. Then give the
+			group a name and start entering names or email address into the body of the group.
+			If a word turns red then it is matching more than one contact and needs to be resolved
+			to a unique person by right clicking the word and selecting the right contact. If a
+			word is grey it doesn't match any contacts and has to be a valid email address to work
+			(i.e. the email address of someone not in your contact database).
+			If a word is black then it matches a single contact and is ready to use. All names in 
+			the body convert to email addresses when you save the group so that the email 
+			engine can use them. You can at any point double click a black word to bring up the
+			contact record for that address giving you all their other details.
+			<p/>
+			To email a group you can either type the name of the group as a recipient or find the
+			group in the add contact window.
+			<p/>
+
+		<div class=helpheading><a name="share">Addressing Email</a></div>
+			When adding addresses to a new email Scribe will search all the
+			contacts in the normal /Contacts folder and any sub folders of 
+			contacts under /Contacts.
+			<p/>
+			The search looks for a matching first name, then a matching whole
+			name, and then a matching nickname.
+			<p/>
+			If a match for a name or email is found
+			then the recipient address entry has a little contact card icon.
+			If the address is not in the database a "To:", "Cc:" or "Bcc:" icon
+			is shown.
+			<p/>
+			If Scribe cannot uniquely identify which contact you
+			meant, a red question mark is shown next to the recipient. To resolve
+			the name conflict, right click on the entry and select which name
+			you meant before you can send. Then you can send.
+			<p/>
+			To browse for the correct recipient, click the "..." button next to the
+			recipient entry field in the main window. This allows you to search through
+			available contacts for the recipient you want. Just type the first few 
+			characters in the search box and the list will seek down to the nearest entry.
+			If the entry you want is now selected, hitting Enter will add that person
+			to the email.
+			<p/>
+			If you have a directory service plugin like the 
+			<a href='plugins.html#ldapclient'>LDAP Client</a> plugin loaded then you
+			will have an extra tab on the "Add Contact" window displaying all the contacts
+			stored on the server.
+
+		<br>
+		<center>&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a></center>
+	</div>
+
+</body>
+</html>

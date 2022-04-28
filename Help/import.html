@@ -1,0 +1,192 @@
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>Import / Export</h2></center>
+
+		<div class=helpheading>How to get data in and out of Scribe</div>
+			Scribe supports a few different standard email and contact formats. So it's usually possible
+			to bring across the data from your old client into Scribe. To a lesser degree you can sometimes
+			take your email and contacts with you to your next client, should you have to stop using Scribe.
+			<p/>
+			So this section will help get you started with importing and exporting. Firstly quite a bit of
+			the import / export is based around drag and drop. Scribe takes it's drag and drop quite seriously
+			so there are often 2 ways to do something, using the tools menu or drag and drop (dnd). For instance, you can
+			drag a folder, an email or a contact onto anything that accepts files, and Scribe will export the
+			object in a standard text file format. The mappings between file and internal object are as follows:
+			<p/>
+			
+			<center>
+				<table style='font-size: 10pt;'>
+					<tr style='font-weight: bold; font-size: 9pt;'>
+						<td width=200 style='border:0px; border-bottom-width: 1px;
+							border-color: #444499; border-style: dotted; '>Scribe Object
+						<td width=200 style='border:0px; border-bottom-width: 1px;
+							border-color: #444499; border-style: dotted; '>Mime Type
+						<td width=150 style='border:0px; border-bottom-width: 1px;
+							border-color: #444499; border-style: dotted; '>File Extension
+					<tr>
+						<td>Email
+						<td>message/rfc822
+						<td>.eml
+					<tr>
+						<td>Folder of Email
+						<td>text/mbox
+						<td>.mbx (Mbox)
+					<tr>
+						<td>Contact
+						<td>text/x-vcard
+						<td>.vcf (<a target='_top' href='http://www.imc.org/pdi'>vCard</a>)
+					<tr>
+						<td>Calendar Appointment
+						<td>text/calendar
+						<td>.ics or .vcs (<a target='_top' href='http://www.imc.org/pdi'>vCal</a>)
+				</table>
+			</center>
+			<p/>
+			
+			Drag and drop can be used to import AND export all these types of files. In the case that you're
+			importing, drop the file into the actual folder in the main window's tree view that you want to
+			import to. If the incoming file is an MBOX folder then all the mail inside will be imported into
+			the destination folder, ie. it won't create a subfolder to import to, you have to do that. When
+			exporting MBOX there is a small delay as the MBOX file is created for the folder being dragged,
+			during this time a progress window will show you how it's going. Just keep the mouse button down
+			until the MBOX is created and then once it's done, drop it where you want to export to.
+			<p/>
+			You might find this obvious, but an Email window can accept as attachments files dropped onto it. This means
+			that you can treat it like a folder, dragging files to and from it to import and export them. This
+			is quite powerful, like you could send someone your schedule for next week.
+			This would be as simple as selecting all the appointments for next week in the calendar view and dropping
+			them straight onto the mail to that person.
+			<p/>
+
+		<div class=helpheading><a name="oe">Scribe</a></div>
+			<h4>Export To Scribe Mail Store</h4>
+			You can export some or all or your folders to another Scribe mail store via Tools &#9654; Export &#9654; Scribe &#9654; Export or
+			<kbd>F7</kbd>. This replicates your current folders to the external mail database, in that anything that
+			exists locally but not in the target folders is copied across. Locally deleted items are do not deleted on the
+			destination mail store.
+			Either select "All Folders" or use the [+] button to select a sub-set of local folders for export.
+			The destination path allows you to map all the local folders to a sub-folder in the target mail store,
+			otherwise to use the root folder as the target put "/" as the destination folder. Typically you'd use
+			this to upload mail received on a portable install of Scribe to your main install on a desktop
+			machine.
+			<p/>
+
+		<div class=helpheading><a name="oe">Outlook Express</a></div>
+			<h4>Import Mail</h4>
+			Outlook Express (OE) stores mail in 1 of 2 proprietry mail box formats. Both are partially supported
+			by Scribe. I say partially because the formats are not published, so I can't be certain that my code
+			will read them correctly. That said in most cases the import will work fine. But if not then I
+			can't help you. To attempt an import directly from OE's MBX (which aren't MBOX) or DBX files use 
+			the Tools &#9654; Import &#9654; Outlook Express &#9654; MBX or DBX menu items.
+			<p/>
+			There is another way to import mail from OE, and that is via .eml files. When you drag an email from
+			OE to a folder it will export it as an .eml file. Which Scribe will happily import, in fact you can 
+			select all the email in an OE folder and drop it straight onto a Scribe folder and it gets converted
+			via .eml files into Scribe objects.
+			<p/>
+			<h4>Export Mail</h4>
+			Exporting mail back to OE can only be done through the drag and drop interface, by dragging email from
+			Scribe main window list view straight into the list view area of OE. This will import mail into the 
+			currently selected folder of OE.
+			<p/>
+			<h4>Import/Export Contacts</h4>
+			OE contacts are natively exported an vCard files. So the easy way to move Contacts between OE and
+			Scribe is again via drag and drop. Both applications support receiving vCard's as dropped files. So
+			open the Address Book in OE and select the /Contacts folder in Scribe. To import, drag the contact from
+			OE's Address Book onto the Contacts folder in Scribe. To export, drag the Contact from Scribe onto OE's
+			Address Book.
+			<p/>
+			OE can also export Contacts as CSV files, so if you want to bring across contacts as a CSV file see 
+			the section on <a href='#contacts'>Contacts</a> section below.
+			<p/>
+
+		<div class=helpheading><a name="outlook">Microsoft Outlook</a></div>
+			<h4>Import Mail</h4>
+			The support for reading Outlook data into Scribe is supplied via the MAPI library in Windows so it's
+			only available in the Win32 port. To bring the whole PST file across in one hit, use the Tools &#9654;
+			Import &#9654; Outlook(MAPI) &#9654; Email menu. This is not foolproof though, and it crashes on some systems.
+			Alternatively you can import by dragging email straight from Outlook into a Scribe folder. This uses
+			different code and can work when the menu options crashes.
+			<p/>
+			<h4>Import Contacts</h4>
+			Firstly try the Tools &#9654; Import &#9654; Outlook(MAPI) &#9654; Personal Address Book. Alternatively you can try
+			exporting contacts from Outlook as a CSV file. To do this click File &#9654; Import and Export in Outlook,
+			select "Export to a file...", select "Comma Separated Values (Windows)", Select the folder that contains
+			your contacts, select a tempory file to store the data. Then import the file using the 
+			<a href='#contacts'>standard CSV import</a> procedure.
+			<p/>
+
+		<div class=helpheading><a name="eudora">Eudora</a></div>
+			<h4>Import Mail</h4>
+			Use File &#9654; Import &#9654; Text &#9654; Unix MBOX and browse to Eudora's directory. Select the .mbx files.
+			<p/>
+			<h4>Import Contacts</h4>
+			Use File &#9654; Import &#9654; Eudora &#9654; Contacts.
+			<p/>
+
+		<div class=helpheading><a name="mozilla">Mozilla</a></div>
+			<h4>Import Mail</h4>
+			Use File &#9654; Import &#9654; Text &#9654; Unix MBOX and browse to Mozilla's directory. You can find out where Mozilla
+			stores it's email by openning Mozilla Mail, Edit &#9654; Mail Account Settings &#9654; <arg>{Your Account}</arg> &#9654; Server Settings
+			and it's down at the bottom called "Local Directory".
+			<p/>
+			<h4>Import Contacts</h4>
+			The current build of <a href='http://www.mozilla.org/projects/thunderbird/'>Thunderbird</a> uses LDIF files to 
+			store the address book. Scribe doesn't directly support this
+			format (yet) so you need to convert the file to a format that Scribe can recognise. There are a number of tools
+			to do this but the easiest to use (on windows) is <a href='http://www.joshie.com/projects/dawn'>Dawn</a>. Open
+			the Thunderbird LDIF file in Dawn and convert it to CSV. Then follow the <a href='#contacts'>CSV</a> import procedure.
+			<p/>
+			For the older Mozilla mail client
+			use File &#9654; Import &#9654; Mozilla &#9654; Contacts to import the Mozilla MAB file.
+			<p/>
+
+		<div class=helpheading><a name="email">Email</a></div>
+			Single email in the form of .eml files can be imported to a folder by dropping the file on the folder.
+			Export can be done by dragging an email from the main window's list view on anything that accepts a
+			dropped file.
+			<p/>
+			Multiple email in the form of MBOX files (.mbx) can be export to a file by dragging the folder onto
+			something that accepts a file. MBOX files can be imported by dropping the file onto a Scribe email
+			folder.
+			<p/>
+
+		<div class=helpheading><a name="contacts">Contacts</a></div>
+			<h4>Import</h4>
+			Single contacts in the form of .vcf (vCard) files can be imported to a folder by dropping the file on 
+			a folder of contacts.
+			<p/>
+			Multiple contacts can be imported from a CSV (comma separated values) file. To import
+			a CSV file of contacts, start with Tools &#9654; Import &#9654; Text &#9654; CSV Contacts. Then select the file to
+			import. Now you have to map all the fields in the CSV file to their Scribe equivalents. The CSV file's
+			fields are listed down the left, and you have to go down the right column, and select a field from the
+			menu by clicking each blank area. If you don't want to map a certain field just leave it blank. Once the
+			field mapping is done, you can save it to a file if you want to store the mapping you've created by using
+			the "Save" button. Likewise the "Load" button loads a previously saved field mapping and applies it to
+			the list of fields. Once you happy with the mappings you can select an output folder in Scribe using "...".
+			Then click "Ok" to start the import.
+			<p/>
+			<h4>Export</h4>
+			Export single contacts by dragging it from the main window's list view to anything that accepts a
+			dropped file.
+			<p/>
+			Export multiple contacts as a CSV file with Tools &#9654; Export &#9654; Text &#9654; CSV Contacts.
+			<p/>
+
+		<br>
+		<center>&copy; 1999-2018 <a href="mailto:fret@memecode.com">Matthew Allen</a></center>
+	</div>
+
+</body>
+</html>

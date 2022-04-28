@@ -1,0 +1,66 @@
+Received: from sea.spamstick.net (sea.spamstick.net [204.109.57.196])
+	by vmmail2.gmn-usa.com (Postfix) with ESMTP id 0F94416A435
+	for <fret@globalmarinenet.com>; Mon,  8 Aug 2016 03:44:32 +0000 (UTC)
+Received: from mail-pf0-f181.google.com ([209.85.192.181])
+	by sea.spamstick.net with esmtps (TLSv1.2:AES128-SHA:128)
+	(Exim 4.85)
+	(envelope-from <memecode@gmail.com>)
+	id 1bWbUM-0008I7-RJ
+	for fret@globalmarinenet.com; Sun, 07 Aug 2016 23:44:32 -0400
+Received: by mail-pf0-f181.google.com with SMTP id x72so114635399pfd.2
+	for <fret@memecode.com>; Sun, 07 Aug 2016 20:44:30 -0700 (PDT)
+Received: from [192.168.1.190] (106-69-215-24.dyn.iinet.net.au. [106.69.215.24])
+	by smtp.gmail.com with ESMTPSA id p75sm43490840pfa.71.2016.08.07.20.44.27
+	for <fret@memecode.com>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 07 Aug 2016 20:44:28 -0700 (PDT)
+To: Matthew Allen <fret@memecode.com>
+From: Matthew Allen <memecode@gmail.com>
+Subject: signed
+Message-ID: <6acf12be-393b-e913-1319-7ab0e1d80df3@gmail.com>
+Date: Mon, 8 Aug 2016 13:44:12 +1000
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+	Thunderbird/45.1.1
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wcQB5OfpGkrsiP914t8enQXuMEufEgjoE"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wcQB5OfpGkrsiP914t8enQXuMEufEgjoE
+Content-Type: multipart/mixed; boundary="l09qthx6bDXRdSid3o9pOdR7D24bsEswc"
+From: Matthew Allen <memecode@gmail.com>
+To: Matthew Allen <fret@memecode.com>
+Message-ID: <6acf12be-393b-e913-1319-7ab0e1d80df3@gmail.com>
+Subject: signed
+
+--l09qthx6bDXRdSid3o9pOdR7D24bsEswc
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+The body
+
+
+
+--l09qthx6bDXRdSid3o9pOdR7D24bsEswc--
+
+--wcQB5OfpGkrsiP914t8enQXuMEufEgjoE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Gnu Privacy Tools
+Comment: Download at http://www.gnupt.de
+
+iQEcBAEBCAAGBQJXqAAXAAoJEKO90sYLI+lAmVwIALSg6NjXy9Quk6Eoke06pm/a
+2i6XFVJ0a/cyOQgbzb1Sz+QtO0fe7YTnZ0shYadkm2HRswpZjm/VIw8yQF5RjIni
+z49Ow8uhdpaTO4hF3g3Hxy2Sp9Fx2dCIZWBTNPPBASqBoXYkcaPRSNjLX2kLILU7
+N9aFi5EJegP26PN/Lens5iMX3xMl6v53i5HtgK16CyO2DmR+HfR6LjqA1f9ZiCDf
+a5k5IfAVKUaMDJlPLm4IESkm2jX9kEBkPLRgajPzFFZGY8w6kyuZRgJmoTautKni
+V6rDIt0goe0qEK0bRl9OhGlYtuoli1gxO6szdrd8bMtUYgreM1vCJ0oaJIG9gcc=
+=MB2C
+-----END PGP SIGNATURE-----
+
+--wcQB5OfpGkrsiP914t8enQXuMEufEgjoE--

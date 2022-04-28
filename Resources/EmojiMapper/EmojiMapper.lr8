@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources Offset="1">
+	<menu Name="IDM_MENU">
+		<string-group Name="&lt;untitled&gt;">
+			<String Ref="2" Cid="2" Define="IDM_FILE" en="&File" />
+			<String Ref="3" Cid="503" Define="IDM_EXIT" en="E&xit" />
+			<String Ref="1" Cid="500" Define="IDM_HELP" en="Help" />
+			<String Ref="4" Cid="500" Define="IDM_HELP" en="Help" />
+			<String Ref="5" Cid="502" Define="IDM_ABOUT" en="About" />
+		</string-group>
+		<submenu Ref="2">
+			<menuitem Ref="3" />
+		</submenu>
+		<submenu Ref="1">
+			<menuitem Ref="4" />
+			<menuitem Ref="5" />
+		</submenu>
+	</menu>
+</resources>

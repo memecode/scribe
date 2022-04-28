@@ -1,0 +1,136 @@
+Return-Path: <memecode@gmail.com>
+Delivered-To: unknown
+Received: from mail2.memecode.com (208.86.227.138:110) by Intelmini.local
+  with POP3; 08 Aug 2016 03:48:40 -0000
+X-GMN-ID: XID-1470627942-84122
+X-Original-To: fret@globalmarinenet.com
+Delivered-To: fret@globalmarinenet.com
+Received: from seb.spamstick.net (seb.spamstick.net [204.109.63.9])
+	by vmmail2.gmn-usa.com (Postfix) with ESMTP id B1AC616A435
+	for <fret@globalmarinenet.com>; Mon,  8 Aug 2016 03:45:42 +0000 (UTC)
+Received: from mail-pa0-f53.google.com ([209.85.220.53])
+	by seb.spamstick.net with esmtps (TLSv1.2:AES128-SHA:128)
+	(Exim 4.85)
+	(envelope-from <memecode@gmail.com>)
+	id 1bWbVU-0006B9-SX
+	for fret@globalmarinenet.com; Sun, 07 Aug 2016 23:45:42 -0400
+Received: by mail-pa0-f53.google.com with SMTP id pp5so109394615pac.3
+        for <fret@memecode.com>; Sun, 07 Aug 2016 20:45:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=to:from:subject:message-id:date:user-agent:mime-version;
+        bh=z835Q1VrxuRMZ4NAERXvAEuLlgvkmt4jjKX2FYX1wu0=;
+        b=eonBnkXptVryKXlX4lyYkPt2wTHrngHUcs/RpARaxbDhCtlKKc9t4rapivtneACtXK
+         YpVwCXWrkn3WI19O4x93oom4TWiBpNTWau2jVsafQ7JTLXUYlVrBSLfRSEO1wENxNOJ/
+         fBwKNUmIi7srRo91JpoURpm380nykob3LljGzyWKEKsFbmMt/x3/NgoHz73zoQ8erKNO
+         +1BCK7Lv0JdLYT3/SnHdxmAwF5KlEmaa5Ng3qI7GV0NYXfzOgUgoApv7WRP2WdH3Bdcq
+         rjypW8EtSsXMZhsBNka8hNBXVqdmJBd9GJz12WbXw53/KmKcuNCKjEoblP1c6W/uwO0y
+         ANxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20130820;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version;
+        bh=z835Q1VrxuRMZ4NAERXvAEuLlgvkmt4jjKX2FYX1wu0=;
+        b=LyN9pwz0e5qEIgalePq96npL9bp/ymlobKkIa2s3BfpeYpt89ul/B/HmEtdsnlrvuJ
+         Y1hpYti00K6I05zCsZav9jwtey29akLVMJfX4BRo3cbJonPLAtLfhZbzT3TL1FLQReAn
+         SJEum8T7NT5p1DF5Z5RqC7rkKA6gHuWeoZ7W1/q9U1zNrZMDn2ZU2gnb3g2ev82KJdzT
+         lURaaipgw+RaZRO++HOP0AijzPA/iRytUPObGqJbv03MEkZQaLUKe+vhYWJo2xfKBeRs
+         4mzgyf73tlosQ0UvEqvW5gBzCCcMBrXyCjU5AveUhmH+AHbzPVvDLdGAxFh4QgHgNdRl
+         B3bA==
+X-Gm-Message-State: AEkoouuKJPwURFnedCRaFLsPn6ygediifDB011Htg29UF4YU2AWNTia3PODEWfqPshmtAw==
+X-Received: by 10.66.242.201 with SMTP id ws9mr157700300pac.7.1470627939368;
+        Sun, 07 Aug 2016 20:45:39 -0700 (PDT)
+Received: from [192.168.1.190] (106-69-215-24.dyn.iinet.net.au. [106.69.215.24])
+        by smtp.gmail.com with ESMTPSA id j2sm43606171paa.46.2016.08.07.20.45.37
+        for <fret@memecode.com>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 07 Aug 2016 20:45:38 -0700 (PDT)
+To: Matthew Allen <fret@memecode.com>
+From: Matthew Allen <memecode@gmail.com>
+Subject: signed, HTML
+Message-ID: <e87906de-977a-3eb8-7d71-0a0733f73317@gmail.com>
+Date: Mon, 8 Aug 2016 13:45:33 +1000
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.1.1
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Ro71NT95pEPljXm4HTOE9uwNS42LfD6Jk"
+Received-SPF: pass (seb.spamstick.net: domain of gmail.com designates 209.85.220.53 as permitted sender) client-ip=209.85.220.53; envelope-from=memecode@gmail.com; helo=mail-pa0-f53.google.com;
+X-SPF-Result: seb.spamstick.net: domain of gmail.com designates 209.85.220.53 as permitted sender
+Authentication-Results: seb.spamstick.net; dmarc=pass header.from=gmail.com
+X-Filter-ID: s0sct1PQhAABKnZB5plbIcsNKnqjojV96DHXHNe2GLwGJ/QYBv88z+Z8DEzu/KNcZngDEjnkgvrl
+ my+sCIExWMquSUPF5VyMWCVb/Sm7yUxtTCHdkaDHaPTnJvwOjNn14P7ygcQoikU2sD3Wbxj4FVJ4
+ JpOdLf4uiiQ+PYJE0h/NBEL8YaMCD0IHaD6T6K5sTO0pJ8I3s1Y66cz7/jmLEk5W5FTlgOneOt9q
+ 3eMyhN+iS5I+eVXzu8Rej/i4zfzePAviATGxHJK6A+qbUIi9n1yA2JiDuTGgcr89RmPEWZy6dsjH
+ QVRRidKu6mevj9bQJq/4FZbX1lzD9O+fyiIjB7tPYR833ExPXYPnh+cOZqGSKj0uxpv/Bg84Z/Ig
+ FNaK/pK1+KimONC06saQh7h0hFJ4JpOdLf4uiiQ+PYJE0h9K8LU902bGxZ2cbLQf9mh+rrOW4zyN
+ qNHAFvEcJKZZkDAhujb6Cb+dGMDr9JFv1KmDwIE7VKe+bqpcdCns72R1eB9HLtPu/aJFBfgTUONt
+ dD2pC00DYqwsVH2I0H503SeAxA0sYAhlvms2ZufBeFrP4sBRRc7avLibZxwfHCDxLQ==
+X-Report-Abuse-To: spam@sea.spamstick.net
+Authentication-Results: spamstick.net; spf=pass smtp.mailfrom=memecode@gmail.com
+Authentication-Results: spamstick.net; dkim=pass header.i=gmail.com
+X-RedPortSpamPortal-Class: ham
+X-RedPortSpamPortal-Evidence: Combined (0.15)
+X-Recommended-Action: accept
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ro71NT95pEPljXm4HTOE9uwNS42LfD6Jk
+Content-Type: multipart/mixed; boundary="fHwscd46sHtI7r997WsJCSt88fmJSJc4B"
+From: Matthew Allen <memecode@gmail.com>
+To: Matthew Allen <fret@memecode.com>
+Message-ID: <e87906de-977a-3eb8-7d71-0a0733f73317@gmail.com>
+Subject: signed, HTML
+
+--fHwscd46sHtI7r997WsJCSt88fmJSJc4B
+Content-Type: multipart/alternative;
+ boundary="------------E6FC94C6F1C44D26357B5EB6"
+
+This is a multi-part message in MIME format.
+--------------E6FC94C6F1C44D26357B5EB6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+The *body*
+
+
+--------------E6FC94C6F1C44D26357B5EB6
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+  <head>
+
+    <meta http-equiv=3D"content-type" content=3D"text/html; charset=3Dutf=
+-8">
+  </head>
+  <body bgcolor=3D"#FFFFFF" text=3D"#000000">
+    <p>The <b>body</b><br>
+    </p>
+  </body>
+</html>
+
+--------------E6FC94C6F1C44D26357B5EB6--
+
+--fHwscd46sHtI7r997WsJCSt88fmJSJc4B--
+
+--Ro71NT95pEPljXm4HTOE9uwNS42LfD6Jk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Gnu Privacy Tools
+Comment: Download at http://www.gnupt.de
+
+iQEcBAEBCAAGBQJXqABdAAoJEKO90sYLI+lAwgYIAKi5ihdqjFLngos+xaukDQ45
+vVjePoz5aWOVxurUvDAaajlcYUKLrhFEXgYRP7IktbOL50q0ZanlIslm7uS3iVCn
+wvonOAqW3fw+l3I/3Xh0ODDthv2+mdcCssbLDE2j7o+WfHY0HH8OiNQZchIB5ypf
+2pHekwqecY5GJhYMYcCLTLjXjSpsUhdBDLGZlC6A7kuJSUcO3OR5rsKTwA/gI333
+YnwGX5EYjxlyQEknSakqYy4BblZqNZgj3MQuRG0sOn4HKOTf4laswhPbUgCQrAXq
+sRc0SPEXX4T0dFg6Ms5B7r87WCjLPQE5z7EvJkUBaT7lGb3qx3V0eXXxysY+d2s=
+=iLic
+-----END PGP SIGNATURE-----
+
+--Ro71NT95pEPljXm4HTOE9uwNS42LfD6Jk--

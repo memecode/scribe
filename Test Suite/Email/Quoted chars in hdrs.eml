@@ -1,0 +1,563 @@
+Return-Path: <sentto-2377106-55601-1490130242-s-wall=bell.net@returns.groups.yahoo.com>
+Received: from mtlspm04.bell.net ([98.139.164.63]) by mtlfep08.bell.net
+          with ESMTP
+          id <20170321210402.BYGR11325.mtlfep08.bell.net@mtlspm04.bell.net>
+          for <s-wall@bell.net>; Tue, 21 Mar 2017 17:04:02 -0400
+Received: from ng16-vm1.bullet.mail.bf1.yahoo.com ([98.139.164.63])
+          by mtlspm04.bell.net with ESMTP
+          id <20170321210402.HVKC21346.mtlspm04.bell.net@ng16-vm1.bullet.mail.bf1.yahoo.com>
+          for <s-wall@bell.net>; Tue, 21 Mar 2017 17:04:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoogroups.com; s=echoe; t=1490130242; bh=TfZPmaMtcjymCaHeJnCqERJ6rnXT9BLcXj8GQt+XMEc=; h=To:From:List-Id:List-Unsubscribe:Date:Subject:Reply-To:From:Subject; b=Vy9GLqbP4BwJJ9hb5uDp08eqxykiPCwru/wBXm17JGSgMGgSjvQ3bywdyhQjSvOErtY/0MHWEuQgK8qz5mG7dlzR/Btl9/gtqUh6pP+mCJGfbpbfU8w91H2mBQhcX8V/XYFgcJ/pk6VXDOqXc57JYIY5C5afem7BI3VNPoVMNVo=
+Received: from [66.196.81.182] by ng16.bullet.mail.bf1.yahoo.com with NNFMP; 21 Mar 2017 21:04:02 -0000
+Received: from [10.193.39.27] by tg10.bullet.mail.bf1.yahoo.com with NNFMP; 21 Mar 2017 21:04:02 -0000
+X-Yahoo-Newman-Id: 2377106-m55601
+X-Sender: cwhelton@verizon.net
+X-Apparently-To: intersect@yahoogroups.com
+X-Received: (qmail 13073 invoked by uid 102); 21 Mar 2017 21:04:01 -0000
+X-Received: from unknown (HELO mtaq1.grp.bf1.yahoo.com) (10.193.84.32)
+  by m10.grp.bf1.yahoo.com with SMTP; 21 Mar 2017 21:04:01 -0000
+X-Received: (qmail 2060 invoked from network); 21 Mar 2017 21:04:01 -0000
+X-Received: from unknown (HELO mta1003.groups.mail.bf1.yahoo.com) (98.139.170.167)
+  by mtaq1.grp.bf1.yahoo.com with SMTP; 21 Mar 2017 21:04:01 -0000
+X-Received-SPF: pass (domain of verizon.net designates 206.46.173.15 as permitted sender)
+X-YMailISG: fqepHuEWLDsUV3N0vVTAIGeri15jUdLAsP.T_FA2GwW0sQYc
+ Vf8oCwAFXnoOA76qOsqGMzOpUdo8am42QkamE7V.QUbjkF7v_r4mHvVuKexa
+ z6J5N93nYRPTnbQZuyVPQl5aByb2Syt8KGorB0Xg7w1SmBzEgSy55D1a_49y
+ sLrwoQV2wVfUQcUDcDeXZSNlukiZ6yaZQHWgYXse4fFLMORLyyxWhmRNl3sE
+ gTW.Momrq.RM48t734FihcdYqjvnXnhZuTUFobdFgHqJ3L8xj7Id94WuzHeZ
+ XMHnd_zjQd79b3J0otgoDEkbhz36PchA8o4Hk68J3cuYEEAeO5wY5ZrYLItf
+ 0prV3X3avob7HiOYC8GtwxHZdT0emsLs5G3TKaS5w1_7aEM0f8EXt_e3aXzz
+ Qj1Sg3mjALI1osrl_81ESV8RaDVAKUcHSgd2JqI_cu4hFqh5zDXbheyiQylx
+ TN4OziFeN4QgrEOsHDe8217Li.4.ePcFHdmaFd2SFZi2VqNuDmFUCr5CaAty
+ eJqr8Q7Uuh4uO3.vVkuOuH9Sw96RLcPHgG0KFuWBoqWAxB9sBlfRWSm4rU8T
+ zg2VH3P58AW3LecwEChbnq5GqU2j4zdK2UkKboJfloEuPOOv37hN.cHNW.8N
+ WzixGqNBsW.KAIym4mekMtCLrZErTfC6F.mcAE1CsT3MqhlfKnoO2uX.ApRu
+ avgApte7a2pixsLv_FaSK7WMUSZGTN.swT9BvdVCxScvsXu89laQpq2ahmEu
+ YDbC_hWkDpTW5fuRntEJPFi5m0EqToZLPxxDXj0LIRKZaos.P0GUTVXWqEGb
+ QTGLAwYXBu8_7lgF.cGiFQxUEqhx0qf6mcg2Xe1LCDyu0TYQ2l2IvPHJ.7_D
+ XCSeJxdF3qHF2Bmpbw44KTggjEzu61KrmpSb2cqlM1mrQ1PbMXWBgxD1ON_X
+ 2Eyh01d6Ux6ugi.q9qCzk64sKQBOfV8NVer_EyfWN5VzHs0IJAvoi9w4CCo.
+ YpaYhTAzNOHXMjH259Q9evorqaB3XZsAc49rTMqhtEKodk67X2j5QoLlondv
+ SLJ98tSfuFNSHwgerTaYFKEOHKOgBp1etiVtQamlyP2QKADxN_m2jjBU4qLD
+ KRHbe8tM2nisFWKCMD.sPYDGVkyKwgETljetKl003hblZltkkuc_i7zQRPbf
+ OdRzJVsTYTbboJTYgRVYgefPiCfm13SoNuE7faDyDhlf
+Authentication-Results: mta1003.groups.mail.bf1.yahoo.com  from=verizon.net; domainkeys=neutral (no sig);  from=verizon.net; dkim=neutral (no sig)
+X-Received: from 127.0.0.1  (EHLO vms173015pub.verizon.net) (206.46.173.15)
+  by mta1003.groups.mail.bf1.yahoo.com with SMTPS; Tue, 21 Mar 2017 21:04:01 +0000
+X-Received: from vz-proxy-l001.mx.aol.com ([64.236.82.150])
+ by vms173015.mailsrvcs.net
+ (Oracle Communications Messaging Server 7.0.5.32.0 64bit (built Jul 16 2014))
+ with ESMTPA id <0ON600AJDNUBJNA0@vms173015.mailsrvcs.net> for
+ intersect@yahoogroups.com; Tue, 21 Mar 2017 16:03:48 -0500 (CDT)
+X-CMAE-Score: 0
+X-CMAE-Analysis: v=2.2 cv=daDw5Tfe c=1 sm=1 tr=0	a=0tGySW8maceftNfHUCUfCA==:117
+ a=4alE___ie6IA:10 a=6Iz7jQTuP9IA:10	a=DAwyPP_o2Byb1YXLmDAA:9 a=tb8WlFYsAAAA:8
+ a=_p30JVjiNZhm3mmp1YgA:9	a=CjuIK1q_8ugA:10 a=Vg0nLmLGLOQA:10 a=n6u2vYzCHnkA:10
+ a=HJlIp2J_-OEA:10	a=yMhMjlubAAAA:8 a=SSmOFEACAAAA:8 a=GOn5Cd3SXV1wtp06yywA:9
+	a=yxbJgRe-bKPhM_dn:21 a=gKO2Hq4RSVkA:10 a=UiCQ7L4-1S4A:10 a=hTZeC7Yk6K0A:10
+	a=frz4AuCg-hUA:10
+X-Received: by 96.224.5.46 with SMTP id 4687185c; Tue, 21 Mar 2017 21:03:48 GMT
+To: "Intersect" <intersect@yahoogroups.com>
+Message-id: <008f01d2a286$a4ef76c0$eece6440$@verizon.net>
+X-Mailer: Microsoft Outlook 16.0
+Content-language: en-us
+Thread-index: AdKihlqVTf506dTVQ1yMNiU1i/O/rw==
+X-Originating-IP: 98.139.170.167
+X-Original-From: "Clark Whelton" <cwhelton@verizon.net>
+From: "'Clark Whelton' cwhelton@verizon.net [intersect]" <intersect@yahoogroups.com>
+X-Yahoo-Profile: allieclark
+Sender: intersect@yahoogroups.com
+MIME-Version: 1.0
+Mailing-List: list intersect@yahoogroups.com; contact intersect-owner@yahoogroups.com
+Delivered-To: mailing list intersect@yahoogroups.com
+List-Id: <intersect.yahoogroups.com>
+Precedence: bulk
+List-Unsubscribe: <mailto:intersect-unsubscribe@yahoogroups.com>
+Date: Tue, 21 Mar 2017 17:03:51 -0400
+Subject: [intersect] Eruptions on the Sun trigger surprising phenomenon near Earth
+Reply-To: intersect@yahoogroups.com
+X-Yahoo-Newman-Property: groups-email-ff-m
+Content-Type: multipart/alternative;
+ boundary="----=_NextPart_000_0090_01D2A265.1DDE24E0"
+X-Cloudmark-Analysis: v=2.2 cv=IbxoYSia c=1 sm=0 tr=0 a=9Z31XwzwOYIA:10 a=4alE___ie6IA:10 a=6Iz7jQTuP9IA:10 a=rP8KBxdgonsA:10 a=X0YUhOOvnUEA:10 a=tb8WlFYsAAAA:8 a=_p30JVjiNZhm3mmp1YgA:9 a=CjuIK1q_8ugA:10 a=Vg0nLmLGLOQA:10 a=n6u2vYzCHnkA:10 a=HJlIp2J_-OEA:10 a=o1OHuDzbAAAA:8 a=CjxXgO3LAAAA:8 a=qV0mfD4mAAAA:8 a=G_5s8neSAAAA:8 a=xyyquwmEAAAA:8 a=SSmOFEACAAAA:8 a=Y3kaVzXZo9qzd0yBLgQA:9 a=DwovEHRVUHecpsID:21 a=_W_S_7VecoQA:10 a=frz4AuCg-hUA:10 a=yHmpGuN2Kb8A:10 a=1GSbIA61q4gA:10 a=MZpOI37Du90A:10 a=TLSEC5ESIkKqL6GM4RuA:22 a=5YQ6H4ZxyGn-KoBYtt8s:22 a=_E8DXSXWC0jInl61zbkG:22 a=mnVZ7iNJyew7AB3q5ROZ:22 a=5aLEZlHgtCWrS4oMx5Sh:22 a=M83_Jf6F84CdENfTZC9c:22 a=zjWhRoSqWz9hl55Hdlzg:22
+
+
+------=_NextPart_000_0090_01D2A265.1DDE24E0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+"Eruptions on the Sun's surface not only send bursts of energetic particles
+into the Earth's atmosphere causing disturbances in our planet's magnetic
+field, they can also strangely decrease the number of free electrons over
+large areas in the polar region of the ionosphere, new research concludes."
+
+ 
+
+ 
+
+https://www.sciencedaily.com/releases/2017/03/170317132043.htm
+
+ 
+
+
+------=_NextPart_000_0090_01D2A265.1DDE24E0
+Content-Type: text/html; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+</head>
+
+
+
+
+
+
+ 
+<body style="background-color: #fff;">
+<span style="display:none">&nbsp;</span>
+
+<!--~-|**|PrettyHtmlStartT|**|-~-->
+<div id="ygrp-mlmsg" style="position:relative;">
+  <div id="ygrp-msg" style="z-index: 1;">
+<!--~-|**|PrettyHtmlEndT|**|-~-->
+
+    <div id="ygrp-text" >
+      
+      
+      <p><div class="WordSection1"><p class="MsoNormal"><span style="font-size:12.0pt;font-family:&quot;Georgia&quot;,serif;">&#8220;Eruptions on the Sun's surface not only send bursts of energetic particles into the Earth's atmosphere causing disturbances in our planet's magnetic field, they can also strangely decrease the number of free electrons over large areas in the polar region of the ionosphere, new research concludes&#8230;&#8221;<o></o></span></p><p class="MsoNormal"><span style="font-size:12.0pt;font-family:&quot;Georgia&quot;,serif;"><o>&nbsp;</o></span></p><p class="MsoNormal"><span style="font-size:12.0pt;font-family:&quot;Georgia&quot;,serif;"><o>&nbsp;</o></span></p><p class="MsoNormal"><span style="font-size:12.0pt;font-family:&quot;Georgia&quot;,serif;"><a href="https://www.sciencedaily.com/releases/2017/03/170317132043.htm">https://www.sciencedaily.com/releases/2017/03/170317132043.htm</a><o></o></span></p><p class="MsoNormal"><span style="font-size:12.0pt;font-family:&quot;Georgia&quot;,serif;"><o>&nbsp;</o></span></p></div></p>
+
+    </div>
+     
+
+    <!--~-|**|PrettyHtmlStart|**|-~-->
+    <div style="color: #fff; height: 0;">__._,_.___</div>
+
+          
+  
+ 
+
+    
+    <div style="clear:both"> </div>
+
+    <div id="fromDMARC" style="margin-top: 10px;">
+        <hr style="height:2px ; border-width:0; color:#E3E3E3; background-color:#E3E3E3;">
+        Posted by: &quot;Clark Whelton&quot; &lt;cwhelton@verizon.net&gt;        <hr style="height:2px ; border-width:0; color:#E3E3E3; background-color:#E3E3E3;">
+     </div>
+    <div style="clear:both"> </div>
+
+    <table cellspacing=4px style="margin-top: 10px; margin-bottom: 10px; color: #2D50FD;">
+      <tbody>
+        <tr>
+          <td style="font-size: 12px; font-family: arial; font-weight: bold; padding: 7px 5px 5px;"  >
+                          <a style="text-decoration: none; color: #2D50FD" href="https://groups.yahoo.com/neo/groups/intersect/conversations/messages/55601;_ylc=X3oDMTJxbWczbGtlBF9TAzk3MzU5NzE0BGdycElkAzIzNzcxMDYEZ3Jwc3BJZAMxNzA1MDgyNjcyBG1zZ0lkAzU1NjAxBHNlYwNmdHIEc2xrA3JwbHkEc3RpbWUDMTQ5MDEzMDI0Mg--?act=reply&messageNum=55601">Reply via web post</a>
+                      </td>
+          <td>&bull;</td>
+          <td style="font-size: 12px; font-family: arial; padding: 7px 5px 5px;" >
+            <a href="mailto:cwhelton@verizon.net?subject=Re%3A%20Eruptions%20on%20the%20Sun%20trigger%20surprising%20phenomenon%20near%20Earth" style="text-decoration: none; color: #2D50FD;">
+               Reply to sender            </a>
+          </td>
+          <td>&bull;</td>
+          <td style="font-size: 12px; font-family: arial; padding: 7px 5px 5px;">
+            <a href="mailto:intersect@yahoogroups.com?subject=Re%3A%20Eruptions%20on%20the%20Sun%20trigger%20surprising%20phenomenon%20near%20Earth" style="text-decoration: none; color: #2D50FD">
+              Reply to group            </a>
+          </td>
+          <td>&bull;</td>
+          <td style="font-size: 12px; font-family: arial; padding: 7px 5px 5px;" >
+            <a href="https://groups.yahoo.com/neo/groups/intersect/conversations/newtopic;_ylc=X3oDMTJlb3ZnN3RmBF9TAzk3MzU5NzE0BGdycElkAzIzNzcxMDYEZ3Jwc3BJZAMxNzA1MDgyNjcyBHNlYwNmdHIEc2xrA250cGMEc3RpbWUDMTQ5MDEzMDI0Mg--" style="text-decoration: none; color: #2D50FD">Start a New Topic</a>
+          </td>
+          <td>&bull;</td>
+          <td style="font-size: 12px; font-family: arial; padding: 7px 5px 5px;color: #2D50FD;" >
+                            <a href="https://groups.yahoo.com/neo/groups/intersect/conversations/topics/55601;_ylc=X3oDMTM2ZGl2YjY5BF9TAzk3MzU5NzE0BGdycElkAzIzNzcxMDYEZ3Jwc3BJZAMxNzA1MDgyNjcyBG1zZ0lkAzU1NjAxBHNlYwNmdHIEc2xrA3Z0cGMEc3RpbWUDMTQ5MDEzMDI0MgR0cGNJZAM1NTYwMQ--" style="text-decoration: none; color: #2D50FD;">Messages in this topic</a>
+                (1)
+                      </td>
+        </tr>
+      </tbody>
+    </table>
+
+        
+<div id="megaphoneModule">
+            <hr style="height:2px ; border-width:0; color:#E3E3E3; background-color:#E3E3E3;">
+        <div>
+	     <div class="stream" style="margin-bottom:10px;">
+        <div style="background-color:white;">
+            <div class="sn-img" style="display:inline;"><img name="tn_file" style="padding:0px 10px;vertical-align:top;margin-top:5px;" src="https://s.yimg.com/ru/static/images/yg/img/megaphone/1464031581_phpFA8bON" height="82" width="82"></div>
+            <div class="mod-txt" style="display:inline-block;">
+                <a rel="nofollow" name="sub_url" target="_blank" href="https://yho.com/1wwmgg" style="color:#0000FF;display:block;margin-left:5px;text-decoration:none;"><span style="font-size:15px;">Have you tried the highest rated email app?</span></a>
+                <div style="max-width:530px;padding:2px 5px;">With 4.5 stars in iTunes, the Yahoo Mail app is the highest rated email app on the market. What are you waiting for? Now you can access all your inboxes (Gmail, Outlook, AOL and more) in one place. Never delete an email again with 1000GB of free cloud storage.</div>
+            </div>
+        </div>
+    </div>        </div>  
+     
+    <hr style="height:2px ; border-width:0; color:#E3E3E3; background-color:#E3E3E3;">
+</div>
+
+<!------- Start Nav Bar ------>
+<!-- |**|begin egp html banner|**| -->
+<!-- |**|end egp html banner|**| -->
+
+
+
+
+ 
+
+<!-- |**|begin egp html banner|**| -->
+<div id="ygrp-vital" style="background-color: #f2f2f2; font-family: Verdana; font-size: 10px; margin-bottom: 10px; padding: 10px;">
+
+    <span id="vithd" style="font-weight: bold; color: #333; text-transform: uppercase; "><a href="https://groups.yahoo.com/neo/groups/intersect/info;_ylc=X3oDMTJlM2xjYjZmBF9TAzk3MzU5NzE0BGdycElkAzIzNzcxMDYEZ3Jwc3BJZAMxNzA1MDgyNjcyBHNlYwN2dGwEc2xrA3ZnaHAEc3RpbWUDMTQ5MDEzMDI0Mg--" style="text-decoration: none;">Visit Your Group</a></span>
+
+     <ul style="list-style-type: none; margin: 0; padding: 0; display: inline;">
+                                                    </ul>
+  </div>
+
+
+<div id="ft" style="font-family: Arial; font-size: 11px; margin-top: 5px; padding: 0 2px 0 0; clear: both;">
+  <a href="https://groups.yahoo.com/neo;_ylc=X3oDMTJkcXZ2ZG04BF9TAzk3NDc2NTkwBGdycElkAzIzNzcxMDYEZ3Jwc3BJZAMxNzA1MDgyNjcyBHNlYwNmdHIEc2xrA2dmcARzdGltZQMxNDkwMTMwMjQy" style="float: left;"><img src="http://l.yimg.com/ru/static/images/yg/img/email/new_logo/logo-groups-137x15.png" height="15" width="137" alt="Yahoo! Groups" style="border: 0;"/></a>
+  <div style="color: #747575; float: right;"> &bull; <a href="https://info.yahoo.com/privacy/us/yahoo/groups/details.html" style="text-decoration: none;">Privacy</a> &bull; <a href="mailto:intersect-unsubscribe@yahoogroups.com?subject=Unsubscribe" style="text-decoration: none;">Unsubscribe</a> &bull; <a href="https://info.yahoo.com/legal/us/yahoo/utos/terms/" style="text-decoration: none;">Terms of Use</a> </div>
+</div>
+<br>
+
+<!-- |**|end egp html banner|**| -->
+
+  </div> <!-- ygrp-msg -->
+
+ 
+  <!-- Sponsor -->
+  <!-- |**|begin egp html banner|**| -->
+  <div id="ygrp-sponsor" style="width:160px; float:right; clear:none; margin:0 0 25px 0; background: #fff;">
+
+<!-- Start Recommendations -->
+<div id="ygrp-reco">
+     </div>
+<!-- End Recommendations -->
+
+
+
+  </div>   <!-- |**|end egp html banner|**| -->
+
+  <div style="clear:both; color: #FFF; font-size:1px;">.</div>
+</div>
+
+  <img src="http://geo.yahoo.com/serv?s=97359714/grpId=2377106/grpspId=1705082672/msgId=55601/stime=1490130242" width="1" height="1"> <br>
+
+<img src="http://y.analytics.yahoo.com/fpc.pl?ywarid=515FB27823A7407E&a=10001310322279&js=no&resp=img&cf12=CP" width="1" height="1"> 
+
+<div style="color: #fff; height: 0;">__,_._,___</div>
+<!--~-|**|PrettyHtmlEnd|**|-~-->
+
+</body>
+
+<!--~-|**|PrettyHtmlStart|**|-~-->
+<head>
+  <style type="text/css">
+  <!--
+  #ygrp-mkp {
+  border: 1px solid #d8d8d8;
+  font-family: Arial;
+  margin: 10px 0;
+  padding: 0 10px;
+}
+
+#ygrp-mkp hr {
+  border: 1px solid #d8d8d8;
+}
+
+#ygrp-mkp #hd {
+  color: #628c2a;
+  font-size: 85%;
+  font-weight: 700;
+  line-height: 122%;
+  margin: 10px 0;
+}
+
+#ygrp-mkp #ads {
+  margin-bottom: 10px;
+}
+
+#ygrp-mkp .ad {
+  padding: 0 0;
+}
+
+#ygrp-mkp .ad p {
+  margin: 0;
+}
+
+#ygrp-mkp .ad a {
+  color: #0000ff;
+  text-decoration: none;
+}
+  #ygrp-sponsor #ygrp-lc {
+  font-family: Arial;
+}
+
+#ygrp-sponsor #ygrp-lc #hd {
+  margin: 10px 0px;
+  font-weight: 700;
+  font-size: 78%;
+  line-height: 122%;
+}
+
+#ygrp-sponsor #ygrp-lc .ad {
+  margin-bottom: 10px;
+  padding: 0 0;
+}
+
+  #actions {
+    font-family: Verdana;
+    font-size: 11px;
+    padding: 10px 0;
+  }
+
+  #activity {
+    background-color: #e0ecee;
+    float: left;
+    font-family: Verdana;
+    font-size: 10px;
+    padding: 10px;
+  }
+
+  #activity span {
+    font-weight: 700;
+  }
+
+  #activity span:first-child {
+    text-transform: uppercase;
+  }
+
+  #activity span a {
+    color: #5085b6;
+    text-decoration: none;
+  }
+
+  #activity span span {
+    color: #ff7900;
+  }
+
+  #activity span .underline {
+    text-decoration: underline;
+  }
+
+  .attach {
+    clear: both;
+    display: table;
+    font-family: Arial;
+    font-size: 12px;
+    padding: 10px 0;
+    width: 400px;
+  }
+
+  .attach div a {
+    text-decoration: none;
+  }
+
+  .attach img {
+    border: none;
+    padding-right: 5px;
+  }
+
+  .attach label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .attach label a {
+    text-decoration: none;
+  }
+  
+  blockquote {
+    margin: 0 0 0 4px;
+  }
+
+  .bold {
+    font-family: Arial;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .bold a {
+    text-decoration: none;
+  }
+
+  dd.last p a {
+    font-family: Verdana;
+    font-weight: 700;
+  }
+
+  dd.last p span {
+    margin-right: 10px;
+    font-family: Verdana;
+    font-weight: 700;
+  }
+
+  dd.last p span.yshortcuts {
+    margin-right: 0;
+  }
+
+  div.attach-table div div a {
+    text-decoration: none;
+  }
+
+  div.attach-table {
+    width: 400px;
+  }
+
+  div.file-title a, div.file-title a:active, div.file-title a:hover, div.file-title a:visited {
+    text-decoration: none;
+  }
+
+  div.photo-title a, div.photo-title a:active, div.photo-title a:hover, div.photo-title a:visited {
+    text-decoration: none;
+  }
+
+  div#ygrp-mlmsg #ygrp-msg p a span.yshortcuts {
+    font-family: Verdana;
+    font-size: 10px;
+    font-weight: normal;
+  }
+
+  .green {
+    color: #628c2a;
+  }
+
+  .MsoNormal {
+    margin: 0 0 0 0;
+  }
+
+  o {
+    font-size: 0;
+  }
+
+  #photos div {
+    float: left;
+    width: 72px;
+  }
+
+  #photos div div {
+    border: 1px solid #666666;
+    height: 62px;
+    overflow: hidden;
+    width: 62px;
+  }
+
+  #photos div label {
+    color: #666666;
+    font-size: 10px;
+    overflow: hidden;
+    text-align: center;
+    white-space: nowrap;
+    width: 64px;
+  }
+
+  #reco-category {
+    font-size: 77%;
+  }
+
+  #reco-desc {
+    font-size: 77%;
+  }
+
+  .replbq {
+    margin: 4px;
+  }
+
+  #ygrp-actbar div a:first-child {
+   /* border-right: 0px solid #000;*/
+    margin-right: 2px;
+    padding-right: 5px;
+  }
+
+  #ygrp-mlmsg {
+    font-size: 13px;
+    font-family: Arial, helvetica,clean, sans-serif;
+    *font-size: small;
+    *font: x-small;
+  }
+
+  #ygrp-mlmsg table {
+    font-size: inherit;
+    font: 100%;
+  }
+
+  #ygrp-mlmsg select, input, textarea {
+    font: 99% Arial, Helvetica, clean, sans-serif;
+  }
+
+  #ygrp-mlmsg pre, code {
+    font:115% monospace;
+    *font-size:100%;
+  }
+
+  #ygrp-mlmsg * {
+    line-height: 1.22em;
+  }
+
+  #ygrp-mlmsg #logo {
+    padding-bottom: 10px;
+  }
+
+
+  #ygrp-msg p a {
+    font-family: Verdana;
+  }
+
+  #ygrp-msg p#attach-count span {
+    color: #1E66AE;
+    font-weight: 700;
+  }
+
+  #ygrp-reco #reco-head {
+    color: #ff7900;
+    font-weight: 700;
+  }
+
+  #ygrp-reco {
+    margin-bottom: 20px;
+    padding: 0px;
+  }
+
+  #ygrp-sponsor #ov li a {
+    font-size: 130%;
+    text-decoration: none;
+  }
+
+  #ygrp-sponsor #ov li {
+    font-size: 77%;
+    list-style-type: square;
+    padding: 6px 0;
+  } 
+
+  #ygrp-sponsor #ov ul {
+    margin: 0;
+    padding: 0 0 0 8px;
+  }
+
+  #ygrp-text {
+    font-family: Georgia;
+  }
+
+  #ygrp-text p {
+    margin: 0 0 1em 0;
+  }
+
+  #ygrp-text tt {
+    font-size: 120%;
+  }
+
+  #ygrp-vital ul li:last-child {
+    border-right: none !important; 
+  } 
+  -->
+  </style>
+</head>
+
+<!--~-|**|PrettyHtmlEnd|**|-~-->
+</html>
+<!-- end group email -->
+
+
+------=_NextPart_000_0090_01D2A265.1DDE24E0--

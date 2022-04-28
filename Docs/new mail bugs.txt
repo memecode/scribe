@@ -1,0 +1,9 @@
+New Mail Handling...
+
+
+ScribeWnd::OnNew
+    ScribeWnd::OnNewMail
+
+
+Mail::NewMailLst contains list of "new" mail.
+

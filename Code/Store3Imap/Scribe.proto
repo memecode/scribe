@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package scribe;
+
+message Field {
+	int32 id = 1;
+	int32 width = 2;
+}
+
+message Address {
+	string name = 1;
+	string email = 2;
+}
+
+message Email {
+	uint32 uid = 1;
+	int32 remoteFlags = 2;
+	int32 localFlags = 3;
+	int64 dateSent = 4;
+	int64 dateReceived = 5;
+	string label = 6;
+	string subject = 7;
+	Address from = 8;
+	Address reply = 9;
+	repeated Address to = 10;
+	uint32 colour = 11;
+	int64 size = 12;
+	string fileName = 13;
+	int32 priority = 14;
+	string structure = 15;
+	string messageId = 16;
+}
+
+message Folder {
+	int32 readPerm = 1;
+	int32 writePerm = 2;
+	int32 sortField = 3;
+	int32 unreadCount = 4;
+	int32 itemType = 5;
+	bool expanded = 6;
+	bool threadView = 7;
+	repeated Field fields = 8;
+	repeated Email mail = 9;
+}

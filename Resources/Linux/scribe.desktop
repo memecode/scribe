@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Scribe
+Exec=scribe
+Type=Application
+Categories=Network;
+Terminal=false
+Icon=About64px

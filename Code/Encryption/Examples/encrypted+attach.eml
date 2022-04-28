@@ -1,0 +1,127 @@
+Return-Path: <memecode@gmail.com>
+Delivered-To: unknown
+Received: from mail2.memecode.com (208.86.227.138:110) by Intelmini.local
+  with POP3; 08 Aug 2016 03:48:41 -0000
+X-GMN-ID: XID-1470628052-86456
+X-Original-To: fret@globalmarinenet.com
+Delivered-To: fret@globalmarinenet.com
+Received: from seb.spamstick.net (seb.spamstick.net [204.109.63.9])
+	by vmmail2.gmn-usa.com (Postfix) with ESMTP id 279C216A435
+	for <fret@globalmarinenet.com>; Mon,  8 Aug 2016 03:47:32 +0000 (UTC)
+Received: from mail-pf0-f169.google.com ([209.85.192.169])
+	by seb.spamstick.net with esmtps (TLSv1.2:AES128-SHA:128)
+	(Exim 4.85)
+	(envelope-from <memecode@gmail.com>)
+	id 1bWbXG-0006Im-JS
+	for fret@globalmarinenet.com; Sun, 07 Aug 2016 23:47:31 -0400
+Received: by mail-pf0-f169.google.com with SMTP id y134so114632337pfg.0
+        for <fret@memecode.com>; Sun, 07 Aug 2016 20:47:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=to:from:subject:message-id:date:user-agent:mime-version;
+        bh=3Tb7H2FdWNrJg53IvPWGYhFKXnEn1mYe3jfV9x4VFBw=;
+        b=YLGBgL7IPhEWSCwAX77jnNNszWbPtrOQBBgsILByF7wgGN9qj2xzygm9ZdxkAFffJA
+         3a81+30nWLDPXS+ITn0HYRfzYouVEytXA7QKwE27x6kylWUrhM9/7MprbCs6k9zghFUw
+         Ztx1iesT894c8sh7tTw7e+dkkGiA7dJ4ZIpREsJnxktbMQ4tcAUBKpSC2kG8v8MHpgXX
+         Jg/fQOAnJP2yCby8iZMp6cdLfYPB7h1GaFTGbpJZ4PfuJ71v9VWiNkL+U4AWwubkD1LU
+         qVxyt9CCREMW7ncCN92N8hIGx97Oc1USCHb9Y/iBACmTzsI6agc09I++JhlUvxVmv7Pt
+         XGZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20130820;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version;
+        bh=3Tb7H2FdWNrJg53IvPWGYhFKXnEn1mYe3jfV9x4VFBw=;
+        b=WmhTxMfOBfxD/9gcARwZ8ROuePUPLSFRVI9L7nLYP/kCMVk9Q8rTrEWw43HU1CO9K/
+         hT6fX4JuEDPFUuqhVnLmR7vHTqgnryqhv2/dXOonAkLJ7UKL5O9HtSFEyZfPf4tHjbkb
+         UhhMj72zZYS7ziij8HjTUa4YW/pFKmHBA+s7K86o097pjovvdYvqo5Mtq1l7CGlNg+ff
+         DP3kh65luwAUU4tiOcT8QfQ+oWHmlnduxpBFr980wVvWwwWz/zZi0bXJlVfqQiHLH9iF
+         CeNmZMBjD7lRwkpH0vEIZUAvnOLW1mTdghOdWpTsZwe5qCjFzA/P7qSJnhBXylhAJJQB
+         9s8Q==
+X-Gm-Message-State: AEkoout1UOzY19fJpcqkhQN48GKhqtfcg0rVxRbHiSp+hLu/o7Wmw2F3RoEt/LX5E6WJoQ==
+X-Received: by 10.98.19.214 with SMTP id 83mr160858488pft.117.1470628049489;
+        Sun, 07 Aug 2016 20:47:29 -0700 (PDT)
+Received: from [192.168.1.190] (106-69-215-24.dyn.iinet.net.au. [106.69.215.24])
+        by smtp.gmail.com with ESMTPSA id w64sm43497161pfb.93.2016.08.07.20.47.27
+        for <fret@memecode.com>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 07 Aug 2016 20:47:29 -0700 (PDT)
+To: Matthew Allen <fret@memecode.com>
+From: Matthew Allen <memecode@gmail.com>
+Subject: enc, attachment
+Message-ID: <c26edf48-b0f8-3e5a-727e-bc4722d2405e@gmail.com>
+Date: Mon, 8 Aug 2016 13:47:23 +1000
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.1.1
+MIME-Version: 1.0
+Content-Type: multipart/encrypted;
+ protocol="application/pgp-encrypted";
+ boundary="iRWXR1O6PkPsOdOPKKGudQ7t47vIpuDtX"
+Received-SPF: pass (seb.spamstick.net: domain of gmail.com designates 209.85.192.169 as permitted sender) client-ip=209.85.192.169; envelope-from=memecode@gmail.com; helo=mail-pf0-f169.google.com;
+X-SPF-Result: seb.spamstick.net: domain of gmail.com designates 209.85.192.169 as permitted sender
+Authentication-Results: seb.spamstick.net; dmarc=pass header.from=gmail.com
+X-Filter-ID: s0sct1PQhAABKnZB5plbIcsNKnqjojV96DHXHNe2GLwGJ/QYBv88z+Z8DEzu/KNcZngDEjnkgvrl
+ my+sCIExWMquSUPF5VyMWCVb/Sm7yUxtTCHdkaDHaPTnJvwOjNn14P7ygcQoikU2sD3Wbxj4FcxP
+ 7IKmpns6Md3lwlbe7pFTyVGm+K7dgcQQ9D1CnN8zCq+m58I5+XCJcnEEhW1VX/Ck9Lv+MjWprpdv
+ QE7Wzkb9sQmST6p7203IxbyGoeXAAzxl/7roEBinew96Ccq6k1FfEoXm0/FPF8PR0w363lkskjm9
+ S/pxqTYd5IiMPM4jQVfMnZnMzYz+Zp0BHmbNwVzohWfiRxLFbXJcKvLTMdslJzgMQPTTtvNWaTuz
+ i6/afqb5R4VemuUI6bcEARsm0HzfF/drKGNn5L+sEPjC9l7tb+NJ9Ho++JBpUTFsqM6IGycevsAj
+ jSSHUgR/4dUvzX6SzeXR8ua5xGwfPOkWzq2rANEF8ZwKK1LKi5s9TDYgeN4tC59K05eZzg6IKrXG
+ U8aSelnD6Z/HcfW+VEnu1FJAm0jU7YJ1npudhW60hyaOlY0hLvgdPXj/UDmlioOLxvY4ocfmWv3F
+ e9Iziczdq+A=
+X-Report-Abuse-To: spam@sea.spamstick.net
+Authentication-Results: spamstick.net; spf=pass smtp.mailfrom=memecode@gmail.com
+Authentication-Results: spamstick.net; dkim=pass header.i=gmail.com
+X-RedPortSpamPortal-Class: ham
+X-RedPortSpamPortal-Evidence: Combined (0.15)
+X-Recommended-Action: accept
+
+This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
+--iRWXR1O6PkPsOdOPKKGudQ7t47vIpuDtX
+Content-Type: application/pgp-encrypted
+Content-Description: PGP/MIME version identification
+
+Version: 1
+
+--iRWXR1O6PkPsOdOPKKGudQ7t47vIpuDtX
+Content-Type: application/octet-stream; name="encrypted.asc"
+Content-Description: OpenPGP encrypted message
+Content-Disposition: inline; filename="encrypted.asc"
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v2
+Comment: Gnu Privacy Tools
+Comment: Download at http://www.gnupt.de
+
+hQEMA43UrBimaGMtAQf/Q/zUiAuRrIRQ9Irpyh2qqtt1o/f5aclVDHtZfcXJBOpz
+JaRzz6cGL/kH/ZU76Hx6DnOmVo9RO9r7xyte8Cf/prMJw/EzeFG2KE/UgxuupwnT
+BsjetBkdtNwKVipnJavOM5SILUbQyEmCNIHhxng5qXtfA/zewc/e/TfZDjD34vHr
+8zUkUvg77f8MSRvpt6h9GHjIiq0ot0xQ2gUAjNkyk1nPb0CVHxx8TJQ/tRsU43To
+1oFCry++gsQT+39Rd1Cu0GfwQ2HGiGtSC5u2GFZLquEAQCsuPdvlNBXVGMhT86BV
+ktJ3xpeL5DSiWeYHN4328ZBHL7x8BbhDYe5HIyekyNLqAeNLrBEUC35AD822OXXK
+/zgHka68ph9sU+ijOIFx+d1jHLDIbjnf7acFxfqWtacWFLrwd3I/LBWK+LTHd7To
+mKl4uG8Jkk1COiUkpKGGU4SNNkedE1qXKfo809rGd13AEvtA7V2jFI7B4P7gY1uA
+dzBz2JlSijpS5By5CBARgyJc0i4UxFQmBwK6BDv1IyMN/Fec4IXia3EjQM5SY0Vc
+6LPufJil06aHnpwTRqnN8NFqSQceXV8ScCFLbbcqWo3iGd98gaGNLZSV8z+RlvgE
+1wqRUqKAGs7NbjWomXCji76G5Zec0iJM6ff/BrAHmiswfYAyeJypTW6oOotX89fs
+fCKRQjaX6YlAlznieu8kLSEaVVE/A4rrp0Z38p0zpV1l2/suPdRqE02JgRlEJmNP
+zuXVTeGyue6u1Nj2NATfaSgEfvAzZwQ182xh3yv+/KxbOKtIlw08ml41MzpYUqVF
+jyO6e+Qusvb7kkpQE+s8t2yJMrCxu5vEW8ed9xrZT/vUGY7qfPyJdaNbHNe83PBL
++MtKfWh0MNF+fRQp58nHWJGQJIFUx6NIOshuKVekbnF+zs7FSTKyrjsCAWzCkwqQ
+8zjwySX7tzmJgEnlEFWdMOmbM5em7qfqzs/bbJT7ZwmjVRXAjKSKXh/UUsb9xuOD
+LExRLSAA7WxjHaj+HhMjPATlaZ+ewQK3LPKU9DcjnagwsWZ02Hlz7qr2iNw+jIJa
+D7n9ImsEemja3uErxfMPLVvUyFUnPMYn7DK/b7Cw9Rtgsxh1qWd7KCbUSGPAC3EN
+e4aL80nHXqLiGPjfh9OVfMsTewFAkELBDEmPf5eq2qWyr3M2Gof2RwfU0O9sBA9t
+VjAsRB8siZPm5sa4AcRSYLy0CvX9aGZ0W9dedhZEnvOmhrJpX6ZibQxl0Eld5sXb
+PcetnhmEqMonZM/T9pSFcyoMwzg6qD50+YkAYVvtDvqh1miraOI9iIs+OzB78XdN
+w0r+jG3qAb+Lutr6+R9aNDTZ4MaGjGEMNKa1uc0liwPeWxSHUr44yi/Iy+UrjWd5
+v5MlX5WcfcaCJZ0yWvLwbIcXFuUuwhDiGaVcYoOBEiIJgnWZk5toUV70XiZT+fNt
+HFwxUMIHCeerfgAtkQdkppc5ON6cnJVpCQ1L+9TaGDgxSVAKB80kLitTqTi7DrpY
+VZVeEfhto7kwTHxRaoVUphpggNjQJxKRa/0HNxHbcrd1oXzN5+G2DBwurXtR9BFu
+Sm5kX1hU9uFhRzTpRRVPKBcQFvgEOL2zniT1M9XpYChRrL07S0cgbzPIsJ+hm3Qm
+OShsZh2VB9GWRPUDFXfN9axMR2ZS3QGSlYPaxtjp3DLzkVCOeJ6/Mk7yKnlu+WmT
+zzA0vu4xONkCzEQ84Xy9ARL8+uXsiXSywmMmrHe14B5ES/l5dR2qWVgHe75xit1X
+Vlc=
+=Kbsj
+-----END PGP MESSAGE-----
+
+--iRWXR1O6PkPsOdOPKKGudQ7t47vIpuDtX--

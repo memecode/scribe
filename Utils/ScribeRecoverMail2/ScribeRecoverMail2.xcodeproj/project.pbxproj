@@ -1,0 +1,311 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		342CE41311FDA669000B1F3C /* ScribeRecoverMail2.lr8 in Resources */ = {isa = PBXBuildFile; fileRef = 342CE41211FDA669000B1F3C /* ScribeRecoverMail2.lr8 */; };
+		342D774A11FA4929005BADBD /* LgiMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 342D774911FA4929005BADBD /* LgiMain.cpp */; };
+		3444A35712275B75004ADADE /* Lgi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3444A35612275B75004ADADE /* Lgi.framework */; };
+		34CF835A1539231A00042273 /* FolderDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34CF83591539231A00042273 /* FolderDump.cpp */; };
+		34ECAFD71539954500E5CEC1 /* GSegmentTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34ECAFD61539954500E5CEC1 /* GSegmentTree.cpp */; };
+		34ECAFDB1539956400E5CEC1 /* Store2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34ECAFDA1539956400E5CEC1 /* Store2.cpp */; };
+		34ECB20B1539958000E5CEC1 /* StoreCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34ECB20A1539958000E5CEC1 /* StoreCommon.cpp */; };
+		34ECB220153995F200E5CEC1 /* Lgi.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3444A35612275B75004ADADE /* Lgi.framework */; };
+		8D0C4E8D0486CD37000505A6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0867D6AAFE840B52C02AAC07 /* InfoPlist.strings */; };
+		8D0C4E8E0486CD37000505A6 /* main.nib in Resources */ = {isa = PBXBuildFile; fileRef = 02345980000FD03B11CA0E72 /* main.nib */; };
+		8D0C4E920486CD37000505A6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20286C33FDCF999611CA2CEA /* Carbon.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		34EFB74D0C295A2A0053C935 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				34ECB220153995F200E5CEC1 /* Lgi.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0867D6ABFE840B52C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1870340FFE93FCAF11CA0CD7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/main.nib; sourceTree = "<group>"; };
+		20286C33FDCF999611CA2CEA /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		32DBCF6D0370B57F00C91783 /* ScribeRecoverMail2_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScribeRecoverMail2_Prefix.pch; sourceTree = "<group>"; };
+		342CE41211FDA669000B1F3C /* ScribeRecoverMail2.lr8 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ScribeRecoverMail2.lr8; sourceTree = "<group>"; };
+		342D774911FA4929005BADBD /* LgiMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LgiMain.cpp; path = ../../../../Lgi/trunk/src/common/Lgi/LgiMain.cpp; sourceTree = SOURCE_ROOT; };
+		3444A35612275B75004ADADE /* Lgi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Lgi.framework; path = ../../../../Lgi/trunk/src/mac/carbon/build/Debug/Lgi.framework; sourceTree = SOURCE_ROOT; };
+		34CF83591539231A00042273 /* FolderDump.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FolderDump.cpp; sourceTree = "<group>"; };
+		34ECAFD61539954500E5CEC1 /* GSegmentTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GSegmentTree.cpp; path = ../../../../Lgi/trunk/src/common/General/GSegmentTree.cpp; sourceTree = SOURCE_ROOT; };
+		34ECAFDA1539956400E5CEC1 /* Store2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Store2.cpp; path = ../../../../Lgi/trunk/src/common/Storage/Store2.cpp; sourceTree = SOURCE_ROOT; };
+		34ECB20A1539958000E5CEC1 /* StoreCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StoreCommon.cpp; path = ../../../../Lgi/trunk/src/common/Storage/StoreCommon.cpp; sourceTree = SOURCE_ROOT; };
+		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D0C4E970486CD37000505A6 /* ScribeRecoverMail2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScribeRecoverMail2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D0C4E910486CD37000505A6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D0C4E920486CD37000505A6 /* Carbon.framework in Frameworks */,
+				3444A35712275B75004ADADE /* Lgi.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		195DF8CFFE9D517E11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D0C4E970486CD37000505A6 /* ScribeRecoverMail2.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		20286C29FDCF999611CA2CEA /* i.Ftp */ = {
+			isa = PBXGroup;
+			children = (
+				20286C2AFDCF999611CA2CEA /* Sources */,
+				20286C2CFDCF999611CA2CEA /* Resources */,
+				20286C32FDCF999611CA2CEA /* External Frameworks and Libraries */,
+				195DF8CFFE9D517E11CA2CBB /* Products */,
+			);
+			name = i.Ftp;
+			sourceTree = "<group>";
+		};
+		20286C2AFDCF999611CA2CEA /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				34B7EA6B0A64B4DE00657E69 /* Lgi */,
+				34CF83591539231A00042273 /* FolderDump.cpp */,
+				32DBCF6D0370B57F00C91783 /* ScribeRecoverMail2_Prefix.pch */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		20286C2CFDCF999611CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				342CE41211FDA669000B1F3C /* ScribeRecoverMail2.lr8 */,
+				8D0C4E960486CD37000505A6 /* Info.plist */,
+				0867D6AAFE840B52C02AAC07 /* InfoPlist.strings */,
+				02345980000FD03B11CA0E72 /* main.nib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		20286C32FDCF999611CA2CEA /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				3444A35612275B75004ADADE /* Lgi.framework */,
+				20286C33FDCF999611CA2CEA /* Carbon.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		34B7EA6B0A64B4DE00657E69 /* Lgi */ = {
+			isa = PBXGroup;
+			children = (
+				34ECB20A1539958000E5CEC1 /* StoreCommon.cpp */,
+				34ECAFDA1539956400E5CEC1 /* Store2.cpp */,
+				34ECAFD61539954500E5CEC1 /* GSegmentTree.cpp */,
+				342D774911FA4929005BADBD /* LgiMain.cpp */,
+			);
+			name = Lgi;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D0C4E890486CD37000505A6 /* ScribeRecoverMail2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 34BA95030B33B2BB00493CD3 /* Build configuration list for PBXNativeTarget "ScribeRecoverMail2" */;
+			buildPhases = (
+				8D0C4E8C0486CD37000505A6 /* Resources */,
+				8D0C4E8F0486CD37000505A6 /* Sources */,
+				8D0C4E910486CD37000505A6 /* Frameworks */,
+				34EFB74D0C295A2A0053C935 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScribeRecoverMail2;
+			productInstallPath = "$(HOME)/Applications";
+			productName = i.Ftp;
+			productReference = 8D0C4E970486CD37000505A6 /* ScribeRecoverMail2.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		20286C28FDCF999611CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 34BA95070B33B2BB00493CD3 /* Build configuration list for PBXProject "ScribeRecoverMail2" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 20286C29FDCF999611CA2CEA /* i.Ftp */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D0C4E890486CD37000505A6 /* ScribeRecoverMail2 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D0C4E8C0486CD37000505A6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D0C4E8D0486CD37000505A6 /* InfoPlist.strings in Resources */,
+				8D0C4E8E0486CD37000505A6 /* main.nib in Resources */,
+				342CE41311FDA669000B1F3C /* ScribeRecoverMail2.lr8 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D0C4E8F0486CD37000505A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				342D774A11FA4929005BADBD /* LgiMain.cpp in Sources */,
+				34CF835A1539231A00042273 /* FolderDump.cpp in Sources */,
+				34ECAFD71539954500E5CEC1 /* GSegmentTree.cpp in Sources */,
+				34ECAFDB1539956400E5CEC1 /* Store2.cpp in Sources */,
+				34ECB20B1539958000E5CEC1 /* StoreCommon.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		02345980000FD03B11CA0E72 /* main.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1870340FFE93FCAF11CA0CD7 /* English */,
+			);
+			name = main.nib;
+			sourceTree = "<group>";
+		};
+		0867D6AAFE840B52C02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0867D6ABFE840B52C02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		34BA95040B33B2BB00493CD3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = ../../../../Lgi/trunk/src/mac/carbon/build/Debug;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ScribeRecoverMail2_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = MAC;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = ScribeRecoverMail2;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		34BA95050B33B2BB00493CD3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = ../../../../Lgi/trunk/src/mac/carbon/build/Release;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ScribeRecoverMail2_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = MAC;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = ScribeRecoverMail2;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		34BA95080B33B2BB00493CD3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				FRAMEWORK_SEARCH_PATHS = ../../../../Lgi/trunk/src/mac/carbon/build/Debug;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				OTHER_CFLAGS = (
+					"-DMAC",
+					"-D_DEBUG",
+				);
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "../../../../Lgi/trunk/include/mac/carbon ../../../../Lgi/trunk/include/common ../../Code";
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		34BA95090B33B2BB00493CD3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				FRAMEWORK_SEARCH_PATHS = ../../../../Lgi/trunk/src/mac/carbon/build/Release;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				OTHER_CFLAGS = "-DMAC";
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "../../../../Lgi/trunk/include/mac/carbon ../../../../Lgi/trunk/include/common ../../Code";
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		34BA95030B33B2BB00493CD3 /* Build configuration list for PBXNativeTarget "ScribeRecoverMail2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34BA95040B33B2BB00493CD3 /* Debug */,
+				34BA95050B33B2BB00493CD3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		34BA95070B33B2BB00493CD3 /* Build configuration list for PBXProject "ScribeRecoverMail2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34BA95080B33B2BB00493CD3 /* Debug */,
+				34BA95090B33B2BB00493CD3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 20286C28FDCF999611CA2CEA /* Project object */;
+}

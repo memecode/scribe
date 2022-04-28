@@ -1,0 +1,16 @@
+LIBRARY					SCRIBEMAPI
+EXPORTS
+	MAPILogon			@1
+	MAPIAddress			@2
+	MAPIDeleteMail		@3
+	MAPIDetails			@4
+	MAPIFindNext		@5
+	MAPIFreeBuffer		@6
+	MAPILogoff			@7
+	MAPIReadMail		@8
+	MAPIResolveName		@9
+	MAPISaveMail		@10
+	MAPISendDocuments	@11
+	MAPISendMail		@12
+	MAPISendMailW		@13
+	MAPISendMailHelper	@14

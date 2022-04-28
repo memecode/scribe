@@ -1,0 +1,127 @@
+Return-Path: <fret@memecode.com>
+Delivered-To: unknown
+Received: from mail2.memecode.com (208.86.227.138:110) by Intelmini.local
+  with POP3; 08 Aug 2016 03:49:36 -0000
+X-GMN-ID: XID-1470628135-86997
+X-Original-To: fret@globalmarinenet.com
+Delivered-To: fret@globalmarinenet.com
+Received: from sea.spamstick.net (sea.spamstick.net [204.109.57.196])
+	by vmmail2.gmn-usa.com (Postfix) with ESMTP id 1931D16A42F
+	for <fret@globalmarinenet.com>; Mon,  8 Aug 2016 03:48:55 +0000 (UTC)
+Received: from ipmail05.adl6.internode.on.net ([150.101.137.143])
+	by sea.spamstick.net with esmtp (Exim 4.85)
+	(envelope-from <fret@memecode.com>)
+	id 1bWbYa-0000Ez-HF
+	for fret@globalmarinenet.com; Sun, 07 Aug 2016 23:48:55 -0400
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-Anti-Spam-Result: A2DgCQDKAKhXEBjXRWoNUIRFQwGHALAOghCBfIgHDgEBAgEBAQYBAQEBAQEBATaBARABhCyBCXsaDQgBAboHhmmKJA6IIoxwBZk5hS6LMQGNbYhqh0I4CYQfgy2EbgEBAQ
+Received: from 106-69-215-24.dyn.iinet.net.au (HELO [192.168.1.190]) ([106.69.215.24])
+  by ipmail05.adl6.internode.on.net with ESMTP; 08 Aug 2016 13:18:26 +0930
+To: Matthew Allen <fret@memecode.com>
+From: Matthew Allen <fret@memecode.com>
+Subject: enc, HTML, attach, key-attach
+Message-ID: <230703df-876d-0bc4-bb85-69a1b295d5bd@memecode.com>
+Date: Mon, 8 Aug 2016 13:48:22 +1000
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.1.1
+MIME-Version: 1.0
+Content-Type: multipart/encrypted;
+ protocol="application/pgp-encrypted";
+ boundary="X5Mp1bh1kVnqC3FD2683U0WkqBDu1592a"
+X-Filter-ID: s0sct1PQhAABKnZB5plbIeWDFvzX8rxcsVRKR9WCjo+RbFX7dyjr9WtQ1sw3wu3tpQEANgj1hwpU
+ lREZh3wERwmMFcsnMm9JbVNT1rmRDWu+tj22Vj4u80tpR7oeh00j268zQ9vAMRjndL89ri39XLbe
+ smTa0dvhI6H3iouP+RdacPcircKGPHZvwg+Igl9jIDWYSqkD0ubCorx4Ui6oaRj0SE2Lt1E5lypp
+ LFVCVvS7q0bjLSsXwlvBxVi7DlqX00jMlfF8KrhxHcslhyrAslz1pRXWhjh9fdbl44I0Df0nLB48
+ NkpObt4Sove1I+9QgbR203TEwunjLB74l16ZIrcMDg777YJ53CxC0vtypBV+ks3l0fLmucRsHzzp
+ Fs6t50q7e2nLHbxYGYdZH2Mk+znKmZKTliv7aKKrqxiku031zJuNnaOtkG2o0FURJEWex59odchr
+ D3YvSlN2gc3rZaGp3RSwCXW+mzuiSaXGa7JQvpJ0u5JNUTFfeWDaD3S/lnEaTdftT8Kul6ZpNgSq
+ NORxWsgqcF2qRmccXjejs6+dtOiBbpDQ+zv6ENK2PSDvNSjVRJ+igYTdhxxwxq0YS6Qp9bdL8oYe
+ EB2/gTYIJTIxL7hrJSk60SF3F6RYOYr2
+X-Report-Abuse-To: spam@sea.spamstick.net
+X-RedPortSpamPortal-Class: ham
+X-RedPortSpamPortal-Evidence: Combined (0.14)
+X-Recommended-Action: accept
+
+This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
+--X5Mp1bh1kVnqC3FD2683U0WkqBDu1592a
+Content-Type: application/pgp-encrypted
+Content-Description: PGP/MIME version identification
+
+Version: 1
+
+--X5Mp1bh1kVnqC3FD2683U0WkqBDu1592a
+Content-Type: application/octet-stream; name="encrypted.asc"
+Content-Description: OpenPGP encrypted message
+Content-Disposition: inline; filename="encrypted.asc"
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v2
+Comment: Gnu Privacy Tools
+Comment: Download at http://www.gnupt.de
+
+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
+fpNwZbVy3FE4Pc/eQA==
+=Vple
+-----END PGP MESSAGE-----
+
+--X5Mp1bh1kVnqC3FD2683U0WkqBDu1592a--

@@ -1,0 +1,203 @@
+Return-Path: <memecode@gmail.com>
+Delivered-To: unknown
+Received: from mail2.memecode.com (208.86.227.138:110) by Intelmini.local
+  with POP3; 08 Aug 2016 03:48:41 -0000
+X-GMN-ID: XID-1470627982-85759
+X-Original-To: fret@globalmarinenet.com
+Delivered-To: fret@globalmarinenet.com
+Received: from sea.spamstick.net (sea.spamstick.net [204.109.57.196])
+	by vmmail2.gmn-usa.com (Postfix) with ESMTP id 251EA16A435
+	for <fret@globalmarinenet.com>; Mon,  8 Aug 2016 03:46:22 +0000 (UTC)
+Received: from mail-pf0-f177.google.com ([209.85.192.177])
+	by sea.spamstick.net with esmtps (TLSv1.2:AES128-SHA:128)
+	(Exim 4.85)
+	(envelope-from <memecode@gmail.com>)
+	id 1bWbW8-0008VH-V9
+	for fret@globalmarinenet.com; Sun, 07 Aug 2016 23:46:22 -0400
+Received: by mail-pf0-f177.google.com with SMTP id p64so114752282pfb.1
+        for <fret@memecode.com>; Sun, 07 Aug 2016 20:46:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=to:from:subject:message-id:date:user-agent:mime-version;
+        bh=NraCmcT5Z+UXhd2+T4CBhu9xpKF12Men7plvM0mAaqY=;
+        b=R+NpT/bHPwUNxa9jFe4zVFSVA7KguePaapvdvCCOvGV5vf2xQsAeKRDS4QSLjO8xxD
+         9dozRW1RsoUZhC9FkPbi9MtYOEdyesw88V8TJfR38YqfoAkTXdg8iF8YJQhx0E+Mkbt7
+         ofA6cYBEgDvPk1dtik7kRqIg82iLataYih9v6J9zgz/jSW5PKEgT78PRaV1cOHRZfFrR
+         Kzgp8maTR3uJnyJStw+wzX9v4wU/TIWo6Ze/mcMO/rf5ubRH0tMQjqBJUfIlSpWiKGWh
+         EiW+cZ54gPOX+4sKKPhce1cD92+nSDDyR1co8YEuXqc2ewpVBfVXU2N2xCkPvTBSKIsB
+         BDkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20130820;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version;
+        bh=NraCmcT5Z+UXhd2+T4CBhu9xpKF12Men7plvM0mAaqY=;
+        b=ZcNyYguTbtZbmXmHDGYXfn7qXsUw4WNZ3cDrhmV3OYg2jdSHniu2lVqUkpeUemWFr/
+         oNSWs4K4eWLvTbpEN23ibTGzWR+wlEw02+N1Cpw2iuowVkDEy0+zx1lV2S8TYp/Xary2
+         8f+/A7xo8tuQWHNMVcU4vn2nudnudJDS9U6klDYY6tWt7b6tOp1wO2wEpGxu/7ubddd8
+         Bj0oUnmVu01RnTwT2y4DLSnjMOw23/2EK4B3O+rdOrlcQiTYgy+y14zT/hbYCQ8N/yVS
+         cH8RxJ+WIUfBxcBzyh1bobNEV2zWogUhlBZWC6lh16LrjguIg0u5iOXW8bUmpwdap4Gu
+         VE4A==
+X-Gm-Message-State: AEkooutcgT8pTQpUCevvYpomXScOweYJm3sVEInNyasxIrOoSZ5wc1IYgAQYFaZ33yIvMA==
+X-Received: by 10.98.36.134 with SMTP id k6mr156764201pfk.116.1470627979875;
+        Sun, 07 Aug 2016 20:46:19 -0700 (PDT)
+Received: from [192.168.1.190] (106-69-215-24.dyn.iinet.net.au. [106.69.215.24])
+        by smtp.gmail.com with ESMTPSA id c125sm43563534pfc.40.2016.08.07.20.46.17
+        for <fret@memecode.com>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 07 Aug 2016 20:46:19 -0700 (PDT)
+To: Matthew Allen <fret@memecode.com>
+From: Matthew Allen <memecode@gmail.com>
+Subject: signed, HTML, attachment, key-attached
+Message-ID: <89d91255-4afd-8c8c-fb13-3751c7e23ba0@gmail.com>
+Date: Mon, 8 Aug 2016 13:46:14 +1000
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.1.1
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="80KWg7mePwL3bAHkk0PXSeAK8BqmNvv3K"
+Received-SPF: pass (sea.spamstick.net: domain of gmail.com designates 209.85.192.177 as permitted sender) client-ip=209.85.192.177; envelope-from=memecode@gmail.com; helo=mail-pf0-f177.google.com;
+X-SPF-Result: sea.spamstick.net: domain of gmail.com designates 209.85.192.177 as permitted sender
+Authentication-Results: sea.spamstick.net; dmarc=pass header.from=gmail.com
+X-Filter-ID: s0sct1PQhAABKnZB5plbIcsNKnqjojV96DHXHNe2GLwGJ/QYBv88z+Z8DEzu/KNcZngDEjnkgvrl
+ my+sCIExWMquSUPF5VyMWCVb/Sm7yUxtTCHdkaDHaPTnJvwOjNn14P7ygcQoikU2sD3Wbxj4FXM3
+ 8jM5uP7UBKI0G1IgT+VTyVGm+K7dgcQQ9D1CnN8zCq+m58I5+XCJcnEEhW1VX/Ck9Lv+MjWprpdv
+ QE7Wzkb3JdNup84Gr3DQm9iUj4Scf44rPiz0tH2FDA8muH8Gf1FfEoXm0/FPF8PR0w363llnHUZA
+ D8Fa6nfQ55SWXC60u5fYGGxDa3jMWKrGu07TSlzohWfiRxLFbXJcKvLTMdslJzgMQPTTtvNWaTuz
+ i6/afqb5R4VemuUI6bcEARsm0Lc3A2Kp5b3I9QSzkTcZzBztb+NJ9Ho++JBpUTFsqM6IGycevsAj
+ jSSHUgR/4dUvzX6SzeXR8ua5xGwfPOkWzq2rANEF8ZwKK1LKi5s9TDYglW+fKuaWhIB552TPs0LK
+ 8saSelnD6Z/HcfW+VEnu1FJAm0jU7YJ1npudhW60hyaOCzBHiRV2FCVMLljiaRMxhOIl8I5S/JYf
+ v8cFQsX31gQ=
+X-Report-Abuse-To: spam@sea.spamstick.net
+Authentication-Results: spamstick.net; spf=pass smtp.mailfrom=memecode@gmail.com
+Authentication-Results: spamstick.net; dkim=pass header.i=gmail.com
+X-RedPortSpamPortal-Class: ham
+X-RedPortSpamPortal-Evidence: Combined (0.15)
+X-Recommended-Action: accept
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--80KWg7mePwL3bAHkk0PXSeAK8BqmNvv3K
+Content-Type: multipart/mixed; boundary="dwO4XXSVHPvEwempW9kMECPhToFkpUFA9"
+From: Matthew Allen <memecode@gmail.com>
+To: Matthew Allen <fret@memecode.com>
+Message-ID: <89d91255-4afd-8c8c-fb13-3751c7e23ba0@gmail.com>
+Subject: signed, HTML, attachment, key-attached
+
+--dwO4XXSVHPvEwempW9kMECPhToFkpUFA9
+Content-Type: multipart/mixed;
+ boundary="------------41D41F1FF404B44643C21BA4"
+
+This is a multi-part message in MIME format.
+--------------41D41F1FF404B44643C21BA4
+Content-Type: multipart/alternative;
+ boundary="------------151898DFAAD305DA1C3EE8F5"
+
+
+--------------151898DFAAD305DA1C3EE8F5
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+The *body*
+
+
+--------------151898DFAAD305DA1C3EE8F5
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+  <head>
+
+    <meta http-equiv=3D"content-type" content=3D"text/html; charset=3Dutf=
+-8">
+  </head>
+  <body bgcolor=3D"#FFFFFF" text=3D"#000000">
+    <p>The <b>body</b><br>
+    </p>
+  </body>
+</html>
+
+--------------151898DFAAD305DA1C3EE8F5--
+
+--------------41D41F1FF404B44643C21BA4
+Content-Type: text/plain; charset=UTF-8;
+ name="application.ini"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="application.ini"
+
+OyBUaGlzIGZpbGUgaXMgbm90IHVzZWQuIElmIHlvdSBtb2RpZnkgaXQgYW5kIHdhbnQgdGhl
+IGFwcGxpY2F0aW9uIHRvIHVzZQo7IHlvdXIgbW9kaWZpY2F0aW9ucywgc3RhcnQgd2l0aCB0
+aGUgIi1hcHAgL3BhdGgvdG8vYXBwbGljYXRpb24uaW5pIgo7IGFyZ3VtZW50LgpbQXBwXQpW
+ZW5kb3I9Ck5hbWU9VGh1bmRlcmJpcmQKUmVtb3RpbmdOYW1lPXRodW5kZXJiaXJkClZlcnNp
+b249NDUuMS4xCkJ1aWxkSUQ9MjAxNjA1MjYxNDA5NTAKU291cmNlUmVwb3NpdG9yeT1odHRw
+czovL2hnLm1vemlsbGEub3JnL3JlbGVhc2VzL2NvbW0tZXNyNDUKU291cmNlU3RhbXA9OTYy
+YjJkNWYwNmU1ZTgzNmFjNzMzYmQwOWUxZjUzYjFhYTZlMmEwZQpJRD17MzU1MGY3MDMtZTU4
+Mi00ZDA1LTlhMDgtNDUzZDA5YmRmZGM2fQoKW0dlY2tvXQpNaW5WZXJzaW9uPTQ1LjEuMQpN
+YXhWZXJzaW9uPTQ1LjEuMQoKW1hSRV0KRW5hYmxlUHJvZmlsZU1pZ3JhdG9yPTEKCltDcmFz
+aCBSZXBvcnRlcl0KRW5hYmxlZD0xClNlcnZlclVSTD1odHRwczovL2NyYXNoLXJlcG9ydHMu
+bW96aWxsYS5jb20vc3VibWl0P2lkPXszNTUwZjcwMy1lNTgyLTRkMDUtOWEwOC00NTNkMDli
+ZGZkYzZ9JnZlcnNpb249NDUuMS4xJmJ1aWxkaWQ9MjAxNjA1MjYxNDA5NTAK
+--------------41D41F1FF404B44643C21BA4
+Content-Type: application/pgp-keys;
+ name="0x0B23E940.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename="0x0B23E940.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2
+Comment: Gnu Privacy Tools
+Comment: Download at http://www.gnupt.de
+
+mQENBFehJpwBCADdHPyJccnbhnOxMs6WTzAjBg2UDCHHATsi6BdmANRSKnUd7pzr
+5Xf18PW2+azfxuDqGWWJNv9lX5YvwMf9wvLWm0zh9wSj5lCeQuMirXjE4Img0w25
+lVRu8i0nYLX7YLHFfzLC6y9UJVF1ZhVZ/gRIujwAWytInbltpnX6ZitXGxiUfp5H
+rpekivF03txTUp63KhusjU1+dMlBatootyo/Xp7v+DreyfF0Bi8MtgfZtGDGxc6e
+q+eGM7YZNpG43eahQ77WbkcAgktrGL8Kqh0K6Sfs78iF6ruSA2765kNF8goQktAk
+jo+sZCgC/MBzSGGeebrtalSCDkZG/Tjygx4nABEBAAG0IU1hdHRoZXcgQWxsZW4g
+PGZyZXRAbWVtZWNvZGUuY29tPokBOAQTAQIAIgUCV6EmnAIbAwYLCQgHAwIGFQgC
+CQoLBBYCAwECHgECF4AACgkQo73Sxgsj6UDhGgf/S2RSx8XAffWth3Xs6GkK+NlQ
+iNegll0IknIsbrFarwnzwc0+XU33LSIwANiN2vtt0SEqT3WxSi4cZ34dgcF+03wf
+YLF816jC1/z0/BLrw5Gv4homtm58etZMTvLffcWSWlDGhbZ4h8/2melrCy7SnuuN
+vnNx82l2AYfEp7GC0u0utDM4sr3kgmWDcgQF+d/wvvZZ+UiHogxVds7rsxUWSfxE
+VuV42+obDSojj2GFwjAF3HTNEFVIrBiHolvf4PUJ1garkimF4/SQqfq5DWfLOX5a
+okbiGpfXaOpQKg9gxL//Hrhw4NO2RiSr/yPrCzJLRd12uXXeKjQPIM/nuIs4r7kB
+DQRXoSacAQgAtnLMBwHCbayRD0D53lha1/dVYe74vvl0R+Ab2GSRVYBLtpBKle9i
+S8RkygSmJKF/8+yOvvubcNeUw56vrCdn25b7qdico+qsVV+LXltdOuUxC5kKJB2x
+mwjH+ISkEa2rHyozOIW9kr/q+ApilxUgJffbwhDMnmtragSMz6GRRIND65sOl71W
++Y7gXRA8Z0Kgsy3yNq7wlkEDLrgjMKyOSpsPfVFYcqzuZZzWxaRi8TFrQ07D8ZmX
+DNJZZ8KchnMYp1arG1POn2S63SoLJpok5l/dEF4oR407I+1J+QhVlviMyjkpeJ96
+a/FUex4sLfXcBNhmAtCFJ94jksyyKUjqCQARAQABiQEfBBgBAgAJBQJXoSacAhsM
+AAoJEKO90sYLI+lAzDYH/2iDu6ut2/Y7wVUMamRbpm8cxIDdPys58Xho06Cl/oaw
+U6XFJxP0CgmTETVsKb4O4UkOxYZVqJXyf/cnGMcWLf87Y1DslOK3xTejjMOZiRqw
+cdsgnR4bHjq5zXo1MsTbJTGMQaxPL52QT8R5WhqASayC8I3ShSKKOCitZa1zQ3VC
+L7fLuyL+QPCkePLjVClMhRDHcI66bg781lZ8Jq/OpAa0lQ5c2HQe7cb50bMmIbze
+pBYGb73kwdgwu5OIX6606nqX7XWztx8VtSRAMtTv60DXZRSocB0YHaGYVPBn4579
+Z1A/zogZ6qWsBEhOnFhigEmonFpE6kAoe3c62bF3w90=3D
+=3DQsK7
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------41D41F1FF404B44643C21BA4--
+
+--dwO4XXSVHPvEwempW9kMECPhToFkpUFA9--
+
+--80KWg7mePwL3bAHkk0PXSeAK8BqmNvv3K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Gnu Privacy Tools
+Comment: Download at http://www.gnupt.de
+
+iQEcBAEBCAAGBQJXqACGAAoJEKO90sYLI+lAPw0IAKLNbn6PISFUUls+xI/jlPPp
+SkkSwc5nJS3crgUrVkg4Wj7PoP5ZPZahycqIcacEkb3v8YoM6WfJR2RrAv7tcmrk
+JKUIO9LTUld3RB3TlO/X6mtQmNS+bfTZAUqxcXyyB+QdaYpn4JpQQtsa7MCn20T3
+h8aiQIZPU5KfJX8z/D5FSa8ZZhmxo9jCkFGIo5k/ddOKibaHqDmHHhlCRbScgEZ0
+Um8lS9rCuXIkS97Xrs4/+YH+uHHP+0oyXsVyp40gqdSI2lIjR4kkprYmApR2qxAc
+1ui6YgX2WKE/2Ue3ml18lWtERcrFaXBCVr9j+GWbFEnbxQRAg2yc6zX57CNCPE0=
+=IxkN
+-----END PGP SIGNATURE-----
+
+--80KWg7mePwL3bAHkk0PXSeAK8BqmNvv3K--

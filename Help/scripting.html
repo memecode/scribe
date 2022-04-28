@@ -1,0 +1,420 @@
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+	<style>
+		.comment {
+			color: green;
+		}
+	</style>
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>Scripting Scribe</h2></center>
+
+		<div class=helpheading>Overview</div>
+		Scribe can execute scripts to extend it's functionality in the following locations:
+		<ul>
+			<li> As a filter that is executed on email being sent or received.
+			<li> From an item in the tools menu.
+			<li> From an item in the context menu of an object like email, contacts etc.
+			<li> Before an email is saved and sent.
+			<li> On start up.
+		</ul>
+
+		Scripts are written in a C like language, the exact syntax is described
+		<a href="scripting/index.html" target="_top">here</a>. Scripts are stored in 2 places,
+		either in the Script tab of a filter or as a .script file in the Scripts subfolder
+		where the executable is located. Files with the extension ".script" in that folder
+		are loaded and executed when Scribe starts, and they for the most part install a call
+		back that is called when some event happens later. Scripts can print debugging information
+		to the scripting console via the Print(...) method. That console can be openned via the
+		Debug -> Show Scripting Console menu.
+		<p/>
+		For information about what properties various objects support please consult the "Dom.txt"
+		in the Scripts sub-folder. That file is generated from the application's source code as part
+		of the release process so is always fully up to date for the currently installed build.
+		<p/>
+
+		<div class=helpheading>Scribe Specific Methods</div>
+		These methods are defined for all scripts run within Scribe, in addition to the various
+		scripts defined by the <a target="_top" href="scripting/library.html">system library</a> 
+		(which are available in any script enabled <a target="_top" href="http://www.memecode.com/lgi.php">Lgi</a>
+		application).<br />
+		<br />
+
+		List of system folder identifiers:
+		<table class=desc>
+			<tr><td> FOLDER_INBOX       </td><td>0</td></tr>
+			<tr><td> FOLDER_OUTBOX      </td><td>1</td></tr>
+			<tr><td> FOLDER_SENT        </td><td>2</td></tr>
+			<tr><td> FOLDER_TRASH       </td><td>3</td></tr>
+			<tr><td> FOLDER_CONTACTS    </td><td>4</td></tr>
+			<tr><td> FOLDER_TEMPLATES   </td><td>5</td></tr>
+			<tr><td> FOLDER_FILTERS     </td><td>6</td></tr>
+			<tr><td> FOLDER_CALENDAR    </td><td>7</td></tr>
+			<tr><td> FOLDER_GROUPS      </td><td>8</td></tr>
+			<tr><td> FOLDER_SPAM        </td><td>9</td></tr>
+		</table>
+
+		List of item types:
+		<table class=desc>
+			<tr><td> MAGIC_MAIL         </td><td>0xAAFF0001</td></tr>
+			<tr><td> MAGIC_CONTACT      </td><td>0xAAFF0002</td></tr>
+			<tr><td> MAGIC_ATTACHMENT   </td><td>0xAAFF0005</td></tr>
+			<tr><td> MAGIC_FILTER       </td><td>0xAAFF0007</td></tr>
+			<tr><td> MAGIC_CALENDAR     </td><td>0xAAFF000b</td></tr>
+			<tr><td> MAGIC_GROUP        </td><td>0xAAFF000d</td></tr>
+		</table>
+
+		However it's best to just include the ScribeScripts.h header and use the symbols in that:
+		<pre>#include "ScribeScripts.h"
+
+if (Thing.Type == ScribeItemMail)
+{
+	// Do something with en email...
+}</pre>
+
+		List of system functions:
+		<ul>
+			<li> <method>Print</method>(...)<br>
+				<div class=desc>
+					Prints string representations of any arguments, converting \r, \t, \n etc to
+					the actual whitespace characters. It doesn't assume there is a new line at the end,
+					that has to be part of the arguments.
+				</div></li>
+				
+			<li>
+				<method>GetFolder</method>(<arg>NameOrIndex</arg>)<br>
+				<div class=desc>
+					Returns a pointer to a folder. If NameOrIndex is a string then it should be the full
+					path of the folder in the form:
+					<pre>/{MailStoreName}/{LocalPath}</pre>
+					To get the path of a folder in the main tree, right click and "Copy Path".<br>
+					<br>
+					Otherwise the argument can be a system folder identifier (integer) like 
+					<b>SystemFolderInbox</b>
+					or <b>SystemFolderContacts</b> etc (See 'ScribeScripts.h').
+				</div></li>
+			<li>
+				<method>GetSourceFolders</method>(<arg>SystemFolderId</arg>)<br>
+				<div class=desc>
+					Returns a list of folders. SystemFolderId is a system folder identifier (integer).
+					Use this to get all the folders for a particular item type. For instance to get all
+					the contacts folder (across all mail stores) you would call:
+					<pre>Flds = GetSourceFolders(4);</pre>
+					See 'ScribeScripts.h' for folder symbols.
+				</div></li>
+
+			<li> <method>CreateSubFolder</method>(<arg>ParentFolderPtr</arg>, <arg>NameTxt</arg>, <arg>Type</arg>)
+				<div class=desc>
+					Creates a subfolder under ParentFolderPtr, with the given name and type.
+					Type can be: "Mail", "Contact", "Filter", "Calendar" or "Group".
+				</div></li>
+
+			<li> <method>BrowseFolder</method>(<arg>ParentWnd</arg>[, <arg>MessageTxt</arg>[, <arg>DefaultFolderName</arg>]])
+				<div class=desc>
+					Browses for a folder location, returns NULL on Cancel, and the folder's path on Ok.
+				</div></li>
+
+			<li> <method>CreateThing</method>(<arg>Type</arg>[, <arg>Folder</arg>=None])
+				<div class=desc>
+					Creates a new thing (email, contact etc). Type is an integer (e.g. MAGIC_MAIL).
+					Optionally you can supply a folder to create the object for. This is especially
+					important if you want to create an IMAP mail. By default CreateThing creates
+					a mail3 based object.
+				</div></li>
+			<li> <method>MoveThing</method>(<arg>Folder</arg>, <arg>Item</arg>)
+				<div class=desc>
+					Moves 'Item' into 'Folder'.<br />
+					'Folder' can either by a direct pointer to a folder object -or- a string
+					specifying the path to the folder.
+				</div></li>
+			<li> <method>SaveThing</method>(<arg>DestinationFolder</arg>, <arg>Item</arg>)
+				<div class=desc>
+					Saves 'Item' into 'DestinationFolder', more of a copy. Usually used with
+					new objects that are't already saved somewhere.
+				</div></li>
+			<li> <method>DeleteThing</method>(<arg>Item</arg>)
+				<div class=desc>
+					Deletes object(s) from memory and disk (or moves it to the trash). You can supply
+					multiple arguments if needed, including List objects. To specify deleting to trash
+					or deleting without trash use a string parameter. The default is not to delete to
+					the trash.
+					<ul>
+						<li debug=1> DeleteThing(MyObj, "trash");
+					</ul>
+				</div></li>
+			<li> <method>ShowThingWindow</method>(<arg>Item</arg>)
+				<div class=desc>
+					Opens the user interface for 'Item'.
+				</div></li>
+			<li> <method>LookupContact</method>(<arg>Email</arg>)
+				<div class=desc>
+					Searches for the contact with a given email address.
+				</div></li>
+
+			<li> <method>AddToolsMenuItem</method>(<arg>Name</arg>, <arg>CallbackMethodName</arg>)
+				<div class=desc>
+					Puts a menu item with the text 'Name' for a script function 'CallbackMethodName'
+					in the tools menu. Where 'CallbackMethodName' is the name of the function as a string.
+					Callbacks have the following form:
+					<blockquote>
+						<method>ToolMenuCallback</method></b>(<arg>Application</arg>, <arg>CmdId</arg>)
+					</blockquote>
+					The return value of the script is not used for anything.
+				</div></li>
+			<li> <method>AddCallback</method>(<arg>HandlerName</arg>, <arg>CallbackMethodName</arg>[, <arg>Parameter</arg>])
+				<div class=desc>
+					Adds a callback to a specific handler. Multiple callbacks can be installed for the same
+					handler. Handlers call the callbacks in the order they were installed.<br>
+					<br>
+					Available callback handlers:
+					<ul>
+						<li> <method>OnThingContextMenu</method></b>(<arg>Application</arg>,
+																	<arg>Thing</arg>,
+																	<arg>Menu</arg>)
+							<div class=desc>
+								The callback script function is called after the context menu for a Thing has
+								been constructed but before it's shown to the user. The callback can install
+								commands or submenus that call other
+								callbacks.
+							</div></li>
+						<li> <method>OnFolderContextMenu</method></b>(<arg>Application</arg>,
+																	<arg>Folder</arg>,
+																	<arg>Menu</arg>)
+							<div class=desc>
+								The callback script function is called after the context menu for a Folder has
+								been constructed but before it's shown to the user. The callback can install
+								commands or submenus that call other
+								callbacks.
+							</div></li>
+						<li> <method>OnThingToolbar</method></b>(<arg>Application</arg>,
+																<arg>Toolbar</arg>,
+																<arg>Thing</arg>)
+							<div class=desc>
+								The callback script function is called after the toolbar for a Thing has been
+								constructed, but before the UI is shown to the user. The callback can install
+								extra button(s) that call other callbacks.
+							</div></li>
+						<li> <method>OnApplicationToolbar</method></b>(<arg>Application</arg>, <arg>Toolbar</arg>)
+							<div class=desc>
+								The callback script function is called after the main application toolbar has been
+								constructed, but before the UI is shown to the user. The callback can install
+								extra button(s) that call other callbacks.
+							</div></li>
+						<li> <method>OnBeforeMailSend</method></b>(<arg>Application</arg>, <arg>EmailMsg</arg>)
+							<div class=desc>
+								The callback script function is called before the email window submits an
+								email for sending. If the script returns zero, the email window does nothing, if the
+								script returns non-zero then sending proceeds as normal.
+							</div></li>
+						<li> <method>OnAfterMailReceive</method></b>(<arg>Application</arg>, <arg>EmailMsg</arg>)
+							<div class=desc>
+								These callbacks get called after a new email is received. You can use them to run filtering scripts
+								that need to handle asyncronous callbacks, like App.GetUri, which don't work in a regular filter.
+							</div></li>
+						<li> <method>OnBeforeInstallBar</method></b>(<arg>Application</arg>, <arg>UserMsg</arg>, <arg>ActionList</arg>)
+							<div class=desc>
+								The callback script function is called before the install capability bar is shown. The user msg
+								and action list can be adjusted by the script function. If FALSE is returned the capability bar is
+								not shown, if TRUE is returned normal behaviour follows, with any modifications the script makes.
+							</div></li>
+						<li>
+							<method>OnInstallComponent</method></b>(<arg>Application</arg>, <arg>ActionName</arg>)
+							<div class=desc>
+								The callback script function is called to install a component after the capability bar has got user
+								permission. If the function returns TRUE the system installers proceed with their default behaviour.
+								If the function returns FALSE then the installation exits without doing anything further. If the script
+								actually performs the install itself, it should return FALSE. ActionName is the text on the button
+								that the user clicked. It is translated into the current language. The system string IDs used are:
+								<table class=desc>
+									<tr><td> IDS_OK <td> Just hides the capability bar without doing anything.
+									<tr><td> IDS_DONT_SHOW_AGAIN <td> Turn off default client warnings.
+									<tr><td> IDS_INSTALL <td> Install library from memecode website (openssl, libjpg etc).
+									<tr><td> IDS_SHOW_CONSOLE <td> Shows the console.
+									<tr><td> IDS_OPEN_SOURCE <td> Opens the script source (on say compile error).
+									<tr><td> IDS_SHOW_REMOTE_CONTENT <td> Shows remote content for a HTML email.
+									<tr><td> IDS_DOWNLOAD <td> Downloads a spell check dictionary.
+								</table>
+								You can use those #defines and the API call <a href="library.html#LoadString">LoadString</a> to get the
+								translated name of the install action. Which you'll need if you are comparing 'ActionName' with any
+								of the system actions.
+							</div></li>
+						<li>
+							<method>OnTimer</method></b>(<arg>Application</arg>)
+							<div class=desc>
+								Calls the function periodically. Set the period via AddCallback's "Parameter". Values for that 
+								are in the form [number][unit], where Unit can be:
+								<ul>
+									<li> s/sec/second
+									<li> m/min/minute
+									<li> h/hr/hour
+									<li> d/day
+								</ul>
+								e.g.
+								<ul>
+									<li> AddCallback("OnTimer", "MyFunction", "5min");
+									<li> AddCallback("OnTimer", "DoEveryHour", "1hr");
+								</ul>
+							</div></li>
+						<li>
+							<method>OnLoad</method></b>(<arg>Application</arg>)
+							<div class=desc>
+								Calls the method after the application loads. Most of the folders will exist, except IMAP.
+								If you need to access them maybe OnTimer is better?
+							</div></li>
+
+						<li> <i style='color: grey'>(if you want something added here, ask the <a href="mailto:fret@memecode.com">author</a>)</i></li>
+					</ul>
+				</div>
+			<li> <method>MenuAddItem</method>(<arg>Menu</arg>,
+												<arg>Icon</arg>,
+												<arg>LabelTxt</arg>,
+												<arg>Position</arg>,
+												<arg>CallbackMethodName</arg>,
+												<arg>CallbackId</arg>)
+				<div class=desc>
+					Adds an item to 'Menu' as 'Position' with the specified text. If the menu item is clicked, then
+					the scripting function 'CallbackMethodName' is called using the following arguments:
+					<blockquote>
+						<method>OnMenuItem</method></b>(<arg>Application</arg>, <arg>Object</arg>, <arg>CallbackId</arg>)
+							<div class=desc>
+							Where 'Object' is the either a 'Thing' or the 'Folder' the menu was used on.<br>
+							And 'CallbackId' is the integer supplied to MenuAddItem.
+							</div>
+					</blockquote>
+					CallbackId should be an integer > 2000 and < 30000, unless you use -1 in which case a separator is
+					placed in the menu. Position is the index into the menu... or -1 to append at the end.<br>
+					<br>
+					This will also append a separator:
+					<pre>Menu.AppendSeparator();</pre>
+				</div>
+			<li> <method>MenuAddSubmenu</method>(<arg>Menu</arg>, <arg>SubmenuTxt</arg>, <arg>Position</arg>)
+				<div class=desc>
+					Returns a pointer to the submenu or NULL on error.
+				</div>
+			<li> <method>ToolbarAddItem</method>(<arg>Toolbar</arg>,
+													<arg>Icon</arg>,
+													<arg>LabelTxt</arg>,
+													<arg>Position</arg>,
+													<arg>CallbackMethodName</arg>,
+													<arg>CallbackId</arg>)
+				<div class=desc>
+					Adds a toolbar button to 'Toolbar'. When the button is clicked, 'CallbackMethodName' is called. The callback
+					is called with the following parameters:
+					<blockquote>
+						<method>OnToolbarButton</method></b>(<arg>Application</arg>, <arg>Window</arg>, <arg>Thing</arg>, <arg>CallbackId</arg>)
+							<div class=desc>
+							Where 'Window' is the window the toolbar is attached to. CallbackId is the integer passed to ToolbarAddItem.
+							</div>
+					</blockquote>
+				</div>
+			<li> <b>Deprecated:</b> FilterDoActions(Filter, Mail)
+				<div class=desc>
+					Executes the actions attached to 'Filter' on 'Mail'.<br>
+					Use Filter.DoActions(<arg>Mail</arg>) instead.
+					
+				</div>
+			<li> <b>Deprecated:</b> LoadFolder(FolderPtr)
+				<div class=desc>
+					Loads the items in a folder if not already.<br>
+					Use Folder.Load() instead.
+				</div></li>
+		</ul>
+
+		<div class=helpheading>File Based Scripts</div>
+		When you create a file based script in the ./Scripts subfolder it has to have the extension .script. It will
+		only be loaded at startup, changes to the script after Scribe loads will not be loaded until next start up.
+		Scripts should be utf-8 text with \r\n or \n end of line characters. They should have a method called "Main" and 
+		optionally one or more callback methods. The Main function should register the callback(s) via AddToolsMenuItem,
+		AddThingMenuCallback, AddThingUiButton or AddCallback.<br>
+		<br>
+		See the existing scripts in that folder for some examples.
+
+		<div class=helpheading><a name="filterscripting">Filter Based Scripts</a></div>
+		Filter based scripts exist in the Script tab of a filter object. When the script tab has some content any
+		existing filter conditions are ignored and the script is executed. There doesn't need to be a method defined
+		in the script. Several pre-defined variables are available:
+		<table style="margin: 1em;">
+			<tr><td> <arg>App</arg> <td> The main application object.
+			<tr><td> <arg>Filter</arg> <td> The filter being evaluated.
+			<tr><td> <arg>Mail</arg> <td> The mail being filtered.
+		</table>
+		<p/>
+		In your script you can call being into the filter object to evaluate the conditions in the filter against the
+		mail object being filtered by using the syntax:
+		<pre>Filter.TestConditions</pre>
+
+		Which returns a boolean true of the mail matches the filter's conditions or false otherwise. Also to execute the
+		actions attached to the filter you can call:
+		<pre>Filter.DoActions(Mail)</pre>
+		
+		The default behaviour of a filter with no script is:
+		<pre>if (Filter.TestConditions)
+{
+	Filter.DoActions(Mail);
+}</pre>
+		You can use that as a template to build up to the functionality you want. Alternatively you can replace 
+		Filter.DoActions(...) with a set of custom calls to manipulate objects directly from the script.<br>
+		<br>
+		To stop further filtering of the current email use the StopFiltering method:
+		<pre>Filter.StopFiltering();</pre>
+
+		<div class=helpheading>Specific Notes on Fields</div>
+		The <method>Mail.Flags</method> object is a group of flags typically expressed as an <arg>Integer</arg>.
+		However if you want to get or set a specific flag you can use a string
+		in the array reference to specify which. The flags are as follows (case sensitive):
+		<table style='margin:1.5em;'>
+			<tr><td>SENT<td class=comment>Email has been sent via SMTP
+			<tr><td>RECEIVED<td class=comment>Email was received by POP or IMAP
+			<tr><td>CREATED<td class=comment>User created email
+			<tr><td>FORWARDED<td class=comment>Email has been forwarded
+			<tr><td>REPLIED<td class=comment>Email has been replied to
+			<tr><td>ATTACHMENTS<td class=comment>Email has attachments (can be wrong if email hasn't been parsed yet, more a display hint for user)
+			<tr><td>READ<td class=comment>User requested monospace font
+			<tr><td>READY_TO_SEND<td class=comment>Email is marked for sending in the next SMTP connection
+			<tr><td>READ_RECEIPT<td class=comment>User requested a receipt
+			<tr><td>IGNORE<td class=comment>User requested thread to be ignored
+			<tr><td>FIXED_WIDTH_FONT<td class=comment>User requested monospace font
+			<tr><td>BOUNCED<td class=comment>Messaged was bounced to somewhere
+			<tr><td>BOUNCE<td class=comment>Message IS a bounce (copy that is sent onwards)
+			<tr><td>SHOW_IMAGES<td class=comment>User requested external resources
+			<tr><td>BAYES_HAM<td class=comment>Currently classified as 'Ham' by the spam filter
+			<tr><td>BAYES_SPAM<td class=comment>Currently classified as 'Spam'
+			<tr><td>NEW<td class=comment>Email has been newly received
+			<tr><td>STORED_FLAT<td class=comment>Encrpytion implementation specific (don't use)
+		</table>
+		For example:
+		<pre>if (MailObj.Flags["NEW"])
+	Print("New mail!\n");</pre>
+		<hr>
+
+		The <method>ScribeWnd.Folders</method> field takes an array parameter to look up system folders. You can use an integer:
+		<table style='margin:1.5em;'>
+			<tr><td>FOLDER_INBOX    <td>0<td class=comment>The mail3 Inbox.
+			<tr><td>FOLDER_OUTBOX   <td>1<td class=comment>The mail3 Outbox.
+			<tr><td>FOLDER_SENT     <td>2<td class=comment>The mail3 Sent folder.
+			<tr><td>FOLDER_TRASH    <td>3<td class=comment>The trash.
+			<tr><td>FOLDER_CONTACTS <td>4<td class=comment>The mail3 Contacts folder.
+			<tr><td>FOLDER_TEMPLATES<td>5<td class=comment>The templates folder.
+			<tr><td>FOLDER_FILTERS  <td>6<td class=comment>The filters.
+			<tr><td>FOLDER_CALENDAR <td>7<td class=comment>The primary calendar folder.
+			<tr><td>FOLDER_GROUPS   <td>8<td class=comment>The contact groups.
+			<tr><td>FOLDER_SPAM     <td>9<td class=comment>All the spam.
+		</table>
+		Or specify a path as a string. When specifying a path, it should be in the form:
+		<pre>/{MailStoreName}/{LocalPath}</pre>
+
+
+		<center>&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a></center>
+	</div>
+
+</body>
+</html>
