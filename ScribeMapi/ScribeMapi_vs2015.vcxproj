@@ -68,26 +68,26 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\$(Platform)$(Configuration)14\</OutDir>
-    <IntDir>$(Platform)$(Configuration)14\</IntDir>
+    <OutDir>..\Windows\$(Platform)$(Configuration)14\</OutDir>
+    <IntDir>..\Windows\$(Platform)$(Configuration)14\Mapi\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\$(Platform)$(Configuration)14\</OutDir>
-    <IntDir>$(Platform)$(Configuration)14\</IntDir>
+    <OutDir>..\Windows\$(Platform)$(Configuration)14\</OutDir>
+    <IntDir>..\Windows\$(Platform)$(Configuration)14\Mapi\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\$(Platform)$(Configuration)14\</OutDir>
-    <IntDir>$(Platform)$(Configuration)14\</IntDir>
+    <OutDir>..\Windows\$(Platform)$(Configuration)14\</OutDir>
+    <IntDir>..\Windows\$(Platform)$(Configuration)14\Mapi\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\$(Platform)$(Configuration)14\</OutDir>
-    <IntDir>$(Platform)$(Configuration)14\</IntDir>
+    <OutDir>..\Windows\$(Platform)$(Configuration)14\</OutDir>
+    <IntDir>..\Windows\$(Platform)$(Configuration)14\Mapi\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;$(IncludePath)</IncludePath>
   </PropertyGroup>

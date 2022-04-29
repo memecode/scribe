@@ -14,7 +14,7 @@ else:
 	
 # setup paths
 basepath = os.path.abspath(os.path.join(os.path.realpath(__file__), "..\\..\\.."))
-exe = os.path.join(basepath, build_folder, "Scribe.exe")
+exe = os.path.join(basepath, "Windows", build_folder, "Scribe.exe")
 hdr = os.path.join(basepath, "code\\scribeinc.h")
 
 def getFileDescription(windows_exe, value):

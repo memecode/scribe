@@ -2,31 +2,31 @@
 !include LogicLib.nsh
 ; !include WinVer.nsh
 
-!system '"C:\Program Files\Python39\python.exe" Utils\Store\check-build.py' = 0
+!system '"C:\Program Files\Python39\python.exe" ..\Utils\Store\check-build.py' = 0
 
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"
 
 !system "copy .\x64ReleaseNoOptimize14\Scribe.exe scribe-setup" = 0
 !system "copy .\x64Release14\ScribeMapi.dll scribe-setup" = 0
-!system "copy ..\libs\aspell-0.60.6.1\win32\dist\x64Release14\aspell-dist-0.60.dll scribe-setup" = 0
-!system "copy ..\..\Lgi\trunk\lib\Lgi14x64nop.dll scribe-setup" = 0
-!system "copy ..\..\Lgi\trunk\lib\libntlm14x64nop.dll scribe-setup" = 0
-!system "copy ..\..\Lgi\trunk\lib\chardet14x64.dll scribe-setup" = 0
-!system "copy ..\..\Lgi\trunk\Updater\x64Release14\Updater.exe scribe-setup" = 0
-!system "copy ..\..\..\CodeLib\libjpeg-9a\build64\Release\libjpeg9a_14x64.dll scribe-setup\libjpeg9a_14x64.dll" = 0
-!system "copy ..\..\..\CodeLib\libpng\build64\Release\libpng15_14x64.dll scribe-setup\libpng15_14x64.dll" = 0
-!system "copy ..\..\..\CodeLib\libpng\build64\zlib_dir\Release\zlib_14x64.dll scribe-setup\zlib_14x64.dll" = 0
+!system "copy ..\..\libs\aspell-0.60.6.1\win32\dist\x64Release14\aspell-dist-0.60.dll scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\lib\Lgi14x64nop.dll scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\lib\libntlm14x64nop.dll scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\lib\chardet14x64.dll scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\Updater\x64Release14\Updater.exe scribe-setup" = 0
+!system "copy ..\..\..\..\CodeLib\libjpeg-9a\build64\Release\libjpeg9a_14x64.dll scribe-setup\libjpeg9a_14x64.dll" = 0
+!system "copy ..\..\..\..\CodeLib\libpng\build64\Release\libpng15_14x64.dll scribe-setup\libpng15_14x64.dll" = 0
+!system "copy ..\..\..\..\CodeLib\libpng\build64\zlib_dir\Release\zlib_14x64.dll scribe-setup\zlib_14x64.dll" = 0
 
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.exe'
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.dll'
 
 ; Generate the DOM documentation
-!system "py Code\Py\DomScan.py > scribe-setup\Dom.txt"
+!system "py ..\Code\Py\DomScan.py > scribe-setup\Dom.txt"
 
-!system "python Utils\Store\store.py .\x64ReleaseNoOptimize14\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
-!system "python Utils\Store\store.py .\x64Release14\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0
-!system "python Utils\Store\store.py ..\..\Lgi\trunk\lib\Lgi14x64nop.pdb Lgi ${__DATE__} ${__TIME__}" = 0
+!system "..\python Utils\Store\store.py .\x64ReleaseNoOptimize14\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
+!system "..\python Utils\Store\store.py .\x64Release14\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0
+!system "..\python Utils\Store\store.py ..\..\..\Lgi\trunk\lib\Lgi14x64nop.pdb Lgi ${__DATE__} ${__TIME__}" = 0
 
 ;--------------------------------
 SetCompressor lzma
@@ -78,57 +78,57 @@ Section ""
 	; Resources
 	CreateDirectory $INSTDIR\Resources
 	SetOutPath $INSTDIR\Resources
-	File .\Resources\Scribe.lr8
-	File .\Resources\Flags.png
-	File .\Resources\Icons-16.png
-	File .\Resources\xgate-icons-32.png
-	File .\Resources\About64px.png
-	File .\Resources\About.html
-	File .\Resources\Title.html
-	File .\Resources\Title.png
-	File .\Resources\NoFace*.png
-	File .\Resources\EmojiMap.png
-	File .\Resources\Preview*.html
+	File ..\Resources\Scribe.lr8
+	File ..\Resources\Flags.png
+	File ..\Resources\Icons-16.png
+	File ..\Resources\xgate-icons-32.png
+	File ..\Resources\About64px.png
+	File ..\Resources\About.html
+	File ..\Resources\Title.html
+	File ..\Resources\Title.png
+	File ..\Resources\NoFace*.png
+	File ..\Resources\EmojiMap.png
+	File ..\Resources\Preview*.html
 
 	CreateDirectory $INSTDIR\Resources\Themes
 	SetOutPath $INSTDIR\Resources\Themes
-	File .\Resources\Themes\readme.txt
+	File ..\Resources\Themes\readme.txt
 
 	CreateDirectory $INSTDIR\Resources\Themes\Dark
 	SetOutPath $INSTDIR\Resources\Themes\Dark
-	File .\Resources\Themes\Dark\*
+	File ..\Resources\Themes\Dark\*
  
 	; Aspell support
 	CreateDirectory $INSTDIR\Aspell
 	SetOutPath $INSTDIR\Aspell
-	File .\Resources\aspell-languages.csv
+	File ..\Resources\aspell-languages.csv
 	CreateDirectory $INSTDIR\Aspell\data
 	SetOutPath $INSTDIR\Aspell\data
-	File ..\libs\aspell-0.60.6.1\data\*.cmap
-	File ..\libs\aspell-0.60.6.1\data\*.cset
-	File ..\libs\aspell-0.60.6.1\data\*.kbd
+	File ..\..\libs\aspell-0.60.6.1\data\*.cmap
+	File ..\..\libs\aspell-0.60.6.1\data\*.cset
+	File ..\..\libs\aspell-0.60.6.1\data\*.kbd
  
 	; Scripts
 	CreateDirectory $INSTDIR\Scripts
 	SetOutPath $INSTDIR\Scripts
 	File .\scribe-setup\Dom.txt
-	File .\Resources\resdefs.h
+	File ..\Resources\resdefs.h
 
-	File ".\Scripts\ScribeScripts.h"
-	File ".\Scripts\Add Senders To Contacts.script"
-	File ".\Scripts\Delete Attachments.script"
-	File ".\Scripts\Delete Duplicate Messages.script"
-	File ".\Scripts\Mail Filters Menu.script"
+	File "..\Scripts\ScribeScripts.h"
+	File "..\Scripts\Add Senders To Contacts.script"
+	File "..\Scripts\Delete Attachments.script"
+	File "..\Scripts\Delete Duplicate Messages.script"
+	File "..\Scripts\Mail Filters Menu.script"
 
 	; Help files
 	CreateDirectory $INSTDIR\Help
 	SetOutPath $INSTDIR\Help
-	File .\Help\*.html
-	File .\Help\*.css
+	File ..\Help\*.html
+	File ..\Help\*.css
 	CreateDirectory $INSTDIR\Help\scripting
 	SetOutPath $INSTDIR\Help\scripting
-	File ..\..\Lgi\trunk\docs\scripting\*.html
-	File ..\..\Lgi\trunk\docs\scripting\*.css
+	File ..\..\..\Lgi\trunk\docs\scripting\*.html
+	File ..\..\..\Lgi\trunk\docs\scripting\*.css
   
 	; Do CRT check
 	ExecWait '"$INSTDIR\Scribe.exe" -crtcheck' $0
