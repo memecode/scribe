@@ -65,7 +65,6 @@
 		3477C3C41CC227ED0028B84B /* Imp_Mozilla.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3781CC227ED0028B84B /* Imp_Mozilla.cpp */; };
 		3477C3C51CC227ED0028B84B /* Imp_NetscapeContacts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3791CC227ED0028B84B /* Imp_NetscapeContacts.cpp */; };
 		3477C3C71CC227ED0028B84B /* ImpExp_Mbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C37B1CC227ED0028B84B /* ImpExp_Mbox.cpp */; };
-		3477C3CA1CC227ED0028B84B /* InScribeKey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C37E1CC227ED0028B84B /* InScribeKey.cpp */; };
 		3477C3CC1CC227ED0028B84B /* ManageMailStores.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3801CC227ED0028B84B /* ManageMailStores.cpp */; };
 		3477C3CD1CC227ED0028B84B /* MContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3811CC227ED0028B84B /* MContainer.cpp */; };
 		3477C3CE1CC227ED0028B84B /* OptionsDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3821CC227ED0028B84B /* OptionsDlg.cpp */; };
@@ -512,7 +511,6 @@
 		3477C3781CC227ED0028B84B /* Imp_Mozilla.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Imp_Mozilla.cpp; path = ../../Code/Imp_Mozilla.cpp; sourceTree = "<group>"; };
 		3477C3791CC227ED0028B84B /* Imp_NetscapeContacts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Imp_NetscapeContacts.cpp; path = ../../Code/Imp_NetscapeContacts.cpp; sourceTree = "<group>"; };
 		3477C37B1CC227ED0028B84B /* ImpExp_Mbox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ImpExp_Mbox.cpp; path = ../../Code/ImpExp_Mbox.cpp; sourceTree = "<group>"; };
-		3477C37E1CC227ED0028B84B /* InScribeKey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InScribeKey.cpp; path = ../../Code/InScribeKey.cpp; sourceTree = "<group>"; };
 		3477C3801CC227ED0028B84B /* ManageMailStores.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ManageMailStores.cpp; path = ../../Code/ManageMailStores.cpp; sourceTree = "<group>"; };
 		3477C3811CC227ED0028B84B /* MContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MContainer.cpp; path = ../../Code/MContainer.cpp; sourceTree = "<group>"; };
 		3477C3821CC227ED0028B84B /* OptionsDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OptionsDlg.cpp; path = ../../Code/OptionsDlg.cpp; sourceTree = "<group>"; };
@@ -1050,7 +1048,6 @@
 				3477C3701CC227ED0028B84B /* GBTreeWordStore.cpp */,
 				3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */,
 				3477C3741CC227ED0028B84B /* HtmlToText.cpp */,
-				3477C37E1CC227ED0028B84B /* InScribeKey.cpp */,
 				3477C3811CC227ED0028B84B /* MContainer.cpp */,
 				3477C3891CC227ED0028B84B /* ScribeAccount.cpp */,
 				3477C38D1CC227ED0028B84B /* ScribeApp.cpp */,
@@ -1572,7 +1569,6 @@
 				3445E5871F1F428400D0A824 /* ImageBlock.cpp in Sources */,
 				3477C3F01CC227ED0028B84B /* ScribeThing.cpp in Sources */,
 				341A78802699058600872FEB /* DatePopup.cpp in Sources */,
-				3477C3CA1CC227ED0028B84B /* InScribeKey.cpp in Sources */,
 				3477C3FF1CC22EF60028B84B /* MonthView.cpp in Sources */,
 				34417D8E205FD4A500D2E80C /* Ftp.cpp in Sources */,
 				3445E5771F1F416500D0A824 /* SpellCheckMac.mm in Sources */,
