@@ -1998,12 +1998,7 @@ bool Calendar::SetVariant(const char *Name, LVariant &Value, const char *Array)
 bool Calendar::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
 {
 	ScribeDomType Fld = StrToDom(MethodName);
-	switch (Fld)
-	{
-		default:
-			break;
-	}
-
+	
 	return Thing::CallMethod(MethodName, ReturnValue, Args);
 }
 

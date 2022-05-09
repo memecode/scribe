@@ -598,8 +598,8 @@ public:
 	bool OnKey(LKey &k) override;
 
 	Store3ItemTypes Type() override { return MAGIC_ATTACHMENT; }
-	bool Get(char **ptr, int *size);
-	bool Set(char *ptr, int size);
+	bool Get(char **ptr, ssize_t *size);
+	bool Set(char *ptr, ssize_t size);
 	bool Set(LAutoStreamI Stream);
 	Attachment *IsAttachment() override { return this; }
 	LAutoString MakeFileName();

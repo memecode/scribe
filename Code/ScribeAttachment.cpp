@@ -85,7 +85,7 @@ Attachment::Attachment(ScribeWnd *App, Attachment *From) : Thing(App)
 	if (From)
 	{
 		char *Ptr = 0;
-		int Len = 0;
+		ssize_t Len = 0;
 
 		if (From->Get(&Ptr, &Len))
 		{
@@ -1331,28 +1331,26 @@ const char *Attachment::GetText(int i)
 	return 0;
 }
 
-bool Attachment::Get(char **ptr, int *size)
+bool Attachment::Get(char **ptr, ssize_t *size)
 {
-	if (ptr && size)
+	if (!ptr || size<=0)
+		return false;
+
+	LStreamI *f = GotoObject(_FL);
+	if (!f)
+		return false;
+
+	*size = f->GetSize();
+	*ptr = new char[*size+1];
+	if (*ptr)
 	{
-		LStreamI *f = GotoObject(_FL);
-		if (f)
-		{
-			*size = (int)f->GetSize();
-			*ptr = new char[*size+1];
-			if (*ptr)
-			{
-				ssize_t r = f->Read(*ptr, *size);
-				(*ptr)[r] = 0;
+		auto r = f->Read(*ptr, *size);
+		(*ptr)[r] = 0;
 
-			}
-
-			DeleteObj(f);
-			return true;
-		}
 	}
 
-	return false;
+	DeleteObj(f);
+	return true;
 }
 
 bool Attachment::Set(LAutoStreamI Stream)
@@ -1372,7 +1370,7 @@ bool Attachment::Set(LAutoStreamI Stream)
 	return true;
 }
 
-bool Attachment::Set(char *ptr, int size)
+bool Attachment::Set(char *ptr, ssize_t size)
 {
 	LAutoStreamI s(new LMemStream(ptr, size));
 	return Set(s);

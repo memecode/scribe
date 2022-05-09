@@ -15,9 +15,8 @@
 
 class IDataStream : public GUnknownImpl<IStream>
 {
-	int Len;
+	ssize_t Len, Pos;
 	char *Data;
-	int Pos;
 
 public:
 	IDataStream(LVariant &v)

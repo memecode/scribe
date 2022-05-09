@@ -364,7 +364,11 @@ public:
 
 						LClipBoard c(this);
 						IsNoFace = false;
-						SetImage(c.Bitmap());
+
+						c.Bitmap([this](auto bmp, auto str)
+						{
+							SetImage(bmp);
+						});
 					}
 					return true;
 				}
@@ -1272,13 +1276,8 @@ bool Contact::GetVariant(const char *Name, LVariant &Value, const char *Array)
 
 bool Contact::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
 {
-	ScribeDomType Fld = StrToDom(MethodName);
-	switch (Fld)
-	{
-		default:
-			break;
-	}
-
+	// ScribeDomType Fld = StrToDom(MethodName);
+	
 	return Thing::CallMethod(MethodName, ReturnValue, Args);
 }
 

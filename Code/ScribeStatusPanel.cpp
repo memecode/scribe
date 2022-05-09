@@ -687,7 +687,7 @@ void LStatusPanel::OnAccountSelect(GAccountStatusItem *Item)
 									al->Empty();
 									
 									// Delete the first 1/3 of the log...
-									LRange r(0, l.Length() * 0.33);
+									LRange r(0, (ssize_t)(l.Length() * 0.33));
 									if (r.Len == 0)
 										r.Len++;
 

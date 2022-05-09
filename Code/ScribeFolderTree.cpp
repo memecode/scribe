@@ -543,7 +543,7 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 				continue;
 			}
 
-			int Errors = 0, Count = 0;
+			ssize_t Errors = 0, Count = 0;
 			LVariant &v = dd.Data.First();
 
 			if (ScribeClipboardFmt::IsFolder(v.Value.Binary.Data, v.Value.Binary.Length))
@@ -553,7 +553,7 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 
 				ScribeFolder *Root = dynamic_cast<ScribeFolder*>(ItemAt(0));
 
-				for (int i=0; i<Fmt->Length(); i++)
+				for (ssize_t i=0; i<Fmt->Length(); i++)
 				{
 					ScribeFolder *Folder = Fmt->FolderAt(i);
 					if (Folder)
@@ -676,7 +676,7 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 				Count = Fmt->Length();
 
 				LArray<Thing*> Items;
-				for (uint32_t i=0; i<Count; i++)
+				for (ssize_t i=0; i<Count; i++)
 				{
 					Thing *Thg = Fmt->ThingAt(i);
 					if (Thg)

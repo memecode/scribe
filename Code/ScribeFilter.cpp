@@ -551,7 +551,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 				for (auto a: Attachments)
 				{
 					char *Data;
-					int Length;
+					ssize_t Length;
 					LDateTime Temp;
 					
 					if (a->Get(&Data, &Length))

@@ -2633,8 +2633,8 @@ void MailUi::OnLoad()
 			auto Items = Container->Length();
 			auto i = Container->IndexOf(Item);
 
-			BtnPrev->Enabled(i<Items-1);
-			BtnNext->Enabled(i>0);
+			BtnPrev->Enabled(i < (ssize_t)Items - 1);
+			BtnNext->Enabled(i > 0);
 		}
 		else
 		{
@@ -2693,7 +2693,7 @@ void MailUi::OnSave()
 	if (FromCbo && Item->GetFrom() && FromAccountId.Length() > 0)
 	{
 		int64 CboVal = FromCbo->Value();
-		LAssert(CboVal < FromAccountId.Length());
+		LAssert(CboVal < (ssize_t)FromAccountId.Length());
 		int AccountId = FromAccountId[(int)CboVal];
 		
 		LDataPropI *Frm = Item->GetFrom();
@@ -6067,7 +6067,7 @@ char *Mail::GetAlternateHtml(List<Attachment> *Refs)
 			// Old way of storing alternate HTML, in an attachment.
 			// pre v1.53
 			char *Ptr;
-			int Size;
+			ssize_t Size;
 			if (Attach->Get(&Ptr, &Size))
 			{
 				Status = NewStr((char*)Ptr, Size);
@@ -7472,7 +7472,11 @@ int Mail::Compare(LListItem *t, ssize_t Field)
 					s2 = v2.Str();					
 				}
 				else
-					return v1.CastInt64() - v2.CastInt64();
+				{
+					auto diff = v1.CastInt64() - v2.CastInt64();
+					if (diff < 0) return -1;
+					return diff > 1;
+				}
 			}
 			default:
 			{

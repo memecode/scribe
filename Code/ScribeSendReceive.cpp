@@ -1184,12 +1184,12 @@ if (DebugTrace) LgiTrace("Send(%i) Item(%i) starting send\n", Account->GetIndex(
 									{
 										LStringPipe InetHeaders;
 										ssize_t Len = e->Send->Rfc822.Length();
-										int Written = 0;
+										ssize_t Written = 0;
 										
 										Item.Range = Len;
 										Item.Start = LCurrentTime();
 										
-										for (int Pos = 0; Pos < Len; )
+										for (ssize_t Pos = 0; Pos < Len; )
 										{
 											ssize_t Remaining = Len - Pos;
 											ssize_t Block = MIN(Remaining, 4 << 10);

@@ -321,7 +321,7 @@ private:
 	{
 		LString Msg;
 		int64 Sz = 0;
-		ssize_t Rd = 0;
+		int64 Rd = 0;
 		ptrdiff_t HdrSize = 0;
 		LString Start;
 		LArray<LRange> Segs;
@@ -352,7 +352,7 @@ private:
 			goto OnSigCheckError;
 		}
 		
-		for (int i=0; i<Sz;)
+		for (int64 i=0; i<Sz;)
 		{
 			Rd = UserMsg->Read(Msg.Get() + i, Msg.Length() - i);
 			if (Rd <= 0)

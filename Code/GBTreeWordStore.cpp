@@ -100,7 +100,7 @@ int LWordStore::SetWordCount(const char *Word, ssize_t Count)
 {
 	if (d->Tree)
 	{
-		return d->Tree->Insert(Word, Count);
+		return d->Tree->Insert(Word, (long)Count);
 	}
 
 	return false;

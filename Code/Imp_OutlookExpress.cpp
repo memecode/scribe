@@ -168,7 +168,7 @@ private:
 	ScribeFolder *ParentFolder;
 	LFile F;
 	uint64 FileSize;
-	List<int> Used;
+	List<ssize_t> Used;
 	
 	class MsgInfo
 	{
@@ -184,7 +184,7 @@ private:
 	};
 	List<MsgInfo> MsgList;
 
-	bool IsUsed(int i)
+	bool IsUsed(ssize_t i)
 	{
 		for (auto n: Used)
 		{
@@ -193,15 +193,15 @@ private:
 		return false;
 	}
 
-	void SetUsed(int i)
+	void SetUsed(ssize_t i)
 	{
 		if (!IsUsed(i))
 		{
-			Used.Insert(new int(i));
+			Used.Insert(new ssize_t(i));
 		}
 	}
 
-	bool ReadMessage(int Pos, bool IsNews, ScribeFolder *Folder)
+	bool ReadMessage(ssize_t Pos, bool IsNews, ScribeFolder *Folder)
 	{
 		bool Status = false;
 		if (!IsUsed(Pos) &&
@@ -223,7 +223,7 @@ private:
 
 				Pos += sizeof(Msg)-4;
 				// int Next = Pos + Msg.Next;
-				int End = Pos + Msg.Include;
+				auto End = Pos + Msg.Include;
 
 				char Buf[1024];
 				while (Pos < End)
@@ -308,12 +308,12 @@ private:
 		return Status;
 	}
 
-	bool ReadTable(uint32_t Pos)
+	bool ReadTable(ssize_t Pos)
 	{
 		bool Status = false;
 
 		if (Pos > 0 &&
-			Pos < FileSize &&
+			(uint64)Pos < FileSize &&
 			!IsUsed(Pos))
 		{
 			DbxTable Tbl;

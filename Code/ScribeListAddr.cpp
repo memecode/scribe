@@ -143,7 +143,7 @@ ListAddr::ListAddr(ScribeWnd *app, LDataPropI *Prop)
 		sName = Prop->GetStr(FIELD_NAME);
 		sAddr = Prop->GetStr(FIELD_EMAIL);
 		CC = (EmailAddressType)Prop->GetInt(FIELD_CC);
-		Status = Prop->GetInt(FIELD_STATUS);
+		Status = (uint8_t) Prop->GetInt(FIELD_STATUS);
 
 		OnFind();
 	}

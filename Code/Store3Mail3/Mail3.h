@@ -398,6 +398,7 @@ public:
 class GMail3Thing : public LDataI, public GMail3Obj 
 {
 	friend class GMail3Store;
+	GMail3Thing &operator =(GMail3Thing &p) = delete;
 
 protected:
     bool NewMail;

@@ -44,7 +44,7 @@ void RemoveChars(char *Str, int Start, int Len)
 
 void InsertChars(char *Ins, char *Str, int At)
 {
-	int Len = strlen(Ins);
+	auto Len = strlen(Ins);
 	memmove(Str + Len, Str, strlen(Str) + 1);
 	memcpy(Str, Ins, Len);
 }
@@ -1501,12 +1501,12 @@ OutlookIO::OutlookIO(ScribeWnd *Wnd, int Flags, ScribeAccount *account)
 				Prog->SetDescription("Initializing...");
 				if (EParams.Export.Length())
 				{
-					Prog->SetLimits(0, EParams.Export.Length());
+					Prog->SetRange(LRange(0, EParams.Export.Length()));
 				}
 				else
 				{
 					GMailStore *Ms = App->GetDefaultMailStore();
-					Prog->SetLimits(0, Ms ? CountFolders(Ms->Root) : 0);
+					Prog->SetRange(LRange(0, Ms ? CountFolders(Ms->Root) : 0));
 				}
 				EParams.Prog = Prog->ItemAt(0);
 				EParams.ItemProg = Prog->Push();
@@ -1536,12 +1536,12 @@ OutlookIO::OutlookIO(ScribeWnd *Wnd, int Flags, ScribeAccount *account)
 					Prog->SetDescription("Initializing...");
 					if (IParams.Import.Length())
 					{
-						Prog->SetLimits(0, IParams.Import.Length());
+						Prog->SetRange(LRange(0, IParams.Import.Length()));
 					}
 					else
 					{
 						GMailStore *Ms = App->GetDefaultMailStore();
-						Prog->SetLimits(0, Ms ? CountFolders(Ms->Root) : 0);
+						Prog->SetRange(LRange(0, Ms ? CountFolders(Ms->Root) : 0));
 					}
 					IParams.Prog = Prog->ItemAt(0);
 					IParams.ItemProg = Prog->Push();
@@ -2235,8 +2235,8 @@ bool OutlookIO::ImportEmail(ScribeFolder *Folder, Mail *&To, IMessage *From, boo
 								    char *p = Data; 
 								    for (int i=0; i<Size; i+=Block)
 								    {
-									    int Len = min(Size - (p - Data), Block);
-									    if (Stream->Read(p, Len, NULL) != S_OK)
+									    auto Len = min(Size - (p - Data), Block);
+									    if (Stream->Read(p, (ULONG)Len, NULL) != S_OK)
 									    {
 										    break;
 									    }
@@ -2741,7 +2741,7 @@ bool OutlookIO::Import(	ImportParams *P,
 					if (P->ItemProg)
 					{
 						P->ItemProg->SetDescription("Processing items...");
-						P->ItemProg->SetLimits(0, Lst.Length());
+						P->ItemProg->SetRange(LRange(0, Lst.Length()));
 					}
 
 					// Loop through all the items
@@ -2773,7 +2773,7 @@ bool OutlookIO::Import(	ImportParams *P,
 					{
 						P->ItemProg->SetDescription("");
 						P->ItemProg->Value(0);
-						P->ItemProg->SetLimits(0, 0);
+						P->ItemProg->SetRange(LRange());
 					}
 				}
 			}
@@ -3287,7 +3287,7 @@ bool OutlookIO::Export(	ExportParams *P,
 					if (P->ItemProg)
 					{
 						P->ItemProg->Value(0);
-						P->ItemProg->SetLimits(0, In->Items.Length());
+						P->ItemProg->SetRange(LRange(0, In->Items.Length()));
 						P->ItemProg->SetType("email");
 						P->ItemProg->Cancel(false);
 						LYield();
@@ -3351,9 +3351,9 @@ bool OutlookIO::Export(	ExportParams *P,
 									if (m->GetTo()->Length())
 									{
 										ADRLIST *Adr = 0;
-										if (MAPIAllocateBuffer(CbNewADRLIST(m->GetTo()->Length()), (void**) &Adr) == S_OK)
+										if (MAPIAllocateBuffer(CbNewADRLIST((ULONG)m->GetTo()->Length()), (void**) &Adr) == S_OK)
 										{
-											Adr->cEntries = m->GetTo()->Length();
+											Adr->cEntries = (ULONG)m->GetTo()->Length();
 
 											int n = 0;
 											for (LDataPropI *a = m->GetTo()->First(); a; a = m->GetTo()->Next(), n++)
@@ -3458,7 +3458,7 @@ bool OutlookIO::Export(	ExportParams *P,
 										for (auto a: Att)
 										{
 											char *Ptr;
-											int Size;
+											ssize_t Size;
 											if (a->Get(&Ptr, &Size))
 											{
 												ULONG AttachmentNum = 0;
@@ -3502,7 +3502,7 @@ bool OutlookIO::Export(	ExportParams *P,
 													SPropValue Bin;
 													Bin.dwAlignPad = 0;
 													Bin.ulPropTag = PR_ATTACH_DATA_BIN;
-													Bin.Value.bin.cb = Size;
+													Bin.Value.bin.cb = (ULONG) Size;
 													Bin.Value.bin.lpb = (uchar*)Ptr;
 													Attach->SetProps(1, &Bin, 0);
 
@@ -3589,7 +3589,7 @@ protected:
 	OutlookIO *Mapi;
 	ScribeWnd *Parent;
 	ScribeAccount *Account;
-	ULONG Ui;
+	UI_TYPE Ui;
 
 	IMsgStore *MsgStore;
 	IMAPIFolder *pFolder;
@@ -3606,7 +3606,7 @@ public:
 	bool Close();
 
 	// Commands available while connected
-	int GetMessages();
+	ssize_t GetMessages() override;
 	bool Receive(LArray<MailTransaction*> &Trans, MailCallbacks *Callbacks);
 	bool Delete(int Message);
 	int Sizeof(int Message);
@@ -3817,9 +3817,9 @@ bool MailMapiSource::ListEntries()
 	return Entries.Length() > 0;
 }
 
-int MailMapiSource::GetMessages()
+ssize_t MailMapiSource::GetMessages()
 {
-	int Status = 0;
+	ssize_t Status = 0;
 	if (ListEntries())
 	{
 		Status = Entries.Length();

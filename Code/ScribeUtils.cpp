@@ -63,6 +63,9 @@ const char *ScribeResourcePath()
 		#if !defined(MAC)
 		// Exe relative mode
 		LFile::Path p(LSP_APP_INSTALL);
+		#if defined(WINDOWS) && defined(_DEBUG)
+		p += "..";
+		#endif
 		p += "Resources";
 		if (p.Exists())
 			strcpy_s(Res, sizeof(Res), p.GetFull());
@@ -1630,8 +1633,8 @@ void TabDialog::IdealSize(LButton *b)
 	{
 		auto s = b->GetWindow()->GetDpiScale();
 		LDisplayString ds(b->GetFont(), b->Name());
-		Inf.Width.Max = ds.X() + (s.x * LButton::Overhead.x);
-		Inf.Height.Max = ds.Y() + (s.y * LButton::Overhead.y);
+		Inf.Width.Max = (int32)(ds.X() + (s.x * LButton::Overhead.x));
+		Inf.Height.Max = (int32)(ds.Y() + (s.y * LButton::Overhead.y));
 	}
 	else
 	{

@@ -91,7 +91,7 @@ public:
 	Store3Status SetStr(int id, const char *str) override;
 	int64 GetInt(int id) override;
 	Store3Status SetInt(int id, int64 i) override;
-	LDataPropI &operator =(LDataPropI &p) override;
+	LDataPropI &operator =(LDataPropI &p);
 };
 
 #endif

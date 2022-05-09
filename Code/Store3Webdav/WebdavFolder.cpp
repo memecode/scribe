@@ -157,13 +157,7 @@ WebdavFld::WebdavFld(LDataStoreI *s, WebdavFolder *p, int id, int width)
 
 const char *WebdavFld::GetStr(int id)
 {
-	switch (id)
-	{
-		default:
-			LAssert(!"Not impl.");
-			break;
-	}
-
+	LAssert(!"Not impl.");
 	return NULL;
 }
 

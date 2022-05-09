@@ -521,7 +521,7 @@ public:
 						nextErr++;
 						break;
 					}
-					if (errs.Start < Cur)
+					if (errs.Start < (ssize_t)Cur)
 						nextErr++;
 					else
 						break;
@@ -1074,7 +1074,7 @@ bool HashSerialize(LHashTbl<StrKeyPool<char>,uint32_t> &h, char *file, bool writ
 				for (auto i : h)
 				{
 					fld->Value = (uint32_t)i.value;
-					fld->Len = strlen(i.key);
+					fld->Len = (uint16_t)strlen(i.key);
 					memcpy(fld->Str, i.key, fld->Len + 1);
 
 					Status = f.Write(fld, header + fld->Len) == (header + fld->Len);
@@ -1226,7 +1226,7 @@ void BayesianFilter::AddFolderToSpamDb(ScribeFolder *f)
 
 static size_t FolderCount(ScribeFolder *f)
 {
-	auto len = f->Length();
+	ssize_t len = f->Length();
 	auto items = f->GetItems();
 	auto n = MAX(len, items);
 
@@ -1337,7 +1337,7 @@ void TokeniseText(const char *Source, bool *Lut, LString::Array &Blocks, TokenMa
 		return;
 
 	char buf[16 << 10];
-	int used = 0;
+	ssize_t used = 0;
 	auto oldWarn = LUtf8Ptr::Warn;
 	LUtf8Ptr::Warn = false;
 
@@ -1668,7 +1668,7 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 			}
 
 		if (spamIdx == 0 || spamIdx == 1)
-			return t.Length() > spamIdx + 1 ? BayesMailUnknown : BayesMailSpam;
+			return (ssize_t)t.Length() > spamIdx + 1 ? BayesMailUnknown : BayesMailSpam;
 	}
 
 	return BayesMailHam;

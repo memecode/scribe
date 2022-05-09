@@ -70,7 +70,7 @@ public:
 				Fd.nFileSizeLow = Sz & 0xffffffff;
 			}
 
-			int Leaf = FileName.RFind(DIR_STR);
+			auto Leaf = FileName.RFind(DIR_STR);
 			LAutoWString FnW(Utf8ToWide(Leaf >= 0 ? FileName(Leaf+1,-1) : FileName));
 			Strcpy(Fd.cFileName, CountOf(Fd.cFileName), FnW.Get());
 
@@ -2103,6 +2103,11 @@ bool ScribeFolder::Serialize(LFile &f, bool Write)
 
 class NullMail : public Mail
 {
+	Thing &operator =(Thing &c) override
+	{
+		return *this;
+	}
+
 public:
 	NullMail(ScribeWnd *App, MContainer *c, ScribeFolder *f) : Mail(App)
 	{

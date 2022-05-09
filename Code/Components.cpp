@@ -475,7 +475,7 @@ public:
 						ch += sprintf_s(Url+ch, sizeof(Url)-ch, "&tags=vc14");
 					#elif _MSC_VER == _MSC_VER_VS2017
 						ch += sprintf_s(Url+ch, sizeof(Url)-ch, "&tags=vc15");
-					#elif _MSC_VER == _MSC_VER_VS2019
+					#elif _MSC_VER >= _MSC_VER_VS2019
 						ch += sprintf_s(Url+ch, sizeof(Url)-ch, "&tags=vc16");
 					#else
 						#error "Impl me."

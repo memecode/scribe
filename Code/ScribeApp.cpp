@@ -724,6 +724,11 @@ public:
 		RefCount--;
 	}
 
+	Thing &operator =(Thing &c) override
+	{
+		return *this;
+	}
+
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array)
 	{
 		ScribeDomType Fld = StrToDom(Name);
@@ -2292,9 +2297,13 @@ void ScribeWnd::OnCreate()
 			#if RUN_STARTUP_SCRIPTS
 			// Run scripts in './Scripts' folder
 			char s[MAX_PATH_LEN];
-			LMakePath(s, sizeof(s), ScribeResourcePath(), "Scripts");
+			LMakePath(s, sizeof(s), ScribeResourcePath(), "../Scripts");
 			if (!LDirExists(s))
-				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL), "Scripts");
+				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
+					#if defined(WINDOWS) && defined(_DEBUG)
+					"..\\"
+					#endif
+					"Scripts");
 			if (!LDirExists(s))
 				LgiTrace("%s:%i - Error: the scripts folder '%s' doesn't exist.\n", _FL, s);
 			else
@@ -12127,7 +12136,7 @@ bool ScribeWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArra
 
 		if (MailList && SelIdx >= 0 && MailList->Length() > 0)
 		{
-			if (SelIdx >= MailList->Length())
+			if (SelIdx >= (ssize_t)MailList->Length())
 				SelIdx = MailList->Length()-1;
 			MailList->Value(SelIdx);
 		}

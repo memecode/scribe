@@ -128,6 +128,7 @@ public:
 class WebdavFolder : public LDataFolderI
 {
 	friend class WebdavStore;
+	WebdavFolder &operator =(const WebdavFolder &f) = delete;
 
 	WebdavStore *Store;
 	WebdavFolder *Parent;
