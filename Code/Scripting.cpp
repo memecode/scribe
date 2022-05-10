@@ -51,14 +51,14 @@ struct LScribeScriptPriv : public LStream, public LThread
 	
 	// Incoming buffer
 	LMutex InputLock; // Covers Used and Buffer
-	int Used;
+	ssize_t Used;
 	LArray<char> Buffer;
 	
 	// Outputs
 	LMutex OutputLock; // Covers LogFile, LogMem and Console
 	LAutoString LogFile;
 	LArray<char> LogMem;
-	int LogMemUsed;
+	ssize_t LogMemUsed;
 	LScriptConsole *Console;
 	
 	LScribeScriptPriv(ScribeWnd *app) :
@@ -196,7 +196,7 @@ struct LScribeScriptPriv : public LStream, public LThread
 					{
 						// Move data down to make space... by deleting a 1/4 of the data
 						// and shifting down the rest.
-						int i = LogMemUsed >> 2;
+						auto i = LogMemUsed >> 2;
 						
 						// Seek to the end of a line
 						for (; i < LogMemUsed; i++)

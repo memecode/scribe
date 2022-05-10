@@ -396,6 +396,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Html.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlCommon.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlParser.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextView4.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\XmlTreeUi.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\RtfHtml.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextConvert.cpp" />

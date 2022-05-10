@@ -1713,7 +1713,7 @@ void ImapFolder::OnListing(ImapMsg *m)
 	// for (ImapMail *Old = Tbl.First(); Old; Old = Tbl.Next())
 	for (auto it : Tbl)
 	{
-	    int OldUid = it.value->Uid;
+	    auto OldUid = it.value->Uid;
 		
 		// Why is this condition here???
 	    if (Fld.LastUid == 0 ||		// Ie we are doing a full folder refresh or initial load
@@ -1794,7 +1794,7 @@ void ImapFolder::Swap(ImapFolder &f)
 
 int ImapFolder::GetLastUid()
 {
-    int Max = 0;
+    uint32_t Max = 0;
     
 	for (auto it : UidMap)
 		Max = MAX(Max, it.key);

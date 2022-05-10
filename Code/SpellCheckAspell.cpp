@@ -149,7 +149,7 @@ public:
 			// LgiTrace("Src.Read next_in=%i avail_in=%i Rd=%i\n", Bz.next_in?Bz.next_in-Buf:-1, Bz.avail_in, Rd);
 			
 			Bz.next_in = Buf;
-			Bz.avail_in += Rd;
+			Bz.avail_in += (unsigned int)Rd;
 			Bz.next_out = (char*)Buffer;
 			Bz.avail_out = (int)Size;
 			
