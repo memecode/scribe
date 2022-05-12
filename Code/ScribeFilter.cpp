@@ -3597,8 +3597,9 @@ FilterUi::FilterUi(Filter *item) :
 	if (Attach(0))
 	{
 		// Setup UI
-		LImageList *ToolImg = Item->App->GetToolbarImgList();
-		Commands.Toolbar = Item->App->LoadToolbar(this, Item->App->GetResourceFile(ResToolbarFile), &ToolImg);
+		Commands.Toolbar = Item->App->LoadToolbar(this,
+												Item->App->GetResourceFile(ResToolbarFile),
+												Item->App->GetToolbarImgList());
 		if (Commands.Toolbar)
 		{
 			Commands.Toolbar->Attach(this);

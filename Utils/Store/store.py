@@ -27,12 +27,11 @@ else:
 	ts = "%04i%02i%02i-%02i%02i%02i" % (year, month, day, hour, min, second)
 	# print(syms, ts)
 	
-	name = "iScribe"
-	hdr = open("code\scribeinc.h", "r").read().split("\n")
+	name = "Scribe"
+	version = None
+	hdr = open("..\\code\\scribeinc.h", "r").read().split("\n")
 	for h in hdr:
-		if h.find("#define InScribe") == 0:
-			name = "InScribe"
-		elif h.find("#define	ScribeVer") == 0:
+		if h.find("#define ScribeVer") >= 0:
 			p = h.split()
 			version = p[2].strip("\"")
 	

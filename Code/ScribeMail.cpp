@@ -1492,8 +1492,9 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 		DropTarget(true);
 
 		// Setup main toolbar
-		auto ToolbarImgs = App->GetToolbarImgList();
-		Commands.Toolbar = App->LoadToolbar(this, App->GetResourceFile(ResToolbarFile), &ToolbarImgs);
+		Commands.Toolbar = App->LoadToolbar(this,
+											App->GetResourceFile(ResToolbarFile),
+											App->GetToolbarImgList());
 		if (Commands.Toolbar)
 		{
 			Commands.Toolbar->Raised(false);

@@ -73,16 +73,16 @@ ProductName = "i.Scribe"
 s = inc.read().split("\n")
 for i,line in enumerate(s):
 	parts = line.split()
-	if (len(parts) >= 2 and parts[0] == "#define"):
+	if (len(parts) >= 1 and parts[0] == "#define"):
 		if (parts[1] == "ScribeVer"):
 			ScribeVer = parts[2].strip("\"").split(".")
 		elif (parts[1] == "InScribe"):
 			ProductName = "InScribe"
 
-#print("ScribeVer:",ScribeVer)
+print("ScribeVer:",ScribeVer)
 
 # construct the new full build version
-Full = "%i,%i,%i,%i" % (int(ScribeVer[0]),int(ScribeVer[1]),int(ScribeVer[2]),int(revision))
+Full = "%i,%i,%i" % (int(ScribeVer[0]),int(ScribeVer[1]),int(revision))
 print("Full version:",Full)
 
 rc = open("../Resource.rc", "rb")

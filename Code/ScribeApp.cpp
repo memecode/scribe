@@ -86,7 +86,6 @@
 #else
 #define SUNKEN_CTRL					true
 #endif
-LString TOOLBAR_FILE;
 
 #if LGI_CARBON
 
@@ -1548,14 +1547,15 @@ ScribeWnd::~ScribeWnd()
 	// they might still be using SSL functions, e.g. an IMAP/SSL connect.
 	EndSSL();
 
-	DeleteObj(ImageList);
-	DeleteObj(ToolbarImgs);
 	DeleteObj(d);
 }
 
 LString ScribeWnd::GetResourceFile(SribeResourceType Type)
 {
-	return d->ResFiles.Find(Type);
+	auto File = d->ResFiles.Find(Type);
+	if (!File)
+		LgiTrace("%s:%i - No file for resource type %i\n", _FL, Type);
+	return File;
 }
 
 void ScribeWnd::LoadImageResources()
@@ -1569,6 +1569,8 @@ void ScribeWnd::LoadImageResources()
 	for (auto p: Folders)
 	{
 		LDirectory Dir;
+
+		LgiTrace("%s:%i - Loading resource folder '%s'\n", _FL, p.Get());
 		for (auto b = Dir.First(p); b; b = Dir.Next())
 		{
 			if (Dir.IsDir())
@@ -1587,8 +1589,8 @@ void ScribeWnd::LoadImageResources()
 		}
 	}
 
-	ToolbarImgs = LLoadImageList(GetResourceFile(ResToolbarFile));
-	ImageList = LLoadImageList(GetResourceFile(ResIconsFile));
+	ToolbarImgs.Reset(LLoadImageList(GetResourceFile(ResToolbarFile)));
+	ImageList.Reset(LLoadImageList(GetResourceFile(ResIconsFile)));
 	if (!ImageList)
 		LgiTrace("%s:%i - Failed to load toolbar image ('xgate-icons-32.png' or 'Toolbar-24.png')\n", _FL);
 }
@@ -5530,20 +5532,22 @@ int ScribeWnd::GetToolbarHeight()
 	return (Commands) ? MAX(Commands->Y()-1, 20) : 20;
 }
 
-LToolBar *ScribeWnd::LoadToolbar(LViewI *Parent, const char *File, LImageList **Img)
+LToolBar *ScribeWnd::LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LImageList> &Img)
 {
-	LImageList *ImgLst = NULL;
-	if (!Img) Img = &ImgLst;
-	
-	if (!*Img)
-		*Img = LLoadImageList(File);
+	if (Img)
+		Img.Reset(LLoadImageList(File));
+	if (!Img)
+	{
+		LAssert(!"Missing image resource.");
+		return NULL;
+	}
 
-	LToolBar *Tools = 0;
+	LToolBar *Tools = NULL;
 	if (Img)
 	{
 		Tools = new LToolBar;
 		if (Tools)
-			Tools->SetImageList(*Img, (*Img)->TileX(), (*Img)->TileY(), false);
+			Tools->SetImageList(Img, Img->TileX(), Img->TileY(), false);
 	}
 	else
 	{
@@ -5855,7 +5859,7 @@ void ScribeWnd::SetupUi()
 	Visible(true);
 
 	// Main toolbar
-	Commands = LoadToolbar(this, TOOLBAR_FILE, &ToolbarImgs);
+	Commands = LoadToolbar(this, GetResourceFile(ResToolbarFile), ToolbarImgs);
 	if (Commands)
 	{
 		Commands->Attach(this);
@@ -5893,37 +5897,6 @@ void ScribeWnd::SetupUi()
 		Commands->AppendSeparator();
 
 		Commands->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), IDM_HELP, TBT_PUSH, true, IMG_HELP);
-
-		#if 0
-		char Opt[32];
-		for (int n=0; sprintf_s(Opt, sizeof(Opt), "tool%i", n); n++)
-		{
-			char *Cmd;
-			if (GetOptions()->Get(Opt, Cmd))
-			{
-				char Delim[] = " \t\r\n,";
-				char *Name = LTokStr(Cmd, Delim);
-				char *Icon = LTokStr(Cmd, Delim);
-				char *Command = LTokStr(Cmd, Delim);
-				
-				if (Name && Icon && Command)
-				{
-					int Ico = atoi(Icon);
-					if (Ico)
-					{
-						Commands->AppendButton(RemoveAmp(Name), IDM_CUSTOM_BASE + n, TBT_PUSH, true, Ico);
-						d->CustomCommands[n] = Command;
-						Command = 0;
-					}
-				}
-
-				DeleteArray(Name);
-				DeleteArray(Icon);
-				DeleteArray(Command);
-			}
-			else break;
-		}
-		#endif
 
 		Commands->Customizable(GetOptions(), OPT_ScribeWndToolbar);
 		if (d->ScriptToolbar.Reset(new LScriptUi(Commands)))
@@ -5993,9 +5966,9 @@ void ScribeWnd::SetupUi()
 	{
 		s.Print(" [%s]", UserName.Str());
 	}
-	LAutoString Str(s.NewStr());
-	TrayIcon.Name(Str);
-	Name(Str);
+	auto AppTitle = s.NewGStr();
+	TrayIcon.Name(AppTitle);
+	Name(AppTitle);
 
 	TrayIcon.Value(TRAY_ICON_NORMAL);
 	TrayIcon.Visible(true);

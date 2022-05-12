@@ -192,7 +192,7 @@ copy Code\Resource.res $(OutDir)
       </Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -265,7 +265,7 @@ cd ..
 copy Code\Resource.res $(OutDir)</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -340,7 +340,7 @@ rc Resource.rc
 copy Resource.res ..\Windows\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -396,7 +396,6 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Html.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlCommon.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlParser.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextView4.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\XmlTreeUi.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\RtfHtml.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextConvert.cpp" />
@@ -642,6 +641,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\gen.py" />
+    <None Include="..\..\libs\build.py" />
     <None Include="..\Code\Encryption\Examples\encrypted+attach.eml" />
     <None Include="..\Code\Encryption\Examples\encrypted+html+attach+key.eml" />
     <None Include="..\Code\Encryption\Examples\encrypted.eml" />
@@ -650,6 +650,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <None Include="..\Code\Encryption\Examples\signed+HTML+attach+key.eml" />
     <None Include="..\Code\Encryption\Examples\signed+html.eml" />
     <None Include="..\Code\Encryption\Examples\signed.eml" />
+    <None Include="..\Code\Py\DomScan.py" />
     <None Include="..\Code\Py\win32_pre_build_step.py" />
     <None Include="..\Code\Store3Imap\compile-proto.bat" />
     <None Include="..\Code\Store3Imap\Scribe.proto" />
@@ -668,8 +669,6 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <None Include="..\Help\print.html" />
     <None Include="..\Help\scripting.html" />
     <None Include="..\Help\ui.html" />
-    <None Include="..\Installer-vs12-32bit.nsi" />
-    <None Include="..\Installer-vs12-64bit.nsi" />
     <None Include="..\Resources\About.html" />
     <None Include="..\Resources\PreviewContact.html" />
     <None Include="..\Resources\PreviewMail.html" />
@@ -684,6 +683,8 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <None Include="..\Scripts\LdapPlugin.script" />
     <None Include="..\Scripts\Mail Filters Menu.script" />
     <None Include="..\Utils\Store\check-build.py" />
+    <None Include="..\Utils\Store\store.py" />
+    <None Include="Installer-vs12-64bit.nsi" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Icons\app.ico" />
@@ -718,7 +719,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ProjectReference Include="..\..\libs\aspell-0.60.6.1\win32\dist\aspell-dist-0.60-vs2015.vcxproj">
       <Project>{1509fe6d-0b3a-422a-99d1-e26a26ce8da5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\bzip2-1.0.6\windows\bzip2-1.0.6-vs2015.vcxproj">
+    <ProjectReference Include="..\..\libs\bzip2-1.0.6\windows\bzip2-1.0.6-vs2019.vcxproj">
       <Project>{e5575141-c1a2-4997-badb-7584cf546e1f}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ScribeMapi\ScribeMapi_vs2015.vcxproj">

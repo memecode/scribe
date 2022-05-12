@@ -2879,8 +2879,9 @@ CalendarViewWnd::CalendarViewWnd(ScribeFolder *folder)
 	SetIcon("_cal.png");
 	#endif
 		
-	LImageList *Il = folder->App->GetToolbarImgList();
-	LToolBar *ToolBar = folder->App->LoadToolbar(this, folder->App->GetResourceFile(ResToolbarFile), &Il);
+	auto ToolBar = folder->App->LoadToolbar(this,
+											folder->App->GetResourceFile(ResToolbarFile),
+											folder->App->GetToolbarImgList());
 	if (ToolBar)
 	{
 		AddView(ToolBar);

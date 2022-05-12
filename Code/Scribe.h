@@ -2205,8 +2205,8 @@ protected:
 	List<ScribeFolder> PostValidateFree;
 
 	// Main view
-	LImageList		*ImageList = NULL;
-	LImageList		*ToolbarImgs = NULL;
+	LAutoPtr<LImageList> ImageList;
+	LAutoPtr<LImageList> ToolbarImgs;
 	class LBox		*Splitter = NULL;
 	ThingList		*MailList = NULL;
 	class DynamicHtml *TitlePage = NULL;
@@ -2337,7 +2337,7 @@ public:
 	ScribeFolder	*GetCurrentFolder();
 	int				GetFolderType(ScribeFolder *f);
 	LImageList		*GetIconImgList() { return ImageList; }
-	LImageList		*GetToolbarImgList() { return ToolbarImgs; }
+	LAutoPtr<LImageList> &GetToolbarImgList() { return ToolbarImgs; }
 	LString			GetResourceFile(SribeResourceType Type);
 	DoEvery			*GetTicker() { return &Ticker; }
 	ScribeAccount	*GetSendAccount();
@@ -2360,7 +2360,7 @@ public:
 	LMutex			*GetLock();
 	LFont			*GetPreviewFont();
 	LFont			*GetBoldFont() { return LSysBold; }
-	LToolBar		*LoadToolbar(LViewI *Parent, const char *File, LImageList **Img = 0);
+	LToolBar		*LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LImageList> &Img);
 	class LVmDebuggerCallback *GetDebuggerCallback();
 	class GpgConnector *GetGpgConnector();
 	LString			GetUserInput(LView *Parent, LString Msg, bool Password = false);

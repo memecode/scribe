@@ -7,16 +7,16 @@
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"
 
-!system "copy .\x64ReleaseNoOptimize14\Scribe.exe scribe-setup" = 0
-!system "copy .\x64Release14\ScribeMapi.dll scribe-setup" = 0
-!system "copy ..\..\libs\aspell-0.60.6.1\win32\dist\x64Release14\aspell-dist-0.60.dll scribe-setup" = 0
-!system "copy ..\..\..\Lgi\trunk\lib\Lgi14x64nop.dll scribe-setup" = 0
-!system "copy ..\..\..\Lgi\trunk\lib\libntlm14x64nop.dll scribe-setup" = 0
-!system "copy ..\..\..\Lgi\trunk\lib\chardet14x64.dll scribe-setup" = 0
-!system "copy ..\..\..\Lgi\trunk\Updater\x64Release14\Updater.exe scribe-setup" = 0
-!system "copy ..\..\..\..\CodeLib\libjpeg-9a\build64\Release\libjpeg9a_14x64.dll scribe-setup\libjpeg9a_14x64.dll" = 0
-!system "copy ..\..\..\..\CodeLib\libpng\build64\Release\libpng15_14x64.dll scribe-setup\libpng15_14x64.dll" = 0
-!system "copy ..\..\..\..\CodeLib\libpng\build64\zlib_dir\Release\zlib_14x64.dll scribe-setup\zlib_14x64.dll" = 0
+!system "copy .\x64ReleaseNoOptimize19\Scribe.exe scribe-setup" = 0
+!system "copy .\x64Release19\ScribeMapi.dll scribe-setup" = 0
+!system "copy ..\..\libs\aspell-0.60.6.1\win32\dist\x64Release19\aspell-dist-0.60.dll scribe-setup" = 0
+!system "copy ..\..\libs\build-x64\libjpeg-9a\Release\libjpeg9a_19x64.dll scribe-setup" = 0
+!system "copy ..\..\libs\build-x64\libpng\Release\libpng15_19x64.dll scribe-setup" = 0
+!system "copy ..\..\libs\build-x64\libpng\zlib_dir\Release\zlib_19x64.dll scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\lib\Lgi19x64nop.dll scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\lib\libntlm19x64nop.dll scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\lib\chardet19x64.dll scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\Updater\x64Release19\Updater.exe scribe-setup" = 0
 
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.exe'
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.dll'
@@ -24,9 +24,9 @@
 ; Generate the DOM documentation
 !system "py ..\Code\Py\DomScan.py > scribe-setup\Dom.txt"
 
-!system "..\python Utils\Store\store.py .\x64ReleaseNoOptimize14\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
-!system "..\python Utils\Store\store.py .\x64Release14\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0
-!system "..\python Utils\Store\store.py ..\..\..\Lgi\trunk\lib\Lgi14x64nop.pdb Lgi ${__DATE__} ${__TIME__}" = 0
+!system "python ..\Utils\Store\store.py .\x64ReleaseNoOptimize19\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
+!system "python ..\Utils\Store\store.py .\x64Release19\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0
+!system "python ..\Utils\Store\store.py ..\..\..\Lgi\trunk\lib\Lgi19x64nop.pdb Lgi ${__DATE__} ${__TIME__}" = 0
 
 ;--------------------------------
 SetCompressor lzma
@@ -68,12 +68,12 @@ Section ""
 	File .\scribe-setup\Updater.exe
 	File .\scribe-setup\ScribeMapi.dll
 	File .\scribe-setup\aspell-dist-0.60.dll
-	File .\scribe-setup\Lgi14x64nop.dll
-	File .\scribe-setup\libntlm14x64nop.dll
-	File .\scribe-setup\libjpeg9a_14x64.dll
-	File .\scribe-setup\libpng15_14x64.dll
-	File .\scribe-setup\zlib_14x64.dll
-	File .\scribe-setup\chardet14x64.dll
+	File .\scribe-setup\Lgi19x64nop.dll
+	File .\scribe-setup\libntlm19x64nop.dll
+	File .\scribe-setup\libjpeg9a_19x64.dll
+	File .\scribe-setup\libpng15_19x64.dll
+	File .\scribe-setup\zlib_19x64.dll
+	File .\scribe-setup\chardet19x64.dll
 
 	; Resources
 	CreateDirectory $INSTDIR\Resources
@@ -133,12 +133,12 @@ Section ""
 	; Do CRT check
 	ExecWait '"$INSTDIR\Scribe.exe" -crtcheck' $0
 	${If} $0 != 0
-		inetc::get /caption "Visual Studio 2015 Redistributable" /popup "" "http://memecode.com/scribe/data/vcredist_vc14x64.exe" "$INSTDIR\vcredist_vc14x64.exe" /end
+		inetc::get /caption "Visual Studio 2015 Redistributable" /popup "" "http://memecode.com/scribe/data/vcredist_vc14x64.exe" "$INSTDIR\vcredist_vc19x64.exe" /end
 		Pop $0 # return value = exit code, "OK" means OK
 		DetailPrint "Download: $0"
 		${If} $0 == "OK"
-				ExecWait "$INSTDIR\vcredist_vc14x64.exe"
-				Delete "$INSTDIR\vcredist_vc14x64.exe"
+				ExecWait "$INSTDIR\vcredist_vc19x64.exe"
+				Delete "$INSTDIR\vcredist_vc19x64.exe"
 		${EndIf}
 	${EndIf}
 
@@ -225,4 +225,4 @@ SectionEnd
 
 ; !system "del /Q .\scribe-setup"
 ; !system "rmdir .\scribe-setup"
-!finalize "python Utils\Store\store.py ${OUTFILE} . ${__DATE__} ${__TIME__}"
+!finalize "python ..\Utils\Store\store.py ${OUTFILE} . ${__DATE__} ${__TIME__}"

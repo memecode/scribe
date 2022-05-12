@@ -56,9 +56,9 @@ def_methods = False
 
 for s in src:
 	try:
-		lines = open(s, "r").read().split("\n")
-	except:
-		sys.stderr.write("Error opening: " + s + "\n")
+		lines = open(s, "r", encoding="utf-8").read().split("\n")
+	except Exception as e:
+		sys.stderr.write("Error opening: " + s + "\n" + str(e) + "\n")
 		continue
 	
 	if s.find("GDom.h") >= 0:
