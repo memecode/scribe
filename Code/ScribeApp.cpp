@@ -5534,7 +5534,7 @@ int ScribeWnd::GetToolbarHeight()
 
 LToolBar *ScribeWnd::LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LImageList> &Img)
 {
-	if (Img)
+	if (!Img)
 		Img.Reset(LLoadImageList(File));
 	if (!Img)
 	{

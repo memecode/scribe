@@ -256,13 +256,12 @@ copy Code\Resource.res $(OutDir)
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <PreLinkEvent>
-      <Command>cd Code\Py
+      <Command>cd ..\Code\Py
 "C:\Program Files\Python39\python.exe"  win32_pre_build_step.py
 cd ..
 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"
 rc Resource.rc
-cd ..
-copy Code\Resource.res $(OutDir)</Command>
+copy Resource.res ..\Windows\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -684,7 +683,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <None Include="..\Scripts\Mail Filters Menu.script" />
     <None Include="..\Utils\Store\check-build.py" />
     <None Include="..\Utils\Store\store.py" />
-    <None Include="Installer-vs12-64bit.nsi" />
+    <None Include="Installer-64bit.nsi" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Icons\app.ico" />
