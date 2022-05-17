@@ -424,7 +424,7 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 		return true; // Lets get all we can, even if this is borked.
 	}
 
-    auto uid = atoi(Uid);
+    uint32_t uid = atoi(Uid);
 	#ifdef _DEBUG
     for (unsigned n=0; n<m->Mail.Length(); n++)
     {
@@ -502,7 +502,7 @@ void ImapThread::FlushListing(bool Force)
 			Now - d->ListingTime > TIMEOUT_LISTING_CHUNK ||
 			d->Listing->Mail.Length() >= MAX_LISTING_SIZE)
 		{
-			d->Listings += d->Listing->Mail.Length();
+			d->Listings += (int)d->Listing->Mail.Length();
 			// LgiTrace("Flushing %i listings (%i)\n", d->Listing->Ids.Length(), d->Listings);
 			d->Listing->Last = Force;
 			PostStore(d->Listing.Release());

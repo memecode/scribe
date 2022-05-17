@@ -71,7 +71,7 @@
 #include "../UnitTests/UnitTest.h"
 #include "../src/common/Coding/ScriptingPriv.h"
 
-#define DEBUG_STORE_EVENTS			1
+#define DEBUG_STORE_EVENTS			0
 #if DEBUG_STORE_EVENTS
 #define LOG_STORE(...)				LgiTrace(__VA_ARGS__)
 #else
@@ -11798,7 +11798,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 	List<Mail> NewMail;
 	ScribeFolder *Parent = 0;
 
-	LOG_STORE("OnChange(%i, %i)\n", (int)items.Length(), FieldHint);
+	// LOG_STORE("OnChange(%i, %i)\n", (int)items.Length(), FieldHint);
 	LAssert(d->CtxFile != NULL);
 
 	for (unsigned c=0; c<d->Store3EventCallbacks.Length(); c++)

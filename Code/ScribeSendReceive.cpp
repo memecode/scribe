@@ -1638,12 +1638,8 @@ bool ReceiveAccountlet::SetItems(LList *l)
 
 	if (Lock())
 	{
-		// if (!IsOnline())
-		{
-			LgiTrace("ReceiveAccountlet::SetItems(%p) IsOnline()=%i\n", l, IsOnline());
-			Items = l;
-			Status = true;
-		}
+		Items = l;
+		Status = true;
 
 		Unlock();
 	}

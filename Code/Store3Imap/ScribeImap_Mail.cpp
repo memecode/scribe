@@ -241,7 +241,7 @@ void ImapMail::Load()
 					break;
 				}
 
-				if (Buf.Length() >= f.GetSize())
+				if ((int64)Buf.Length() >= f.GetSize())
 					break;
 			}
 
