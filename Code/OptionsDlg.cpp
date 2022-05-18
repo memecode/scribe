@@ -467,7 +467,7 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) : TabDialog(IDC_TAB, IDC_LAUNCH_HELP)
 			LArray<LLanguageId> *InLangs = Res->GetLanguages();
 			for (unsigned n=0; n<InLangs->Length(); n++)
 			{
-				LLanguage *Lang = GFindLang((*InLangs)[n]);
+				LLanguage *Lang = LFindLang((*InLangs)[n]);
 				if (Lang)
 				{
 					Langs.Insert(Lang);

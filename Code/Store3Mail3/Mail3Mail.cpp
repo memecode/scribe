@@ -1043,7 +1043,7 @@ const char *GMail3Mail::InferCharset()
 				LAutoString ContentLang(InetGetHeaderField(InetHdrs, "Content-Language"));
 				if (ContentLang)
 				{
-					LLanguage *Lang = GFindLang(ContentLang);
+					LLanguage *Lang = LFindLang(ContentLang);
 					if (Lang)
 						InferredCharset = Lang->Charset;
 				}

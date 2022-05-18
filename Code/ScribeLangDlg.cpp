@@ -149,7 +149,7 @@ LanguageDlg::LanguageDlg(ScribeWnd *app)
 				for (unsigned n=0; n<InLangs->Length(); n++)
 				{
 					LLanguageId i = (*InLangs)[n];
-					LLanguage *Lang = GFindLang(i);
+					LLanguage *Lang = LFindLang(i);
 					if (Lang)
 					{
 						LListItem *i = new LangItem;
