@@ -314,7 +314,7 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) : TabDialog(IDC_TAB, IDC_LAUNCH_HELP)
 	Map(OPT_HttpProxy, IDC_HTTP_PROXY, GV_STRING);
 	Map(OPT_CheckForDialUp, IDC_CHECKDIALUP, GV_BOOL);
 
-	// Appearence/Look Tab
+	// Appearance/Look Tab
 	Map(OPT_EditControl, IDC_EDIT_CONTROL, GV_INT32);
 	Map(OPT_WordWrap, IDC_WRAP, GV_BOOL);
 	Map(OPT_WrapAtColumn, IDC_WRAP_COLS, GV_INT32);
@@ -1086,50 +1086,49 @@ LMessage::Result OptionsDlg::OnEvent(LMessage *m)
 				break;
 			}
 
-			LAutoPtr< LArray<LSpellCheck::LanguageId> > Langs((LArray<LSpellCheck::LanguageId>*)m->A());
-			
+			LAutoPtr< LArray<LSpellCheck::LanguageId> > Langs((LArray<LSpellCheck::LanguageId>*)m->A());			
 			if (!Langs)
 			{
 				LgiTrace("%s:%i - Error: No dictionary list.\n", _FL);
 				break;
 			}
 			
-			// LgiTrace("%s:%i - Got M_ENUMERATE_LANGUAGES: %i.\n", _FL, Langs->Length());
-
 			LControlTree::Item *ci;
-			if ((ci = Ct->Find(OPT_SpellCheckLanguage)))
+			if (!(ci = Ct->Find(OPT_SpellCheckLanguage)))
 			{
-				LAutoPtr<LControlTree::Item::EnumArr> Enum(new LControlTree::Item::EnumArr);
-				if (Enum)
-				{
-					for (unsigned i=0; i<Langs->Length(); i++)
-					{
-						LSpellCheck::LanguageId &p = (*Langs)[i];
-						
-						LControlTree::EnumValue &e = Enum->New();
-						if (p.EnglishName && p.NativeName)
-						{
-							LString s;
-							s.Printf("%s / %s", p.NativeName.Get(), p.EnglishName.Get());
-							e.Name = s;
-						}
-						else if (p.EnglishName)
-							e.Name = p.EnglishName;
-						else if (p.LangCode)
-							e.Name = p.LangCode;
-						else
-							LAssert(!"Null object.");
-
-						e.Value = p.EnglishName ? p.EnglishName : p.LangCode;
-
-						// LgiTrace("[%i]=%s\n", i, e.Value.Str());
-					}
-					
-					ci->SetEnum(Enum);
-				}
-				else LgiTrace("%s:%i - Error: alloc failed.\n", _FL);
+				LgiTrace("%s:%i - Error: No OPT_SpellCheckLanguage leaf.\n", _FL);
+				break;
 			}
-			else LgiTrace("%s:%i - Error: No OPT_SpellCheckLanguage leaf.\n", _FL);
+
+			LAutoPtr<LControlTree::Item::EnumArr> Enum(new LControlTree::Item::EnumArr);
+			if (!Enum)
+			{
+				LgiTrace("%s:%i - Error: alloc failed.\n", _FL);
+				break;
+			}
+
+			for (unsigned i=0; i<Langs->Length(); i++)
+			{
+				LSpellCheck::LanguageId &p = (*Langs)[i];
+						
+				LControlTree::EnumValue &e = Enum->New();
+				if (p.EnglishName && p.NativeName)
+				{
+					LString s;
+					s.Printf("%s / %s", p.NativeName.Get(), p.EnglishName.Get());
+					e.Name = s;
+				}
+				else if (p.EnglishName)
+					e.Name = p.EnglishName;
+				else if (p.LangCode)
+					e.Name = p.LangCode;
+				else
+					LAssert(!"Null object.");
+
+				e.Value = p.EnglishName ? p.EnglishName : p.LangCode;
+			}
+
+			ci->SetEnum(Enum);
 			break;
 		}
 		case M_ENUMERATE_DICTIONARIES:
@@ -1138,8 +1137,7 @@ LMessage::Result OptionsDlg::OnEvent(LMessage *m)
 			if (!GetViewById(IDC_ADVANCED, Ct))
 				break;
 
-			LAutoPtr< LArray<LSpellCheck::DictionaryId> > Dicts((LArray<LSpellCheck::DictionaryId>*)m->A());
-			
+			LAutoPtr< LArray<LSpellCheck::DictionaryId> > Dicts((LArray<LSpellCheck::DictionaryId>*)m->A());			
 			if (!Dicts)
 			{
 				LgiTrace("%s:%i - Error: No dictionary list.\n", _FL);
@@ -1147,25 +1145,28 @@ LMessage::Result OptionsDlg::OnEvent(LMessage *m)
 			}
 			
 			LControlTree::Item *ci;
-			if ((ci = Ct->Find(OPT_SpellCheckDictionary)))
+			if (!(ci = Ct->Find(OPT_SpellCheckDictionary)))
 			{
-				LAutoPtr<LControlTree::Item::EnumArr> Enum(new LControlTree::Item::EnumArr);
-				if (Enum)
-				{
-					for (unsigned i=0; i<Dicts->Length(); i++)
-					{
-						LSpellCheck::DictionaryId &s = (*Dicts)[i];
-						LControlTree::EnumValue &e = Enum->New();
-						e.Name = s.Dict;
-						e.Value = s.Dict;
-					}
-
-					ci->SetEnum(Enum);
-				}
-				else LgiTrace("%s:%i - Error: alloc failed.\n", _FL);
+				LgiTrace("%s:%i - Error: No OPT_SpellCheckDictionary leaf.\n", _FL);
+				break;
 			}
-			else LgiTrace("%s:%i - Error: No OPT_SpellCheckDictionary leaf.\n", _FL);
 
+			LAutoPtr<LControlTree::Item::EnumArr> Enum(new LControlTree::Item::EnumArr);
+			if (!Enum)
+			{
+				LgiTrace("%s:%i - Error: alloc failed.\n", _FL);
+				break;
+			}
+
+			for (unsigned i=0; i<Dicts->Length(); i++)
+			{
+				LSpellCheck::DictionaryId &s = (*Dicts)[i];
+				LControlTree::EnumValue &e = Enum->New();
+				e.Name = s.Dict;
+				e.Value = s.Dict;
+			}
+
+			ci->SetEnum(Enum);
 			break;
 		}
 	}
