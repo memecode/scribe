@@ -51,28 +51,14 @@ def Download(url, folder):
 def Extract(file, path):
 	shutil.unpack_archive(file, path)
 
-def MakeIconv(url):
-	archive = Download(url, codeLib)
-	leaf = url.split("/")[-1].replace(".tar.gz", "")
-	oldPath = os.path.join(codeLib, leaf)
-	newPath = os.path.join(codeLib, "libiconv")
-	if not os.path.exists(newPath):
-		Extract(archive, codeLib)
-		os.rename(oldPath, newPath)
-	iconv_h = os.path.join(newPath, "include", "iconv.h")
-	if not os.path.exists(iconv_h):
-		print("Build iconv somehow")
-		sys.exit(1)
-
 print("\nChecking repos:")
 Clone("https://phab.mallen.id.au/diffusion/15/scribelibs/", scribeLibs)
 Clone("https://phab.mallen.id.au/source/lgi/", lgi)
 Clone("https://phab.mallen.id.au/source/libpng/", libpng)
 Clone("https://phab.mallen.id.au/diffusion/10/zlib/", zlib)
 Clone("https://phab.mallen.id.au/diffusion/11/libjpeg/", libjpeg)
-MakeIconv("https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz")
 
-print("Building dependencies:")
+print("\nBuilding dependencies:")
 if os.path.exists(os.path.join(scribeLibs, "build-x64")):
 	print("    Seems to be already built.")
 else:
@@ -80,6 +66,7 @@ else:
 	p = subprocess.run(args,
 		cwd=scribeLibs)
 
-print("Building scribe:")
-args = ["devenv.com", os.path.join(trunk, "Windows\Scribe_vs2019.sln"), "/Build", "Debug"]
+print("\nBuilding Scribe:")
+vs2019 = "c:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\devenv.com"
+args = [vs2019, os.path.join(trunk, "Windows\Scribe_vs2019.sln"), "/Build", "Debug"]
 p = subprocess.run(args, cwd=trunk)
