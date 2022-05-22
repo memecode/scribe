@@ -3,6 +3,12 @@ import sys
 import subprocess
 import urllib.request
 import shutil
+import platform
+
+print("platform.system():", platform.system())
+isMac = platform.system() == "Darwin"
+isWin = platform.system() == "Windows"
+isLinux = platform.system() == "Linux"
 
 print("Build paths:")
 trunk = os.path.abspath(os.path.join(__file__, ".."))
@@ -51,6 +57,17 @@ def Download(url, folder):
 def Extract(file, path):
 	shutil.unpack_archive(file, path)
 
+if len(sys.argv) > 1 and sys.argv[1].lower() == "clean":
+	print("\nCleaning folders...")
+	if os.path.exists(codeLib):
+		shutil.rmtree(codeLib)
+	if os.path.exists(lgi):
+		shutil.rmtree(lgi)
+	if os.path.exists(scribeLibs):
+		shutil.rmtree(scribeLibs)
+	print("    ...done.")
+	sys.exit(0)
+
 print("\nChecking repos:")
 Clone("https://phab.mallen.id.au/diffusion/15/scribelibs/", scribeLibs)
 Clone("https://phab.mallen.id.au/source/lgi/", lgi)
@@ -67,6 +84,15 @@ else:
 		cwd=scribeLibs)
 
 print("\nBuilding Scribe:")
-vs2019 = "c:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\devenv.com"
-args = [vs2019, os.path.join(trunk, "Windows\Scribe_vs2019.sln"), "/Build", "Debug"]
+if isMac:
+	args = ["xcodebuild", "-project", "MacCocoa/Scribe.xcodeproj"]
+elif isWin:
+	vs2019 = "c:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\devenv.com"
+	args = [vs2019, os.path.join(trunk, "Windows\Scribe_vs2019.sln"), "/Build", "Debug"]
+elif isLinux:
+	args = ["make", "-f", "Linux/makefile.linux"]
+else:
+	print("Error: unsupported system.")
+	sys.exit(1)
+
 p = subprocess.run(args, cwd=trunk)
