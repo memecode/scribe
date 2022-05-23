@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34749B44278B042500C8197E /* LgiCocoa.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 34749B44278B042500C8197E /* LgiCocoa.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		340FA6A9237E7E2D0043D1F2 /* EmojiMap.png in Resources */ = {isa = PBXBuildFile; fileRef = 340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */; };
 		340FAAEA23888A570017BC62 /* WebdavContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 340FAADC23888A570017BC62 /* WebdavContact.cpp */; };
 		3416149A238484F800A65477 /* WebdavFolder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161495238484F700A65477 /* WebdavFolder.cpp */; };
 		3416149B238484F800A65477 /* WebdavCalendar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161496238484F700A65477 /* WebdavCalendar.cpp */; };
 		3416149C238484F800A65477 /* WebdavThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161498238484F800A65477 /* WebdavThread.cpp */; };
-		34167B37279FEADE005422F6 /* libchardet.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34167B37279FEADE005422F6 /* libchardet.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34167B38279FEBA8005422F6 /* libchardet.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; };
 		341A02B823BD702800F0FF48 /* SpellCheckAspell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 341A02B723BD702800F0FF48 /* SpellCheckAspell.cpp */; };
 		341A78802699058600872FEB /* DatePopup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 341A787F2699058600872FEB /* DatePopup.cpp */; };
@@ -33,7 +33,6 @@
 		3445E5871F1F428400D0A824 /* ImageBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5821F1F428400D0A824 /* ImageBlock.cpp */; };
 		3445E5881F1F428400D0A824 /* TextBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5831F1F428400D0A824 /* TextBlock.cpp */; };
 		3445E58A1F1F42BA00D0A824 /* ObjectInspector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5891F1F42BA00D0A824 /* ObjectInspector.cpp */; };
-		345915EB24CF93C800A2A699 /* libjpeg9a.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3464E67E24CF830D004885BD /* libjpeg9a.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		345F31461CC7A3B400656B8B /* Icons-16.png in Resources */ = {isa = PBXBuildFile; fileRef = 345F31451CC7A3B400656B8B /* Icons-16.png */; };
 		345F31481CC7A40F00656B8B /* Gif.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 345F31471CC7A40F00656B8B /* Gif.cpp */; };
 		345F314A1CC7A44C00656B8B /* Lzw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 345F31491CC7A44C00656B8B /* Lzw.cpp */; };
@@ -169,8 +168,6 @@
 		349AB0C0217B3D9500573982 /* scribe-mac-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */; };
 		34A66681237968A200ED0212 /* FolderCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A66680237968A200ED0212 /* FolderCalendarSource.cpp */; };
 		34AB68F6275240BC0045380B /* ScribeScripts.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34AB68E8275240B40045380B /* ScribeScripts.h */; };
-		34B12D7B23F5F870003F24D3 /* libpng15.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 341BF46123231C4B00BC3AB0 /* libpng15.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34B12D7C23F5F87B003F24D3 /* libz_local.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 341BF46923231C4B00BC3AB0 /* libz_local.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34C1BF90238CAEC500658B99 /* calendar.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF71238CA23500658B99 /* calendar.html */; };
 		34C1BF91238CAEC500658B99 /* contacts.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF75238CA23500658B99 /* contacts.html */; };
 		34C1BF92238CAEC500658B99 /* email.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF73238CA23500658B99 /* email.html */; };
@@ -190,6 +187,10 @@
 		34C9A80B23C9615300129861 /* NoFace160.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A7FC23C9615200129861 /* NoFace160.png */; };
 		34C9A80C23C9615300129861 /* NoFace80.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A80A23C9615200129861 /* NoFace80.png */; };
 		34D2892F275B3EF5005961A8 /* RemoteCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D2892E275B3EF5005961A8 /* RemoteCalendarSource.cpp */; };
+		34D6AEF9283AF0FD00897A16 /* libjpeg9a.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34D6AEFA283AF0FD00897A16 /* libpng15.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE6283AF0A100897A16 /* libpng15.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34D6AEFB283AF0FD00897A16 /* libz_local.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEEE283AF0A100897A16 /* libz_local.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34D6AEFC283AF11600897A16 /* libiconv.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE0283AF0A100897A16 /* libiconv.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34DD329823153AF000FA2B35 /* Title.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329423153AF000FA2B35 /* Title.html */; };
 		34DD329923153AF000FA2B35 /* About.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329523153AF000FA2B35 /* About.html */; };
 		34DD329A23153AF000FA2B35 /* Title.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329623153AF000FA2B35 /* Title.png */; };
@@ -197,8 +198,8 @@
 		34DED72A23AC319E0049E01F /* libsqlite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34DED72623AC30C30049E01F /* libsqlite.a */; };
 		34EE8BB52748A6EC00F12915 /* HomoglyphsTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */; };
 		34EE8BB62748A6EC00F12915 /* Homoglyphs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */; };
-		34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34F1BD082442B0050062DCF4 /* libssl.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34F1BD0D2442B03B0062DCF4 /* libcrypto.3.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34F1BD092442B0050062DCF4 /* libcrypto.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34F1BD082442B0050062DCF4 /* libssl.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34F1BD0D2442B03B0062DCF4 /* libcrypto.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34F1BD092442B0050062DCF4 /* libcrypto.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34FB966F237D07740039423C /* WebdavStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB9661237D07740039423C /* WebdavStore.cpp */; };
 		34FB968A23835BB40039423C /* WebDav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB968923835BB40039423C /* WebDav.cpp */; };
 /* End PBXBuildFile section */
@@ -215,78 +216,8 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = E411633BA503434D9CAF1E0F;
+			remoteGlobalIDString = 227CFE3F2FA14FCFA60502AE;
 			remoteInfo = chardet;
-		};
-		341BF45E23231C4B00BC3AB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 70A4105F29D44F6788C8CA39;
-			remoteInfo = example;
-		};
-		341BF46023231C4B00BC3AB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 0D98D0B9854A4E27BCCAC747;
-			remoteInfo = libpng15;
-		};
-		341BF46223231C4B00BC3AB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 07A36AA5236B4F7D981E2EB2;
-			remoteInfo = libpng15_static;
-		};
-		341BF46423231C4B00BC3AB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C858FA57F4204977BD9B3AED;
-			remoteInfo = minigzip;
-		};
-		341BF46623231C4B00BC3AB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9141646A4D564C9AB54DE060;
-			remoteInfo = pngtest;
-		};
-		341BF46823231C4B00BC3AB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16B6E4F9F4124BD080903641;
-			remoteInfo = zlib;
-		};
-		341BF46A23231C4B00BC3AB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1EED45D4F17944BAA6FF081E;
-			remoteInfo = zlib_static;
-		};
-		341BF46C23231C5D00BC3AB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 6E0E6C089FA643D996341259;
-			remoteInfo = libpng15;
-		};
-		3464E67D24CF830D004885BD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF42E23231BEB00BC3AB0 /* libjpeg.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 0CA8898ABC7947308E870C78;
-			remoteInfo = libjpeg9a;
-		};
-		3464E67F24CF830D004885BD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF42E23231BEB00BC3AB0 /* libjpeg.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = E26E0DA1D11540AF8525FE49;
-			remoteInfo = libjpeg9a_static;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -330,6 +261,111 @@
 			remoteGlobalIDString = 3477C4A71CC2792F0028B84B;
 			remoteInfo = Btree;
 		};
+		34D6AEDB283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FF72102AEA49492FB655D92A;
+			remoteInfo = example;
+		};
+		34D6AEDD283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 594564A70D2647C992398CB6;
+			remoteInfo = iconv;
+		};
+		34D6AEDF283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B3BAD2B1AEF34065AAEDBBFC;
+			remoteInfo = libiconv;
+		};
+		34D6AEE1283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 752092F92C094FEFA6322AA9;
+			remoteInfo = libjpeg9a;
+		};
+		34D6AEE3283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1860D095485B4874BD28CD68;
+			remoteInfo = libjpeg9a_static;
+		};
+		34D6AEE5283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 82B90DD671F24451898C0426;
+			remoteInfo = libpng15;
+		};
+		34D6AEE7283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 31AFC44E6C6649BB91C96E18;
+			remoteInfo = libpng15_static;
+		};
+		34D6AEE9283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 505D5B97A5D94B03A6D24F5B;
+			remoteInfo = minigzip;
+		};
+		34D6AEEB283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 41E3CCF185644EB3A43F7D64;
+			remoteInfo = pngtest;
+		};
+		34D6AEED283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 37BD6E3953634A6B9444B6F7;
+			remoteInfo = zlib;
+		};
+		34D6AEEF283AF0A100897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 619D79627D09459B9BF2FFDC;
+			remoteInfo = zlib_static;
+		};
+		34D6AEF1283AF0B300897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A0ECF9D5B76542BD99D7188A;
+			remoteInfo = libjpeg9a;
+		};
+		34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8F0DC2BC2FDB451BAD86E497;
+			remoteInfo = libpng15;
+		};
+		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF9036D78E354F97BC1A634A;
+			remoteInfo = zlib;
+		};
+		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 40D337E08C424F228E5E1C6E;
+			remoteInfo = libiconv;
+		};
 		34DED72523AC30C30049E01F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
@@ -344,30 +380,25 @@
 			remoteGlobalIDString = 3477C4FB1CC3021B0028B84B;
 			remoteInfo = sqlite;
 		};
-		34F1BD142442BBB50062DCF4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 5DB72C35B3F241A8BBD29DC8;
-			remoteInfo = zlib;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3477C51C1CC304850028B84B /* CopyFiles */ = {
+		3477C51C1CC304850028B84B /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				34167B37279FEADE005422F6 /* libchardet.dylib in CopyFiles */,
-				340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in CopyFiles */,
-				345915EB24CF93C800A2A699 /* libjpeg9a.dylib in CopyFiles */,
-				34F1BD0D2442B03B0062DCF4 /* libcrypto.3.dylib in CopyFiles */,
-				34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in CopyFiles */,
-				34B12D7C23F5F87B003F24D3 /* libz_local.dylib in CopyFiles */,
-				34B12D7B23F5F870003F24D3 /* libpng15.dylib in CopyFiles */,
+				34D6AEFC283AF11600897A16 /* libiconv.dylib in Copy Files */,
+				34D6AEF9283AF0FD00897A16 /* libjpeg9a.dylib in Copy Files */,
+				34D6AEFA283AF0FD00897A16 /* libpng15.dylib in Copy Files */,
+				34D6AEFB283AF0FD00897A16 /* libz_local.dylib in Copy Files */,
+				34167B37279FEADE005422F6 /* libchardet.dylib in Copy Files */,
+				340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */,
+				34F1BD0D2442B03B0062DCF4 /* libcrypto.3.dylib in Copy Files */,
+				34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3497D54E2399D27A009FCC14 /* CopyFiles */ = {
@@ -422,8 +453,6 @@
 		34161499238484F800A65477 /* WebdavStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebdavStore.h; path = ../../Code/Store3Webdav/WebdavStore.h; sourceTree = "<group>"; };
 		341A02B723BD702800F0FF48 /* SpellCheckAspell.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpellCheckAspell.cpp; path = ../../Code/SpellCheckAspell.cpp; sourceTree = "<group>"; };
 		341A787F2699058600872FEB /* DatePopup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DatePopup.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/DatePopup.cpp; sourceTree = "<group>"; };
-		341BF42E23231BEB00BC3AB0 /* libjpeg.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libjpeg.xcodeproj; path = ../../../../CodeLib/libjpeg/build/libjpeg.xcodeproj; sourceTree = "<group>"; };
-		341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libpng.xcodeproj; path = ../../../../CodeLib/libpng/build/libpng.xcodeproj; sourceTree = "<group>"; };
 		341BF47023231D0600BC3AB0 /* Jpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Jpeg.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Filters/Jpeg.cpp; sourceTree = "<group>"; };
 		3425DC6A23F788AE00BC025E /* SpellCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SpellCheck.h; path = ../../../../Lgi/trunk/include/lgi/common/SpellCheck.h; sourceTree = "<group>"; };
 		342BAE3A2588AFA8006EF16E /* TextConvert.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextConvert.cpp; path = ../../../../Lgi/trunk/src/common/Text/TextConvert.cpp; sourceTree = "<group>"; };
@@ -677,20 +706,17 @@
 			isa = PBXGroup;
 			children = (
 				34167B34279FEAAF005422F6 /* libchardet.dylib */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		341BF45123231C4A00BC3AB0 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				341BF45F23231C4B00BC3AB0 /* example */,
-				341BF46123231C4B00BC3AB0 /* libpng15.dylib */,
-				341BF46323231C4B00BC3AB0 /* libpng15_static.a */,
-				341BF46523231C4B00BC3AB0 /* minigzip */,
-				341BF46723231C4B00BC3AB0 /* pngtest */,
-				341BF46923231C4B00BC3AB0 /* libz_local.dylib */,
-				341BF46B23231C4B00BC3AB0 /* libzlib_static.a */,
+				34D6AEDC283AF0A100897A16 /* example */,
+				34D6AEDE283AF0A100897A16 /* iconv */,
+				34D6AEE0283AF0A100897A16 /* libiconv.dylib */,
+				34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */,
+				34D6AEE4283AF0A100897A16 /* libjpeg9a_static.a */,
+				34D6AEE6283AF0A100897A16 /* libpng15.dylib */,
+				34D6AEE8283AF0A100897A16 /* libpng15_static.a */,
+				34D6AEEA283AF0A100897A16 /* minigzip */,
+				34D6AEEC283AF0A100897A16 /* pngtest */,
+				34D6AEEE283AF0A100897A16 /* libz_local.dylib */,
+				34D6AEF0283AF0A100897A16 /* libzlib_static.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -921,15 +947,6 @@
 				345921131F2565D100098DFD /* Scribe.h */,
 			);
 			name = Headers;
-			sourceTree = "<group>";
-		};
-		3464E67724CF830D004885BD /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3464E67E24CF830D004885BD /* libjpeg9a.dylib */,
-				3464E68024CF830D004885BD /* libjpeg9a_static.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		346FACFB1D3C81E600FFEBCE /* Spelling */ = {
@@ -1201,8 +1218,6 @@
 				34417DAB205FD56300D2E80C /* bzip2.xcodeproj */,
 				3477C4DF1CC27C9F0028B84B /* Btree.xcodeproj */,
 				3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */,
-				341BF42E23231BEB00BC3AB0 /* libjpeg.xcodeproj */,
-				341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1233,7 +1248,7 @@
 				3477C21A1CBEFD940028B84B /* Sources */,
 				3477C21B1CBEFD940028B84B /* Frameworks */,
 				3477C21C1CBEFD940028B84B /* Resources */,
-				3477C51C1CC304850028B84B /* CopyFiles */,
+				3477C51C1CC304850028B84B /* Copy Files */,
 				34C1BF8F238CAEAD00658B99 /* CopyFiles */,
 				3497D54E2399D27A009FCC14 /* CopyFiles */,
 				3488015523FCF01800D24534 /* ShellScript */,
@@ -1241,11 +1256,13 @@
 			buildRules = (
 			);
 			dependencies = (
+				34D6AEF8283AF0E400897A16 /* PBXTargetDependency */,
+				34D6AEF6283AF0BD00897A16 /* PBXTargetDependency */,
+				34D6AEF4283AF0B900897A16 /* PBXTargetDependency */,
+				34D6AEF2283AF0B300897A16 /* PBXTargetDependency */,
 				34749B5B278B06B900C8197E /* PBXTargetDependency */,
 				34167B36279FEAC2005422F6 /* PBXTargetDependency */,
-				34F1BD152442BBB50062DCF4 /* PBXTargetDependency */,
 				34DED72823AC31950049E01F /* PBXTargetDependency */,
-				341BF46D23231C5D00BC3AB0 /* PBXTargetDependency */,
 				3474FC5A226DE08D0064E0AD /* PBXTargetDependency */,
 				3474FC5C226DE08D0064E0AD /* PBXTargetDependency */,
 			);
@@ -1303,14 +1320,6 @@
 					ProjectRef = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
 				},
 				{
-					ProductGroup = 3464E67724CF830D004885BD /* Products */;
-					ProjectRef = 341BF42E23231BEB00BC3AB0 /* libjpeg.xcodeproj */;
-				},
-				{
-					ProductGroup = 341BF45123231C4A00BC3AB0 /* Products */;
-					ProjectRef = 341BF45023231C4A00BC3AB0 /* libpng.xcodeproj */;
-				},
-				{
 					ProductGroup = 34167B2E279FEAAF005422F6 /* Products */;
 					ProjectRef = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 				},
@@ -1334,71 +1343,6 @@
 			remoteRef = 34167B33279FEAAF005422F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		341BF45F23231C4B00BC3AB0 /* example */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = example;
-			remoteRef = 341BF45E23231C4B00BC3AB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		341BF46123231C4B00BC3AB0 /* libpng15.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			name = libpng15.dylib;
-			path = libpng15.15.4.0.dylib;
-			remoteRef = 341BF46023231C4B00BC3AB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		341BF46323231C4B00BC3AB0 /* libpng15_static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libpng15_static.a;
-			remoteRef = 341BF46223231C4B00BC3AB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		341BF46523231C4B00BC3AB0 /* minigzip */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = minigzip;
-			remoteRef = 341BF46423231C4B00BC3AB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		341BF46723231C4B00BC3AB0 /* pngtest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = pngtest;
-			remoteRef = 341BF46623231C4B00BC3AB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		341BF46923231C4B00BC3AB0 /* libz_local.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			name = libz_local.dylib;
-			path = libz_local.1.2.5.dylib;
-			remoteRef = 341BF46823231C4B00BC3AB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		341BF46B23231C4B00BC3AB0 /* libzlib_static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libzlib_static.a;
-			remoteRef = 341BF46A23231C4B00BC3AB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3464E67E24CF830D004885BD /* libjpeg9a.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libjpeg9a.dylib;
-			remoteRef = 3464E67D24CF830D004885BD /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3464E68024CF830D004885BD /* libjpeg9a_static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libjpeg9a_static.a;
-			remoteRef = 3464E67F24CF830D004885BD /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		34749B44278B042500C8197E /* LgiCocoa.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -1418,6 +1362,85 @@
 			fileType = "compiled.mach-o.dylib";
 			path = libBtree.a;
 			remoteRef = 3474FC4D226DCCDD0064E0AD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEDC283AF0A100897A16 /* example */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = example;
+			remoteRef = 34D6AEDB283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEDE283AF0A100897A16 /* iconv */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = iconv;
+			remoteRef = 34D6AEDD283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEE0283AF0A100897A16 /* libiconv.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libiconv.dylib;
+			remoteRef = 34D6AEDF283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libjpeg9a.dylib;
+			remoteRef = 34D6AEE1283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEE4283AF0A100897A16 /* libjpeg9a_static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libjpeg9a_static.a;
+			remoteRef = 34D6AEE3283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEE6283AF0A100897A16 /* libpng15.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			name = libpng15.dylib;
+			path = libpng15.15.4.0.dylib;
+			remoteRef = 34D6AEE5283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEE8283AF0A100897A16 /* libpng15_static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libpng15_static.a;
+			remoteRef = 34D6AEE7283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEEA283AF0A100897A16 /* minigzip */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = minigzip;
+			remoteRef = 34D6AEE9283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEEC283AF0A100897A16 /* pngtest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = pngtest;
+			remoteRef = 34D6AEEB283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEEE283AF0A100897A16 /* libz_local.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			name = libz_local.dylib;
+			path = libz_local.1.2.5.dylib;
+			remoteRef = 34D6AEED283AF0A100897A16 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34D6AEF0283AF0A100897A16 /* libzlib_static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libzlib_static.a;
+			remoteRef = 34D6AEEF283AF0A100897A16 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		34DED72623AC30C30049E01F /* libsqlite.a */ = {
@@ -1630,11 +1653,6 @@
 			name = chardet;
 			targetProxy = 34167B35279FEAC2005422F6 /* PBXContainerItemProxy */;
 		};
-		341BF46D23231C5D00BC3AB0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = libpng15;
-			targetProxy = 341BF46C23231C5D00BC3AB0 /* PBXContainerItemProxy */;
-		};
 		34749B5B278B06B900C8197E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = LgiCocoa;
@@ -1650,15 +1668,30 @@
 			name = Btree;
 			targetProxy = 3474FC5B226DE08D0064E0AD /* PBXContainerItemProxy */;
 		};
+		34D6AEF2283AF0B300897A16 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libjpeg9a;
+			targetProxy = 34D6AEF1283AF0B300897A16 /* PBXContainerItemProxy */;
+		};
+		34D6AEF4283AF0B900897A16 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libpng15;
+			targetProxy = 34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */;
+		};
+		34D6AEF6283AF0BD00897A16 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = zlib;
+			targetProxy = 34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */;
+		};
+		34D6AEF8283AF0E400897A16 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libiconv;
+			targetProxy = 34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */;
+		};
 		34DED72823AC31950049E01F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = sqlite;
 			targetProxy = 34DED72723AC31950049E01F /* PBXContainerItemProxy */;
-		};
-		34F1BD152442BBB50062DCF4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = zlib;
-			targetProxy = 34F1BD142442BBB50062DCF4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1680,7 +1713,7 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_EMPTY_BODY = NO;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
@@ -1753,7 +1786,7 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_EMPTY_BODY = NO;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;

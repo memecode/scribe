@@ -1333,7 +1333,7 @@ const char *Attachment::GetText(int i)
 
 bool Attachment::Get(char **ptr, ssize_t *size)
 {
-	if (!ptr || size<=0)
+	if (!ptr || !size || *size <= 0)
 		return false;
 
 	LStreamI *f = GotoObject(_FL);

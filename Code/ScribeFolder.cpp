@@ -1941,6 +1941,8 @@ void ScribeFolder::SetDefaultFields(bool Force)
 					DefField(FIELD_GROUP_NAME, 300);
 					break;
 				}
+				default:
+					break;
 			}
 		}
 
