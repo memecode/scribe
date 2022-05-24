@@ -23,6 +23,7 @@ codeLib = os.path.abspath(os.path.join(code, "../codelib"))
 libpng = os.path.join(codeLib, "libpng")
 zlib = os.path.join(codeLib, "zlib")
 libjpeg = os.path.join(codeLib, "libjpeg-9a")
+openssl = os.path.join(codeLib, "openssl")
 print("    codeLib:   ", codeLib)
 lgi = os.path.abspath(os.path.join(code, "lgi/trunk"))
 print("    lgi:       ", lgi)
@@ -57,6 +58,70 @@ def Download(url, folder):
 def Extract(file, path):
 	shutil.unpack_archive(file, path)
 
+def GetInstallName(lib):
+	args = ["otool", "-D", lib]
+	p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	if p.returncode:
+		print("Error: GetInstallName failed:", lib)
+		sys.exit(1)
+	last = p.stdout.decode().strip().split("\n")[-1].strip()
+	return last
+
+def Openssl(repo, folder):
+	global isMac
+	if isMac:
+		if not os.path.exists(folder):
+			args = ["git", "clone", repo, folder]
+			print("    Cloning openssl...")
+			p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=codeLib)
+			if p.returncode:
+				print("Error: failed to clone openssl")
+				sys.exit(1)
+			
+			print("     Configuring...")
+			args = ["/bin/sh", "config"]
+			p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=openssl)
+			if p.returncode:
+				print("     Error:", p.returncode)
+				sys.exit(1)
+
+			print("     Building...")
+			args = ["make", "-j", "4"]
+			p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=openssl)
+			if p.returncode:
+				print("     Error:", p.returncode)
+				sys.exit(1)
+
+		libcrypto = os.path.join(openssl, "libcrypto.3.dylib")	
+		if not os.path.exists(libcrypto):
+			print("Error:", libcrypto, "doesn't exist.")
+			sys.exit(1)
+		libssl = os.path.join(openssl, "libssl.3.dylib")
+		if not os.path.exists(libssl):
+			print("Error:", libssl, "doesn't exist.")
+			sys.exit(1)
+		
+		path = GetInstallName(libssl)
+		relssl = "@executable_path/../Frameworks/libssl.3.dylib"
+		relcrypto = "@executable_path/../Frameworks/libcrypto.3.dylib"
+		if path != relssl:
+			args = ["install_name_tool", "-id", relssl, libssl]
+			p = subprocess.run(args, cwd=openssl)
+			args = ["install_name_tool", "-change", "/usr/local/lib/libcrypto.3.dylib", relcrypto, libssl]
+			p = subprocess.run(args, cwd=openssl)
+			print("    ssl changed to:", relssl)
+		else:
+			print("    ssl already:", relssl)
+
+		path = GetInstallName(libssl)
+		if path != relcrypto:
+			args = ["install_name_tool", "-id", relcrypto, libcrypto]
+			p = subprocess.run(args, cwd=openssl)
+			print("    crypto changed to:", relcrypto)
+		else:
+			print("    crypto already:", relcrypto)
+
+
 if len(sys.argv) > 1 and sys.argv[1].lower() == "clean":
 	print("\nCleaning folders...")
 	if os.path.exists(codeLib):
@@ -74,6 +139,7 @@ Clone("https://phab.mallen.id.au/source/lgi/", lgi)
 Clone("https://phab.mallen.id.au/source/libpng/", libpng)
 Clone("https://phab.mallen.id.au/diffusion/10/zlib/", zlib)
 Clone("https://phab.mallen.id.au/diffusion/11/libjpeg/", libjpeg)
+Openssl("git://git.openssl.org/openssl.git", openssl)
 
 print("\nBuilding dependencies:")
 if os.path.exists(os.path.join(scribeLibs, "build-x64")):
