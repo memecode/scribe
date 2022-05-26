@@ -13,7 +13,6 @@
 		3416149A238484F800A65477 /* WebdavFolder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161495238484F700A65477 /* WebdavFolder.cpp */; };
 		3416149B238484F800A65477 /* WebdavCalendar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161496238484F700A65477 /* WebdavCalendar.cpp */; };
 		3416149C238484F800A65477 /* WebdavThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161498238484F800A65477 /* WebdavThread.cpp */; };
-		34167B37279FEADE005422F6 /* libchardet.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34167B38279FEBA8005422F6 /* libchardet.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; };
 		341A02B823BD702800F0FF48 /* SpellCheckAspell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 341A02B723BD702800F0FF48 /* SpellCheckAspell.cpp */; };
 		341A78802699058600872FEB /* DatePopup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 341A787F2699058600872FEB /* DatePopup.cpp */; };
@@ -184,13 +183,14 @@
 		34C1BF9D238CAEC500658B99 /* scripting.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF7A238CA23600658B99 /* scripting.html */; };
 		34C1BF9E238CAEC500658B99 /* ui.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF74238CA23500658B99 /* ui.html */; };
 		34C1BF9F238CB05A00658B99 /* About64px.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34DD329B23153B2300FA2B35 /* About64px.png */; };
+		34C1D42528403C2400FCC98D /* libchardet.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34C1D42628403CD300FCC98D /* libjpeg9a.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34C1D42728403CDC00FCC98D /* libpng15.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE6283AF0A100897A16 /* libpng15.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34C1D42828403CE800FCC98D /* libz_local.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEEE283AF0A100897A16 /* libz_local.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34C1D42928403CF000FCC98D /* libiconv.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE0283AF0A100897A16 /* libiconv.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34C9A80B23C9615300129861 /* NoFace160.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A7FC23C9615200129861 /* NoFace160.png */; };
 		34C9A80C23C9615300129861 /* NoFace80.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A80A23C9615200129861 /* NoFace80.png */; };
 		34D2892F275B3EF5005961A8 /* RemoteCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D2892E275B3EF5005961A8 /* RemoteCalendarSource.cpp */; };
-		34D6AEF9283AF0FD00897A16 /* libjpeg9a.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34D6AEFA283AF0FD00897A16 /* libpng15.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE6283AF0A100897A16 /* libpng15.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34D6AEFB283AF0FD00897A16 /* libz_local.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEEE283AF0A100897A16 /* libz_local.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34D6AEFC283AF11600897A16 /* libiconv.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE0283AF0A100897A16 /* libiconv.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34DD329823153AF000FA2B35 /* Title.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329423153AF000FA2B35 /* Title.html */; };
 		34DD329923153AF000FA2B35 /* About.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329523153AF000FA2B35 /* About.html */; };
 		34DD329A23153AF000FA2B35 /* Title.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329623153AF000FA2B35 /* Title.png */; };
@@ -216,7 +216,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 227CFE3F2FA14FCFA60502AE;
+			remoteGlobalIDString = D01CC49532A747A29EA00D13;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -342,28 +342,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = A0ECF9D5B76542BD99D7188A;
+			remoteGlobalIDString = 026FC77338384C76800E2252;
 			remoteInfo = libjpeg9a;
 		};
 		34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8F0DC2BC2FDB451BAD86E497;
+			remoteGlobalIDString = DCA9FBC7AEF841BD880FB9B4;
 			remoteInfo = libpng15;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = FF9036D78E354F97BC1A634A;
+			remoteGlobalIDString = 235DAB71A64547758266A0AF;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 40D337E08C424F228E5E1C6E;
+			remoteGlobalIDString = 8D8280AD42C749A4AD6195EB;
 			remoteInfo = libiconv;
 		};
 		34DED72523AC30C30049E01F /* PBXContainerItemProxy */ = {
@@ -389,11 +389,11 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				34D6AEFC283AF11600897A16 /* libiconv.dylib in Copy Files */,
-				34D6AEF9283AF0FD00897A16 /* libjpeg9a.dylib in Copy Files */,
-				34D6AEFA283AF0FD00897A16 /* libpng15.dylib in Copy Files */,
-				34D6AEFB283AF0FD00897A16 /* libz_local.dylib in Copy Files */,
-				34167B37279FEADE005422F6 /* libchardet.dylib in Copy Files */,
+				34C1D42928403CF000FCC98D /* libiconv.dylib in Copy Files */,
+				34C1D42828403CE800FCC98D /* libz_local.dylib in Copy Files */,
+				34C1D42728403CDC00FCC98D /* libpng15.dylib in Copy Files */,
+				34C1D42628403CD300FCC98D /* libjpeg9a.dylib in Copy Files */,
+				34C1D42528403C2400FCC98D /* libchardet.dylib in Copy Files */,
 				340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */,
 				34F1BD0D2442B03B0062DCF4 /* libcrypto.3.dylib in Copy Files */,
 				34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in Copy Files */,
@@ -613,7 +613,7 @@
 		3477C4431CC235810028B84B /* Html.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Html.cpp; path = ../../../../Lgi/trunk/src/common/Text/Html.cpp; sourceTree = "<group>"; };
 		3477C4441CC235810028B84B /* HtmlCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlCommon.cpp; path = ../../../../Lgi/trunk/src/common/Text/HtmlCommon.cpp; sourceTree = "<group>"; };
 		3477C4451CC235810028B84B /* HtmlParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlParser.cpp; path = ../../../../Lgi/trunk/src/common/Text/HtmlParser.cpp; sourceTree = "<group>"; };
-		3477C44B1CC235C60028B84B /* OptionsFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OptionsFile.cpp; path = ../../../../Lgi/trunk/src/common/Lgi/OptionsFile.cpp; sourceTree = "<group>"; };
+		3477C44B1CC235C60028B84B /* OptionsFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OptionsFile.cpp; path = ../../../Lgi/trunk/src/common/Lgi/OptionsFile.cpp; sourceTree = SOURCE_ROOT; };
 		3477C44D1CC2624B0028B84B /* ControlTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ControlTree.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/ControlTree.cpp; sourceTree = "<group>"; };
 		3477C44F1CC262670028B84B /* ColourSelect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColourSelect.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/ColourSelect.cpp; sourceTree = "<group>"; };
 		3477C4521CC262AF0028B84B /* LexCpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LexCpp.cpp; path = ../../../../Lgi/trunk/src/common/Coding/LexCpp.cpp; sourceTree = "<group>"; };
