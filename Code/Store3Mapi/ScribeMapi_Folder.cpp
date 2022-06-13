@@ -79,8 +79,10 @@ bool GMapiFolder::Set(GMapiFolder *parent, ScribeMapiList *Lst)
 	{
 		// Check if we are the Inbox
 		ULONG Result = 0;
-		HRESULT res = Store->Handle()->CompareEntryIDs(	Store->InboxEntry.Length(), (LPENTRYID)&Store->InboxEntry[0],
-														Entry.Length(), (LPENTRYID)&Entry[0],
+		HRESULT res = Store->Handle()->CompareEntryIDs(	(ULONG)Store->InboxEntry.Length(),
+														(LPENTRYID)&Store->InboxEntry[0],
+														(ULONG)Entry.Length(),
+														(LPENTRYID)&Entry[0],
 														0,
 														&Result);
 		if (SUCCEEDED(res) && Result)

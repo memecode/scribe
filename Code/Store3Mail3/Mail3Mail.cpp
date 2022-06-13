@@ -239,7 +239,7 @@ bool SafeAddrTokenize(const char *In, List<char> &Out, bool Debug = false)
 	// quotes due to recipient names having un-escaped single quotes.
 	const char *Last = In;
 	LAutoString Str;
-	for (ssize_t i=0; i<a.Length(); i++)
+	for (ssize_t i=0; i<(ssize_t)a.Length(); i++)
 	{
 		// Check for '<' '@', '>' pattern
 		if (i < (ssize_t)a.Length() - 4 &&

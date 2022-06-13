@@ -69,7 +69,7 @@ LPMESSAGE GMapiMail::Handle()
 	{
 		ULONG Type = 0;
 		IUnknown *Item = NULL;
-		HRESULT e = Parent->Handle()->OpenEntry(	Entry.Length(),
+		HRESULT e = Parent->Handle()->OpenEntry(	(ULONG)Entry.Length(),
 													(LPENTRYID)&Entry[0],
 													NULL,
 													MAPI_BEST_ACCESS,
