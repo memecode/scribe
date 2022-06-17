@@ -151,7 +151,7 @@ const char *GMapiMail::GetStr(int id)
 					{
 						HtmlBody.Set(NULL, (NativeInt)s.cbSize.QuadPart);
 						ULONG Rd = 0;
-						res = Html->Read(HtmlBody.Get(), HtmlBody.Length(), &Rd);
+						res = Html->Read(HtmlBody.Get(), (ULONG)HtmlBody.Length(), &Rd);
 						if (FAILED(res))
 						{
 							HtmlBody.Empty();

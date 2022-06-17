@@ -115,7 +115,7 @@ GMapiStore::GMapiStore(const char *profile, const char *username, const char *pa
 			if (e->DisplayName && stristr(e->DisplayName, Username))
 			{
 				HRESULT res = Session->OpenMsgStore(Ui,
-													e->Entry.Length(),		// entry bytes
+													(ULONG)e->Entry.Length(),		// entry bytes
 													(LPENTRYID)&e->Entry[0],// ptr to entry
 													NULL,					// default interface: IMsgStore
 													MAPI_BEST_ACCESS,
@@ -151,7 +151,7 @@ GMapiStore::GMapiStore(const char *profile, const char *username, const char *pa
 				Notify = new GMapiAdviseSink(this);
 				if (Notify)
 				{					
-					res = MsgStore->Advise(	InboxEntry.Length(),
+					res = MsgStore->Advise(	(ULONG)InboxEntry.Length(),
 											(LPENTRYID)&InboxEntry[0],
 											fnevNewMail |
 												fnevObjectCreated |
@@ -477,7 +477,7 @@ Store3Status GMapiStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 			
 			SBinary &bin = Entries.New();
 			bin.lpb = &t->Entry[0];
-			bin.cb = t->Entry.Length();
+			bin.cb = (ULONG)t->Entry.Length();
 			if (t->UserData)
 				Moved.Add(t);
 		}
@@ -485,7 +485,7 @@ Store3Status GMapiStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 	}
 
 	ENTRYLIST Msgs;
-	Msgs.cValues = Entries.Length();
+	Msgs.cValues = (ULONG)Entries.Length();
 	Msgs.lpbin = &Entries[0];
 
 	if (!Items.Length())
@@ -606,14 +606,14 @@ Store3Status GMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 					ENTRYLIST Msgs;
 					LArray<SBinary> Entries;
 					
-					Msgs.cValues = Del.Length();
+					Msgs.cValues = (ULONG)Del.Length();
 					Entries.Length(Del.Length());
 					
 					for (unsigned i=0; i<Del.Length(); i++)
 					{
 						t = Del[i];
 						SBinary &e = Entries[i];
-						e.cb = t->Entry.Length();
+						e.cb = (ULONG)t->Entry.Length();
 						e.lpb = &t->Entry[0];
 					}
 					
@@ -668,7 +668,7 @@ Store3Status GMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 				{
 					HRESULT res = f->Parent->MapiFolder->DeleteFolder
 					(
-						f->Entry.Length(),
+						(ULONG)f->Entry.Length(),
 						(LPENTRYID) &f->Entry[0],
 						Ui,
 						NULL, // Progress
@@ -786,7 +786,7 @@ bool MapiEntryRef::OpenRoot(LPMAPISESSION Session, UI_TYPE UiHnd, IMsgStore **Ms
 		if (!*MsgStore)
 		{
 			HRESULT res = Session->OpenMsgStore(UiHnd,
-												Entry.Length(),			// entry bytes
+												(ULONG)Entry.Length(),			// entry bytes
 												(LPENTRYID)&Entry[0],	// ptr to entry
 												NULL,					// default interface: IMsgStore
 												MAPI_BEST_ACCESS,

@@ -101,7 +101,7 @@ LPMAPIFOLDER GMapiFolder::Handle()
 			ULONG Type;
 			HRESULT res = Parent->MapiFolder->OpenEntry
 			(
-				Entry.Length(),
+				(ULONG)Entry.Length(),
 				(LPENTRYID)&Entry[0],
 				NULL,
 				MAPI_BEST_ACCESS,
