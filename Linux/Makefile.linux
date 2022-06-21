@@ -232,7 +232,6 @@ Source =	../Utils/Tables/MailFlags.c \
 			../../../lgi/trunk/src/common/General/SharedMemory.cpp \
 			../../../lgi/trunk/src/common/General/SegmentTree.cpp \
 			../../../lgi/trunk/src/common/General/Growl.cpp \
-			../../../lgi/trunk/src/common/Gdc2/Path/Path.cpp \
 			../../../lgi/trunk/src/common/Gdc2/Font/EmojiFont.cpp \
 			../../../lgi/trunk/src/common/Gdc2/Filters/Png.cpp \
 			../../../lgi/trunk/src/common/Gdc2/Filters/Lzw.cpp \
@@ -251,7 +250,7 @@ Objects := $(addprefix $(BuildDir)/,$(SourceLst))
 
 # Target
 # Executable target
-$(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).so ../../libs/bzip2-1.0.6/linux/$(BuildDir)/liblibbzip2$(Tag).a ../../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
+$(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).so ../../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a ../../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	mkdir -p $(BuildDir)
 	@echo Linking $(Target) [$(Build)]...
 	$(CPP) -Wl,-export-dynamic,-R. -o \
@@ -342,6 +341,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../libs/aspell-0.60.6.1/common/vararray.hpp \
 	../../libs/aspell-0.60.6.1/common/vector.hpp \
 	../../libs/aspell-0.60.6.1/common/word_list.hpp \
+	../../libs/aspell-0.60.6.1/gen/static_filters.src.cpp \
 	../../libs/aspell-0.60.6.1/interfaces/cc/aspell.h \
 	../../libs/aspell-0.60.6.1/interfaces/cc/pspell.h \
 	../../libs/aspell-0.60.6.1/lib/can_have_error-c.cpp \
@@ -409,7 +409,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	export Build=$(Build); \
 	$(MAKE) -C ../../libs/aspell-0.60.6.1/linux -f Makefile.linux
 
-../../libs/bzip2-1.0.6/linux/$(BuildDir)/liblibbzip2$(Tag).a : ../../libs/bzip2-1.0.6/blocksort.c \
+../../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a : ../../libs/bzip2-1.0.6/blocksort.c \
 	../../libs/bzip2-1.0.6/bzlib.c \
 	../../libs/bzip2-1.0.6/bzlib.h \
 	../../libs/bzip2-1.0.6/bzlib_private.h \
