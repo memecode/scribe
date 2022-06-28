@@ -63,7 +63,7 @@ const char *ScribeResourcePath()
 		#if !defined(MAC)
 		// Exe relative mode
 		LFile::Path p(LSP_APP_INSTALL);
-		p += "Resources";
+		p += "../Resources";
 		#if defined(WINDOWS)
 		if (!p.Exists())
 			p += "../../Resources"; // When running a build from source.

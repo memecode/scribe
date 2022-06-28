@@ -9,7 +9,7 @@
 ScribePrintContext::ScribePrintContext(ScribeWnd *app, Thing *object) : FontType("Courier New", 9)
 {
 	App = app;
-	Dpi.x = Dpi.y = LScreenDpi();
+	Dpi = LScreenDpi();
 	Object = object;
 	MarginPx.ZOff(0, 0);
 }
@@ -31,8 +31,7 @@ int ScribePrintContext::OnBeginPrint(LPrintDC *pdc)
 {
 	pDC = pdc;
 	PrintDC = pdc;
-	Dpi.x = PrintDC->DpiX();
-	Dpi.y = PrintDC->DpiY();
+	Dpi = PrintDC->GetDpi();
 
 	// read any options out..
 	LVariant v;

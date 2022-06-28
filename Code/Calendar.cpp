@@ -1085,8 +1085,10 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 	float Sy = 1.0;
 	if (pDC->IsPrint())
 	{
-		Sx = (float)pDC->DpiX() / LScreenDpi();
-		Sy = (float)pDC->DpiY() / LScreenDpi();
+		auto DcDpi = pDC->GetDpi();
+		auto SrcDpi = LScreenDpi();
+		Sx = (float)DcDpi.x / SrcDpi.x;
+		Sy = (float)DcDpi.y / SrcDpi.y;
 	}
 	float Scale = Sx < Sy ? Sx : Sy;
 

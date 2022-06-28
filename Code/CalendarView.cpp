@@ -1007,13 +1007,15 @@ bool CalendarView::OnPrintPage(LPrintDC *pDC, int PageIndex)
 	{
 		// setup device context
 		double CmToInch = 0.393700787;
-		double ScaleX = (double)LScreenDpi() / pDC->DpiX();
-		double ScaleY = (double)LScreenDpi() / pDC->DpiY();
+		auto ScreenDpi = LScreenDpi();
+		auto DcDpi = pDC->GetDpi();
+		double ScaleX = (double)ScreenDpi.x / DcDpi.x;
+		double ScaleY = (double)ScreenDpi.y / DcDpi.y;
 		// LRect c = GetClient();
-		PrintMargin.x1 = (int) (( (Bx1.CastDouble() * CmToInch) * pDC->DpiX() ) * ScaleX);
-		PrintMargin.y1 = (int) (( (By1.CastDouble() * CmToInch) * pDC->DpiY() ) * ScaleY);
-		PrintMargin.x2 = (int) (( pDC->X() - ((Bx2.CastDouble() * CmToInch) * pDC->DpiX()) ) * ScaleX);
-		PrintMargin.y2 = (int) (( pDC->Y() - ((By2.CastDouble() * CmToInch) * pDC->DpiY()) ) * ScaleY);
+		PrintMargin.x1 = (int) (( (Bx1.CastDouble() * CmToInch) * DcDpi.x ) * ScaleX);
+		PrintMargin.y1 = (int) (( (By1.CastDouble() * CmToInch) * DcDpi.y ) * ScaleY);
+		PrintMargin.x2 = (int) (( pDC->X() - ((Bx2.CastDouble() * CmToInch) * DcDpi.x) ) * ScaleX);
+		PrintMargin.y2 = (int) (( pDC->Y() - ((By2.CastDouble() * CmToInch) * DcDpi.y) ) * ScaleY);
 
 		// setup font
 		Font.Reset(FontType.Create(pDC));
@@ -1142,8 +1144,10 @@ void CalendarView::OnPaint(LSurface *pDC)
 	if (pDC->IsPrint())
 	{
 		c = PrintMargin;
-		_Sx = (float)pDC->DpiX() / LScreenDpi();
-		_Sy = (float)pDC->DpiY() / LScreenDpi();
+		auto ScreenDpi = LScreenDpi();
+		auto DcDpi = pDC->GetDpi();
+		_Sx = (float)DcDpi.x / ScreenDpi.x;
+		_Sy = (float)DcDpi.y / ScreenDpi.y;
 	}
 	
 	float Scale = _Sx < _Sy ? _Sx : _Sy;

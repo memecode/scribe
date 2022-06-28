@@ -1367,11 +1367,7 @@ ScribeWnd::ScribeWnd() :
 	LResources::SetLoadStyles(true);
 
 	// Load the resources (with the current lang)
-	if (!LgiGetResObj(true
-		#ifdef _WIN64
-		,"Scribe"
-		#endif
-		))
+	if (!LgiGetResObj(true, "Scribe"))
 	{
 		LgiMsg(0, "The resource file 'Scribe.lr8' is missing.", AppName);
 		ScribeState = ScribeExiting;
