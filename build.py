@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
 import os
 import sys
 import subprocess
 import urllib.request
 import shutil
 import platform
+import multiprocessing
 
 print("platform.system():", platform.system())
 isMac = platform.system() == "Darwin"
@@ -145,7 +147,7 @@ print("\nBuilding dependencies:")
 if os.path.exists(os.path.join(scribeLibs, "build-x64")):
 	print("    Seems to be already built.")
 else:
-	args = ["python", "build.py"]
+	args = [sys.executable, "build.py"]
 	p = subprocess.run(args,
 		cwd=scribeLibs)
 
@@ -156,7 +158,8 @@ elif isWin:
 	vs2019 = "c:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\devenv.com"
 	args = [vs2019, os.path.join(trunk, "Windows\Scribe_vs2019.sln"), "/Build", "Debug"]
 elif isLinux:
-	args = ["make", "-f", "Linux/makefile.linux"]
+	jobs = multiprocessing.cpu_count()
+	args = ["make", "-j", str(jobs), "-C", "Linux", "-f", "Makefile.linux"]
 else:
 	print("Error: unsupported system.")
 	sys.exit(1)
