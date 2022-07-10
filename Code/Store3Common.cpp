@@ -85,9 +85,9 @@ Store3Addr::~Store3Addr()
 {
 }
 
-int Store3Addr::Sizeof()
+size_t Store3Addr::Sizeof()
 {
-	int s = sizeof(*this);
+	size_t s = sizeof(*this);
 	if (Addr) s += strlen(Addr);
 	if (Name) s += strlen(Name);
 	return s;

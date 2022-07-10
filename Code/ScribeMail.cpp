@@ -400,7 +400,7 @@ public:
 				FileSize >= iKb << 10)
 			{
 				// Create a JPEG filter
-				LAutoPtr<LFilter> Jpeg(GFilterFactory::New(".jpg", FILTER_CAP_WRITE, NULL));
+				auto Jpeg = LFilterFactory::New(".jpg", FILTER_CAP_WRITE, NULL);
 				if (Jpeg)
 				{
 					// Re-sample the image...
