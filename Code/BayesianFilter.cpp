@@ -461,6 +461,12 @@ public:
 		LAutoPtr<LSpellCheck> Spell(App->CreateSpellObject());
 		Tokens.Reset(new TokenStore);
 		
+		if (!Ham || !Spam)
+		{
+			LgiTrace("%s:%i - No Ham/Spam DB loaded?\n", _FL);
+			return 0.0;
+		}
+		
 		ssize_t HamItems = Ham->Length();
 		ssize_t SpamItems = Spam->Length();
 		
@@ -622,7 +628,13 @@ public:
 
 	void ApplyChange(Change *c, LWordStore *Ws, bool Add)
 	{
-		bool status;
+		bool status = false;
+
+		if (!Ws || !c)
+		{
+			LgiTrace("%s:%i - Invalid param.\n", _FL);
+			return;
+		}
 
 		ProcessWords(c->Words, [&](auto w)
 		{
