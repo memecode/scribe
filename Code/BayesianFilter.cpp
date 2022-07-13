@@ -1135,107 +1135,9 @@ void BayesianFilter::AddFolderToSpamDb(ScribeFolder *f)
 	d->Build->AddFolder(f);
 	for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
 		AddFolderToSpamDb(c);
-
-	/*
-	for (Thing *t=*Items; t && !Build->Dlg->IsCancelled(); t=*++Items)
-	{
-		Mail *m = t->IsMail();
-		if (m && TestFlag(m->GetFlags(), MAIL_READ)) // We only care about read email...
-		{
-			bool Loaded = true;
-			Store3State LoadState = m->GetLoaded();
-			if (LoadState != Store3Loaded)
-			{
-				m->GetBody();
-						
-				uint64 Start = LCurrentTime();
-				while (m->GetLoaded() != Store3Loaded)
-				{
-					LSleep(10);
-					LYield();
-					if (LCurrentTime() - Start > TIMEOUT_BAYES_LOAD)
-					{
-						LAssert(!"Mail didn't load... :(");
-						Loaded = false;
-						break;							
-					}
-				}
-			}
-
-			if (!Loaded)
-			{
-				Build->LoadFailures++;
-				continue;
-			}
-
-			const char *email;
-			if (Type == BayesMailHam &&
-				(email = m->GetFromStr(FIELD_EMAIL)))
-			{
-				Build->b->InsertWhiteList(email);
-			}
-
-			LString Words;
-			auto Status = MakeMailWordList(m, Words);
-			if (Status == Store3Success)
-			{
-				ProcessWords(Words, [&](auto w)
-				{
-					if (Type == BayesMailSpam)
-						Build->b->InsertSpamWords(w);
-					else if (Type == BayesMailHam)
-						Build->b->InsertHamWords(w);
-					// else do nothing
-				});
-
-				if (Type == BayesMailSpam)
-					Build->b->SpamEmailCount++;
-				else if (Type == BayesMailHam)
-					Build->b->HamEmailCount++;
-
-				WordsDone += Words.Length();
-							
-				int Flags = m->GetFlags();
-				if (Flags & MAIL_BAYES_HAM)
-				{
-					if (Type == BayesMailSpam)
-						Build->FalseNegatives++;
-					else if (Type == BayesMailHam)
-						Build->HamCount++;
-				}
-				else if (Flags & MAIL_BAYES_SPAM)
-				{
-					if (Type == BayesMailSpam)
-						Build->SpamCount++;
-					else if (Type == BayesMailHam)
-						Build->FalsePositives++;
-				}
-			}
-			else LAssert(!"Can't make word list.");
-
-			Processed++;
-
-			auto now = LCurrentTime();
-			if (now - d->Ts >= TIMEOUT_UPDATE_REBUILD)
-			{
-				LgiTrace("Processed " LPrintfInt64 ", Mem: %s/%s\n",
-					Processed,
-					LFormatSize(Build->b->HamWords.Sizeof()).Get(),
-					LFormatSize(Build->b->SpamWords.Sizeof()).Get());
-				Processed = 0;
-				d->Ts = now;
-			}
-		}
-
-		Build->Dlg++;
-		LYield();
-	}
-
-	if (!IsLoaded)
-		f->UnloadThings();
-	*/
 }
 
+/*
 static size_t FolderCount(ScribeFolder *f)
 {
 	ssize_t len = f->Length();
@@ -1247,6 +1149,7 @@ static size_t FolderCount(ScribeFolder *f)
 	
 	return n;
 }
+*/
 
 void BayesianFilter::BuildStats()
 {

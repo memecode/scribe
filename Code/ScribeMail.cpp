@@ -9227,6 +9227,8 @@ void Mail::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c)
 							Icon = ICON_PRIORITY_LOW;
 							break;
 						}
+						default:
+							break;
 					}
 
 					break;
@@ -9247,6 +9249,8 @@ void Mail::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c)
 					}
 					break;
 				}
+				default:
+					break;
 			}
 
 			if (Icon >= 0)

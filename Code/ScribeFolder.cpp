@@ -189,6 +189,8 @@ ScribeFolder::~ScribeFolder()
 		case MAGIC_GROUP:
 			App->RemoveThingSrc(this);
 			break;
+		default:
+			break;
 	}
 	
 	if (View())
@@ -801,6 +803,8 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			case MAGIC_FILTER:
 				Type = LLoadString(IDS_FILTER);
 				break;
+			default:
+				break;
 		}
 
 		if (Type)
@@ -866,6 +870,8 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			}
 			break;
 		}
+		default:
+			break;
 	}
 
 	if (s.Sub->ItemAt(0))
@@ -926,6 +932,8 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 						App->CreateItem(GetItemType(), this);
 					break;
 				}
+				default:
+					break;
 			}
 			break;
 		}
@@ -1217,6 +1225,8 @@ void ScribeFolder::OnItemType()
 		case MAGIC_CALENDAR:
 		case MAGIC_GROUP:
 			App->AddThingSrc(this);
+			break;
+		default:
 			break;
 	}
 }
@@ -2127,18 +2137,18 @@ public:
 		}
 	}
 
-	bool IsPlaceHolder()
+	bool IsPlaceHolder() override
 	{
 		return true;
 	}
 	
-	const char *GetText(int i)
+	const char *GetText(int i) override
 	{
 		// Clear all the fields
 		return 0;
 	}
 
-	int Compare(LListItem *Arg, ssize_t Field)
+	int Compare(LListItem *Arg, ssize_t Field) override
 	{
 		// Use the first mail to sort into position
 		if (Container)
@@ -2153,12 +2163,12 @@ public:
 		return -1;
 	}
 
-	void OnMouseClick(LMouse &m)
+	void OnMouseClick(LMouse &m) override
 	{
 		// Disable the mouse click
 	}
 
-	bool SetDirty(bool b = true)
+	bool SetDirty(bool b = true) override
 	{
 		// Don't set it to dirty, otherwise the dirty object
 		// clean up code will save it into the outbox.
