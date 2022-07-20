@@ -1270,11 +1270,11 @@ bool GMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
 	LMakePath(base, sizeof(base), DbFile, "..");
 	
 	#ifdef WINDOWS
-	const char *SqliteBin = "sqlite3.exe";
-	LMakePath(exe, sizeof(exe), base, SqliteBin);
+		const char *SqliteBin = "sqlite3.exe";
+		LMakePath(exe, sizeof(exe), base, SqliteBin);
 	#else
-	const char *SqliteBin = "sqlite3";
-	CheckPathForFile(SqliteBin, exe, sizeof(exe));
+		const char *SqliteBin = "sqlite3";
+		CheckPathForFile(SqliteBin, exe, sizeof(exe));
 	#endif		    
 	if (!LFileExists(exe))
 	{
@@ -1300,17 +1300,20 @@ bool GMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
 					SqliteBin,
 					DownloadUrl.Get(),
 					base);
-		LAlert Dlg(	p?p:Parent,
-					"GMail3Store::Repair",
-					Msg,
-					"Browse Download Site & Local Folder",
-					"Cancel");
-		int Btn = Dlg.DoModal();
-		if (Btn == 1)
+		auto Dlg = new LAlert(p?p:Parent,
+							"GMail3Store::Repair",
+							Msg,
+							"Browse Download Site & Local Folder",
+							"Cancel");
+		Dlg->DoModal([&](auto dlg, auto ctrlId)
 		{
-			LExecute(DownloadUrl);
-			LExecute(base);
-		}
+			if (ctrlId == 1)
+			{
+				LExecute(DownloadUrl);
+				LExecute(base);
+			}
+			delete dlg;
+		});
 	
 		return true;
 	}

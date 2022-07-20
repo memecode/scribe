@@ -70,16 +70,24 @@ int BayesDlg::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDC_SET_SUSPECT_FOLDER:
 		{
-			FolderDlg fd(this, d->App, MAGIC_MAIL);
-			if (fd.DoModal())
-				SetCtrlName(IDC_SUSPECT_FOLDER, fd.Get());
+			auto fd = new FolderDlg(this, d->App, MAGIC_MAIL);
+			fd->DoModal([&](auto dlg, auto ctrlId)
+			{
+				if (ctrlId)
+					SetCtrlName(IDC_SUSPECT_FOLDER, fd->Get());
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_SET_SPAM_FOLDER:
 		{
-			FolderDlg fd(this, d->App, MAGIC_MAIL);
-			if (fd.DoModal())
-				SetCtrlName(IDC_SPAM_FOLDER, fd.Get());
+			auto fd = new FolderDlg(this, d->App, MAGIC_MAIL);
+			fd->DoModal([&](auto dlg, auto ctrlId)
+			{
+				if (ctrlId)
+					SetCtrlName(IDC_SPAM_FOLDER, fd->Get());
+				delete dlg;
+			});
 			break;
 		}
 		case IDOK:

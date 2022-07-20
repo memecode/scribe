@@ -2824,23 +2824,28 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 			if (!Ctrl->Value())
 				break;
 
-			GRecurDlg Dlg(this);
-			if (!Dlg.DoModal())
+			auto Dlg = new GRecurDlg(this);
+			Dlg->DoModal([&](auto dlg, auto ctrlId)
 			{
-				SetCtrlValue(IDC_REPEAT, 0);
-			}
+				if (ctrlId)
+					SetCtrlValue(IDC_REPEAT, 0);
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_TIMEZONE:
 		{
 			auto Tz = Item->GetObject()->GetStr(FIELD_CAL_TIMEZONE);
-			LInput Dlg(this, Tz, "Time zone:", "Calendar Event Timezone");
-			int Result = Dlg.DoModal();
-			if (Result)
+			auto Dlg = new LInput(this, Tz, "Time zone:", "Calendar Event Timezone");
+			Dlg->DoModal([&](auto dlg, auto Result)
 			{
-				Item->GetObject()->SetStr(FIELD_CAL_TIMEZONE, Dlg.GetStr());
-				Item->SetDirty();
-			}
+				if (Result)
+				{
+					Item->GetObject()->SetStr(FIELD_CAL_TIMEZONE, Dlg->GetStr());
+					Item->SetDirty();
+				}
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_REMINDER_ADD:

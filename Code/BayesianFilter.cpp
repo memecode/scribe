@@ -344,7 +344,7 @@ public:
 		return 0;
 	}
 
-	bool PostEvent(int Cmd, LMessage::Param a = 0, LMessage::Param b = 0)
+	bool PostEvent(int Cmd, LMessage::Param a = 0, LMessage::Param b = 0, int64_t TimeoutMs = -1) override
 	{
 		LMessage m(Cmd, a, b);
 		OnEvent(&m);

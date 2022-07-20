@@ -595,13 +595,16 @@ DoFileSearch:
 					Files.Length(),
 					Dir) == IDYES)
 		{
-			LFileSelect Select;
-			Select.Parent(Parent);
-			if (Select.OpenFolder())
+			auto Select = new LFileSelect(Parent);
+			Select->OpenFolder([&](auto dlg, auto status)
 			{
-				strcpy_s(Dir, sizeof(Dir), Select.Name());
-				goto DoFileSearch;
-			}
+				if (status)
+				{
+					strcpy_s(Dir, sizeof(Dir), Select->Name());
+					goto DoFileSearch;
+				}
+				delete dlg;
+			});
 		}
 	}
 

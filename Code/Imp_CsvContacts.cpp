@@ -250,41 +250,47 @@ public:
 		{
 			case IDC_SAVE:
 			{
-				LFileSelect s;
-				s.Parent(this);
-				s.Type("XML", "*.xml");
-				s.Type("All Files", LGI_ALL_FILES);
-				if (s.Save())
+				auto s = new LFileSelect(this);
+				s->Type("XML", "*.xml");
+				s->Type("All Files", LGI_ALL_FILES);
+				s->Save([&](auto dlg, auto id)
 				{
-					SaveMapping(s.Name());
-				}
+					if (id)
+						SaveMapping(s->Name());
+					delete dlg;
+				});
 				break;
 			}
 			case IDC_LOAD:
 			{
-				LFileSelect s;
-				s.Parent(this);
-				s.Type("XML", "*.xml");
-				s.Type("All Files", LGI_ALL_FILES);
-				if (s.Open())
+				auto s = new LFileSelect(this);
+				s->Type("XML", "*.xml");
+				s->Type("All Files", LGI_ALL_FILES);
+				s->Open([&](auto dlg, auto id)
 				{
-					LoadMapping(s.Name());					
-				}
+					if (id)
+						LoadMapping(s->Name());
+					delete dlg;
+				});
 				break;
 			}
 			case IDC_BROWSE_FOLDER:
 			{
-				FolderDlg d(this, App, MAGIC_CONTACT);
-				if (d.DoModal())
+				auto d = new FolderDlg(this, App, MAGIC_CONTACT);
+				d->DoModal([&](auto dlg, auto id)
 				{
-					char *NewPath = d.Get();
-					if (NewPath)
+					if (id)
 					{
-						Folder = App->GetFolder(NewPath);
-						if (Folder)
-							SetCtrlName(IDC_FOLDER, Folder->GetPath());
+						auto NewPath = d->Get();
+						if (NewPath)
+						{
+							this->Folder = App->GetFolder(NewPath);
+							if (this->Folder)
+								SetCtrlName(IDC_FOLDER, this->Folder->GetPath());
+						}
 					}
-				}
+					delete dlg;
+				});
 				break;
 			}
 			case IDOK:
@@ -319,102 +325,107 @@ bool ImgCsvMatch(const char *a, const char *b)
 
 void ImportCsv(ScribeWnd *App)
 {
-	LFileSelect s;
-	s.Parent(App);
-	s.Type("Comma Separated Text", "*.csv;*.txt");
-	s.Type("All Files", LGI_ALL_FILES);
-	if (s.Open() && LFileExists(s.Name()))
+	auto s = new LFileSelect(App);
+	s->Type("Comma Separated Text", "*.csv;*.txt");
+	s->Type("All Files", LGI_ALL_FILES);
+	s->Open([&](auto dlg, auto status)
 	{
-		GDb *Db = OpenCsvDatabase(s.Name());
-		if (Db)
+		if (status && LFileExists(s->Name()))
 		{
-			LDbRecordset *Rs = Db->TableAt(0);
-			if (Rs)
+			LAutoPtr<GDb> Db(OpenCsvDatabase(s->Name()));
+			if (Db)
 			{
-				GImpCsv Dlg(App, Rs);
-				if (Dlg.DoModal())
+				LDbRecordset *Rs = Db->TableAt(0);
+				if (Rs)
 				{
-					if (Dlg.Folder)
+					auto Dlg = new GImpCsv(App, Rs);
+					Dlg->DoModal([&](auto dlg, auto id)
 					{
-						for (bool b=Rs->MoveFirst(); b; b=Rs->MoveNext())
+						if (id)
 						{
-							Contact *c = new Contact(App);
-							if (c)
+							if (Dlg->Folder)
 							{
-								c->App = App;
+								for (bool b=Rs->MoveFirst(); b; b=Rs->MoveNext())
+								{
+									Contact *c = new Contact(App);
+									if (c)
+									{
+										c->App = App;
 								
-								for (auto fm: Dlg.Mapping)
-								{
-									fm->Convert(c);
-								}
+										for (auto fm: Dlg->Mapping)
+										{
+											fm->Convert(c);
+										}
 
-								if (Dlg.Merge)
-								{
-									Contact *m = 0;
-									const char *CFirst = 0, *CLast = 0;
-									c->Get(OPT_First, CFirst);
-									c->Get(OPT_Last, CLast);
-									
-									for (auto t: Dlg.Folder->Items)
-									{
-										Contact *i = t->IsContact();
-										if (i)
+										if (Dlg->Merge)
 										{
-											const char *IFirst = 0, *ILast = 0;
-											i->Get(OPT_First, IFirst);
-											i->Get(OPT_Last, ILast);
+											Contact *m = 0;
+											const char *CFirst = 0, *CLast = 0;
+											c->Get(OPT_First, CFirst);
+											c->Get(OPT_Last, CLast);
+									
+											for (auto t: Dlg->Folder->Items)
+											{
+												Contact *i = t->IsContact();
+												if (i)
+												{
+													const char *IFirst = 0, *ILast = 0;
+													i->Get(OPT_First, IFirst);
+													i->Get(OPT_Last, ILast);
 											
-											if (ImgCsvMatch(IFirst, CFirst) &&
-												ImgCsvMatch(ILast, CLast))
-											{
-												m = i;
-												break;
+													if (ImgCsvMatch(IFirst, CFirst) &&
+														ImgCsvMatch(ILast, CLast))
+													{
+														m = i;
+														break;
+													}
+												}
 											}
-										}
-									}
 									
-									if (m)
-									{
-										// Convert across fields.
-										for (ItemFieldDef *Def = ContactFieldDefs; Def->FieldId; Def++)
-										{
-											const char *s;
-											if (c->Get(Def->DisplayText, s))
+											if (m)
 											{
-												#ifdef WIN32
-												auto t = LFromNativeCp(s);
-												if (t)
-													m->Set(Def->Option, t);
-												#else
-												m->Set(Def->Option, s);
-												#endif
+												// Convert across fields.
+												for (ItemFieldDef *Def = ContactFieldDefs; Def->FieldId; Def++)
+												{
+													const char *s;
+													if (c->Get(Def->DisplayText, s))
+													{
+														#ifdef WIN32
+														auto t = LFromNativeCp(s);
+														if (t)
+															m->Set(Def->Option, t);
+														#else
+														m->Set(Def->Option, s);
+														#endif
+													}
+												}
+										
+												m->Save();
+												if (c->DecRefs())
+													DeleteObj(c);
+												m->Update();
+											}
+											else
+											{
+												// No match, new entry
+												c->Save(Dlg->Folder);
 											}
 										}
-										
-										m->Save();
-										if (c->DecRefs())
-											DeleteObj(c);
-										m->Update();
+										else
+										{
+											c->Save(Dlg->Folder);
+										}
 									}
-									else
-									{
-										// No match, new entry
-										c->Save(Dlg.Folder);
-									}
-								}
-								else
-								{
-									c->Save(Dlg.Folder);
 								}
 							}
 						}
-					}
+						delete dlg;
+					});
 				}
 			}
-
-			DeleteObj(Db);
 		}
-	}
+		delete dlg;
+	});
 }
 
 class GExportCsv : public LDialog
@@ -460,15 +471,13 @@ public:
 		{
 			case IDC_SET_FOLDER:
 			{
-				FolderDlg d(this, App, MAGIC_CONTACT);
-				if (d.DoModal())
+				auto d = new FolderDlg(this, App, MAGIC_CONTACT);
+				d->DoModal([&](auto dlg, auto id)
 				{
-					char *NewPath = d.Get();
-					if (NewPath)
-					{
-						SetCtrlName(IDC_FOLDERS, NewPath);
-					}
-				}
+					if (id)
+						SetCtrlName(IDC_FOLDERS, d->Get());
+					delete dlg;
+				});
 				break;
 			}
 			case IDOK:
@@ -489,81 +498,88 @@ public:
 
 void ExportCsv(ScribeWnd *App)
 {
-	GExportCsv Dlg(App);
-	if (Dlg.DoModal())
+	auto Dlg = new GExportCsv(App);
+	Dlg->DoModal([&](auto dlg, auto id)
 	{
-		ScribeFolder *Folder = App->GetFolder(Dlg.Folder);
-		if (Folder)
+		if (id)
 		{
-			LFileSelect s;
-			s.Parent(App);
-			s.Type("Comma Separated Text", "*.csv");
-			s.Type("All Files", LGI_ALL_FILES);
-			if (s.Save())
+			ScribeFolder *Folder = App->GetFolder(Dlg->Folder);
+			if (Folder)
 			{
-				LString MsgStr = AskOverwriteMsg(s.Name());
-				bool Exists = LFileExists(s.Name());
-				if (!Exists || LgiMsg(App, MsgStr, AppName, MB_YESNO) == IDYES)
+				auto s = new LFileSelect(App);
+				s->Type("Comma Separated Text", "*.csv");
+				s->Type("All Files", LGI_ALL_FILES);
+				s->Save([&](auto dlg, auto status)
 				{
-					int Exported = 0;
-					const char *Error = 0;
-
-					if (Exists)
-						FileDev->Delete(s.Name());
-
-					GDb *Db = OpenCsvDatabase(s.Name());
-					LAssert(Db != NULL);
-					if (Db)
+					if (status)
 					{
-						LDbRecordset *Rs = Db->TableAt(0);
-						LAssert(Rs != NULL);
-						if (Rs)
+						LString MsgStr = AskOverwriteMsg(s->Name());
+						bool Exists = LFileExists(s->Name());
+						if (!Exists || LgiMsg(App, MsgStr, AppName, MB_YESNO) == IDYES)
 						{
-							for (ItemFieldDef *f=ContactFieldDefs; f->Option && f->FieldId; f++)
-							{
-								Rs->InsertField(f->DisplayText, GV_STRING);
-							}
-							Rs->InsertField("AltEmail", GV_STRING);
+							int Exported = 0;
+							const char *Error = 0;
 
-							List<Contact> Contacts;
-							App->GetContacts(Contacts, Folder, Dlg.SubFolders);
-							if (Contacts[0])
+							if (Exists)
+								FileDev->Delete(s->Name());
+
+							GDb *Db = OpenCsvDatabase(s->Name());
+							LAssert(Db != NULL);
+							if (Db)
 							{
-								for (auto c: Contacts)
+								LDbRecordset *Rs = Db->TableAt(0);
+								LAssert(Rs != NULL);
+								if (Rs)
 								{
-									if (Rs->AddNew())
+									for (ItemFieldDef *f=ContactFieldDefs; f->Option && f->FieldId; f++)
 									{
-										int Index = 0;
-										for (ItemFieldDef *f=ContactFieldDefs; f->Option && f->FieldId; f++, Index++)
+										Rs->InsertField(f->DisplayText, GV_STRING);
+									}
+									Rs->InsertField("AltEmail", GV_STRING);
+
+									List<Contact> Contacts;
+									App->GetContacts(Contacts, Folder, Dlg->SubFolders);
+									if (Contacts[0])
+									{
+										for (auto c: Contacts)
 										{
-											const char *n;
-											if (c->Get(f->Option, n))
+											if (Rs->AddNew())
 											{
-												LVariant v(n);
-												(*Rs)[Index].Set(v);
+												int Index = 0;
+												for (ItemFieldDef *f=ContactFieldDefs; f->Option && f->FieldId; f++, Index++)
+												{
+													const char *n;
+													if (c->Get(f->Option, n))
+													{
+														LVariant v(n);
+														(*Rs)[Index].Set(v);
+													}
+												}
+
+												auto Emails = LString(",").Join(c->GetEmails().Slice(1));
+												if (Emails)
+													(*Rs)[Index] = Emails;
+
+												if (Rs->Update())
+													Exported++;
 											}
 										}
-
-										auto Emails = LString(",").Join(c->GetEmails().Slice(1));
-										if (Emails)
-											(*Rs)[Index] = Emails;
-
-										if (Rs->Update())
-											Exported++;
 									}
+									else Error = "No Contacts.";
 								}
+								else Error = "Couldn't open record set.";
+
+								DeleteObj(Db);
 							}
-							else Error = "No Contacts.";
+							else Error = "Couldn't open database.";
+
+							LgiMsg(App, LLoadString(IDS_EXPORT_MSG), AppName, MB_OK, Exported, Error?Error:(char*)"");
 						}
-						else Error = "Couldn't open record set.";
-
-						DeleteObj(Db);
 					}
-					else Error = "Couldn't open database.";
-
-					LgiMsg(App, LLoadString(IDS_EXPORT_MSG), AppName, MB_OK, Exported, Error?Error:(char*)"");
-				}
+					delete dlg;
+				});
 			}
 		}
-	}
+		delete dlg;
+	});
 }

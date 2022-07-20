@@ -286,7 +286,6 @@ public:
 class ChooseFolderDlg : public LDialog
 {
     ScribeWnd *App;
-	// LTextLabel *Message;
 	LEdit *Folder;
 	int Type;
 	bool Export;
@@ -304,9 +303,9 @@ public:
 		bool IsExport,
 		const char *Title,
 		const char *Msg,
-		char *DefFolder = 0,
+		char *DefFolder = NULL,
 		int FolderType = MAGIC_MAIL,
-		LArray<char*> *Files = 0
+		LString::Array *Files = NULL
 	);
 	~ChooseFolderDlg();
 	int OnNotify(LViewI *Ctrl, LNotification n);

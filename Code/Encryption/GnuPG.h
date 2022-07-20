@@ -75,8 +75,8 @@ public:
 	const char *GetClass() { return "MailUiGpg"; }
 
 	// Actions
-	int SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey);
-	int Decrypt();
+	void SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, std::function<void(int)> callback);
+	void Decrypt(std::function<void(int)> callback);
 	LString GetPublicKey(const char *Email);
 	
 	// Mail Events
@@ -87,8 +87,10 @@ public:
 	void OnPaint(LSurface *pDC);
 	void OnCreate();
 	int OnNotify(LViewI *Ctrl, LNotification n);
-	int OnCommand(int Cmd, int Event, OsView From);
+	void DoCommand(int Cmd, std::function<void(int)> callback);
 	LMessage::Result OnEvent(LMessage *Msg);
+
+	int OnCommand(int Cmd, int Event, OsView Wnd) { LAssert(!"Call DoCommand..."); return 0; }
 };
 
 #endif

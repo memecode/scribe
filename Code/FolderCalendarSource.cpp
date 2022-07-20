@@ -229,13 +229,17 @@ void FolderCalendarSource::EditPath(LView *parent, CalendarView *cv)
 	if (!GetPath())
 		return;
 
-	FolderDlg Dlg(parent, App, MAGIC_CALENDAR);
-	if (!Dlg.DoModal())
-		return;
-
-	SetPath(Dlg.Get());
-	if (cv)
-		cv->OnContentsChanged(this);
+	auto Dlg = new FolderDlg(parent, App, MAGIC_CALENDAR);
+	Dlg->DoModal([&](auto dlg, auto ctrlId)
+	{
+		if (ctrlId)
+		{
+			SetPath(Dlg->Get());
+			if (cv)
+				cv->OnContentsChanged(this);
+		}
+		delete dlg;
+	});
 }
 
 bool FolderCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArray<TimePeriod> &Events)

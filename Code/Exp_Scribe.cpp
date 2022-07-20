@@ -506,49 +506,57 @@ public:
 			}
 			case IDC_SET_DEST:
 			{
-				LFileSelect s;
-				s.Parent(this);
-				s.Type("Scribe Folders", "*.mail3");
-				s.Type("All Files", LGI_ALL_FILES);
-				if (s.Open())
+				auto s = new LFileSelect(this);
+				s->Type("Scribe Folders", "*.mail3");
+				s->Type("All Files", LGI_ALL_FILES);
+				s->Open([&](auto dlg, auto status)
 				{
-					DeleteObj(Folders);
-					EnableCtrls(false);
-					SetCtrlName(IDC_DEST, s.Name());
-					OnSelectFolders();
-				}
+					if (status)
+					{
+						DeleteObj(Folders);
+						EnableCtrls(false);
+						SetCtrlName(IDC_DEST, s->Name());
+						OnSelectFolders();
+					}
+					delete dlg;
+				});
 				break;
 			}
 			case IDC_ADD_SRC_FOLDER:
 			{
 				if (Lst)
 				{
-					FolderDlg s(this, App);
-					if (s.DoModal() && ValidStr(s.Get()))
+					auto s = new FolderDlg(this, App);
+					s->DoModal([&](auto dlg, auto status)
 					{
-						bool Has = false;
-
-						for (auto n : *Lst)
+						if (status && ValidStr(s->Get()))
 						{
-							const char *p = n->GetText(0);
-							if (p && _stricmp(p, s.Get()) == 0)
+							bool Has = false;
+
+							for (auto n : *Lst)
 							{
-								Has = true;
-								break;
+								const char *p = n->GetText(0);
+								if (p && _stricmp(p, s->Get()) == 0)
+								{
+									Has = true;
+									break;
+								}
+							}
+
+							if (!Has)
+							{
+								LListItem *i = new LListItem;
+								if (i)
+								{
+									i->SetText(s->Get());
+									Lst->Insert(i);
+									Lst->ResizeColumnsToContent();
+								}
 							}
 						}
 
-						if (!Has)
-						{
-							LListItem *i = new LListItem;
-							if (i)
-							{
-								i->SetText(s.Get());
-								Lst->Insert(i);
-								Lst->ResizeColumnsToContent();
-							}
-						}
-					}
+						delete dlg;
+					});
 				}
 				break;
 			}
@@ -569,11 +577,13 @@ public:
 				LoadFolders();
 				if (Mailbox)
 				{
-					FolderDlg s(this, App, MAGIC_NONE, Mailbox);
-					if (s.DoModal())
+					auto s = new FolderDlg(this, App, MAGIC_NONE, Mailbox);
+					s->DoModal([&](auto dlg, auto ctrlId)
 					{
-						SetCtrlName(IDC_FOLDER, s.Get());
-					}
+						if (ctrlId)
+							SetCtrlName(IDC_FOLDER, s->Get());
+						delete dlg;
+					});
 				}
 				break;
 			}
@@ -664,69 +674,73 @@ public:
 
 void ExportScribe(ScribeWnd *App)
 {
-	ScribeExport Dlg(App);
-	if (Dlg.DoModal())
+	auto Dlg = new ScribeExport(App);
+	Dlg->DoModal([&](auto dlg, auto ctrlId)
 	{
+		if (ctrlId)
 		{
-			LProgressDlg Prog(App);
-			Prog.SetDescription("Initializing...");
-			Prog.SetType("items");
-			LYield();
-
-			GMailStore *Ms = App->GetDefaultMailStore();
-			if (!Ms)
-				return;
-
-			int Items = 0;
-			if (Dlg.AllFolders)
 			{
-				Items += Dlg.CountItems(Ms->Root, true);
-			}
-			else
-			{
-				for (unsigned i=0; i<Dlg.SrcPaths.Length(); i++)
+				LProgressDlg Prog(App);
+				Prog.SetDescription("Initializing...");
+				Prog.SetType("items");
+				LYield();
+
+				GMailStore *Ms = App->GetDefaultMailStore();
+				if (!Ms)
+					return;
+
+				int Items = 0;
+				if (Dlg->AllFolders)
 				{
-					Items += Dlg.CountItems(App->GetFolder(Dlg.SrcPaths[i]), false);
+					Items += Dlg->CountItems(Ms->Root, true);
 				}
-			}
-			Prog.SetRange(LRange(0, Items));
-
-			if (Dlg.AllFolders)
-			{
-				Dlg.ExportFolder(Dlg.DestPath, "/", true, &Prog);
-			}
-			else
-			{
-				for (unsigned i=0; i<Dlg.SrcPaths.Length() && !Prog.IsCancelled(); i++)
+				else
 				{
-					char Dest[256];
-					strcpy_s(Dest, sizeof(Dest), Dlg.DestPath);
-					char *e = Dest + strlen(Dest) - 1;
-					if (*e == '/') *e = 0;
-					strcat(Dest, Dlg.SrcPaths[i]);
-
-					bool s = Dlg.ExportFolder(Dest, Dlg.SrcPaths[i], false, &Prog);
-					if (!s)
+					for (unsigned i=0; i<Dlg->SrcPaths.Length(); i++)
 					{
-						break;
+						Items += Dlg->CountItems(App->GetFolder(Dlg->SrcPaths[i]), false);
+					}
+				}
+				Prog.SetRange(LRange(0, Items));
+
+				if (Dlg->AllFolders)
+				{
+					Dlg->ExportFolder(Dlg->DestPath, "/", true, &Prog);
+				}
+				else
+				{
+					for (unsigned i=0; i<Dlg->SrcPaths.Length() && !Prog.IsCancelled(); i++)
+					{
+						char Dest[256];
+						strcpy_s(Dest, sizeof(Dest), Dlg->DestPath);
+						char *e = Dest + strlen(Dest) - 1;
+						if (*e == '/') *e = 0;
+						strcat(Dest, Dlg->SrcPaths[i]);
+
+						bool s = Dlg->ExportFolder(Dest, Dlg->SrcPaths[i], false, &Prog);
+						if (!s)
+						{
+							break;
+						}
 					}
 				}
 			}
-		}
 
-		LgiMsg(	App,
-				"Mail export complete.\n"
-				"\n"
-				"    Email: %i created, %i already exist, %i errors\n"
-				"    Contacts: %i created, %i already exist, %i errors",
-				"Export",
-				MB_OK,
-				Dlg.MailCreated,
-				Dlg.MailSkipped,
-				Dlg.MailErrors,
-				Dlg.ContactCreated,
-				Dlg.ContactSkipped,
-				Dlg.ContactErrors
-				);
-	}
+			LgiMsg(	App,
+					"Mail export complete.\n"
+					"\n"
+					"    Email: %i created, %i already exist, %i errors\n"
+					"    Contacts: %i created, %i already exist, %i errors",
+					"Export",
+					MB_OK,
+					Dlg->MailCreated,
+					Dlg->MailSkipped,
+					Dlg->MailErrors,
+					Dlg->ContactCreated,
+					Dlg->ContactSkipped,
+					Dlg->ContactErrors
+					);
+		}
+		delete dlg;
+	});
 }
