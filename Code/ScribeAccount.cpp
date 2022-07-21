@@ -429,10 +429,15 @@ void ScribeAccount::SerializeUi(LView *Wnd, bool Load)
 	}
 }
 
-bool ScribeAccount::InitUI(LView *Parent, int Tab)
+void ScribeAccount::InitUI(LView *Parent, int Tab, std::function<void(bool)> callback)
 {
-	AccountDlg Dlg(Parent, this->Parent, this, Tab);
-	return Dlg.DoModal() == IDOK;
+	auto Dlg = new AccountDlg(Parent, this->Parent, this, Tab);
+	Dlg->DoModal([&](auto dlg, auto id)
+	{
+		if (callback)
+			callback(id);
+		delete dlg;
+	});
 }
 
 int ScribeAccount::OnNotify(LViewI *Ctrl, LNotification &n)
@@ -469,11 +474,13 @@ int ScribeAccount::OnNotify(LViewI *Ctrl, LNotification &n)
 		}
 		case IDC_PICK_FOLDER:
 		{
-			FolderDlg Dlg(Parent, Parent);
-			if (Dlg.DoModal())
+			auto Dlg = new FolderDlg(Parent, Parent);
+			Dlg->DoModal([&](auto dlg, auto id)
 			{
-				Ctrl->GetWindow()->SetCtrlName(IDC_FOLDER, Dlg.Get());
-			}
+				if (id)
+					Ctrl->GetWindow()->SetCtrlName(IDC_FOLDER, Dlg->Get());
+				delete dlg;
+			});
 			break;
 		}
 	}

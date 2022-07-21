@@ -1965,12 +1965,12 @@ bool MailUi::OnViewKey(LView *v, LKey &k)
 				if (Tab->Value() == 0)
 				{
 					if (TextView)
-						TextView->DoFind();
+						TextView->DoFind(NULL);
 				}
 				else if (Tab->Value() == 1)
 				{
 					if (HtmlView)
-						HtmlView->DoFind();
+						HtmlView->DoFind(NULL);
 				}
 				break;
 			}
@@ -3207,34 +3207,35 @@ int MailUi::OnCommand(int Cmd, int Event, OsView From)
 		}
 		case IDM_ATTACH_FILE:
 		{
-			LFileSelect Select;
-
-			Select.Parent(this);
-			Select.MultiSelect(true);
-			Select.Type("All files", LGI_ALL_FILES);
-
-			if (Select.Open())
+			auto Select = new LFileSelect(this);
+			Select->MultiSelect(true);
+			Select->Type("All files", LGI_ALL_FILES);
+			Select->Open([&](auto dlg, auto status)
 			{
-				Mail *m = GetItem();
-				if (m)
+				if (status)
 				{
-					for (size_t i=0; i<Select.Length(); i++)
+					Mail *m = GetItem();
+					if (m)
 					{
-						char File[MAX_PATH_LEN];
-						if (!LResolveShortcut(Select[i], File, sizeof(File)))
+						for (size_t i=0; i<Select->Length(); i++)
 						{
-							strcpy_s(File, sizeof(File), Select[i]);
-						}
+							char File[MAX_PATH_LEN];
+							if (!LResolveShortcut((*Select)[i], File, sizeof(File)))
+							{
+								strcpy_s(File, sizeof(File), (*Select)[i]);
+							}
 
-						Attachment *a = m->AttachFile(this, File);
-						if (a && Attachments)
-						{
-							Attachments->Insert(a);
-							Attachments->ResizeColumnsToContent();
+							Attachment *a = m->AttachFile(this, File);
+							if (a && Attachments)
+							{
+								Attachments->Insert(a);
+								Attachments->ResizeColumnsToContent();
+							}
 						}
 					}
 				}
-			}
+				delete dlg;
+			});
 			break;
 		}
 		default:
@@ -6387,11 +6388,13 @@ void SetFolderCallback(LInput *Dlg, LViewI *EditCtrl, void *Param)
 {
 	ScribeWnd *App = (ScribeWnd*) Param;
 	auto Str = EditCtrl->Name();
-	LAutoPtr<FolderDlg> Select(new FolderDlg(Dlg, App, MAGIC_MAIL, 0, Str));
-	if (Select && Select->DoModal())
+	auto Select = new FolderDlg(Dlg, App, MAGIC_MAIL, 0, Str);
+	Select->DoModal([&](auto dlg, auto id)
 	{
-		EditCtrl->Name(Select->Get());
-	}
+		if (id)
+			EditCtrl->Name(Select->Get());
+		delete dlg;
+	});
 }
 
 void Mail::DoContextMenu(LMouse &m, LView *p)
@@ -7675,12 +7678,16 @@ void Mail::OnProperties(int Tab)
 		
 		if (Lst[0])
 		{
-			MailPropDlg Dlg(GetList(), Lst);
-			if (Dlg.DoModal() == IDOK)
+			auto Dlg = new MailPropDlg(GetList(), Lst);
+			Dlg->DoModal([&](auto dlg, auto id)
 			{
-				SetDirty();
-				Update();
-			}
+				if (id == IDOK)
+				{
+					SetDirty();
+					Update();
+				}
+				delete dlg;
+			});
 		}
 	}
 }
@@ -9966,7 +9973,8 @@ void Mail::OnPrintText(ScribePrintContext &Context, LPrintPageRanges &Pages)
 	}
 }
 
-void Mail::OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml)
+/// \returns the number of pages printed
+int Mail::OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml)
 {
 	// HTML printing...
 	LDrawListSurface *Page = Context.Pages.Last();
@@ -9975,38 +9983,44 @@ void Mail::OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSu
 	double MemScale = (double) Context.pDC->X() / (double) RenderedHtml->X();
 	
 	// Now paint the bitmap onto the existing page
-	int PageIdx = 0;
+	int PageIdx = 0, Printed = 0;
 	for (int y = 0; y < RenderedHtml->Y(); PageIdx++)
 	{
-		// Work out how much bitmap we can paint onto the current page...
-		int PageRemaining = Context.MarginPx.Y() - Context.CurrentY;
-		int MemPaint = (int) (PageRemaining / MemScale);
-
-		// This is how much of the memory context we can fit on the page
-		LRect MemRect(0, y, RenderedHtml->X()-1, y + MemPaint - 1);
-		LRect Bnds = RenderedHtml->Bounds();
-		MemRect.Bound(&Bnds);
-		
-		// Work out how much page that is take up
-		int PageHeight = (int) (MemRect.Y() * MemScale);
-		
-		// This is the position on the page we are blting to
-		LRect PageRect(Context.MarginPx.x1, Context.CurrentY, Context.MarginPx.x2, Context.CurrentY + PageHeight - 1);
-		
-		// Do the blt
-		Page->StretchBlt(&PageRect, RenderedHtml, &MemRect);
-		
-		// Now move our position down the page..
-		Context.CurrentY += PageHeight;
-		if ((Context.MarginPx.Y() - Context.CurrentY) * 100 / Context.MarginPx.Y() < 5)
+		if (Pages.InRanges(PageIdx))
 		{
-			// Ok we hit the end of the page and need to go to the next page
-			Context.CurrentY = Context.MarginPx.y1;
-			Page = Context.NewPage();
-		}
+			// Work out how much bitmap we can paint onto the current page...
+			int PageRemaining = Context.MarginPx.Y() - Context.CurrentY;
+			int MemPaint = (int) (PageRemaining / MemScale);
 
-		y += MemRect.Y();
+			// This is how much of the memory context we can fit on the page
+			LRect MemRect(0, y, RenderedHtml->X()-1, y + MemPaint - 1);
+			LRect Bnds = RenderedHtml->Bounds();
+			MemRect.Bound(&Bnds);
+		
+			// Work out how much page that is take up
+			int PageHeight = (int) (MemRect.Y() * MemScale);
+		
+			// This is the position on the page we are blting to
+			LRect PageRect(Context.MarginPx.x1, Context.CurrentY, Context.MarginPx.x2, Context.CurrentY + PageHeight - 1);
+		
+			// Do the blt
+			Page->StretchBlt(&PageRect, RenderedHtml, &MemRect);
+			Printed++;
+		
+			// Now move our position down the page..
+			Context.CurrentY += PageHeight;
+			if ((Context.MarginPx.Y() - Context.CurrentY) * 100 / Context.MarginPx.Y() < 5)
+			{
+				// Ok we hit the end of the page and need to go to the next page
+				Context.CurrentY = Context.MarginPx.y1;
+				Page = Context.NewPage();
+			}
+
+			y += MemRect.Y();
+		}
 	}
+
+	return Printed;
 }
 
 //////////////////////////////////////////////////////////////////////////////

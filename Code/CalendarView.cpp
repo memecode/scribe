@@ -3121,7 +3121,7 @@ int CalendarViewWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			if (Printer)
 			{
 				CalendarViewPrint Cvp(Cv);
-				Printer->Print(&Cvp, "Scribe Calendar", -1, this);
+				Printer->Print(&Cvp, NULL, "Scribe Calendar", -1, this);
 			}				
 			break;
 		}

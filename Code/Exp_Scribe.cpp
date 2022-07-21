@@ -288,10 +288,7 @@ public:
 							case MAGIC_MAIL:
 							{
 								if (Prog)
-								{
 									Prog->SetDescription(FromPath);
-									LYield();
-								}
 
 								To->LoadThings();
 								From->LoadThings();
@@ -311,7 +308,6 @@ public:
 								}
 
 								int InitMailErrors = MailErrors;
-								uint64 Last = LCurrentTime();
 								
 								for (auto t: From->Items)
 								{
@@ -365,15 +361,7 @@ public:
 									}
 
 									if (Prog)
-									{
 										Prog->Value(Prog->Value() + 1);
-										uint64 Now = LCurrentTime();
-										if (Now > Last + 300)
-										{
-											LYield();
-											Last = Now;
-										}
-									}
 								}
 
 								Status |= MailErrors == InitMailErrors;
@@ -437,15 +425,7 @@ public:
 									}
 
 									if (Prog)
-									{
 										Prog->Value(Prog->Value() + 1);
-										uint64 Now = LCurrentTime();
-										if (Now > Last + 300)
-										{
-											LYield();
-											Last = Now;
-										}
-									}
 								}
 
 								Status |= ContactErrors == InitContactErrors;
@@ -683,7 +663,6 @@ void ExportScribe(ScribeWnd *App)
 				LProgressDlg Prog(App);
 				Prog.SetDescription("Initializing...");
 				Prog.SetType("items");
-				LYield();
 
 				GMailStore *Ms = App->GetDefaultMailStore();
 				if (!Ms)
@@ -696,10 +675,8 @@ void ExportScribe(ScribeWnd *App)
 				}
 				else
 				{
-					for (unsigned i=0; i<Dlg->SrcPaths.Length(); i++)
-					{
-						Items += Dlg->CountItems(App->GetFolder(Dlg->SrcPaths[i]), false);
-					}
+					for (auto path: Dlg->SrcPaths)
+						Items += Dlg->CountItems(App->GetFolder(path), false);
 				}
 				Prog.SetRange(LRange(0, Items));
 

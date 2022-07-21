@@ -286,13 +286,17 @@ bool RemoteCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArra
 
 void RemoteCalendarSource::EditPath(LView *parent, CalendarView *cv)
 {
-	LInput Dlg(parent, d->Uri);
-	if (!Dlg.DoModal())
-		return;
-
-	SetUri(Dlg.GetStr());
-	if (cv)
-		cv->OnContentsChanged(this);
+	auto Dlg = new LInput(parent, d->Uri);
+	Dlg->DoModal([&](auto dlg, auto id)
+	{
+		if (id)
+		{
+			SetUri(Dlg->GetStr());
+			if (cv)
+				cv->OnContentsChanged(this);
+		}
+		delete dlg;
+	});
 }
 
 LColour RemoteCalendarSource::GetColour()

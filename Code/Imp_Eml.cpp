@@ -137,8 +137,6 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 	LDirectory d;
 	
 	{
-		DoEvery Timer(300);
-		
 		LDataStoreI::StoreTrans Trans = Out->GetObject()->GetStore()->StartTransaction();
 		for (int b=d.First(In); b && !Prog->IsCancelled(); b=d.Next())
 		{
@@ -167,8 +165,6 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 					else (*Errors)++;
 					
 					Prog->Value(Prog->Value() + 1);
-					if (Timer.DoNow())
-						LYield();
 				}
 			}
 		}

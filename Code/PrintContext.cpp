@@ -27,7 +27,10 @@ LDrawListSurface *ScribePrintContext::NewPage()
 	return dls;
 }
 
-int ScribePrintContext::OnBeginPrint(LPrintDC *pdc)
+#define PrintStatus(val) \
+	{ if (callback) callback(val); return; }
+
+void ScribePrintContext::OnBeginPrint(LPrintDC *pdc, std::function<void(int)> callback)
 {
 	pDC = pdc;
 	PrintDC = pdc;
@@ -77,7 +80,7 @@ int ScribePrintContext::OnBeginPrint(LPrintDC *pdc)
 	if (!AppFont || !MailFont)
 	{
 		LgiTrace("%s:%i - Error creating fonts for printing\n", _FL);
-		return OnBeginPrintError;
+		PrintStatus(OnBeginPrintError);
 	}
 	
 	// There is always at least one page...
@@ -94,14 +97,23 @@ int ScribePrintContext::OnBeginPrint(LPrintDC *pdc)
 	}    	
 	if (HtmlPrinting)
 	{
-		PrintPreview Dlg(App, mail, pdc);
-		if (!Dlg.DoModal())
-		    return OnBeginPrintCancel;
+		auto Dlg = new PrintPreview(App, mail, pdc);
+		Dlg->DoModal([&](auto dlg, auto id)
+		{
+			if (!id)
+			{
+				delete dlg;
+				PrintStatus(OnBeginPrintCancel);
+			}
 
-		PageRanges.Reset(new LPrintPageRanges(Dlg.GetPageRanges()));
-		HtmlImg = Dlg.ReleaseImage();
-		mail->OnPrintHeaders(*this);
-		mail->OnPrintHtml(*this, *PageRanges, HtmlImg);
+			PageRanges.Reset(new LPrintPageRanges(Dlg->GetPageRanges()));
+			HtmlImg = Dlg->ReleaseImage();
+			mail->OnPrintHeaders(*this);
+			mail->OnPrintHtml(*this, *PageRanges, HtmlImg);
+			
+			delete dlg;
+			PrintStatus(1);
+		});
 	}
 	else
 	{
@@ -110,7 +122,7 @@ int ScribePrintContext::OnBeginPrint(LPrintDC *pdc)
 		Object->OnPrintText(*this, *PageRanges);
 	}
 
-	return (int)Pages.Length();
+	PrintStatus((int)Pages.Length());
 }
 
 bool ScribePrintContext::OnPrintPage(LPrintDC *pdc, int PageIndex)

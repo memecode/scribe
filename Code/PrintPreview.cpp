@@ -203,7 +203,6 @@ int PrintPreview::OnNotify(LViewI *Ctrl, LNotification n)
 			d->Mem.Reset();
 			
 			SetCtrlName(IDC_STATUS, LLoadString(IDS_LOADING));
-			LYield();
 			d->Render();
 			SetCtrlName(IDC_STATUS, LLoadString(IDS_PREVIEW));
 			break;
@@ -212,19 +211,20 @@ int PrintPreview::OnNotify(LViewI *Ctrl, LNotification n)
 		{
 			if (d->Mem)
 			{
-				LFileSelect s;
-				s.Parent(this);
-				s.Type("JPEG", "*.jpg");
+				auto s = new LFileSelect(this);
+				s->Type("JPEG", "*.jpg");
 				
 				char p[MAX_PATH_LEN];
 				LGetSystemPath(LSP_USER_DOWNLOADS, p, sizeof(p));
 				LMakePath(p, sizeof(p), p, "print-preview.jpg");
-				s.Name(p);
+				s->Name(p);
 				
-				if (s.Save())
+				s->Save([&](auto dlg, auto status)
 				{
-					GdcD->Save(s.Name(), d->Mem);
-				}
+					if (status)
+						GdcD->Save(s->Name(), d->Mem);
+					delete dlg;
+				});
 			}
 			else LgiMsg(this, "No image to save.", LLoadString(IDS_ERROR));
 			break;

@@ -52,15 +52,17 @@ class SubFolderDlg : public LDialog, public LXmlTreeUi
 
 	void FolderSelector(int OutputCtrl, int Limit)
 	{
-		FolderDlg Dlg(this, App, Limit);
-		if (Dlg.DoModal())
+		auto Dlg = new FolderDlg(this, App, Limit);
+		Dlg->DoModal([&](auto dlg, auto id)
 		{
-			LEdit *e;
-			if (GetViewById(OutputCtrl, e))
+			if (id)
 			{
-				e->Name(Dlg.Get());
+				LEdit *e;
+				if (GetViewById(OutputCtrl, e))
+					e->Name(Dlg->Get());
 			}
-		}
+			delete dlg;
+		});
 	}
 
 public:
@@ -90,7 +92,6 @@ public:
 			
 			Convert(App->GetOptions(), this, true);
 			MoveToCenter();
-			DoModal();
 		}
 	}
 
@@ -170,30 +171,33 @@ int GetFolderVersion(const char *f)
 	return 0;
 }
 
-bool EditWebdav(LViewI *parent, LXmlTag *t)
+void EditWebdav(LViewI *parent, LXmlTag *t, std::function<void(bool)> callback)
 {
-	LDialog dlg;
+	auto dlg = new LDialog(parent);
 
-	dlg.SetParent(parent);
-	dlg.LoadFromResource(IDD_WEBDAV_PROPS);
-	dlg.MoveSameScreen(parent);
+	dlg->LoadFromResource(IDD_WEBDAV_PROPS);
+	dlg->MoveSameScreen(parent);
 	
-	dlg.SetCtrlName(IDC_DESC, t->GetAttr(OPT_MailStoreName));
-	dlg.SetCtrlName(IDC_CONTACTS_URL, t->GetAttr(OPT_MailStoreContactUrl));
-	dlg.SetCtrlName(IDC_CALENDAR_URL, t->GetAttr(OPT_MailStoreCalendarUrl));
-	dlg.SetCtrlName(IDC_USERNAME, t->GetAttr(OPT_MailStoreUserName));
-	dlg.SetCtrlName(IDC_PASSWORD, t->GetAttr(OPT_MailStorePassword));
+	dlg->SetCtrlName(IDC_DESC, t->GetAttr(OPT_MailStoreName));
+	dlg->SetCtrlName(IDC_CONTACTS_URL, t->GetAttr(OPT_MailStoreContactUrl));
+	dlg->SetCtrlName(IDC_CALENDAR_URL, t->GetAttr(OPT_MailStoreCalendarUrl));
+	dlg->SetCtrlName(IDC_USERNAME, t->GetAttr(OPT_MailStoreUserName));
+	dlg->SetCtrlName(IDC_PASSWORD, t->GetAttr(OPT_MailStorePassword));
 
-	int res = dlg.DoModal();
-	if (res != IDOK)
-		return false;
-	
-	t->SetAttr(OPT_MailStoreName, dlg.GetCtrlName(IDC_DESC));
-	t->SetAttr(OPT_MailStoreContactUrl, dlg.GetCtrlName(IDC_CONTACTS_URL));
-	t->SetAttr(OPT_MailStoreCalendarUrl, dlg.GetCtrlName(IDC_CALENDAR_URL));
-	t->SetAttr(OPT_MailStoreUserName, dlg.GetCtrlName(IDC_USERNAME));
-	t->SetAttr(OPT_MailStorePassword, dlg.GetCtrlName(IDC_PASSWORD));
-	return true;
+	dlg->DoModal([&](auto dlg, auto res)
+	{
+		if (res == IDOK)
+		{	
+			t->SetAttr(OPT_MailStoreName, dlg->GetCtrlName(IDC_DESC));
+			t->SetAttr(OPT_MailStoreContactUrl, dlg->GetCtrlName(IDC_CONTACTS_URL));
+			t->SetAttr(OPT_MailStoreCalendarUrl, dlg->GetCtrlName(IDC_CALENDAR_URL));
+			t->SetAttr(OPT_MailStoreUserName, dlg->GetCtrlName(IDC_USERNAME));
+			t->SetAttr(OPT_MailStorePassword, dlg->GetCtrlName(IDC_PASSWORD));
+			callback(true);
+		}
+		else callback(false);
+		delete dlg;
+	});
 }
 
 class StoreItem : public LListItem
@@ -268,8 +272,11 @@ public:
 
 	void Edit()
 	{
-		if (EditWebdav(GetList(), &Tag))
-			Update();
+		EditWebdav(GetList(), &Tag, [&](auto status)
+		{
+			if (status)
+				Update();
+		});
 	}
 
 	void OnMouseClick(LMouse &m)
@@ -404,30 +411,32 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDC_OPEN_MS:
 		{
-			LFileSelect s;
-			s.Parent(this);
-			s.InitialDir(LGetExePath());
-			s.Type("Mail Folders", "*.mail3;*.sqlite");
-
-			if (s.Open())
+			auto s = new LFileSelect(this);
+			s->InitialDir(LGetExePath());
+			s->Type("Mail Folders", "*.mail3;*.sqlite");
+			s->Open([&](auto dlg, auto status)
 			{
-				StoreItem *Si = new StoreItem(App);
-				if (Si)
+				if (status)
 				{
-					char b[MAX_PATH_LEN];
-					strcpy_s(b, sizeof(b), s.Name());
-					char *n = LGetExtension(b);
-					if (n && !_stricmp(n, "sqlite"))
+					StoreItem *Si = new StoreItem(App);
+					if (Si)
 					{
-						n = strrchr(b, DIR_CHAR);
-						if (n) *n = 0;
-					}
+						char b[MAX_PATH_LEN];
+						strcpy_s(b, sizeof(b), s->Name());
+						char *n = LGetExtension(b);
+						if (n && !_stricmp(n, "sqlite"))
+						{
+							n = strrchr(b, DIR_CHAR);
+							if (n) *n = 0;
+						}
 
-					Si->Tag.SetAttr(OPT_MailStoreLocation, b);
-					Lst->Insert(Si);
-					Lst->ResizeColumnsToContent();
+						Si->Tag.SetAttr(OPT_MailStoreLocation, b);
+						Lst->Insert(Si);
+						Lst->ResizeColumnsToContent();
+					}
 				}
-			}
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_CLOSE_MS:
@@ -456,38 +465,42 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 			int Cmd = s.Float(this, pt.x, pt.y, LSubMenu::BtnLeft);
 			if (Cmd == IDM_LOCAL_FOLDERS)
 			{
-				LFileSelect s;
-				s.Parent(this);
-				s.InitialDir(Opts);
-				s.Name((char*)"Folders.mail3");
-				if (s.Save())
+				auto s = new LFileSelect(this);
+				s->InitialDir(Opts);
+				s->Name((char*)"Folders.mail3");
+				s->Save([&](auto dlg, auto status)
 				{
-					StoreItem *Si = new StoreItem(App);
-					if (Si)
+					if (status)
 					{
-						auto Rel = LMakeRelativePath(Opts, s.Name());
+						StoreItem *Si = new StoreItem(App);
+						if (Si)
+						{
+							auto Rel = LMakeRelativePath(Opts, s->Name());
 					
-						Si->Tag.SetAttr(OPT_MailStoreLocation, Rel ? Rel.Get() : s.Name());
+							Si->Tag.SetAttr(OPT_MailStoreLocation, Rel ? Rel.Get() : s->Name());
 					
-						Lst->Insert(Si);
-						Lst->ResizeColumnsToContent();
+							Lst->Insert(Si);
+							Lst->ResizeColumnsToContent();
+						}
 					}
-				}
+					delete dlg;
+				});
 			}
 			else if (Cmd == IDM_WEBDAV_FOLDER)
 			{
 				StoreItem *Si = new StoreItem(App);
 				if (!Si)
 					break;
-				if (EditWebdav(this, &Si->Tag))
-				{					
-					Lst->Insert(Si);
-					Lst->ResizeColumnsToContent();
-				}
-				else
+				
+				EditWebdav(this, &Si->Tag, [&](auto status)
 				{
-					DeleteObj(Si);
-				}
+					if (status)
+					{					
+						Lst->Insert(Si);
+						Lst->ResizeColumnsToContent();
+					}
+					else DeleteObj(Si);
+				});
 			}
 			break;
 		}
@@ -509,16 +522,18 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 			GMailStore *ms = GetCurrentMailStore();
 			if (ms)
 			{
-				FmtDlg Dlg(this, (int)ms->Store->GetInt(FIELD_FORMAT));
-				if (Dlg.DoModal())
+				auto Dlg = new FmtDlg(this, (int)ms->Store->GetInt(FIELD_FORMAT));
+				Dlg->DoModal([&](auto dlg, auto id)
 				{
-					Store3Progress Prog(App, true);
-					Prog.SetInt(Store3UiNewFormat, Dlg.Ver);
-					if (!ms->Store->SetFormat(this, &Prog))
+					if (id)
 					{
-						LgiMsg(this, "Set format failed.", AppName);
+						Store3Progress Prog(App, true);
+						Prog.SetInt(Store3UiNewFormat, Dlg->Ver);
+						if (!ms->Store->SetFormat(this, &Prog))
+							LgiMsg(this, "Set format failed.", AppName);
 					}
-				}
+					delete dlg;
+				});
 			}			
 			break;
 		}
@@ -543,14 +558,19 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDC_SUB_FOLDERS:
 		{
-			SubFolderDlg Dlg(this, App);
+			auto Dlg = new SubFolderDlg(this, App);
+			Dlg->DoModal(NULL);
 			break;
 		}
 		case IDC_SET_START_IN:
 		{
-			FolderDlg Dlg(this, App);
-			if (Dlg.DoModal())
-				SetCtrlName(IDC_START_IN, Dlg.Get());
+			auto Dlg = new FolderDlg(this, App);
+			Dlg->DoModal([&](auto dlg, auto id)
+			{
+				if (id)
+					SetCtrlName(IDC_START_IN, Dlg->Get());
+				delete dlg;
+			});
 			break;
 		}
 		case IDOK:

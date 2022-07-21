@@ -111,8 +111,11 @@ public:
 			Account &&
 			Dlg->App->GetAccountSettingsAccess(Dlg, ScribeReadAccess))
 		{
-			Account->InitUI(Parent);
-			Update();
+			Account->InitUI(Parent, 0, [&](auto status)
+			{
+				if (status)
+					Update();
+			});
 		}
 
 		LListItem::OnMouseClick(m);
@@ -826,12 +829,15 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 						a->Create();
 
 						// Open the UI
-						if (a->InitUI(this))
+						a->InitUI(this, 0, [&](auto status)
 						{
-							ACtrl->Insert(new AccountItem(this, a));
-							AList->Insert(a.Release());
-							UpdateDefaultSendAccounts();
-						}
+							if (status)
+							{
+								ACtrl->Insert(new AccountItem(this, a));
+								AList->Insert(a.Release());
+								UpdateDefaultSendAccounts();
+							}
+						});
 					}
 				}
 			}
@@ -953,9 +959,14 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 					AccountItem *i = dynamic_cast<AccountItem*>(Sel[0]);
 					if (i)
 					{
-						i->GetAccount()->InitUI(this);
-						i->Update();
-						UpdateDefaultSendAccounts();
+						i->GetAccount()->InitUI(this, 0, [&](auto status)
+						{
+							if (status)
+							{
+								i->Update();
+								UpdateDefaultSendAccounts();
+							}
+						});
 					}
 				}
 				else
@@ -967,41 +978,40 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_SET_SOUND:
 		{
-			LFileSelect Select;
-
-			Select.Parent(this);
-			Select.Type("Sound", "*.wav");
-
-			if (Select.Open())
+			auto Select = new LFileSelect(this);
+			Select->Type("Sound", "*.wav");
+			Select->Open([&](auto dlg, auto status)
 			{
-				LEdit *LogFile;
-				if (GetViewById(IDC_NEW_MAIL_SOUND, LogFile))
+				if (status)
 				{
-					LogFile->Name(Select.Name());
+					LEdit *LogFile;
+					if (GetViewById(IDC_NEW_MAIL_SOUND, LogFile))
+						LogFile->Name(Select->Name());
 				}
-			}
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_SET_FONT:
 		{
-			if (EditorFont.DoUI(this))
+			EditorFont.DoUI(this, [&](auto fontType)
 			{
 				UpdateFontDescription();
-			}
+			});
 			break;
 		}
 		case IDC_SET_HTML_FONT:
 		{
-			if (HtmlFont.DoUI(this))
+			HtmlFont.DoUI(this, [&](auto fontType)
 			{
 				UpdateFontDescription();
-			}
+			});
 			break;
 		}
 		case IDC_CONFIGURE_REMOTE_CONTENT:
 		{
-			RemoteContentDlg Dlg(this, App);
-			Dlg.DoModal();
+			auto Dlg = new RemoteContentDlg(this, App);
+			Dlg->DoModal(NULL);
 			break;
 		}
 		case IDOK:

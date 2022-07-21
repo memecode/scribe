@@ -2449,8 +2449,6 @@ Calendar *MatchCalendar(ScribeFolder *f, Calendar *c1)
 
 bool OutlookIO::ImportItem(ScribeFolder *Out, IMAPIFolder *In, SPropValue *EntryId)
 {
-	LYield();
-
 	bool Status = false;
 	if (Out && In && EntryId)
 	{
@@ -2717,7 +2715,6 @@ bool OutlookIO::Import(	ImportParams *P,
 			char FolderStr[256];
 			sprintf_s(FolderStr, sizeof(FolderStr), "Folder: '%s'", FolderName);
 			P->Prog->SetDescription(FolderStr);
-			LYield();
 		}
 
 		bool ImportThisFolder = P->AllFolders;
@@ -3242,7 +3239,6 @@ bool OutlookIO::Export(	ExportParams *P,
 						char s[256];
 						sprintf_s(s, sizeof(s), "Loading %s...", FolderPath ? FolderPath.Get() : InName.Get());
 						P->Prog->SetDescription(s);
-						LYield();
 					}
 
 					// Export all the contained items, by first scanning existing entries so
@@ -3300,7 +3296,6 @@ bool OutlookIO::Export(	ExportParams *P,
 						char s[256];
 						sprintf_s(s, sizeof(s), "Exporting %s...", FolderPath ? FolderPath.Get() : InName.Get());
 						P->Prog->SetDescription(s);
-						LYield();
 					}
 					if (P->ItemProg)
 					{
@@ -3308,7 +3303,6 @@ bool OutlookIO::Export(	ExportParams *P,
 						P->ItemProg->SetRange(LRange(0, In->Items.Length()));
 						P->ItemProg->SetType("email");
 						P->ItemProg->Cancel(false);
-						LYield();
 					}
 					for (auto t: In->Items)
 					{
@@ -3565,17 +3559,11 @@ bool OutlookIO::Export(	ExportParams *P,
 						}
 
 						if (P->ItemProg)
-						{
 							P->ItemProg->Value(P->ItemProg->Value()+1);
-						}
-						LYield();
 					}
 
 					if (P->Prog)
-					{
 						P->Prog->Value(P->Prog->Value()+1);
-						LYield();
-					}
 
 					if (!WasLoaded)
 					{

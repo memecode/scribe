@@ -85,6 +85,7 @@ class ContactGroup;
 class ScribeBehaviour;
 class AccountletThread;
 class ThingList;
+class LSpellCheck;
 
 ////////////////////////////////////////////////////////////////////////
 // Scripting support
@@ -360,7 +361,7 @@ public:
 	// Printing
 	virtual void OnPrintHeaders(struct ScribePrintContext &Context) { LAssert(!"Impl me."); }
 	virtual void OnPrintText(ScribePrintContext &Context, LPrintPageRanges &Pages) { LAssert(!"Impl me."); }
-	virtual void OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml) { LAssert(!"Impl me."); }
+	virtual int OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml) { LAssert(!"Impl me."); return 0; }
 };
 
 class MailContainerIter;
@@ -1024,7 +1025,7 @@ public:
 	// Printing
 	void OnPrintHeaders(ScribePrintContext &Context) override;
 	void OnPrintText(ScribePrintContext &Context, LPrintPageRanges &Pages) override;
-	void OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml) override;
+	int OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml) override;
 
 	// Misc	
 	uint32_t GetFlags() override;
@@ -2000,7 +2001,7 @@ public:
 	void SetDefaults();
 
 	// User interface
-	bool InitUI(LView *Parent, int Tab = 0);
+	void InitUI(LView *Parent, int Tab, std::function<void(bool)> callback);
 	bool InitMenus();
 	void SerializeUi(LView *Wnd, bool Load);
 	int OnNotify(LViewI *Ctrl, LNotification &n);
@@ -2283,7 +2284,7 @@ public:
 	void			SetLayout(LayoutMode Mode = OptionsLayout);
 	bool			IsMyEmail(const char *Email);
 	bool			SetItemPreview(LView *v);
-	LOptionsFile::PortableType GetPortableType();
+	void			GetPortableType(std::function<void(LOptionsFile::PortableType)> callback);
 	ScribeRemoteContent RemoteContent_GetSenderStatus(const char *Addr);
 	void			RemoteContent_ClearCache();
 	void			RemoteContent_AddSender(const char *Addr, bool WhiteList);
@@ -2378,9 +2379,9 @@ public:
 	bool			LogFilterActivity();
 	ScribeFolder *FindContainer(LDataFolderI *f);
 	bool			SaveDirtyObjects(int TimeLimitMs = 100);
-	class LSpellCheck *CreateSpellObject();
-	class LSpellCheck *GetSpellThread(bool OverrideOpt = false);
-	bool			SetSpellThreadParams(LSpellCheck *Thread);
+	void			CreateSpellObject(std::function<void(LSpellCheck*)> callback);
+	void			GetSpellThread(std::function<void(LSpellCheck*)> callback, bool OverrideOpt = false);
+	void			SetSpellThreadParams(LSpellCheck *Thread, std::function<void(LSpellCheck*, bool)> callback);
 	void			OnSpellerSettingChange();
 	bool			OnMailTransferEvent(MailTransferEvent *e);
 	LViewI			*GetView() { return this; }
@@ -2411,7 +2412,7 @@ public:
 	// Options
 	LOptionsFile	*GetOptions(bool Create = false) override;
 	bool			ScanForOptionsFiles(LArray<OptionsInfo> &Inf, LSystemPath PathType);
-	bool			LoadOptions();
+	void			LoadOptions(std::function<void(bool)> callback);
 	bool			SaveOptions();
 	bool			IsSending() { return false; }
 	bool			ShowToolbarText();
