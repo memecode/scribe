@@ -58,7 +58,6 @@ CreateSubFolderDlg::CreateSubFolderDlg(LView *parent, int defaulttype, bool *Ena
 		}
 
 		MoveToCenter();
-		DoModal();
 	}
 }
 

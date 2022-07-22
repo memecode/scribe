@@ -382,19 +382,23 @@ bool LScribeScript::BrowseFolder(LScriptArguments &Args)
 {
 	ARG_CHECK(!=, 3);
 
+	LAssert(!"FIXME: this doesn't wait for the callback.");
+
 	LView *Parent = CastGView(Args[0]);
-	FolderDlg d(Parent,
-				App,
-				MAGIC_ANY, // limit to
-				0, // root
-				0, // init sel
-				true,
-				Args[2]->Str(),
-				Args[1]->Str());
-	if (d.DoModal())
+	auto d = new FolderDlg(	Parent,
+							App,
+							MAGIC_ANY, // limit to
+							0, // root
+							0, // init sel
+							true,
+							Args[2]->Str(),
+							Args[1]->Str());
+	d->DoModal([&](auto dlg, auto id)
 	{
-		*Args.GetReturn() = d.Get();
-	}
+		if (id)
+			*Args.GetReturn() = d->Get();
+		delete dlg;
+	});
 
 	return true;
 }

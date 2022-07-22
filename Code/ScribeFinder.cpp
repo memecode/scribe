@@ -1207,11 +1207,13 @@ int FindWnd::OnNotify(LViewI *Col, LNotification n)
 		{
 			if (Folder)
 			{
-				FolderDlg Dlg(this, App);
-				if (Dlg.DoModal())
+				auto Dlg = new FolderDlg(this, App);
+				Dlg->DoModal([&](auto dlg, auto id)
 				{
-					Folder->Name(Dlg.Get());
-				}
+					if (id)
+						Folder->Name(Dlg->Get());
+					delete dlg;
+				});
 			}
 			break;
 		}

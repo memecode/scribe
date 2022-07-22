@@ -3190,7 +3190,7 @@ LOptionsFile *ScribeWnd::GetOptions(bool Create)
 	if (!d->Options && Create)
 	{
 		LAssert(!"Not here... do it in LoadOptions.");
-		return false;
+		return NULL;
 	}
 
 	return d->Options;
@@ -11592,28 +11592,32 @@ void ScribeWnd::MailMerge(LArray<ListAddr*> &Contacts, const char *FileName, Mai
 				char Msg[256];
 				sprintf_s(Msg, sizeof(Msg), LLoadString(IDS_MAIL_MERGE_Q), Msgs.Length());
 				
-				LAlert Ask(this, AppName, Msg,
+				auto Ask = new LAlert(this, AppName, Msg,
 					LLoadString(IDS_SAVE_TO_OUTBOX), LLoadString(IDS_CANCEL));
 
-				switch (Ask.DoModal())
+				Ask->DoModal([&](auto dlg, auto id)
 				{
-					case 1: // Save To Outbox
+					switch (id)
 					{
-						for (size_t i=0; i<Msgs.Length(); i++)
+						case 1: // Save To Outbox
 						{
-							Msgs[i]->Save(Outbox);
+							for (size_t i=0; i<Msgs.Length(); i++)
+							{
+								Msgs[i]->Save(Outbox);
+							}
+							break;
 						}
-						break;
-					}
-					case 2: // Cancel
-					{
-						for (size_t i=0; i<Msgs.Length(); i++)
+						case 2: // Cancel
 						{
-							Msgs[i]->OnDelete();
+							for (size_t i=0; i<Msgs.Length(); i++)
+							{
+								Msgs[i]->OnDelete();
+							}
+							break;
 						}
-						break;
 					}
-				}
+					delete dlg;
+				});
 			}
 			else
 			{

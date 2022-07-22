@@ -992,29 +992,32 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 		}
 		case IDM_RENAME:
 		{
-			FolderNameDlg Dlg(mt, GetName(true));
-			if (Dlg.DoModal() &&
-				ValidStr(Dlg.Name))
+			auto Dlg = new FolderNameDlg(mt, GetName(true));
+			Dlg->DoModal([&](auto dlg, auto id)
 			{
-				// check for folder name conflicts...
-				ScribeFolder *ParentFolder = GetFolder();
-				LString Path;
-				if (ParentFolder)
-				    Path = ParentFolder->GetPath();
-				if (Path)
+				if (id && ValidStr(Dlg->Name))
 				{
-					char s[256];
-					sprintf_s(s, sizeof(s), "%s/%s", Path.Get(), Dlg.Name);
-					if (App->GetFolder(s))
+					// check for folder name conflicts...
+					ScribeFolder *ParentFolder = GetFolder();
+					LString Path;
+					if (ParentFolder)
+					    Path = ParentFolder->GetPath();
+					if (Path)
 					{
-						LgiMsg(mt, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);
-						return;
+						char s[256];
+						sprintf_s(s, sizeof(s), "%s/%s", Path.Get(), Dlg->Name);
+						if (App->GetFolder(s))
+						{
+							LgiMsg(mt, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);
+							return;
+						}
 					}
-				}
 
-				// change the folders name...
-				OnRename(Dlg.Name);
-			}
+					// change the folders name...
+					OnRename(Dlg->Name);
+				}
+				delete dlg;
+			});
 			break;
 		}
 		case IDM_EXPORT:
@@ -1026,31 +1029,34 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 				break;
 			}
 
-			LFileSelect s;
-			s.Name(DropName);
-			s.Parent(mt);
-			if (!s.Save())
-				break;
-
-			if (LFileExists(s.Name()))
+			auto s = new LFileSelect(mt);
+			s->Name(DropName);
+			s->Save([&](auto dlg, auto status)
 			{
-				LString a, b;
-				a.Printf(LLoadString(IDS_ERROR_FILE_EXISTS), s.Name());
-				b.Printf("\n%s\n", LLoadString(IDS_ERROR_FILE_OVERWRITE));
-				if (LgiMsg(GetTree(), a + b, AppName, MB_YESNO) == IDNO)
-					break;
-			}
+				LAutoPtr<LFileSelect> mem(dlg);
+				if (status)
+				{
+					if (LFileExists(s->Name()))
+					{
+						LString a, b;
+						a.Printf(LLoadString(IDS_ERROR_FILE_EXISTS), s->Name());
+						b.Printf("\n%s\n", LLoadString(IDS_ERROR_FILE_OVERWRITE));
+						if (LgiMsg(GetTree(), a + b, AppName, MB_YESNO) == IDNO)
+							return;
+					}
 
-			LAutoPtr<LFile> f(new LFile);
-			if (!f || !f->Open(s.Name(), O_WRITE))
-			{
-				LgiTrace("%s:%i - Failed to open '%s' for writing.\n", _FL, s.Name());
-				break;
-			}
-			
-			f->SetSize(0);
-			LAutoPtr<LStreamI> str(f.Release());
-			ExportAsync(str, ExportMimeType);
+					LAutoPtr<LFile> f(new LFile);
+					if (!f || !f->Open(s->Name(), O_WRITE))
+					{
+						LgiTrace("%s:%i - Failed to open '%s' for writing.\n", _FL, s->Name());
+						return;
+					}
+					
+					f->SetSize(0);
+					LAutoPtr<LStreamI> str(f.Release());
+					ExportAsync(str, ExportMimeType);
+				}
+			});
 			break;
 		}
 		case IDM_EMPTY:
@@ -1134,19 +1140,22 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 		}
 		case IDM_MERGE_FILE:
 		{
-			LFileSelect s;
-			s.Parent(mt);
-			s.Type("Email Template", "*.txt;*.eml");
-			if (s.Open())
+			auto s = new LFileSelect(mt);
+			s->Type("Email Template", "*.txt;*.eml");
+			s->Open([&](auto dlg, auto id)
 			{
-				LArray<ListAddr*> Recip;
-				for (auto i: Items)
+				if (id)
 				{
-					Recip.Add(new ListAddr(i->IsContact()));
+					LArray<ListAddr*> Recip;
+					for (auto i: Items)
+					{
+						Recip.Add(new ListAddr(i->IsContact()));
+					}
+					App->MailMerge(Recip, s->Name(), 0);
+					Recip.DeleteObjects();
 				}
-				App->MailMerge(Recip, s.Name(), 0);
-				Recip.DeleteObjects();
-			}
+				delete dlg;
+			});
 			break;
 		}
 		case IDM_UNDELETE:

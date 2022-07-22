@@ -427,16 +427,19 @@ void ContactGroup::OnMouseClick(LMouse &m)
 					}
 					case IDM_MERGE_FILE:
 					{
-						LFileSelect s;
-						s.Parent(App);
-						s.Type("Email Template", "*.txt;*.eml");
-						if (s.Open())
+						auto s = new LFileSelect(App);
+						s->Type("Email Template", "*.txt;*.eml");
+						s->Open([&](auto dlg, auto status)
 						{
-							LArray<ListAddr*> Recip;
-							if (ConvertList(this, Recip))
-								App->MailMerge(Recip, s.Name(), 0);
-							Recip.DeleteObjects();
-						}
+							if (status)
+							{
+								LArray<ListAddr*> Recip;
+								if (ConvertList(this, Recip))
+									App->MailMerge(Recip, s->Name(), 0);
+								Recip.DeleteObjects();
+							}
+							delete dlg;
+						});
 						break;
 					}
 					default:

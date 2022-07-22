@@ -123,75 +123,78 @@ int ScribeFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 	{
 		case IDC_BROWSE_NEW:
 		{
-			LFileSelect Select;
+			auto Select = new LFileSelect(this);
 			auto Txt = GetCtrlName(IDC_NEW_FOLDER);
 			if (Txt)
 			{
 				char Def[MAX_PATH_LEN];
 				strcpy_s(Def, sizeof(Def), Txt);
 				LTrimDir(Def);
-				Select.InitialDir(Def);
+				Select->InitialDir(Def);
 			}
 			else
 			{
-				Select.InitialDir(LGetExePath());
+				Select->InitialDir(LGetExePath());
 			}
 			
 
-			Select.Parent(this);
-			Select.Type("v3 Mail Store", "*.sqlite");
-			Select.Type("All Files", LGI_ALL_FILES);
+			Select->Type("v3 Mail Store", "*.sqlite");
+			Select->Type("All Files", LGI_ALL_FILES);
 
-			if (Select.Save())
+			Select->Save([&](auto dlg, auto status)
 			{
-				char Def[MAX_PATH_LEN];
-				strcpy_s(Def, sizeof(Def), Select.Name());
-				char *d = strrchr(Def, DIR_CHAR);
-				if (d)
+				if (status)
 				{
-					char *e = strrchr(d, '.');
-					if (!e)
+					char Def[MAX_PATH_LEN];
+					strcpy_s(Def, sizeof(Def), Select->Name());
+					char *d = strrchr(Def, DIR_CHAR);
+					if (d)
 					{
-						if (Select.SelectedType() == 0)
+						char *e = strrchr(d, '.');
+						if (!e)
 						{
-							strcat(d, ".mail3");
+							if (Select->SelectedType() == 0)
+								strcat(d, ".mail3");
 						}
-						else break;
-					}
 
-					SetCtrlName(IDC_NEW_FOLDER, Def);
+						SetCtrlName(IDC_NEW_FOLDER, Def);
+					}
+					else LgiMsg(this, "Error: Invalid path.", AppName);
 				}
-				else LgiMsg(this, "Error: Invalid path.", AppName);
-			}
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_BROWSE_EXISTING:
 		{
-			LFileSelect Select;
+			auto Select = new LFileSelect(this);
 			char Def[300];
 			auto Txt = GetCtrlName(IDC_EXISTING_FOLDER);
 			if (Txt)
 			{
 				strcpy_s(Def, sizeof(Def), Txt);
 				LTrimDir(Def);
-				Select.InitialDir(Def);
+				Select->InitialDir(Def);
 			}
 			else
 			{
-				Select.InitialDir(LGetExePath());
+				Select->InitialDir(LGetExePath());
 			}
 
-			Select.Parent(this);
-			Select.Type("v3 Mail Store", "*.sqlite");
-			Select.Type("All Files", LGI_ALL_FILES);
+			Select->Type("v3 Mail Store", "*.sqlite");
+			Select->Type("All Files", LGI_ALL_FILES);
 
-			if (Select.Open())
+			Select->Open([&](auto dlg, auto id)
 			{
-				if (LFileExists(Select.Name()) || LDirExists(Select.Name()))
-					SetCtrlName(IDC_EXISTING_FOLDER, Select.Name());
-				else
-					LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_DONT_EXIST), AppName, MB_OK, Select.Name());
-			}
+				if (id)
+				{
+					if (LFileExists(Select->Name()) || LDirExists(Select->Name()))
+						SetCtrlName(IDC_EXISTING_FOLDER, Select->Name());
+					else
+						LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_DONT_EXIST), AppName, MB_OK, Select->Name());
+				}
+				delete dlg;
+			});
 			break;
 		}
 		// case IDC_ACTION:

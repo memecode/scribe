@@ -288,9 +288,7 @@ void GAccountStatusItem::OnMouseClick(LMouse &m)
 			case IDM_CONFIG:
 			{
 				if (Account->GetApp()->GetAccountSettingsAccess(GetList(), ScribeReadAccess))
-				{
-					Account->InitUI(Parent);
-				}
+					Account->InitUI(Parent, 0, NULL);
 				break;
 			}
 		}

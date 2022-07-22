@@ -106,8 +106,6 @@ public:
 				SetCtrlEnabled(IDC_FPW_ADMIN, false);
 			}
 			SetCtrlValue(IDC_FOLDER_WRITE, p);
-
-			DoModal();
 		}
 	}
 

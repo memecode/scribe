@@ -1471,7 +1471,7 @@ void Calendar::DoContextMenu(LMouse &m, LView *Parent)
 			}
 			case IDM_EXPORT:
 			{
-				ExportAll(GetList(), sMimeVCalendar);
+				ExportAll(GetList(), sMimeVCalendar, NULL);
 				break;
 			}
 			case IDM_INSPECT:

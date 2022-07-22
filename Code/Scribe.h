@@ -459,7 +459,7 @@ public:
 	virtual bool Export(LStreamI &f, const char *MimeType) = 0;
 	
 	/// This exports all the selected items
-	bool ExportAll(LViewI *Parent, const char *ExportMimeType);
+	void ExportAll(LViewI *Parent, const char *ExportMimeType, std::function<void(bool)> Callback);
 
 	// UI
 	bool OnKey(LKey &k) override;

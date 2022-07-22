@@ -6629,7 +6629,7 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 			}
 			case IDM_EXPORT:
 			{
-				ExportAll(Parent, sMimeMessage);
+				ExportAll(Parent, sMimeMessage, NULL);
 				break;
 			}
 			case IDM_REPLY:

@@ -748,11 +748,10 @@ void Attachment::OnSaveAs(LView *Parent)
 	{
 		CleanFileName(n);
 
-		LFileSelect Select;
+		auto Select = new LFileSelect(Parent);
 
-		Select.Parent(Parent);
-		Select.Type("All files", LGI_ALL_FILES);
-		Select.Name(n);
+		Select->Type("All files", LGI_ALL_FILES);
+		Select->Name(n);
 
 		List<LListItem> Files;
 
@@ -767,23 +766,10 @@ void Attachment::OnSaveAs(LView *Parent)
 
 		if (Files.Length() > 0)
 		{
-			bool Status = false;
-
-			if (Files.Length() > 1)
-			{
-				// multiple files, ask which directory to write to
-				Status = Select.OpenFolder();
-			}
-			else
-			{
-				// single file, ask for filename and path
-				Status = Select.Save();
-			}
-
-			if (Status)
+			auto DoSave = [&](LFileSelect *Select)
 			{
 				char Dir[MAX_PATH_LEN];
-				strcpy_s(Dir, sizeof(Dir), Select.Name());
+				strcpy_s(Dir, sizeof(Dir), Select->Name());
 
 				if (Files.Length() > 1)
 				{
@@ -813,6 +799,27 @@ void Attachment::OnSaveAs(LView *Parent)
 						a->SaveTo(Dir, false, Parent);
 					}
 				}
+			};
+
+			if (Files.Length() > 1)
+			{
+				// multiple files, ask which directory to write to
+				Select->OpenFolder([&](auto dlg, auto status)
+				{
+					if (status)
+						DoSave(dlg);
+					delete dlg;
+				});
+			}
+			else
+			{
+				// single file, ask for filename and path
+				Select->Save([&](auto dlg, auto status)
+				{
+					if (status)
+						DoSave(dlg);
+					delete dlg;
+				});
 			}
 		}
 

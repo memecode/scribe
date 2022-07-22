@@ -447,7 +447,9 @@ bool Thing::GetFormats(LDragFormats &Formats)
 	return Formats.Length() > 0;
 }
 
-bool Thing::ExportAll(LViewI *Parent, const char *ExportMimeType)
+void Thing::ExportAll(	LViewI *Parent,
+						const char *ExportMimeType,
+						std::function<void(bool)> Callback)
 {
 	List<Thing> Sel;
 	if (GetList())
@@ -455,86 +457,98 @@ bool Thing::ExportAll(LViewI *Parent, const char *ExportMimeType)
 	else
 		Sel.Insert(this);
 	
-	LFileSelect Select;
-	if (Sel.Length() == 1)
-		Select.Name(LGetLeaf(GetDropFileName()));
-	Select.Parent(Parent);
-	Select.Type("Email", "*.eml");
-	
-	if
-	(
-		Sel.Length() > 1
-		?
-		!Select.OpenFolder()
-		:
-		!Select.Save()
-	)
-		return false;
-
-	int Exported = 0;
-	int Errors = 0;
-	for (auto m: Sel)
+	auto Process = [&](LFileSelect *Select)
 	{
-		const char *Out;
-		char Buf[MAX_PATH_LEN];
-		if (Sel.Length() == 1)
+		int Exported = 0;
+		int Errors = 0;
+		for (auto m: Sel)
 		{
-			Out = Select.Name();
-		}
-		else
-		{
-			char *Leaf = LGetLeaf(m->GetDropFileName());
-			if (!Leaf)
+			const char *Out;
+			char Buf[MAX_PATH_LEN];
+			if (Sel.Length() == 1)
 			{
-				Errors++;
-				continue;
+				Out = Select->Name();
 			}
-			
-			// Make a unique name...
-			for (int Index = 1; Index < 1000; Index++)
+			else
 			{
-				LString Nm = Leaf;
-				if (Index > 1)
-				{
-					LString::Array a = Nm.RSplit(".", 1);
-					if (a.Length() == 2)
-						Nm.Printf("%s %i.%s", a[0].Get(), Index, a[1].Get());
-					else
-						Nm.Printf("%s %i", a[0].Get(), Index);
-				}				
-				if (!LMakePath(Buf, sizeof(Buf), Select.Name(), Nm))
+				char *Leaf = LGetLeaf(m->GetDropFileName());
+				if (!Leaf)
 				{
 					Errors++;
-					break;
+					continue;
 				}
 				
-				if (!LFileExists(Buf))
-					break;
-			}
-			
-			Out = Buf;
-		}					
-	
-		LFile f;
-		if (!f.Open(Out, O_WRITE))
-		{
-			LgiTrace("%s:%i - Couldn't open '%s' for writing.", _FL, Select.Name());
-			Errors++;
-		}
-		else
-		{
-			f.SetSize(0);
-			if (m->Export(f, ExportMimeType))
-				Exported++;
-			else
+				// Make a unique name...
+				for (int Index = 1; Index < 1000; Index++)
+				{
+					LString Nm = Leaf;
+					if (Index > 1)
+					{
+						LString::Array a = Nm.RSplit(".", 1);
+						if (a.Length() == 2)
+							Nm.Printf("%s %i.%s", a[0].Get(), Index, a[1].Get());
+						else
+							Nm.Printf("%s %i", a[0].Get(), Index);
+					}				
+					if (!LMakePath(Buf, sizeof(Buf), Select->Name(), Nm))
+					{
+						Errors++;
+						break;
+					}
+					
+					if (!LFileExists(Buf))
+						break;
+				}
+				
+				Out = Buf;
+			}					
+		
+			LFile f;
+			if (!f.Open(Out, O_WRITE))
+			{
+				LgiTrace("%s:%i - Couldn't open '%s' for writing.", _FL, Select->Name());
 				Errors++;
+			}
+			else
+			{
+				f.SetSize(0);
+				if (m->Export(f, ExportMimeType))
+					Exported++;
+				else
+					Errors++;
+			}
 		}
+
+		if (Errors > 0)
+			LgiMsg(Parent, "Export failed: %i exported, %i errors.", AppName, MB_OK, Exported, Errors);
+			
+		if (Callback)
+			Callback(Errors == 0);
+	};
+	
+	auto Select = new LFileSelect(Parent);
+	if (Sel.Length() == 1)
+		Select->Name(LGetLeaf(GetDropFileName()));
+	Select->Type("Email", "*.eml");
+
+	if (Sel.Length() > 1)
+	{
+		Select->OpenFolder([&](auto dlg, auto status)
+		{
+			if (status)
+				Process(dlg);
+			delete dlg;
+		});
 	}
-
-	if (Errors > 0)
-		LgiMsg(Parent, "Export failed: %i exported, %i errors.", AppName, MB_OK, Exported, Errors);
-
-	return Errors == 0;
+	else
+	{
+		Select->Save([&](auto dlg, auto status)
+		{
+			if (status)
+				Process(dlg);
+			delete dlg;
+		});
+	}
 }
 
 bool Thing::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)

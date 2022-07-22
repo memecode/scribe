@@ -1598,7 +1598,7 @@ public:
 	}
 };
 
-int LHtmlMsg(LViewI *Parent, const char *Html, const char *Title, int Type, ...)
+void LHtmlMsg(std::function<void(int)> Callback, LViewI *Parent, const char *Html, const char *Title, int Type, ...)
 {
 	va_list Arg;
 	va_start(Arg, Type);
@@ -1608,8 +1608,13 @@ int LHtmlMsg(LViewI *Parent, const char *Html, const char *Title, int Type, ...)
 	vsprintf_s(Msg, length, Html, Arg);
 	va_end(Arg);
 
-	HtmlMsg Dlg(Parent, Msg, Title, Type);
-	return Dlg.DoModal();
+	auto Dlg = new HtmlMsg(Parent, Msg, Title, Type);
+	Dlg->DoModal([&](auto dlg, auto id)
+	{
+		if (Callback)
+			Callback(id);
+		delete dlg;
+	});
 }
 
 /////////////////////////////////////////////////////////////////////////////
