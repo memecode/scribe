@@ -360,7 +360,6 @@ Accountlet::Accountlet(ScribeAccount *a) : PrivLock("Accountlet")
 	ConnectionStatus = true;
 	OptPassword = 0;
 	Client = 0;
-	TempPsw = 0;
 	LastOnline = 0;
 	Parent = 0;
 
@@ -393,7 +392,6 @@ Accountlet::~Accountlet()
 		Lck->d->Log.DeleteObjects();
 		Lck.Reset();
 	}
-	DeleteArray(TempPsw);
 	DeleteObj(Root);
 	DeleteObj(DataStore);
 }
@@ -749,14 +747,40 @@ bool Accountlet::Connect(LView *p, bool quiet)
 					Lck->d->Log.DeleteObjects();
 					Lck.Reset();
 				}
-		
-				// Start thread
-				if (Thread.Reset(new AccountletThread(this, 0)))
+
+				auto StartThread = [&]()
 				{
-					Status = true;
-					Thread->Run();
-					Account->Parent->OnBeforeConnect(Account, IsReceive());
+					if (Thread.Reset(new AccountletThread(this, 0)))
+					{
+						Status = true;
+						Thread->Run();
+						Account->Parent->OnBeforeConnect(Account, IsReceive());
+					}
+				};
+
+				// Do we need the password?
+				LString Password;
+				GPassword Psw;
+				GetPassword(&Psw);
+				Password = Psw.Get();
+				auto User = UserName();
+
+				if (User.Str() && !ValidStr(Password))
+				{
+					auto RemoteHost = Server();
+
+					LString Msg;
+					Msg.Printf(LLoadString(IDS_ASK_ACCOUNT_PASSWORD), User.Str(), RemoteHost.Str());
+					GetApp()->GetUserInput(	Parent ? Parent : GetApp(),
+											Msg,
+											true,
+											[&](auto Psw)
+											{
+												this->TempPsw = Psw;
+												StartThread();
+											});
 				}
+				else StartThread();		
 			}
 		}
 
@@ -1835,9 +1859,9 @@ GetApp()->GetOptions()->GetValue(OPT_DebugTrace, v);
 DebugTrace = v.CastInt32();
 if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), TimeDelta());
 
-	LVariant RemoteHost = Server();
-	LVariant RemotePort = Port();
-	LVariant User = UserName();
+	auto RemoteHost = Server();
+	auto RemotePort = Port();
+	auto User = UserName();
 
 	// int LeaveCopy = LeaveOnServer();
 	int DeleteIfLargerThan = DeleteLarger() ? DeleteSize() << 10 : 0;
@@ -1848,50 +1872,12 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 	Params.MaxSize = DownloadLimit() << 10;
 
 	auto MailSourceType = ProtocolStrToEnum(Protocol().Str());
-	/*
-	LXmlTag *Limits = LAppInst->GetConfig("Scribe-Limits");
-	if (Limits)
-	{
-		GMailStore *Ms = GetApp()->GetDefaultMailStore();
-		if (Ms)
-		{
-	        #ifdef _MSC_VER
-	        // #pragma message(__LOC__"no advanced receive parameters support.")
-	        #endif
-			#if 0 // fixme
-			Params.KitFileName = Kit->GetFileName();
 
-			uint64 Size;
-			if (LGetDriveInfo(Kit->GetFileName(), 0, &Size))
-			{
-				char *s;
-				if (s = Limits->GetAttr("NoAttach"))
-				{
-					Params.NoAttachLimit = ConvertRelitiveSize(s, Size);
-				}
-				if (s = Limits->GetAttr("NoDownload"))
-				{
-					Params.NoDownloadLimit = ConvertRelitiveSize(s, Size);
-				}
-				if (s = Limits->GetAttr("Lines"))
-				{
-					Params.DownloadLines = atoi(s);
-				}
-				if (Params.NoAttachLimit < Params.NoDownloadLimit)
-				{
-					Params.NoAttachLimit = Params.NoDownloadLimit;
-				}
-			}
-			#endif
-		}
-	}
-	*/
-
-	char Password[256] = "";
+	LString Password;
 
 	GPassword Psw;
 	GetPassword(&Psw);
-	Psw.Get(Password);
+	Password = Psw.Get();
 
 	MailSource *Source = 0;
 	LVariant RecHotFolder = HotFolder();
@@ -1930,7 +1916,7 @@ if (DebugTrace) LgiTrace("Receive(%i) protocol=%i client=%p, time=%i\n", Account
 
 	if (Source)
 	{
-		LAutoString HttpProxy = GetApp()->GetHttpProxy();
+		auto HttpProxy = GetApp()->GetHttpProxy();
 		if (HttpProxy)
 		{
 			LUri Host(HttpProxy);
@@ -1939,27 +1925,18 @@ if (DebugTrace) LgiTrace("Receive(%i) protocol=%i client=%p, time=%i\n", Account
 		}
 	
 		// Setup logging
-		// GProtocolLogger Logger(GetApp(), M_SCRIBE_LOG_MSG, &Log);
 		Source->Logger = this;
 		Source->Items = &Group;
 		Source->Transfer = &Item;
 
-		int OpenFlags = MakeOpenFlags(Account, false);
-		bool IsTempPsw = !ValidStr(Password) && ValidStr(User.Str());
-		if (IsTempPsw)
+		auto OpenFlags = MakeOpenFlags(Account, false);
+		auto NeedsPassword = !ValidStr(Password) && ValidStr(User.Str());
+		if (NeedsPassword)
 		{
 			if (TempPsw)
-			{
-				strcpy_s(Password, sizeof(Password), TempPsw);
-			}
+				Password = TempPsw;
 			else if (!SecureAuth())
-			{
-				LString Str;
-				Str.Printf(LLoadString(IDS_ASK_ACCOUNT_PASSWORD), User.Str(), RemoteHost.Str());				
-				auto Psw = GetApp()->GetUserInput(Parent ? Parent : GetApp(), Str, true);
-				if (Psw)
-					strcpy_s(Password, sizeof(Password), Psw.Get());
-			}
+				LAssert(!"Need to ask user for password BEFORE we're in the worker thread.");
 		}
 
 if (DebugTrace) LgiTrace("Receive(%i) opening connection..., time=%i\n", Account->GetIndex(), TimeDelta());
@@ -1974,7 +1951,7 @@ if (DebugTrace) LgiTrace("Receive(%i) opening connection..., time=%i\n", Account
 		}
 		else if (!Source->Open(	CreateSocket(false, GetAccount(), false),
 								RemoteHost.Str(),
-								RemotePort.CastInt32(),
+								RemotePort,
 								User.Str(),
 								Password,
 								SettingStore,
@@ -1985,10 +1962,6 @@ if (DebugTrace) LgiTrace("Receive(%i) opening connection..., time=%i\n", Account
 		else
 		{
 if (DebugTrace) LgiTrace("Receive(%i) connected, time=%i\n", Account->GetIndex(), TimeDelta());
-			if (!TempPsw && IsTempPsw)
-			{
-				TempPsw = NewStr(Password);
-			}
 			SecondsTillOnline = -1;
 
 			// Get all the messages..

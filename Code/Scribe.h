@@ -1602,7 +1602,7 @@ protected:
 	bool ConnectionStatus;
 	MailProtocol *Client;
 	uint64 LastOnline;
-	char *TempPsw;
+	LString TempPsw;
 	bool Quiet;
 	LView *Parent;
 
@@ -2224,7 +2224,7 @@ protected:
 	int				AdjustAllObjectSizes(LDataI *Item);
 	bool			CleanFolders(ScribeFolder *f);
 	LDataStoreI		*CreateDataStore(char *Full, bool CreateIfMissing);
-	bool			LoadFolders();
+	void			LoadFolders(std::function<void(bool)> Callback);
 	bool			LoadMailStores();
 	bool			UnLoadFolders();
 	void			AddFolderToMru(char *FileName);
@@ -2275,7 +2275,7 @@ public:
 
 	void			Update(int What = 0);
 	void			UpdateUnRead(ScribeFolder *Folder, int Delta);
-	bool			ThingPrint(ThingType *m, LPrinter *Info = 0, LView *Parent = 0, int MaxPage = -1);
+	void			ThingPrint(std::function<void(bool)> Callback, ThingType *m, LPrinter *Info = NULL, LView *Parent = NULL, int MaxPage = -1);
 	bool			OpenAMail(ScribeFolder *Folder);
 	void			BuildDynMenus();
 	LDocView		*CreateTextControl(int Id, const char *MimeType, bool Editor, Mail *m = 0);
@@ -2284,7 +2284,7 @@ public:
 	void			SetLayout(LayoutMode Mode = OptionsLayout);
 	bool			IsMyEmail(const char *Email);
 	bool			SetItemPreview(LView *v);
-	void			GetPortableType(std::function<void(LOptionsFile::PortableType)> callback);
+	LOptionsFile::PortableType GetPortableType();
 	ScribeRemoteContent RemoteContent_GetSenderStatus(const char *Addr);
 	void			RemoteContent_ClearCache();
 	void			RemoteContent_AddSender(const char *Addr, bool WhiteList);
@@ -2363,7 +2363,7 @@ public:
 	LToolBar		*LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LImageList> &Img);
 	class LVmDebuggerCallback *GetDebuggerCallback();
 	class GpgConnector *GetGpgConnector();
-	LString			GetUserInput(LView *Parent, LString Msg, bool Password = false);
+	void			GetUserInput(LView *Parent, LString Msg, bool Password, std::function<void(LString)> Callback);
 
 	int				GetCalendarSources(LArray<CalendarSource*> &Sources);
 
@@ -2379,9 +2379,9 @@ public:
 	bool			LogFilterActivity();
 	ScribeFolder *FindContainer(LDataFolderI *f);
 	bool			SaveDirtyObjects(int TimeLimitMs = 100);
-	void			CreateSpellObject(std::function<void(LSpellCheck*)> callback);
-	void			GetSpellThread(std::function<void(LSpellCheck*)> callback, bool OverrideOpt = false);
-	void			SetSpellThreadParams(LSpellCheck *Thread, std::function<void(LSpellCheck*, bool)> callback);
+	class LSpellCheck *CreateSpellObject();
+	class LSpellCheck *GetSpellThread(bool OverrideOpt = false);
+	bool			SetSpellThreadParams(LSpellCheck *Thread);
 	void			OnSpellerSettingChange();
 	bool			OnMailTransferEvent(MailTransferEvent *e);
 	LViewI			*GetView() { return this; }
@@ -2412,7 +2412,7 @@ public:
 	// Options
 	LOptionsFile	*GetOptions(bool Create = false) override;
 	bool			ScanForOptionsFiles(LArray<OptionsInfo> &Inf, LSystemPath PathType);
-	void			LoadOptions(std::function<void(bool)> callback);
+	bool			LoadOptions();
 	bool			SaveOptions();
 	bool			IsSending() { return false; }
 	bool			ShowToolbarText();

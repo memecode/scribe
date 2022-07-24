@@ -47,8 +47,10 @@ extern bool SearchHtml
 	const char *ResultExp
 );
 
-extern int LHtmlMsg
+extern void LHtmlMsg
 (
+	/// The callback to receive the status
+	std::function<void(int)> Callback,
 	/// The parent view or NULL if none available
 	LViewI *Parent,
 	/// The message's text. This is a printf format string that you can pass arguments to

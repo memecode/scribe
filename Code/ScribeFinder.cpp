@@ -1211,7 +1211,7 @@ int FindWnd::OnNotify(LViewI *Col, LNotification n)
 				Dlg->DoModal([&](auto dlg, auto id)
 				{
 					if (id)
-						Folder->Name(Dlg->Get());
+						this->Folder->Name(Dlg->Get());
 					delete dlg;
 				});
 			}

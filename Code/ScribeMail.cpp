@@ -1956,7 +1956,7 @@ bool MailUi::OnViewKey(LView *v, LKey &k)
 			case 'p':
 			case 'P':
 			{
-				App->ThingPrint(GetItem(), NULL, this);
+				App->ThingPrint(NULL, GetItem(), NULL, this);
 				break;
 			}
 			case 'f':
@@ -3201,7 +3201,7 @@ int MailUi::OnCommand(int Cmd, int Event, OsView From)
 					OnDataEntered();
 					OnSave();
 				}
-				App->ThingPrint(GetItem(), 0, this);
+				App->ThingPrint(NULL, GetItem(), 0, this);
 			}
 			break;
 		}

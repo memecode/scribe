@@ -1271,243 +1271,242 @@ ScribeWnd::ScribeWnd() :
 	printf("%s\n", App.Get());
 	#endif
 
-	LoadOptions([&](auto status)
+	if (!LoadOptions())
 	{
-		if (!status)
+		ScribeState = ScribeExiting;
+		return;
+	}
+	ScribeOptionsDefaults(d->Options);
+
+	#define DefaultIntOption(opt, def) { LVariant v; if (!GetOptions()->GetValue(opt, v)) \
+											GetOptions()->SetValue(opt, v = (int)def); }
+	#define DefaultStrOption(opt, def) { LVariant v; if (!GetOptions()->GetValue(opt, v)) \
+											GetOptions()->SetValue(opt, v = def); }
+	DefaultIntOption(OPT_DefaultAlternative, 1);
+	DefaultIntOption(OPT_BoldUnread, 1);
+	DefaultIntOption(OPT_PreviewLines, 1);
+	DefaultIntOption(OPT_AutoDeleteExe, 1);
+	DefaultIntOption(OPT_DefaultReplyAllSetting, MAIL_ADDR_BCC);
+	DefaultIntOption(OPT_BlinkNewMail, 1);
+	DefaultIntOption(OPT_MarkReadAfterSeconds, 5);
+	DefaultStrOption(OPT_BayesThreshold, "0.9");
+	DefaultIntOption(OPT_SoftwareUpdate, 1);
+	DefaultIntOption(OPT_ResizeImgAttachments, false);
+	DefaultIntOption(OPT_ResizeJpegQual, 80);
+	DefaultIntOption(OPT_ResizeMaxPx, 1024);
+	DefaultIntOption(OPT_ResizeMaxKb, 200);
+	DefaultIntOption(OPT_RegisterWindowsClient, 1);
+	DefaultIntOption(OPT_HasTemplates, 0);
+	DefaultIntOption(OPT_HasCalendar, 1);
+	DefaultIntOption(OPT_HasGroups, 1);
+	DefaultIntOption(OPT_HasFilters, 1);
+	DefaultIntOption(OPT_HasSpam, 0);
+
+	LVariant GlyphSub;
+	if (GetOptions()->GetValue(OPT_GlyphSub, GlyphSub))
+	{
+		bool UseGlyphSub = GlyphSub.CastInt32() != 0;
+		LSysFont->SubGlyphs(UseGlyphSub);
+		LSysBold->SubGlyphs(UseGlyphSub);
+		LFontSystem::Inst()->SetDefaultGlyphSub(UseGlyphSub);
+	}
+	else
+	{
+		GetOptions()->SetValue(OPT_GlyphSub, GlyphSub = LFontSystem::Inst()->GetDefaultGlyphSub());
+	}
+
+	{
+		// Limit the size of the 'Scribe.txt' log file
+		char p[MAX_PATH_LEN];
+		if (LgiTraceGetFilePath(p, sizeof(p)))
 		{
+			int64 Sz = LFileSize(p);
+			#define MiB * 1024 * 1024
+			if (Sz > (3 MiB))
+				FileDev->Delete(p);
+		}
+	}
+
+	// Process pre-UI options
+	LVariant SizeAdj;
+	int SzAdj = SizeAdj.CastInt32();
+	if (GetOptions()->GetValue(OPT_UiFontSize, SizeAdj) &&
+		(SzAdj = SizeAdj.CastInt32()) >= 0 &&
+		SzAdj < 5)
+	{
+		SzAdj -= 2;
+		if (SzAdj)
+		{
+			int Pt = LSysFont->PointSize();
+			
+			LSysFont->PointSize(Pt + SzAdj);
+			LSysFont->Create();
+
+			LSysBold->PointSize(Pt + SzAdj);
+			LSysBold->Create();
+			
+			LFont *m = LMenu::GetFont();
+			if (m)
+			{
+				m->PointSize(m->PointSize() + SzAdj);
+				m->Create();
+			}
+		}
+	}
+	else
+	{
+		GetOptions()->SetValue(OPT_UiFontSize, SizeAdj = 2);
+	}
+
+	// Resources and languages
+	LVariant LangId;
+	auto SetLanguage = [&]()
+	{
+		if (GetOptions()->GetValue(OPT_UiLanguage, LangId))
+		{
+			// Set the language to load...
+			LAppInst->SetConfig("Language", LangId.Str());
+		}
+		LResources::SetLoadStyles(true);
+
+		// Load the resources (with the current lang)
+		if (!LgiGetResObj(true, "Scribe"))
+		{
+			LgiMsg(NULL, "The resource file 'Scribe.lr8' is missing.", AppName);
 			ScribeState = ScribeExiting;
-			return;
+			LCloseApp();
 		}
+	};
 
-		ScribeOptionsDefaults(d->Options);
+	SetLanguage();
 
-		#define DefaultIntOption(opt, def) { LVariant v; if (!GetOptions()->GetValue(opt, v)) \
-												GetOptions()->SetValue(opt, v = (int)def); }
-		#define DefaultStrOption(opt, def) { LVariant v; if (!GetOptions()->GetValue(opt, v)) \
-												GetOptions()->SetValue(opt, v = def); }
-		DefaultIntOption(OPT_DefaultAlternative, 1);
-		DefaultIntOption(OPT_BoldUnread, 1);
-		DefaultIntOption(OPT_PreviewLines, 1);
-		DefaultIntOption(OPT_AutoDeleteExe, 1);
-		DefaultIntOption(OPT_DefaultReplyAllSetting, MAIL_ADDR_BCC);
-		DefaultIntOption(OPT_BlinkNewMail, 1);
-		DefaultIntOption(OPT_MarkReadAfterSeconds, 5);
-		DefaultStrOption(OPT_BayesThreshold, "0.9");
-		DefaultIntOption(OPT_SoftwareUpdate, 1);
-		DefaultIntOption(OPT_ResizeImgAttachments, false);
-		DefaultIntOption(OPT_ResizeJpegQual, 80);
-		DefaultIntOption(OPT_ResizeMaxPx, 1024);
-		DefaultIntOption(OPT_ResizeMaxKb, 200);
-		DefaultIntOption(OPT_RegisterWindowsClient, 1);
-		DefaultIntOption(OPT_HasTemplates, 0);
-		DefaultIntOption(OPT_HasCalendar, 1);
-		DefaultIntOption(OPT_HasGroups, 1);
-		DefaultIntOption(OPT_HasFilters, 1);
-		DefaultIntOption(OPT_HasSpam, 0);
-
-		LVariant GlyphSub;
-		if (GetOptions()->GetValue(OPT_GlyphSub, GlyphSub))
+	auto FinishConstruct = [&]()
+	{
+		#if 1
+		auto CurRes = LgiGetResObj(false);
+		LVariant Theme;
+		if (CurRes && GetOptions()->GetValue(OPT_Theme, Theme))
 		{
-			bool UseGlyphSub = GlyphSub.CastInt32() != 0;
-			LSysFont->SubGlyphs(UseGlyphSub);
-			LSysBold->SubGlyphs(UseGlyphSub);
-			LFontSystem::Inst()->SetDefaultGlyphSub(UseGlyphSub);
-		}
-		else
-		{
-			GetOptions()->SetValue(OPT_GlyphSub, GlyphSub = LFontSystem::Inst()->GetDefaultGlyphSub());
-		}
-
-		{
-			// Limit the size of the 'Scribe.txt' log file
-			char p[MAX_PATH_LEN];
-			if (LgiTraceGetFilePath(p, sizeof(p)))
+			auto Paths = ScribeThemePaths();
+			auto NoTheme = LLoadString(IDS_DEFAULT);
+			if (Theme.Str() &&
+				Stricmp(NoTheme, Theme.Str()))
 			{
-				int64 Sz = LFileSize(p);
-				#define MiB * 1024 * 1024
-				if (Sz > (3 MiB))
-					FileDev->Delete(p);
-			}
-		}
-
-		// Process pre-UI options
-		LVariant SizeAdj;
-		int SzAdj = SizeAdj.CastInt32();
-		if (GetOptions()->GetValue(OPT_UiFontSize, SizeAdj) &&
-			(SzAdj = SizeAdj.CastInt32()) >= 0 &&
-			SzAdj < 5)
-		{
-			SzAdj -= 2;
-			if (SzAdj)
-			{
-				int Pt = LSysFont->PointSize();
-			
-				LSysFont->PointSize(Pt + SzAdj);
-				LSysFont->Create();
-
-				LSysBold->PointSize(Pt + SzAdj);
-				LSysBold->Create();
-			
-				LFont *m = LMenu::GetFont();
-				if (m)
+				for (auto p: Paths)
 				{
-					m->PointSize(m->PointSize() + SzAdj);
-					m->Create();
-				}
-			}
-		}
-		else
-		{
-			GetOptions()->SetValue(OPT_UiFontSize, SizeAdj = 2);
-		}
-
-		// Resources and languages
-		LVariant LangId;
-		auto SetLanguage = [&]()
-		{
-			if (GetOptions()->GetValue(OPT_UiLanguage, LangId))
-			{
-				// Set the language to load...
-				LAppInst->SetConfig("Language", LangId.Str());
-			}
-			LResources::SetLoadStyles(true);
-
-			// Load the resources (with the current lang)
-			if (!LgiGetResObj(true, "Scribe"))
-			{
-				LgiMsg(0, "The resource file 'Scribe.lr8' is missing.", AppName);
-				ScribeState = ScribeExiting;
-				return;
-			}
-		};
-
-		auto FinishInit = [&]()
-		{
-			#if 1
-			auto CurRes = LgiGetResObj(false);
-			LVariant Theme;
-			if (CurRes && GetOptions()->GetValue(OPT_Theme, Theme))
-			{
-				auto Paths = ScribeThemePaths();
-				auto NoTheme = LLoadString(IDS_DEFAULT);
-				if (Theme.Str() &&
-					Stricmp(NoTheme, Theme.Str()))
-				{
-					for (auto p: Paths)
+					LFile::Path Inst(p);
+					Inst += Theme.Str();
+					if (Inst.Exists())
 					{
-						LFile::Path Inst(p);
-						Inst += Theme.Str();
-						if (Inst.Exists())
-						{
-							CurRes->SetThemeFolder(Inst);
-							d->Static->OnSystemColourChange();
-							break;
-						}
+						CurRes->SetThemeFolder(Inst);
+						d->Static->OnSystemColourChange();
+						break;
 					}
 				}
 			}
-			#endif
+		}
+		#endif
 
-			LoadCalendarStringTable();
+		LoadCalendarStringTable();
 
-			ZeroObj(DefaultFolderNames);
-			DefaultFolderNames[FOLDER_INBOX] = LLoadString(IDS_FOLDER_INBOX, "Inbox");
-			DefaultFolderNames[FOLDER_OUTBOX] = LLoadString(IDS_FOLDER_OUTBOX, "Outbox");
-			DefaultFolderNames[FOLDER_SENT] = LLoadString(IDS_FOLDER_SENT, "Sent");
-			DefaultFolderNames[FOLDER_TRASH] = LLoadString(IDS_FOLDER_TRASH, "Trash");
-			DefaultFolderNames[FOLDER_CONTACTS] = LLoadString(IDS_FOLDER_CONTACTS, "Contacts");
-			DefaultFolderNames[FOLDER_TEMPLATES] = LLoadString(IDS_FOLDER_TEMPLATES, "Templates");
-			DefaultFolderNames[FOLDER_FILTERS] = LLoadString(IDS_FOLDER_FILTERS, "Filters");
-			DefaultFolderNames[FOLDER_CALENDAR] = LLoadString(IDS_FOLDER_CALENDAR, "Calendar");
-			DefaultFolderNames[FOLDER_GROUPS] = LLoadString(IDS_FOLDER_GROUPS, "Groups");
-			DefaultFolderNames[FOLDER_SPAM] = LLoadString(IDS_SPAM, "Spam");
+		ZeroObj(DefaultFolderNames);
+		DefaultFolderNames[FOLDER_INBOX] = LLoadString(IDS_FOLDER_INBOX, "Inbox");
+		DefaultFolderNames[FOLDER_OUTBOX] = LLoadString(IDS_FOLDER_OUTBOX, "Outbox");
+		DefaultFolderNames[FOLDER_SENT] = LLoadString(IDS_FOLDER_SENT, "Sent");
+		DefaultFolderNames[FOLDER_TRASH] = LLoadString(IDS_FOLDER_TRASH, "Trash");
+		DefaultFolderNames[FOLDER_CONTACTS] = LLoadString(IDS_FOLDER_CONTACTS, "Contacts");
+		DefaultFolderNames[FOLDER_TEMPLATES] = LLoadString(IDS_FOLDER_TEMPLATES, "Templates");
+		DefaultFolderNames[FOLDER_FILTERS] = LLoadString(IDS_FOLDER_FILTERS, "Filters");
+		DefaultFolderNames[FOLDER_CALENDAR] = LLoadString(IDS_FOLDER_CALENDAR, "Calendar");
+		DefaultFolderNames[FOLDER_GROUPS] = LLoadString(IDS_FOLDER_GROUPS, "Groups");
+		DefaultFolderNames[FOLDER_SPAM] = LLoadString(IDS_SPAM, "Spam");
 
-			LStringPipe RfXml;
-			RfXml.Print(DefaultRfXml,
-						LLoadString(IDS_ORIGINAL_MESSAGE),
-						LLoadString(FIELD_TO),
-						LLoadString(FIELD_FROM),
-						LLoadString(FIELD_SUBJECT),
-						LLoadString(IDS_DATE));
-			{
-				LAutoString Xml(RfXml.NewStr());
-				UpgradeRfOption(this, OPT_TextReplyFormat, "ReplyXml", Xml);
-				UpgradeRfOption(this, OPT_TextForwardFormat, "ForwardXml", Xml);
-			}
-
-			LFontType t;
-			if (t.GetSystemFont("small"))
-			{
-				d->PreviewFont = t.Create();
-				if (d->PreviewFont)
-				{
-					#if defined WIN32
-					d->PreviewFont->PointSize(8);
-					#endif
-				}
-			}
-
-			MoveOnScreen();
-
-			// Load global graphics
-			LoadImageResources();
-
-			// Load time threads
-			// Window name
-			Name(AppName);
-			SetSnapToEdge(true);
-			ClearTempPath();
-
-			#if WINNATIVE
-			SetStyle(GetStyle() & ~WS_VISIBLE);
-			SetExStyle(GetExStyle() & ~WS_EX_ACCEPTFILES);
-			CreateClassW32(AppName, LoadIcon(LProcessInst(), MAKEINTRESOURCE(IDI_APP)));
-			#endif
-
-			#if defined LINUX
-			SetIcon("About64px.png");
-			LFinishXWindowsStartup(this);
-			#endif
-		};
-
-		SetLanguage();
-
-		// If no language set...
-		if (!GetOptions()->GetValue(OPT_UiLanguage, LangId))
+		LStringPipe RfXml;
+		RfXml.Print(DefaultRfXml,
+					LLoadString(IDS_ORIGINAL_MESSAGE),
+					LLoadString(FIELD_TO),
+					LLoadString(FIELD_FROM),
+					LLoadString(FIELD_SUBJECT),
+					LLoadString(IDS_DATE));
 		{
-			// Ask the user...
-			auto Dlg = new LanguageDlg(this);
-			if (!Dlg->Ok)
-			{
-				delete Dlg;
-			}
-			else
-			{
-				Dlg->DoModal([&](auto dlg, auto id)
-				{
-					if (id)
-					{
-						// Set the language in the options file
-						GetOptions()->SetValue(OPT_UiLanguage, LangId = (char*)Dlg->Lang);
-			
-						// Reload the resource file... to get the new lang.
-						LResources *Cur = LgiGetResObj(false);
-						DeleteObj(Cur);
+			LAutoString Xml(RfXml.NewStr());
+			UpgradeRfOption(this, OPT_TextReplyFormat, "ReplyXml", Xml);
+			UpgradeRfOption(this, OPT_TextForwardFormat, "ForwardXml", Xml);
+		}
 
-						SetLanguage();
-					}
-				
-					delete dlg;
-
-					if (id)
-						FinishInit();
-					else
-						LCloseApp();
-				});
+		LFontType t;
+		if (t.GetSystemFont("small"))
+		{
+			d->PreviewFont = t.Create();
+			if (d->PreviewFont)
+			{
+				#if defined WIN32
+				d->PreviewFont->PointSize(8);
+				#endif
 			}
 		}
-		else FinishInit();
-	});
+
+		MoveOnScreen();
+
+		// Load global graphics
+		LoadImageResources();
+
+		// Load time threads
+		// Window name
+		Name(AppName);
+		SetSnapToEdge(true);
+		ClearTempPath();
+
+		#if WINNATIVE
+		SetStyle(GetStyle() & ~WS_VISIBLE);
+		SetExStyle(GetExStyle() & ~WS_EX_ACCEPTFILES);
+		CreateClassW32(AppName, LoadIcon(LProcessInst(), MAKEINTRESOURCE(IDI_APP)));
+		#endif
+
+		#if defined LINUX
+		SetIcon("About64px.png");
+		LFinishXWindowsStartup(this);
+		#endif
+	};
+
+	// If no language set...
+	if (!GetOptions()->GetValue(OPT_UiLanguage, LangId))
+	{
+		// Ask the user...
+		auto Dlg = new LanguageDlg(this);
+		if (!Dlg->Ok)
+		{
+			delete Dlg;
+			LgiMsg(this, "Failed to create language selection dialog.", "Scribe Error");
+			ScribeState = ScribeExiting;
+			LCloseApp();
+		}
+		else
+		{
+			Dlg->DoModal([&](auto dlg, auto id)
+			{
+				if (id)
+				{
+					// Set the language in the options file
+					GetOptions()->SetValue(OPT_UiLanguage, LangId = (char*)Dlg->Lang);
+			
+					// Reload the resource file... to get the new lang.
+					LResources *Cur = LgiGetResObj(false);
+					DeleteObj(Cur);
+
+					SetLanguage();
+					FinishConstruct();
+				}
+				else // User cancelled
+				{
+					ScribeState = ScribeExiting;
+					LCloseApp();
+				}
+				delete dlg;
+			});
+		}
+	}
+	else FinishConstruct();
 }
 
 int StrSort(char *a, char *b, int d)
@@ -1930,9 +1929,9 @@ LStream *ScribeWnd::ShowScriptingConsole()
 	return LScribeScript::Inst->GetLog();
 }
 
-void ScribeWnd::GetPortableType(std::function<void(LOptionsFile::PortableType)> callback)
+LOptionsFile::PortableType ScribeWnd::GetPortableType()
 {
-	d->GetInstallMode(callback);
+	return d->GetInstallMode();
 }
 
 void ScribeWnd::RemoteContent_AddSender(const char *Addr, bool WhiteList)
@@ -1998,51 +1997,38 @@ void ScribeWnd::OnSpellerSettingChange()
 	d->SpellerThread.Reset();
 	
 	// Setup the new thread
-	GetSpellThread([&](auto t)
+	LSpellCheck *t = GetSpellThread();
+	if (t)
 	{
-		if (t)
-		{
-			// Trigger an install if needed
-			t->Check(d->AppWndHnd, "thisisamispeltword", 0, 18);
-		}
-	});
+		// Trigger an install if needed
+		t->Check(d->AppWndHnd, "thisisamispeltword", 0, 18);
+	}
 }
 
-void ScribeWnd::SetSpellThreadParams(LSpellCheck *Thread, std::function<void(LSpellCheck*, bool)> callback)
+bool ScribeWnd::SetSpellThreadParams(LSpellCheck *Thread)
 {
 	if (!Thread)
-	{
-		if (callback) callback(Thread, false);
-		return;
-	}
+		return false;
 	
 	LVariant Lang, Dict;
 	GetOptions()->GetValue(OPT_SpellCheckLanguage, Lang);
 	GetOptions()->GetValue(OPT_SpellCheckDictionary, Dict);
 
-	GetPortableType([&](auto type)
-	{
-		LAutoPtr<LSpellCheck::Params> Params(new LSpellCheck::Params);
-		if (!Params)
-		{
-			if (callback) callback(Thread, false);
-			return;
-		}
+	LAutoPtr<LSpellCheck::Params> Params(new LSpellCheck::Params);
+	if (!Params)
+		return false;
 
-		Params->IsPortable = type;
-		Params->OptionsPath = GetOptions()->GetFile();
-		Params->Lang = Lang.Str();
-		Params->Dict = Dict.Str();
-		Params->CapTarget = this;
-		
-		Thread->SetParams(Params);
-
-		if (callback)
-			callback(Thread, true);
-	});
+	Params->IsPortable = GetPortableType();
+	Params->OptionsPath = GetOptions()->GetFile();
+	Params->Lang = Lang.Str();
+	Params->Dict = Dict.Str();
+	Params->CapTarget = this;
+	
+	Thread->SetParams(Params);
+	return true;
 }
 
-void ScribeWnd::CreateSpellObject(std::function<void(LSpellCheck*)> callback)
+LSpellCheck *ScribeWnd::CreateSpellObject()
 {
 	LVariant PrefAspell;
 	GetOptions()->GetValue(OPT_PreferAspell, PrefAspell);
@@ -2082,16 +2068,11 @@ void ScribeWnd::CreateSpellObject(std::function<void(LSpellCheck*)> callback)
 	if (!Obj)
 		Obj = CreateAspellObject();
 
-	SetSpellThreadParams(Obj.Release(), [&](auto obj, auto status)
-	{
-		if (callback)
-			callback(obj);
-		else
-			delete obj;
-	});
+	SetSpellThreadParams(Obj);
+	return Obj.Release();
 }
 
-void ScribeWnd::GetSpellThread(std::function<void(LSpellCheck*)> callback, bool OverrideOpt)
+LSpellCheck *ScribeWnd::GetSpellThread(bool OverrideOpt)
 {
 	LVariant Use;
 	if (OverrideOpt)
@@ -2101,28 +2082,10 @@ void ScribeWnd::GetSpellThread(std::function<void(LSpellCheck*)> callback, bool 
 
 	#if USE_SPELLCHECKER
 	if ((Use.CastInt32() != 0) ^ (d->SpellerThread.Get() != 0))
-	{
-		if (Use.CastInt32())
-		{
-			CreateSpellObject([&](auto obj)
-			{
-				d->SpellerThread.Reset(obj);
-				if (callback)
-					callback(d->SpellerThread);
-			});
-			return;
-		}
-		else
-		{
-			if (callback)
-				callback(NULL);
-			return;			
-		}
-	}
+		d->SpellerThread.Reset(Use.CastInt32() ? CreateSpellObject() : NULL);
 	#endif
 
-	if (callback)
-		callback(d->SpellerThread);
+	return d->SpellerThread;
 }
 
 LAutoString ScribeWnd::GetHttpProxy()
@@ -2270,13 +2233,11 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 	}
 	else if (!_stricmp(Action.Str(), LLoadString(IDS_DOWNLOAD)))
 	{
-		GetSpellThread([&](auto t)
-		{
-			if (t)
-				t->InstallDictionary();
-			else
-				LgiTrace("%s:%i - No spell thread.\n", _FL);
-		});
+		auto t = GetSpellThread();
+		if (t)
+			t->InstallDictionary();
+		else
+			LgiTrace("%s:%i - No spell thread.\n", _FL);
 	}
 	else LAssert(!"Unknown action.");
 	
@@ -2523,38 +2484,39 @@ void ScribeWnd::OnCreate()
 	SetupAccounts();
 
 	// Recursively load folder tree
-	LoadFolders();
-
-	// Redo it for the templates... now that load folders has completed.
-	BuildDynMenus();
-
-	if (ScribeState == ScribeExiting)
-		return;
-
-	// Process command line
-	OnCommandLine();
-
-	// Update the templates sub-menu now that the folders are loaded
-	BuildDynMenus();
-
-	// Check registry settings
-	SetDefaultHandler();
-
-	// Run on load scripts...
-	LArray<LScriptCallback*> OnLoadCallbacks;
-	if (GetScriptCallbacks(LOnLoad, OnLoadCallbacks))
+	LoadFolders([&](auto status)
 	{
-		for (auto r: OnLoadCallbacks)
+		// Redo it for the templates... now that load folders has completed.
+		BuildDynMenus();
+
+		if (ScribeState == ScribeExiting)
+			return;
+
+		// Process command line
+		OnCommandLine();
+
+		// Update the templates sub-menu now that the folders are loaded
+		BuildDynMenus();
+
+		// Check registry settings
+		SetDefaultHandler();
+
+		// Run on load scripts...
+		LArray<LScriptCallback*> OnLoadCallbacks;
+		if (GetScriptCallbacks(LOnLoad, OnLoadCallbacks))
 		{
-			LVirtualMachine Vm;
-			LScriptArguments Args(&Vm);
-			Args.New() = new LVariant(this);
-			ExecuteScriptCallback(*r, Args);
-			Args.DeleteObjects();
+			for (auto r: OnLoadCallbacks)
+			{
+				LVirtualMachine Vm;
+				LScriptArguments Args(&Vm);
+				Args.New() = new LVariant(this);
+				ExecuteScriptCallback(*r, Args);
+				Args.DeleteObjects();
+			}
 		}
-	}
 	
-	ScribeState = ScribeRunning;
+		ScribeState = ScribeRunning;
+	});
 }
 
 ScribeAccount *ScribeWnd::GetAccountByEmail(const char *Email)
@@ -3354,8 +3316,10 @@ bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, LSystemPath Path
 
 bool ScribeWnd::IsUnitTest = false;
 
-void ScribeWnd::LoadOptions(std::function<void(bool)> callback)
+bool ScribeWnd::LoadOptions()
 {
+	bool Load = false;
+	
 	// Check if we are running unit tests...
 	if ((IsUnitTest = LAppInst->GetOption("unittest")))
 	{
@@ -3501,9 +3465,7 @@ void ScribeWnd::LoadOptions(std::function<void(bool)> callback)
 							
 							LgiTrace("Passed args to the other running instance of Scribe (pid=%i)\n", Pid);
 							LCloseApp();
-							
-							callback(false);
-							return;
+							return false;
 						}
 						else LgiTrace("%s:%i - No arguments to pass.\n", _FL);
 					}
@@ -3528,13 +3490,17 @@ void ScribeWnd::LoadOptions(std::function<void(bool)> callback)
 		}
 	}
 
-	d->GetInstallMode([&](auto mode)
-	{				
-		d->Options = new LOptionsFile(mode, OptionsFileName);
-		ScribeOptionsDefaults(d->Options);
-		
-		auto Load = d->Options->SerializeFile(false);
-		if (!Load)
+	// Open file and load..
+	if (!Load && d->Options)
+	{
+		LOptionsFile *Opts = GetOptions();
+		Load = Opts->SerializeFile(false);
+		if (Load)
+		{
+			LVariant v = d->GetInstallMode() == LOptionsFile::PortableMode;
+			GetOptions()->SetValue(OPT_IsPortableInstall, v);
+		}
+		else
 		{
 			LgiMsg(	this,
 					LLoadString(IDS_ERROR_LR8_FAILURE),
@@ -3542,58 +3508,77 @@ void ScribeWnd::LoadOptions(std::function<void(bool)> callback)
 					MB_OK,
 					GetOptions()->GetError());
 		}
+	}
 
-		LVariant v = mode == LOptionsFile::PortableMode;
-		d->Options->SetValue(OPT_IsPortableInstall, v);
+	if (!d->Options)
+	{
+		d->Options = new LOptionsFile(d->GetInstallMode(), OptionsFileName);
+	}
 
-		if (d->Options->GetValue(OPT_PrintSettings, v))
+	if (d->Options)
+	{
+		LVariant v;
+
+		if (!d->Options->GetValue(OPT_IsPortableInstall, v) &&
+			d->GetInstallMode() != LOptionsFile::UnknownMode)
 		{
-			auto *p = GetPrinter();
-			if (p)
+			v = d->GetInstallMode() == LOptionsFile::PortableMode;
+			d->Options->SetValue(OPT_IsPortableInstall, v);
+		}
+
+		ScribeOptionsDefaults(d->Options);
+
+		if (Load)
+		{
+			if (GetOptions()->GetValue(OPT_PrintSettings, v))
 			{
-				LString s = v.Str();
-				p->Serialize(s, false);
+				auto *p = GetPrinter();
+				if (p)
+				{
+					LString s = v.Str();
+					p->Serialize(s, false);
+				}
 			}
 		}
 
-		if (d->Options->GetValue(OPT_PreviewLines, v))
+		if (GetOptions()->GetValue(OPT_PreviewLines, v))
 		{
 			Mail::PreviewLines = v.CastInt32() != 0;
 		}
 
 		// upgrade smtp password
 		const char *Pw = "SmtpPsw";
-		if (!d->Options->GetValue(OPT_EncryptedSmtpPassword, v))
+		if (!GetOptions()->GetValue(OPT_EncryptedSmtpPassword, v))
 		{
 			// no encrypted password, look for unencrypted password
-			if (d->Options->GetValue(Pw, v))
+			if (GetOptions()->GetValue(Pw, v))
 			{
 				GPassword p;
 				p.Set(v.Str());
-				p.Serialize(d->Options, OPT_EncryptedSmtpPassword, true);
+				p.Serialize(GetOptions(), OPT_EncryptedSmtpPassword, true);
 			}
 		}
 
 		// if old un-encrypted password exists...
 		// delete the key, we are now storing an encrypted 
 		// password
-		if (d->Options->GetValue(Pw, v))
-			d->Options->DeleteValue(Pw);
+		if (GetOptions()->GetValue(Pw, v))
+			GetOptions()->DeleteValue(Pw);
 		
-		if (d->Options->GetValue(OPT_AdjustDateTz, v))
+		if (GetOptions()->GetValue(OPT_AdjustDateTz, v))
 			Mail::AdjustDateTz = !v.CastInt32();
 
-		if (!d->Options->GetValue(OPT_ConfirmDelete, v))
-			d->Options->SetValue(OPT_ConfirmDelete, v = true);
+		if (!GetOptions()->GetValue(OPT_ConfirmDelete, v))
+			GetOptions()->SetValue(OPT_ConfirmDelete, v = true);
 
-		if (!d->Options->GetValue(OPT_DelDirection, v))
-			d->Options->SetValue(OPT_DelDirection, v = DeleteActionPrev);
+		if (!GetOptions()->GetValue(OPT_DelDirection, v))
+			GetOptions()->SetValue(OPT_DelDirection, v = DeleteActionPrev);
 
-		if (d->Options->GetValue(OPT_SizeInKiB, v))
+		if (GetOptions()->GetValue(OPT_SizeInKiB, v))
 			OptionSizeInKiB = v.CastInt32() != 0;	
 
 		// date format
-		if (d->Options->GetValue(OPT_DateFormat, v))
+		if (GetOptions()->GetValue(OPT_DateFormat, v))
 		{
 			int Idx = v.CastInt32();
 			if (Idx >= 0 && Idx < CountOf(DateTimeFormats))
@@ -3601,11 +3586,11 @@ void ScribeWnd::LoadOptions(std::function<void(bool)> callback)
 		}
 		
 		// SSL debug logging
-		if (d->Options->GetValue(OPT_DebugSSL, v))
+		if (GetOptions()->GetValue(OPT_DebugSSL, v))
 			SslSocket::DebugLogging = v.CastInt32() != 0;
 
 		// Growl
-		if (d->Options->GetValue(OPT_GrowlEnabled, v) &&
+		if (GetOptions()->GetValue(OPT_GrowlEnabled, v) &&
 			v.CastInt32())
 		{
 			LVariant Ver, Bld;
@@ -3615,45 +3600,45 @@ void ScribeWnd::LoadOptions(std::function<void(bool)> callback)
 			n.Printf("%s\n%s", Ver.Str(), Bld.Str());
 			GrowlInfo("Scribe has started up...", n);
 		}
+	}
 
-		#if LGI_EXCEPTIONS
-		try
+	#if LGI_EXCEPTIONS
+	try
+	{
+	#endif
+		// Default the font settings to the system font
+		// if they don't already exist
+		const char *OptFont[] = { OPT_EditorFont, OPT_PrintFont, OPT_HtmlFont, 0 };
+		int Index = 0;
+		for (const char **Opt=OptFont; *Opt; Opt++, Index++)
 		{
-		#endif
-			// Default the font settings to the system font
-			// if they don't already exist
-			const char *OptFont[] = { OPT_EditorFont, OPT_PrintFont, OPT_HtmlFont, 0 };
-			int Index = 0;
-			for (const char **Opt=OptFont; *Opt; Opt++, Index++)
+			LVariant v;
+			if (!GetOptions()->GetValue(*Opt, v))
 			{
-				LVariant v;
-				if (!GetOptions()->GetValue(*Opt, v))
+				LFontType Type;
+				if (Type.GetSystemFont("System"))
 				{
-					LFontType Type;
-					if (Type.GetSystemFont("System"))
+					if (Index == 2)
 					{
-						if (Index == 2)
-						{
-							int Pt = Type.GetPointSize();
-							Type.SetPointSize(Pt+3);
-						}
-						Type.Serialize(GetOptions(), *Opt, true);
+						int Pt = Type.GetPointSize();
+						Type.SetPointSize(Pt+3);
 					}
+					Type.Serialize(GetOptions(), *Opt, true);
 				}
 			}
-		#if LGI_EXCEPTIONS
 		}
-		catch (...)
-		{
-			LgiMsg(	this,
-					LLoadString(IDS_ERROR_FONT_SETTINGS),
-					AppName,
-					MB_OK);
-		}
-		#endif
+	#if LGI_EXCEPTIONS
+	}
+	catch (...)
+	{
+		LgiMsg(	this,
+				LLoadString(IDS_ERROR_FONT_SETTINGS),
+				AppName,
+				MB_OK);
+	}
+	#endif
 
-		callback(true);
-	});
+	return true;
 }
 
 bool ScribeWnd::SaveOptions()
@@ -5300,7 +5285,7 @@ bool ScribeWnd::LoadMailStores()
 	return Status;
 }
 
-bool ScribeWnd::LoadFolders()
+void ScribeWnd::LoadFolders(std::function<void(bool)> Callback)
 {
 	bool Status = false;
 	AppState PrevState = ScribeState;
@@ -5341,9 +5326,14 @@ bool ScribeWnd::LoadFolders()
 				}
 			}
 		}
-		if (!MailStores)
-			return false;
+
 		GetOptions()->Unlock();
+		if (!MailStores)
+		{
+			if (Callback)
+				Callback(false);
+			return;
+		}
 	}
 
 	// Set loading flags
@@ -5362,73 +5352,78 @@ bool ScribeWnd::LoadFolders()
 		}
 	}
 
+	auto FinishLoad = [&]()
+	{
+		if (ScribeState == ScribeExiting)
+		{
+			LCloseApp();
+		}
+		else
+		{
+			d->FoldersLoaded = true;
+			PostEvent(M_SCRIBE_LOADED);
+		}
+
+		if (ScribeState == ScribeExiting)
+			LCloseApp();
+		ScribeState = PrevState;
+
+		if (Callback)
+			Callback(Status);
+	};
+
 	if (Folders.Length() == 0)
 	{
-		ScribeFolderDlg Dlg(this);
-		if (Dlg.DoModal() == IDOK)
+		auto Dlg = new ScribeFolderDlg(this);
+		Dlg->DoModal([&](auto dlg, auto id)
 		{
-			bool CreateMailStore = false;
-
-			if (Dlg.Create)
+			if (id == IDOK)
 			{
-				// create folders
-				if (LFileExists(Dlg.FolderFile))
+				bool CreateMailStore = false;
+
+				if (Dlg->Create)
 				{
-					if (LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_ALREADY_EXIST), AppName, MB_YESNO) == IDYES)
+					// create folders
+					if (LFileExists(Dlg->FolderFile))
 					{
+						if (LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_ALREADY_EXIST), AppName, MB_YESNO) == IDYES)
+							CreateMailStore = true;
+						else
+							LgiMsg(this, LLoadString(IDS_ERROR_WONT_OVERWRITE_FOLDERS), AppName);
+					}
+					else if ((Status = CreateFolders(Dlg->FolderFile)))
 						CreateMailStore = true;
-					}
-					else
-					{
-						LgiMsg(this, LLoadString(IDS_ERROR_WONT_OVERWRITE_FOLDERS), AppName);
-					}
 				}
-				else if ((Status = CreateFolders(Dlg.FolderFile)))
-				{
+				else
 					CreateMailStore = true;
-				}
-			}
-			else
-			{
-				CreateMailStore = true;
-			}
 
-			if (CreateMailStore)
-			{
-				LXmlTag *MailStores = GetOptions()->LockTag(OPT_MailStores, _FL);
-				if (MailStores)
+				if (CreateMailStore)
 				{
-					LXmlTag *Store = MailStores->CreateTag(OPT_MailStore);
-					if (Store)
+					LXmlTag *MailStores = GetOptions()->LockTag(OPT_MailStores, _FL);
+					if (MailStores)
 					{
-						char p[MAX_PATH_LEN];
-						LMakePath(p, sizeof(p), GetOptions()->GetFile(), "..");
-						auto RelPath = LMakeRelativePath(p, Dlg.FolderFile);
-						Store->SetAttr(OPT_MailStoreLocation, RelPath ? RelPath.Get() : Dlg.FolderFile.Get());
-					}
-					GetOptions()->Unlock();
+						LXmlTag *Store = MailStores->CreateTag(OPT_MailStore);
+						if (Store)
+						{
+							char p[MAX_PATH_LEN];
+							LMakePath(p, sizeof(p), GetOptions()->GetFile(), "..");
+							auto RelPath = LMakeRelativePath(p, Dlg->FolderFile);
+							Store->SetAttr(OPT_MailStoreLocation, RelPath ? RelPath.Get() : Dlg->FolderFile.Get());
+						}
+						GetOptions()->Unlock();
 
-					LoadMailStores();
+						LoadMailStores();
+					}
 				}
 			}
-		}
-	}
+			delete dlg;
 
-	if (ScribeState == ScribeExiting)
-	{
-		LCloseApp();
+			if (id)
+				FinishLoad();
+			else if (Callback)
+				Callback(false);
+		});
 	}
-	else
-	{
-		d->FoldersLoaded = true;
-		PostEvent(M_SCRIBE_LOADED);
-	}
-
-	if (ScribeState == ScribeExiting)
-		LCloseApp();
-	ScribeState = PrevState;
-	
-	return Status;
 }
 
 bool ScribeWnd::UnLoadFolders()
@@ -6430,7 +6425,7 @@ void ScribeWnd::OnReceiveFiles(LArray<const char*> &Files)
 			}
 			else if (HasPrint)
 			{
-				ThingPrint(m, GetPrinter(), 0, sPages ? atoi(sPages) : 0);
+				ThingPrint(NULL, m, GetPrinter(), 0, sPages ? atoi(sPages) : 0);
 			}
 			else
 			{
@@ -6648,38 +6643,41 @@ void ScribeWnd::OnZoom(LWindowZoom Action)
 
 struct UserInput
 {
+	std::function<void(LString)> Callback;
 	LView *Parent;
-	LString Result;
 	LString Msg;
-	bool Password, Done;
+	bool Password;
+
 	UserInput()
 	{
-		Password = Done = false;
+		Password = false;
 	}
 };
 
-LString ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password)
+void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::function<void(LString)> Callback)
 {
 	if (InThread())
 	{
-		LInput Inp(Parent ? Parent : this, "", Msg, AppName, Password);
-		return Inp.DoModal() ? Inp.GetStr() : NULL;
+		auto Inp = new LInput(Parent ? Parent : this, "", Msg, AppName, Password);
+		Inp->DoModal([&](auto dlg, auto id)
+		{
+			if (Callback)
+				Callback(id ? Inp->GetStr() : NULL);
+			delete dlg;
+		});
 	}
 
-	UserInput i;
-	i.Parent = Parent;
-	i.Msg = Msg;
-	i.Password = Password;
-	if (!PostEvent(M_GET_USER_INPUT, (LMessage::Param)&i))
+	auto i = new UserInput;
+	i->Parent = Parent;
+	i->Msg = Msg;
+	i->Password = Password;
+	i->Callback = Callback;
+	if (!PostEvent(M_GET_USER_INPUT, (LMessage::Param)i))
 	{
 		LAssert(!"PostEvent failed.");
-		return NULL;
+		if (Callback)
+			Callback(NULL);
 	}
-
-	while (!i.Done)
-		LSleep(50);
-
-	return i.Result;
 }
 
 LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
@@ -6713,11 +6711,11 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_GET_USER_INPUT:
 		{
-			UserInput *i = (UserInput*)Msg->A();
+			LAutoPtr<UserInput> i((UserInput*)Msg->A());
 			LAssert(i);
 			LAssert(InThread()); // Least we get stuck in an infinite loop
-			i->Result = GetUserInput(i->Parent, i->Msg, i->Password);
-			i->Done = true;
+			
+			GetUserInput(i->Parent, i->Msg, i->Password, i->Callback);
 			break;
 		}
 		case M_SET_HTML:
@@ -6945,27 +6943,42 @@ int ScribeWnd::GetMaxPages()
 	return d->PrintMaxPages;
 }
 
-bool ScribeWnd::ThingPrint(ThingType *m, LPrinter *Printer, LView *Parent, int MaxPages)
+void ScribeWnd::ThingPrint(std::function<void(bool)> Callback, ThingType *m, LPrinter *Printer, LView *Parent, int MaxPages)
 {
-	int Status = 0;
 	d->PrintMaxPages = MaxPages;
 	
 	if (!Printer)
 		Printer = GetPrinter();
 	if (!Printer)
-		return false;
+	{
+		if (Callback) Callback(false);
+		return;
+	}
 	Thing *t = dynamic_cast<Thing*>(m);
 	if (!t)
-		return false;
+	{
+		if (Callback) Callback(false);
+		return;
+	}
 		
 	ScribePrintContext Events(this, t);
-	Status = Printer->Print(&Events, AppName, -1, Parent ? Parent : this);
-	if (Status == Events.OnBeginPrintError)
-		LgiMsg(Parent, "Printing failed: %s", AppName, MB_OK, Printer->GetErrorMsg().Get());
-	else
-		Status = true;
-
-	return Status > 0; // Number of pages printed..
+	Printer->Print(	&Events,
+					[&](auto pages)
+					{
+						if (pages == Events.OnBeginPrintError)
+						{
+							LgiMsg(Parent, "Printing failed: %s", AppName, MB_OK, Printer->GetErrorMsg().Get());
+							if (Callback)
+								Callback(false);
+						}
+						else if (Callback)
+						{
+							Callback(true);
+						}
+					},
+					AppName,
+					-1,
+					Parent ? Parent : this);
 }
 
 bool ScribeWnd::MailReplyTo(Mail *m, bool All)
@@ -7138,11 +7151,15 @@ void ScribeWnd::OnBayesAnalyse(const char *Msg, const char *WhiteListEmail)
 		s += LString("<br>") + q;
 	}
 	s += "</body></html>";
-	auto result = LHtmlMsg(this, s, AppName, WhiteListEmail ? MB_YESNO : MB_OK);
-	if (result == IDYES)
-	{
-		RemoveFromWhitelist(WhiteListEmail);
-	}
+	LHtmlMsg([&](auto result)
+			{
+				if (result == IDYES)
+					RemoveFromWhitelist(WhiteListEmail);
+			},
+			this,
+			s,
+			AppName,
+			WhiteListEmail ? MB_YESNO : MB_OK);
 }
 
 bool ScribeWnd::OnBayesResult(const char *MailRef, double Rating)
@@ -7338,53 +7355,62 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		// File menu
 		case IDM_MANAGE_MAIL_STORES:
 		{
-			ManageMailStores Dlg(this);
-			if (Dlg.DoModal())
+			auto Dlg = new ManageMailStores(this);
+			Dlg->DoModal([&](auto dlg, auto id)
 			{
-				SaveOptions();
-
-				if (!UnLoadFolders())
-					break;
-
-				LXmlTag *Ms = GetOptions()->LockTag(OPT_MailStores, _FL);
-				if (Ms)
+				LAutoPtr<LDialog> mem(dlg);
+				if (id)
 				{
-					while (Ms->Children.Length())
-						delete Ms->Children[0];
-					
-					LXmlTag *t = Dlg.Options.GetChildTag(OPT_MailStores);
-					if (t)
+					SaveOptions();
+
+					if (!UnLoadFolders())
+						return;
+
+					LXmlTag *Ms = GetOptions()->LockTag(OPT_MailStores, _FL);
+					if (Ms)
 					{
-						for (auto c: t->Children)
+						while (Ms->Children.Length())
+							delete Ms->Children[0];
+					
+						LXmlTag *t = Dlg->Options.GetChildTag(OPT_MailStores);
+						if (t)
 						{
-							LXmlTag *n = new LXmlTag;
-							n->Copy(*c, true);
-							Ms->InsertTag(n);
+							for (auto c: t->Children)
+							{
+								LXmlTag *n = new LXmlTag;
+								n->Copy(*c, true);
+								Ms->InsertTag(n);
+							}
 						}
+
+						GetOptions()->Unlock();
 					}
 
-					GetOptions()->Unlock();
+					LVariant v;
+					GetOptions()->SetValue(OPT_CreateFoldersIfMissing, v = true);
+
+					if (!Dlg->Options.GetValue(OPT_StartInFolder, v))
+						v.Empty();
+					GetOptions()->SetValue(OPT_StartInFolder, v);
+
+					LoadFolders(NULL);
 				}
-
-				LVariant v;
-				GetOptions()->SetValue(OPT_CreateFoldersIfMissing, v = true);
-
-				if (!Dlg.Options.GetValue(OPT_StartInFolder, v))
-					v.Empty();
-				GetOptions()->SetValue(OPT_StartInFolder, v);
-
-				LoadFolders();
-			}
+			});
 			break;
 		}
 		case IDM_REPLICATE:
 		{
-			ReplicateDlg Dlg(this);
-			if (Dlg.DoModal())
+			auto Dlg = new ReplicateDlg(this);
+			Dlg->DoModal([&](auto dlg, auto id)
 			{
-				UnLoadFolders();
-				Dlg.StartProcess();
-			}
+				if (id)
+				{
+					UnLoadFolders();
+					Dlg->StartProcess();
+					// Don't delete dialog... let it run
+				}
+				else delete dlg;
+			});
 			break;
 		}
 		case IDM_SECURITY:
@@ -7399,8 +7425,8 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			}
 			if (Allow)
 			{
-				SecurityDlg Dlg(this);
-				Dlg.DoModal();
+				auto Dlg = new SecurityDlg(this);
+				Dlg->DoModal(NULL);
 			}
 			break;
 		}
@@ -7410,70 +7436,73 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			GetOptions()->GetValue(OPT_ShowFolderTotals, ShowTotals);
 
 			// do the dialog
-			OptionsDlg Dlg(this);
-			int Status = Dlg.DoModal();
-			if (Status)
+			auto Dlg = new OptionsDlg(this);
+			Dlg->DoModal([&](auto dlg, auto id)
 			{
-				// set up the POP3 accounts
-				SetupAccounts();
-				SaveOptions();
-
-				// close any IMAP accounts that are now disabled.
-				for (auto a : Accounts)
+				if (id)
 				{
-					if (a->Receive.IsConfigured() &&
-						a->Receive.IsPersistant())
+					// set up the POP3 accounts
+					SetupAccounts();
+					SaveOptions();
+
+					// close any IMAP accounts that are now disabled.
+					for (auto a : Accounts)
 					{
-						if (a->Receive.Disabled())
-							a->Receive.Disconnect();
-						else
-							Receive(a->GetIndex());
+						if (a->Receive.IsConfigured() &&
+							a->Receive.IsPersistant())
+						{
+							if (a->Receive.Disabled())
+								a->Receive.Disconnect();
+							else
+								Receive(a->GetIndex());
+						}
+					}
+
+					// List/Tree view options update
+					LVariant i;
+					if (GetOptions()->GetValue(OPT_ShowFolderTotals, i) &&
+						i.CastInt32() != ShowTotals.CastInt32())
+					{
+						Tree->UpdateAllItems();
+					}
+					if (GetOptions()->GetValue(OPT_PreviewLines, i))
+					{
+						Mail::PreviewLines = i.CastInt32() != 0;
+					}
+					if (MailList)
+					{
+						if (GetOptions()->GetValue(OPT_GridLines, i))
+						{
+							MailList->DrawGridLines(i.CastInt32() != 0);
+						}
+						MailList->Invalidate();
+					}
+
+					// date formats
+					if (GetOptions()->GetValue(OPT_DateFormat, i))
+					{
+						int Idx = i.CastInt32();
+						if (Idx >= 0 && Idx < CountOf(DateTimeFormats))
+						{
+							LDateTime::SetDefaultFormat(DateTimeFormats[Idx]);
+						}
+					}
+					if (GetOptions()->GetValue(OPT_AdjustDateTz, i))
+						Mail::AdjustDateTz = i.CastInt32() == 0;
+
+					// SSL debug logging
+					if (GetOptions()->GetValue(OPT_DebugSSL, i))
+						SslSocket::DebugLogging = i.CastInt32() != 0;
+
+					// Html edit menu
+					if (GetOptions()->GetValue(OPT_EditControl, i))
+					{
+						auto mi = Menu->FindItem(IDM_HTML_EDITOR);
+						if (mi) mi->Checked(i.CastInt32() != 0);
 					}
 				}
-
-				// List/Tree view options update
-				LVariant i;
-				if (GetOptions()->GetValue(OPT_ShowFolderTotals, i) &&
-					i.CastInt32() != ShowTotals.CastInt32())
-				{
-					Tree->UpdateAllItems();
-				}
-				if (GetOptions()->GetValue(OPT_PreviewLines, i))
-				{
-					Mail::PreviewLines = i.CastInt32() != 0;
-				}
-				if (MailList)
-				{
-					if (GetOptions()->GetValue(OPT_GridLines, i))
-					{
-						MailList->DrawGridLines(i.CastInt32() != 0);
-					}
-					MailList->Invalidate();
-				}
-
-				// date formats
-				if (GetOptions()->GetValue(OPT_DateFormat, i))
-				{
-					int Idx = i.CastInt32();
-					if (Idx >= 0 && Idx < CountOf(DateTimeFormats))
-					{
-						LDateTime::SetDefaultFormat(DateTimeFormats[Idx]);
-					}
-				}
-				if (GetOptions()->GetValue(OPT_AdjustDateTz, i))
-					Mail::AdjustDateTz = i.CastInt32() == 0;
-
-				// SSL debug logging
-				if (GetOptions()->GetValue(OPT_DebugSSL, i))
-					SslSocket::DebugLogging = i.CastInt32() != 0;
-
-				// Html edit menu
-				if (GetOptions()->GetValue(OPT_EditControl, i))
-				{
-					auto mi = Menu->FindItem(IDM_HTML_EDITOR);
-					if (mi) mi->Checked(i.CastInt32() != 0);
-				}
-			}
+				delete dlg;
+			});
 			break;
 		}
 		case IDM_WORK_OFFLINE:
@@ -7554,7 +7583,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 					for (auto i: Sel)
 					{
 						ThingType *t = dynamic_cast<ThingType*>(i);
-						ThingPrint(t);
+						ThingPrint(NULL, t);
 					}
 				}
 			}
@@ -7576,8 +7605,8 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_PAGE_SETUP:
 		{
-			ScribePageSetup Dlg(this, GetOptions());
-			Dlg.DoModal();
+			auto Dlg = new ScribePageSetup(this, GetOptions());
+			Dlg->DoModal(NULL);
 			break;
 		}
 		case IDM_EXIT:
@@ -7596,7 +7625,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			LDocView *doc = dynamic_cast<LDocView*>(v);
 			if (doc)
 			{
-				doc->DoFind();
+				doc->DoFind(NULL);
 			}
 			else
 			{
@@ -8083,59 +8112,63 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_BAYES_SETTINGS:
 		{
-			BayesDlg Dlg(this);
-			if (Dlg.DoModal())
+			auto Dlg = new BayesDlg(this);
+			Dlg->DoModal([&](auto dlg, auto id)
 			{
-				LVariant i;
-				if (GetOptions()->GetValue(OPT_BayesFilterMode, i))
+				if (id)
 				{
-					ScribeBayesianFilterMode m = ((ScribeBayesianFilterMode)i.CastInt32());
-					if (m != BayesOff)
+					LVariant i;
+					if (GetOptions()->GetValue(OPT_BayesFilterMode, i))
 					{
-						LVariant SpamPath, ProbablyPath;
-						GetOptions()->GetValue(OPT_SpamFolder, SpamPath);
-						GetOptions()->GetValue(OPT_BayesMoveTo, ProbablyPath);
-											
-						if (m == BayesFilter)
+						ScribeBayesianFilterMode m = ((ScribeBayesianFilterMode)i.CastInt32());
+						if (m != BayesOff)
 						{
-							ScribeFolder *Spam = GetFolder(SpamPath.Str());
-							if (!Spam)
+							LVariant SpamPath, ProbablyPath;
+							GetOptions()->GetValue(OPT_SpamFolder, SpamPath);
+							GetOptions()->GetValue(OPT_BayesMoveTo, ProbablyPath);
+											
+							if (m == BayesFilter)
 							{
-							
-								GMailStore *RelevantStore = GetMailStoreForPath(SpamPath.Str());
-								if (RelevantStore)
+								ScribeFolder *Spam = GetFolder(SpamPath.Str());
+								if (!Spam)
 								{
-									LString p = SpamPath.Str();
-									LString::Array a = p.SplitDelimit("/");
-									
-									Spam = RelevantStore->Root;
-									for (unsigned i=1; i<a.Length(); i++)
+							
+									GMailStore *RelevantStore = GetMailStoreForPath(SpamPath.Str());
+									if (RelevantStore)
 									{
-										ScribeFolder *c = Spam->GetSubFolder(a[i]);
-										if (!c)
-											c = Spam->CreateSubDirectory(a[i], MAGIC_MAIL);
-										Spam = c;
+										LString p = SpamPath.Str();
+										LString::Array a = p.SplitDelimit("/");
+									
+										Spam = RelevantStore->Root;
+										for (unsigned i=1; i<a.Length(); i++)
+										{
+											ScribeFolder *c = Spam->GetSubFolder(a[i]);
+											if (!c)
+												c = Spam->CreateSubDirectory(a[i], MAGIC_MAIL);
+											Spam = c;
+										}
 									}
 								}
-							}
 							
-							if (Spam)
-							{
-								LVariant v;
-								GetOptions()->SetValue(OPT_HasSpam, v = 1);
+								if (Spam)
+								{
+									LVariant v;
+									GetOptions()->SetValue(OPT_HasSpam, v = 1);
+								}
 							}
-						}
-						else if (m == BayesTrain)
-						{
-							ScribeFolder *Probably = GetFolder(ProbablyPath.Str());
-							if (!Probably)
+							else if (m == BayesTrain)
 							{
-								LgiMsg(this, "Couldn't find the folder '%s'", AppName, MB_OK, ProbablyPath.Str());
+								ScribeFolder *Probably = GetFolder(ProbablyPath.Str());
+								if (!Probably)
+								{
+									LgiMsg(this, "Couldn't find the folder '%s'", AppName, MB_OK, ProbablyPath.Str());
+								}
 							}
 						}
 					}
 				}
-			}			
+				delete dlg;
+			});
 			break;
 		}
 		case IDM_BAYES_CHECK:
@@ -9759,12 +9792,16 @@ void ScribeWnd::SetDefaultHandler()
 		if (!IsDef)
 		{
 			// Ask the user...
-			DefaultClientDlg Dlg(this);
-			if (Dlg.DoModal())
+			auto Dlg = new DefaultClientDlg(this);
+			Dlg->DoModal([&](auto dlg, auto id)
 			{
-				Error = !Def.SetDefault();
-				GetOptions()->SetValue(OPT_CheckDefaultEmail, n = (int) (!Dlg.DontWarn));
-			}
+				if (id)
+				{
+					Error = !Def.SetDefault();
+					GetOptions()->SetValue(OPT_CheckDefaultEmail, n = (int) (!Dlg->DontWarn));
+				}
+				delete dlg;
+			});
 		}
 		
 		LRegKey::AssertOnError = OldAssert;
@@ -10968,6 +11005,8 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 
 bool ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName)
 {
+	LAssert(!"Fixme: convert to async.");
+
 	if (Required <= CurrentAuthLevel)
 	{
 		return true;
@@ -10995,20 +11034,24 @@ bool ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *
 				char Msg[256];
 				sprintf_s(Msg, sizeof(Msg), LLoadString(IDS_ASK_USER_PASS), ResourceName);
 				
-				LInput d(Parent, "", Msg, AppName, true);
-				if (d.DoModal() && d.GetStr())
+				auto d = new LInput(Parent, "", Msg, AppName, true);
+				d->DoModal([&](auto dlg, auto id)
 				{
-					char Pass[256];
-					p.Get(Pass);
-					Status = strcmp(Pass, d.GetStr()) == 0;
-					if (Status)
+					if (id && d->GetStr())
 					{
-						CurrentAuthLevel = PermRequireUser;
+						char Pass[256];
+						p.Get(Pass);
+						Status = strcmp(Pass, d->GetStr()) == 0;
+						if (Status)
+						{
+							CurrentAuthLevel = PermRequireUser;
 						
-						auto i = Menu->FindItem(IDM_LOGOUT);
-						if (i) i->Enabled(true);
+							auto i = Menu->FindItem(IDM_LOGOUT);
+							if (i) i->Enabled(true);
+						}
 					}
-				}
+					delete dlg;
+				});
 			}
 			else
 			{
@@ -11028,22 +11071,26 @@ bool ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *
 				ssize_t BinLen = 0;
 				if ((BinLen = ConvertBase64ToBinary(Bin, sizeof(Bin), Hash, strlen(Hash))) == 16)
 				{
-					LInput d(Parent, "", LLoadString(IDS_ASK_ADMIN_PASS), AppName, true);
-					if (d.DoModal() && d.GetStr())
+					auto d = new LInput(Parent, "", LLoadString(IDS_ASK_ADMIN_PASS), AppName, true);
+					d->DoModal([&](auto dlg, auto id)
 					{
-						unsigned char Digest[16];
-						char Str[256];
-						sprintf_s(Str, sizeof(Str), "%s admin", d.GetStr().Get());
-						MDStringToDigest(Digest, Str);
-						
-						if (memcmp(Bin, Digest, 16) == 0)
+						if (id && d->GetStr())
 						{
-							CurrentAuthLevel = PermRequireAdmin;
-							auto i = Menu->FindItem(IDM_LOGOUT);
-							if (i) i->Enabled(true);
-							return true;
+							unsigned char Digest[16];
+							char Str[256];
+							sprintf_s(Str, sizeof(Str), "%s admin", d->GetStr().Get());
+							MDStringToDigest(Digest, Str);
+						
+							if (memcmp(Bin, Digest, 16) == 0)
+							{
+								CurrentAuthLevel = PermRequireAdmin;
+								auto i = Menu->FindItem(IDM_LOGOUT);
+								if (i) i->Enabled(true);
+								// return true;
+							}
 						}
-					}
+						delete dlg;
+					});
 				}
 				else
 				{
@@ -11274,15 +11321,17 @@ void ScribeWnd::Send(int Which, bool Quiet)
 				}
 				else
 				{
-					LAlert d(this,
+					auto d = new LAlert(this,
 							AppName,
 							LLoadString(IDS_ERROR_NO_CONFIG_SEND),
 							LLoadString(IDS_CONFIGURE),
 							LLoadString(IDS_CANCEL));
-					if (d.DoModal() == 1)
+					d->DoModal([&](auto dlg, auto id)
 					{
-						a->GetAccount()->InitUI(this, 1);
-					}
+						if (id == 1)
+							a->GetAccount()->InitUI(this, 1, NULL);
+						delete dlg;
+					});
 				}
 			}
 		}
@@ -11311,15 +11360,17 @@ void ScribeWnd::Receive(int Which)
 				}
 				else
 				{
-					LAlert a(this,
+					auto a = new LAlert(this,
 							AppName,
 							LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
 							LLoadString(IDS_CONFIGURE),
 							LLoadString(IDS_CANCEL));
-					if (a.DoModal() == 1)
+					a->DoModal([&](auto dlg, auto id)
 					{
-						i->InitUI(this, 2);
-					}
+						if (id == 1)
+							i->InitUI(this, 2, NULL);
+						delete dlg;
+					});
 				}
 			}
 		}
