@@ -1654,6 +1654,16 @@ bool Calendar::Save(ScribeFolder *Folder)
 		}
 	}
 
+	auto ChangeEvent = [&]()
+	{
+		auto View = GetView();
+		if (View && Status)
+		{
+			View->OnContentsChanged(Source);
+			OnSerialize(true);
+		}
+	};
+
 	if (GetObject() &&
 		GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Webdav)
 	{
@@ -1661,6 +1671,8 @@ bool Calendar::Save(ScribeFolder *Folder)
 		Status = s > Store3Error;
 		if (Status)
 			SetDirty(false);
+
+		ChangeEvent();
 	}
 	else
 	{
@@ -1673,18 +1685,18 @@ bool Calendar::Save(ScribeFolder *Folder)
 			Folder = App->GetFolder(FOLDER_CALENDAR);
 		}
 
+		// FIXME: This can't wait for WriteThing to finish it's call back...
+		Status = true;
 		if (Folder)
 		{
-			if ((Status = (Folder->WriteThing(this) != Store3Error)))
-				SetDirty(false);
+			Folder->WriteThing(this, [&](auto Status)
+			{
+				if (Status > Store3Error)
+					SetDirty(false);
+				ChangeEvent();
+			});
 		}
-	}
-
-	auto View = GetView();
-	if (View && Status)
-	{
-		View->OnContentsChanged(Source);
-		OnSerialize(true);
+		else ChangeEvent();
 	}
 
 	return Status;

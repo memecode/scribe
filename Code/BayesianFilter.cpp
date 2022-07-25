@@ -929,7 +929,9 @@ void BuildSpamDB::Process()
 					FolderLoads--;
 					(*Prog)++;
 				});
-				f->LoadThings();
+
+				// FIXME: does this need to do something on callback?
+				f->LoadThings(NULL, NULL);
 			}
 			else
 			{
@@ -1158,16 +1160,8 @@ void BayesianFilter::BuildStats()
 	if (!prob || !inbox)
 		return;
 
-	prob->LoadThings();
-	inbox->LoadThings();
-
-	for (auto t: prob->Items)
-	{
-		auto m = t->IsMail();
-		if (m)
-		{
-		}
-	}
+	prob->LoadThings(NULL, NULL);
+	inbox->LoadThings(NULL, NULL);
 }
 
 bool BayesianFilter::BuildSpamDb()

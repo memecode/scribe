@@ -283,190 +283,194 @@ public:
 						bool FromLoaded = From->IsLoaded();
 						bool ToLoaded = From->IsLoaded();
 
-						switch ((uint32_t)To->GetItemType())
+						auto ProcessItem = [&]()
 						{
-							case MAGIC_MAIL:
+							switch ((uint32_t)To->GetItemType())
 							{
-								if (Prog)
-									Prog->SetDescription(FromPath);
-
-								To->LoadThings();
-								From->LoadThings();
-
-								LHashTbl<ConstStrKey<char>,Mail*> ToMsgs;
-								for (auto t: To->Items)
+								case MAGIC_MAIL:
 								{
-									Mail *m = t->IsMail();
-									if (m)
+									if (Prog)
+										Prog->SetDescription(FromPath);
+
+									LHashTbl<ConstStrKey<char>,Mail*> ToMsgs;
+									for (auto t: To->Items)
 									{
-										auto Id = m->GetMessageId(true);
-										if (Id)
+										Mail *m = t->IsMail();
+										if (m)
 										{
-											ToMsgs.Add(Id, m);
+											auto Id = m->GetMessageId(true);
+											if (Id)
+											{
+												ToMsgs.Add(Id, m);
+											}
 										}
 									}
-								}
 
-								int InitMailErrors = MailErrors;
+									int InitMailErrors = MailErrors;
 								
-								for (auto t: From->Items)
-								{
-									if (Prog && Prog->IsCancelled())
-										break;
-									
-									Mail *m = t->IsMail();
-									if (m)
+									for (auto t: From->Items)
 									{
-										auto Id = m->GetMessageId(true);
-										if (Id)
+										if (Prog && Prog->IsCancelled())
+											break;
+									
+										Mail *m = t->IsMail();
+										if (m)
 										{
-											if (!ToMsgs.Find(Id))
+											auto Id = m->GetMessageId(true);
+											if (Id)
 											{
-												// Create new mail...
-												Mail *n = new Mail(App);
-												if (n)
+												if (!ToMsgs.Find(Id))
 												{
-													*n = (Thing&)*m;
-													n->SetParentFolder(To);
-													To->Items.Insert(n);
-
-													n->SetObject(To->GetObject()->GetStore()->Create(MAGIC_MAIL), _FL);
-													if (n->GetObject())
+													// Create new mail...
+													Mail *n = new Mail(App);
+													if (n)
 													{
-														MailCreated++;
+														*n = (Thing&)*m;
+														n->SetParentFolder(To);
+														To->Items.Insert(n);
 
-														// Now create all the attachments
-														List<Attachment> Att;
-														if (m->GetAttachments(&Att))
+														n->SetObject(To->GetObject()->GetStore()->Create(MAGIC_MAIL), _FL);
+														if (n->GetObject())
 														{
-															for (auto OldAttachment: Att)
+															MailCreated++;
+
+															// Now create all the attachments
+															List<Attachment> Att;
+															if (m->GetAttachments(&Att))
 															{
-																Attachment *NewAttachment = new Attachment(m->App, OldAttachment);
-																if (NewAttachment)
+																for (auto OldAttachment: Att)
 																{
-																	n->AttachFile(NewAttachment);
-																	NewAttachment->SetObject(n->GetObject()->GetStore()->Create(MAGIC_ATTACHMENT), _FL);
+																	Attachment *NewAttachment = new Attachment(m->App, OldAttachment);
+																	if (NewAttachment)
+																	{
+																		n->AttachFile(NewAttachment);
+																		NewAttachment->SetObject(n->GetObject()->GetStore()->Create(MAGIC_ATTACHMENT), _FL);
+																	}
 																}
 															}
 														}
+														else MailErrors++;
+
 													}
 													else MailErrors++;
-
 												}
-												else MailErrors++;
+												else MailSkipped++;
 											}
-											else MailSkipped++;
+											else MailErrors++;
 										}
-										else MailErrors++;
+
+										if (Prog)
+											Prog->Value(Prog->Value() + 1);
 									}
 
-									if (Prog)
-										Prog->Value(Prog->Value() + 1);
+									Status |= MailErrors == InitMailErrors;
+									break;
 								}
-
-								Status |= MailErrors == InitMailErrors;
-								break;
-							}
-							case MAGIC_CONTACT:
-							{
-								// bool FromLoaded = From->IsLoaded();
-								To->LoadThings();
-								From->LoadThings();
-
-								LHashTbl<StrKey<char>,Contact*> ToContacts;
-								for (auto t: To->Items)
+								case MAGIC_CONTACT:
 								{
-									Contact *c = t->IsContact();
-									if (c)
+									LHashTbl<StrKey<char>,Contact*> ToContacts;
+									for (auto t: To->Items)
 									{
-										auto k = ContactKey(c);
-										if (k)
-											ToContacts.Add(k, c);
-									}
-								}
-
-								int InitContactErrors = ContactErrors;
-								uint64 Last = LCurrentTime();
-								for (auto t: From->Items)
-								{
-									if (Prog && Prog->IsCancelled())
-										break;
-										
-									Contact *c = t->IsContact();
-									if (c)
-									{
-										auto k = ContactKey(c);
-										if (k)
+										Contact *c = t->IsContact();
+										if (c)
 										{
-											if (!ToContacts.Find(k))
-											{
-												Contact *n = new Contact(App);
-												if (n)
-												{
-													*n = (Thing&)*c;
-													n->SetParentFolder(To);
-													To->Items.Insert(n);
+											auto k = ContactKey(c);
+											if (k)
+												ToContacts.Add(k, c);
+										}
+									}
 
-													/*
-													n->Store = To->Store->CreateSub(n);
-													if (n->Store)
+									int InitContactErrors = ContactErrors;
+									uint64 Last = LCurrentTime();
+									for (auto t: From->Items)
+									{
+										if (Prog && Prog->IsCancelled())
+											break;
+										
+										Contact *c = t->IsContact();
+										if (c)
+										{
+											auto k = ContactKey(c);
+											if (k)
+											{
+												if (!ToContacts.Find(k))
+												{
+													Contact *n = new Contact(App);
+													if (n)
 													{
-														n->Store->Object = n;
-														ContactCreated++;
+														*n = (Thing&)*c;
+														n->SetParentFolder(To);
+														To->Items.Insert(n);
+
+														/*
+														n->Store = To->Store->CreateSub(n);
+														if (n->Store)
+														{
+															n->Store->Object = n;
+															ContactCreated++;
+														}
+														else ContactErrors++;
+														*/
 													}
 													else ContactErrors++;
-													*/
 												}
-												else ContactErrors++;
+												else ContactSkipped++;
 											}
-											else ContactSkipped++;
+											else ContactErrors++;
 										}
-										else ContactErrors++;
+
+										if (Prog)
+											Prog->Value(Prog->Value() + 1);
 									}
 
-									if (Prog)
-										Prog->Value(Prog->Value() + 1);
+									Status |= ContactErrors == InitContactErrors;
+									break;
 								}
 
-								Status |= ContactErrors == InitContactErrors;
-								break;
-							}
-						}
-
-						if (!FromLoaded)
-						{
-							From->UnloadThings();
-						}
-						if (!ToLoaded)
-						{
-							To->UnloadThings();
-						}
-
-						if (Children)
-						{
-							char t[256];
-							char f[256];
-							LString n;
-
-							for (ScribeFolder *c = From->GetChildFolder(); c && (!Prog || !Prog->IsCancelled()); c = c->GetNextFolder())
-							{
-								n = c->GetName(true);
-								if (n)
+								if (!FromLoaded)
 								{
-									strcpy_s(t, sizeof(t), ToPath);
-									char *e = t + strlen(t) - 1;
-									if (*e++ != '/') *e++ = '/';
-									strcpy_s(e, sizeof(t)-(e-t), n);
+									From->UnloadThings();
+								}
+								if (!ToLoaded)
+								{
+									To->UnloadThings();
+								}
 
-									strcpy_s(f, sizeof(f), FromPath);
-									e = f + strlen(f) - 1;
-									if (*e++ != '/') *e++ = '/';
-									strcpy_s(e, sizeof(f)-(e-f), n);
+								if (Children)
+								{
+									char t[256];
+									char f[256];
+									LString n;
+
+									for (ScribeFolder *c = From->GetChildFolder(); c && (!Prog || !Prog->IsCancelled()); c = c->GetNextFolder())
+									{
+										n = c->GetName(true);
+										if (n)
+										{
+											strcpy_s(t, sizeof(t), ToPath);
+											char *e = t + strlen(t) - 1;
+											if (*e++ != '/') *e++ = '/';
+											strcpy_s(e, sizeof(t)-(e-t), n);
+
+											strcpy_s(f, sizeof(f), FromPath);
+											e = f + strlen(f) - 1;
+											if (*e++ != '/') *e++ = '/';
+											strcpy_s(e, sizeof(f)-(e-f), n);
 									
-									ExportFolder(t, f, true, Prog);
+											ExportFolder(t, f, true, Prog);
+										}
+									}
 								}
 							}
-						}
+						};
+
+						To->LoadThings(NULL, [&](auto status)
+						{
+							From->LoadThings(NULL, [&](auto status)
+							{
+								ProcessItem();
+							});
+						});
 					}
 				}
 			}

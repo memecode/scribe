@@ -1213,11 +1213,11 @@ public:
 	void SetDefaultFields(bool Force = false);
 	bool Thread();
 	ScribePerm GetFolderPerms(ScribeAccessType Access); 
-	bool SetFolderPerms(LView *Parent, ScribeAccessType Access, ScribePerm Perm); 
+	void SetFolderPerms(LView *Parent, ScribeAccessType Access, ScribePerm Perm, std::function<void(bool)> Callback); 
 	bool GetThreaded();
 	void SetThreaded(bool t);
 	// void Update();
-	Mail *GetMessageById(char *Id);
+	void GetMessageById(const char *Id, std::function<void(Mail*)> Callback);
 	void SetLoadOnDemand();
 	void SortSubfolders();
 	void DoContextMenu(LMouse &m);
@@ -1226,11 +1226,11 @@ public:
 	bool SortItems();
 	
 	// Virtuals
-	virtual Store3Status WriteThing(Thing *t);
+	virtual void WriteThing(Thing *t, std::function<void(Store3Status)> Callback);
+	virtual void LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback);
 	virtual bool DeleteThing(Thing *t);
 	virtual bool DeleteAllThings();
 	virtual bool LoadFolders();
-	virtual Store3State LoadThings(LViewI *Parent = 0);
 	virtual bool UnloadThings();
 	virtual bool IsWriteable() { return true; }
 	virtual bool IsPublicFolders() { return false; }
@@ -1269,9 +1269,9 @@ public:
 
 	// Import/Export
 	bool GetFormats(bool Export, LString::Array &MimeTypes);
-	bool Import(LStreamI &f, char *MimeType);
-	bool Export(LStreamI &f, char *MimeType);
-	LProgressDlg *ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType);
+	bool Import(LStreamI &f, const char *MimeType);
+	void Export(LStreamI &f, const char *MimeType, std::function<void(Store3Status)> Callback = NULL);
+	void ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, std::function<void(LProgressDlg*)> Callback = NULL);
 	const char *GetStorageMimeType();
 
 	// Dom
@@ -2367,8 +2367,8 @@ public:
 
 	int				GetCalendarSources(LArray<CalendarSource*> &Sources);
 
-	bool			GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName);
-	bool			GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType);
+	void			GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback);
+	void			GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType, std::function<void(bool)> Callback);
 	const char*		EditCtrlMimeType();
 	LAutoString		GetReplyXml(const char *MimeType);
 	LAutoString		GetForwardXml(const char *MimeType);

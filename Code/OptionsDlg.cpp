@@ -107,14 +107,18 @@ public:
 
 	void OnMouseClick(LMouse &m)
 	{
-		if (m.Double() &&
-			Account &&
-			Dlg->App->GetAccountSettingsAccess(Dlg, ScribeReadAccess))
+		if (m.Double() && Account)
 		{
-			Account->InitUI(Parent, 0, [&](auto status)
+			Dlg->App->GetAccountSettingsAccess(Dlg, ScribeReadAccess, [&](auto Allow)
 			{
-				if (status)
-					Update();
+				if (Allow)
+				{
+					Account->InitUI(Parent, 0, [&](auto status)
+					{
+						if (status)
+							Update();
+					});
+				}
 			});
 		}
 
@@ -816,8 +820,10 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_ADD:
 		{
-			if (App->GetAccountSettingsAccess(this, ScribeWriteAccess))
+			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [&](auto Allow)
 			{
+				if (!Allow)
+					return;
 				List<ScribeAccount> *AList = App->GetAccounts();
 				LList *ACtrl;
 				if (AList && GetViewById(IDC_ACCOUNTS, ACtrl))
@@ -840,13 +846,15 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 						});
 					}
 				}
-			}
+			});
 			break;
 		}
 		case IDC_DELETE:
 		{
-			if (App->GetAccountSettingsAccess(this, ScribeWriteAccess))
+			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [&](auto Allow)
 			{
+				if (!Allow)
+					return;
 				List<AccountItem> Sel;
 				LList *ACtrl;
 				if (GetViewById(IDC_ACCOUNTS, ACtrl) && ACtrl->GetSelection(Sel))
@@ -885,73 +893,63 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 						}
 					}
 				}
-			}
+			});
 			break;
 		}
 		case IDC_UP:
 		case IDC_DOWN:
 		{
-			if (!App->GetAccountSettingsAccess(this, ScribeWriteAccess))
-				break;
-
-			List<AccountItem> a;
-			LList *ACtrl;
-			if (!GetViewById(IDC_ACCOUNTS, ACtrl) || !ACtrl->GetAll(a))
-				break;
-
-			AccountItem *Sel = NULL;
-			for (int i=0; i<a.Length(); i++)
+			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [&](auto Allow)
 			{
-				if (a[i]->Select())
+				if (!Allow)
+					return;
+
+				List<AccountItem> a;
+				LList *ACtrl;
+				if (!GetViewById(IDC_ACCOUNTS, ACtrl) || !ACtrl->GetAll(a))
+					return;
+
+				AccountItem *Sel = NULL;
+				for (int i=0; i<a.Length(); i++)
 				{
-					Sel = a[i];
-					break;
+					if (a[i]->Select())
+					{
+						Sel = a[i];
+						break;
+					}
 				}
-			}
 			
-			if (!Sel)
-				break;
+				if (!Sel)
+					return;
 				
-			bool IsUp = Ctrl->GetId() == IDC_UP;
-			int Idx = ACtrl->IndexOf(Sel);
-			int NewIdx = IsUp ? Idx - 1 : Idx + 1;
-			if (NewIdx < 0)
-				break;
-			ACtrl->Remove(Sel);
-			ACtrl->Insert(Sel, NewIdx);
-			Sel->Select(true);
+				bool IsUp = Ctrl->GetId() == IDC_UP;
+				int Idx = ACtrl->IndexOf(Sel);
+				int NewIdx = IsUp ? Idx - 1 : Idx + 1;
+				if (NewIdx < 0)
+					return;
+				ACtrl->Remove(Sel);
+				ACtrl->Insert(Sel, NewIdx);
+				Sel->Select(true);
 
-			// printf("%s:%i - index = %i -> %i, sel=%p\n", _FL, Idx, NewIdx, Sel->Account);
-			
-			ACtrl->GetAll(a);
-			for (int i=0; i<a.Length(); i++)
-			{
-				ScribeAccount *Acc = a[i]->GetAccount();
-				if (Acc)
+				ACtrl->GetAll(a);
+				for (int i=0; i<a.Length(); i++)
 				{
-					Acc->Identity.Sort(i+1);
-					// printf("%s:%i - %p = %i\n", _FL, Acc, i+1);
+					ScribeAccount *Acc = a[i]->GetAccount();
+					if (Acc)
+						Acc->Identity.Sort(i+1);
 				}
-			}
 			
-			ACtrl->Sort(AccountCmp);
-
-			/*
-			for (unsigned i=0; i<a.Length(); i++)
-			{
-				ScribeAccount *Acc = a[i]->GetAccount();
-				if (Acc)
-				{
-					printf("%s:%i - %p = %i\n", _FL, Acc, Acc->Identity.Sort());
-				}
-			}
-			*/
+				ACtrl->Sort(AccountCmp);
+			});
 			break;
 		}
 		case IDC_PROPERTIES:
 		{
-			if (App->GetAccountSettingsAccess(this, ScribeReadAccess))
+			App->GetAccountSettingsAccess(this, ScribeReadAccess, [&](auto Allow)
 			{
+				if (!Allow)
+					return;
+
 				List<LListItem> Sel;
 				LList *ACtrl;
 				if (GetViewById(IDC_ACCOUNTS, ACtrl) && ACtrl->GetSelection(Sel))
@@ -973,7 +971,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 				{
 					LgiMsg(this, "No account selected.", AppName, MB_OK);
 				}
-			}
+			});
 			break;
 		}
 		case IDC_SET_SOUND:

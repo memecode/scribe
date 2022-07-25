@@ -320,18 +320,18 @@ int AccountDlg::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDOK:
 		{
-			if (App->GetAccountSettingsAccess(this, ScribeWriteAccess))
+			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [&](auto Allow)
 			{
-				if (!ValidStr(GetCtrlName(IDC_ACCOUNT_NAME)))
+				if (Allow)
 				{
-					SetCtrlName(IDC_ACCOUNT_NAME, "My ISP");
+					if (!ValidStr(GetCtrlName(IDC_ACCOUNT_NAME)))
+						SetCtrlName(IDC_ACCOUNT_NAME, "My ISP");
+					Account->SerializeUi(this, false);
+
+					EndModal(c->GetId());
 				}
-
-				Account->SerializeUi(this, false);
-			}
-			else break;
-
-			// fall through
+			});
+			break;
 		}
 		case IDCANCEL:
 		{

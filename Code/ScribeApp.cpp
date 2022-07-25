@@ -7417,16 +7417,24 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		{
 			// Check for user perm password...
 			// No point allow any old one to edit the security settings.
-			bool Allow = true;
-			GPassword p;
-			if (p.Serialize(GetOptions(), OPT_UserPermPassword, false))
-			{
-				Allow = GetAccessLevel(this, PermRequireUser, "Security Settings");
-			}
-			if (Allow)
+			auto ShowDialog = [&]()
 			{
 				auto Dlg = new SecurityDlg(this);
 				Dlg->DoModal(NULL);
+			};
+
+			GPassword p;
+			if (p.Serialize(GetOptions(), OPT_UserPermPassword, false))
+			{
+				GetAccessLevel(this, PermRequireUser, "Security Settings", [&](bool Allow)
+				{
+					if (Allow)
+						ShowDialog();
+				});
+			}
+			else
+			{
+				ShowDialog();
 			}
 			break;
 		}
@@ -11003,26 +11011,23 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 	return LAutoString(p.NewStr());
 }
 
-bool ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName)
+void ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback)
 {
-	LAssert(!"Fixme: convert to async.");
-
 	if (Required <= CurrentAuthLevel)
 	{
-		return true;
+		if (Callback) Callback(true);
+		return;
 	}
 	
 	if (!Parent)
-	{
 		Parent = this;
-	}
 	
 	switch (Required)
 	{
 		case PermRequireNone:
 		{
-			return true;
-			break;
+			if (Callback) Callback(true);
+			return;
 		}
 		case PermRequireUser:
 		{
@@ -11048,6 +11053,11 @@ bool ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *
 						
 							auto i = Menu->FindItem(IDM_LOGOUT);
 							if (i) i->Enabled(true);
+							if (Callback) Callback(true);
+						}
+						else
+						{
+							if (Callback) Callback(false);
 						}
 					}
 					delete dlg;
@@ -11055,10 +11065,10 @@ bool ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *
 			}
 			else
 			{
-				Status = true;
+				if (Callback) Callback(true);
+				return;
 			}
-
-			return Status;
+			break;
 		}
 		case PermRequireAdmin:
 		{
@@ -11086,7 +11096,11 @@ bool ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *
 								CurrentAuthLevel = PermRequireAdmin;
 								auto i = Menu->FindItem(IDM_LOGOUT);
 								if (i) i->Enabled(true);
-								// return true;
+								if (Callback) Callback(true);
+							}
+							else
+							{
+								if (Callback) Callback(false);
 							}
 						}
 						delete dlg;
@@ -11095,18 +11109,16 @@ bool ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *
 				else
 				{
 					LgiMsg(Parent, "Admin password not correctly encoded.", AppName);
+					if (Callback) Callback(false);
 				}
-
-				return false;
 			}
+			else if (Callback) Callback(false);
 			break;
 		}
 	}
-	
-	return false;
 }
 
-bool ScribeWnd::GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType)
+void ScribeWnd::GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType, std::function<void(bool)> Callback)
 {
 	LVariant Level = (int)PermRequireNone;
 	
@@ -11123,7 +11135,7 @@ bool ScribeWnd::GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType Access
 	}
 	*/
 
-	return GetAccessLevel(Parent ? Parent : this, (ScribePerm)Level.CastInt32(), "Account Settings");
+	GetAccessLevel(Parent ? Parent : this, (ScribePerm)Level.CastInt32(), "Account Settings", Callback);
 }
 
 LMutex *ScribeWnd::GetLock()
