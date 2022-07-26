@@ -2374,7 +2374,7 @@ public:
 
 	int				GetCalendarSources(LArray<CalendarSource*> &Sources);
 
-	void			GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback);
+	Store3Status	GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback);
 	void			GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType, std::function<void(bool)> Callback);
 	const char*		EditCtrlMimeType();
 	LAutoString		GetReplyXml(const char *MimeType);

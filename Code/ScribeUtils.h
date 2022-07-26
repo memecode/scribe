@@ -22,6 +22,8 @@ ScribeExtern LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes C
 ScribeFunc const char *ScribeResourcePath();
 ScribeExtern LString::Array ScribeThemePaths();
 ScribeExtern LString DetectCharset(LString s);
+ScribeExtern void WaitForVariant(LVariant &var);
+ScribeExtern void WaitForString(LString &var);
 extern LAutoString ConvertThreadIndex(char *ThreadIndex, int TruncateChars = 0);
 
 /// Parses HTML into a tree and then evaluates 'SearchExp' on each node.

@@ -511,7 +511,7 @@ public:
 		for (auto Groups: GrpSrcs)
 		{
 			if (!Groups->IsLoaded())
-				Groups->LoadThings(NULL, NULL); // FIXME... this should refresh the browse list after load
+				Groups->LoadThings(); // FIXME... this should refresh the browse list after load
 
 			for (auto t : Groups->Items)
 			{

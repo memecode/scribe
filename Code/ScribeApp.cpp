@@ -3032,11 +3032,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 
 			// This is obviously not ideal, but I don't want to implement a scripting language callback for
 			// something that should be a simple modal dialog that waits for user input.
-			while (Loop)
-			{
-				LYield();
-				LSleep(10);
-			}
+			WaitForString(Result);
 
 			if (ReturnValue)
 				*ReturnValue = Result;
@@ -4902,6 +4898,7 @@ public:
 		while (Status < 0)
 		{
 			LYield();
+			LSleep(10);
 		}
 
 		Prog.Reset();
@@ -5224,10 +5221,10 @@ bool ScribeWnd::LoadMailStores()
 		// Force load some folders...
 		ScribeFolder *Folder = GetFolder(FOLDER_CALENDAR);
 		if (Folder)
-			Folder->LoadThings(NULL, NULL);
+			Folder->LoadThings();
 		Folder = GetFolder(FOLDER_FILTERS);
 		if (Folder)
-			Folder->LoadThings(NULL, NULL);
+			Folder->LoadThings();
 		for (auto ms: Folders)
 		{
 			if (!ms.Root)
@@ -5236,7 +5233,7 @@ bool ScribeWnd::LoadMailStores()
 			{
 				if (c->GetItemType() == MAGIC_CONTACT ||
 					c->GetItemType() == MAGIC_FILTER)
-					c->LoadThings(NULL, NULL);
+					c->LoadThings();
 			}
 		}
 
@@ -5568,7 +5565,7 @@ void ScribeWnd::BuildDynMenus()
 		ScribeFolder *Templates = GetFolder(FOLDER_TEMPLATES, NULL, true);
 		if (Templates)
 		{
-			Templates->LoadThings(NULL, NULL);
+			Templates->LoadThings();
 
 			for (auto i: Templates->Items)
 			{
@@ -6216,7 +6213,7 @@ bool ScribeWnd::OpenAMail(ScribeFolder *Folder)
 	if (Folder &&
 		Tree)
 	{
-		Folder->LoadThings(NULL, NULL);
+		Folder->LoadThings();
 
 		for (auto i: Folder->Items)
 		{
@@ -6506,7 +6503,7 @@ void ScribeWnd::OnTrayMenu(LSubMenu &m)
 	LArray<ScribeFolder*> Srcs = GetThingSources(MAGIC_CONTACT);
 	for (auto c: Srcs)
 	{
-		c->LoadThings(NULL, NULL);
+		c->LoadThings();
 		for (auto i: c->Items)
 		{
 			Contact *c = i->IsContact();
@@ -8306,9 +8303,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			CurrentAuthLevel = PermRequireNone; 
 			auto i = Menu->FindItem(IDM_LOGOUT);
 			if (i)
-			{
 				i->Enabled(false);
-			}
 			break;
 		}
 		case IDM_LAYOUT1:
@@ -11013,12 +11008,24 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 	return LAutoString(p.NewStr());
 }
 
-void ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback)
+// Get the effective permissions for a resource.
+//
+// This method can be used by both sync and async code:
+// In sync mode, don't supply a callback (ie = NULL) and the return value will be:
+//		Store3Error - no access
+//		Store3Delayed - no access, asking the user for password
+//		Store3Success - allow immediate access
+//
+// In async mode, supply a callback and wait for the response.
+//		callback(false) - no access
+//		callback(true) - allow immediate access
+// in this mode the same return values as sync mode are used.
+Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback)
 {
-	if (Required <= CurrentAuthLevel)
+	if (Required >= CurrentAuthLevel)
 	{
 		if (Callback) Callback(true);
-		return;
+		return Store3Success;
 	}
 	
 	if (!Parent)
@@ -11026,51 +11033,47 @@ void ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *
 	
 	switch (Required)
 	{
-		case PermRequireNone:
-		{
-			if (Callback) Callback(true);
-			return;
-		}
+		default:
+			break;
 		case PermRequireUser:
 		{
 			bool Status = false;
 
 			GPassword p;
-			if (p.Serialize(GetOptions(), OPT_UserPermPassword, false))
-			{
-				char Msg[256];
-				sprintf_s(Msg, sizeof(Msg), LLoadString(IDS_ASK_USER_PASS), ResourceName);
-				
-				auto d = new LInput(Parent, "", Msg, AppName, true);
-				d->DoModal([&](auto dlg, auto id)
-				{
-					if (id && d->GetStr())
-					{
-						char Pass[256];
-						p.Get(Pass);
-						Status = strcmp(Pass, d->GetStr()) == 0;
-						if (Status)
-						{
-							CurrentAuthLevel = PermRequireUser;
-						
-							auto i = Menu->FindItem(IDM_LOGOUT);
-							if (i) i->Enabled(true);
-							if (Callback) Callback(true);
-						}
-						else
-						{
-							if (Callback) Callback(false);
-						}
-					}
-					delete dlg;
-				});
-			}
-			else
+			if (!p.Serialize(GetOptions(), OPT_UserPermPassword, false))
 			{
 				if (Callback) Callback(true);
-				return;
+				return Store3Success;
 			}
-			break;
+
+			char Msg[256];
+			sprintf_s(Msg, sizeof(Msg), LLoadString(IDS_ASK_USER_PASS), ResourceName);
+				
+			auto d = new LInput(Parent, "", Msg, AppName, true);
+			d->DoModal([&](auto dlg, auto id)
+			{
+				if (id && d->GetStr())
+				{
+					char Pass[256];
+					p.Get(Pass);
+					Status = strcmp(Pass, d->GetStr()) == 0;
+					if (Status)
+					{
+						CurrentAuthLevel = PermRequireUser;
+						
+						auto i = Menu->FindItem(IDM_LOGOUT);
+						if (i) i->Enabled(true);
+						if (Callback) Callback(true);
+					}
+					else
+					{
+						if (Callback) Callback(false);
+					}
+				}
+				delete dlg;
+			});
+
+			return Store3Delayed;
 		}
 		case PermRequireAdmin:
 		{
@@ -11079,45 +11082,50 @@ void ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *
 			auto Hash = LAppInst->GetConfig(Key);
 			if (ValidStr(Hash))
 			{
-				uchar Bin[256];
-				ssize_t BinLen = 0;
-				if ((BinLen = ConvertBase64ToBinary(Bin, sizeof(Bin), Hash, strlen(Hash))) == 16)
-				{
-					auto d = new LInput(Parent, "", LLoadString(IDS_ASK_ADMIN_PASS), AppName, true);
-					d->DoModal([&](auto dlg, auto id)
-					{
-						if (id && d->GetStr())
-						{
-							unsigned char Digest[16];
-							char Str[256];
-							sprintf_s(Str, sizeof(Str), "%s admin", d->GetStr().Get());
-							MDStringToDigest(Digest, Str);
-						
-							if (memcmp(Bin, Digest, 16) == 0)
-							{
-								CurrentAuthLevel = PermRequireAdmin;
-								auto i = Menu->FindItem(IDM_LOGOUT);
-								if (i) i->Enabled(true);
-								if (Callback) Callback(true);
-							}
-							else
-							{
-								if (Callback) Callback(false);
-							}
-						}
-						delete dlg;
-					});
-				}
-				else
-				{
-					LgiMsg(Parent, "Admin password not correctly encoded.", AppName);
-					if (Callback) Callback(false);
-				}
+				if (Callback) Callback(false);
+				return Store3Error;
 			}
-			else if (Callback) Callback(false);
-			break;
+
+			uchar Bin[256];
+			ssize_t BinLen = 0;
+			if ((BinLen = ConvertBase64ToBinary(Bin, sizeof(Bin), Hash, strlen(Hash))) != 16)
+			{
+				LgiMsg(Parent, "Admin password not correctly encoded.", AppName);
+				if (Callback) Callback(false);
+				return Store3Error;
+			}
+
+			auto d = new LInput(Parent, "", LLoadString(IDS_ASK_ADMIN_PASS), AppName, true);
+			d->DoModal([&](auto dlg, auto id)
+			{
+				if (id && d->GetStr())
+				{
+					unsigned char Digest[16];
+					char Str[256];
+					sprintf_s(Str, sizeof(Str), "%s admin", d->GetStr().Get());
+					MDStringToDigest(Digest, Str);
+						
+					if (memcmp(Bin, Digest, 16) == 0)
+					{
+						CurrentAuthLevel = PermRequireAdmin;
+						auto i = Menu->FindItem(IDM_LOGOUT);
+						if (i) i->Enabled(true);
+						if (Callback) Callback(true);
+					}
+					else
+					{
+						if (Callback) Callback(false);
+					}
+				}
+				delete dlg;
+			});
+
+			return Store3Delayed;
 		}
 	}
+
+	if (Callback) Callback(true);
+	return Store3Success;
 }
 
 void ScribeWnd::GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType, std::function<void(bool)> Callback)

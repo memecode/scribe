@@ -931,7 +931,7 @@ void BuildSpamDB::Process()
 				});
 
 				// FIXME: does this need to do something on callback?
-				f->LoadThings(NULL, NULL);
+				f->LoadThings();
 			}
 			else
 			{
@@ -1160,8 +1160,8 @@ void BayesianFilter::BuildStats()
 	if (!prob || !inbox)
 		return;
 
-	prob->LoadThings(NULL, NULL);
-	inbox->LoadThings(NULL, NULL);
+	prob->LoadThings();
+	inbox->LoadThings();
 }
 
 bool BayesianFilter::BuildSpamDb()

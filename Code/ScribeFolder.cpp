@@ -851,7 +851,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			if (f)
 			{
 				// FIXME
-				f->LoadThings(NULL, NULL);
+				f->LoadThings();
 
 				auto Merge = s.Sub->AppendSub(LLoadString(IDS_MERGE_TEMPLATE));
 				if (Merge)
@@ -1479,135 +1479,159 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 	if (!FldObj)
 	{
 		LgiTrace("%s:%i - No folder object.\n", _FL);
-		if (Callback) Callback(Store3Error);
 		return Store3Error;
 	}
 
-	auto Loaded = [&]()
+	if (!Parent)
+		Parent = App;
+
+	auto ContinueLoading = [&]()
 	{
-		int Unread = OldUnRead;
-		if (Unread < 0)
-			Unread = GetUnRead();
-
-		Loading.Reset();
-
-		auto &Children = GetFldObj()->Children();
-		if (Children.GetState() != Store3Loaded)
-		{
-			LAssert(!"Really should be loaded by now.");
-			return;
-		}
-
-		for (auto c = Children.First(); c; c = Children.Next())
-		{
-			auto t = CastThing(c);
-			if (t)
+		WhenLoaded(_FL,
+			[&]()
 			{
-				// LAssert(Items.HasItem(t));
-			}
-			else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
-			{
-				t->SetObject(c, _FL);
-				t->App = App;
+				// This is called when all the Store3 objects are loaded
+				int Unread = OldUnRead;
+				if (Unread < 0)
+					Unread = GetUnRead();
 
-				t->ParentFolder = this;
-				LAssert(!Items.HasItem(t));
-				Items.Insert(t);
+				Loading.Reset();
+
+				auto &Children = GetFldObj()->Children();
+				if (Children.GetState() != Store3Loaded)
+				{
+					LAssert(!"Really should be loaded by now.");
+					return;
+				}
+
+				for (auto c = Children.First(); c; c = Children.Next())
+				{
+					auto t = CastThing(c);
+					if (t)
+					{
+						// LAssert(Items.HasItem(t));
+					}
+					else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
+					{
+						t->SetObject(c, _FL);
+						t->App = App;
+
+						t->ParentFolder = this;
+						LAssert(!Items.HasItem(t));
+						Items.Insert(t);
 						
-				t->OnSerialize(false);
-			}
-		}
+						t->OnSerialize(false);
+					}
+				}
 
-		int NewUnRead = 0;
-		for (auto t: Items)
-		{
-			if (t->GetFolder() != this)
-			{
-				#ifdef _DEBUG
-				char s[256];
-				sprintf_s(s, sizeof(s),
-					"%s:%i - Error, thing not parented correctly: this='%s', child='%x'\n",
-					_FL,
-					GetText(0),
-					t->GetObject() ? t->GetObject()->Type() : 0);
-				printf("%s", s);
-				LgiMsg(App, s, AppName);
-				#endif
+				int NewUnRead = 0;
+				for (auto t: Items)
+				{
+					if (t->GetFolder() != this)
+					{
+						#ifdef _DEBUG
+						char s[256];
+						sprintf_s(s, sizeof(s),
+							"%s:%i - Error, thing not parented correctly: this='%s', child='%x'\n",
+							_FL,
+							GetText(0),
+							t->GetObject() ? t->GetObject()->Type() : 0);
+						printf("%s", s);
+						LgiMsg(App, s, AppName);
+						#endif
 			
-				t->SetFolder(this);
+						t->SetFolder(this);
+					}
+
+					Mail *m = t->IsMail();
+					if (m)
+						NewUnRead += (m->GetFlags() & MAIL_READ) ? 0 : 1;
+
+					t->SetFieldArray(FieldArray);
+				}
+
+				if (Unread != NewUnRead)
+					OnUpdateUnRead(NewUnRead - Unread, false);
+
+				Update();
+
+				if (d->IsInbox < 0 && App)
+				{
+					d->IsInbox = App->GetFolder(FOLDER_INBOX) == this;
+					if (d->IsInbox > 0)
+						UpdateOsUnread();
+				}
+
+				if (Callback)
+					Callback(Store3Success);
+			},
+			0);
+
+		if (!IsLoaded())
+		{
+			bool Ui = Tree ? Tree->InThread() : false;
+			if (Ui)
+				Tree->Capture(false);
+
+			auto &Children = FldObj->Children();
+			auto Status = Children.GetState();
+			if (Status != Store3Loaded)
+			{
+				if (View() && Loading.Reset(Ui ? new LoadingItem(&Children) : NULL))
+					View()->Insert(Loading);
+
+				return Status; // Ie deferred or error...
 			}
 
-			Mail *m = t->IsMail();
-			if (m)
-				NewUnRead += (m->GetFlags() & MAIL_READ) ? 0 : 1;
-
-			t->SetFieldArray(FieldArray);
+			IsLoaded(true);
 		}
 
-		if (Unread != NewUnRead)
-			OnUpdateUnRead(NewUnRead - Unread, false);
-
-		Update();
-
-		if (d->IsInbox < 0 && App)
-		{
-			d->IsInbox = App->GetFolder(FOLDER_INBOX) == this;
-			if (d->IsInbox > 0)
-				UpdateOsUnread();
-		}
+		return Store3Loaded;
 	};
 
 	auto Path = GetPath();
-	if (App)
+	if (!App || !Path)
 	{
-		App->GetAccessLevel(Parent ? Parent : App, GetReadAccess(), Path, [&](bool Allow)
+		LAssert(!"We should probably always have an 'App' and 'Path' ptrs...");
+		return Store3Error;
+	}
+
+	std::function<void(bool)> AccessCb;
+	if (Callback)
+	{
+		AccessCb = [&](bool Access)
 		{
-			if (Allow)
-			{
-				WhenLoaded(_FL, Loaded, 0);
-			}
+			if (Access)
+				ContinueLoading();
 			else
-			{
-				// No read access:
-				LgiTrace("%s:%i - Folder read access denied.\n", _FL);
+				Callback(Store3Error);
+		};
+	}
 
-				// Emptying the item list, leave the store nodes around though
-				for (auto t: Items)
-					t->SetObject(NULL, _FL);
+	auto Access = App->GetAccessLevel(	Parent,
+										GetReadAccess(),
+										Path,
+										AccessCb);
+	if (Access == Store3Error)
+	{		
+		// No read access:
+		LgiTrace("%s:%i - Folder read access denied.\n", _FL);
 
-				Items.Empty();
-				IsLoaded(false);
+		// Emptying the item list, leave the store nodes around though
+		for (auto t: Items)
+			t->SetObject(NULL, _FL);
+
+		Items.Empty();
+		IsLoaded(false);
 		
-				Update();
-				if (Callback)
-					Callback(Store3Error);
-			}
-		});
+		Update();
 	}
-	else WhenLoaded(_FL, Loaded, 0);
-
-	if (!IsLoaded())
+	else if (Access == Store3Success)
 	{
-		bool Ui = Tree ? Tree->InThread() : false;
-		if (Ui)
-			Tree->Capture(false);
-
-		auto &Children = FldObj->Children();
-		auto Status = Children.GetState();
-		if (Status != Store3Loaded)
-		{
-			if (View() && Loading.Reset(Ui ? new LoadingItem(&Children) : NULL))
-				View()->Insert(Loading);
-
-			auto Ret = Status >= Store3Loaded ? Store3Success : Store3Error;
-			if (Callback) Callback(Ret);
-			return Ret;
-		}
-
-		IsLoaded(true);
+		ContinueLoading();
 	}
-
-	return Store3Success;
+		
+	return Access;
 }
 
 void ScribeFolder::OnRename(char *NewName)
@@ -2662,7 +2686,7 @@ Prof.Add("Set def fields");
 
 Prof.Add("Load things");
 		// FIXME:
-		LoadThings(NULL, NULL);
+		LoadThings();
 	}
 
 	// Filter
@@ -3972,21 +3996,6 @@ Mail *ScribeFolder::operator [](size_t i)
 	return NULL;
 }
 
-// This converts an async call to sync, because the GetVariant / CallMethod API
-// can't be changed to include a callback. It's a hack until such time as there
-// is proper support for callbacks in the DOM api.
-void WaitForVariant(LVariant &var)
-{
-	auto StartTs = LCurrentTime();
-	while (var.Type == GV_NULL)
-	{
-		LSleep(10);
-		LYield();
-		if (LCurrentTime() - StartTs > 20000)
-			LAssert(!"Yeah why is this taking so long?");
-	}
-}
-
 bool ScribeFolder::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
 	ScribeDomType Fld = StrToDom(Name);
@@ -4025,59 +4034,53 @@ bool ScribeFolder::GetVariant(const char *Name, LVariant &Value, const char *Arr
 		{
 			Value.Empty();
 
-			LoadThings(NULL, [&](auto Status)
+			LoadThings(); // Use in sync mode, no callback
+
+			// This call back HAS to set value one way or another...
+			if (Array)
 			{
-				// This call back HAS to set value one way or another...
-				if (Array)
+				bool IsNumeric = true;
+				for (auto *v = Array; *v; v++)
 				{
-					bool IsNumeric = true;
-					for (auto *v = Array; *v; v++)
+					if (!IsDigit(*v))
 					{
-						if (!IsDigit(*v))
-						{
-							IsNumeric = false;
-							break;
-						}
-					}
-
-					if (IsNumeric)
-					{
-						int Idx = atoi(Array);
-						if (Idx >= 0 && Idx < (ssize_t)Items.Length())
-						{
-							Value = (LDom*) Items[Idx];
-							return;
-						}
-					}
-					else // Is message ID?
-					{
-						for (auto t : Items)
-						{
-							Mail *m = t->IsMail();
-							if (!m)
-								break;
-
-							auto Id = m->GetMessageId();
-							if (Id && !strcmp(Id, Array))
-							{
-								Value = (LDom*)t;
-								return;
-							}
-						}
+						IsNumeric = false;
+						break;
 					}
 				}
-				else if (Value.SetList())
+
+				if (IsNumeric)
+				{
+					int Idx = atoi(Array);
+					if (Idx >= 0 && Idx < (ssize_t)Items.Length())
+					{
+						Value = (LDom*) Items[Idx];
+						return true;
+					}
+				}
+				else // Is message ID?
 				{
 					for (auto t : Items)
-						Value.Value.Lst->Insert(new LVariant((LDom*)t));
-					return;
+					{
+						Mail *m = t->IsMail();
+						if (!m)
+							break;
+
+						auto Id = m->GetMessageId();
+						if (Id && !strcmp(Id, Array))
+						{
+							Value = (LDom*)t;
+							return true;
+						}
+					}
 				}
-
-				Value = false;
-			});
-
-			// Convert the async LoadFolders call back to sync.
-			WaitForVariant(Value);
+			}
+			else if (Value.SetList())
+			{
+				for (auto t : Items)
+					Value.Value.Lst->Insert(new LVariant((LDom*)t));
+				return true;
+			}
 			break;
 		}
 		case SdItemType: // Type: Int32
