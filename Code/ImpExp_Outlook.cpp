@@ -1672,7 +1672,7 @@ bool OutlookIO::LoadSession(LViewI *Parent, char *ResetClient)
 
 Mail *MatchEmail(ScribeFolder *f, Mail *m1)
 {
-	f->LoadThings();
+	f->LoadThings(NULL, NULL);
 
 	for (auto t: f->Items)
 	{
@@ -2374,7 +2374,7 @@ bool PropToDate(SPropValue *p, LDateTime &dt)
 
 Contact *MatchContact(ScribeFolder *f, Contact *c1)
 {
-	f->LoadThings();
+	f->LoadThings(NULL, NULL);
 
 	for (auto t: f->Items)
 	{
@@ -2405,7 +2405,7 @@ Contact *MatchContact(ScribeFolder *f, Contact *c1)
 
 Calendar *MatchCalendar(ScribeFolder *f, Calendar *c1)
 {
-	f->LoadThings();
+	f->LoadThings(NULL, NULL);
 
 	for (auto t: f->Items)
 	{
@@ -3289,7 +3289,7 @@ bool OutlookIO::Export(	ExportParams *P,
 
 					// Copy items from Scribe to the MAPI store
 					bool WasLoaded = In->IsLoaded();
-					In->LoadThings();
+					In->LoadThings(NULL, NULL);
 
 					if (P->Prog)
 					{

@@ -111,7 +111,7 @@ bool ImportEudoraAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 									else n = Next;
 								}
 
-								Status |= (Folder->WriteThing(c) != Store3Error);
+								Status |= (Folder->WriteThing(c, NULL) != Store3Error);
 							}
 						}
 					}

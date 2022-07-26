@@ -324,7 +324,7 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 
 					if (Flds > 0)
 					{
-						Folder->WriteThing(c);
+						Folder->WriteThing(c, NULL);
 						Status = true;
 					}
 					else
@@ -409,7 +409,7 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 		
 		Status = Map.Length() > 0;
 		for (auto p: Map)
-			Folder->WriteThing(p.value);
+			Folder->WriteThing(p.value, NULL);
 	}
 	else
 	{

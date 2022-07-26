@@ -1225,25 +1225,32 @@ public:
 	bool IsInTrash();
 	bool SortItems();
 	
-	// Virtuals
-	virtual void WriteThing(Thing *t, std::function<void(Store3Status)> Callback);
-	virtual void LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback);
-	virtual bool DeleteThing(Thing *t);
-	virtual bool DeleteAllThings();
-	virtual bool LoadFolders();
-	virtual bool UnloadThings();
-	virtual bool IsWriteable() { return true; }
-	virtual bool IsPublicFolders() { return false; }
+	// Virtuals:
+		/// 
+		/// These methods can be used in a synchronous or asynchronous manner:
+		///		sync:	Call with 'Callback=NULL' and use the return value.
+		///				If the function needs to show a dialog (like to get permissions from
+		///				the user) then it'll return Store3Delayed immediately.
+		///		async:	Call with a valid callback, and the method will possibly wait 
+		///				for the user and then either return Store3Error or Store3Success.
+		virtual Store3Status LoadThings(LViewI *Parent = NULL,	std::function<void(Store3Status)> Callback = NULL);
+		virtual Store3Status WriteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
+		virtual Store3Status DeleteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
+		virtual Store3Status DeleteAllThings(					std::function<void(Store3Status)> Callback = NULL);
+		virtual bool LoadFolders();
+		virtual bool UnloadThings();
+		virtual bool IsWriteable() { return true; }
+		virtual bool IsPublicFolders() { return false; }
 
-	virtual void OnProperties(int Tab = -1) override;
-	virtual ScribeFolder *CreateSubDirectory(const char *Name, int Type);
-	virtual void OnRename(char *NewName);
-	virtual void OnDelete();
-	virtual LString GetPath();
-	virtual ScribeFolder *GetSubFolder(const char *Path);
-	virtual void Populate(ThingList *List);
-	virtual bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL) { return GetItemType() != MAGIC_ANY; }
-	virtual void OnRethread();
+		virtual void OnProperties(int Tab = -1) override;
+		virtual ScribeFolder *CreateSubDirectory(const char *Name, int Type);
+		virtual void OnRename(char *NewName);
+		virtual void OnDelete();
+		virtual LString GetPath();
+		virtual ScribeFolder *GetSubFolder(const char *Path);
+		virtual void Populate(ThingList *List);
+		virtual bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL) { return GetItemType() != MAGIC_ANY; }
+		virtual void OnRethread();
 
 	// Name
 	void SetName(const char *Name, bool Encode);

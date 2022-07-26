@@ -626,16 +626,15 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 	return Moved;
 }
 
-bool ScribeFolder::DeleteAllThings()
+Store3Status ScribeFolder::DeleteAllThings(std::function<void(Store3Status)> Callback)
 {
 	if (!GetFldObj())
-		return false;
+		return Store3Error;
 		
 	Store3Status r = GetFldObj()->DeleteAllChildren();
 	if (r == Store3Error)
 	{
 		LAssert(!"DeleteAllChildren failed.");
-		return false;
 	}
 	else if (r == Store3Success)
 	{
@@ -644,12 +643,12 @@ bool ScribeFolder::DeleteAllThings()
 		Update();
 	}
 
-	return true;
+	return r;
 }
 
-bool ScribeFolder::DeleteThing(Thing *t)
+Store3Status ScribeFolder::DeleteThing(Thing *t, std::function<void(Store3Status)> Callback)
 {
-	bool Status = false;
+	Store3Status Status = Store3Error;
 
 	if (t && t->GetObject())
 	{
@@ -676,12 +675,12 @@ bool ScribeFolder::DeleteThing(Thing *t)
 	return Status;
 }
 
-void ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)> Callback)
+Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)> Callback)
 {
 	if (!t)
 	{
 		if (Callback) Callback(Store3Error);
-		return;
+		return Store3Error;
 	}
 
 	auto Path = GetFolder()->GetPath();
@@ -728,6 +727,8 @@ void ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)> Callba
 		});
 	else
 		OnAllow();	
+
+	return Store3Success;
 }
 
 int ThingContainerNameCmp(LTreeItem *a, LTreeItem *b, NativeInt d)
@@ -1093,8 +1094,10 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 				if (Del.Length())
 					GetObject()->GetStore()->Delete(Del, false);
 
-				DeleteAllThings();
-				mt->Invalidate();
+				DeleteAllThings([&](auto status)
+				{
+					mt->Invalidate();
+				});
 			}
 			break;
 		}
@@ -1468,10 +1471,8 @@ bool ScribeFolder::UnloadThings()
 	#define PROFILE(str)
 #endif
 
-
-void ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback)
+Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback)
 {
-	Store3State Status = Store3Loaded;
 	int OldUnRead = GetUnRead();
 
 	auto FldObj = GetFldObj();
@@ -1479,7 +1480,7 @@ void ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> 
 	{
 		LgiTrace("%s:%i - No folder object.\n", _FL);
 		if (Callback) Callback(Store3Error);
-		return;
+		return Store3Error;
 	}
 
 	auto Loaded = [&]()
@@ -1592,19 +1593,21 @@ void ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> 
 			Tree->Capture(false);
 
 		auto &Children = FldObj->Children();
-		Status = Children.GetState();
+		auto Status = Children.GetState();
 		if (Status != Store3Loaded)
 		{
 			if (View() && Loading.Reset(Ui ? new LoadingItem(&Children) : NULL))
 				View()->Insert(Loading);
 
-			if (Callback)
-				Callback(Status >= Store3Loaded ? Store3Success : Store3Error);
-			return;
+			auto Ret = Status >= Store3Loaded ? Store3Success : Store3Error;
+			if (Callback) Callback(Ret);
+			return Ret;
 		}
 
 		IsLoaded(true);
 	}
+
+	return Store3Success;
 }
 
 void ScribeFolder::OnRename(char *NewName)
@@ -3008,7 +3011,7 @@ bool ScribeFolder::MoveTo(LArray<Thing*> &Items, bool CopyOnly, LArray<Store3Sta
 				  NewFolderType == FOLDER_TRASH)
 			{
 				// Delete for good
-				bool Success = Old && Old->DeleteThing(t);
+				auto Success = Old ? Old->DeleteThing(t, NULL) : Store3Error;
 				MoveToStatus(i, Success ? Store3Success : Store3Error);
 				if (Success)
 					t->OnMove();

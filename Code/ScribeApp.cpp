@@ -5224,10 +5224,10 @@ bool ScribeWnd::LoadMailStores()
 		// Force load some folders...
 		ScribeFolder *Folder = GetFolder(FOLDER_CALENDAR);
 		if (Folder)
-			Folder->LoadThings();
+			Folder->LoadThings(NULL, NULL);
 		Folder = GetFolder(FOLDER_FILTERS);
 		if (Folder)
-			Folder->LoadThings();
+			Folder->LoadThings(NULL, NULL);
 		for (auto ms: Folders)
 		{
 			if (!ms.Root)
@@ -5236,7 +5236,7 @@ bool ScribeWnd::LoadMailStores()
 			{
 				if (c->GetItemType() == MAGIC_CONTACT ||
 					c->GetItemType() == MAGIC_FILTER)
-					c->LoadThings();
+					c->LoadThings(NULL, NULL);
 			}
 		}
 
@@ -5568,7 +5568,7 @@ void ScribeWnd::BuildDynMenus()
 		ScribeFolder *Templates = GetFolder(FOLDER_TEMPLATES, NULL, true);
 		if (Templates)
 		{
-			Templates->LoadThings();
+			Templates->LoadThings(NULL, NULL);
 
 			for (auto i: Templates->Items)
 			{
@@ -6216,7 +6216,7 @@ bool ScribeWnd::OpenAMail(ScribeFolder *Folder)
 	if (Folder &&
 		Tree)
 	{
-		Folder->LoadThings();
+		Folder->LoadThings(NULL, NULL);
 
 		for (auto i: Folder->Items)
 		{
@@ -6506,7 +6506,7 @@ void ScribeWnd::OnTrayMenu(LSubMenu &m)
 	LArray<ScribeFolder*> Srcs = GetThingSources(MAGIC_CONTACT);
 	for (auto c: Srcs)
 	{
-		c->LoadThings();
+		c->LoadThings(NULL, NULL);
 		for (auto i: c->Items)
 		{
 			Contact *c = i->IsContact();
@@ -6766,13 +6766,15 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 					{
 						LUri u;
 						LString a = u.DecodeStr(d);
-						Mail *r = f->GetMessageById(a);
-						if (r)
+						f->GetMessageById(a, [&](auto r)
 						{
-							int ExistingFlags = r->GetFlags();
-							int NewFlag = (int)Msg->B();
-							r->SetFlags(ExistingFlags | NewFlag);
-						}
+							if (r)
+							{
+								int ExistingFlags = r->GetFlags();
+								int NewFlag = (int)Msg->B();
+								r->SetFlags(ExistingFlags | NewFlag);
+							}
+						});
 					}
 				}
 			}
@@ -12564,64 +12566,66 @@ bool ScribeWnd::OnTransfer()
 			if (!Outbox)
 				break;
 			
-			Mail *m = Outbox->GetMessageById(Transfer->Send->MsgId);
-			if (!m)
+			Outbox->GetMessageById(Transfer->Send->MsgId, [&](auto m)
 			{
-				LAssert(!"Where is the email?");
-				LgiTrace("%s:%i - Can't find outbox for msg id '%s'\n", _FL, Transfer->Send->MsgId.Get());
-			}
-			else
-			{
-				if (Transfer->OutgoingHeaders)
+				if (!m)
 				{
-					m->SetInternetHeader(Transfer->OutgoingHeaders);
-					DeleteArray(Transfer->OutgoingHeaders);
+					LAssert(!"Where is the email?");
+					LgiTrace("%s:%i - Can't find outbox for msg id '%s'\n", _FL, Transfer->Send->MsgId.Get());
 				}
-				
-				m->OnAfterSend();
-				m->Save();
-
-				// Do filtering
-				LVariant DisableFilters;
-				GetOptions()->GetValue(OPT_DisableUserFilters, DisableFilters);
-				if (!DisableFilters.CastInt32())
+				else
 				{
-					// Run the filters
-					List<Filter> Filters;
-					GetFilters(Filters, false, true, false);
-					if (Filters[0])
-					{													
-						List<Mail> In;
-						In.Insert(m);
-						
-						Filter::ApplyFilters(0, Filters, In);
-					}
-				}
-
-				// Add to bayesian spam whitelist...
-				LVariant v;
-				ScribeBayesianFilterMode FilterMode = BayesOff;
-				GetOptions()->GetValue(OPT_BayesFilterMode, v);
-				FilterMode = (ScribeBayesianFilterMode) v.CastInt32();
-
-				if (FilterMode != BayesOff &&
-					m->GetObject())
-				{
-					GDataIt To = m->GetObject()->GetList(FIELD_TO);
-					if (To)
+					if (Transfer->OutgoingHeaders)
 					{
-						for (LDataPropI *a = To->First();
-							a;
-							a = To->Next())
-						{
-							if (a->GetStr(FIELD_EMAIL))
-								WhiteListIncrement(a->GetStr(FIELD_EMAIL));
+						m->SetInternetHeader(Transfer->OutgoingHeaders);
+						DeleteArray(Transfer->OutgoingHeaders);
+					}
+				
+					m->OnAfterSend();
+					m->Save();
+
+					// Do filtering
+					LVariant DisableFilters;
+					GetOptions()->GetValue(OPT_DisableUserFilters, DisableFilters);
+					if (!DisableFilters.CastInt32())
+					{
+						// Run the filters
+						List<Filter> Filters;
+						GetFilters(Filters, false, true, false);
+						if (Filters[0])
+						{													
+							List<Mail> In;
+							In.Insert(m);
+						
+							Filter::ApplyFilters(0, Filters, In);
 						}
 					}
-				}
 
-				NewStatus = MailReceivedOk;
-			}
+					// Add to bayesian spam whitelist...
+					LVariant v;
+					ScribeBayesianFilterMode FilterMode = BayesOff;
+					GetOptions()->GetValue(OPT_BayesFilterMode, v);
+					FilterMode = (ScribeBayesianFilterMode) v.CastInt32();
+
+					if (FilterMode != BayesOff &&
+						m->GetObject())
+					{
+						GDataIt To = m->GetObject()->GetList(FIELD_TO);
+						if (To)
+						{
+							for (LDataPropI *a = To->First();
+								a;
+								a = To->Next())
+							{
+								if (a->GetStr(FIELD_EMAIL))
+									WhiteListIncrement(a->GetStr(FIELD_EMAIL));
+							}
+						}
+					}
+
+					NewStatus = MailReceivedOk;
+				}
+			});
 		}
 
 		#if DEBUG_NEW_MAIL
