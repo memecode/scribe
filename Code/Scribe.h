@@ -2152,8 +2152,9 @@ public:
 
 	enum AppState
 	{
-	    ScribeInitializing,
-	    ScribeRunning,
+	    ScribeConstructing, // 1) In ScribeWnd constructor OR one of it's dialogs.
+	    ScribeInitializing, // 2) In the ScribeWnd::OnCreate event.
+	    ScribeRunning,		// 3) Normal fully initialized runtime.
 	    ScribeExiting,
 	    ScribeLoadingFolders,
 	    ScribeUnloadingFolders,

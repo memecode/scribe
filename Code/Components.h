@@ -7,7 +7,7 @@
 
 class CapabilityInstaller;
 
-struct InstallProgress : public LMutex, public GRefCount
+struct InstallProgress : public LMutex, public LRefCount
 {
 	int64 CurrentPos;
 	int64 TotalSize;
@@ -35,7 +35,7 @@ struct InstallProgress : public LMutex, public GRefCount
 	{
 		if (Lock(_FL))
 		{
-			GRefCount::AddRef();
+			LRefCount::AddRef();
 			Unlock();
 		}
 	}
@@ -44,7 +44,7 @@ struct InstallProgress : public LMutex, public GRefCount
 	{
 		if (Lock(_FL))
 		{
-			if (GRefCount::DecRef())
+			if (LRefCount::DecRef())
 				return true;
 
 			Unlock();

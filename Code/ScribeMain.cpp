@@ -114,12 +114,12 @@ int LgiMain(OsAppArguments &AppArgs)
 		return -2;
 	}
 	
-    if (Wnd->GetScribeState() == ScribeWnd::ScribeInitializing)
+    if (Wnd->GetScribeState() == ScribeWnd::ScribeConstructing)
     {
         if (App.AppWnd->Attach(0))
         {
 			auto State = Wnd->GetScribeState();
-            if (State == ScribeWnd::ScribeRunning)
+            if (State != ScribeWnd::ScribeExiting)
             {
                 #if 0
 		        App.Run(true, ScribeOnIdle, &App);
