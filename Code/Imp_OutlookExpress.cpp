@@ -618,7 +618,7 @@ void Import_OutlookExpress(ScribeWnd *Parent, bool v5)
 										CurrentPath,
 										MAGIC_MAIL,
 										&FileArr);
-		Dlg->DoModal([&](auto dlg, auto id)
+		Dlg->DoModal([Parent, Dlg, v5, FileArr](auto dlg, auto id)
 		{
 			if (id)
 			{
@@ -627,7 +627,7 @@ void Import_OutlookExpress(ScribeWnd *Parent, bool v5)
 				{
 					LProgressDlg PrgDlg(Parent);
 					PrgDlg.SetDescription("Importing folders...");
-					PrgDlg.SetRange(LRange(0, Files.Length()));
+					PrgDlg.SetRange(LRange(0, FileArr.Length()));
 
 					int Imported = 0;
 					int i=1;
@@ -651,7 +651,7 @@ void Import_OutlookExpress(ScribeWnd *Parent, bool v5)
 
 					PrgDlg.Visible(false);
 					char *FileType = (v5) ? (char*)"DBX" : (char*)"MBX";
-					LgiMsg(Parent, "%i of %i %s files imported successfully.", AppName, MB_OK, Imported, Files.Length(), FileType);
+					LgiMsg(Parent, "%i of %i %s files imported successfully.", AppName, MB_OK, Imported, FileArr.Length(), FileType);
 				}
 				else
 				{

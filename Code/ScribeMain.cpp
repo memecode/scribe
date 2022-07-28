@@ -114,7 +114,7 @@ int LgiMain(OsAppArguments &AppArgs)
 		return -2;
 	}
 	
-    if (Wnd->GetScribeState() == ScribeWnd::ScribeConstructing)
+    if (Wnd->GetScribeState() != ScribeWnd::ScribeExiting)
     {
         if (App.AppWnd->Attach(0))
         {

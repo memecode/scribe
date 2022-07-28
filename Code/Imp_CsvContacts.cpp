@@ -128,11 +128,12 @@ class GImpCsv : public LDialog
 	LList *Map;
 
 public:
+	LAutoPtr<GDb> Database;
 	List<GFieldMap> Mapping;
 	ScribeFolder *Folder;
 	bool Merge;
 
-	GImpCsv(ScribeWnd *app, LDbRecordset *Rs)
+	GImpCsv(ScribeWnd *app)
 	{
 		Folder = 0;
 		Map = 0;
@@ -145,16 +146,6 @@ public:
 			if (GetViewById(IDC_MAPPING, Map))
 			{
 				Map->DrawGridLines(true);
-				for (int i=0; i<Rs->Fields(); i++)
-				{
-					LDbField &Fld = (*Rs)[i];
-					GFieldMap *m = new GFieldMap(Fld);
-					if (m)
-					{
-						Mapping.Insert(m);
-						Map->Insert(m);
-					}
-				}
 			}
 		}
 
@@ -166,6 +157,20 @@ public:
 
 		if (Folder)
 			SetCtrlName(IDC_FOLDER, Folder->GetPath());
+	}
+
+	void SetRecords(LDbRecordset *Rs)
+	{
+		for (int i=0; i<Rs->Fields(); i++)
+		{
+			LDbField &Fld = (*Rs)[i];
+			GFieldMap *m = new GFieldMap(Fld);
+			if (m)
+			{
+				Mapping.Insert(m);
+				Map->Insert(m);
+			}
+		}
 	}
 
 	void SaveMapping(const char *File)
@@ -276,12 +281,12 @@ public:
 			}
 			case IDC_BROWSE_FOLDER:
 			{
-				auto d = new FolderDlg(this, App, MAGIC_CONTACT);
-				d->DoModal([&](auto dlg, auto id)
+				auto Dlg = new FolderDlg(this, App, MAGIC_CONTACT);
+				Dlg->DoModal([this, Dlg](auto dlg, auto id)
 				{
 					if (id)
 					{
-						auto NewPath = d->Get();
+						auto NewPath = Dlg->Get();
 						if (NewPath)
 						{
 							this->Folder = App->GetFolder(NewPath);
@@ -328,103 +333,106 @@ void ImportCsv(ScribeWnd *App)
 	auto s = new LFileSelect(App);
 	s->Type("Comma Separated Text", "*.csv;*.txt");
 	s->Type("All Files", LGI_ALL_FILES);
-	s->Open([&](auto dlg, auto status)
+	s->Open([App](auto s, auto status)
 	{
-		if (status && LFileExists(s->Name()))
-		{
-			LAutoPtr<GDb> Db(OpenCsvDatabase(s->Name()));
-			if (Db)
-			{
-				LDbRecordset *Rs = Db->TableAt(0);
-				if (Rs)
-				{
-					auto Dlg = new GImpCsv(App, Rs);
-					Dlg->DoModal([&](auto dlg, auto id)
-					{
-						if (id)
-						{
-							if (Dlg->Folder)
-							{
-								for (bool b=Rs->MoveFirst(); b; b=Rs->MoveNext())
-								{
-									Contact *c = new Contact(App);
-									if (c)
-									{
-										c->App = App;
-								
-										for (auto fm: Dlg->Mapping)
-										{
-											fm->Convert(c);
-										}
+		LAutoPtr<LFileSelect> mem(s);
+		if (!status || !LFileExists(s->Name()))
+			return;
 
-										if (Dlg->Merge)
-										{
-											Contact *m = 0;
-											const char *CFirst = 0, *CLast = 0;
-											c->Get(OPT_First, CFirst);
-											c->Get(OPT_Last, CLast);
+		LAutoPtr<GImpCsv> Dlg(new GImpCsv(App));
+		if (!Dlg)
+			return;
+
+		if (!Dlg->Database.Reset(OpenCsvDatabase(s->Name())))
+			return;
+
+		LDbRecordset *Rs = Dlg->Database->TableAt(0);
+		if (!Rs)
+			return;
+
+		Dlg->SetRecords(Rs);
+
+		Dlg.Release()->DoModal([this, Dlg, App](auto dlg, auto id)
+		{
+			LAutoPtr<LDialog> mem(dlg);
+			if (!id)
+				return;
+
+			if (!Dlg->Folder)
+				return;
+
+			LDbRecordset *Rs = Dlg->Database->TableAt(0);
+			for (bool b=Rs->MoveFirst(); b; b=Rs->MoveNext())
+			{
+				Contact *c = new Contact(App);
+				if (c)
+				{
+					c->App = App;
+								
+					for (auto fm: Dlg->Mapping)
+						fm->Convert(c);
+
+					if (Dlg->Merge)
+					{
+						Contact *m = 0;
+						const char *CFirst = 0, *CLast = 0;
+						c->Get(OPT_First, CFirst);
+						c->Get(OPT_Last, CLast);
 									
-											for (auto t: Dlg->Folder->Items)
-											{
-												Contact *i = t->IsContact();
-												if (i)
-												{
-													const char *IFirst = 0, *ILast = 0;
-													i->Get(OPT_First, IFirst);
-													i->Get(OPT_Last, ILast);
+						for (auto t: Dlg->Folder->Items)
+						{
+							Contact *i = t->IsContact();
+							if (i)
+							{
+								const char *IFirst = 0, *ILast = 0;
+								i->Get(OPT_First, IFirst);
+								i->Get(OPT_Last, ILast);
 											
-													if (ImgCsvMatch(IFirst, CFirst) &&
-														ImgCsvMatch(ILast, CLast))
-													{
-														m = i;
-														break;
-													}
-												}
-											}
-									
-											if (m)
-											{
-												// Convert across fields.
-												for (ItemFieldDef *Def = ContactFieldDefs; Def->FieldId; Def++)
-												{
-													const char *s;
-													if (c->Get(Def->DisplayText, s))
-													{
-														#ifdef WIN32
-														auto t = LFromNativeCp(s);
-														if (t)
-															m->Set(Def->Option, t);
-														#else
-														m->Set(Def->Option, s);
-														#endif
-													}
-												}
-										
-												m->Save();
-												if (c->DecRefs())
-													DeleteObj(c);
-												m->Update();
-											}
-											else
-											{
-												// No match, new entry
-												c->Save(Dlg->Folder);
-											}
-										}
-										else
-										{
-											c->Save(Dlg->Folder);
-										}
-									}
+								if (ImgCsvMatch(IFirst, CFirst) &&
+									ImgCsvMatch(ILast, CLast))
+								{
+									m = i;
+									break;
 								}
 							}
 						}
-						delete dlg;
-					});
+									
+						if (m)
+						{
+							// Convert across fields.
+							for (ItemFieldDef *Def = ContactFieldDefs; Def->FieldId; Def++)
+							{
+								const char *s;
+								if (c->Get(Def->DisplayText, s))
+								{
+									#ifdef WIN32
+									auto t = LFromNativeCp(s);
+									if (t)
+										m->Set(Def->Option, t);
+									#else
+									m->Set(Def->Option, s);
+									#endif
+								}
+							}
+										
+							m->Save();
+							if (c->DecRefs())
+								DeleteObj(c);
+							m->Update();
+						}
+						else
+						{
+							// No match, new entry
+							c->Save(Dlg->Folder);
+						}
+					}
+					else
+					{
+						c->Save(Dlg->Folder);
+					}
 				}
 			}
-		}
-		delete dlg;
+		});
 	});
 }
 
@@ -471,11 +479,11 @@ public:
 		{
 			case IDC_SET_FOLDER:
 			{
-				auto d = new FolderDlg(this, App, MAGIC_CONTACT);
-				d->DoModal([&](auto dlg, auto id)
+				auto Dlg = new FolderDlg(this, App, MAGIC_CONTACT);
+				Dlg->DoModal([this, Dlg](auto dlg, auto id)
 				{
 					if (id)
-						SetCtrlName(IDC_FOLDERS, d->Get());
+						SetCtrlName(IDC_FOLDERS, Dlg->Get());
 					delete dlg;
 				});
 				break;
@@ -499,7 +507,7 @@ public:
 void ExportCsv(ScribeWnd *App)
 {
 	auto Dlg = new GExportCsv(App);
-	Dlg->DoModal([&](auto dlg, auto id)
+	Dlg->DoModal([Dlg, App](auto dlg, auto id)
 	{
 		if (id)
 		{
@@ -509,7 +517,7 @@ void ExportCsv(ScribeWnd *App)
 				auto s = new LFileSelect(App);
 				s->Type("Comma Separated Text", "*.csv");
 				s->Type("All Files", LGI_ALL_FILES);
-				s->Save([&](auto dlg, auto status)
+				s->Save([App, SubFolders = Dlg->SubFolders, Folder](auto s, auto status)
 				{
 					if (status)
 					{
@@ -538,7 +546,7 @@ void ExportCsv(ScribeWnd *App)
 									Rs->InsertField("AltEmail", GV_STRING);
 
 									List<Contact> Contacts;
-									App->GetContacts(Contacts, Folder, Dlg->SubFolders);
+									App->GetContacts(Contacts, Folder, SubFolders);
 									if (Contacts[0])
 									{
 										for (auto c: Contacts)
@@ -576,7 +584,7 @@ void ExportCsv(ScribeWnd *App)
 							LgiMsg(App, LLoadString(IDS_EXPORT_MSG), AppName, MB_OK, Exported, Error?Error:(char*)"");
 						}
 					}
-					delete dlg;
+					delete s;
 				});
 			}
 		}

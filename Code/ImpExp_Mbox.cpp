@@ -156,7 +156,7 @@ int ChooseFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 				break;
 
 			auto Dlg = new FolderDlg(this, App, Type);
-			Dlg->DoModal([&](auto dlg, auto ctrlId)
+			Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 			{
 				if (ctrlId)
 				{
@@ -206,7 +206,7 @@ void Import_UnixMBox(ScribeWnd *Parent)
 	    Path = Cur->GetPath();
 	
 	auto Dlg = new ChooseFolderDlg(Parent, false, LLoadString(IDS_MBOX_IMPORT), LLoadString(IDS_MBOX_SELECT_FOLDER), Path);
-	Dlg->DoModal([&](auto dlg, auto ctrlId)
+	Dlg->DoModal([Dlg, Parent](auto dlg, auto ctrlId)
 	{
 		if (ctrlId && Dlg->DestFolder)
 		{
@@ -236,7 +236,7 @@ void Export_UnixMBox(ScribeWnd *Parent)
 						LLoadString(IDS_MBOX_EXPORT),
 						LLoadString(IDS_MBOX_EXPORT_FOLDER),
 						Path);
-	Dlg->DoModal([&](auto dlg, auto ctrlId)
+	Dlg->DoModal([Dlg, Parent](auto dlg, auto ctrlId)
 	{
 		if (ctrlId && Dlg->DestFolder)
 		{

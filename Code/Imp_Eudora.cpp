@@ -168,7 +168,7 @@ void Import_EudoraAddressBook(ScribeWnd *App)
 						DefaultFolder,
 						MAGIC_CONTACT,
 						&Files);
-	Dlg->DoModal([&](auto dlg, auto id)
+	Dlg->DoModal([App, Dlg](auto dlg, auto id)
 	{
 		if (id && Dlg->SrcFiles[0])
 			ImportEudoraAddresss(App, App->GetFolder(Dlg->DestFolder), Dlg->SrcFiles[0]);

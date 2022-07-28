@@ -665,7 +665,7 @@ public:
 					break;
 
 				auto Dlg = new FolderDlg(this, App);
-				Dlg->DoModal([&](auto dlg, auto ctrlId)
+				Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 				{
 					if (ctrlId)
 						this->Folder->LView::Name(Dlg->Get());
@@ -1133,10 +1133,10 @@ public:
 		if (Stores)
 		{
 			EntryRef *e = (*Stores)[(int)GetCtrlValue(IDC_MSG_STORE)];
-			if (e)
+			if (!e)
 			{
 				auto Dlg = new AddFolderDlg(this, Io, e);
-				Dlg->DoModal([&](auto dlg, auto ctrlId)
+				Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 				{
 					if (ctrlId)
 						AddPath(Dlg->Path);
@@ -1155,7 +1155,7 @@ public:
 			case IDC_SET_FOLDER:
 			{
 				auto Dlg = new FolderDlg(this, App);
-				Dlg->DoModal([&](auto dlg, auto ctrlId)
+				Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 				{
 					if (ctrlId)
 						SetCtrlName(IDC_FOLDER, Dlg->Get());
@@ -1289,7 +1289,7 @@ public:
 	void AddFolder()
 	{
 		auto Fs = new FolderDlg(this, App);
-		Fs->DoModal([&](auto dlg, auto ctrlId)
+		Fs->DoModal([this, Fs](auto dlg, auto ctrlId)
 		{
 			if (ctrlId && Fs->Get())
 				AddPath(Fs->Get());
@@ -1337,7 +1337,7 @@ public:
 					if (e)
 					{
 						auto Dlg = new AddFolderDlg(this, Io, e);
-						Dlg->DoModal([&](auto dlg, auto id)
+						Dlg->DoModal([this, Dlg](auto dlg, auto id)
 						{
 							if (id)
 								SetCtrlName(IDC_FOLDER, Dlg->Path);
@@ -2838,7 +2838,7 @@ bool OutlookIO::Import(	ImportParams *P,
 void OutlookIO::ImportPersonalAddressBook(std::function<void(bool)> callback)
 {
 	auto Dlg = new FolderDlg(App, App, MAGIC_CONTACT);
-	Dlg->DoModal([&](auto dlg, auto ctrlId)
+	Dlg->DoModal([this, Dlg, callback](auto dlg, auto ctrlId)
 	{
 		if (!ctrlId)
 		{
@@ -3602,6 +3602,7 @@ protected:
 	List<MapiEntry> Entries;
 
 	bool ListEntries();
+	bool OnMsgStore(HRESULT Result);
 
 public:
 	MailMapiSource(ScribeWnd *parent, ScribeAccount *account);
@@ -3644,6 +3645,55 @@ MailMapiSource::~MailMapiSource()
 	}
 
 	DeleteObj(Mapi);
+}
+
+bool MailMapiSource::OnMsgStore(HRESULT Result)
+{
+	if (FAILED(Result))
+		return false;
+
+	if (!MsgStore)
+		return false;
+
+	SPropValue *SubTree = MapiGetProp(MsgStore, PR_IPM_SUBTREE_ENTRYID);
+	if (!SubTree)
+		return false;
+
+	ULONG ObjType;
+	IMAPIFolder *Root = 0;
+	if (MsgStore->OpenEntry(SubTree->Value.bin.cb, (LPENTRYID)SubTree->Value.bin.lpb, NULL, MAPI_BEST_ACCESS, &ObjType, (IUnknown**) &Root) != S_OK ||
+		!Root)
+		return false;
+
+	LPMAPITABLE Folders = 0;
+	if (Root->GetHierarchyTable(0, &Folders) != S_OK)
+		return false;
+
+	// Loop through all the folders
+	bool Status = false;
+	for (LMapiList Lst(Folders); Lst.More(); Lst.Next())
+	{
+		SPropValue *v = Lst.GetField(PR_ENTRYID);
+		SPropValue *Name = Lst.GetField(PR_DISPLAY_NAME);
+		if (v && Name)
+		{
+			char *FolderName = MapiCastString(Name);
+			if (FolderName &&
+				_stricmp(FolderName, "Inbox") == 0)
+			{
+				ULONG Type;
+				Status |= Root->OpenEntry(v->Value.bin.cb,
+										(LPENTRYID)v->Value.bin.lpb,
+										NULL,
+										MAPI_BEST_ACCESS,
+										&Type,
+										(IUnknown**)&pFolder) == S_OK &&
+										pFolder;
+			}
+		}
+	}
+
+	return Status;
 }
 
 bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const char *User, const char *Password, LDom *SettingStore, int Flags)
@@ -3703,8 +3753,6 @@ bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const c
 
 		if (Mapi->Session)
 		{
-			HRESULT Error = S_OK;
-
 			LVariant UserName = Account->Receive.UserName();
 			if (!ValidStr(UserName.Str()))
 			{
@@ -3715,18 +3763,19 @@ bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const c
 				}
 				else
 				{
-					Dlg->DoModal([&](auto dlg, auto id)
+					Dlg->DoModal([this, Dlg](auto dlg, auto id)
 					{
 						if (id && Dlg->Ref)
 						{
 							Account->Receive.UserName(Dlg->Ref->DisplayName);
 
-							Error = Mapi->Session->OpenMsgStore(Ui,
+							auto Error = Mapi->Session->OpenMsgStore(Ui,
 																Dlg->Ref->Size, // entry bytes
 																Dlg->Ref->Entry, // ptr to entry
 																NULL, // default interface: IMsgStore
 																MAPI_BEST_ACCESS,
 																&MsgStore);
+							OnMsgStore(Error);
 						}
 						delete dlg;
 					});
@@ -3742,56 +3791,15 @@ bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const c
 						if (e->DisplayName &&
 							_stricmp(e->DisplayName, UserName.Str()) == 0)
 						{
-							Error = Mapi->Session->OpenMsgStore(Ui,
+							auto Error = Mapi->Session->OpenMsgStore(Ui,
 																e->Size, // entry bytes
 																e->Entry, // ptr to entry
 																NULL, // default interface: IMsgStore
 																MAPI_BEST_ACCESS,
 																&MsgStore);
-							break;
+							if (OnMsgStore(Error))
+								break;
 						}
-					}
-				}
-			}
-
-			if (MsgStore)
-			{
-				SPropValue *SubTree = MapiGetProp(MsgStore, PR_IPM_SUBTREE_ENTRYID);
-				if (SubTree)
-				{
-					ULONG ObjType;
-					IMAPIFolder *Root = 0;
-					if (MsgStore->OpenEntry(SubTree->Value.bin.cb, (LPENTRYID)SubTree->Value.bin.lpb, NULL, MAPI_BEST_ACCESS, &ObjType, (IUnknown**) &Root) == S_OK &&
-						Root)
-					{
-						LPMAPITABLE Folders = 0;
-						if (Root->GetHierarchyTable(0, &Folders) == S_OK)
-						{
-							// Loop through all the folders
-							for (LMapiList Lst(Folders); Lst.More(); Lst.Next())
-							{
-								SPropValue *v = Lst.GetField(PR_ENTRYID);
-								SPropValue *Name = Lst.GetField(PR_DISPLAY_NAME);
-								if (v && Name)
-								{
-									char *FolderName = MapiCastString(Name);
-									if (FolderName &&
-										_stricmp(FolderName, "Inbox") == 0)
-									{
-										ULONG Type;
-										Status = Root->OpenEntry(v->Value.bin.cb,
-																(LPENTRYID)v->Value.bin.lpb,
-																NULL,
-																MAPI_BEST_ACCESS,
-																&Type,
-																(IUnknown**)&pFolder) == S_OK &&
-																pFolder;
-									}
-								}
-							}
-						}
-
-						// Root->Release();
 					}
 				}
 			}

@@ -230,7 +230,7 @@ void FolderCalendarSource::EditPath(LView *parent, CalendarView *cv)
 		return;
 
 	auto Dlg = new FolderDlg(parent, App, MAGIC_CALENDAR);
-	Dlg->DoModal([&](auto dlg, auto ctrlId)
+	Dlg->DoModal([this, Dlg, cv](auto dlg, auto ctrlId)
 	{
 		if (ctrlId)
 		{

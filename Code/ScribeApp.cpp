@@ -1252,6 +1252,7 @@ ScribeWnd::AppState ScribeWnd::ScribeState = ScribeConstructing;
  * This constructor is a little convoluted, but the basic idea is this:
  * 
  * - Do some basic init.
+ * - Attempt to load the options (could make portable/desktop mode clear)
  * - If the portable/desktop mode is unclear ask the user.
  * - Call AppConstruct1.
  * - If the UI language is not known, ask the user.
@@ -1314,7 +1315,7 @@ ScribeWnd::ScribeWnd() :
 
 	auto AppConstruct1 = [this]()
 	{
-		if (!LoadOptions())
+		if (!d->Options && !LoadOptions())
 		{
 			ScribeState = ScribeExiting;
 			return;
@@ -1535,6 +1536,13 @@ ScribeWnd::ScribeWnd() :
 	};
 
 	auto Type = d->GetInstallMode();
+
+	if (Type == LOptionsFile::UnknownMode)
+	{
+		LoadOptions(); // This may make the mode more clear...
+		Type = d->GetInstallMode();
+	}
+
 	if (Type == LOptionsFile::UnknownMode)
 	{
 		d->AskUserForInstallMode([this, AppConstruct1](auto selectedMode)

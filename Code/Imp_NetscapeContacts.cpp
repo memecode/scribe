@@ -109,12 +109,13 @@ void Import_NetscapeContacts(ScribeWnd *Parent)
 
 	auto Select = new LFileSelect(Parent);
 	Select->Type("Netscape Contacts", "*.csv");
-	Select->Open([&](auto dlg, auto status)
+	Select->Open([Parent](auto dlg, auto status)
 	{
 		if (status)
 		{
+			LString Name = dlg->Name();
 			auto Dlg = new FolderDlg(Parent, Parent, MAGIC_CONTACT);
-			Dlg->DoModal([&](auto ctrl, auto id)
+			Dlg->DoModal([Parent, Dlg, Name](auto dlg, auto id)
 			{
 				if (id)
 				{
@@ -146,7 +147,7 @@ void Import_NetscapeContacts(ScribeWnd *Parent)
 						Rs.Fields.Insert(NewStr("Unknown2"));
 
 						// read file
-						if (ReadCsv(Select->Name(), Rs, false) > 0)
+						if (ReadCsv(Name, Rs, false) > 0)
 						{
 							for (auto r: Rs)
 							{

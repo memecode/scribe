@@ -103,12 +103,12 @@ public:
 			}
 			case IDC_SET_OUT:
 			{
-				auto d = new FolderDlg(this, App, MAGIC_MAIL);
-				d->DoModal([&](auto dlg, auto id)
+				auto Dlg = new FolderDlg(this, App, MAGIC_MAIL);
+				Dlg->DoModal([this, Dlg](auto dlg, auto id)
 				{
 					if (id)
 					{
-						Out = App->GetFolder(d->Get());
+						Out = App->GetFolder(Dlg->Get());
 						if (Out)
 							SetCtrlName(IDC_OUT_FOLDER, Out->GetPath());
 					}
@@ -193,7 +193,7 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 void ImportEml(ScribeWnd *App)
 {
 	auto Dlg = new GImportEml(App);
-	Dlg->DoModal([&](auto dlg, auto id)
+	Dlg->DoModal([Dlg, App](auto dlg, auto id)
 	{
 		if (id)
 		{

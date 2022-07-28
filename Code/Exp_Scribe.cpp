@@ -508,40 +508,40 @@ public:
 			}
 			case IDC_ADD_SRC_FOLDER:
 			{
-				if (Lst)
+				if (!Lst)
+					break;
+
+				auto s = new FolderDlg(this, App);
+				s->DoModal([this, s](auto dlg, auto status)
 				{
-					auto s = new FolderDlg(this, App);
-					s->DoModal([&](auto dlg, auto status)
+					if (status && ValidStr(s->Get()))
 					{
-						if (status && ValidStr(s->Get()))
+						bool Has = false;
+
+						for (auto n : *Lst)
 						{
-							bool Has = false;
-
-							for (auto n : *Lst)
+							const char *p = n->GetText(0);
+							if (p && _stricmp(p, s->Get()) == 0)
 							{
-								const char *p = n->GetText(0);
-								if (p && _stricmp(p, s->Get()) == 0)
-								{
-									Has = true;
-									break;
-								}
-							}
-
-							if (!Has)
-							{
-								LListItem *i = new LListItem;
-								if (i)
-								{
-									i->SetText(s->Get());
-									Lst->Insert(i);
-									Lst->ResizeColumnsToContent();
-								}
+								Has = true;
+								break;
 							}
 						}
 
-						delete dlg;
-					});
-				}
+						if (!Has)
+						{
+							LListItem *i = new LListItem;
+							if (i)
+							{
+								i->SetText(s->Get());
+								Lst->Insert(i);
+								Lst->ResizeColumnsToContent();
+							}
+						}
+					}
+
+					delete dlg;
+				});
 				break;
 			}
 			case IDC_DEL_SRC_FOLDER:
@@ -559,16 +559,16 @@ public:
 			case IDC_SET_FOLDER:
 			{
 				LoadFolders();
-				if (Mailbox)
+				if (!Mailbox)
+					break;
+
+				auto s = new FolderDlg(this, App, MAGIC_NONE, Mailbox);
+				s->DoModal([this, s](auto dlg, auto ctrlId)
 				{
-					auto s = new FolderDlg(this, App, MAGIC_NONE, Mailbox);
-					s->DoModal([&](auto dlg, auto ctrlId)
-					{
-						if (ctrlId)
-							SetCtrlName(IDC_FOLDER, s->Get());
-						delete dlg;
-					});
-				}
+					if (ctrlId)
+						SetCtrlName(IDC_FOLDER, s->Get());
+					delete dlg;
+				});
 				break;
 			}
 			case IDOK:
@@ -659,7 +659,7 @@ public:
 void ExportScribe(ScribeWnd *App)
 {
 	auto Dlg = new ScribeExport(App);
-	Dlg->DoModal([&](auto dlg, auto ctrlId)
+	Dlg->DoModal([Dlg, App](auto dlg, auto ctrlId)
 	{
 		if (ctrlId)
 		{

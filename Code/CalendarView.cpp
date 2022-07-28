@@ -3279,7 +3279,7 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 						case IDM_ADD_LOCAL_CAL:
 						{
 							auto Dlg = new FolderDlg(this, App, MAGIC_CALENDAR);
-							Dlg->DoModal([&](auto dlg, auto ctrlId)
+							Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 							{
 								if (ctrlId)
 								{
@@ -3305,7 +3305,7 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 						case IDM_ADD_CAL_URL:
 						{
 							auto dlg = new LInput(this);
-							dlg->DoModal([&](auto dialog, auto ctrlId)
+							dlg->DoModal([this, dlg](auto dialog, auto ctrlId)
 							{
 								if (ctrlId)
 								{

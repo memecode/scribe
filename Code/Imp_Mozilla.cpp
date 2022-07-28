@@ -467,7 +467,7 @@ void Import_MozillaAddressBook(ScribeWnd *App)
 						DefaultFolder,
 						MAGIC_CONTACT,
 						&Files);
-	Dlg->DoModal([&](auto dlg, auto id)
+	Dlg->DoModal([App, Dlg](auto dlg, auto id)
 	{
 		if (id && Dlg->SrcFiles[0])
 			ImportMozillaAddresss(App, App->GetFolder(Dlg->DestFolder), Dlg->SrcFiles[0]);
@@ -570,7 +570,7 @@ void Import_MozillaMail(ScribeWnd *App)
 						CurPath,
 						MAGIC_MAIL,
 						&Files);
-	Dlg->DoModal([&](auto dlg, auto id)
+	Dlg->DoModal([App, Dlg](auto dlg, auto id)
 	{
 		if (id && Dlg->DestFolder)
 		{

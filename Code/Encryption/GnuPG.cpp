@@ -906,7 +906,7 @@ struct MailUiGpgPriv
 	void SetStatus(const char *Str) { Set(Str, cTxt); }
 	void SetSuccess(const char *Str) { Set(Str, cGood); }
 	
-	void GetPassword(LViewI *Parent, const char *Addr, std::function<void(LString)> Callback)
+	void GetPassword(LViewI *Parent, LString Addr, std::function<void(LString)> Callback)
 	{
 		for (unsigned i=0; i<Psw.Length(); i++)
 		{
@@ -923,7 +923,7 @@ struct MailUiGpgPriv
 		Msg.Printf("Enter password for the user '%s':", Addr);
 		
 		auto Dlg = new LInput(Parent, "", Msg, "GnuPG Password", true);
-		Dlg->DoModal([&](auto dlg, auto ctrlId)
+		Dlg->DoModal([this, Dlg, Addr, Callback](auto dlg, auto ctrlId)
 		{
 			if (ctrlId)
 			{

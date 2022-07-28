@@ -432,7 +432,7 @@ void ScribeAccount::SerializeUi(LView *Wnd, bool Load)
 void ScribeAccount::InitUI(LView *Parent, int Tab, std::function<void(bool)> callback)
 {
 	auto Dlg = new AccountDlg(Parent, this->Parent, this, Tab);
-	Dlg->DoModal([&](auto dlg, auto id)
+	Dlg->DoModal([callback](auto dlg, auto id)
 	{
 		if (callback)
 			callback(id);

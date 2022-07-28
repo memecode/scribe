@@ -2837,7 +2837,7 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 				break;
 
 			auto Dlg = new GRecurDlg(this);
-			Dlg->DoModal([&](auto dlg, auto ctrlId)
+			Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 			{
 				if (ctrlId)
 					SetCtrlValue(IDC_REPEAT, 0);
@@ -2849,7 +2849,7 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 		{
 			auto Tz = Item->GetObject()->GetStr(FIELD_CAL_TIMEZONE);
 			auto Dlg = new LInput(this, Tz, "Time zone:", "Calendar Event Timezone");
-			Dlg->DoModal([&](auto dlg, auto Result)
+			Dlg->DoModal([this, Dlg](auto dlg, auto Result)
 			{
 				if (Result)
 				{
