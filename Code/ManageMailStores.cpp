@@ -53,7 +53,7 @@ class SubFolderDlg : public LDialog, public LXmlTreeUi
 	void FolderSelector(int OutputCtrl, int Limit)
 	{
 		auto Dlg = new FolderDlg(this, App, Limit);
-		Dlg->DoModal([&](auto dlg, auto id)
+		Dlg->DoModal([this, Dlg, OutputCtrl](auto dlg, auto id)
 		{
 			if (id)
 			{
@@ -184,7 +184,7 @@ void EditWebdav(LViewI *parent, LXmlTag *t, std::function<void(bool)> callback)
 	dlg->SetCtrlName(IDC_USERNAME, t->GetAttr(OPT_MailStoreUserName));
 	dlg->SetCtrlName(IDC_PASSWORD, t->GetAttr(OPT_MailStorePassword));
 
-	dlg->DoModal([&](auto dlg, auto res)
+	dlg->DoModal([t, callback](auto dlg, auto res)
 	{
 		if (res == IDOK)
 		{	
@@ -523,7 +523,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 			if (ms)
 			{
 				auto Dlg = new FmtDlg(this, (int)ms->Store->GetInt(FIELD_FORMAT));
-				Dlg->DoModal([&](auto dlg, auto id)
+				Dlg->DoModal([this, Dlg, ms](auto dlg, auto id)
 				{
 					if (id)
 					{
@@ -565,7 +565,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 		case IDC_SET_START_IN:
 		{
 			auto Dlg = new FolderDlg(this, App);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
 					SetCtrlName(IDC_START_IN, Dlg->Get());

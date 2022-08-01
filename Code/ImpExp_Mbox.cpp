@@ -55,44 +55,38 @@ ChooseFolderDlg::ChooseFolderDlg
 	MoveToCenter();
 }
 
-ChooseFolderDlg::~ChooseFolderDlg()
+void ChooseFolderDlg::InsertFile(const char *f)
 {
-	DeleteArray(DestFolder);
-	SrcFiles.DeleteArrays();
-}
+	if (!Lst)
+		return;
 
-void ChooseFolderDlg::InsertFile(char *f)
-{
-	if (Lst)
+	bool Has = false;
+	for (auto n : *Lst)
 	{
-		bool Has = false;
-		for (auto n : *Lst)
+		char Path[MAX_PATH_LEN];
+		LMakePath(Path, sizeof(Path), n->GetText(0), n->GetText(1));
+		if (_stricmp(Path, f) == 0)
 		{
-			char Path[MAX_PATH_LEN];
-			LMakePath(Path, sizeof(Path), n->GetText(0), n->GetText(1));
-			if (_stricmp(Path, f) == 0)
-			{
-				Has = true;
-				break;
-			}
-		}
-
-		if (!Has)
-		{
-			LListItem *n = new LListItem;
-			if (n)
-			{
-				char *d = strrchr(f, DIR_CHAR);
-				if (d)
-				{
-					*d = 0;				
-					n->SetText(f, 0);
-					n->SetText(d+1, 1);
-					Lst->Insert(n);
-				}
-			}
+			Has = true;
+			break;
 		}
 	}
+
+	if (Has)
+		return;
+	
+	LListItem *n = new LListItem;
+	if (!n)
+		return;
+
+	auto parts = LString(f).RSplit(DIR_STR, 1);
+	if (parts.Length() == 2)
+	{
+		n->SetText(parts[0], 0);
+		n->SetText(parts[1], 1);
+		Lst->Insert(n);
+	}
+	else delete n;
 }
 
 int ChooseFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
@@ -176,7 +170,7 @@ int ChooseFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 				{
 					char Path[MAX_PATH_LEN];
 					LMakePath(Path, sizeof(Path), n->GetText(0), n->GetText(1));
-					SrcFiles.Insert(NewStr(Path));
+					SrcFiles.Add(Path);
 				}
 			}
 

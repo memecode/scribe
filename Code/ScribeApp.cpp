@@ -2229,7 +2229,7 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 			s.Printf(LLoadString(IDS_WINDOWS_SSL_INSTALL), LGetOsName());
 			
 			auto q = new LAlert(this, AppName, s, "Open Website", LLoadString(IDS_CANCEL));
-			q->DoModal([&](auto dlg, auto id)
+			q->DoModal([this, q](auto dlg, auto id)
 			{
 				switch (id)
 				{
@@ -3078,7 +3078,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			LString Result;
 			bool Loop = true;
 			auto i = new LInput(View ? View : this, Default, Prompt, AppName, Pass);
-			i->DoModal([&](auto dlg, auto id)
+			i->DoModal([&Result, &Loop, i](auto dlg, auto id)
 			{
 				if (id)
 					Result = i->GetStr();
@@ -3088,7 +3088,11 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 
 			// This is obviously not ideal, but I don't want to implement a scripting language callback for
 			// something that should be a simple modal dialog that waits for user input.
-			WaitForString(Result);
+			while (Loop)
+			{
+				LSleep(10);
+				LYield();
+			}
 
 			if (ReturnValue)
 				*ReturnValue = Result;
@@ -4327,7 +4331,7 @@ bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 		}
 
 		auto Dlg = new LShutdown(&Online);
-		Dlg->DoModal([&](auto dlg, auto id)
+		Dlg->DoModal([this, Dlg](auto dlg, auto id)
 		{
 			if (id)
 			{
@@ -5023,6 +5027,83 @@ MailStoreUpgrade::~MailStoreUpgrade()
 	DeleteObj(Thread);
 }
 
+bool ScribeWnd::ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName)
+{
+	if (Store->GetInt(FIELD_VERSION) == 0)
+	{
+		// version error
+		LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_VERSION), AppName, MB_OK, 0, Store->GetInt(FIELD_VERSION));
+		return false;
+	}
+
+	if (Store->GetInt(FIELD_READONLY))
+	{
+		LgiMsg(this, LLoadString(IDS_ERROR_READONLY_FOLDERS), AppName);
+	}
+
+	// get root item
+	LDataFolderI *Root = Store->GetRoot();
+	if (!Root)
+		return false;
+
+	ScribeFolder *&Mailbox = Folders[StoreIdx].Root;
+	Mailbox = new ScribeFolder;
+	if (Mailbox)
+	{
+		Mailbox->App = this;
+		Mailbox->SetObject(Root, _FL);
+
+		Root->SetStr(FIELD_FOLDER_NAME, StoreName);
+		Root->SetInt(FIELD_FOLDER_TYPE, MAGIC_NONE);
+	}
+
+	#ifdef TEST_OBJECT_SIZE
+	// debug/repair code
+	if (Root->StoreSize != Root->Sizeof())
+	{
+		SizeErrors[0]++;
+		Root->StoreSize = Root->Sizeof();
+		if (Root->Object)
+		{
+			Root->Object->StoreDirty = true;
+		}
+	}
+	#endif
+
+	// Insert the root object and then...
+	Tree->Insert(Mailbox);
+
+	// Recursively load the rest of the tree
+	{
+		LProfile p("Loadfolders");
+		Mailbox->LoadFolders();
+	}
+				
+	// This forces a re-pour to re-order the folders according to their
+	// sort settings.
+	Tree->UpdateAllItems();
+
+	if (ScribeState != ScribeExiting)
+	{
+		// Show the tree
+		Mailbox->Expanded(Folders[StoreIdx].Expanded);
+
+		// Checks the folders for a number of required objects
+		// and creates them if required
+		auto StoreType = Store->GetInt(FIELD_STORE_TYPE);
+		if (StoreType == Store3Sqlite)
+			Validate(&Folders[StoreIdx]);
+		else if (StoreType < 0)
+			LAssert(!"Make sure you impl the FIELD_STORE_TYPE field in the store.");
+
+					
+		// FIXME
+		// AddFolderToMru(Full);
+	}
+
+	return true;
+}
+
 bool ScribeWnd::LoadMailStores()
 {
 	bool Status = false;
@@ -5144,7 +5225,7 @@ bool ScribeWnd::LoadMailStores()
 								AppName, ErrMsg ? ErrMsg : LLoadString(IDS_ERROR_FOLDERS_STATUS),
 								LLoadString(IDS_EDIT_MAIL_STORES),
 								LLoadString(IDS_OK));			
-			a->DoModal([&](auto dlg, auto Btn)
+			a->DoModal([this](auto dlg, auto Btn)
 			{
 				if (Btn == 1)
 					PostEvent(M_COMMAND, IDM_MANAGE_MAIL_STORES);
@@ -5153,87 +5234,9 @@ bool ScribeWnd::LoadMailStores()
 			continue;
 		}
 
-		auto ProcessFolder = [&]()
-		{
-			if (Store->GetInt(FIELD_VERSION) == 0)
-			{
-				// version error
-				LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_VERSION), AppName, MB_OK, 0, Store->GetInt(FIELD_VERSION));
-			}
-			else
-			{
-				if (Store->GetInt(FIELD_READONLY))
-				{
-					LgiMsg(this, LLoadString(IDS_ERROR_READONLY_FOLDERS), AppName);
-				}
-
-				// get root item
-				LDataFolderI *Root = Store->GetRoot();
-				if (Root)
-				{
-					ScribeFolder *&Mailbox = Folders[StoreIdx].Root;
-					Mailbox = new ScribeFolder;
-					if (Mailbox)
-					{
-						Mailbox->App = this;
-						Mailbox->SetObject(Root, _FL);
-
-						Root->SetStr(FIELD_FOLDER_NAME, StoreName);
-						Root->SetInt(FIELD_FOLDER_TYPE, MAGIC_NONE);
-					}
-
-					#ifdef TEST_OBJECT_SIZE
-					// debug/repair code
-					if (Root->StoreSize != Root->Sizeof())
-					{
-						SizeErrors[0]++;
-						Root->StoreSize = Root->Sizeof();
-						if (Root->Object)
-						{
-							Root->Object->StoreDirty = true;
-						}
-					}
-					#endif
-
-					// Insert the root object and then...
-					Tree->Insert(Mailbox);
-
-					// Recursively load the rest of the tree
-					{
-						LProfile p("Loadfolders");
-						Mailbox->LoadFolders();
-					}
-				
-					// This forces a re-pour to re-order the folders according to their
-					// sort settings.
-					Tree->UpdateAllItems();
-
-					if (ScribeState != ScribeExiting)
-					{
-						// Show the tree
-						Mailbox->Expanded(Folders[StoreIdx].Expanded);
-
-						// Checks the folders for a number of required objects
-						// and creates them if required
-						auto StoreType = Store->GetInt(FIELD_STORE_TYPE);
-						if (StoreType == Store3Sqlite)
-							Validate(&Folders[StoreIdx]);
-						else if (StoreType < 0)
-							LAssert(!"Make sure you impl the FIELD_STORE_TYPE field in the store.");
-
-					
-						// FIXME
-						// AddFolderToMru(Full);
-					}
-
-					LYield();
-					Status = true;
-				}
-			}
-		};
 
 		// check password
-		const char *FolderPsw;
+		LString FolderPsw;
 		if ((FolderPsw = Store->GetStr(FIELD_STORE_PASSWORD)))
 		{
 			bool Verified = false;
@@ -5247,27 +5250,22 @@ bool ScribeWnd::LoadMailStores()
 			if (!Verified)
 			{
 				auto Dlg = new LInput(this, "", LLoadString(IDS_ASK_FOLDER_PASS), AppName, true);
-				Dlg->DoModal([&](auto dlg, auto id)
+				Dlg->DoModal([this, Dlg, FolderPsw, &Store, StoreIdx, StoreName](auto dlg, auto id)
 				{
 					if (id == IDOK)
 					{
 						GPassword User;
 						User.Set(Dlg->GetStr());
-						Verified = Strcmp(Dlg->GetStr().Get(), FolderPsw) == 0;
-						if (Verified)
-						{
-							ProcessFolder();
-						}
+						if (Dlg->GetStr() == FolderPsw)
+							ProcessFolder(Store, StoreIdx, StoreName);
 						else
-						{
 							DeleteObj(Store);
-						}
 					}
 					delete dlg;
 				});
 			}
 		}
-		else ProcessFolder();
+		else ProcessFolder(Store, StoreIdx, StoreName);
 		
 		StoreIdx++;
 	}

@@ -475,7 +475,7 @@ int ScribeAccount::OnNotify(LViewI *Ctrl, LNotification &n)
 		case IDC_PICK_FOLDER:
 		{
 			auto Dlg = new FolderDlg(Parent, Parent);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg, Ctrl](auto dlg, auto id)
 			{
 				if (id)
 					Ctrl->GetWindow()->SetCtrlName(IDC_FOLDER, Dlg->Get());

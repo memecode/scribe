@@ -292,11 +292,11 @@ class ChooseFolderDlg : public LDialog
 	bool Export;
 	LList *Lst;
 
-	void InsertFile(char *f);
+	void InsertFile(const char *f);
 
 public:
-	char *DestFolder;
-	List<char> SrcFiles;
+	LString DestFolder;
+	LString::Array SrcFiles;
 
 	ChooseFolderDlg
 	(
@@ -308,7 +308,7 @@ public:
 		int FolderType = MAGIC_MAIL,
 		LString::Array *Files = NULL
 	);
-	~ChooseFolderDlg();
+
 	int OnNotify(LViewI *Ctrl, LNotification n);
 };
 
@@ -2234,6 +2234,7 @@ protected:
 	LDataStoreI		*CreateDataStore(char *Full, bool CreateIfMissing);
 	void			LoadFolders(std::function<void(bool)> Callback);
 	bool			LoadMailStores();
+	bool			ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName);
 	bool			UnLoadFolders();
 	void			AddFolderToMru(char *FileName);
 	void			AddContactsToMenu(LSubMenu *Menu);

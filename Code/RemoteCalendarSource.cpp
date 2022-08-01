@@ -287,7 +287,7 @@ bool RemoteCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArra
 void RemoteCalendarSource::EditPath(LView *parent, CalendarView *cv)
 {
 	auto Dlg = new LInput(parent, d->Uri);
-	Dlg->DoModal([&](auto dlg, auto id)
+	Dlg->DoModal([this, Dlg, cv](auto dlg, auto id)
 	{
 		if (id)
 		{

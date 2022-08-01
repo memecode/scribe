@@ -98,7 +98,7 @@ void ScribePrintContext::OnBeginPrint(LPrintDC *pdc, std::function<void(int)> ca
 	if (HtmlPrinting)
 	{
 		auto Dlg = new PrintPreview(App, mail, pdc);
-		Dlg->DoModal([&](auto dlg, auto id)
+		Dlg->DoModal([this, Dlg, callback, mail](auto dlg, auto id)
 		{
 			if (!id)
 			{
@@ -109,11 +109,13 @@ void ScribePrintContext::OnBeginPrint(LPrintDC *pdc, std::function<void(int)> ca
 			PageRanges.Reset(new LPrintPageRanges(Dlg->GetPageRanges()));
 			HtmlImg = Dlg->ReleaseImage();
 			mail->OnPrintHeaders(*this);
-			mail->OnPrintHtml(*this, *PageRanges, HtmlImg);
+			auto Pages = mail->OnPrintHtml(*this, *PageRanges, HtmlImg);
 			
 			delete dlg;
-			PrintStatus(1);
+			PrintStatus(Pages);
 		});
+
+		return; // Don't call callback yet, the UI lambda will do it.
 	}
 	else
 	{
