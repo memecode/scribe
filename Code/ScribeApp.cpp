@@ -1821,7 +1821,7 @@ LScriptEngine *ScribeWnd::GetScriptEngine()
 	return d->Engine;
 }
 
-LScriptCallback ScribeWnd::GetCallback(char *CallbackMethodName)
+LScriptCallback ScribeWnd::GetCallback(const char *CallbackMethodName)
 {
 	LScriptCallback Cb;
 	
@@ -6722,7 +6722,7 @@ void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::fun
 	if (InThread())
 	{
 		auto Inp = new LInput(Parent ? Parent : this, "", Msg, AppName, Password);
-		Inp->DoModal([&](auto dlg, auto id)
+		Inp->DoModal([this, Inp, Callback](auto dlg, auto id)
 		{
 			if (Callback)
 				Callback(id ? Inp->GetStr() : NULL);
@@ -7421,7 +7421,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		case IDM_MANAGE_MAIL_STORES:
 		{
 			auto Dlg = new ManageMailStores(this);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				LAutoPtr<LDialog> mem(dlg);
 				if (id)
@@ -7466,7 +7466,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		case IDM_REPLICATE:
 		{
 			auto Dlg = new ReplicateDlg(this);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
 				{
@@ -7510,7 +7510,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 
 			// do the dialog
 			auto Dlg = new OptionsDlg(this);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg, ShowTotals](auto dlg, auto id)
 			{
 				if (id)
 				{
@@ -8186,7 +8186,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		case IDM_BAYES_SETTINGS:
 		{
 			auto Dlg = new BayesDlg(this);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
 				{
@@ -9515,7 +9515,7 @@ struct DefaultClient
 		return true;
 	}
 
-	LAutoPtr<LRegKey> CheckKey(bool Write, const char *Key, ...)
+	LAutoPtr<LRegKey> CheckKey(bool Write, const char *Key, ...) const
 	{
 		char Buffer[512];
 		va_list Arg;
@@ -9608,7 +9608,7 @@ struct DefaultClient
 		return !_stricmp(v, "Scribe");
 	}
 
-	bool SetDefault()
+	bool SetDefault() const
 	{
 		LAutoPtr<LRegKey> mail = CheckKey(true, "HKCU\\Software\\Clients\\Mail");
 		if (!mail)
@@ -9858,30 +9858,34 @@ void ScribeWnd::SetDefaultHandler()
 		// HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\mailto\UserChoice
 		
 		LRegKey::AssertOnError = false;
-		bool Error = false;
 		bool IsDef = Def.IsDefault();
 		if (!IsDef)
 		{
 			// Ask the user...
 			auto Dlg = new DefaultClientDlg(this);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg, Def, OldAssert](auto dlg, auto id)
 			{
 				if (id)
 				{
-					Error = !Def.SetDefault();
-					GetOptions()->SetValue(OPT_CheckDefaultEmail, n = (int) (!Dlg->DontWarn));
+					auto Error = !Def.SetDefault();
+					LVariant v;
+					GetOptions()->SetValue(OPT_CheckDefaultEmail, v = (int) (!Dlg->DontWarn));
+					OnSetDefaultHandler(Error, OldAssert);
 				}
 				delete dlg;
 			});
 		}
-		
-		LRegKey::AssertOnError = OldAssert;
-		if (Error)
-		{
-			NeedsCapability("RegistryWritePermissions");
-		}
+		else OnSetDefaultHandler(false, OldAssert);
 	}
+
 	#endif
+}
+
+void ScribeWnd::OnSetDefaultHandler(bool Error, bool OldAssert)
+{
+	LRegKey::AssertOnError = OldAssert;
+	if (Error)
+		NeedsCapability("RegistryWritePermissions");
 }
 
 void ScribeWnd::OnSelect(List<Thing> *l, bool ChangeEvent)
@@ -11116,13 +11120,13 @@ Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, cons
 			sprintf_s(Msg, sizeof(Msg), LLoadString(IDS_ASK_USER_PASS), ResourceName);
 				
 			auto d = new LInput(Parent, "", Msg, AppName, true);
-			d->DoModal([&](auto dlg, auto id)
+			d->DoModal([this, d, p, Callback](auto dlg, auto id)
 			{
 				if (id && d->GetStr())
 				{
 					char Pass[256];
 					p.Get(Pass);
-					Status = strcmp(Pass, d->GetStr()) == 0;
+					bool Status = strcmp(Pass, d->GetStr()) == 0;
 					if (Status)
 					{
 						CurrentAuthLevel = PermRequireUser;
@@ -11162,7 +11166,7 @@ Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, cons
 			}
 
 			auto d = new LInput(Parent, "", LLoadString(IDS_ASK_ADMIN_PASS), AppName, true);
-			d->DoModal([&](auto dlg, auto id)
+			d->DoModal([this, d, Bin, Callback](auto dlg, auto id)
 			{
 				if (id && d->GetStr())
 				{
@@ -11414,7 +11418,7 @@ void ScribeWnd::Send(int Which, bool Quiet)
 							LLoadString(IDS_ERROR_NO_CONFIG_SEND),
 							LLoadString(IDS_CONFIGURE),
 							LLoadString(IDS_CANCEL));
-					d->DoModal([&](auto dlg, auto id)
+					d->DoModal([this, d, a](auto dlg, auto id)
 					{
 						if (id == 1)
 							a->GetAccount()->InitUI(this, 1, NULL);
@@ -11453,7 +11457,7 @@ void ScribeWnd::Receive(int Which)
 							LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
 							LLoadString(IDS_CONFIGURE),
 							LLoadString(IDS_CANCEL));
-					a->DoModal([&](auto dlg, auto id)
+					a->DoModal([this, a, i](auto dlg, auto id)
 					{
 						if (id == 1)
 							i->InitUI(this, 2, NULL);
@@ -11734,7 +11738,7 @@ void ScribeWnd::MailMerge(LArray<ListAddr*> &Contacts, const char *FileName, Mai
 				auto Ask = new LAlert(this, AppName, Msg,
 					LLoadString(IDS_SAVE_TO_OUTBOX), LLoadString(IDS_CANCEL));
 
-				Ask->DoModal([&](auto dlg, auto id)
+				Ask->DoModal([this, Msgs, Outbox](auto dlg, auto id)
 				{
 					switch (id)
 					{

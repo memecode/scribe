@@ -118,9 +118,34 @@ if (Thing.Type == ScribeItemMail)
 					Type can be: "Mail", "Contact", "Filter", "Calendar" or "Group".
 				</div></li>
 
-			<li> <method>BrowseFolder</method>(<arg>ParentWnd</arg>[, <arg>MessageTxt</arg>[, <arg>DefaultFolderName</arg>]])
+			<li> <method>BrowseFolder</method>(</arg><arg>ParentWnd</arg>, <arg>MessageTxt</arg>, <arg>DefaultFolderName</arg>, <arg>CallbackFunctionName</arg>)
 				<div class=desc>
-					Browses for a folder location, returns NULL on Cancel, and the folder's path on Ok.
+					Browses for a folder location and calls "CallbackFunctionName" on completion.
+					<ul>
+						<li> ParentWnd: The parent window view or handle, or NULL if not known. </li>
+						<li> MessageTxt: Message to user or NULL. </li>
+						<li> DefaultFolderName: Optional path for default selected folder or NULL. </li>
+						<li> CallbackFunctionName: Name of callback method with the form: </li>
+						<blockquote>
+							function CallbackFunction(FolderPath);
+						</blockquote>
+						The FolderPath will be NULL on a cancelled dialog.
+					</ul>
+					There is no useful return value from the function itself. Example:
+					<pre>function TestCallback(FolderPath)
+{
+    Print("TestCallback called: " + FolderPath + "\n");	
+}
+
+function TestLoad(App)
+{
+    BrowseFolder(App, "User prompt:", NULL, "TestCallback");
+}
+
+function Main(App)
+{
+    return AddCallback("OnLoad", "TestLoad");
+}</pre>
 				</div></li>
 
 			<li> <method>CreateThing</method>(<arg>Type</arg>[, <arg>Folder</arg>=None])

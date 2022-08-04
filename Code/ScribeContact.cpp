@@ -575,10 +575,10 @@ public:
 		if (Ctrl->GetId() == 100)
 		{
 			auto s = new LFileSelect(this);
-			s->Open([&](auto dlg, auto status)
+			s->Open([this](auto dlg, auto status)
 			{
 				if (status)
-					Load(s->Name());
+					Load(dlg->Name());
 				delete dlg;
 			});
 		}

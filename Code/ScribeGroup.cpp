@@ -429,13 +429,13 @@ void ContactGroup::OnMouseClick(LMouse &m)
 					{
 						auto s = new LFileSelect(App);
 						s->Type("Email Template", "*.txt;*.eml");
-						s->Open([&](auto dlg, auto status)
+						s->Open([this](auto dlg, auto status)
 						{
 							if (status)
 							{
 								LArray<ListAddr*> Recip;
 								if (ConvertList(this, Recip))
-									App->MailMerge(Recip, s->Name(), 0);
+									App->MailMerge(Recip, dlg->Name(), 0);
 								Recip.DeleteObjects();
 							}
 							delete dlg;

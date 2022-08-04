@@ -1305,7 +1305,7 @@ bool GMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
 							Msg,
 							"Browse Download Site & Local Folder",
 							"Cancel");
-		Dlg->DoModal([&](auto dlg, auto ctrlId)
+		Dlg->DoModal([this, Dlg, DownloadUrl, base](auto dlg, auto ctrlId)
 		{
 			if (ctrlId == 1)
 			{

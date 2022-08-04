@@ -1208,7 +1208,7 @@ int FindWnd::OnNotify(LViewI *Col, LNotification n)
 			if (Folder)
 			{
 				auto Dlg = new FolderDlg(this, App);
-				Dlg->DoModal([&](auto dlg, auto id)
+				Dlg->DoModal([this, Dlg](auto dlg, auto id)
 				{
 					if (id)
 						this->Folder->Name(Dlg->Get());

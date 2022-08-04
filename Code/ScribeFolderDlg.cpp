@@ -184,14 +184,14 @@ int ScribeFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 			Select->Type("v3 Mail Store", "*.sqlite");
 			Select->Type("All Files", LGI_ALL_FILES);
 
-			Select->Open([&](auto dlg, auto id)
+			Select->Open([this](auto dlg, auto id)
 			{
 				if (id)
 				{
-					if (LFileExists(Select->Name()) || LDirExists(Select->Name()))
-						SetCtrlName(IDC_EXISTING_FOLDER, Select->Name());
+					if (LFileExists(dlg->Name()) || LDirExists(dlg->Name()))
+						SetCtrlName(IDC_EXISTING_FOLDER, dlg->Name());
 					else
-						LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_DONT_EXIST), AppName, MB_OK, Select->Name());
+						LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_DONT_EXIST), AppName, MB_OK, dlg->Name());
 				}
 				delete dlg;
 			});

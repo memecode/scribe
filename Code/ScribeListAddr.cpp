@@ -957,7 +957,7 @@ void ListAddr::OnMouseClick(LMouse &m)
 				case IDM_EDIT:
 				{
 					auto Dlg = new LInput(Parent, sAddr);
-					Dlg->DoModal([&](auto dlg, auto id)
+					Dlg->DoModal([this, Dlg](auto dlg, auto id)
 					{
 						if (id == IDOK)
 						{

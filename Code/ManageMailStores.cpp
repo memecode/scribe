@@ -414,7 +414,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 			auto s = new LFileSelect(this);
 			s->InitialDir(LGetExePath());
 			s->Type("Mail Folders", "*.mail3;*.sqlite");
-			s->Open([&](auto dlg, auto status)
+			s->Open([this](auto dlg, auto status)
 			{
 				if (status)
 				{
@@ -422,7 +422,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 					if (Si)
 					{
 						char b[MAX_PATH_LEN];
-						strcpy_s(b, sizeof(b), s->Name());
+						strcpy_s(b, sizeof(b), dlg->Name());
 						char *n = LGetExtension(b);
 						if (n && !_stricmp(n, "sqlite"))
 						{

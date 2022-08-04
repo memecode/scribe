@@ -1923,7 +1923,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_EMPTY_FOLDER:
 		{
 			auto Dlg = new FolderDlg(Parent, App, MAGIC_MAIL);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
 					Arg1.Reset(NewStr(Dlg->Get()));
@@ -2079,10 +2079,10 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			}
 			Select->Name(Arg1);
 
-			Select->Open([&](auto dlg, auto id)
+			Select->Open([this](auto dlg, auto id)
 			{
 				if (id)
-					Arg1.Reset(NewStr(Select->Name()));
+					Arg1.Reset(NewStr(dlg->Name()));
 				delete dlg;
 			});
 			break;
@@ -2090,7 +2090,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_REPLY:
 		{
 			auto Dlg = new BrowseReply(App, Parent, Arg1);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
 					Arg1.Reset(NewStr(Dlg->Arg));
@@ -2101,7 +2101,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_FORWARD:
 		{
 			auto Dlg = new BrowseForward(App, Parent, Arg1, true);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
 					Arg1.Reset(NewStr(Dlg->Arg));
@@ -2112,7 +2112,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_BOUNCE:
 		{
 			auto Dlg = new BrowseForward(App, Parent, Arg1, false);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
 					Arg1.Reset(NewStr(Dlg->Arg));
@@ -2123,7 +2123,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_SAVE_ATTACHMENTS:
 		{
 			auto Dlg = new BrowseSaveAttach(App, Parent, Arg1);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
 					Arg1.Reset(NewStr(Dlg->Arg));

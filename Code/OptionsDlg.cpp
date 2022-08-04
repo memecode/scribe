@@ -978,13 +978,13 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		{
 			auto Select = new LFileSelect(this);
 			Select->Type("Sound", "*.wav");
-			Select->Open([&](auto dlg, auto status)
+			Select->Open([this](auto dlg, auto status)
 			{
 				if (status)
 				{
 					LEdit *LogFile;
 					if (GetViewById(IDC_NEW_MAIL_SOUND, LogFile))
-						LogFile->Name(Select->Name());
+						LogFile->Name(dlg->Name());
 				}
 				delete dlg;
 			});

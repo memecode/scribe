@@ -2299,6 +2299,7 @@ public:
 	void			RemoteContent_AddSender(const char *Addr, bool WhiteList);
 
 	void			SetDefaultHandler();
+	void			OnSetDefaultHandler(bool Error, bool OldAssert);
 	void			SetCurrentIdentity(int i=-1);
 	int				GetCurrentIdentity();
 
@@ -2412,7 +2413,7 @@ public:
 
 	// Scripting support
 	bool GetScriptCallbacks(LScriptCallbackType Type, LArray<LScriptCallback*> &Callbacks);
-	LScriptCallback GetCallback(char *CallbackMethodName);
+	LScriptCallback GetCallback(const char *CallbackMethodName);
 	bool RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args);
 	LStream *ShowScriptingConsole();
 	bool ExecuteScriptCallback(LScriptCallback &c, LScriptArguments &Args, bool ReturnArgs = false);

@@ -130,15 +130,15 @@ int ChooseFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 			s->Type("Outlook Express Folders", "*.mbx;*.dbx");
 			s->Type("Mozilla Address Book", "*.mab");
 			s->Type("Eudora Address Book", "NNdbase.txt");
-			s->Open([&](auto dlg, auto status)
+			s->Open([this](auto dlg, auto status)
 			{
 				if (status)
 				{
 					if (Export)
 						Lst->Empty();
 
-					for (int i=0; i<s->Length(); i++)
-						InsertFile((*s)[i]);
+					for (int i=0; i<dlg->Length(); i++)
+						InsertFile((*dlg)[i]);
 				}
 				delete dlg;
 			});

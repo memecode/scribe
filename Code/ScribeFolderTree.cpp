@@ -666,7 +666,7 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 													LLoadString(IDS_NEXT_FOLDER),
 													LLoadString(IDS_SUB_FOLDER),
 													LLoadString(IDS_CANCEL));
-							Dlg->DoModal([&](auto dlg, auto Res)
+							Dlg->DoModal([this, Dlg, FinishFolderOp](auto dlg, auto Res)
 							{
 								if (Res > 0)
 									FinishFolderOp(Res);

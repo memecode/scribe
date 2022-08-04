@@ -271,10 +271,10 @@ public:
 				auto s = new LFileSelect(this);
 				s->Type("XML", "*.xml");
 				s->Type("All Files", LGI_ALL_FILES);
-				s->Open([&](auto dlg, auto id)
+				s->Open([this](auto dlg, auto id)
 				{
 					if (id)
-						LoadMapping(s->Name());
+						LoadMapping(dlg->Name());
 					delete dlg;
 				});
 				break;

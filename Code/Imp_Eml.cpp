@@ -79,12 +79,12 @@ public:
 				auto s = new LFileSelect(this);
 				s->Type("Email Files", "*.eml");
 				s->Type("All Files", LGI_ALL_FILES);
-				s->Open([&](auto dlg, auto status)
+				s->Open([this](auto dlg, auto status)
 				{
 					if (status)
 					{
 						char p[MAX_PATH_LEN];
-						strcpy_s(p, sizeof(p), s->Name());
+						strcpy_s(p, sizeof(p), dlg->Name());
 						LTrimDir(p);
 						SetCtrlName(IDC_IN_FOLDER, p);
 					

@@ -493,13 +493,13 @@ public:
 				auto s = new LFileSelect(this);
 				s->Type("Scribe Folders", "*.mail3");
 				s->Type("All Files", LGI_ALL_FILES);
-				s->Open([&](auto dlg, auto status)
+				s->Open([this](auto dlg, auto status)
 				{
 					if (status)
 					{
 						DeleteObj(Folders);
 						EnableCtrls(false);
-						SetCtrlName(IDC_DEST, s->Name());
+						SetCtrlName(IDC_DEST, dlg->Name());
 						OnSelectFolders();
 					}
 					delete dlg;

@@ -3210,19 +3210,19 @@ int MailUi::OnCommand(int Cmd, int Event, OsView From)
 			auto Select = new LFileSelect(this);
 			Select->MultiSelect(true);
 			Select->Type("All files", LGI_ALL_FILES);
-			Select->Open([&](auto dlg, auto status)
+			Select->Open([this](auto dlg, auto status)
 			{
 				if (status)
 				{
 					Mail *m = GetItem();
 					if (m)
 					{
-						for (size_t i=0; i<Select->Length(); i++)
+						for (size_t i=0; i<dlg->Length(); i++)
 						{
 							char File[MAX_PATH_LEN];
-							if (!LResolveShortcut((*Select)[i], File, sizeof(File)))
+							if (!LResolveShortcut((*dlg)[i], File, sizeof(File)))
 							{
-								strcpy_s(File, sizeof(File), (*Select)[i]);
+								strcpy_s(File, sizeof(File), (*dlg)[i]);
 							}
 
 							Attachment *a = m->AttachFile(this, File);
@@ -7679,7 +7679,7 @@ void Mail::OnProperties(int Tab)
 		if (Lst[0])
 		{
 			auto Dlg = new MailPropDlg(GetList(), Lst);
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id == IDOK)
 				{

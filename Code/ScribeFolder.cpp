@@ -1016,7 +1016,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 		case IDM_RENAME:
 		{
 			auto Dlg = new FolderNameDlg(mt, GetName(true));
-			Dlg->DoModal([&](auto dlg, auto id)
+			Dlg->DoModal([this, Dlg, mt](auto dlg, auto id)
 			{
 				if (id && ValidStr(Dlg->Name))
 				{
@@ -1166,7 +1166,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 		{
 			auto s = new LFileSelect(mt);
 			s->Type("Email Template", "*.txt;*.eml");
-			s->Open([&](auto dlg, auto id)
+			s->Open([this](auto dlg, auto id)
 			{
 				if (id)
 				{
@@ -1175,7 +1175,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 					{
 						Recip.Add(new ListAddr(i->IsContact()));
 					}
-					App->MailMerge(Recip, s->Name(), 0);
+					App->MailMerge(Recip, dlg->Name(), 0);
 					Recip.DeleteObjects();
 				}
 				delete dlg;

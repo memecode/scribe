@@ -1609,7 +1609,7 @@ void LHtmlMsg(std::function<void(int)> Callback, LViewI *Parent, const char *Htm
 	va_end(Arg);
 
 	auto Dlg = new HtmlMsg(Parent, Msg, Title, Type);
-	Dlg->DoModal([&](auto dlg, auto id)
+	Dlg->DoModal([Callback](auto dlg, auto id)
 	{
 		if (Callback)
 			Callback(id);
