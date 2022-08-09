@@ -736,7 +736,11 @@ public:
 
 				if (c->Str)
 				{
-					if (c->NewType == BayesMailSpam || c->RemoveWhite)
+					if (!WhiteList)
+					{
+						LgiTrace("Missing whitelist obj.\n");
+					}
+					else if (c->NewType == BayesMailSpam || c->RemoveWhite)
 					{
 						// Make sure the email address is not in the white list...
 						WhiteList->DeleteWord(c->Str);
