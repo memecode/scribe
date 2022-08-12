@@ -216,7 +216,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D01CC49532A747A29EA00D13;
+			remoteGlobalIDString = 8F15D55C301E444E9E82A2B8;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -342,28 +342,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 026FC77338384C76800E2252;
+			remoteGlobalIDString = 111230ED7D734BB598EEA1B2;
 			remoteInfo = libjpeg9a;
 		};
 		34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = DCA9FBC7AEF841BD880FB9B4;
+			remoteGlobalIDString = BE49F3400B994612A1DC9A76;
 			remoteInfo = libpng15;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 235DAB71A64547758266A0AF;
+			remoteGlobalIDString = 52FF9D103A1C46C79ACB9A09;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D8280AD42C749A4AD6195EB;
+			remoteGlobalIDString = 453DFD289DBD49E4BA4363EA;
 			remoteInfo = libiconv;
 		};
 		34DED72523AC30C30049E01F /* PBXContainerItemProxy */ = {
@@ -1760,7 +1760,7 @@
 					../../../../CodeLib/openssl,
 					/opt/local/include,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DLGI_COCOA=1";
@@ -1827,7 +1827,7 @@
 					../../../../CodeLib/openssl,
 					/opt/local/include,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "-DLGI_COCOA=1";
 				OTHER_CPLUSPLUSFLAGS = "-DLGI_COCOA=1";
@@ -1868,7 +1868,6 @@
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CFLAGS = (
 					"-D__NCURSES_H=1",
 					"-DNCURSES_UNCTRL_H_incl=1",
@@ -1922,7 +1921,6 @@
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CFLAGS = (
 					"-D__NCURSES_H=1",
 					"-DNCURSES_UNCTRL_H_incl=1",
