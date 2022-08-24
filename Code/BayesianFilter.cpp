@@ -736,7 +736,11 @@ public:
 
 				if (c->Str)
 				{
-					if (c->NewType == BayesMailSpam || c->RemoveWhite)
+					if (!WhiteList)
+					{
+						LgiTrace("Missing whitelist obj.\n");
+					}
+					else if (c->NewType == BayesMailSpam || c->RemoveWhite)
 					{
 						// Make sure the email address is not in the white list...
 						WhiteList->DeleteWord(c->Str);
@@ -817,10 +821,16 @@ public:
 
 	void Process();
 	void ProcessMail(Mail *m, ScribeMailType type);
+	void AbortProcess();
 
 	void AddFolder(ScribeFolder *f)
 	{
 		Folders.Add(f);
+	}
+
+	bool IsCancelled()
+	{
+		return Prog ? Prog->IsCancelled() : true;
 	}
 };
 
@@ -850,6 +860,11 @@ public:
             Thread.Reset(new BayesianThread(App));
         return Thread;
     }
+
+	bool IsCancelled()
+	{
+		return Build ? Build->IsCancelled() : true;
+	}
 };
 
 BuildSpamDB::BuildSpamDB(ScribeWnd *app) : App(app), Filter(app)
@@ -888,8 +903,17 @@ BuildSpamDB::~BuildSpamDB()
 	App->OnFolderTask(Filter->d->GetThread(), false);
 }
 
+void BuildSpamDB::AbortProcess()
+{
+	Folders.Length(0);
+	Items.Length(0);
+}
+
 void BuildSpamDB::Process()
 {
+	if (IsCancelled())
+		AbortProcess();
+
 	// This should execute for only a small time slice...
 	if (Folders.Length() || FolderLoads)
 	{
@@ -1134,6 +1158,9 @@ BayesianFilter::~BayesianFilter()
 
 void BayesianFilter::AddFolderToSpamDb(ScribeFolder *f)
 {
+	if (d->IsCancelled())
+		return;
+
 	d->Build->AddFolder(f);
 	for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
 		AddFolderToSpamDb(c);
