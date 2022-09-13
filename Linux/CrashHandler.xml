@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project>
+	<Node Name="Source" Type="1" Platforms="15" Id="1">
+		<Node File="./CrashHandler.cpp" Type="2" Platforms="15" />
+	</Node>
+	<Node Name="Build" Type="1" Platforms="15" Id="2">
+		<Node File="./CrashHandlerMakefile.linux" Type="9" Platforms="15" />
+	</Node>
+	<Settings>
+		<Editor>
+			<TabSize>
+				<All>4</All>
+			</TabSize>
+			<IndentSize>
+				<All>4</All>
+			</IndentSize>
+			<UseHardTabs>
+				<All>1</All>
+			</UseHardTabs>
+		</Editor>
+		<General>
+			<Makefile>
+				<Linux>CrashHandlerMakefile.linux</Linux>
+			</Makefile>
+			<Executable>
+				<Linux>
+					<Debug>./crash-handler</Debug>
+					<Release>./crash-handler</Release>
+				</Linux>
+			</Executable>
+			<Compiler>
+				<Linux>gcc</Linux>
+			</Compiler>
+		</General>
+		<Build>
+			<IncludePaths>
+				<All>
+					<Debug>../../../lgi/trunk/include</Debug>
+					<Release>../../../lgi/trunk/include</Release>
+				</All>
+				<Linux>
+					<Debug>../../../lgi/trunk/include/lgi/linux/Gtk</Debug>
+					<Release>../../../lgi/trunk/include/lgi/linux/Gtk</Release>
+				</Linux>
+			</IncludePaths>
+			<TargetType>
+				<All>Executable</All>
+			</TargetType>
+			<SystemIncludes>
+				<Linux>
+					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
+					<Release>`pkg-config --cflags gtk+-3.0`</Release>
+				</Linux>
+			</SystemIncludes>
+		</Build>
+	</Settings>
+</Project>
