@@ -216,7 +216,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8F15D55C301E444E9E82A2B8;
+			remoteGlobalIDString = 63F1B6C35FC9475F8A6274EC;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -342,28 +342,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 111230ED7D734BB598EEA1B2;
+			remoteGlobalIDString = FAEB745E38014DB5912D04F5;
 			remoteInfo = libjpeg9a;
 		};
 		34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = BE49F3400B994612A1DC9A76;
+			remoteGlobalIDString = A47CE3DD6D7E44FF984E327F;
 			remoteInfo = libpng15;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 52FF9D103A1C46C79ACB9A09;
+			remoteGlobalIDString = 7D1CF078C60E4238813E5BB7;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 453DFD289DBD49E4BA4363EA;
+			remoteGlobalIDString = C84F72522656464CBED4EA91;
 			remoteInfo = libiconv;
 		};
 		34DED72523AC30C30049E01F /* PBXContainerItemProxy */ = {
@@ -1493,7 +1493,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/opt/local/bin/python ${PROJECT_DIR}/PostBuildStep.py ${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython3 ${PROJECT_DIR}/PostBuildStep.py ${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1727,7 +1727,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer: fret@memecode.com (TDDY28LGJ7)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1738,6 +1737,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC,
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -1749,16 +1749,19 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					../Code,
+					../Code/Sqlite,
 					../Resources,
 					../Utils/Tables,
+					../../libs/libchardet/include,
+					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include/common,
-					../../../Lgi/trunk/include/mac/cocoa,
-					"../../../../CodeLib/libjpeg-9a",
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/openssl,
-					/opt/local/include,
+					"../../libs/build-x64/libpng",
+					../../../lgi/trunk/include,
+					../../../lgi/trunk/private/common,
+					../../../lgi/trunk/include/lgi/mac/cocoa,
+					"../../../../codelib/libjpeg-9a",
+					../../../../codelib/libpng,
+					"/usr/local/Cellar/openssl@1.1/1.1.1q/include",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1800,7 +1803,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer: fret@memecode.com (TDDY28LGJ7)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1808,6 +1810,7 @@
 				FRAMEWORK_SEARCH_PATHS = ../../../Lgi/trunk/src/mac/cocoa/build/Release;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = MAC;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -1816,16 +1819,19 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					../Code,
+					../Code/Sqlite,
 					../Resources,
 					../Utils/Tables,
+					../../libs/libchardet/include,
+					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include/common,
-					../../../Lgi/trunk/include/mac/cocoa,
-					"../../../../CodeLib/libjpeg-9a",
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/openssl,
-					/opt/local/include,
+					"../../libs/build-x64/libpng",
+					../../../lgi/trunk/include,
+					../../../lgi/trunk/private/common,
+					../../../lgi/trunk/include/lgi/mac/cocoa,
+					"../../../../codelib/libjpeg-9a",
+					../../../../codelib/libpng,
+					"/usr/local/Cellar/openssl@1.1/1.1.1q/include",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1842,30 +1848,10 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = Scribe/Scribe.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 21;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
-				HEADER_SEARCH_PATHS = (
-					../Code,
-					../Resources,
-					../Utils/Tables,
-					../Code/Sqlite,
-					../../libs/libchardet/include,
-					../../libs/libchardet/src,
-					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include,
-					../../../Lgi/trunk/include/lgi/mac/cocoa,
-					../../../Lgi/trunk/private/common,
-					../../../../CodeLib/libjpeg,
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/libpng/build,
-					/opt/local/include,
-				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				OTHER_CFLAGS = (
@@ -1895,30 +1881,10 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = Scribe/Scribe.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 21;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
-				HEADER_SEARCH_PATHS = (
-					../Code,
-					../Resources,
-					../Utils/Tables,
-					../Code/Sqlite,
-					../../libs/libchardet/include,
-					../../libs/libchardet/src,
-					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include,
-					../../../Lgi/trunk/include/lgi/mac/cocoa,
-					../../../Lgi/trunk/private/common,
-					../../../../CodeLib/libjpeg,
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/libpng/build,
-					/opt/local/include,
-				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				OTHER_CFLAGS = (

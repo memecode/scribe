@@ -3452,11 +3452,12 @@ bool ScribeWnd::LoadOptions()
 		}
 		else
 		{
+            auto err = GetOptions()->GetError();
 			LgiMsg(	this,
 					LLoadString(IDS_ERROR_LR8_FAILURE),
 					AppName,
 					MB_OK,
-					GetOptions()->GetError());
+					err);
 		}
 	}
 
