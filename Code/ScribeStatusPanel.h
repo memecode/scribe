@@ -6,18 +6,18 @@
 #include "lgi/common/TableLayout.h"
 
 // Status item
-class GAccountStatusItem : public LListItem
+class AccountStatusItem : public LListItem
 {
 	char Buf[32];
 
 public:
-	LStatusPanel *Panel;
+	AccountStatusPanel *Panel;
 	ScribeAccount *Account;
 	LImageList *ImgLst;
 	int State;
 
-	GAccountStatusItem(LStatusPanel *panel, ScribeAccount *account, LImageList *imglst);
-	~GAccountStatusItem();
+	AccountStatusItem(AccountStatusPanel *panel, ScribeAccount *account, LImageList *imglst);
+	~AccountStatusItem();
 
 	const char *GetText(int Col);
 	void OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c);
@@ -27,18 +27,18 @@ public:
 };
 
 // Reports the status of client transaction, SMTP, POP3, IMAP4 etc
-class LStatusPanel :
+class AccountStatusPanel :
 	public ScribePanel,
 	public LResourceLoad
 {
-	friend class GAccountStatusItem;
+	friend class AccountStatusItem;
 
 	// Data
 	LImageList *ImgLst;
 	List<ScribeAccount> *Accounts;
 	size_t PrevAccounts;
 	ScribeAccount *Current;
-	GAccountStatusItem *CurStatusItem;
+	AccountStatusItem *CurStatusItem;
 
 	// Controls
 	LViewI *AccountTbl;
@@ -57,11 +57,11 @@ class LStatusPanel :
 	void _Unlock();
 
 public:
-	LStatusPanel(ScribeWnd *app, LImageList *imglst);
-	~LStatusPanel();
+	AccountStatusPanel(ScribeWnd *app, LImageList *imglst);
+	~AccountStatusPanel();
 
 	// Impl
-	void OnAccountSelect(GAccountStatusItem *Item);
+	void OnAccountSelect(AccountStatusItem *Item);
 	void OnAccountListChange();
 	void Empty();
 	LXmlTag *GetOptions();

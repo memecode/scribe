@@ -1510,7 +1510,7 @@ ScribeWnd::~ScribeWnd()
 	}
 	Mail::NewMailLst.Empty();
 
-	// ~GAccountStatusItem references the account list... must be before we
+	// ~AccountStatusItem references the account list... must be before we
 	// delete the accounts.
 	DeleteObj(StatusPanel);
 
@@ -5906,7 +5906,7 @@ void ScribeWnd::SetupUi()
 
 	// Preview and status windows
 	PreviewPanel = new LPreviewPanel(this);
-	StatusPanel = new LStatusPanel(this, ImageList);
+	StatusPanel = new AccountStatusPanel(this, ImageList);
 	if (PreviewPanel &&
 		StatusPanel)
 	{
@@ -7827,13 +7827,38 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_RECEIVE_ALL:
 		{
+			#define LOG_RECEIVE_ALL		0
 			int i = 0;
+			
+			Accounts.Sort(AccountCmp);
+			
 			for (auto a : Accounts)
 			{
-				if (a->Receive.IsConfigured() &&
-					a->Receive.Disabled() < 1)
-				{				
-					Receive(i);
+				#if LOG_RECEIVE_ALL
+				auto name = a->Identity.Name();
+				auto email = a->Identity.Email();
+				LString desc;
+				desc.Printf("%s/%s", name.Str(), email.Str());
+				#endif
+				
+				if (!a->Receive.IsConfigured())
+				{
+					#if LOG_RECEIVE_ALL
+					LgiTrace("%s:%i - %i/%s not configured.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+				}
+				else if (a->Receive.Disabled() > 0)
+				{
+					#if LOG_RECEIVE_ALL
+					LgiTrace("%s:%i - %i/%s is disabled.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+				}
+				else
+				{
+					#if LOG_RECEIVE_ALL				
+					LgiTrace("%s:%i - %i/%s will connect.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+					Receive(a->GetIndex());
 				}
 				i++;
 			}
@@ -11216,34 +11241,52 @@ void ScribeWnd::Send(int Which, bool Quiet)
 
 void ScribeWnd::Receive(int Which)
 {
+	#define LOG_RECEIVE		0
+	
 	if (ScribeState == ScribeExiting)
+	{
+		LgiTrace("%s:%i - Won't receive, is trying to exit.\n", _FL);
 		return;
+	}
 
 	for (ScribeAccount *i: Accounts)
 	{
-		if (i->GetIndex() == Which)
+		if (i->GetIndex() != Which)
+			continue;
+			
+		if (i->Receive.IsOnline())
 		{
-			if (!i->Receive.IsOnline() &&
-				i->Receive.Disabled() < 1)
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i already online.\n", _FL, Which);
+			#endif
+		}
+		else if (i->Receive.Disabled() > 0)
+		{
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i is disabled.\n", _FL, Which);
+			#endif
+		}
+		else if (!i->Receive.IsConfigured())
+		{
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i is not configured.\n", _FL, Which);
+			#endif
+
+			LAlert a(this,
+					AppName,
+					LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
+					LLoadString(IDS_CONFIGURE),
+					LLoadString(IDS_CANCEL));
+			if (a.DoModal() == 1)
 			{
-				if (i->Receive.IsConfigured())
-				{
-					i->Receive.Connect(0, false);
-				}
-				else
-				{
-					LAlert a(this,
-							AppName,
-							LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
-							LLoadString(IDS_CONFIGURE),
-							LLoadString(IDS_CANCEL));
-					if (a.DoModal() == 1)
-					{
-						i->InitUI(this, 2);
-					}
-				}
+				i->InitUI(this, 2);
 			}
 		}
+		else
+		{
+			i->Receive.Connect(0, false);
+		}
+		break;
 	}
 }
 
