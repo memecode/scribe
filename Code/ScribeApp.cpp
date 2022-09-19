@@ -3940,10 +3940,10 @@ int ScribeWnd::GetCurrentIdentity()
 	LVariant i;
 	if (GetOptions()->GetValue(OPT_CurrentIdentity, i))
 		return i.CastInt32();
-	else
+	else if (ScribeState != ScribeInitializing)
 		LgiTrace("%s:%i - No OPT_CurrentIdentity set.\n", _FL);
 
-	return NULL;
+	return -1;
 }
 
 void ScribeWnd::SetupAccounts()
@@ -4043,7 +4043,7 @@ void ScribeWnd::SetupAccounts()
 			break;
 	}
 
-	if (ResetDefault && Enabled.Length())
+	if ((ResetDefault || CurrentIdentity < 0) && Enabled.Length())
 	{
 		for (unsigned i=0; i<Enabled.Length(); i++)
 		{
@@ -5156,7 +5156,7 @@ bool ScribeWnd::LoadMailStores()
 					// AddFolderToMru(Full);
 				}
 
-				LYield();
+				// LYield();
 				Status = true;
 			}
 		}
