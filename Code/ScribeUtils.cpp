@@ -86,11 +86,13 @@ LString::Array ScribeThemePaths()
 	
 	LFile::Path ro(ScribeResourcePath());
 	ro += "Themes";
-	r.Add(ro.GetFull());
+	if (ro.Exists())
+		r.Add(ro.GetFull());
 	
 	LFile::Path rw(LSP_APP_ROOT);
 	rw += "Themes";
-	r.Add(rw.GetFull());
+	if (rw.Exists())
+		r.Add(rw.GetFull());
 	
 	return r;
 }

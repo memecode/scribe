@@ -1559,7 +1559,11 @@ void ScribeWnd::LoadImageResources()
 	auto Res = LgiGetResObj();
 	LString::Array Folders;
 	if (Res)
-		Folders.Add(Res->GetThemeFolder());
+	{
+		auto p = Res->GetThemeFolder();
+		if (p)
+			Folders.Add(p);
+	}
 	Folders.Add(ScribeResourcePath());
 
 	for (auto p: Folders)
@@ -2295,7 +2299,11 @@ void ScribeWnd::OnCreate()
 			#if RUN_STARTUP_SCRIPTS
 			// Run scripts in './Scripts' folder
 			char s[MAX_PATH_LEN];
-			LMakePath(s, sizeof(s), ScribeResourcePath(), "../Scripts");
+			LMakePath(s, sizeof(s), ScribeResourcePath(),
+				#ifndef MAC
+				"../"
+				#endif
+				"Scripts");
 			if (!LDirExists(s))
 				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
 					#if defined(WINDOWS) && defined(_DEBUG)
