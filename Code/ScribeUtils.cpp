@@ -61,20 +61,31 @@ const char *ScribeResourcePath()
 		#endif
 		
 		#if !defined(MAC)
-		// Exe relative mode
-		LFile::Path p(LSP_APP_INSTALL);
-		p += "../Resources";
-		#if defined(WINDOWS)
-		if (!p.Exists())
-			p += "../../Resources"; // When running a build from source.
-		#endif
-		if (p.Exists())
-			strcpy_s(Res, sizeof(Res), p.GetFull());
-		else
+		const char *Paths[] = {
+			"./Resources",
+			"../Resources",
+			"../../Resources",
+		};
+		bool Found = false;
+		for (unsigned i=0; i<CountOf(Paths); i++)
 		{
-			LAssert(!"Can't find resource folder");
-			LgiTrace("%s:%i - Can't find resource folder.\n", _FL);
+			// Exe relative mode
+			LFile::Path p(LSP_APP_INSTALL);
+			p += Paths[i];
+			if (p.Exists())
+			{
+				Found = true;
+				strcpy_s(Res, sizeof(Res), p.GetFull());
+				break;
+			}
+
+			LgiTrace("Resource folder: '%s' doesn't exist.\n", p.GetFull().Get());
 		}
+
+		#ifdef _DEBUG
+		if (!Found)
+			LAssert(!"Can't find resource folder");
+		#endif
 		#endif
 	}
 	return Res;	
