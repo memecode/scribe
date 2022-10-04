@@ -22,6 +22,17 @@ void ThingType::WhenLoaded(const char *file, int line, std::function<void()> Cal
 		return;
 	}
 
+	if (!Loaded && GetObject())
+	{
+		// Lets just check the state of the object first...
+		auto i = GetObject()->GetInt(FIELD_LOADED);
+		if (i == Store3Loaded)
+		{
+			// This is the default for mail3 for instance...
+			Loaded = true;
+		}
+	}
+
 	if (Loaded)
 	{
 		Callback();

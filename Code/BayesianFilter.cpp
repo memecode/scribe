@@ -632,7 +632,7 @@ public:
 
 		if (!Ws || !c)
 		{
-			LgiTrace("%s:%i - Invalid param.\n", _FL);
+			LgiTrace("%s:%i - Invalid param: %p, %p\n", _FL, c, Ws);
 			return;
 		}
 
@@ -1046,7 +1046,7 @@ void BuildSpamDB::ProcessMail(Mail *m, ScribeMailType Type)
 	auto flags = m->GetFlags();
 
 	// Remove the bayes DB flags...
-	flags &= !(MAIL_HAM_DB|MAIL_SPAM_DB);
+	flags &= ~(MAIL_HAM_DB|MAIL_SPAM_DB);
 
 	if (Type == BayesMailSpam)
 	{
@@ -1473,8 +1473,10 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 			if (fld)
 				path = fld->GetPath();
 			LgiTrace("%s:%i - couldn't get body for %s/%s\n", _FL, path.Get(), m->GetMessageId());
+			/* Technically not an error... body can be blank.
 			Processing = false;
 			return Store3Error;
+			*/
 		}
 	
 		out = LString("").Join(Blocks);
