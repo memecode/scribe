@@ -5,9 +5,10 @@
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/SpellCheck.h"
 
-#define TIMEOUT_BAYES_LOAD		(10 * 1000)	// 10sec
-#define TIMEOUT_SPELL_CHECK		(3 * 1000)	// 3sec
-#define TIMEOUT_UPDATE_REBUILD	(2 * 1000)  // 2sec
+#define SECONDS(n)				((n) * 1000)
+#define TIMEOUT_BAYES_LOAD		SECONDS(10)
+#define TIMEOUT_SPELL_CHECK		SECONDS(3)
+#define TIMEOUT_UPDATE_REBUILD	SECONDS(2)
 #define TIMEOUT_BAYES_IDLE		(50) // ms, out of 100ms idle timer.
 
 #define WHITELIST_MY_EMAIL		0
@@ -290,7 +291,9 @@ private:
 			if (!list->GetFile()) \
 			{ \
 				if (auto s = FindWordDb(file)) \
+				{ \
 					list->SetFile(s); \
+				} \
 			}
 
 		SetListFile(WhiteList, WhiteListFile);
@@ -309,7 +312,7 @@ private:
 public:
 	BayesianThread(ScribeWnd *app) :
 		LThread("BayesianThread.Thread"),
-		LMutex("BayesianThread.Mutex")
+		LMutex ("BayesianThread.Mutex")
 	{
 		App = app;
 		State = BayesLoading;		
@@ -407,9 +410,12 @@ public:
 	LString FindWordDb(const char *Name)
 	{
 		LString OptPath;
-		if (App->GetOptions() && App->GetOptions()->GetFile())
+		auto Opts = App->GetOptions();
+		
+		// Look in the same folder as the options file:
+		if (Opts && Opts->GetFile())
 		{
-			LFile::Path p(App->GetOptions()->GetFile());
+			LFile::Path p(Opts->GetFile());
 			p--;
 			OptPath = p.GetFull();
 			p += Name;
@@ -417,12 +423,16 @@ public:
 				return p.GetFull();
 		}
 
+		// Check the install folder too:
 		LFile::Path p(LSP_APP_INSTALL);
 		p += Name;
 		if (p.IsFile())
 			return p.GetFull();
 
-		return NULL;
+		// No existing file found, so create a path using the options location:
+		p = OptPath;
+		p += Name;
+		return p.GetFull();
 	}
 
 	void OnCheckText(LSpellCheck::CheckText *Ct)
@@ -584,7 +594,7 @@ public:
                             LHashTbl<ConstStrKeyPool<char,false>,int> &Hash,
                             int EmailCount,
                             bool Append,
-                            LStream *Debug = 0)
+                            LStream *Debug = NULL)
     {
 	    auto Items = Hash.Length();
 	    int64 Start = LCurrentTime();
@@ -592,7 +602,9 @@ public:
 	    if (Debug)
 		    Debug->Print("ConvertHashToBtree(%s, %i words, %i emails)\n", Ws->GetFile(), Items, EmailCount);
 
-		for (auto i : Hash)
+		Ws->Empty();
+		
+		for (auto i: Hash)
 	    {
 	        ssize_t Result;
 	        
@@ -622,8 +634,10 @@ public:
 
 	    Hash.Empty();
 
-	    if (Debug)
-		    Debug->Print("	\tSetWordCount took %.1f sec\n", ((double)((int64)LCurrentTime()-Start))/1000.0);
+	    LgiTrace("ConvertHashToBtree(%s) took %.1f sec, for " LPrintfInt64 " items.\n",
+	    	Ws->GetFile(),
+	    	((double)((int64)LCurrentTime()-Start))/1000.0,
+	    	Items);
     }
 
 	void ApplyChange(Change *c, LWordStore *Ws, bool Add)
@@ -653,8 +667,6 @@ public:
 
 	int Main()
 	{
-		// int64 Size = 0;
-
 		if (auto s = FindWordDb(HamWordsFile))
 			SetStore(Ham, new LWordStore(s));
 		if (auto s = FindWordDb(SpamWordsFile))
@@ -819,7 +831,8 @@ public:
 	BuildSpamDB(ScribeWnd *app);
 	~BuildSpamDB();
 
-	void Process();
+	/// \returns true when the processing is finished
+	bool Process();
 	void ProcessMail(Mail *m, ScribeMailType type);
 	void AbortProcess();
 
@@ -909,7 +922,7 @@ void BuildSpamDB::AbortProcess()
 	Items.Length(0);
 }
 
-void BuildSpamDB::Process()
+bool BuildSpamDB::Process()
 {
 	if (IsCancelled())
 		AbortProcess();
@@ -968,7 +981,7 @@ void BuildSpamDB::Process()
 			Prog->SetRange(LRange(0, Items.Length()));
 			Prog->Value(0);
 		}
-		return;
+		return false;
 	}
 
 	if (Items.Length() || MailLoads)
@@ -1003,11 +1016,11 @@ void BuildSpamDB::Process()
 				Items.DeleteAt(0);
 			}
 		}
-		return;
+		return false;
 	}
 
 	// We're done...
-	Filter->d->Build.Reset();
+	return true;
 }
 
 void BuildSpamDB::ProcessMail(Mail *m, ScribeMailType Type)
@@ -1199,8 +1212,6 @@ void BayesianFilter::BuildStats()
 
 bool BayesianFilter::BuildSpamDb()
 {
-	bool Status = false;
-
 	if (!d->GetThread())
 		return false;
 
@@ -1209,22 +1220,8 @@ bool BayesianFilter::BuildSpamDb()
 	if (!App->GetOptions()->GetValue(OPT_BayesMoveTo, MoveTo))
 		MoveTo = "/Spam/Probably";
 
-	d->Build.Reset(new BuildSpamDB(App));
-
-	/*
-	Build.Spam = App->GetFolder("/Spam");
-	Build.Probably = App->GetFolder(MoveTo.Str());
-	Build.Sent = App->GetFolder(FOLDER_SENT);
-	Build.Trash = App->GetFolder(FOLDER_TRASH);
-
-	if (Build.Debug)
-	{
-		Build.Debug->Print("%s:%i - Probably Path='%s'\n", _FL, MoveTo.Str());
-		Build.Debug->Print("%s:%i - Spam=%p Probably=%p Sent=%p Trash=%p\n",
-							_FL,
-							Build.Spam, Build.Probably, Build.Sent, Build.Trash);
-	}
-	*/
+	if (!d->Build.Reset(new BuildSpamDB(App)))
+		return false;
 
 	// Recurse over the folders
 	for (auto &s: App->GetStorageFolders())
@@ -1240,14 +1237,8 @@ bool BayesianFilter::BuildSpamDb()
 	}
 
 	d->Build->Prog->SetRange(LRange(0, d->Build->Folders.Length()));
-	return Status;
+	return true;
 }
-
-/*
-
-
-
-*/
 
 #define IsCJK(c) \
 	( \
@@ -1704,7 +1695,14 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 
 			if (d->Build)
 			{
-				d->Build->Process();
+				if (d->Build->Process())
+				{
+					// Give the hash tables to the worker thread to convert to disk:
+					d->GetThread()->Add(d->Build->b);
+					
+					// And finish doing the build processing:
+					d->Build.Reset();
+				}				
 				break;
 			}
 
@@ -1829,30 +1827,31 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 		case M_SCRIBE_BAYES_RESULT:
 		{
 			LArray< LAutoPtr<BayesianThread::Test> > Results;
-    		if (d->GetThread()->GetResults(Results))
-    		{
-    			for (unsigned i=0; i<Results.Length(); i++)
-    			{
-    				BayesianThread::Test *t = Results[i];
-    				if (t)
-    				{
-    					if (t->Analyse)
-    					{
-    						LArray<char> a;
-    						int Size = (int) t->Log.GetSize();
-    						a.Length(Size+1);
-    						t->Log.Read(&a[0], Size);
-    						a[Size] = 0;
-    						OnBayesAnalyse(&a[0], t->WhiteListed ? t->FromAddr : NULL);
-    					}
-    					else if (t->MsgRef)
-    					{
-							OnBayesResult(t->MsgRef, t->Score);
-    					}
-    					else LAssert(!"There should always be a msg ref");
-    				}
-    				else LAssert(!"Shouldn't happen.");
-    			}
+    		if (!d->GetThread()->GetResults(Results))
+    			break;
+
+			for (auto t: Results)
+			{
+				if (!t)
+				{
+					LAssert(!"Null ptr in Results");
+					continue;
+				}
+				
+				if (t->Analyse)
+				{
+					LArray<char> a;
+					int Size = (int) t->Log.GetSize();
+					a.Length(Size+1);
+					t->Log.Read(&a[0], Size);
+					a[Size] = 0;
+					OnBayesAnalyse(&a[0], t->WhiteListed ? t->FromAddr : NULL);
+				}
+				else if (t->MsgRef)
+				{
+					OnBayesResult(t->MsgRef, t->Score);
+				}
+				else LAssert(!"There should always be a msg ref");
 			}
 			break;
     	}	    
