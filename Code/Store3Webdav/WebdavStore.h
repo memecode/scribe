@@ -133,8 +133,9 @@ class WebdavFolder : public LDataFolderI
 	WebdavStore *Store;
 	WebdavFolder *Parent;
 	LString Name;
-	Store3ItemTypes ItemType;
-	int64 Sort;
+	Store3ItemTypes ItemType = MAGIC_ANY;
+	int64 Sort = 0;
+	Store3State State = Store3Unloaded;
 
 public:
 	DIterator<LDataI,       WebdavObj,    WebdavStore> Items;

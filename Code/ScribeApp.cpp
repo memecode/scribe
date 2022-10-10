@@ -4661,12 +4661,6 @@ void ScribeWnd::OnPulseSecond()
 	}
 
 	#if PROFILE_ON_PULSE
-	Prof.Add("SaveDirtyObjects handling");
-	#endif
-	
-	SaveDirtyObjects();	
-
-	#if PROFILE_ON_PULSE
 	Prof.Add("PreviewPanel handling");
 	#endif
 
@@ -4857,6 +4851,7 @@ public:
 		while (Status < 0)
 		{
 			LYield();
+			LSleep(1);
 		}
 
 		Prog.Reset();
@@ -12552,14 +12547,25 @@ bool ScribeWnd::OnIdle()
 	bool Status = false;
 	
 	for (auto a : Accounts)
-	{
 		Status |= a->Receive.OnIdle();
-	}
 
 	Status |= OnTransfer();
 
 	LMessage m(M_SCRIBE_IDLE);
 	BayesianFilter::OnEvent(&m);
+
+	SaveDirtyObjects();	
+
+	#ifdef _DEBUG
+	static uint64_t LastTs = 0;
+	auto Now = LCurrentTime();
+	if (Now - LastTs >= 1000)
+	{
+		LastTs = Now;
+		if (Thing::DirtyThings.Length() > 0)
+			LgiTrace("%s:%i - Thing::DirtyThings=" LPrintfInt64 "\n", _FL, Thing::DirtyThings.Length());
+	}
+	#endif
 
 	return Status;
 }

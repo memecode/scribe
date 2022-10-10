@@ -117,7 +117,6 @@ void WebdavThread::ReadDirectory(LWebdav &Wd)
 int WebdavThread::Main()
 {
 	LWebdav Wd(Remote.Url, Remote.User, Remote.Pass, this);
-	// LString::Array Opts = Wd.GetOptions("/");
 		
 	ReadDirectory(Wd);
 	

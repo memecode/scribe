@@ -931,7 +931,7 @@ bool BuildSpamDB::Process()
 	if (Folders.Length() || FolderLoads)
 	{
 		if (!Folders.Length())
-			return; // Just wait for them...
+			return false; // Just wait for them...
 
 		auto f = Folders[0];
 		Folders.DeleteAt(0);
