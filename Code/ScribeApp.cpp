@@ -728,7 +728,7 @@ public:
 		return *this;
 	}
 
-	bool GetVariant(const char *Name, LVariant &Value, const char *Array)
+	bool GetVariant(const char *Name, LVariant &Value, const char *Array) override
 	{
 		ScribeDomType Fld = StrToDom(Name);
 		int Px = Array ? atoi(Array) : 80;
@@ -1762,7 +1762,7 @@ LScriptCallback ScribeWnd::GetCallback(char *CallbackMethodName)
 		for (auto s: d->Scripts)
 		{
 			Cb.Script = s;
-			if (Cb.Func = s->Code->GetMethod(CallbackMethodName))
+			if ((Cb.Func = s->Code->GetMethod(CallbackMethodName)))
 				break;
 		}
 	}

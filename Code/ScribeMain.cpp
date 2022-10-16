@@ -95,7 +95,7 @@ int LgiMain(OsAppArguments &AppArgs)
 		LFontSystem::Inst()->AddFont(f);
 	#endif
 
-    ScribeWnd *Wnd;
+    ScribeWnd *Wnd = NULL;
 	if (App.GetOption("help"))
 	{
 		printf(	"\n"

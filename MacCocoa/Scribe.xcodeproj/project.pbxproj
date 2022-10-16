@@ -54,7 +54,6 @@
 		3477C3B41CC227ED0028B84B /* CalendarView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3681CC227ED0028B84B /* CalendarView.cpp */; };
 		3477C3B51CC227ED0028B84B /* Components.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3691CC227ED0028B84B /* Components.cpp */; };
 		3477C3B91CC227ED0028B84B /* Exp_Scribe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C36D1CC227ED0028B84B /* Exp_Scribe.cpp */; };
-		3477C3BC1CC227ED0028B84B /* GBTreeWordStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3701CC227ED0028B84B /* GBTreeWordStore.cpp */; };
 		3477C3BE1CC227ED0028B84B /* GNewMailDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */; };
 		3477C3BF1CC227ED0028B84B /* SearchView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3731CC227ED0028B84B /* SearchView.cpp */; };
 		3477C3C01CC227ED0028B84B /* HtmlToText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3741CC227ED0028B84B /* HtmlToText.cpp */; };
@@ -216,7 +215,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D01CC49532A747A29EA00D13;
+			remoteGlobalIDString = B26738779D8A4F42834DFD1F;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -342,28 +341,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 026FC77338384C76800E2252;
+			remoteGlobalIDString = 0098502908084FD78FD933B4;
 			remoteInfo = libjpeg9a;
 		};
 		34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = DCA9FBC7AEF841BD880FB9B4;
+			remoteGlobalIDString = F40E71FF74D2486595C7B16C;
 			remoteInfo = libpng15;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 235DAB71A64547758266A0AF;
+			remoteGlobalIDString = DF9B6DE1D73B486D819B6745;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D8280AD42C749A4AD6195EB;
+			remoteGlobalIDString = CB2C4C633E464EA286E86F2E;
 			remoteInfo = libiconv;
 		};
 		34DED72523AC30C30049E01F /* PBXContainerItemProxy */ = {
@@ -531,7 +530,6 @@
 		3477C3681CC227ED0028B84B /* CalendarView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CalendarView.cpp; path = ../../Code/CalendarView.cpp; sourceTree = "<group>"; };
 		3477C3691CC227ED0028B84B /* Components.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Components.cpp; path = ../../Code/Components.cpp; sourceTree = "<group>"; };
 		3477C36D1CC227ED0028B84B /* Exp_Scribe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Exp_Scribe.cpp; path = ../../Code/Exp_Scribe.cpp; sourceTree = "<group>"; };
-		3477C3701CC227ED0028B84B /* GBTreeWordStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GBTreeWordStore.cpp; path = ../../Code/GBTreeWordStore.cpp; sourceTree = "<group>"; };
 		3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GNewMailDlg.cpp; path = ../../Code/GNewMailDlg.cpp; sourceTree = "<group>"; };
 		3477C3731CC227ED0028B84B /* SearchView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SearchView.cpp; path = ../../Code/SearchView.cpp; sourceTree = "<group>"; };
 		3477C3741CC227ED0028B84B /* HtmlToText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlToText.cpp; path = ../../Code/HtmlToText.cpp; sourceTree = "<group>"; };
@@ -1062,7 +1060,6 @@
 			children = (
 				3477C3631CC227ED0028B84B /* AddressSelect.cpp */,
 				3477C3691CC227ED0028B84B /* Components.cpp */,
-				3477C3701CC227ED0028B84B /* GBTreeWordStore.cpp */,
 				3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */,
 				3477C3741CC227ED0028B84B /* HtmlToText.cpp */,
 				3477C3811CC227ED0028B84B /* MContainer.cpp */,
@@ -1493,7 +1490,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/opt/local/bin/python ${PROJECT_DIR}/PostBuildStep.py ${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/bin/python3 ${PROJECT_DIR}/PostBuildStep.py ${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1520,7 +1517,6 @@
 				3477C41F1CC231890028B84B /* ScribeImap_Thread.cpp in Sources */,
 				3477C3F91CC227ED0028B84B /* TitlePage.cpp in Sources */,
 				3477C42E1CC2319B0028B84B /* Mail3Group.cpp in Sources */,
-				3477C3BC1CC227ED0028B84B /* GBTreeWordStore.cpp in Sources */,
 				3477C4291CC2319B0028B84B /* Mail3Attachment.cpp in Sources */,
 				3477C3B51CC227ED0028B84B /* Components.cpp in Sources */,
 				34EE8BB62748A6EC00F12915 /* Homoglyphs.cpp in Sources */,
@@ -1857,13 +1853,13 @@
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include,
-					../../../Lgi/trunk/include/lgi/mac/cocoa,
-					../../../Lgi/trunk/private/common,
-					../../../../CodeLib/libjpeg,
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/libpng/build,
+					../../../lgi/trunk/include,
+					../../../lgi/trunk/include/lgi/mac/cocoa,
+					../../../lgi/trunk/private/common,
+					../../../../codelib/libjpeg,
+					../../../../codelib/zlib,
+					../../../../codelib/libpng,
+					../../../../codelib/libpng/build,
 					/opt/local/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
@@ -1911,13 +1907,13 @@
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include,
-					../../../Lgi/trunk/include/lgi/mac/cocoa,
-					../../../Lgi/trunk/private/common,
-					../../../../CodeLib/libjpeg,
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/libpng/build,
+					../../../lgi/trunk/include,
+					../../../lgi/trunk/include/lgi/mac/cocoa,
+					../../../lgi/trunk/private/common,
+					../../../../codelib/libjpeg,
+					../../../../codelib/zlib,
+					../../../../codelib/libpng,
+					../../../../codelib/libpng/build,
 					/opt/local/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;

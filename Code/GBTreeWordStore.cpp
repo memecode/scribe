@@ -137,16 +137,6 @@ char *LWordStore::GetFile()
 	return d->File;
 }
 
-const char *LWordStore::First()
-{
-	return 0;
-}
-
-const char *LWordStore::Next()
-{
-	return 0;
-}
-
 #ifdef _DEBUG
 int64 LWordStore::Sizeof()
 {
