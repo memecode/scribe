@@ -1953,7 +1953,7 @@ class ScribeAccount :
 {
 	friend class ScribeWnd;
 	friend class ScribePopViewer;
-	friend class LStatusPanel;
+	friend class AccountStatusPanel;
 	friend class Accountlet;
 	friend class SendAccountlet;
 	friend class ReceiveAccountlet;
@@ -2099,7 +2099,7 @@ class ScribeClass ScribeWnd :
 	friend class Accountlet;
 	friend class SendAccountlet;
 	friend class ReceiveAccountlet;
-	friend class LStatusPanel;
+	friend class AccountStatusPanel;
 	friend class ScribeFolder;
 	friend class OptionsDlg;
 	friend class LoadWordStoreThread;
@@ -2213,7 +2213,7 @@ protected:
 	class LSearchView *SearchView = NULL;
 	MailTree		*Tree = NULL;
 	class LPreviewPanel	*PreviewPanel = NULL;
-	class LStatusPanel	*StatusPanel = NULL;
+	class AccountStatusPanel *StatusPanel = NULL;
 
 	// Security
 	ScribePerm		CurrentAuthLevel = PermRequireNone;

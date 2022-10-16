@@ -9,13 +9,16 @@
 
 !system "copy .\x64ReleaseNoOptimize19\Scribe.exe scribe-setup" = 0
 !system "copy .\x64Release19\ScribeMapi.dll scribe-setup" = 0
+
 !system "copy ..\..\libs\aspell-0.60.6.1\win32\dist\x64Release19\aspell-dist-0.60.dll scribe-setup" = 0
+
 !system "copy ..\..\libs\build-x64\libjpeg-9a\Release\libjpeg9a_19x64.dll scribe-setup" = 0
 !system "copy ..\..\libs\build-x64\libpng\Release\libpng15_19x64.dll scribe-setup" = 0
 !system "copy ..\..\libs\build-x64\libpng\zlib_dir\Release\zlib_19x64.dll scribe-setup" = 0
+!system "copy ..\..\libs\build-x64\libchardet\Release\chardet19x64.dll scribe-setup" = 0
+
 !system "copy ..\..\..\Lgi\trunk\lib\Lgi19x64nop.dll scribe-setup" = 0
 !system "copy ..\..\..\Lgi\trunk\lib\libntlm19x64nop.dll scribe-setup" = 0
-!system "copy ..\..\..\Lgi\trunk\lib\chardet19x64.dll scribe-setup" = 0
 !system "copy ..\..\..\Lgi\trunk\Updater\x64Release19\Updater.exe scribe-setup" = 0
 
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.exe'

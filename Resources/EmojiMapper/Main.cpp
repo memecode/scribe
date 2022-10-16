@@ -706,8 +706,7 @@ struct IconThread : public LThread
 	
 	int Main()
 	{
-		LAutoPtr<LFilter> Png(GFilterFactory::New("file.png", FILTER_CAP_READ, NULL));
-
+		auto Png = LFilterFactory::New("file.png", FILTER_CAP_READ, NULL);
 		while (Loop && Png)
 		{
 			ListItem *Item = NULL;
@@ -1384,7 +1383,7 @@ public:
 
 		ImgFile.SetSize(0);
 				
-		LAutoPtr<LFilter> Png(GFilterFactory::New(OutPath, FILTER_CAP_READ, NULL));
+		auto Png = LFilterFactory::New(OutPath, FILTER_CAP_READ, NULL);
 		if (!Png)
 		{
 			LgiMsg(this, "Failed to encode PNG icons", "Error");

@@ -472,13 +472,12 @@ size_t Sizeof(LVariant &v)
 	return s + sizeof(v);
 }
 
-int Sizeof(DIterator<LDataPropI, Store3Addr, GMail3Store> &i)
+size_t Sizeof(DIterator<LDataPropI, Store3Addr, GMail3Store> &i)
 {
-	int s = sizeof(i);
+	size_t s = sizeof(i);
 	for (unsigned n=0; n<i.Length(); n++)
-	{
 		s += i.a[n]->Sizeof();
-	}
+
 	return s;
 }
 

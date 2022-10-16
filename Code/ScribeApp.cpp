@@ -1510,7 +1510,7 @@ ScribeWnd::~ScribeWnd()
 	}
 	Mail::NewMailLst.Empty();
 
-	// ~GAccountStatusItem references the account list... must be before we
+	// ~AccountStatusItem references the account list... must be before we
 	// delete the accounts.
 	DeleteObj(StatusPanel);
 
@@ -1559,7 +1559,11 @@ void ScribeWnd::LoadImageResources()
 	auto Res = LgiGetResObj();
 	LString::Array Folders;
 	if (Res)
-		Folders.Add(Res->GetThemeFolder());
+	{
+		auto p = Res->GetThemeFolder();
+		if (p)
+			Folders.Add(p);
+	}
 	Folders.Add(ScribeResourcePath());
 
 	for (auto p: Folders)
@@ -2295,7 +2299,11 @@ void ScribeWnd::OnCreate()
 			#if RUN_STARTUP_SCRIPTS
 			// Run scripts in './Scripts' folder
 			char s[MAX_PATH_LEN];
-			LMakePath(s, sizeof(s), ScribeResourcePath(), "../Scripts");
+			LMakePath(s, sizeof(s), ScribeResourcePath(),
+				#ifndef MAC
+				"../"
+				#endif
+				"Scripts");
 			if (!LDirExists(s))
 				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
 					#if defined(WINDOWS) && defined(_DEBUG)
@@ -3452,11 +3460,12 @@ bool ScribeWnd::LoadOptions()
 		}
 		else
 		{
+            auto err = GetOptions()->GetError();
 			LgiMsg(	this,
 					LLoadString(IDS_ERROR_LR8_FAILURE),
 					AppName,
 					MB_OK,
-					GetOptions()->GetError());
+					err);
 		}
 	}
 
@@ -3931,10 +3940,10 @@ int ScribeWnd::GetCurrentIdentity()
 	LVariant i;
 	if (GetOptions()->GetValue(OPT_CurrentIdentity, i))
 		return i.CastInt32();
-	else
+	else if (ScribeState != ScribeInitializing)
 		LgiTrace("%s:%i - No OPT_CurrentIdentity set.\n", _FL);
 
-	return NULL;
+	return -1;
 }
 
 void ScribeWnd::SetupAccounts()
@@ -4034,7 +4043,7 @@ void ScribeWnd::SetupAccounts()
 			break;
 	}
 
-	if (ResetDefault && Enabled.Length())
+	if ((ResetDefault || CurrentIdentity < 0) && Enabled.Length())
 	{
 		for (unsigned i=0; i<Enabled.Length(); i++)
 		{
@@ -4652,12 +4661,6 @@ void ScribeWnd::OnPulseSecond()
 	}
 
 	#if PROFILE_ON_PULSE
-	Prof.Add("SaveDirtyObjects handling");
-	#endif
-	
-	SaveDirtyObjects();	
-
-	#if PROFILE_ON_PULSE
 	Prof.Add("PreviewPanel handling");
 	#endif
 
@@ -4848,6 +4851,7 @@ public:
 		while (Status < 0)
 		{
 			LYield();
+			LSleep(1);
 		}
 
 		Prog.Reset();
@@ -5147,7 +5151,7 @@ bool ScribeWnd::LoadMailStores()
 					// AddFolderToMru(Full);
 				}
 
-				LYield();
+				// LYield();
 				Status = true;
 			}
 		}
@@ -5905,7 +5909,7 @@ void ScribeWnd::SetupUi()
 
 	// Preview and status windows
 	PreviewPanel = new LPreviewPanel(this);
-	StatusPanel = new LStatusPanel(this, ImageList);
+	StatusPanel = new AccountStatusPanel(this, ImageList);
 	if (PreviewPanel &&
 		StatusPanel)
 	{
@@ -7826,13 +7830,38 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_RECEIVE_ALL:
 		{
+			#define LOG_RECEIVE_ALL		0
 			int i = 0;
+			
+			Accounts.Sort(AccountCmp);
+			
 			for (auto a : Accounts)
 			{
-				if (a->Receive.IsConfigured() &&
-					a->Receive.Disabled() < 1)
-				{				
-					Receive(i);
+				#if LOG_RECEIVE_ALL
+				auto name = a->Identity.Name();
+				auto email = a->Identity.Email();
+				LString desc;
+				desc.Printf("%s/%s", name.Str(), email.Str());
+				#endif
+				
+				if (!a->Receive.IsConfigured())
+				{
+					#if LOG_RECEIVE_ALL
+					LgiTrace("%s:%i - %i/%s not configured.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+				}
+				else if (a->Receive.Disabled() > 0)
+				{
+					#if LOG_RECEIVE_ALL
+					LgiTrace("%s:%i - %i/%s is disabled.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+				}
+				else
+				{
+					#if LOG_RECEIVE_ALL				
+					LgiTrace("%s:%i - %i/%s will connect.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+					Receive(a->GetIndex());
 				}
 				i++;
 			}
@@ -11215,34 +11244,52 @@ void ScribeWnd::Send(int Which, bool Quiet)
 
 void ScribeWnd::Receive(int Which)
 {
+	#define LOG_RECEIVE		0
+	
 	if (ScribeState == ScribeExiting)
+	{
+		LgiTrace("%s:%i - Won't receive, is trying to exit.\n", _FL);
 		return;
+	}
 
 	for (ScribeAccount *i: Accounts)
 	{
-		if (i->GetIndex() == Which)
+		if (i->GetIndex() != Which)
+			continue;
+			
+		if (i->Receive.IsOnline())
 		{
-			if (!i->Receive.IsOnline() &&
-				i->Receive.Disabled() < 1)
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i already online.\n", _FL, Which);
+			#endif
+		}
+		else if (i->Receive.Disabled() > 0)
+		{
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i is disabled.\n", _FL, Which);
+			#endif
+		}
+		else if (!i->Receive.IsConfigured())
+		{
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i is not configured.\n", _FL, Which);
+			#endif
+
+			LAlert a(this,
+					AppName,
+					LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
+					LLoadString(IDS_CONFIGURE),
+					LLoadString(IDS_CANCEL));
+			if (a.DoModal() == 1)
 			{
-				if (i->Receive.IsConfigured())
-				{
-					i->Receive.Connect(0, false);
-				}
-				else
-				{
-					LAlert a(this,
-							AppName,
-							LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
-							LLoadString(IDS_CONFIGURE),
-							LLoadString(IDS_CANCEL));
-					if (a.DoModal() == 1)
-					{
-						i->InitUI(this, 2);
-					}
-				}
+				i->InitUI(this, 2);
 			}
 		}
+		else
+		{
+			i->Receive.Connect(0, false);
+		}
+		break;
 	}
 }
 
@@ -11602,10 +11649,6 @@ void ScribeWnd::OnNew(
 		Stricmp(Parent->GetStr(FIELD_FOLDER_NAME), "Calendar"))
 	{
 		LOG_STORE("OnNew(%s, %s, %i, %i)\n", Parent->GetStr(FIELD_FOLDER_NAME), _GetUids(NewItems).Get(), Pos, IsNew);
-		if (!IsNew)
-		{
-			int asd=0;
-		}
 	}
 
 	if (!Fld)
@@ -12504,14 +12547,25 @@ bool ScribeWnd::OnIdle()
 	bool Status = false;
 	
 	for (auto a : Accounts)
-	{
 		Status |= a->Receive.OnIdle();
-	}
 
 	Status |= OnTransfer();
 
 	LMessage m(M_SCRIBE_IDLE);
 	BayesianFilter::OnEvent(&m);
+
+	SaveDirtyObjects();	
+
+	#ifdef _DEBUG
+	static uint64_t LastTs = 0;
+	auto Now = LCurrentTime();
+	if (Now - LastTs >= 1000)
+	{
+		LastTs = Now;
+		if (Thing::DirtyThings.Length() > 0)
+			LgiTrace("%s:%i - Thing::DirtyThings=" LPrintfInt64 "\n", _FL, Thing::DirtyThings.Length());
+	}
+	#endif
 
 	return Status;
 }

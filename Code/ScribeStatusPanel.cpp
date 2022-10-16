@@ -115,7 +115,7 @@ class LAccountLogFactory : public LViewFactory
 }	AccountLogFactory;
 
 ////////////////////////////////////////////////////////////////////////////
-GAccountStatusItem::GAccountStatusItem(LStatusPanel *panel, ScribeAccount *account, LImageList *imglst)
+AccountStatusItem::AccountStatusItem(AccountStatusPanel *panel, ScribeAccount *account, LImageList *imglst)
 {
 	Buf[0] = 0;
 
@@ -128,13 +128,13 @@ GAccountStatusItem::GAccountStatusItem(LStatusPanel *panel, ScribeAccount *accou
 	SetImage(ICON_UNSENT_MAIL);
 }
 
-GAccountStatusItem::~GAccountStatusItem()
+AccountStatusItem::~AccountStatusItem()
 {
 	LAssert(Account->Views.HasItem(this));
 	Account->Views.Delete(this);
 }
 
-const char *GAccountStatusItem::GetText(int Col)
+const char *AccountStatusItem::GetText(int Col)
 {
 	char *Status = 0;
 
@@ -168,10 +168,10 @@ const char *GAccountStatusItem::GetText(int Col)
 	return Status;
 }
 
-int GAccountStatusItem::Compare(LListItem *To, ssize_t Field)
+int AccountStatusItem::Compare(LListItem *To, ssize_t Field)
 {
 	int ASort = Account->Identity.Sort();
-	GAccountStatusItem *b = dynamic_cast<GAccountStatusItem*>(To);
+	AccountStatusItem *b = dynamic_cast<AccountStatusItem*>(To);
 	if (!b)
 		return 0;
 		
@@ -179,7 +179,7 @@ int GAccountStatusItem::Compare(LListItem *To, ssize_t Field)
 	return ASort - BSort;
 }
 
-void GAccountStatusItem::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c)
+void AccountStatusItem::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c)
 {
 	LListItem::OnPaintColumn(Ctx, i, c);
 
@@ -217,7 +217,7 @@ void GAccountStatusItem::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemCol
 	}
 }
 
-void GAccountStatusItem::OnPulse()
+void AccountStatusItem::OnPulse()
 {
 	if (Account)
 	{
@@ -227,7 +227,7 @@ void GAccountStatusItem::OnPulse()
 	}
 }
 
-void GAccountStatusItem::OnMouseClick(LMouse &m)
+void AccountStatusItem::OnMouseClick(LMouse &m)
 {
 	if (!Account)
 		return;
@@ -243,7 +243,7 @@ void GAccountStatusItem::OnMouseClick(LMouse &m)
 		{
 			for (auto i: Sel)
 			{
-				auto *si = dynamic_cast<GAccountStatusItem*>(i);
+				auto *si = dynamic_cast<AccountStatusItem*>(i);
 
 				Acc.Add(si->Account);
 
@@ -312,7 +312,7 @@ void GAccountStatusItem::OnMouseClick(LMouse &m)
 ////////////////////////////////////////////////////////////////////////////
 #define OPT_StatusOpen					"ScribeUI.StatusOpen"
 
-LStatusPanel::LStatusPanel(ScribeWnd *app, LImageList *imglst) :
+AccountStatusPanel::AccountStatusPanel(ScribeWnd *app, LImageList *imglst) :
 	ScribePanel(app, LLoadString(IDS_STATUS), 20, false)
 {
 	App = app;
@@ -384,14 +384,14 @@ LStatusPanel::LStatusPanel(ScribeWnd *app, LImageList *imglst) :
 	}
 };
 
-LStatusPanel::~LStatusPanel()
+AccountStatusPanel::~AccountStatusPanel()
 {
 	LVariant v;
 	auto Opts = App->GetOptions();
 	Opts->SetValue(OPT_StatusOpen, v = Open());
 }
 
-void LStatusPanel::OnPosChange()
+void AccountStatusPanel::OnPosChange()
 {
 	GLayoutRect c(this);
 	if (Open() && c.Valid())
@@ -404,17 +404,17 @@ void LStatusPanel::OnPosChange()
 	}
 }
 
-bool LStatusPanel::_Lock()
+bool AccountStatusPanel::_Lock()
 {
 	return App->Lock(_FL);
 }
 
-void LStatusPanel::_Unlock()
+void AccountStatusPanel::_Unlock()
 {
 	App->Unlock();
 }
 
-int LStatusPanel::OnNotify(LViewI *Ctrl, LNotification n)
+int AccountStatusPanel::OnNotify(LViewI *Ctrl, LNotification n)
 {
 	switch (Ctrl->GetId())
 	{
@@ -462,7 +462,7 @@ int LStatusPanel::OnNotify(LViewI *Ctrl, LNotification n)
 	return 0;
 }
 
-void LStatusPanel::OnAccountSelect(GAccountStatusItem *Item)
+void AccountStatusPanel::OnAccountSelect(AccountStatusItem *Item)
 {
 	Current = (Item) ? Item->Account : 0;
 
@@ -712,12 +712,12 @@ void LStatusPanel::OnAccountSelect(GAccountStatusItem *Item)
 	}
 }
 
-int LStatusPanel::AccountStatus(Accountlet *a)
+int AccountStatusPanel::AccountStatus(Accountlet *a)
 {
 	return a ? a->GetStatusIcon() : STATUS_ERROR;
 }
 
-int LStatusPanel::CalcWidth()
+int AccountStatusPanel::CalcWidth()
 {
 	int BaseX = LPanel::CalcWidth();
 
@@ -749,7 +749,7 @@ int LStatusPanel::CalcWidth()
 	return BaseX;
 }
 
-void LStatusPanel::OnPaint(LSurface *pDC)
+void AccountStatusPanel::OnPaint(LSurface *pDC)
 {
 	#ifdef __GTK_H__
 	LDoubleBuffer Buf(pDC);
@@ -800,7 +800,7 @@ void LStatusPanel::OnPaint(LSurface *pDC)
 	}
 }
 
-void LStatusPanel::OnPulse()
+void AccountStatusPanel::OnPulse()
 {
 	if (Accounts && PrevAccounts != Accounts->Length())
 	{
@@ -813,12 +813,12 @@ void LStatusPanel::OnPulse()
 	}
 	else if (Lst)
 	{
-		OnAccountSelect(dynamic_cast<GAccountStatusItem*>(Lst->GetSelected()));
+		OnAccountSelect(dynamic_cast<AccountStatusItem*>(Lst->GetSelected()));
 	}
 
 	if (Lst)
 	{
-		List<GAccountStatusItem> All;
+		List<AccountStatusItem> All;
 		Lst->GetAll(All);
 		for (auto a: All)
 		{
@@ -827,7 +827,7 @@ void LStatusPanel::OnPulse()
 	}
 }
 
-void LStatusPanel::Empty()
+void AccountStatusPanel::Empty()
 {
 	OnAccountSelect(0);	
 
@@ -842,7 +842,7 @@ int AccountItemCmp(LListItem *a, LListItem *b, NativeInt Data)
 	return a->Compare(b);
 }
 
-void LStatusPanel::OnAccountListChange()
+void AccountStatusPanel::OnAccountListChange()
 {
 	if (Lst)
 	{
@@ -854,7 +854,7 @@ void LStatusPanel::OnAccountListChange()
 			RePour();
 
 			for (auto a: *Accounts)
-				Lst->Insert(new GAccountStatusItem(this, a, ImgLst));
+				Lst->Insert(new AccountStatusItem(this, a, ImgLst));
 			
 			Lst->Sort(AccountItemCmp);
 
@@ -869,12 +869,12 @@ void LStatusPanel::OnAccountListChange()
 	Invalidate();
 }
 
-LXmlTag *LStatusPanel::GetOptions()
+LXmlTag *AccountStatusPanel::GetOptions()
 {
 	return 0;
 }
 
-void LStatusPanel::SetDataRate(int Percent)
+void AccountStatusPanel::SetDataRate(int Percent)
 {
 }
 

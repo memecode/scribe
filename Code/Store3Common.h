@@ -49,7 +49,7 @@ public:
 	Store3Status SetStr(int id, const char *str) override;
 	int64 GetInt(int id) override;
 	Store3Status SetInt(int id, int64 i) override;
-	int Sizeof();
+	size_t Sizeof();
 
 	bool GetVariant(const char *n, LVariant &Value, const char *Array = NULL) override;
 	bool SetVariant(const char *n, LVariant &Value, const char *Array = NULL) override;

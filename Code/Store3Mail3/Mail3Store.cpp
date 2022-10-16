@@ -539,115 +539,128 @@ Store3Status GMail3Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 	Store3Status Status = Store3Error;
 
 	GMail3Folder *To = dynamic_cast<GMail3Folder*>(NewFolder);
-	if (To)
+	if (!To)
+		return Status;
+	if (Items.Length() == 0)
+		return Store3Success;
+
+LProfile prof("GMail3Store::Move");
+	LDataFolderI *OldParent = NULL;
+	LArray<LDataI*> Moved;
+	StoreTrans Tr = StartTransaction();
+
+	for (unsigned n=0; n<Items.Length(); n++)
 	{
-		LDataFolderI *OldParent = 0;
-		LArray<LDataI*> Moved;
-		StoreTrans Tr = StartTransaction();
-
-		for (unsigned n=0; n<Items.Length(); n++)
+		GMail3Thing *Thing = 0;
+		GMail3Folder *Fld = dynamic_cast<GMail3Folder*>(Items[n]);
+		if (Fld)
 		{
-			GMail3Thing *Thing = 0;
-			GMail3Folder *Fld = dynamic_cast<GMail3Folder*>(Items[n]);
-			if (Fld)
+prof.Add("0");
+			if (Fld->ParentId == To->Id)
+				Status = Store3Success;
+			else
 			{
-				if (Fld->ParentId == To->Id)
+				char s[256];
+				sprintf_s(s, sizeof(s), "update " MAIL3_TBL_FOLDER " set ParentId=" LPrintfInt64 " where Id=" LPrintfInt64, To->Id, Fld->Id);
+prof.Add("1");
+				GStatement Stmt(this, s);
+				if (Stmt.Exec())
+				{
+prof.Add("2");
 					Status = Store3Success;
-				else
-				{
-					char s[256];
-					sprintf_s(s, sizeof(s), "update " MAIL3_TBL_FOLDER " set ParentId=" LPrintfInt64 " where Id=" LPrintfInt64, To->Id, Fld->Id);
-					GStatement Stmt(this, s);
-					if (Stmt.Exec())
+					LAssert(Fld->Parent->Sub.IndexOf(Fld) >= 0);
+
+					Fld->Parent->Sub.Delete(Fld);
+					LDataFolderI *From = Fld->Parent;
+					Fld->Parent = To;
+					Fld->ParentId = Fld->Parent->Id;
+					To->Sub.Insert(Fld);
+
+					if (!OldParent) OldParent = From;
+					if (Callback && OldParent && Moved.Length() && OldParent != From)
 					{
-						Status = Store3Success;
-						LAssert(Fld->Parent->Sub.IndexOf(Fld) >= 0);
-
-						Fld->Parent->Sub.Delete(Fld);
-						LDataFolderI *From = Fld->Parent;
-						Fld->Parent = To;
-						Fld->ParentId = Fld->Parent->Id;
-						To->Sub.Insert(Fld);
-
-						if (!OldParent) OldParent = From;
-						if (Callback && OldParent && Moved.Length() && OldParent != From)
-						{
-							Callback->OnMove(To, OldParent, Moved);
-							Moved.Length(0);
-							OldParent = From;
-						}							
-						Moved.Add(Fld);
-					}
-				}
-			}
-			else if ((Thing = dynamic_cast<GMail3Thing*>(Items[n])))
-			{
-				if (Thing->ParentId == To->Id)
-					Status = Store3Success;
-				else if (To->ItemType != MAGIC_ANY &&
-						 Thing->Type() != To->ItemType)
-				{
-					LgiTrace("%s:%i - Can't move item (type=%x) to folder containing type %x.\n", _FL, Thing->Type(), To->ItemType);
-					Status = Store3Error;
-				}
-				else
-				{
-					// This needs to be before the SQL update so that duplicate Mail 
-					// objects don't get created when moving to an unloaded folder.
-					if (To->Items.GetState() != Store3Loaded)
-						To->Children();
-					
-					char s[256];
-					sprintf_s(s, sizeof(s), "update %s set ParentId=" LPrintfInt64 " where Id=" LPrintfInt64, Thing->GetTable(), To->Id, Thing->Id);
-					GStatement Stmt(this, s);
-					if (Stmt.Exec())
-					{
-						Status = Store3Success;
-						LDataFolderI *From = Thing->Parent;
-						if (Thing->Parent)
-						{
-							LAssert(Thing->Parent->Items.IndexOf(Thing) >= 0);
-							Thing->Parent->Items.Delete(Thing);
-						}
-
-						Thing->Parent = To;
-						Thing->ParentId = To->Id;
-						
-						LAssert(To->Items.IndexOf(Thing) < 0);
-						
-						#ifdef _DEBUG
-						if (To->System != Store3SystemTrash)
-						{
-							// Check there is no duplicate ID..
-							for (unsigned k=0; k<To->Items.a.Length(); k++)
-							{
-								if (To->Items.a[k]->Id == Thing->Id)
-								{
-									LAssert(!"Can't have duplicate IDs in the same folder.");
-								}
-							}
-						}
-						#endif						
-						
-// LgiTrace("%s:%i - Saving %p:%i to %s (%i items)\n", _FL, Thing, (int)Thing->Id, To->GetStr(FIELD_FOLDER_NAME), To->Items.Length());
-						To->Items.Insert(Thing);
-
-						if (!OldParent) OldParent = From;
-						if (Callback && OldParent && Moved.Length() && OldParent != From)
-						{
-							Callback->OnMove(To, OldParent, Moved);
-							Moved.Length(0);
-							OldParent = From;
-						}							
-						Moved.Add(Thing);
-					}
+prof.Add("3");
+						Callback->OnMove(To, OldParent, Moved);
+prof.Add("4");
+						Moved.Length(0);
+						OldParent = From;
+					}							
+					Moved.Add(Fld);
 				}
 			}
 		}
+		else if ((Thing = dynamic_cast<GMail3Thing*>(Items[n])))
+		{
+prof.Add("5");
+			if (Thing->ParentId == To->Id)
+				Status = Store3Success;
+			else if (To->ItemType != MAGIC_ANY &&
+						Thing->Type() != To->ItemType)
+			{
+				LgiTrace("%s:%i - Can't move item (type=%x) to folder containing type %x.\n", _FL, Thing->Type(), To->ItemType);
+				Status = Store3Error;
+			}
+			else
+			{
+				// This needs to be before the SQL update so that duplicate Mail 
+				// objects don't get created when moving to an unloaded folder.
+				if (To->Items.GetState() != Store3Loaded)
+					To->Children();
+					
+prof.Add("6");
+				char s[256];
+				sprintf_s(s, sizeof(s), "update %s set ParentId=" LPrintfInt64 " where Id=" LPrintfInt64, Thing->GetTable(), To->Id, Thing->Id);
+				GStatement Stmt(this, s);
+				if (Stmt.Exec())
+				{
+prof.Add("6");
+					Status = Store3Success;
+					LDataFolderI *From = Thing->Parent;
+					if (Thing->Parent)
+					{
+						LAssert(Thing->Parent->Items.IndexOf(Thing) >= 0);
+						Thing->Parent->Items.Delete(Thing);
+					}
 
-		if (Callback && Moved.Length())
-			Callback->OnMove(To, OldParent, Moved);
+					Thing->Parent = To;
+					Thing->ParentId = To->Id;
+						
+					LAssert(To->Items.IndexOf(Thing) < 0);
+						
+					#ifdef _DEBUG
+					if (To->System != Store3SystemTrash)
+					{
+						// Check there is no duplicate ID..
+						for (unsigned k=0; k<To->Items.a.Length(); k++)
+						{
+							if (To->Items.a[k]->Id == Thing->Id)
+							{
+								LAssert(!"Can't have duplicate IDs in the same folder.");
+							}
+						}
+					}
+					#endif						
+						
+// LgiTrace("%s:%i - Saving %p:%i to %s (%i items)\n", _FL, Thing, (int)Thing->Id, To->GetStr(FIELD_FOLDER_NAME), To->Items.Length());
+					To->Items.Insert(Thing);
+
+					if (!OldParent) OldParent = From;
+					if (Callback && OldParent && Moved.Length() && OldParent != From)
+					{
+prof.Add("7");
+						Callback->OnMove(To, OldParent, Moved);
+prof.Add("8");
+						Moved.Length(0);
+						OldParent = From;
+					}							
+					Moved.Add(Thing);
+				}
+			}
+		}
 	}
+
+	if (Callback && Moved.Length())
+		Callback->OnMove(To, OldParent, Moved);
 
 	return Status;
 }
