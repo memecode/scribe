@@ -622,7 +622,7 @@ public:
 	{
 		if (!IsLoaded())
 		{
-			LgiTrace("%s:%i - Failed to load Aspell DLL.\n", _FL);
+			LgiTrace("%s:%i - Failed to load Aspell library.\n", _FL);
 			return false;
 		}
 
