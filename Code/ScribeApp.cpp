@@ -8751,7 +8751,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, GMailStore *Store, bool Quiet)
 	}
 	else if (!Quiet)
 	{
-		LgiTrace("%s:%i - No option '%s'\n", _FL, KeyName);
+		// LgiTrace("%s:%i - No option '%s'\n", _FL, KeyName);
 		NoOption = true;
 	}
 
@@ -8771,11 +8771,8 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, GMailStore *Store, bool Quiet)
 			ScribeFolder *c = GetFolder(DefaultFolderNames[Id], Store);
 			if (!c)
 			{
-				if (!Quiet)
-				{
-					LgiTrace("%s:%i - Default folder '%s' doesn't exist.\n",
-						_FL, DefaultFolderNames[Id]);
-				}
+				// if (!Quiet)
+				// LgiTrace("%s:%i - Default folder '%s' doesn't exist.\n", _FL, DefaultFolderNames[Id]);
 			}
 			else if (NoOption)
 			{

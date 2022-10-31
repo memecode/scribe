@@ -534,6 +534,13 @@ LDataFolderI *GMail3Store::GetRoot(bool create)
 	return Root;
 }
 
+#define PROFILE_MOVE		0
+#if PROFILE_MOVE
+	#define PROF_MOVE(...)	prof.Add(__VA_ARGS__)
+#else
+	#define PROF_MOVE(...)
+#endif
+
 Store3Status GMail3Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 {
 	Store3Status Status = Store3Error;
@@ -544,7 +551,9 @@ Store3Status GMail3Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 	if (Items.Length() == 0)
 		return Store3Success;
 
+#if PROFILE_MOVE
 LProfile prof("GMail3Store::Move");
+#endif
 	LDataFolderI *OldParent = NULL;
 	LArray<LDataI*> Moved;
 	StoreTrans Tr = StartTransaction();
@@ -555,18 +564,18 @@ LProfile prof("GMail3Store::Move");
 		GMail3Folder *Fld = dynamic_cast<GMail3Folder*>(Items[n]);
 		if (Fld)
 		{
-prof.Add("0");
+PROF_MOVE("0");
 			if (Fld->ParentId == To->Id)
 				Status = Store3Success;
 			else
 			{
 				char s[256];
 				sprintf_s(s, sizeof(s), "update " MAIL3_TBL_FOLDER " set ParentId=" LPrintfInt64 " where Id=" LPrintfInt64, To->Id, Fld->Id);
-prof.Add("1");
+PROF_MOVE("1");
 				GStatement Stmt(this, s);
 				if (Stmt.Exec())
 				{
-prof.Add("2");
+PROF_MOVE("2");
 					Status = Store3Success;
 					LAssert(Fld->Parent->Sub.IndexOf(Fld) >= 0);
 
@@ -579,9 +588,9 @@ prof.Add("2");
 					if (!OldParent) OldParent = From;
 					if (Callback && OldParent && Moved.Length() && OldParent != From)
 					{
-prof.Add("3");
+PROF_MOVE("3");
 						Callback->OnMove(To, OldParent, Moved);
-prof.Add("4");
+PROF_MOVE("4");
 						Moved.Length(0);
 						OldParent = From;
 					}							
@@ -591,7 +600,7 @@ prof.Add("4");
 		}
 		else if ((Thing = dynamic_cast<GMail3Thing*>(Items[n])))
 		{
-prof.Add("5");
+PROF_MOVE("5");
 			if (Thing->ParentId == To->Id)
 				Status = Store3Success;
 			else if (To->ItemType != MAGIC_ANY &&
@@ -607,13 +616,13 @@ prof.Add("5");
 				if (To->Items.GetState() != Store3Loaded)
 					To->Children();
 					
-prof.Add("6");
+PROF_MOVE("6");
 				char s[256];
 				sprintf_s(s, sizeof(s), "update %s set ParentId=" LPrintfInt64 " where Id=" LPrintfInt64, Thing->GetTable(), To->Id, Thing->Id);
 				GStatement Stmt(this, s);
 				if (Stmt.Exec())
 				{
-prof.Add("6");
+PROF_MOVE("6");
 					Status = Store3Success;
 					LDataFolderI *From = Thing->Parent;
 					if (Thing->Parent)
@@ -647,9 +656,9 @@ prof.Add("6");
 					if (!OldParent) OldParent = From;
 					if (Callback && OldParent && Moved.Length() && OldParent != From)
 					{
-prof.Add("7");
+PROF_MOVE("7");
 						Callback->OnMove(To, OldParent, Moved);
-prof.Add("8");
+PROF_MOVE("8");
 						Moved.Length(0);
 						OldParent = From;
 					}							
