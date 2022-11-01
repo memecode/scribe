@@ -4,9 +4,8 @@
 
 #define GWordStore_AllItems		"__GWordStoreAllItems__"
 
-class LWordStorePriv
+struct LWordStorePriv
 {
-public:
 	LString File;
 	LAutoPtr<GBTree> Tree;
 };
@@ -35,7 +34,7 @@ bool LWordStore::Serialize(const char *file, bool Load)
 	if (Load)
 	{
 		if (!d->File)
-			d->File = NewStr(file);
+			d->File = file;
 
 		Status = d->Tree.Reset(new GBTree(d->File));
 	}
@@ -59,8 +58,7 @@ long LWordStore::GetItems()
 
 void LWordStore::SetFile(const char *file)
 {
-	DeleteArray(d->File);
-	d->File = NewStr(file);
+	d->File = file;
 }
 
 bool LWordStore::SetItems(int s)
@@ -98,16 +96,17 @@ bool LWordStore::Insert(const char *Word)
 
 int LWordStore::SetWordCount(const char *Word, ssize_t Count)
 {
-	if (d->Tree)
-	{
-		return d->Tree->Insert(Word, (long)Count);
-	}
+	if (!d->Tree)
+		return false;
 
-	return false;
+	return d->Tree->Insert(Word, (long)Count);
 }
 
 bool LWordStore::DeleteWord(const char *Word)
 {
+	if (!d->Tree)
+		return false;
+
 	return d->Tree ? d->Tree->Delete(Word) : false;
 }
 
@@ -117,9 +116,7 @@ long LWordStore::GetWordCount(const char *Word)
 	{
 		long Count = 0;
 		if (d->Tree->Find(Word, Count))
-		{
 			return Count;
-		}
 	}
 
 	return 0;
@@ -130,6 +127,7 @@ void LWordStore::Empty()
 	d->Tree.Reset();
 	if (d->File)
 		FileDev->Delete(d->File, false);
+	d->Tree.Reset(new GBTree(d->File));
 }
 
 char *LWordStore::GetFile()
@@ -137,20 +135,10 @@ char *LWordStore::GetFile()
 	return d->File;
 }
 
-const char *LWordStore::First()
-{
-	return 0;
-}
-
-const char *LWordStore::Next()
-{
-	return 0;
-}
-
 #ifdef _DEBUG
 int64 LWordStore::Sizeof()
 {
-	return 0;
+	return LFileSize(d->File);
 }
 #endif
 

@@ -54,7 +54,6 @@
 		3477C3B41CC227ED0028B84B /* CalendarView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3681CC227ED0028B84B /* CalendarView.cpp */; };
 		3477C3B51CC227ED0028B84B /* Components.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3691CC227ED0028B84B /* Components.cpp */; };
 		3477C3B91CC227ED0028B84B /* Exp_Scribe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C36D1CC227ED0028B84B /* Exp_Scribe.cpp */; };
-		3477C3BC1CC227ED0028B84B /* GBTreeWordStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3701CC227ED0028B84B /* GBTreeWordStore.cpp */; };
 		3477C3BE1CC227ED0028B84B /* GNewMailDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */; };
 		3477C3BF1CC227ED0028B84B /* SearchView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3731CC227ED0028B84B /* SearchView.cpp */; };
 		3477C3C01CC227ED0028B84B /* HtmlToText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3741CC227ED0028B84B /* HtmlToText.cpp */; };
@@ -216,7 +215,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8F15D55C301E444E9E82A2B8;
+			remoteGlobalIDString = 4B92638E78294D309C8F4B71;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -342,28 +341,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 111230ED7D734BB598EEA1B2;
+			remoteGlobalIDString = 4BD8C6B10C81477DB207C5EE;
 			remoteInfo = libjpeg9a;
 		};
 		34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = BE49F3400B994612A1DC9A76;
+			remoteGlobalIDString = F507E4C9BCC14896B103C636;
 			remoteInfo = libpng15;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 52FF9D103A1C46C79ACB9A09;
+			remoteGlobalIDString = AC9223C4E8CB4724958ECB9E;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 453DFD289DBD49E4BA4363EA;
+			remoteGlobalIDString = E4BCA0C756B64D00AC86B714;
 			remoteInfo = libiconv;
 		};
 		34DED72523AC30C30049E01F /* PBXContainerItemProxy */ = {
@@ -531,7 +530,6 @@
 		3477C3681CC227ED0028B84B /* CalendarView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CalendarView.cpp; path = ../../Code/CalendarView.cpp; sourceTree = "<group>"; };
 		3477C3691CC227ED0028B84B /* Components.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Components.cpp; path = ../../Code/Components.cpp; sourceTree = "<group>"; };
 		3477C36D1CC227ED0028B84B /* Exp_Scribe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Exp_Scribe.cpp; path = ../../Code/Exp_Scribe.cpp; sourceTree = "<group>"; };
-		3477C3701CC227ED0028B84B /* GBTreeWordStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GBTreeWordStore.cpp; path = ../../Code/GBTreeWordStore.cpp; sourceTree = "<group>"; };
 		3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GNewMailDlg.cpp; path = ../../Code/GNewMailDlg.cpp; sourceTree = "<group>"; };
 		3477C3731CC227ED0028B84B /* SearchView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SearchView.cpp; path = ../../Code/SearchView.cpp; sourceTree = "<group>"; };
 		3477C3741CC227ED0028B84B /* HtmlToText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlToText.cpp; path = ../../Code/HtmlToText.cpp; sourceTree = "<group>"; };
@@ -1062,7 +1060,6 @@
 			children = (
 				3477C3631CC227ED0028B84B /* AddressSelect.cpp */,
 				3477C3691CC227ED0028B84B /* Components.cpp */,
-				3477C3701CC227ED0028B84B /* GBTreeWordStore.cpp */,
 				3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */,
 				3477C3741CC227ED0028B84B /* HtmlToText.cpp */,
 				3477C3811CC227ED0028B84B /* MContainer.cpp */,
@@ -1493,7 +1490,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/opt/local/bin/python ${PROJECT_DIR}/PostBuildStep.py ${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython3 ${PROJECT_DIR}/PostBuildStep.py ${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1520,7 +1517,6 @@
 				3477C41F1CC231890028B84B /* ScribeImap_Thread.cpp in Sources */,
 				3477C3F91CC227ED0028B84B /* TitlePage.cpp in Sources */,
 				3477C42E1CC2319B0028B84B /* Mail3Group.cpp in Sources */,
-				3477C3BC1CC227ED0028B84B /* GBTreeWordStore.cpp in Sources */,
 				3477C4291CC2319B0028B84B /* Mail3Attachment.cpp in Sources */,
 				3477C3B51CC227ED0028B84B /* Components.cpp in Sources */,
 				34EE8BB62748A6EC00F12915 /* Homoglyphs.cpp in Sources */,
@@ -1727,7 +1723,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer: fret@memecode.com (TDDY28LGJ7)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1738,6 +1733,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC,
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -1749,16 +1745,19 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					../Code,
+					../Code/Sqlite,
 					../Resources,
 					../Utils/Tables,
+					../../libs/libchardet/include,
+					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include/common,
-					../../../Lgi/trunk/include/mac/cocoa,
-					"../../../../CodeLib/libjpeg-9a",
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/openssl,
-					/opt/local/include,
+					"../../libs/build-x64/libpng",
+					../../../lgi/trunk/include,
+					../../../lgi/trunk/private/common,
+					../../../lgi/trunk/include/lgi/mac/cocoa,
+					"../../../../codelib/libjpeg-9a",
+					../../../../codelib/libpng,
+					"/usr/local/Cellar/openssl@1.1/1.1.1q/include",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1800,7 +1799,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer: fret@memecode.com (TDDY28LGJ7)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1808,6 +1806,7 @@
 				FRAMEWORK_SEARCH_PATHS = ../../../Lgi/trunk/src/mac/cocoa/build/Release;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = MAC;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -1816,16 +1815,19 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					../Code,
+					../Code/Sqlite,
 					../Resources,
 					../Utils/Tables,
+					../../libs/libchardet/include,
+					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include/common,
-					../../../Lgi/trunk/include/mac/cocoa,
-					"../../../../CodeLib/libjpeg-9a",
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/openssl,
-					/opt/local/include,
+					"../../libs/build-x64/libpng",
+					../../../lgi/trunk/include,
+					../../../lgi/trunk/private/common,
+					../../../lgi/trunk/include/lgi/mac/cocoa,
+					"../../../../codelib/libjpeg-9a",
+					../../../../codelib/libpng,
+					"/usr/local/Cellar/openssl@1.1/1.1.1q/include",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1842,29 +1844,26 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = Scribe/Scribe.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 21;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				HEADER_SEARCH_PATHS = (
 					../Code,
+					../Code/Sqlite,
 					../Resources,
 					../Utils/Tables,
-					../Code/Sqlite,
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include,
-					../../../Lgi/trunk/include/lgi/mac/cocoa,
-					../../../Lgi/trunk/private/common,
-					../../../../CodeLib/libjpeg,
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/libpng/build,
-					/opt/local/include,
+					"../../libs/build-x64/libpng",
+					../../../lgi/trunk/include,
+					../../../lgi/trunk/private/common,
+					../../../lgi/trunk/include/lgi/mac/cocoa,
+					"../../../../codelib/libjpeg-9a",
+					../../../../codelib/libpng,
+					"/usr/local/Cellar/openssl@1.1/1.1.1q/include",
+					/opt/local/libexec/openssl11/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1895,29 +1894,26 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = Scribe/Scribe.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 21;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				HEADER_SEARCH_PATHS = (
 					../Code,
+					../Code/Sqlite,
 					../Resources,
 					../Utils/Tables,
-					../Code/Sqlite,
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					../../../Lgi/trunk/include,
-					../../../Lgi/trunk/include/lgi/mac/cocoa,
-					../../../Lgi/trunk/private/common,
-					../../../../CodeLib/libjpeg,
-					../../../../CodeLib/zlib,
-					../../../../CodeLib/libpng,
-					../../../../CodeLib/libpng/build,
-					/opt/local/include,
+					"../../libs/build-x64/libpng",
+					../../../lgi/trunk/include,
+					../../../lgi/trunk/private/common,
+					../../../lgi/trunk/include/lgi/mac/cocoa,
+					"../../../../codelib/libjpeg-9a",
+					../../../../codelib/libpng,
+					"/usr/local/Cellar/openssl@1.1/1.1.1q/include",
+					/opt/local/libexec/openssl11/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";

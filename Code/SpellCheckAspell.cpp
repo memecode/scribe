@@ -387,7 +387,7 @@ public:
 			p += "..";
 			#endif
 			#if defined(_DEBUG)
-			p += "..\\libs\\aspell-0.60.6.1";
+			p += "..\\..\\libs\\aspell-0.60.6.1";
 			#endif
 			#if defined(WINDOWS)
 			    p += "win32\\dist";
@@ -474,6 +474,8 @@ public:
 			LFile::Path s = DataDir;
 			s += "iso-8859-1.cmap";
 			DataPopulated = s.Exists();
+			if (!DataPopulated)
+				LgiTrace("%s:%i - Aspell data dir not populated.\n", _FL);
 		}
 
 		bool CopyError = false;
@@ -493,10 +495,13 @@ public:
 			}
 			{	// Check debug time install location
 				LFile::Path s = AppInstall;
-				s += "../libs/aspell-0.60.6.1/data";
+				s += "../../libs/aspell-0.60.6.1/data";
 				if (s.Exists())
 					Sources.Add(s.GetFull());
 			}
+			
+			if (Sources.Length() == 0)
+				LAssert(!"Failed to find data source folder.");
 
 			for (auto Src: Sources)
 			{
@@ -514,7 +519,11 @@ public:
 							LFile::Path In = Src, Out = Data;
 							In += d.GetName();
 							Out += d.GetName();
-							if (!FileDev->Copy(In.GetFull(), Out.GetFull()))
+							if (FileDev->Copy(In.GetFull(), Out.GetFull()))
+							{
+								LgiTrace("%s:%i - Copied in '%s'\n", _FL, Out.GetFull().Get());
+							}
+							else
 							{
 								CopyError = true;
 								break;
@@ -622,7 +631,7 @@ public:
 	{
 		if (!IsLoaded())
 		{
-			LgiTrace("%s:%i - Failed to load Aspell DLL.\n", _FL);
+			LgiTrace("%s:%i - Failed to load Aspell library.\n", _FL);
 			return false;
 		}
 
@@ -858,6 +867,11 @@ public:
 				return false;
 			}
 		}
+		else
+		{
+			LgiTrace("%s:%i - Unhandled protocol '%s'\n", _FL, Url.sProtocol.Get());
+			return false;
+		}
 		
 		return true;
 	}
@@ -1030,6 +1044,7 @@ public:
 					// LgiTrace("%s:%i - PrezipDecompress('%s') failed.\n", _FL, p);
 					return false;
 				}
+				
 				LString ReadOnlyWL = CreateReadOnlyMaster(Decomp);
 				if (!ReadOnlyWL.Get())
 				{

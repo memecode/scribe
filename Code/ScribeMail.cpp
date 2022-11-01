@@ -2238,6 +2238,7 @@ bool MailUi::IsWorking(int Set)
 	if (!GetItem())
 		return false;
 
+	// Are any of the attachments busy doing something?
 	LDataI *AttachPoint = GetItem() && Set >= 0 ? GetItem()->GetFileAttachPoint() : NULL;
 
 	List<Attachment> Attachments;
@@ -2261,6 +2262,16 @@ bool MailUi::IsWorking(int Set)
 		}
 	}
 	
+	// Check rich text control as well...
+	auto Rte = dynamic_cast<LRichTextEdit*>(HtmlView);
+	if (Rte)
+	{
+		if (Rte->IsBusy())
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -7908,6 +7919,10 @@ void Mail::SetFlagsCache(int64_t NewFlags, bool IgnoreReceipt, bool UpdateScreen
 				App->OnBayesianMailEvent(this, BayesMailUnknown, BayesMailHam);
 			}
 		}
+		else
+		{
+			int asd=0;
+		}
 
 		if (UpdateScreen)
 		{
@@ -9115,11 +9130,6 @@ void Mail::OnMeasure(LPoint *Info)
 	}
 }
 
-#define CUSTOM_SUBJECT	0
-#if CUSTOM_SUBJECT
-GRichTextPriv *TextPriv = NULL;
-#endif
-
 void Mail::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c)
 {
 	int Field = 0;
@@ -9132,10 +9142,7 @@ void Mail::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c)
 		Field = DefaultMailFields[i];
 	}
 
-	if (
-		#if !CUSTOM_SUBJECT
-		Container &&
-		#endif
+	if (Container &&
 		i >= 0 &&
 		Field == FIELD_SUBJECT)
 	{
@@ -9147,68 +9154,6 @@ void Mail::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c)
 			// Container needs to paint the subject...
 			Container->OnPaint(Ctx.pDC, Ctx, c, Ctx.Fore, Ctx.Back, f?f:LSysFont, Subj);
 		}
-		#if CUSTOM_SUBJECT
-		else if (Subj)
-		{
-			if (!TextPriv)
-				TextPriv = new GRichTextPriv(NULL, NULL);
-
-			// Special case the display of emoji
-			if (!d->Subj)
-			{
-				// Convert text to utf-32
-				uint32 *Txt = (uint32*) LNewConvertCp("utf-32", Subj, "utf-8", strlen(Subj));
-				if (d->Subj.Reset(new GRichTextPriv::TextBlock(TextPriv)))
-				{
-					LAutoPtr<LCss> s(new LCss);
-					if (f->Bold())
-						s->FontWeight(LCss::FontWeightBold);
-					c->WordWrap(LCss::WrapNone);
-					GNamedStyle *Style = TextPriv->AddStyleToCache(s);
-					d->Subj->AddText(NULL, 0, Txt, -1, Style);
-				}
-				DeleteArray(Txt);
-			}
-
-			GRichTextPriv::Flow Flow(TextPriv);
-			Flow.pDC = Ctx.pDC;
-			Flow.Left = Ctx.x1;
-			Flow.Right = Ctx.x2;
-			Flow.CurY = Flow.Top = Ctx.y1;
-			d->Subj->OnLayout(Flow);
-
-			GRichTextPriv::TextLine *line = d->Subj->Layout.First();
-			int ClipY = line ? line->PosOff.Y() : f->GetHeight();
-
-			LRect Clp(Ctx);
-			Clp.Dimension(Ctx.X(), ClipY);
-			Ctx.pDC->ClipRgn(&Ctx);
-
-			GRichTextPriv::PaintContext pc;
-			pc.pDC = Ctx.pDC;
-			pc.Colours[0].Fore = Ctx.Fore;
-			pc.Colours[0].Back = Ctx.Back;
-			d->Subj->OnPaint(pc);
-
-			if (Flow.CurY < Ctx.y2)
-			{
-				Ctx.pDC->Colour(Ctx.Back);
-				Ctx.pDC->Rectangle(Ctx.x1, Flow.CurY, Ctx.x2, Ctx.y2);
-			}
-
-			Ctx.pDC->ClipRgn(NULL);
-			if (Clp.y2 < Ctx.y2)
-			{
-				Ctx.pDC->Colour(Ctx.Back);
-				Ctx.pDC->Rectangle(Ctx.x1, Clp.y2 + 1, Ctx.x2, Ctx.y2);
-			}
-		}
-		else
-		{
-			Ctx.pDC->Colour(Ctx.Back);
-			Ctx.pDC->Rectangle(&Ctx);
-		}
-		#endif
 	}
 	else
 	{

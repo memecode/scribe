@@ -32,12 +32,15 @@
 			<Node File="../../libs/Btree/hashtable.c" Type="2" Platforms="15" />
 			<Node File="../../libs/Btree/offsetlist.c" Type="2" Platforms="15" />
 		</Node>
-		<Node File="../Code/GBTreeWordStore.cpp" Type="2" Platforms="15" />
+		<Node Name="WordStore" Type="1" Platforms="15" Id="1">
+			<Node File="../../../lgi/trunk/include/lgi/common/WordStore.h" Type="3" Platforms="15" />
+			<Node File="../Code/GBTreeWordStore.cpp" Type="2" Platforms="15" />
+		</Node>
+		<Node File="../Code/HtmlToText.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/SegmentTree.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/SharedMemory.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/TimeZone.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/Tnef.cpp" Type="2" Platforms="15" />
-		<Node File="../Code/HtmlToText.cpp" Type="2" Platforms="15" />
 	</Node>
 	<Node Name="Help Files" Type="1" Open="0" Platforms="7" Id="5">
 		<Node File="../Help/calendar.html" Type="3" Platforms="7" />
@@ -334,9 +337,9 @@
 			<Node File="../../../lgi/trunk/include/lgi/common/Store3Defs.h" Type="3" Platforms="15" />
 		</Node>
 	</Node>
-	<Node File="../../libs/aspell-0.60.6.1/linux/aspell-dist-0.60.xml" Type="4" Platforms="15" />
-	<Node File="../../libs/bzip2-1.0.6/linux/bzip2.xml" Type="4" Platforms="15" />
-	<Node File="../../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" />
+	<Node File="../../libs/aspell-0.60.6.1/linux/aspell-dist-0.60.xml" Type="4" Platforms="15" LinkAgainst="1" />
+	<Node File="../../libs/bzip2-1.0.6/linux/bzip2.xml" Type="4" Platforms="15" LinkAgainst="1" />
+	<Node File="../../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Node Name="Installer Scripts" Type="1" Platforms="15" Open="0" Id="43">
 		<Node File="../Code/Py/DomScan.py" Type="8" Platforms="15" />
 		<Node File="../Utils/getversion.py" Type="8" Platforms="15" />

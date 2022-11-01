@@ -10,9 +10,7 @@
 WebdavFolder::WebdavFolder(WebdavStore *store, WebdavFolder *parent)
 {
 	Store = store;
-	ItemType = MAGIC_ANY;
 	Field.State = Store3Loaded;
-	Sort = 0;
 
 	if ((Parent = parent))
 	{
@@ -85,6 +83,9 @@ int64 WebdavFolder::GetInt(int id)
 			else if (ItemType == MAGIC_CALENDAR)
 				return Store3SystemCalendar;
 			return Store3SystemNone;
+		case FIELD_LOADED:
+			return State;
+			break;
 		default:
 			LAssert(!"Not impl.");
 			break;
@@ -106,6 +107,18 @@ Store3Status WebdavFolder::SetInt(int id, int64 i)
 			Sort = i;
 			break;
 		case FIELD_LOADED:
+			if ( i != State &&
+				 i >= Store3Unloaded &&
+				 i <= Store3Loaded)
+			{
+				if (State < Store3Loaded &&
+					i >= Store3Loaded)
+				{
+					// What do?
+				}
+
+				State = (Store3State)i;
+			}
 			break;
 		default:
 			LAssert(!"Not impl.");

@@ -1145,7 +1145,10 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			{
 				LProgressDlg Prog(GetTree(), 500);
 				Prog.SetRange(LRange(0, Change.Length()));
-				Prog.SetYieldTime(200);
+				
+				// FIXME!!
+				// Prog.SetYieldTime(200);
+
 				Prog.SetDescription("Marking email...");
 				for (auto c : Change)
 				{

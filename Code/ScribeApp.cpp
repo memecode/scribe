@@ -1585,7 +1585,7 @@ ScribeWnd::~ScribeWnd()
 	}
 	Mail::NewMailLst.Empty();
 
-	// ~GAccountStatusItem references the account list... must be before we
+	// ~AccountStatusItem references the account list... must be before we
 	// delete the accounts.
 	DeleteObj(StatusPanel);
 
@@ -1634,7 +1634,11 @@ void ScribeWnd::LoadImageResources()
 	auto Res = LgiGetResObj();
 	LString::Array Folders;
 	if (Res)
-		Folders.Add(Res->GetThemeFolder());
+	{
+		auto p = Res->GetThemeFolder();
+		if (p)
+			Folders.Add(p);
+	}
 	Folders.Add(ScribeResourcePath());
 
 	for (auto p: Folders)
@@ -2385,7 +2389,11 @@ void ScribeWnd::OnCreate()
 			#if RUN_STARTUP_SCRIPTS
 			// Run scripts in './Scripts' folder
 			char s[MAX_PATH_LEN];
-			LMakePath(s, sizeof(s), ScribeResourcePath(), "../Scripts");
+			LMakePath(s, sizeof(s), ScribeResourcePath(),
+				#ifndef MAC
+				"../"
+				#endif
+				"Scripts");
 			if (!LDirExists(s))
 				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
 					#if defined(WINDOWS) && defined(_DEBUG)
@@ -3558,11 +3566,12 @@ bool ScribeWnd::LoadOptions()
 		}
 		else
 		{
+            auto err = GetOptions()->GetError();
 			LgiMsg(	this,
 					LLoadString(IDS_ERROR_LR8_FAILURE),
 					AppName,
 					MB_OK,
-					GetOptions()->GetError());
+					err);
 		}
 	}
 
@@ -4037,10 +4046,10 @@ int ScribeWnd::GetCurrentIdentity()
 	LVariant i;
 	if (GetOptions()->GetValue(OPT_CurrentIdentity, i))
 		return i.CastInt32();
-	else
+	else if (ScribeState != ScribeInitializing)
 		LgiTrace("%s:%i - No OPT_CurrentIdentity set.\n", _FL);
 
-	return NULL;
+	return -1;
 }
 
 void ScribeWnd::SetupAccounts()
@@ -4140,7 +4149,7 @@ void ScribeWnd::SetupAccounts()
 			break;
 	}
 
-	if (ResetDefault && Enabled.Length())
+	if ((ResetDefault || CurrentIdentity < 0) && Enabled.Length())
 	{
 		for (unsigned i=0; i<Enabled.Length(); i++)
 		{
@@ -4762,12 +4771,6 @@ void ScribeWnd::OnPulseSecond()
 	}
 
 	#if PROFILE_ON_PULSE
-	Prof.Add("SaveDirtyObjects handling");
-	#endif
-	
-	SaveDirtyObjects();	
-
-	#if PROFILE_ON_PULSE
 	Prof.Add("PreviewPanel handling");
 	#endif
 
@@ -4944,11 +4947,11 @@ class MailStoreUpgrade
 {
 public:
 	LAutoPtr<LProgressDlg> Prog;
-	ScribeWnd *App;
-	LDataStoreI *Ds;
-	class MailStoreUpgradeThread *Thread;
-	int Status;
-	LAutoString Error;
+	ScribeWnd *App = NULL;
+	LDataStoreI *Ds = NULL;
+	class MailStoreUpgradeThread *Thread = NULL;
+	int Status = -1;
+	LString Error;
 
 	MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds);
 	~MailStoreUpgrade();
@@ -4982,10 +4985,7 @@ public:
 
 	~MailStoreUpgradeThread()
 	{
-		while (!IsExited())
-		{
-			LSleep(10);
-		}
+		WaitForExit();
 	}
 
 	LDataPropI &operator =(LDataPropI &p) { LAssert(0); return *this; }
@@ -4994,7 +4994,7 @@ public:
 		switch (id)
 		{
 			case Store3UiError:
-				Up->Error.Reset(NewStr(str));
+				Up->Error = str;
 				break;
 			default:
 				LAssert(!"Impl me.");
@@ -5016,7 +5016,6 @@ MailStoreUpgrade::MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds) : Prog(new L
 {
 	App = app;
 	Ds = ds;
-	Status = -1;
 
 	Prog->SetDescription("Upgrading mail store...");
 	Thread = new MailStoreUpgradeThread(this);
@@ -6043,7 +6042,7 @@ void ScribeWnd::SetupUi()
 
 	// Preview and status windows
 	PreviewPanel = new LPreviewPanel(this);
-	StatusPanel = new LStatusPanel(this, ImageList);
+	StatusPanel = new AccountStatusPanel(this, ImageList);
 	if (PreviewPanel &&
 		StatusPanel)
 	{
@@ -7309,6 +7308,117 @@ static int AccountCmp(ScribeAccount *a, ScribeAccount *b, int Data)
 	return a->Identity.Sort() - b->Identity.Sort();
 }
 
+class ScribePasteState : public LProgressDlg
+{
+	ScribeWnd *App = NULL;
+	ScribeFolder *Folder = NULL;
+	LAutoPtr<uint8_t, true> Data;
+	ssize_t Size = 0;
+	LDataStoreI::StoreTrans Trans;
+	LProgressPane *LoadPane = NULL, *SavePane = NULL;
+	ScribeClipboardFmt *tl = NULL;
+	uint32_t Errors = 0;
+	ssize_t Idx = 0;
+
+	enum PasteState
+	{
+		LoadingThings,
+		SavingThings,
+	}	State = LoadingThings;
+
+public:
+	ScribePasteState(ScribeWnd *app, ScribeFolder *folder, LAutoPtr<uint8_t, true> data, ssize_t size) :
+		LProgressDlg(app),
+		App(app),
+		Folder(folder),
+		Data(data),
+		Size(size)
+	{
+		// Paste 'ScribeThingList'
+		tl = (ScribeClipboardFmt*)Data.Get();
+
+		Trans = Folder->GetObject()->GetStore()->StartTransaction();
+
+		LoadPane = ItemAt(0);
+		LoadPane->SetDescription("Loading objects...");
+		LoadPane->SetRange(LRange(0, tl->Length()));
+
+		SavePane = Push();
+		SavePane->SetRange(LRange(0, tl->Length()));
+		SavePane->SetDescription("Saving: No errors...");
+
+		// LProgressDlg will do a SetPulse in it's OnCreate
+	}
+
+	void OnPulse()
+	{
+		auto Start = LCurrentTime();
+		static int TimeSlice = 300; //ms
+
+		if (State == LoadingThings)
+		{
+			while (	Idx < tl->Length() &&
+					!IsCancelled() &&
+					LCurrentTime() - Start < TimeSlice)
+			{
+				Thing *t = tl->ThingAt(Idx++);
+				if (!t)
+					continue;
+
+				auto Obj = t->GetObject();
+				if (Obj->GetInt(FIELD_LOADED) < Store3Loaded)
+					Obj->SetInt(FIELD_LOADED, Store3Loaded);
+			}
+
+			Value(Idx);
+			if (Idx >= tl->Length())
+			{
+				State = SavingThings;
+				Idx = 0;
+			}
+		}
+		else if (State == SavingThings)
+		{
+			while (	Idx < tl->Length() &&
+					!IsCancelled() &&
+					LCurrentTime() - Start < TimeSlice)
+			{
+				Thing *t = tl->ThingAt(Idx++);
+				if (!t)
+					continue;
+
+				auto Obj = t->GetObject();
+				LAssert(Obj->GetInt(FIELD_LOADED) == Store3Loaded); // Load loop should have done this already
+
+				Thing *Dst = App->CreateItem(Obj->Type(), Folder, false);
+				if (Dst)
+				{
+					*Dst = *t;
+					Dst->Update();
+					if (!Dst->Save(Folder))
+					{
+						LString s;
+						s.Printf("Saving: " LPrintfSSizeT " error(s)", ++Errors);
+						SetDescription(s);
+					}
+				}
+				else Errors++;
+			}
+
+			SavePane->Value(Idx);
+			if (Idx >= tl->Length())
+			{
+				if (Errors > 0)
+					LgiMsg(this, "Failed to save %i of %i objects.", AppName, MB_OK, Errors, tl->Length());
+				Quit();
+				return;
+			}
+		}
+
+		LProgressDlg::OnPulse();
+	}
+};
+
 int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 {
 	// Send mail multi-menu
@@ -7782,76 +7892,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 
 			if (ScribeClipboardFmt::IsThing(Data.Get(), Size))
 			{
-				// Paste 'ScribeThingList'
-				LProgressDlg Prog(this, 500);
-				ScribeClipboardFmt *tl = (ScribeClipboardFmt*)Data.Get();
-				Prog.SetYieldTime(200);
-
-				uint32_t Errors = 0;
-				LDataStoreI::StoreTrans Trans = Folder->GetObject()->GetStore()->StartTransaction();
-
-				auto LoadPane = Prog.ItemAt(0);
-				LoadPane->SetDescription("Loading objects...");
-				LoadPane->SetRange(LRange(0, tl->Length()));
-
-				auto SavePane = Prog.Push();
-				SavePane->SetRange(LRange(0, tl->Length()));
-				SavePane->SetDescription("Saving: No errors...");
-
-				for (uint32_t i=0; i<tl->Length() && !Prog.IsCancelled(); i++)
-				{
-					Thing *t = tl->ThingAt(i);
-					if (!t)
-						continue;
-
-					auto Obj = t->GetObject();
-					if (Obj->GetInt(FIELD_LOADED) < Store3Loaded)
-						Obj->GetStr(FIELD_TEXT);
-
-					Prog.Value(i);
-				}
-
-				for (uint32_t i=0; i<tl->Length() && !Prog.IsCancelled(); i++)
-				{
-					Thing *t = tl->ThingAt(i);
-					if (!t)
-						continue;
-
-					auto Obj = t->GetObject();
-					auto StartTs = LCurrentTime();
-					bool LoadOk = true;
-					while (Obj->GetInt(FIELD_LOADED) < Store3Loaded)
-					{
-						LYield();
-						if (LCurrentTime() - StartTs > 5000)
-						{
-							LoadOk = false;
-							break;
-						}
-						LSleep(1);
-					}
-
-					if (LoadOk)
-					{
-						Thing *Dst = CreateItem(Obj->Type(), Folder, false);
-						if (Dst)
-						{
-							*Dst = *t;
-							Dst->Update();
-							if (!Dst->Save(Folder))
-							{
-								LString s;
-								s.Printf("Saving: " LPrintfSSizeT " error(s)", ++Errors);
-								Prog.SetDescription(s);
-							}
-						}
-					}
-
-					SavePane->Value(i);
-				}
-
-				if (Errors > 0)
-					LgiMsg(this, "Failed to save %i of %i objects.", AppName, MB_OK, Errors, tl->Length());
+				new ScribePasteState(this, Folder, Data, Size);
 			}
 			break;
 		}
@@ -8008,13 +8049,38 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_RECEIVE_ALL:
 		{
+			#define LOG_RECEIVE_ALL		0
 			int i = 0;
+			
+			Accounts.Sort(AccountCmp);
+			
 			for (auto a : Accounts)
 			{
-				if (a->Receive.IsConfigured() &&
-					a->Receive.Disabled() < 1)
-				{				
-					Receive(i);
+				#if LOG_RECEIVE_ALL
+				auto name = a->Identity.Name();
+				auto email = a->Identity.Email();
+				LString desc;
+				desc.Printf("%s/%s", name.Str(), email.Str());
+				#endif
+				
+				if (!a->Receive.IsConfigured())
+				{
+					#if LOG_RECEIVE_ALL
+					LgiTrace("%s:%i - %i/%s not configured.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+				}
+				else if (a->Receive.Disabled() > 0)
+				{
+					#if LOG_RECEIVE_ALL
+					LgiTrace("%s:%i - %i/%s is disabled.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+				}
+				else
+				{
+					#if LOG_RECEIVE_ALL				
+					LgiTrace("%s:%i - %i/%s will connect.\n", _FL, a->GetIndex(), desc.Get());
+					#endif
+					Receive(a->GetIndex());
 				}
 				i++;
 			}
@@ -8676,7 +8742,6 @@ bool ScribeWnd::CompactFolders(GMailStore &Store, bool Interactive)
 	Store3Progress Dlg(this, Interactive);
 
 	Dlg.SetDescription(LLoadString(IDS_CHECKING_OBJECTS));
-	LYield();
 
 	bool Offline = false;
 	if (WorkOffline)
@@ -8906,7 +8971,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, GMailStore *Store, bool Quiet)
 	}
 	else if (!Quiet)
 	{
-		LgiTrace("%s:%i - No option '%s'\n", _FL, KeyName);
+		// LgiTrace("%s:%i - No option '%s'\n", _FL, KeyName);
 		NoOption = true;
 	}
 
@@ -8926,11 +8991,8 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, GMailStore *Store, bool Quiet)
 			ScribeFolder *c = GetFolder(DefaultFolderNames[Id], Store);
 			if (!c)
 			{
-				if (!Quiet)
-				{
-					LgiTrace("%s:%i - Default folder '%s' doesn't exist.\n",
-						_FL, DefaultFolderNames[Id]);
-				}
+				// if (!Quiet)
+				// LgiTrace("%s:%i - Default folder '%s' doesn't exist.\n", _FL, DefaultFolderNames[Id]);
 			}
 			else if (NoOption)
 			{
@@ -11436,36 +11498,54 @@ void ScribeWnd::Send(int Which, bool Quiet)
 
 void ScribeWnd::Receive(int Which)
 {
+	#define LOG_RECEIVE		0
+	
 	if (ScribeState == ScribeExiting)
+	{
+		LgiTrace("%s:%i - Won't receive, is trying to exit.\n", _FL);
 		return;
+	}
 
 	for (ScribeAccount *i: Accounts)
 	{
-		if (i->GetIndex() == Which)
+		if (i->GetIndex() != Which)
+			continue;
+			
+		if (i->Receive.IsOnline())
 		{
-			if (!i->Receive.IsOnline() &&
-				i->Receive.Disabled() < 1)
-			{
-				if (i->Receive.IsConfigured())
-				{
-					i->Receive.Connect(0, false);
-				}
-				else
-				{
-					auto a = new LAlert(this,
-							AppName,
-							LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
-							LLoadString(IDS_CONFIGURE),
-							LLoadString(IDS_CANCEL));
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i already online.\n", _FL, Which);
+			#endif
+		}
+		else if (i->Receive.Disabled() > 0)
+		{
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i is disabled.\n", _FL, Which);
+			#endif
+		}
+		else if (!i->Receive.IsConfigured())
+		{
+			#if LOG_RECEIVE
+			LgiTrace("%s:%i - %i is not configured.\n", _FL, Which);
+			#endif
+
+					LAlert a(this,
+					AppName,
+					LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
+					LLoadString(IDS_CONFIGURE),
+					LLoadString(IDS_CANCEL));
 					a->DoModal([this, a, i](auto dlg, auto id)
-					{
+			{
 						if (id == 1)
 							i->InitUI(this, 2, NULL);
 						delete dlg;
 					});
-				}
-			}
 		}
+		else
+		{
+			i->Receive.Connect(0, false);
+		}
+		break;
 	}
 }
 
@@ -12729,14 +12809,25 @@ bool ScribeWnd::OnIdle()
 	bool Status = false;
 	
 	for (auto a : Accounts)
-	{
 		Status |= a->Receive.OnIdle();
-	}
 
 	Status |= OnTransfer();
 
 	LMessage m(M_SCRIBE_IDLE);
 	BayesianFilter::OnEvent(&m);
+
+	SaveDirtyObjects();	
+
+	#ifdef _DEBUG
+	static uint64_t LastTs = 0;
+	auto Now = LCurrentTime();
+	if (Now - LastTs >= 1000)
+	{
+		LastTs = Now;
+		if (Thing::DirtyThings.Length() > 0)
+			LgiTrace("%s:%i - Thing::DirtyThings=" LPrintfInt64 "\n", _FL, Thing::DirtyThings.Length());
+	}
+	#endif
 
 	return Status;
 }
