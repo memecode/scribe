@@ -11529,17 +11529,17 @@ void ScribeWnd::Receive(int Which)
 			LgiTrace("%s:%i - %i is not configured.\n", _FL, Which);
 			#endif
 
-					LAlert a(this,
+			auto a = new LAlert(this,
 					AppName,
 					LLoadString(IDS_ERROR_NO_CONFIG_RECEIVE),
 					LLoadString(IDS_CONFIGURE),
 					LLoadString(IDS_CANCEL));
-					a->DoModal([this, a, i](auto dlg, auto id)
+			a->DoModal([this, a, i](auto dlg, auto id)
 			{
-						if (id == 1)
-							i->InitUI(this, 2, NULL);
-						delete dlg;
-					});
+				if (id == 1)
+					i->InitUI(this, 2, NULL);
+				delete dlg;
+			});
 		}
 		else
 		{
