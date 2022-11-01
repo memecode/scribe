@@ -7151,6 +7151,117 @@ static int AccountCmp(ScribeAccount *a, ScribeAccount *b, int Data)
 	return a->Identity.Sort() - b->Identity.Sort();
 }
 
+class ScribePasteState : public LProgressDlg
+{
+	ScribeWnd *App = NULL;
+	ScribeFolder *Folder = NULL;
+	LAutoPtr<uint8_t, true> Data;
+	ssize_t Size = 0;
+	LDataStoreI::StoreTrans Trans;
+	LProgressPane *LoadPane = NULL, *SavePane = NULL;
+	ScribeClipboardFmt *tl = NULL;
+	uint32_t Errors = 0;
+	ssize_t Idx = 0;
+
+	enum PasteState
+	{
+		LoadingThings,
+		SavingThings,
+	}	State = LoadingThings;
+
+public:
+	ScribePasteState(ScribeWnd *app, ScribeFolder *folder, LAutoPtr<uint8_t, true> data, ssize_t size) :
+		LProgressDlg(app),
+		App(app),
+		Folder(folder),
+		Data(data),
+		Size(size)
+	{
+		// Paste 'ScribeThingList'
+		tl = (ScribeClipboardFmt*)Data.Get();
+
+		Trans = Folder->GetObject()->GetStore()->StartTransaction();
+
+		LoadPane = ItemAt(0);
+		LoadPane->SetDescription("Loading objects...");
+		LoadPane->SetRange(LRange(0, tl->Length()));
+
+		SavePane = Push();
+		SavePane->SetRange(LRange(0, tl->Length()));
+		SavePane->SetDescription("Saving: No errors...");
+
+		// LProgressDlg will do a SetPulse in it's OnCreate
+	}
+
+	void OnPulse()
+	{
+		auto Start = LCurrentTime();
+		static int TimeSlice = 300; //ms
+
+		if (State == LoadingThings)
+		{
+			while (	Idx < tl->Length() &&
+					!IsCancelled() &&
+					LCurrentTime() - Start < TimeSlice)
+			{
+				Thing *t = tl->ThingAt(Idx++);
+				if (!t)
+					continue;
+
+				auto Obj = t->GetObject();
+				if (Obj->GetInt(FIELD_LOADED) < Store3Loaded)
+					Obj->SetInt(FIELD_LOADED, Store3Loaded);
+			}
+
+			Value(Idx);
+			if (Idx >= tl->Length())
+			{
+				State = SavingThings;
+				Idx = 0;
+			}
+		}
+		else if (State == SavingThings)
+		{
+			while (	Idx < tl->Length() &&
+					!IsCancelled() &&
+					LCurrentTime() - Start < TimeSlice)
+			{
+				Thing *t = tl->ThingAt(Idx++);
+				if (!t)
+					continue;
+
+				auto Obj = t->GetObject();
+				LAssert(Obj->GetInt(FIELD_LOADED) == Store3Loaded); // Load loop should have done this already
+
+				Thing *Dst = App->CreateItem(Obj->Type(), Folder, false);
+				if (Dst)
+				{
+					*Dst = *t;
+					Dst->Update();
+					if (!Dst->Save(Folder))
+					{
+						LString s;
+						s.Printf("Saving: " LPrintfSSizeT " error(s)", ++Errors);
+						SetDescription(s);
+					}
+				}
+				else Errors++;
+			}
+
+			SavePane->Value(Idx);
+			if (Idx >= tl->Length())
+			{
+				if (Errors > 0)
+					LgiMsg(this, "Failed to save %i of %i objects.", AppName, MB_OK, Errors, tl->Length());
+				Quit();
+				return;
+			}
+		}
+
+		LProgressDlg::OnPulse();
+	}
+};
+
 int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 {
 	// Send mail multi-menu
@@ -7604,76 +7715,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 
 			if (ScribeClipboardFmt::IsThing(Data.Get(), Size))
 			{
-				// Paste 'ScribeThingList'
-				LProgressDlg Prog(this, 500);
-				ScribeClipboardFmt *tl = (ScribeClipboardFmt*)Data.Get();
-				Prog.SetYieldTime(200);
-
-				uint32_t Errors = 0;
-				LDataStoreI::StoreTrans Trans = Folder->GetObject()->GetStore()->StartTransaction();
-
-				auto LoadPane = Prog.ItemAt(0);
-				LoadPane->SetDescription("Loading objects...");
-				LoadPane->SetRange(LRange(0, tl->Length()));
-
-				auto SavePane = Prog.Push();
-				SavePane->SetRange(LRange(0, tl->Length()));
-				SavePane->SetDescription("Saving: No errors...");
-
-				for (uint32_t i=0; i<tl->Length() && !Prog.IsCancelled(); i++)
-				{
-					Thing *t = tl->ThingAt(i);
-					if (!t)
-						continue;
-
-					auto Obj = t->GetObject();
-					if (Obj->GetInt(FIELD_LOADED) < Store3Loaded)
-						Obj->GetStr(FIELD_TEXT);
-
-					Prog.Value(i);
-				}
-
-				for (uint32_t i=0; i<tl->Length() && !Prog.IsCancelled(); i++)
-				{
-					Thing *t = tl->ThingAt(i);
-					if (!t)
-						continue;
-
-					auto Obj = t->GetObject();
-					auto StartTs = LCurrentTime();
-					bool LoadOk = true;
-					while (Obj->GetInt(FIELD_LOADED) < Store3Loaded)
-					{
-						LYield();
-						if (LCurrentTime() - StartTs > 5000)
-						{
-							LoadOk = false;
-							break;
-						}
-						LSleep(1);
-					}
-
-					if (LoadOk)
-					{
-						Thing *Dst = CreateItem(Obj->Type(), Folder, false);
-						if (Dst)
-						{
-							*Dst = *t;
-							Dst->Update();
-							if (!Dst->Save(Folder))
-							{
-								LString s;
-								s.Printf("Saving: " LPrintfSSizeT " error(s)", ++Errors);
-								Prog.SetDescription(s);
-							}
-						}
-					}
-
-					SavePane->Value(i);
-				}
-
-				if (Errors > 0)
-					LgiMsg(this, "Failed to save %i of %i objects.", AppName, MB_OK, Errors, tl->Length());
+				new ScribePasteState(this, Folder, Data, Size);
 			}
 			break;
 		}
