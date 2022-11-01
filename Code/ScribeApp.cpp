@@ -4837,11 +4837,11 @@ class MailStoreUpgrade
 {
 public:
 	LAutoPtr<LProgressDlg> Prog;
-	ScribeWnd *App;
-	LDataStoreI *Ds;
-	class MailStoreUpgradeThread *Thread;
-	int Status;
-	LAutoString Error;
+	ScribeWnd *App = NULL;
+	LDataStoreI *Ds = NULL;
+	class MailStoreUpgradeThread *Thread = NULL;
+	int Status = -1;
+	LString Error;
 
 	MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds);
 	~MailStoreUpgrade();
@@ -4875,10 +4875,7 @@ public:
 
 	~MailStoreUpgradeThread()
 	{
-		while (!IsExited())
-		{
-			LSleep(10);
-		}
+		WaitForExit();
 	}
 
 	LDataPropI &operator =(LDataPropI &p) { LAssert(0); return *this; }
@@ -4887,7 +4884,7 @@ public:
 		switch (id)
 		{
 			case Store3UiError:
-				Up->Error.Reset(NewStr(str));
+				Up->Error = str;
 				break;
 			default:
 				LAssert(!"Impl me.");
@@ -4909,7 +4906,6 @@ MailStoreUpgrade::MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds) : Prog(new L
 {
 	App = app;
 	Ds = ds;
-	Status = -1;
 
 	Prog->SetDescription("Upgrading mail store...");
 	Thread = new MailStoreUpgradeThread(this);
@@ -8563,7 +8559,6 @@ bool ScribeWnd::CompactFolders(GMailStore &Store, bool Interactive)
 	Store3Progress Dlg(this, Interactive);
 
 	Dlg.SetDescription(LLoadString(IDS_CHECKING_OBJECTS));
-	LYield();
 
 	bool Offline = false;
 	if (WorkOffline)
