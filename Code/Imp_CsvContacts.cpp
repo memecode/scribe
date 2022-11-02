@@ -352,8 +352,9 @@ void ImportCsv(ScribeWnd *App)
 
 		Dlg->SetRecords(Rs);
 
-		Dlg.Release()->DoModal([this, Dlg, App](auto dlg, auto id)
+		Dlg.Release()->DoModal([App](auto dlg, auto id)
 		{
+			GImpCsv *Dlg = dynamic_cast<GImpCsv*>(dlg);
 			LAutoPtr<LDialog> mem(dlg);
 			if (!id)
 				return;

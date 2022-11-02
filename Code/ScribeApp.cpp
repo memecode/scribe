@@ -1489,7 +1489,9 @@ ScribeWnd::ScribeWnd() :
 			#endif
 
 			ScribeState = ScribeInitializing;
+			#if LGI_VIEW_HANDLE
 			if (Handle())
+			#endif
 				OnCreate();
 		};
 
@@ -4966,7 +4968,7 @@ public:
 
 		Prog.Reset();
 		if (!Status)
-			LgiMsg(App, Error?Error:(char*)"<unknown error>", AppName);
+			LgiMsg(App, Error?Error.Get():(char*)"<unknown error>", AppName);
 
 		return Status > 0;
 	}
@@ -9945,7 +9947,9 @@ void ScribeWnd::SetDefaultHandler()
 
 void ScribeWnd::OnSetDefaultHandler(bool Error, bool OldAssert)
 {
+	#if WINDOWS
 	LRegKey::AssertOnError = OldAssert;
+	#endif
 	if (Error)
 		NeedsCapability("RegistryWritePermissions");
 }
