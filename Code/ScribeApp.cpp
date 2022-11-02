@@ -4856,7 +4856,7 @@ public:
 
 		Prog.Reset();
 		if (!Status)
-			LgiMsg(App, Error?Error:(char*)"<unknown error>", AppName);
+			LgiMsg(App, Error?Error.Get():(char*)"<unknown error>", AppName);
 
 		return Status > 0;
 	}
