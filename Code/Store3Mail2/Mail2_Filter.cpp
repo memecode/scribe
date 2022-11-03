@@ -25,7 +25,7 @@ static const char *OpNames[] =
 };
 
 //////////////////////////////////////////////////////////////////////
-FilterData::FilterData(GMail2Store *s) : ThingData(s)
+FilterData::FilterData(LMail2Store *s) : ThingData(s)
 {
 	Flags = 0;
 	Index = 0;

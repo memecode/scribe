@@ -36,7 +36,7 @@ GMail3Def TblCalendar[] =
 	{0, 0}
 };
 
-GMail3Calendar::GMail3Calendar(GMail3Store *store) : GMail3Thing(store)
+LMail3Calendar::LMail3Calendar(LMail3Store *store) : LMail3Thing(store)
 {
 	CalType = 0;
 	CalPriv = CalDefaultPriv;
@@ -53,24 +53,24 @@ GMail3Calendar::GMail3Calendar(GMail3Store *store) : GMail3Thing(store)
 	StoreStatus = Store3Success;
 }
 
-GMail3Calendar::~GMail3Calendar()
+LMail3Calendar::~LMail3Calendar()
 {
 }
 
-bool GMail3Calendar::DbDelete()
+bool LMail3Calendar::DbDelete()
 {
 	char s[256];
 
 	// Delete the calendar itself
 	sprintf_s(s, sizeof(s), "delete from " MAIL3_TBL_CALENDAR " where Id=" LPrintfInt64, Id);
-	GMail3Store::GStatement Del(Store, s);
+	LMail3Store::LStatement Del(Store, s);
 	if (!Del.Exec())
 		return false;
 
 	return true;
 }
 
-bool GMail3Calendar::Serialize(GMail3Store::GStatement &s, bool Write)
+bool LMail3Calendar::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	int i = 0;
 
@@ -124,7 +124,7 @@ bool GMail3Calendar::Serialize(GMail3Store::GStatement &s, bool Write)
 	return true;
 }
 
-Store3CopyImpl(GMail3Calendar)
+Store3CopyImpl(LMail3Calendar)
 {
 	SetInt(FIELD_CAL_TYPE, p.GetInt(FIELD_CAL_TYPE));
 	SetInt(FIELD_CAL_COMPLETED, p.GetInt(FIELD_CAL_COMPLETED));
@@ -152,7 +152,7 @@ Store3CopyImpl(GMail3Calendar)
 	return true;
 }
 
-const char *GMail3Calendar::GetStr(int id)
+const char *LMail3Calendar::GetStr(int id)
 {
 	switch (id)
 	{
@@ -199,7 +199,7 @@ const char *GMail3Calendar::GetStr(int id)
 	return 0;
 }
 
-Store3Status GMail3Calendar::SetStr(int id, const char *str)
+Store3Status LMail3Calendar::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -267,7 +267,7 @@ Store3Status GMail3Calendar::SetStr(int id, const char *str)
 	return Store3Success;
 }
 
-int64 GMail3Calendar::GetInt(int id)
+int64 LMail3Calendar::GetInt(int id)
 {
 	switch (id)
 	{
@@ -309,7 +309,7 @@ int64 GMail3Calendar::GetInt(int id)
 	return -1;
 }
 
-Store3Status GMail3Calendar::SetInt(int id, int64 val)
+Store3Status LMail3Calendar::SetInt(int id, int64 val)
 {
 	int n = (int)val;
 	switch (id)
@@ -367,7 +367,7 @@ Store3Status GMail3Calendar::SetInt(int id, int64 val)
 	return Store3Success;
 }
 
-const LDateTime *GMail3Calendar::GetDate(int id)
+const LDateTime *LMail3Calendar::GetDate(int id)
 {
 	switch (id)
 	{
@@ -385,7 +385,7 @@ const LDateTime *GMail3Calendar::GetDate(int id)
 	return 0;
 }
 
-Store3Status GMail3Calendar::SetDate(int id, const LDateTime *t)
+Store3Status LMail3Calendar::SetDate(int id, const LDateTime *t)
 {
 	switch (id)
 	{

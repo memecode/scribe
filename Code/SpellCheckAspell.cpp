@@ -64,7 +64,7 @@ static char AspellDelim[] =
 
 static char AspellUrlDelim[] = " \r\t\n,";
 
-class GBzip2File : public LFile
+class LBzip2File : public LFile
 {
 	int BufLen;
 	LAutoString Buf;
@@ -74,7 +74,7 @@ class GBzip2File : public LFile
 	int Result;
 
 public:
-	GBzip2File(int buflen = 64 << 10)
+	LBzip2File(int buflen = 64 << 10)
 	{
 		ZeroObj(Bz);
 		BufLen = buflen;
@@ -225,7 +225,7 @@ char *GetAspellPath(char *Path)
 // Class
 bool WarnMissingAspell = true;
 
-class ASpell : public LLibrary, public GTarParser
+class ASpell : public LLibrary, public LTarParser
 {
 protected:
 	struct LanguageEntry
@@ -235,7 +235,7 @@ protected:
 		char *NativeName;
 		char *File;
 	};
-	LAutoPtr<GDb> LanguageDb;
+	LAutoPtr<LDb> LanguageDb;
 	LArray<LanguageEntry> Languages;
 
 	LAutoPtr<LSpellCheck::Params> SpellParams;
@@ -294,7 +294,7 @@ protected:
 			f.Dir.Empty();
 		}
 	
-		return GTarParser::Process(f, s, SkipOverFile);
+		return LTarParser::Process(f, s, SkipOverFile);
 	}
 
 public:
@@ -884,7 +884,7 @@ public:
 		{
 			if (!_stricmp(Ext, "bz2"))
 			{
-				GBzip2File In;
+				LBzip2File In;
 				LFile Out;
 				if (!In.Open(File, O_READ))
 				{

@@ -5,7 +5,7 @@
 #include "LTree.h"
 #include "InetTools.h"
 #include "LTextLog.h"
-#include "GToken.h"
+#include "LToken.h"
 
 enum Id
 {
@@ -42,7 +42,7 @@ public:
 		if (h)
 			Data->Print("%s\n", h);
 
-		GToken m(Mime->GetMimeType(), "/");
+		LToken m(Mime->GetMimeType(), "/");
 		LStreamI *s = Mime->GetData();
 		if (s && s->GetSize() < 0)
 			s = 0;
@@ -69,7 +69,7 @@ public:
 	{
 		if (m.IsContextMenu())
 		{
-			GSubMenu s;
+			LSubMenu s;
 			s.AppendItem("Save Data To...", ID_SAVE, true);
 
 			m.ToScreen();

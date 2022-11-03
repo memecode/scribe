@@ -14,7 +14,7 @@ class CalendarUi;
 class CalendarView;
 class Attendee;
 class CalendarSource;
-class GTimeLine;
+class LTimeLine;
 
 extern void InitCalendarView();
 
@@ -178,7 +178,7 @@ class CalendarUi :
 	LTabPage *Appointment;
 	LTabPage *AttendTab;
 	LScriptUi Commands;
-	class GAttendees *Attendees;
+	class LAttendees *Attendees;
 	bool NotifyOn;
 
 	bool OnViewKey(LView *v, LKey &k);	

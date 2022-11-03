@@ -4,7 +4,7 @@
 
 ScribeFunc bool AddressBrowseLookup(ScribeWnd *App, LArray<BrowseItem*> &Items, LString s);
 
-class AddressBrowse : public GPopupList<BrowseItem>
+class AddressBrowse : public LPopupList<BrowseItem>
 {
 	class AddressBrowsePrivate *d;
 

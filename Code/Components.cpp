@@ -48,7 +48,7 @@ struct MissingCapsBarPriv
     LColour Back;
     int CountDown;
     
-    GToken Msg;
+    LToken Msg;
     LArray<LDisplayString*> Strs;
     
     MissingCapsBarPriv() : Back(0xd2, 0x40, 0x40)

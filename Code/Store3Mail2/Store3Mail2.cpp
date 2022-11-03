@@ -70,7 +70,7 @@ GAutoStreamI ThingData::GetStream(const char *file, int line)
 	return Ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-GMail2Store::GMail2Store(char *file, LDataEventsI *callback) : Storage2::StorageKitImpl(file)
+LMail2Store::LMail2Store(char *file, LDataEventsI *callback) : Storage2::StorageKitImpl(file)
 {
 	Callback = callback;
 	Mailbox = 0;
@@ -83,16 +83,16 @@ GMail2Store::GMail2Store(char *file, LDataEventsI *callback) : Storage2::Storage
 	}
 }
 
-GMail2Store::~GMail2Store()
+LMail2Store::~LMail2Store()
 {
 }
 
-uint64 GMail2Store::Size()
+uint64 LMail2Store::Size()
 {
 	return GetFileSize();
 }
 
-char *GMail2Store::GetStr(int id)
+char *LMail2Store::GetStr(int id)
 {
 	switch (id)
 	{
@@ -114,12 +114,12 @@ char *GMail2Store::GetStr(int id)
 	return 0;
 }
 
-bool GMail2Store::SetStr(int id, const char *str)
+bool LMail2Store::SetStr(int id, const char *str)
 {
 	return 0;
 }
 
-int64 GMail2Store::GetInt(int id)
+int64 LMail2Store::GetInt(int id)
 {
 	switch (id)
 	{
@@ -134,12 +134,12 @@ int64 GMail2Store::GetInt(int id)
 	return -1;
 }
 
-bool GMail2Store::SetInt(int id, int64 i)
+bool LMail2Store::SetInt(int id, int64 i)
 {
 	return 0;
 }
 
-LDataI *GMail2Store::Create(int Type)
+LDataI *LMail2Store::Create(int Type)
 {
 	switch (Type)
 	{
@@ -162,7 +162,7 @@ LDataI *GMail2Store::Create(int Type)
 	return 0;
 }
 
-LDataFolderI *GMail2Store::GetRoot(bool Create)
+LDataFolderI *LMail2Store::GetRoot(bool Create)
 {
 	if (!Mailbox && GetStatus())
 	{
@@ -182,7 +182,7 @@ LDataFolderI *GMail2Store::GetRoot(bool Create)
 	return Mailbox;
 }
 
-FolderData *GMail2Store::GetFolder(char *Path)
+FolderData *LMail2Store::GetFolder(char *Path)
 {
 	StorageItem *root = StorageKitImpl::GetRoot();
 	FolderData *r = CastFolder(root);
@@ -193,7 +193,7 @@ FolderData *GMail2Store::GetFolder(char *Path)
 		return NULL;
 	}
 
-	GToken t(Path, "/");
+	LToken t(Path, "/");
 	if (t.Length())
 	{
 		for (unsigned i=0; i<t.Length(); i++)
@@ -231,7 +231,7 @@ FolderData *GMail2Store::GetFolder(char *Path)
 	return r;
 }
 
-FolderData *GMail2Store::CastFolder(StorageItem *i)
+FolderData *LMail2Store::CastFolder(StorageItem *i)
 {
 	if (!i)
 		return 0;
@@ -244,7 +244,7 @@ FolderData *GMail2Store::CastFolder(StorageItem *i)
 	return (FolderData*)i->Object;
 }
 
-Store3Status GMail2Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
+Store3Status LMail2Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 {
 	if (Items.Length() == 0)
 	{
@@ -309,7 +309,7 @@ Store3Status GMail2Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 	return Status;
 }
 
-Store3Status GMail2Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
+Store3Status LMail2Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 {
 	Store3Status Status = Store3Error;
 
@@ -384,7 +384,7 @@ Store3Status GMail2Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 	return Status;
 }
 
-Store3Status GMail2Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &Value)
+Store3Status LMail2Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &Value)
 {
 	if (Items.Length() == 0)
 		return Store3Success;
@@ -447,13 +447,13 @@ public:
 	void Cancel(bool i) { Props->SetInt(Store3UiCancel, i); }
 };
 
-bool GMail2Store::Compact(LViewI *Parent, LDataPropI *Props)
+bool LMail2Store::Compact(LViewI *Parent, LDataPropI *Props)
 {
 	Mail2ProgressAdapter Prog(Props);
 	return StorageKitImpl::Compact(&Prog, Props->GetInt(Store3UiInteractive) != 0);
 }
 
-void GMail2Store::OnEvent(void *Param)
+void LMail2Store::OnEvent(void *Param)
 {
 }
 
@@ -464,7 +464,7 @@ LDataStoreI *OpenMail2(char *Mail2Folders, LDataEventsI *Callback, bool Create)
 
 	if (FileExists(Mail2Folders) || Create)
 	{
-		s = new GMail2Store(Mail2Folders, Callback);
+		s = new LMail2Store(Mail2Folders, Callback);
 		if (s)
 		{
 			s->GetRoot(Create);

@@ -192,7 +192,7 @@ void DumpTree(LFile *f, LStream *Log)
 	}
 }
 
-class GFolderInfo
+class LFolderInfo
 {
 public:
 	uint32 Type;
@@ -205,7 +205,7 @@ public:
 	uint32 Loc;
 	uint32 NewLoc;
 	StorageItemHeader Header;
-	GFolderInfo *Fld;
+	LFolderInfo *Fld;
 	Node *Owner;
 	LArray<Node*> Children;
 
@@ -233,7 +233,7 @@ public:
 		Owner = 0;
 		Header.Type = MAGIC_FOLDER;
 
-		Fld = new GFolderInfo;
+		Fld = new LFolderInfo;
 		if (Fld)
 		{
 			Fld->Type = Type;
@@ -373,7 +373,7 @@ public:
 				if (Magic == MAGIC_FOLDER_OLD)
 				{
 					if (!Fld)
-						Fld = new GFolderInfo;
+						Fld = new LFolderInfo;
 	
 					if (Fld)
 					{
@@ -412,7 +412,7 @@ public:
 										{
 											assert(Size == 4);
 											if (!Fld)
-												Fld = new GFolderInfo;
+												Fld = new LFolderInfo;
 											if (Fld)
 											{
 												Read(f, Fld->Type);
@@ -427,7 +427,7 @@ public:
 										if (Read(f, s))
 										{
 											if (!Fld)
-												Fld = new GFolderInfo;
+												Fld = new LFolderInfo;
 											if (Fld)
 											{
 												Fld->Name = s;

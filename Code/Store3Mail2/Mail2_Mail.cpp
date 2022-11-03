@@ -5,7 +5,7 @@
 
 const char sAlternative[] = "multipart/alternative";
 
-MailData::MailData(GMail2Store *s) :
+MailData::MailData(LMail2Store *s) :
 	ThingData(s),
 	From(s),
 	Reply(s)

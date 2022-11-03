@@ -13,7 +13,7 @@
 #define PR_BODY_HTML		PROP_TAG(PT_TSTRING, 0x1013)
 #endif
 
-class IDataStream : public GUnknownImpl<IStream>
+class IDataStream : public LUnknownImpl<IStream>
 {
 	ssize_t Len, Pos;
 	char *Data;

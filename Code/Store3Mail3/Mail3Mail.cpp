@@ -51,7 +51,7 @@ GMail3Def TblMailSegs[] =
 	{0,					0},
 };
 
-bool Mail3_InsertSeg(GMail3Store::GInsert &Ins, LMime *m, int64 ParentId, int64 ParentSeg, int64 &MailSize)
+bool Mail3_InsertSeg(LMail3Store::LInsert &Ins, LMime *m, int64 ParentId, int64 ParentSeg, int64 &MailSize)
 {
 	Ins.SetInt64(1, ParentId);
 	Ins.SetInt64(2, ParentSeg);
@@ -80,7 +80,7 @@ bool Mail3_InsertSeg(GMail3Store::GInsert &Ins, LMime *m, int64 ParentId, int64 
 	return true;
 }
 
-bool Mail3_CopySegs(GMail3Mail *m, GMail3Attachment *parent, LDataI *in)
+bool Mail3_CopySegs(LMail3Mail *m, LMail3Attachment *parent, LDataI *in)
 {
 	const char *Mt = in->GetStr(FIELD_MIME_TYPE);
 	if (!Mt)
@@ -88,7 +88,7 @@ bool Mail3_CopySegs(GMail3Mail *m, GMail3Attachment *parent, LDataI *in)
 		return false;
 	}
 	
-	GMail3Attachment *out = new GMail3Attachment(m->Store);
+	LMail3Attachment *out = new LMail3Attachment(m->Store);
 	if (!out)
 		return false;
 
@@ -109,8 +109,8 @@ bool Mail3_CopySegs(GMail3Mail *m, GMail3Attachment *parent, LDataI *in)
 	return true;
 }
 
-GMail3Mail::GMail3Mail(GMail3Store *store) :
-	GMail3Thing(store),
+LMail3Mail::LMail3Mail(LMail3Store *store) :
+	LMail3Thing(store),
 	From(store),
 	Reply(store)
 {
@@ -123,7 +123,7 @@ GMail3Mail::GMail3Mail(GMail3Store *store) :
 	To.State = Store3Loaded;
 }
 
-GMail3Mail::~GMail3Mail()
+LMail3Mail::~LMail3Mail()
 {
 	To.DeleteObjects();
 	DeleteObj(Seg);
@@ -131,7 +131,7 @@ GMail3Mail::~GMail3Mail()
 
 #define DEBUG_COPY_PROPS		0
 
-Store3CopyImpl(GMail3Mail)
+Store3CopyImpl(LMail3Mail)
 {
 #if DEBUG_COPY_PROPS
 LProfile Prof("Store3CopyProps");
@@ -209,11 +209,11 @@ Prof.Add(_FL);
 	return true;
 }
 
-void GMail3Mail::SetStore(GMail3Store *s)
+void LMail3Mail::SetStore(LMail3Store *s)
 {
 	if (Id < 0)
 	{
-		GMail3Thing::SetStore(s);
+		LMail3Thing::SetStore(s);
 		From.SetStore(s);
 		Reply.SetStore(s);
 		if (Seg)
@@ -292,7 +292,7 @@ bool SafeAddrTokenize(const char *In, List<char> &Out, bool Debug = false)
 #define DEBUG_SERIALIZE(...)
 #endif
 
-bool GMail3Mail::Serialize(GMail3Store::GStatement &s, bool Write)
+bool LMail3Mail::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	static LVariant vTo, vFrom, vReply;
 	bool Debug = false;
@@ -452,7 +452,7 @@ bool GMail3Mail::Serialize(GMail3Store::GStatement &s, bool Write)
 	return true;
 }
 
-uint32_t GMail3Mail::Type()
+uint32_t LMail3Mail::Type()
 {
 	return MAGIC_MAIL;
 }
@@ -472,7 +472,7 @@ size_t Sizeof(LVariant &v)
 	return s + sizeof(v);
 }
 
-size_t Sizeof(DIterator<LDataPropI, Store3Addr, GMail3Store> &i)
+size_t Sizeof(DIterator<LDataPropI, Store3Addr, LMail3Store> &i)
 {
 	size_t s = sizeof(i);
 	for (unsigned n=0; n<i.Length(); n++)
@@ -481,7 +481,7 @@ size_t Sizeof(DIterator<LDataPropI, Store3Addr, GMail3Store> &i)
 	return s;
 }
 
-uint64 GMail3Mail::Size()
+uint64 LMail3Mail::Size()
 {
 	if (MailSize < 0 && Seg)
 	{
@@ -507,17 +507,17 @@ uint64 GMail3Mail::Size()
 			sizeof(DateSent);
 }
 
-bool GMail3Mail::DbDelete()
+bool LMail3Mail::DbDelete()
 {
 	return Store->DeleteMailById(Id);
 }
 
-LDataStoreI *GMail3Mail::GetStore()
+LDataStoreI *LMail3Mail::GetStore()
 {
 	return Store;
 }
 
-LAutoStreamI GMail3Mail::GetStream(const char *file, int line)
+LAutoStreamI LMail3Mail::GetStream(const char *file, int line)
 {
 	LAutoStreamI Ret;
 	const char *TmpPath = Store->GetStr(FIELD_TEMP_PATH);
@@ -527,7 +527,7 @@ LAutoStreamI GMail3Mail::GetStream(const char *file, int line)
 		// Construct from the single segment...
 		LString Sql;
 		Sql.Printf("select * from '%s' where MailId=" LPrintfInt64, MAIL3_TBL_MAILSEGS, Id);
-		GMail3Store::GStatement s(Store, Sql);
+		LMail3Store::LStatement s(Store, Sql);
 		if (s.Row())
 		{
 			LStreamConcat *Sc;
@@ -586,7 +586,7 @@ LAutoStreamI GMail3Mail::GetStream(const char *file, int line)
 	return Ret;
 }
 
-bool GMail3Mail::SetStream(LAutoStreamI stream)
+bool LMail3Mail::SetStream(LAutoStreamI stream)
 {
 	if (!stream)
 		return false;
@@ -597,7 +597,7 @@ bool GMail3Mail::SetStream(LAutoStreamI stream)
 	LMime Mime;
 	if (Mime.Text.Decode.Pull(stream))
 	{
-		Seg = new GMail3Attachment(Store);
+		Seg = new LMail3Attachment(Store);
 		if (Seg)
 		{
 			// This stops the objects being written to disk.
@@ -615,18 +615,18 @@ bool GMail3Mail::SetStream(LAutoStreamI stream)
 	return false;
 }
 
-bool GMail3Mail::FindSegs(const char *MimeType, LArray<GMail3Attachment*> &Results, bool Create)
+bool LMail3Mail::FindSegs(const char *MimeType, LArray<LMail3Attachment*> &Results, bool Create)
 {
 	LoadSegs();
 	
 	if ((!Seg || !Seg->FindSegs(MimeType, Results)) && Create)
 	{
-		GMail3Attachment *a = new GMail3Attachment(Store);
+		LMail3Attachment *a = new LMail3Attachment(Store);
 		if (!a)
 			return false;
 		a->SetStr(FIELD_MIME_TYPE, MimeType);
 
-		Store3MimeTree<GMail3Store, GMail3Mail, GMail3Attachment> Tree(this, Seg);
+		Store3MimeTree<LMail3Store, LMail3Mail, LMail3Attachment> Tree(this, Seg);
 		Tree.Add(a);
 		if (!Tree.Build())
 			return false;
@@ -637,7 +637,7 @@ bool GMail3Mail::FindSegs(const char *MimeType, LArray<GMail3Attachment*> &Resul
 	/* 
 	for (unsigned i=0; i<Results.Length(); i++)
 	{
-		GMail3Attachment *a = Results[i];
+		LMail3Attachment *a = Results[i];
 		if (!a->GetStr(FIELD_MIME_TYPE))
 		{
 			// Ugh, a bug has caused a bunch of NULL mime-types..
@@ -649,7 +649,7 @@ bool GMail3Mail::FindSegs(const char *MimeType, LArray<GMail3Attachment*> &Resul
 	return Results.Length() > 0;
 }
 
-GMail3Attachment *GMail3Mail::GetAttachment(int64 Id)
+LMail3Attachment *LMail3Mail::GetAttachment(int64 Id)
 {
 	return Seg ? Seg->Find(Id) : 0;
 }
@@ -657,10 +657,10 @@ GMail3Attachment *GMail3Mail::GetAttachment(int64 Id)
 struct Pair
 {
 	int64 Parent;
-	GMail3Attachment *Seg;
+	LMail3Attachment *Seg;
 };
 
-int GMail3Mail::GetAttachments(LArray<GMail3Attachment*> *Lst)
+int LMail3Mail::GetAttachments(LArray<LMail3Attachment*> *Lst)
 {
 	if (!Seg)
 		return -1;
@@ -689,7 +689,7 @@ int GMail3Mail::GetAttachments(LArray<GMail3Attachment*> *Lst)
 					Count++;
 					if (Lst)
 					{
-						GMail3Attachment *a = dynamic_cast<GMail3Attachment*>(i);
+						LMail3Attachment *a = dynamic_cast<LMail3Attachment*>(i);
 						if (a)
 							Lst->Add(a);
 					}
@@ -701,7 +701,7 @@ int GMail3Mail::GetAttachments(LArray<GMail3Attachment*> *Lst)
 	return Count;
 }
 
-void GMail3Mail::LoadSegs()
+void LMail3Mail::LoadSegs()
 {
 	if (Id > 0 && !Seg)
 	{
@@ -724,11 +724,11 @@ void GMail3Mail::LoadSegs()
 
 			char Sql[256];
 			sprintf_s(Sql, sizeof(Sql), "select * from '%s' where MailId=" LPrintfInt64, MAIL3_TBL_MAILSEGS, Id);
-			GMail3Store::GStatement s(Store, Sql);
+			LMail3Store::LStatement s(Store, Sql);
 			while (s.Row())
 			{
 				Pair p;
-				p.Seg = new GMail3Attachment(Store);
+				p.Seg = new LMail3Attachment(Store);
 				if (p.Seg->Load(s, p.Parent))
 				{
 					if (p.Parent <= 0)
@@ -756,7 +756,7 @@ void GMail3Mail::LoadSegs()
 
 				for (unsigned i=0; i<Others.Length(); i++)
 				{
-					GMail3Attachment *p = Seg->Find(Others[i].Parent);
+					LMail3Attachment *p = Seg->Find(Others[i].Parent);
 					if (p)
 					{
 						Others[i].Seg->AttachTo(p);
@@ -799,7 +799,7 @@ void GMail3Mail::LoadSegs()
 
 static auto DefaultCharset = "windows-1252";
 			
-const char *GMail3Mail::GetStr(int id)
+const char *LMail3Mail::GetStr(int id)
 {
 	switch (id)
 	{
@@ -835,7 +835,7 @@ const char *GMail3Mail::GetStr(int id)
 		}
 		case FIELD_TEXT:
 		{
-			LArray<GMail3Attachment*> Results;
+			LArray<LMail3Attachment*> Results;
 			if (!TextCache && FindSegs("text/plain", Results))
 			{
 				LStringPipe p;
@@ -893,7 +893,7 @@ const char *GMail3Mail::GetStr(int id)
 		}
 		case FIELD_ALTERNATE_HTML:
 		{
-			LArray<GMail3Attachment*> Results;
+			LArray<LMail3Attachment*> Results;
 			if (!HtmlCache && FindSegs("text/html", Results))
 			{
 				LMemQueue Blocks(1024);
@@ -985,7 +985,7 @@ const char *GMail3Mail::GetStr(int id)
 	return 0;
 }
 
-void GMail3Mail::OnSave()
+void LMail3Mail::OnSave()
 {
 	if (Seg)
 	{
@@ -994,7 +994,7 @@ void GMail3Mail::OnSave()
 	}
 }
 
-void GMail3Mail::ParseAddresses(char *Str, int CC)
+void LMail3Mail::ParseAddresses(char *Str, int CC)
 {
 	List<char> Addr;
 	TokeniseStrList(Str, Addr, ",");
@@ -1017,14 +1017,14 @@ void GMail3Mail::ParseAddresses(char *Str, int CC)
 	Addr.DeleteArrays();
 }
 
-void GMail3Mail::ResetCaches()
+void LMail3Mail::ResetCaches()
 {
 	TextCache.Reset();
 	HtmlCache.Reset();
 	SizeCache.Reset();
 }
 
-const char *GMail3Mail::InferCharset()
+const char *LMail3Mail::InferCharset()
 {
 	if (!InferredCharset)
 	{
@@ -1053,7 +1053,7 @@ const char *GMail3Mail::InferCharset()
 	return InferredCharset;
 }
 
-bool GMail3Mail::Utf8Check(LAutoString &v)
+bool LMail3Mail::Utf8Check(LAutoString &v)
 {
 	if (!LIsUtf8(v.Get()))
 	{
@@ -1072,7 +1072,7 @@ bool GMail3Mail::Utf8Check(LAutoString &v)
 	return false;
 }
 
-bool GMail3Mail::Utf8Check(LVariant &v)
+bool LMail3Mail::Utf8Check(LVariant &v)
 {
 	if (!LIsUtf8(v.Str()))
 	{
@@ -1091,7 +1091,7 @@ bool GMail3Mail::Utf8Check(LVariant &v)
 	return false;
 }
 
-bool GMail3Mail::ParseHeaders()
+bool LMail3Mail::ParseHeaders()
 {
 	// Reload from headers...
 	auto InetHdrs = GetStr(FIELD_INTERNET_HEADER);
@@ -1135,7 +1135,7 @@ bool GMail3Mail::ParseHeaders()
 	return true;
 }
 
-Store3Status GMail3Mail::SetStr(int id, const char *str)
+Store3Status LMail3Mail::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -1146,7 +1146,7 @@ Store3Status GMail3Mail::SetStr(int id, const char *str)
 		case FIELD_TEXT:
 		{
 			TextCache.Reset();
-			LArray<GMail3Attachment*> Results;
+			LArray<LMail3Attachment*> Results;
 			if (FindSegs("text/plain", Results, str != 0))
 			{
 				for (unsigned i=0; i<Results.Length(); i++)
@@ -1163,7 +1163,7 @@ Store3Status GMail3Mail::SetStr(int id, const char *str)
 		}
 		case FIELD_CHARSET:
 		{
-			LArray<GMail3Attachment*> Results;
+			LArray<LMail3Attachment*> Results;
 			if (FindSegs("text/plain", Results, str != 0))
 			{
 				for (unsigned i=0; i<Results.Length(); i++)
@@ -1180,7 +1180,7 @@ Store3Status GMail3Mail::SetStr(int id, const char *str)
 		case FIELD_ALTERNATE_HTML:
 		{
 			HtmlCache.Reset();
-			LArray<GMail3Attachment*> Results;
+			LArray<LMail3Attachment*> Results;
 			if (FindSegs("text/html", Results, str != 0))
 			{
 				for (unsigned i=0; i<Results.Length(); i++)
@@ -1206,7 +1206,7 @@ Store3Status GMail3Mail::SetStr(int id, const char *str)
 		}
 		case FIELD_HTML_CHARSET:
 		{
-			LArray<GMail3Attachment*> Results;
+			LArray<LMail3Attachment*> Results;
 			if (FindSegs("text/html", Results, str != 0))
 			{
 				const char *Charset = str && *str == '>' ? str + 1 : str;
@@ -1235,7 +1235,7 @@ Store3Status GMail3Mail::SetStr(int id, const char *str)
 			{
 				// This happens when the user re-sends an email and it creates
 				// a new empty email to copy the old sent email into.
-				GMail3Attachment *a = new GMail3Attachment(Store);
+				LMail3Attachment *a = new LMail3Attachment(Store);
 				if (!a)
 				{
 					LAssert(0);
@@ -1278,7 +1278,7 @@ Store3Status GMail3Mail::SetStr(int id, const char *str)
 	return Store3Success;
 }
 
-int64 GMail3Mail::GetInt(int id)
+int64 LMail3Mail::GetInt(int id)
 {
 	switch (id)
 	{
@@ -1306,7 +1306,7 @@ int64 GMail3Mail::GetInt(int id)
 	return -1;
 }
 
-Store3Status GMail3Mail::SetInt(int id, int64 i)
+Store3Status LMail3Mail::SetInt(int id, int64 i)
 {
 	switch (id)
 	{
@@ -1330,7 +1330,7 @@ Store3Status GMail3Mail::SetInt(int id, int64 i)
 	return Store3NotImpl;
 }
 
-const LDateTime *GMail3Mail::GetDate(int id)
+const LDateTime *LMail3Mail::GetDate(int id)
 {
 	switch (id)
 	{
@@ -1344,7 +1344,7 @@ const LDateTime *GMail3Mail::GetDate(int id)
 	return 0;
 }
 
-Store3Status GMail3Mail::SetDate(int id, const LDateTime *t)
+Store3Status LMail3Mail::SetDate(int id, const LDateTime *t)
 {
 	switch (id)
 	{
@@ -1366,7 +1366,7 @@ Store3Status GMail3Mail::SetDate(int id, const LDateTime *t)
 	return Store3NotImpl;
 }
 
-LDataPropI *GMail3Mail::GetObj(int id)
+LDataPropI *LMail3Mail::GetObj(int id)
 {
 	switch (id)
 	{
@@ -1381,7 +1381,7 @@ LDataPropI *GMail3Mail::GetObj(int id)
 			/* This causes replies to have the wrong format for "text/plain"
 			if (!Seg)
 			{
-				GMail3Attachment *a = new GMail3Attachment(Store);
+				LMail3Attachment *a = new LMail3Attachment(Store);
 				if (a)
 				{
 					a->SetStr(FIELD_MIME_TYPE, sMultipartMixed);
@@ -1398,7 +1398,7 @@ LDataPropI *GMail3Mail::GetObj(int id)
 	return 0;
 }
 
-Store3Status GMail3Mail::SetObj(int id, LDataPropI *i)
+Store3Status LMail3Mail::SetObj(int id, LDataPropI *i)
 {
 	switch (id)
 	{
@@ -1410,7 +1410,7 @@ Store3Status GMail3Mail::SetObj(int id, LDataPropI *i)
 				Seg = NULL;
 			}
 			
-			GMail3Attachment *a = dynamic_cast<GMail3Attachment*>(i);
+			LMail3Attachment *a = dynamic_cast<LMail3Attachment*>(i);
 			if (!a)
 			{
 				LAssert(!"Incorrect object...");
@@ -1423,12 +1423,12 @@ Store3Status GMail3Mail::SetObj(int id, LDataPropI *i)
 		}
 		case FIELD_HTML_RELATED:
 		{
-			GMail3Attachment *a = i ? dynamic_cast<GMail3Attachment*>(i) : NULL;
+			LMail3Attachment *a = i ? dynamic_cast<LMail3Attachment*>(i) : NULL;
 			
 			LoadSegs();
 			if (Seg)
 			{
-				Store3MimeTree<GMail3Store, GMail3Mail, GMail3Attachment> Tree(this, Seg);
+				Store3MimeTree<LMail3Store, LMail3Mail, LMail3Attachment> Tree(this, Seg);
 				
 				if (a)
 					Tree.MsgHtmlRelated.Add(a);
@@ -1451,7 +1451,7 @@ Store3Status GMail3Mail::SetObj(int id, LDataPropI *i)
 	return Store3Success;
 }
 
-GDataIt GMail3Mail::GetList(int id)
+GDataIt LMail3Mail::GetList(int id)
 {
 	switch (id)
 	{
@@ -1554,7 +1554,7 @@ public:
 	LStreamI *Clone() { return new LSubStream(s, Start, Len); }
 };
 
-Store3Status GMail3Mail::SetRfc822(LStreamI *m)
+Store3Status LMail3Mail::SetRfc822(LStreamI *m)
 {
 	Store3Status Status = Store3Error;
 
@@ -1573,7 +1573,7 @@ Store3Status GMail3Mail::SetRfc822(LStreamI *m)
 		{
 			char s[256];
 			sprintf_s(s, sizeof(s), "delete from %s where MailId=" LPrintfInt64, MAIL3_TBL_MAILSEGS, Id);
-			GMail3Store::GStatement Del(Store, s);
+			LMail3Store::LStatement Del(Store, s);
 			if (!Del.Exec())
 				return Store3Error;
 		}
@@ -1615,7 +1615,7 @@ Store3Status GMail3Mail::SetRfc822(LStreamI *m)
 			}
 		}
 
-		GMail3Store::GInsert Ins(Store, MAIL3_TBL_MAILSEGS);
+		LMail3Store::LInsert Ins(Store, MAIL3_TBL_MAILSEGS);
 		MailSize = 0;
 
 		LMime Mime;

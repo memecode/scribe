@@ -53,7 +53,7 @@
 	_Macro(RecurEnd, FIELD_CAL_RECUR_END_DATE)
 
 //////////////////////////////////////////////////////////////////////
-CalendarData::CalendarData(GMail2Store *s) : ThingData(s)
+CalendarData::CalendarData(LMail2Store *s) : ThingData(s)
 {
 	CalType = CAL_EVENT;
 	Completed = false;

@@ -128,14 +128,14 @@ int MakeOpenFlags(ScribeAccount *a, bool Send)
 }
 
 /*
-class GProtocolLogger : public LStreamI
+class LProtocolLogger : public LStreamI
 {
 	LViewI *Wnd;
 	int Msg;
 	List<LogEntry> *Log;
 
 public:
-	GProtocolLogger(LViewI *wnd, int msg, List<LogEntry> *log)
+	LProtocolLogger(LViewI *wnd, int msg, List<LogEntry> *log)
 	{
 		Wnd = wnd;
 		Msg = msg;
@@ -1013,7 +1013,7 @@ void SendAccountlet::Main(AccountletThread *Thread)
 
 		{
 			MailSink *Sink;
-			// GProtocolLogger Logger(GetApp(), M_SCRIBE_LOG_MSG, &Log);
+			// LProtocolLogger Logger(GetApp(), M_SCRIBE_LOG_MSG, &Log);
 
 			LVariant SendHotFolder = HotFolder();
 			if (SendHotFolder.Str() && LDirExists(SendHotFolder.Str()))
@@ -1491,7 +1491,7 @@ int ReceiveAccountlet::GetCheckTimeout()
 	LVariant Timeout = CheckTimeout();
 	if (Timeout.Str())
 	{
-		GToken t(Timeout.Str(), ":");
+		LToken t(Timeout.Str(), ":");
 		if (t.Length() == 2)
 		{
 			Sec = (atoi(t[0]) * 60) + atoi(t[1]);
@@ -1852,7 +1852,7 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 	LXmlTag *Limits = LAppInst->GetConfig("Scribe-Limits");
 	if (Limits)
 	{
-		GMailStore *Ms = GetApp()->GetDefaultMailStore();
+		LMailStore *Ms = GetApp()->GetDefaultMailStore();
 		if (Ms)
 		{
 	        #ifdef _MSC_VER
@@ -1939,7 +1939,7 @@ if (DebugTrace) LgiTrace("Receive(%i) protocol=%i client=%p, time=%i\n", Account
 		}
 	
 		// Setup logging
-		// GProtocolLogger Logger(GetApp(), M_SCRIBE_LOG_MSG, &Log);
+		// LProtocolLogger Logger(GetApp(), M_SCRIBE_LOG_MSG, &Log);
 		Source->Logger = this;
 		Source->Items = &Group;
 		Source->Transfer = &Item;
@@ -2831,7 +2831,7 @@ bool MsgList::GetDate(char *id, LDateTime *dt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-GMimeStream::GMimeStream() : LTempStream(ScribeTempPath(), 4 << 20)
+LMimeStream::LMimeStream() : LTempStream(ScribeTempPath(), 4 << 20)
 {
 }
 
@@ -2841,7 +2841,7 @@ GMimeStream::GMimeStream() : LTempStream(ScribeTempPath(), 4 << 20)
 #define DEBUG_MIME_STREAM	0
 #endif
 
-bool GMimeStream::Parse()
+bool LMimeStream::Parse()
 {
 	if (Tmp)
 		Tmp->SetPos(0);

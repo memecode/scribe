@@ -360,7 +360,7 @@ void IsSoftwareUpToDate(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bo
 			{
 				auto LocalVer = LString(ScribeVer).SplitDelimit(".");
 				LString BuildVer = ExtractVer(Info.Build);
-				GToken OnlineVer(BuildVer, ".");
+				LToken OnlineVer(BuildVer, ".");
 				if (OnlineVer.Length() != LocalVer.Length())
 				{
 					LgiTrace("%s:%i - Invalid online version number \"%s\"\n", _FL, Info.Version.Get());
@@ -389,7 +389,7 @@ void IsSoftwareUpToDate(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bo
 				}
 
 				LDateTime Compile;
-				GToken Date(__DATE__, " ");
+				LToken Date(__DATE__, " ");
 				Compile.Month(LDateTime::MonthFromName(Date[0]));
 				Compile.Day(atoi(Date[1]));
 				Compile.Year(atoi(Date[2]));
@@ -783,7 +783,7 @@ public:
 };
 
 class ScribeWndPrivate :
-	public GBrowser::GBrowserEvents,
+	public LBrowser::LBrowserEvents,
 	public LVmDebuggerCallback,
 	public LHtmlStaticInst
 {
@@ -991,17 +991,17 @@ public:
 
 	bool CompileScript(LAutoPtr<LCompiledCode> &Output, const char *FileName, const char *Source)
 	{
-		GCompiler c;
+		LCompiler c;
 		return c.Compile(Output, Engine->GetSystemContext(), LScribeScript::Inst, FileName, Source, NULL);
 	}
 
-	bool OnSearch(GBrowser *br, const char *txt)
+	bool OnSearch(LBrowser *br, const char *txt)
 	{
 		char Path[256];
 		if (!App->GetHelpFilesPath(Path, sizeof(Path)))
 			return false;
 
-		GToken Terms(txt, ", ");
+		LToken Terms(txt, ", ");
 
 		LStringPipe p;
 		p.Print("<html>\n<body><h1>Search Results</h1>\n<ul>\n");
@@ -2359,7 +2359,7 @@ void ScribeWnd::OnCreate()
 							LScribeScript::Inst->GetLog()->Write(Msg,
 								sprintf_s(Msg, sizeof(Msg), "Compiling '%s'...\n", Dir.GetName()));
 
-							GCompiler c;
+							LCompiler c;
 							if (c.Compile(	Cur->Code,
 											d->Engine->GetSystemContext(),
 											LScribeScript::Inst,
@@ -4789,9 +4789,9 @@ bool ScribeWnd::OnFolderTask(LEventTargetI *Ptr, bool Add)
 	}
 }
 
-GMailStore *ScribeWnd::GetDefaultMailStore()
+LMailStore *ScribeWnd::GetDefaultMailStore()
 {
-	GMailStore *Def = 0;
+	LMailStore *Def = 0;
 
 	for (unsigned i=0; i<Folders.Length(); i++)
 	{
@@ -8110,7 +8110,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 							if (!Spam)
 							{
 							
-								GMailStore *RelevantStore = GetMailStoreForPath(SpamPath.Str());
+								LMailStore *RelevantStore = GetMailStoreForPath(SpamPath.Str());
 								if (RelevantStore)
 								{
 									LString p = SpamPath.Str();
@@ -8575,7 +8575,7 @@ bool ScribeWnd::CreateFolders(LAutoString &FileName)
 	return Status;
 }
 
-bool ScribeWnd::CompactFolders(GMailStore &Store, bool Interactive)
+bool ScribeWnd::CompactFolders(LMailStore &Store, bool Interactive)
 {
 	if (!Store.Store)
 		return false;
@@ -8737,7 +8737,7 @@ bool ScribeWnd::GetSystemPath(int Folder, LVariant &Path)
 	return GetOptions()->GetValue(KeyName, Path);
 }
 
-GMailStore *ScribeWnd::GetMailStoreForIdentity(const char *IdEmail)
+LMailStore *ScribeWnd::GetMailStoreForIdentity(const char *IdEmail)
 {
 	LVariant Tmp;
 	if (!IdEmail)
@@ -8786,7 +8786,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LDataI *s)
 	return GetFolder(Id);
 }
 
-ScribeFolder *ScribeWnd::GetFolder(int Id, GMailStore *Store, bool Quiet)
+ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 {
 	char KeyName[64];
 	sprintf_s(KeyName, sizeof(KeyName), "Folder-%i", Id);
@@ -8847,7 +8847,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, GMailStore *Store, bool Quiet)
 	return NULL;
 }
 
-bool ScribeWnd::OnMailStore(GMailStore **MailStore, bool Add)
+bool ScribeWnd::OnMailStore(LMailStore **MailStore, bool Add)
 {
 	if (!MailStore)
 	{
@@ -8879,12 +8879,12 @@ bool ScribeWnd::OnMailStore(GMailStore **MailStore, bool Add)
 	return false;
 }
 
-GMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
+LMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 {
 	if (!Path)
 		return NULL;
 
-	GToken t(Path, "/");
+	LToken t(Path, "/");
 	if (t.Length() > 0)
 	{
 		const char *First = t[0];
@@ -8906,7 +8906,7 @@ GMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 	return NULL;
 }
 
-ScribeFolder *ScribeWnd::GetFolder(const char *Name, GMailStore *s)
+ScribeFolder *ScribeWnd::GetFolder(const char *Name, LMailStore *s)
 {
 	ScribeFolder *Folder = 0;
 
@@ -8914,7 +8914,7 @@ ScribeFolder *ScribeWnd::GetFolder(const char *Name, GMailStore *s)
 	{
 		LString Sep("/");
 		auto t = LString(Name).Split(Sep);
-		GMailStore tmp;
+		LMailStore tmp;
 		LString TmpName;
 
 		if (t.Length() > 0)
@@ -9179,7 +9179,7 @@ bool ScribeWnd::GetContacts(List<Contact> &Contacts, ScribeFolder *Folder, bool 
 	This function goes through the database and checks for some
 	basic requirements and fixes things up if they aren't ok.
 */
-bool ScribeWnd::ValidateFolder(GMailStore *s, int Id)
+bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 {
 	char OptName[32];
 	sprintf_s(OptName, sizeof(OptName), "Folder-%i", Id);
@@ -9204,7 +9204,7 @@ bool ScribeWnd::ValidateFolder(GMailStore *s, int Id)
 		}
 		else
 		{
-			GMailStore *ms = GetMailStoreForPath(Path.Str());
+			LMailStore *ms = GetMailStoreForPath(Path.Str());
 			if (ms)
 			{
 				s = ms;
@@ -9237,7 +9237,7 @@ bool ScribeWnd::ValidateFolder(GMailStore *s, int Id)
 	return true;
 }
 
-void ScribeWnd::Validate(GMailStore *s)
+void ScribeWnd::Validate(LMailStore *s)
 {
 	// Check for all the basic folders
 
@@ -10887,7 +10887,7 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 						char *File = LReadTextFile(FileName);
 						if (File)
 						{
-							GToken Lines(File, "\r\n");
+							LToken Lines(File, "\r\n");
 							DeleteArray(File);
 							char *RandomLine = Lines[LRand((unsigned)Lines.Length())];
 							if (RandomLine)
@@ -11405,7 +11405,7 @@ bool ScribeWnd::LaunchHelp(const char *File)
 	if (File)
 	{
 		char *Hash = 0;
-		GBrowser *Browse = 0;
+		LBrowser *Browse = 0;
 		
 		// Find help files...
 		char Path[MAX_PATH_LEN];
@@ -11430,7 +11430,7 @@ bool ScribeWnd::LaunchHelp(const char *File)
 
 		#if USE_INTERNAL_BROWSER
 
-		Browse = new GBrowser(this, "Help");
+		Browse = new LBrowser(this, "Help");
 		if (Browse)
 		{
 			Browse->SetEvents(d);

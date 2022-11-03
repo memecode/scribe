@@ -16,10 +16,10 @@ bool ImportEudoraAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 			char *Alias = 0;
 			char *Address = 0;
 
-			GToken L(Text, "\r\n");
+			LToken L(Text, "\r\n");
 			for (unsigned i=0; i<L.Length(); i++)
 			{
-				GToken S(L[i], " ");
+				LToken S(L[i], " ");
 				if (S.Length() > 2)
 				{
 					if (_stricmp(S[0], "alias") == 0)

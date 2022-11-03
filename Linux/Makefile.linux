@@ -487,6 +487,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/include/lgi/common/List.h \
 	../../../lgi/trunk/include/lgi/common/ListItemCheckBox.h \
 	../../../lgi/trunk/include/lgi/common/ListItemRadioBtn.h \
+	../../../lgi/trunk/include/lgi/common/LMallocArray.h \
 	../../../lgi/trunk/include/lgi/common/Mail.h \
 	../../../lgi/trunk/include/lgi/common/Matrix.h \
 	../../../lgi/trunk/include/lgi/common/Mem.h \

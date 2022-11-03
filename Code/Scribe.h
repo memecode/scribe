@@ -61,7 +61,7 @@ struct ItemFieldDef
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Classes
 class MailTree;
-class GMailStore;
+class LMailStore;
 class ScribeWnd;
 class Thing;
 class Mail;
@@ -1490,10 +1490,10 @@ public:
 	}
 };
 
-class GMimeStream : public LTempStream, public LScribeMime
+class LMimeStream : public LTempStream, public LScribeMime
 {
 public:
-	GMimeStream();
+	LMimeStream();
 	bool Parse();
 };
 
@@ -1609,7 +1609,7 @@ protected:
 	// Pointers
 	ScribeFolder *Root;
 	LDataStoreI *DataStore;
-	GMailStore *MailStore; // this memory is owned by ScribeWnd
+	LMailStore *MailStore; // this memory is owned by ScribeWnd
 
 	// Options
 	const char *OptPassword;
@@ -1681,7 +1681,7 @@ public:
 	char *OptionName(const char *Opt, char *Dest, int DestLen);
 	void Delete();
 	LThread *GetThread() { return Thread; }
-	GMailStore *GetMailStore() { return MailStore; }
+	LMailStore *GetMailStore() { return MailStore; }
 	LDataStoreI *GetDataStore() { return DataStore; }
 
 	// General options
@@ -2037,7 +2037,7 @@ public:
 #include "BayesianFilter.h"
 #include "Components.h"
 
-class GMailStore
+class LMailStore
 {
 public:
 	bool Default, Expanded;
@@ -2046,7 +2046,7 @@ public:
 	LDataStoreI *Store;
 	ScribeFolder *Root;
 
-	GMailStore()
+	LMailStore()
 	{
 		Expanded = true;
 		Default = false;
@@ -2066,7 +2066,7 @@ public:
 		return Ver;
 	}
 
-	GMailStore &operator =(GMailStore &a)
+	LMailStore &operator =(LMailStore &a)
 	{
 		LAssert(0);
 		return *this;
@@ -2160,7 +2160,7 @@ public:
 protected:
 	class ScribeWndPrivate *d = NULL;
 
-	GTrayIcon		TrayIcon;
+	LTrayIcon		TrayIcon;
 	
 	// Ipc
 	LSharedMemory	*ScribeIpc = NULL;
@@ -2171,7 +2171,7 @@ protected:
 	List<ScribeAccount> Accounts;
 
 	// New Mail stuff
-	class GNewMailDlg *NewMailDlg = NULL;
+	class LNewMailDlg *NewMailDlg = NULL;
 
 	static AppState ScribeState;
 	DoEvery			Ticker;
@@ -2199,7 +2199,7 @@ protected:
 	LCommand		CmdPreview;
 
 	// Storage
-	LArray<GMailStore> Folders;
+	LArray<LMailStore> Folders;
 	LArray<LEventTargetI*> FolderTasks;
 	
 	List<ScribeFolder> PostValidateFree;
@@ -2231,7 +2231,7 @@ protected:
 	void			AddContactsToMenu(LSubMenu *Menu);
 	bool			FindWordDb(char *Out, int OutSize, char *Name);
 	void			OnFolderChanged(LDataFolderI *folder);
-	bool			ValidateFolder(GMailStore *s, int Id);
+	bool			ValidateFolder(LMailStore *s, int Id);
     void            GrowlOnMail(Mail *m);
 	void			GrowlInfo(LString title, LString text);
 	bool			OnTransfer();
@@ -2247,7 +2247,7 @@ public:
 	static bool IsUnitTest;
 	const char *GetClass() override { return "ScribeWnd"; }
 	void DoDebug(char *s);
-	void Validate(GMailStore *s);
+	void Validate(LMailStore *s);
 
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
@@ -2261,7 +2261,7 @@ public:
 	Mail			*CreateMail(Contact *c = 0, const char *Email = 0, const char *Name = 0);
 	Mail			*LookupMailRef(const char *MsgRef, bool TraceAllUids = false);
 	bool			CreateFolders(LAutoString &FileName);
-	bool			CompactFolders(GMailStore &Store, bool Interactive = true);
+	bool			CompactFolders(LMailStore &Store, bool Interactive = true);
 	void			Send(int Which = -1, bool Quiet = false);
 	void			Receive(int Which);
 	void			Preview(int Which);
@@ -2324,15 +2324,15 @@ public:
 	ThingList		*GetMailList() { return MailList; }
 	
 	// Gets the matching mail store for a given identity
-	GMailStore		*GetMailStoreForIdentity
+	LMailStore		*GetMailStoreForIdentity
 	(
 		/// If this is NULL, assume the current identity
 		const char *IdEmail = NULL
 	);
 	
-	ScribeFolder	*GetFolder(int Id, GMailStore *s = NULL, bool Quiet = false);
+	ScribeFolder	*GetFolder(int Id, LMailStore *s = NULL, bool Quiet = false);
 	ScribeFolder	*GetFolder(int Id, LDataI *s);
-	ScribeFolder	*GetFolder(const char *Name, GMailStore *s = NULL);
+	ScribeFolder	*GetFolder(const char *Name, LMailStore *s = NULL);
 	
 	ScribeFolder	*GetCurrentFolder();
 	int				GetFolderType(ScribeFolder *f);
@@ -2351,10 +2351,10 @@ public:
 	int				GetToolbarHeight();
 	void			GetFilters(List<Filter> &Filters, bool JustIn, bool JustOut, bool JustInternal);
 	bool			OnFolderTask(LEventTargetI *Ptr, bool Add);
-	LArray<GMailStore> &GetStorageFolders() { return Folders; }
-	GMailStore		*GetDefaultMailStore();
-	GMailStore		*GetMailStoreForPath(const char *Path);
-	bool			OnMailStore(GMailStore **MailStore, bool Add);
+	LArray<LMailStore> &GetStorageFolders() { return Folders; }
+	LMailStore		*GetDefaultMailStore();
+	LMailStore		*GetMailStoreForPath(const char *Path);
+	bool			OnMailStore(LMailStore **MailStore, bool Add);
 	ThingList		*GetItemList() { return MailList; }
 	LColour			GetColour(int i);
 	LMutex			*GetLock();

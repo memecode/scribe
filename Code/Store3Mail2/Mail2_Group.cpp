@@ -1,7 +1,7 @@
 #include "Store3Mail2.h"
 
 //////////////////////////////////////////////////////////////////////
-GroupData::GroupData(GMail2Store *s) : ThingData(s)
+GroupData::GroupData(LMail2Store *s) : ThingData(s)
 {
 	Flags = 0;
 	Name = 0;

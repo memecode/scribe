@@ -6,7 +6,7 @@
 #define OLD_FIELD_SORT				1003
 
 //////////////////////////////////////////////////////////////////////
-FolderData::FolderData(GMail2Store *store)
+FolderData::FolderData(LMail2Store *store)
 {
 	Debug = false;
 	Kit = store;

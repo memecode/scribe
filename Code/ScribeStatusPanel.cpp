@@ -393,7 +393,7 @@ AccountStatusPanel::~AccountStatusPanel()
 
 void AccountStatusPanel::OnPosChange()
 {
-	GLayoutRect c(this);
+	LLayoutRect c(this);
 	if (Open() && c.Valid())
 	{
 		c.x1 += 20;

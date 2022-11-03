@@ -365,7 +365,7 @@ void ManageMailStores::OnItemSelect()
 	SetCtrlEnabled(IDC_REPAIR_MS, true);
 }
 
-GMailStore *ManageMailStores::GetCurrentMailStore()
+LMailStore *ManageMailStores::GetCurrentMailStore()
 {
 	LListItem *s = Lst->GetSelected();
 	if (s)
@@ -374,7 +374,7 @@ GMailStore *ManageMailStores::GetCurrentMailStore()
 
 		for (unsigned i=0; i<App->GetStorageFolders().Length(); i++)
 		{
-			GMailStore &s = App->GetStorageFolders()[i];
+			LMailStore &s = App->GetStorageFolders()[i];
 
 			if (s.Path && !_stricmp(s.Path, p.Str()))
 			{
@@ -493,7 +493,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDC_COMPACT_MS:
 		{
-			GMailStore *ms = GetCurrentMailStore();
+			LMailStore *ms = GetCurrentMailStore();
 			if (ms)
 			{
 				App->CompactFolders(*ms);
@@ -506,7 +506,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDC_CONVERT_MS:
 		{
-			GMailStore *ms = GetCurrentMailStore();
+			LMailStore *ms = GetCurrentMailStore();
 			if (ms)
 			{
 				FmtDlg Dlg(this, (int)ms->Store->GetInt(FIELD_FORMAT));
@@ -524,7 +524,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDC_REPAIR_MS:
 		{
-			GMailStore *ms = GetCurrentMailStore();
+			LMailStore *ms = GetCurrentMailStore();
 			if (ms)
 			{
 				Store3Progress Prog(App, true);

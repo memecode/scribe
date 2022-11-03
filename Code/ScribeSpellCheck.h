@@ -15,7 +15,7 @@ public:
 	SpellErrorStyle(LString word);
 	~SpellErrorStyle();
 
-	bool OnMenu(GSubMenu *m);
+	bool OnMenu(LSubMenu *m);
 	void OnMenuClick(int i);
 };
 

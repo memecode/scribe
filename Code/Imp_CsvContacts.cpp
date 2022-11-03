@@ -6,14 +6,14 @@
 #include "lgi/common/FileSelect.h"
 
 //////////////////////////////////////////////////////////////////////////
-class GFieldMap : public LListItem
+class LFieldMap : public LListItem
 {
 	LDbField &From;
 	ItemFieldDef *To;
 	LString Txt;
 
 public:
-	GFieldMap(LDbField &from) : From(from)
+	LFieldMap(LDbField &from) : From(from)
 	{
 		To = 0;
 
@@ -122,17 +122,17 @@ public:
 	}
 };
 
-class GImpCsv : public LDialog
+class LImpCsv : public LDialog
 {
 	ScribeWnd *App;
 	LList *Map;
 
 public:
-	List<GFieldMap> Mapping;
+	List<LFieldMap> Mapping;
 	ScribeFolder *Folder;
 	bool Merge;
 
-	GImpCsv(ScribeWnd *app, LDbRecordset *Rs)
+	LImpCsv(ScribeWnd *app, LDbRecordset *Rs)
 	{
 		Folder = 0;
 		Map = 0;
@@ -148,7 +148,7 @@ public:
 				for (int i=0; i<Rs->Fields(); i++)
 				{
 					LDbField &Fld = (*Rs)[i];
-					GFieldMap *m = new GFieldMap(Fld);
+					LFieldMap *m = new LFieldMap(Fld);
 					if (m)
 					{
 						Mapping.Insert(m);
@@ -179,7 +179,7 @@ public:
 			LXmlTag Root;
 			Root.SetTag("field-map");
 
-			List<GFieldMap> All;
+			List<LFieldMap> All;
 			Map->GetAll(All);
 			for (auto i: All)
 			{
@@ -217,7 +217,7 @@ public:
 
 			if (Xml.Read(&Root, &f, 0))
 			{
-				List<GFieldMap> All;
+				List<LFieldMap> All;
 				Map->GetAll(All);
 				for (auto i: All)
 				{
@@ -325,13 +325,13 @@ void ImportCsv(ScribeWnd *App)
 	s.Type("All Files", LGI_ALL_FILES);
 	if (s.Open() && LFileExists(s.Name()))
 	{
-		GDb *Db = OpenCsvDatabase(s.Name());
+		LDb *Db = OpenCsvDatabase(s.Name());
 		if (Db)
 		{
 			LDbRecordset *Rs = Db->TableAt(0);
 			if (Rs)
 			{
-				GImpCsv Dlg(App, Rs);
+				LImpCsv Dlg(App, Rs);
 				if (Dlg.DoModal())
 				{
 					if (Dlg.Folder)
@@ -417,7 +417,7 @@ void ImportCsv(ScribeWnd *App)
 	}
 }
 
-class GExportCsv : public LDialog
+class LExportCsv : public LDialog
 {
 	ScribeWnd *App;
 
@@ -425,7 +425,7 @@ public:
 	char *Folder;
 	bool SubFolders;
 
-	GExportCsv(ScribeWnd *app)
+	LExportCsv(ScribeWnd *app)
 	{
 		Folder = 0;
 		SubFolders = false;
@@ -449,7 +449,7 @@ public:
 		}
 	}
 
-	~GExportCsv()
+	~LExportCsv()
 	{
 		DeleteArray(Folder);
 	}
@@ -489,7 +489,7 @@ public:
 
 void ExportCsv(ScribeWnd *App)
 {
-	GExportCsv Dlg(App);
+	LExportCsv Dlg(App);
 	if (Dlg.DoModal())
 	{
 		ScribeFolder *Folder = App->GetFolder(Dlg.Folder);
@@ -511,7 +511,7 @@ void ExportCsv(ScribeWnd *App)
 					if (Exists)
 						FileDev->Delete(s.Name());
 
-					GDb *Db = OpenCsvDatabase(s.Name());
+					LDb *Db = OpenCsvDatabase(s.Name());
 					LAssert(Db != NULL);
 					if (Db)
 					{

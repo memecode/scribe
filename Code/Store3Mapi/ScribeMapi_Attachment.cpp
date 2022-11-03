@@ -3,14 +3,14 @@
 #include "ScribeMapi.h"
 #include "lgi/common/Com.h"
 
-GMapiAttachment::GMapiAttachment(GMapiStore *store) : Store3Attachment(store)
+LMapiAttachment::LMapiAttachment(LMapiStore *store) : Store3Attachment(store)
 {
 	MapiAttach = NULL;
 	AttachNum = -1;
 	DataSize = 0;
 }
 
-GMapiAttachment::~GMapiAttachment()
+LMapiAttachment::~LMapiAttachment()
 {
 	if (MapiAttach)
 	{
@@ -19,7 +19,7 @@ GMapiAttachment::~GMapiAttachment()
 	}
 }
 
-LPATTACH GMapiAttachment::Handle()
+LPATTACH LMapiAttachment::Handle()
 {
 	if (!MapiAttach &&
 		Mail &&
@@ -34,7 +34,7 @@ LPATTACH GMapiAttachment::Handle()
 	return MapiAttach;
 }
 
-bool GMapiAttachment::Set(GMapiMail *mail, ScribeMapiList *Lst)
+bool LMapiAttachment::Set(LMapiMail *mail, ScribeMapiList *Lst)
 {
 	SetMail(mail);
 	
@@ -60,7 +60,7 @@ bool GMapiAttachment::Set(GMapiMail *mail, ScribeMapiList *Lst)
 	return true;
 }
 
-bool GMapiAttachment::Set(const char *content, const char *charset, const char *mimeType)
+bool LMapiAttachment::Set(const char *content, const char *charset, const char *mimeType)
 {
 	Literal = content;
 	Charset = charset;
@@ -69,13 +69,13 @@ bool GMapiAttachment::Set(const char *content, const char *charset, const char *
 	return true;
 }
 
-Store3CopyImpl(GMapiAttachment)
+Store3CopyImpl(LMapiAttachment)
 {
 	LAssert(0);
 	return false;
 }
 
-const char *GMapiAttachment::GetStr(int id)
+const char *LMapiAttachment::GetStr(int id)
 {
 	switch (id)
 	{
@@ -97,7 +97,7 @@ const char *GMapiAttachment::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMapiAttachment::SetStr(int id, const char *str)
+Store3Status LMapiAttachment::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -124,7 +124,7 @@ Store3Status GMapiAttachment::SetStr(int id, const char *str)
 	return Store3Success;
 }
 
-int64 GMapiAttachment::GetInt(int id)
+int64 LMapiAttachment::GetInt(int id)
 {
 	switch (id)
 	{
@@ -140,7 +140,7 @@ int64 GMapiAttachment::GetInt(int id)
 	return -1;
 }
 
-Store3Status GMapiAttachment::SetInt(int id, int64 i)
+Store3Status LMapiAttachment::SetInt(int id, int64 i)
 {
 	switch (id)
 	{
@@ -155,40 +155,40 @@ Store3Status GMapiAttachment::SetInt(int id, int64 i)
 	return Store3Success;
 }
 
-uint32_t GMapiAttachment::Type()
+uint32_t LMapiAttachment::Type()
 {
 	return MAGIC_ATTACHMENT;
 }
 
-bool GMapiAttachment::IsOnDisk()
+bool LMapiAttachment::IsOnDisk()
 {
 	return Mail != NULL;
 }
 
-bool GMapiAttachment::IsOrphan()
+bool LMapiAttachment::IsOrphan()
 {
 	return Mail == NULL;
 }
 
-uint64 GMapiAttachment::Size()
+uint64 LMapiAttachment::Size()
 {
 	LAssert(0);
 	return 0;
 }
 
-Store3Status GMapiAttachment::Save(LDataI *Parent)
+Store3Status LMapiAttachment::Save(LDataI *Parent)
 {
 	LAssert(0);
 	return Store3Error;
 }
 
-Store3Status GMapiAttachment::Delete(bool ToTrash)
+Store3Status LMapiAttachment::Delete(bool ToTrash)
 {
 	LAssert(0);
 	return Store3Error;
 }
 
-LAutoStreamI GMapiAttachment::GetStream(const char *file, int line)
+LAutoStreamI LMapiAttachment::GetStream(const char *file, int line)
 {
 	LAutoStreamI s;
 	
@@ -237,7 +237,7 @@ LAutoStreamI GMapiAttachment::GetStream(const char *file, int line)
 	return s;
 }
 
-void GMapiAttachment::OnSave()
+void LMapiAttachment::OnSave()
 {
 }
 

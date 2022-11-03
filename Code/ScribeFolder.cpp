@@ -28,7 +28,7 @@
 #include "lgi/common/Com.h"
 #endif
 
-class GDndFilePromise
+class LDndFilePromise
 	#if defined(WINDOWS)
 	#elif defined(__GTK_H__)
 	#elif defined(MAC)
@@ -42,7 +42,7 @@ class GDndFilePromise
 	#endif
 	
 public:
-	GDndFilePromise(LDragData &dd, LStream *src, LString FileName)
+	LDndFilePromise(LDragData &dd, LStream *src, LString FileName)
 	{
 		Src = src;
 		
@@ -111,7 +111,7 @@ public:
 		#endif
 	}
 	
-	~GDndFilePromise()
+	~LDndFilePromise()
 	{
 		#if defined(WINDOWS)
 		#elif defined(__GTK_H__)
@@ -145,7 +145,7 @@ public:
 	bool InUpdateUnread = false;
 	LAutoPtr<LDisplayString> DsBase;
 	LAutoPtr<LDisplayString> DsUnread;
-	LAutoPtr<GDndFilePromise> FilePromise;
+	LAutoPtr<LDndFilePromise> FilePromise;
 
 	ThingContainerPriv()
 	{
@@ -3399,7 +3399,7 @@ void ScribeFolder::OnReceiveFiles(LArray<const char*> &Files)
 			// printf("[%i]=%s %s\n", i, File, MimeType.Get());
 
 			// Import the file...
-			GTextFile f;
+			LTextFile f;
 			if (f.Open(File, O_READ))
 			{
 				Import(f, MimeType);
@@ -3434,7 +3434,7 @@ class MboxParser : public LStringPipe
 			return false;
 
 		// check that it's a from line
-		GToken T(c, " \r", true);
+		LToken T(c, " \r", true);
 		if (T.Length() >= 7 &&
 			T.Length() <= 9 &&
 			!strcmp(T[0], "From"))

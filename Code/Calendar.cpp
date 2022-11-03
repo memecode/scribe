@@ -907,7 +907,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 
 				if (Show && ValidStr(FilterYear))
 				{
-					GToken t(FilterYear, " ,;:");
+					LToken t(FilterYear, " ,;:");
 					Show = false;
 					for (unsigned i=0; i<t.Length(); i++)
 					{
@@ -926,7 +926,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 					int Off = Sm.DayOfWeek();
 					int Idx = (CurLocal.Day() + Off) / 7;
 
-					GToken t(FilterPos, " ,;:");
+					LToken t(FilterPos, " ,;:");
 					Show = false;
 					for (unsigned i=0; i<t.Length(); i++)
 					{
@@ -2197,7 +2197,7 @@ struct LEditDropDownFactory : public LViewFactory
 }	EditDropDownFactory;
 
 //////////////////////////////////////////////////////////////////////////////
-class GRecurDlg : public LDialog
+class LRecurDlg : public LDialog
 {
 	CalendarUi *Ui;
 	LEditDropDown *EndOnDate;
@@ -2205,7 +2205,7 @@ class GRecurDlg : public LDialog
 	bool AcceptNotify;
 	
 public:
-	GRecurDlg(CalendarUi *ui)
+	LRecurDlg(CalendarUi *ui)
 	{
 		EndOnDate = NULL;
 		Repeats = NULL;
@@ -2240,7 +2240,7 @@ public:
 		}
 	}
 	
-	~GRecurDlg()
+	~LRecurDlg()
 	{
 	}
 	
@@ -2824,7 +2824,7 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 			if (!Ctrl->Value())
 				break;
 
-			GRecurDlg Dlg(this);
+			LRecurDlg Dlg(this);
 			if (!Dlg.DoModal())
 			{
 				SetCtrlValue(IDC_REPEAT, 0);
@@ -3193,14 +3193,14 @@ int LDateTimeViewBase = 1000;
 class LDateTimeView : public LLayout, public ResObject
 {
     LEdit *Edit;
-    GDateDropDown *Date;
+    LDateDropDown *Date;
     LTimeDropDown *Time;
     
 public:
     LDateTimeView() : ResObject(Res_Custom)
     {
         AddView(Edit = new LEdit(10, 0, 0, 60, 20, NULL));
-        AddView(Date = new GDateDropDown());
+        AddView(Date = new LDateDropDown());
         AddView(Time = new LTimeDropDown());
 
         Edit->SetId(LDateTimeViewBase++);

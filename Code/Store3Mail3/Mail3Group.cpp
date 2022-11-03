@@ -11,28 +11,28 @@ GMail3Def TblGroup[] =
 	{0, 0}
 };
 
-GMail3Group::GMail3Group(GMail3Store *store) : GMail3Thing(store)
+LMail3Group::LMail3Group(LMail3Store *store) : LMail3Thing(store)
 {	
 }
 
-GMail3Group::~GMail3Group()
+LMail3Group::~LMail3Group()
 {
 }
 
-bool GMail3Group::DbDelete()
+bool LMail3Group::DbDelete()
 {
 	char s[256];
 
 	// Delete the contact
 	sprintf_s(s, sizeof(s), "delete from " MAIL3_TBL_GROUP " where Id=" LPrintfInt64, Id);
-	GMail3Store::GStatement Del(Store, s);
+	LMail3Store::LStatement Del(Store, s);
 	if (!Del.Exec())
 		return false;
 
 	return true;
 }
 
-Store3CopyImpl(GMail3Group)
+Store3CopyImpl(LMail3Group)
 {
 	Name = p.GetStr(FIELD_GROUP_NAME);
 	Group = p.GetStr(FIELD_GROUP_LIST);
@@ -40,7 +40,7 @@ Store3CopyImpl(GMail3Group)
 	return true;
 }
 
-bool GMail3Group::Serialize(GMail3Store::GStatement &s, bool Write)
+bool LMail3Group::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	int i = 0;
 
@@ -59,7 +59,7 @@ bool GMail3Group::Serialize(GMail3Store::GStatement &s, bool Write)
 	return true;
 }
 
-const char *GMail3Group::GetStr(int id)
+const char *LMail3Group::GetStr(int id)
 {
 	switch (id)
 	{
@@ -72,7 +72,7 @@ const char *GMail3Group::GetStr(int id)
 	return 0;
 }
 
-Store3Status GMail3Group::SetStr(int id, const char *str)
+Store3Status LMail3Group::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -85,7 +85,7 @@ Store3Status GMail3Group::SetStr(int id, const char *str)
 	return Store3Error;
 }
 
-const LDateTime *GMail3Group::GetDate(int id)
+const LDateTime *LMail3Group::GetDate(int id)
 {
 	switch (id)
 	{
@@ -96,7 +96,7 @@ const LDateTime *GMail3Group::GetDate(int id)
 	return NULL;
 }
 
-Store3Status GMail3Group::SetDate(int id, const LDateTime *i)
+Store3Status LMail3Group::SetDate(int id, const LDateTime *i)
 {
 	switch (id)
 	{

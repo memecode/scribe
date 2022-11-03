@@ -332,14 +332,14 @@ public:
 
 // DEBUG STUFF
 #ifdef _DEBUG
-class GRow : public LListItem
+class LRow : public LListItem
 {
 	SRow *Row;
 	char **Data;
 	int Cols;
 
 public:
-	GRow(SRow *row)
+	LRow(SRow *row)
 	{
 		Cols = 0;
 		Row = row;
@@ -447,7 +447,7 @@ public:
 
 				for (unsigned i=0; i<Table->cRows; i++)
 				{
-					List->Insert(new GRow(Table->aRow+i));
+					List->Insert(new LRow(Table->aRow+i));
 				}
 			}
 
@@ -1084,7 +1084,7 @@ public:
 			LVariant s;
 			if (App->GetOptions()->GetValue(OPT_OutlookImportSrc, s) && s.Str())
 			{
-				GToken t(s.Str(), ",");
+				LToken t(s.Str(), ",");
 				for (unsigned i=0; i<t.Length(); i++)
 				{
 					AddPath(t[i]);
@@ -1241,7 +1241,7 @@ public:
 			LVariant v;
 			if (App->GetOptions()->GetValue(OPT_OutlookExportSrc, v) && v.Str())
 			{
-				GToken t(v.Str(), ",");
+				LToken t(v.Str(), ",");
 				for (unsigned i=0; i<t.Length(); i++)
 				{
 					AddPath(t[i]);
@@ -1390,7 +1390,7 @@ public:
 						const char *DstFolder = GetCtrlName(IDC_FOLDER);
 						if (DstFolder)
 						{
-							GToken t(DstFolder, "/");
+							LToken t(DstFolder, "/");
 							if (t.Length() > 0)
 							{
 								LComPtr<IMAPIFolder> f = *MapiFolder;
@@ -1505,7 +1505,7 @@ OutlookIO::OutlookIO(ScribeWnd *Wnd, int Flags, ScribeAccount *account)
 				}
 				else
 				{
-					GMailStore *Ms = App->GetDefaultMailStore();
+					LMailStore *Ms = App->GetDefaultMailStore();
 					Prog->SetRange(LRange(0, Ms ? CountFolders(Ms->Root) : 0));
 				}
 				EParams.Prog = Prog->ItemAt(0);
@@ -1540,7 +1540,7 @@ OutlookIO::OutlookIO(ScribeWnd *Wnd, int Flags, ScribeAccount *account)
 					}
 					else
 					{
-						GMailStore *Ms = App->GetDefaultMailStore();
+						LMailStore *Ms = App->GetDefaultMailStore();
 						Prog->SetRange(LRange(0, Ms ? CountFolders(Ms->Root) : 0));
 					}
 					IParams.Prog = Prog->ItemAt(0);

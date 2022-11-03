@@ -21,7 +21,7 @@
 #include "lgi/common/LgiRes.h"
 
 //////////////////////////////////////////////////////////////////////////////
-class GFolderInfo : public LListItem
+class LFolderInfo : public LListItem
 {
 public:
 	ScribeFolder *Folder;
@@ -30,8 +30,8 @@ public:
 
 int FolderInfo_Compare(LListItem *a, LListItem *b, NativeInt Data)
 {
-	GFolderInfo *A = dynamic_cast<GFolderInfo*>(a);
-	GFolderInfo *B = dynamic_cast<GFolderInfo*>(b);
+	LFolderInfo *A = dynamic_cast<LFolderInfo*>(a);
+	LFolderInfo *B = dynamic_cast<LFolderInfo*>(b);
 	if (A && B)
 	{
 		return (int) ((int64)B->Size - (int64)A->Size);
@@ -251,7 +251,7 @@ public:
 
 			if (Usage)
 			{
-				GFolderInfo *i = new GFolderInfo;
+				LFolderInfo *i = new LFolderInfo;
 				if (i)
 				{
 					i->Folder = Child;
@@ -278,7 +278,7 @@ public:
 		    // set the percent
 		    for (auto it = Usage->begin(); Loop && it != Usage->end(); it++)
 		    {
-		    	GFolderInfo *i = dynamic_cast<GFolderInfo*>(*it);
+		    	LFolderInfo *i = dynamic_cast<LFolderInfo*>(*it);
 		    	if (!i) continue;
 				
 			    char Str[32];
@@ -306,7 +306,7 @@ public:
 
 		if (Loop && !Folder->GetParent())
 		{
-			GMailStore *Ms = Folder->App->GetDefaultMailStore();
+			LMailStore *Ms = Folder->App->GetDefaultMailStore();
 			if (Ms)
 			{
 				char File[32], Unused[32];

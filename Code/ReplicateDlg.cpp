@@ -1261,14 +1261,14 @@ struct ReplicateDlgPriv
 	}
 };
 
-class GType : public LListItem
+class LType : public LListItem
 {
 	LListItemCheckBox *Chk;
 
 public:
 	int Type;
 
-	GType(int t, int s)
+	LType(int t, int s)
 	{
 		Type = t;
 		SetText((char*)LLoadString(s), 1);
@@ -1352,11 +1352,11 @@ ReplicateDlg::ReplicateDlg(ScribeWnd *app)
 
 		if (GetViewById(IDC_TYPES, d->Lst))
 		{
-			d->Lst->Insert(new GType(MAGIC_MAIL, IDS_EMAIL));
-			d->Lst->Insert(new GType(MAGIC_CONTACT, IDS_CONTACT));
-			d->Lst->Insert(new GType(MAGIC_GROUP, IDC_GROUP));
-			d->Lst->Insert(new GType(MAGIC_CALENDAR, IDS_CALENDAR));
-			d->Lst->Insert(new GType(MAGIC_FILTER, IDS_FILTER));
+			d->Lst->Insert(new LType(MAGIC_MAIL, IDS_EMAIL));
+			d->Lst->Insert(new LType(MAGIC_CONTACT, IDS_CONTACT));
+			d->Lst->Insert(new LType(MAGIC_GROUP, IDC_GROUP));
+			d->Lst->Insert(new LType(MAGIC_CALENDAR, IDS_CALENDAR));
+			d->Lst->Insert(new LType(MAGIC_FILTER, IDS_FILTER));
 			d->Lst->ResizeColumnsToContent();
 		}
 
@@ -1388,7 +1388,7 @@ int ReplicateDlg::OnNotify(LViewI *c, LNotification n)
 		{
 			d->Settings.Reset(new ReplicateSettings);
 
-			List<GType> Types;
+			List<LType> Types;
 			if (d->Lst->GetAll(Types))
 			{
 				for (auto t: Types)

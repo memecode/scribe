@@ -817,14 +817,14 @@ ItemFieldDef MailFieldDefs[] =
 };
 
 //////////////////////////////////////////////////////////////////////////////
-class GIdentityItem : public LListItem
+class LIdentityItem : public LListItem
 {
 	ScribeWnd *App;
 	ScribeAccount *Acc;
 	char *Txt;
 
 public:
-	GIdentityItem(ScribeWnd *app, ScribeAccount *acc)
+	LIdentityItem(ScribeWnd *app, ScribeAccount *acc)
 	{
 		App = app;
 		Acc = acc;
@@ -861,7 +861,7 @@ public:
 		}
 	}
 	
-	~GIdentityItem()
+	~LIdentityItem()
 	{
 		DeleteArray(Txt);
 	}
@@ -886,14 +886,14 @@ public:
 	}
 };
 
-class GIdentityDropDrop : public LPopup
+class LIdentityDropDrop : public LPopup
 {
 	ScribeWnd *App;
 	Mail *Email;
 	LList *Lst;
 
 public:
-	GIdentityDropDrop(ScribeWnd *app, Mail *mail, LView *owner) :
+	LIdentityDropDrop(ScribeWnd *app, Mail *mail, LView *owner) :
 		LPopup(owner)
 	{
 		App = app;
@@ -909,20 +909,20 @@ public:
 
 			if (App)
 			{
-				Lst->Insert(new GIdentityItem(App, 0));
+				Lst->Insert(new LIdentityItem(App, 0));
 
 				for (auto a : *App->GetAccounts())
 				{
 					if (a->Identity.Name().Str())
 					{
-						Lst->Insert(new GIdentityItem(App, a));
+						Lst->Insert(new LIdentityItem(App, a));
 					}
 				}
 				
 				/*
 				for (LListItem *i = List->First(); i; i = List->Next())
 				{
-					GIdentityItem *Item = dynamic_cast<GIdentityItem*>(i);
+					LIdentityItem *Item = dynamic_cast<LIdentityItem*>(i);
 					if (Item)
 					{
 						char *IdEmail = a->Send.IdentityEmail();
@@ -956,7 +956,7 @@ public:
 				{
 					Visible(false);
 
-					GIdentityItem *NewFrom = dynamic_cast<GIdentityItem*>(Lst->GetSelected());
+					LIdentityItem *NewFrom = dynamic_cast<LIdentityItem*>(Lst->GetSelected());
 					if (Email && NewFrom)
 					{
 						// ScribeAccount *a = NewFrom->GetAccount();
@@ -2700,7 +2700,7 @@ void MailUi::OnSave()
 		To->OnSave(Item->GetObject()->GetStore(), Item->GetTo());
 	}
 	
-	GMailStore *AccountMailStore = NULL;
+	LMailStore *AccountMailStore = NULL;
 	
 	if (FromCbo && Item->GetFrom() && FromAccountId.Length() > 0)
 	{
@@ -7791,7 +7791,7 @@ void Mail::DeleteAsSpam(LView *View)
 
 	// Move it to the spam folder if it exists.
 	auto FolderPath = ParentFolder->GetPath();
-	GToken Parts(FolderPath, "/");
+	LToken Parts(FolderPath, "/");
 	
 	if (Parts.Length() == 0)
 		LgiMsg(View, "Error: No folder path?", AppName);
@@ -7804,7 +7804,7 @@ void Mail::DeleteAsSpam(LView *View)
 		ScribeFolder *Spam = App->GetFolder(SpamPath);
 		if (!Spam)
 		{
-			GMailStore *Ms = App->GetMailStoreForPath(FolderPath);
+			LMailStore *Ms = App->GetMailStoreForPath(FolderPath);
 			if (!Ms)
 			{
 				if (ParentFolder->GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Imap)

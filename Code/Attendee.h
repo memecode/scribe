@@ -14,7 +14,7 @@ class Attendee :
 	// , public VObjectImpl<LDataI>
 {
 	friend class Calendar;
-	friend class GTimeLine;
+	friend class LTimeLine;
 
 	Calendar *Cal;
 	ScribeWnd *App;

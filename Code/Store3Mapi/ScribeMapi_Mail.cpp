@@ -1,8 +1,8 @@
 #include "ScribeMapi.h"
 #include "lgi/common/Store3MimeTree.h"
 
-GMapiMail::GMapiMail(GMapiStore *store) :
-	GMapiThing(store),
+LMapiMail::LMapiMail(LMapiStore *store) :
+	LMapiThing(store),
 	From(store),
 	Reply(store)
 {
@@ -16,13 +16,13 @@ GMapiMail::GMapiMail(GMapiStore *store) :
 	Reply.m = this;
 }
 
-GMapiMail::~GMapiMail()
+LMapiMail::~LMapiMail()
 {
 	To.DeleteObjects();
 	DeleteObj(Seg);
 }
 
-void GMapiMail::Set(SPropValue *entry, GMapiFolder *parent, ScribeMapiList *Lst)
+void LMapiMail::Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *Lst)
 {
 	Entry.Add((uint8_t*)entry->Value.bin.lpb, entry->Value.bin.cb);
 	Parent = parent;
@@ -63,7 +63,7 @@ void GMapiMail::Set(SPropValue *entry, GMapiFolder *parent, ScribeMapiList *Lst)
 static int HandleLoads = 0;
 static uint64 HandleTs = 0;
 
-LPMESSAGE GMapiMail::Handle()
+LPMESSAGE LMapiMail::Handle()
 {
 	if (!MapiMsg && Parent && Parent->Handle())
 	{
@@ -107,12 +107,12 @@ LPMESSAGE GMapiMail::Handle()
 	return MapiMsg;
 }
 
-Store3CopyImpl(GMapiMail)
+Store3CopyImpl(LMapiMail)
 {
 	return false;
 }
 
-const char *GMapiMail::GetStr(int id)
+const char *LMapiMail::GetStr(int id)
 {
 	switch (id)
 	{
@@ -183,7 +183,7 @@ const char *GMapiMail::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMapiMail::SetStr(int id, const char *str)
+Store3Status LMapiMail::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -205,7 +205,7 @@ Store3Status GMapiMail::SetStr(int id, const char *str)
 	return Store3Success;
 }
 
-int64 GMapiMail::GetInt(int id)
+int64 LMapiMail::GetInt(int id)
 {
 	switch (id)
 	{
@@ -229,7 +229,7 @@ int64 GMapiMail::GetInt(int id)
 	return NULL;
 }
 
-Store3Status GMapiMail::SetInt(int id, int64 i)
+Store3Status LMapiMail::SetInt(int id, int64 i)
 {
 	switch (id)
 	{
@@ -255,7 +255,7 @@ Store3Status GMapiMail::SetInt(int id, int64 i)
 	return Store3Success;
 }
 
-const LDateTime *GMapiMail::GetDate(int id)
+const LDateTime *LMapiMail::GetDate(int id)
 {
 	switch (id)
 	{
@@ -272,7 +272,7 @@ const LDateTime *GMapiMail::GetDate(int id)
 	return NULL;
 }
 
-Store3Status GMapiMail::SetDate(int id, const LDateTime *i)
+Store3Status LMapiMail::SetDate(int id, const LDateTime *i)
 {
 	switch (id)
 	{
@@ -289,7 +289,7 @@ Store3Status GMapiMail::SetDate(int id, const LDateTime *i)
 	return Store3Error;
 }
 
-LDataPropI *GMapiMail::GetObj(int id)
+LDataPropI *LMapiMail::GetObj(int id)
 {
 	switch (id)
 	{
@@ -304,10 +304,10 @@ LDataPropI *GMapiMail::GetObj(int id)
 				HRESULT res = Handle()->GetAttachmentTable(MAPI_UNICODE, &hAttach);
 				if (SUCCEEDED(res))
 				{
-					LArray<GMapiAttachment*> Segs;
+					LArray<LMapiAttachment*> Segs;
 					for (ScribeMapiList Lst(hAttach); Lst.More(); Lst.Next())
 					{
-						LAutoPtr<GMapiAttachment> a(new GMapiAttachment(Store));
+						LAutoPtr<LMapiAttachment> a(new LMapiAttachment(Store));
 						if (a->Set(this, &Lst))
 							Segs.Add(a.Release());
 					}
@@ -315,7 +315,7 @@ LDataPropI *GMapiMail::GetObj(int id)
 					auto Txt = GetStr(FIELD_TEXT);
 					if (Txt)
 					{
-						LAutoPtr<GMapiAttachment> a(new GMapiAttachment(Store));
+						LAutoPtr<LMapiAttachment> a(new LMapiAttachment(Store));
 						if (a && a->Set(Txt, GetStr(FIELD_CHARSET), "text/plain"))
 							Segs.Add(a.Release());
 					}
@@ -323,12 +323,12 @@ LDataPropI *GMapiMail::GetObj(int id)
 					auto Html = GetStr(FIELD_ALTERNATE_HTML);
 					if (Html)
 					{
-						LAutoPtr<GMapiAttachment> a(new GMapiAttachment(Store));
+						LAutoPtr<LMapiAttachment> a(new LMapiAttachment(Store));
 						if (a && a->Set(Html, GetStr(FIELD_HTML_CHARSET), "text/html"))
 							Segs.Add(a.Release());
 					}
 					
-					Store3MimeTree<GMapiStore, GMapiMail, GMapiAttachment> Tree(this, Seg);
+					Store3MimeTree<LMapiStore, LMapiMail, LMapiAttachment> Tree(this, Seg);
 					for (unsigned i=0; i<Segs.Length(); i++)
 					{
 						Tree.Add(Segs[i]);
@@ -346,7 +346,7 @@ LDataPropI *GMapiMail::GetObj(int id)
 	return NULL;
 }
 
-Store3Status GMapiMail::SetObj(int id, LDataPropI *i)
+Store3Status LMapiMail::SetObj(int id, LDataPropI *i)
 {
 	switch (id)
 	{
@@ -359,7 +359,7 @@ Store3Status GMapiMail::SetObj(int id, LDataPropI *i)
 	return Store3Error;
 }
 
-GDataIt GMapiMail::GetList(int id)
+GDataIt LMapiMail::GetList(int id)
 {
 	switch (id)
 	{
@@ -377,7 +377,7 @@ GDataIt GMapiMail::GetList(int id)
 						SPropValue *Name = Lst.GetField(PR_DISPLAY_NAME_W);
 						SPropValue *Email1 = Lst.GetField(PR_EMAIL_ADDRESS);
 						SPropValue *Email2 = Lst.GetField(PR_SMTP_ADDRESS);
-						LAutoPtr<GMapiAddr> a(new GMapiAddr(Store));
+						LAutoPtr<LMapiAddr> a(new LMapiAddr(Store));
 						if ((Name || Email1 || Email2) && a)
 						{
 							a->Name = MapiCastString(Name);
@@ -417,48 +417,48 @@ GDataIt GMapiMail::GetList(int id)
 	return NULL;
 }
 
-Store3Status GMapiMail::SetRfc822(LStreamI *m)
+Store3Status LMapiMail::SetRfc822(LStreamI *m)
 {
 	// IConverterSession does the handling of converting MIME to MAPI (and back)
 	LAssert(0);
 	return Store3Error;
 }
 
-uint32_t GMapiMail::Type()
+uint32_t LMapiMail::Type()
 {
 	return MAGIC_MAIL;
 }
 
-bool GMapiMail::IsOnDisk()
+bool LMapiMail::IsOnDisk()
 {
 	return true;
 }
 
-bool GMapiMail::IsOrphan()
+bool LMapiMail::IsOrphan()
 {
 	return false;
 }
 
-uint64 GMapiMail::Size()
+uint64 LMapiMail::Size()
 {
 	LAssert(0);
 	return 0;
 }
 
-Store3Status GMapiMail::Save(LDataI *Parent)
+Store3Status LMapiMail::Save(LDataI *Parent)
 {
 	LAssert(0);
 	return Store3Error;
 }
 
-Store3Status GMapiMail::Delete(bool ToTrash)
+Store3Status LMapiMail::Delete(bool ToTrash)
 {
 	LArray<LDataI*> del;
 	del.Add(this);
 	return Store->Delete(del, true);
 }
 
-LAutoStreamI GMapiMail::GetStream(const char *file, int line)
+LAutoStreamI LMapiMail::GetStream(const char *file, int line)
 {
 	LAutoStreamI s;
 	LAssert(0);
@@ -466,7 +466,7 @@ LAutoStreamI GMapiMail::GetStream(const char *file, int line)
 }
 
 ////////////////////////////////////////////
-GMapiAddr::GMapiAddr(GMapiStore *store)
+LMapiAddr::LMapiAddr(LMapiStore *store)
 {
 	Store = store;
 	CC = 0;
@@ -474,7 +474,7 @@ GMapiAddr::GMapiAddr(GMapiStore *store)
 	m = NULL;	
 }
 
-Store3CopyImpl(GMapiAddr)
+Store3CopyImpl(LMapiAddr)
 {
 	CC = (int)p.GetInt(FIELD_CC);
 	Name = p.GetStr(FIELD_NAME);
@@ -482,7 +482,7 @@ Store3CopyImpl(GMapiAddr)
 	return true;
 }
 
-const char *GMapiAddr::GetStr(int id)
+const char *LMapiAddr::GetStr(int id)
 {
 	if (!m)
 	{
@@ -502,7 +502,7 @@ const char *GMapiAddr::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMapiAddr::SetStr(int id, const char *str)
+Store3Status LMapiAddr::SetStr(int id, const char *str)
 {
 	if (!m)
 	{
@@ -524,7 +524,7 @@ Store3Status GMapiAddr::SetStr(int id, const char *str)
 	return Store3Error;
 }
 
-int64 GMapiAddr::GetInt(int id)
+int64 LMapiAddr::GetInt(int id)
 {
 	switch (id)
 	{
@@ -538,7 +538,7 @@ int64 GMapiAddr::GetInt(int id)
 	return -1;
 }
 
-Store3Status GMapiAddr::SetInt(int id, int64 i)
+Store3Status LMapiAddr::SetInt(int id, int64 i)
 {
 	switch (id)
 	{

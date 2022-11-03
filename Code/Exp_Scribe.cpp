@@ -81,7 +81,7 @@ public:
 			LVariant s;
 			if (Lst && App->GetOptions()->GetValue(OPT_ScribeExpSrcPaths, s) && s.Str())
 			{
-				GToken t(s.Str(), ":");
+				LToken t(s.Str(), ":");
 				for (unsigned i=0; Lst && i<t.Length(); i++)
 				{
 					LListItem *n = new LListItem;
@@ -218,7 +218,7 @@ public:
 
 		if (Path && Mailbox)
 		{
-			GToken t(Path, "/");
+			LToken t(Path, "/");
 			f = Mailbox;
 			for (unsigned i=0; i<t.Length(); i++)
 			{
@@ -673,7 +673,7 @@ void ExportScribe(ScribeWnd *App)
 			Prog.SetType("items");
 			LYield();
 
-			GMailStore *Ms = App->GetDefaultMailStore();
+			LMailStore *Ms = App->GetDefaultMailStore();
 			if (!Ms)
 				return;
 

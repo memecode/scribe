@@ -2,13 +2,13 @@
 #include "../Resources/resdefs.h"
 
 /////////////////////////////////////////////////////////////
-class GNewMailItem : public LListItem
+class LNewMailItem : public LListItem
 {
 	Mail *m;
-	GNewMailDlg *Parent;
+	LNewMailDlg *Parent;
 
 public:
-	GNewMailItem(GNewMailDlg *parent, Mail *mail)
+	LNewMailItem(LNewMailDlg *parent, Mail *mail)
 	{
 		m = mail;
 		Parent = parent;
@@ -60,7 +60,7 @@ public:
 };
 
 /////////////////////////////////////////////////////////////
-GNewMailDlg::GNewMailDlg(ScribeWnd *app, GNewMailDlg **ptr)
+LNewMailDlg::LNewMailDlg(ScribeWnd *app, LNewMailDlg **ptr)
 {
 	App = app;
 	Ptr = ptr;
@@ -72,7 +72,7 @@ GNewMailDlg::GNewMailDlg(ScribeWnd *app, GNewMailDlg **ptr)
 	}
 }
 
-GNewMailDlg::~GNewMailDlg()
+LNewMailDlg::~LNewMailDlg()
 {
 	if (App->Lock(_FL))
 	{
@@ -85,21 +85,21 @@ GNewMailDlg::~GNewMailDlg()
 	}
 }
 
-void GNewMailDlg::AddThings(List<Mail> *NewThings)
+void LNewMailDlg::AddThings(List<Mail> *NewThings)
 {
 	LList *l;
 	if (GetViewById(IDC_NEW_MAIL, l) && NewThings)
 	{
 		l->MultiSelect(true);
 
-		GNewMailItem *Select = 0;
+		LNewMailItem *Select = 0;
 		for (auto m: *NewThings)
 		{
 			bool Has = false;
 
 			for (auto li : *l)
 			{
-				GNewMailItem *mi = dynamic_cast<GNewMailItem*>(li);
+				LNewMailItem *mi = dynamic_cast<LNewMailItem*>(li);
 				if (mi->GetMail() == m)
 				{
 					Has = true;
@@ -108,7 +108,7 @@ void GNewMailDlg::AddThings(List<Mail> *NewThings)
 
 			if (!Has)
 			{
-				GNewMailItem *New = new GNewMailItem(this, m);
+				LNewMailItem *New = new LNewMailItem(this, m);
 				if (New)
 				{
 					if (!Select)
@@ -128,7 +128,7 @@ void GNewMailDlg::AddThings(List<Mail> *NewThings)
 	}
 }
 
-int GNewMailDlg::OnNotify(LViewI *c, LNotification n)
+int LNewMailDlg::OnNotify(LViewI *c, LNotification n)
 {
 	switch (c->GetId())
 	{
@@ -137,7 +137,7 @@ int GNewMailDlg::OnNotify(LViewI *c, LNotification n)
 			LList *l;
 			if (GetViewById(IDC_NEW_MAIL, l))
 			{
-				List<GNewMailItem> a;
+				List<LNewMailItem> a;
 				l->GetAll(a);
 				for (auto i: a)
 				{

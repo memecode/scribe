@@ -194,13 +194,13 @@ const char *WinFmtUrl = "UniformResourceLocatorW";
 const char *FmtUrlList = "text/uri-list";
 #include "lgi/common/SkinEngine.h"
 
-class GContactBtn : public LView
+class LContactBtn : public LView
 {
 	bool Down;
 	bool Over;
 
 public:
-	GContactBtn(int id)
+	LContactBtn(int id)
 	{
 		SetId(id);
 		Over = false;
@@ -210,7 +210,7 @@ public:
 		SetPos(r);
 	}
 	
-	~GContactBtn()
+	~LContactBtn()
 	{
 	}
 	
@@ -280,7 +280,7 @@ class LContactImage :
 
 	ScribeWnd *App = NULL;
 	Contact *c = NULL;
-	GContactBtn *Btn = NULL;
+	LContactBtn *Btn = NULL;
 	bool IsNoFace = false;
 
 	// This is the uncompressed bitmap which is not saved.
@@ -478,7 +478,7 @@ public:
 			
 			if (!Btn)
 			{
-				Btn = new GContactBtn(100);
+				Btn = new LContactBtn(100);
 			}
 			if (Btn)
 			{

@@ -1192,7 +1192,7 @@ bool CollectAttachmentsByPattern(Mail *m, char *Pattern, List<Attachment> &Files
 		List<Attachment> Attachments;
 		if (m->GetAttachments(&Attachments))
 		{
-			GToken p(Pattern, " ,;");
+			LToken p(Pattern, " ,;");
 			for (auto a: Attachments)
 			{
 				bool Match = true;
@@ -1590,7 +1590,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 			else
 			{
 				// parse out RGB
-				GToken T(Arg1, ",");
+				LToken T(Arg1, ",");
 				if (T.Length() == 3)
 				{
 					// we have an RGB, so set it baby
@@ -3531,7 +3531,7 @@ int FilterCallback(	LFilterView *View,
 			/*
 			else
 			{
-				auto s = new GSubMenu;
+				auto s = new LSubMenu;
 				if (s)
 				{
 					int n = 1;
