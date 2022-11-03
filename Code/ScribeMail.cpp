@@ -9461,61 +9461,30 @@ bool Mail::Export(LStreamI &f, const char *MimeType)
 	}
 	else if (!Stricmp(MimeType, sMimeMessage))
 	{
-		LProgressDlg Prog(App, 500);
-		Prog.SetDescription(LLoadString(IDS_LOADING));
-		Prog.SetRange(LRange(0, TIMEOUT_OBJECT_LOAD));
-
-		int64 Start = LCurrentTime();
-		bool First = true;
-		while (GetObject())
+		// This function can't be asyncronous, it must complete with UI or waiting for a callback.
+		// Because it is used by the drag and drop system. Which won't wait.
+		auto state = GetLoaded();
+		if (state != Store3Loaded)
 		{
-			Store3State Loaded = (Store3State)GetObject()->GetInt(FIELD_LOADED);
-			if (Loaded == Store3Loaded)
-				break;
-			
-			if (First)
-			{
-				GetObject()->SetInt(FIELD_LOADED, Store3Loaded);
-				First = false;
-			}
-			
-			// Get obj could've loaded the object, so try the feld again...
-			Loaded = (Store3State)GetObject()->GetInt(FIELD_LOADED);
-			if (Loaded == Store3Loaded)
-				break;
-			
-			// Still not loaded... so wait...?
-			LgiTrace("%s:%i - Waiting for object load... %i\n", _FL, Loaded);			
-
-			auto YieldTs = LCurrentTime();
-			while (LCurrentTime() - YieldTs < 2000)
-			{
-				LSleep(30);
-				Prog.Value(LCurrentTime() - Start);
-				LYield();
-
-				if (Prog.IsCancelled())
-					return false;
-			}
-			if (LCurrentTime() - Start >= TIMEOUT_OBJECT_LOAD)
-			{
-				LAssert(!"Load failed?");
-				return false;
-			}
-		}
-		if (GetObject())
+			LAssert(!"Object not loaded.");
+			return false;
+		}			
+		if (!GetObject())
 		{
-			// New way: get the back end DB do the work of converting the message
-			// to RFC822.
-			LAutoStreamI Data = GetObject()->GetStream(_FL);
-			if (Data)
-			{
-				Data->SetPos(0);
-				
-				LCopyStreamer Cp(512<<10);
-				return Cp.Copy(Data, &f) > 0;
-			}
+			LAssert(!"No object?");
+			return false;
 		}
+		
+		auto Data = GetObject()->GetStream(_FL);
+		if (!Data)
+		{
+			LgiTrace("%s:%i - Object for export has no data.\n", _FL);
+			return false;
+		}
+		
+		Data->SetPos(0);
+		LCopyStreamer Cp(512<<10);
+		return Cp.Copy(Data, &f) > 0;
 	}
 
 	return false;
