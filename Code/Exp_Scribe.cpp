@@ -689,7 +689,7 @@ void ExportScribe(ScribeWnd *App)
 					Items += Dlg.CountItems(App->GetFolder(Dlg.SrcPaths[i]), false);
 				}
 			}
-			Prog.SetRange(LRange(0, Items));
+			Prog.SetRange(Items);
 
 			if (Dlg.AllFolders)
 			{

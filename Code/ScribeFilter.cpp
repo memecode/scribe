@@ -2337,7 +2337,7 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 	LAutoPtr<LProgressDlg> Prog;
 	if (Parent && Prog.Reset(new LProgressDlg(Parent)))
 	{
-		Prog->SetRange(LRange(0, Email.Length()));
+		Prog->SetRange(Email.Length());
 		Prog->SetDescription("Filtering...");
 		Prog->SetType("email");
 		LYield();

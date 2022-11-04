@@ -257,7 +257,7 @@ void MissingCapsBar::OnPulse()
 			{
 				// Create ctrl
 				ProgCtrl = new LProgressView(-1, 0, 0, 150, 12, NULL);
-				ProgCtrl->SetRange(LRange(0, Progress->TotalSize));
+				ProgCtrl->SetRange(Progress->TotalSize);
 				ProgCtrl->Attach(this);
 			}
 			else

@@ -7201,10 +7201,10 @@ public:
 
 		LoadPane = ItemAt(0);
 		LoadPane->SetDescription("Loading objects...");
-		LoadPane->SetRange(LRange(0, tl->Length()));
+		LoadPane->SetRange(tl->Length());
 
 		SavePane = Push();
-		SavePane->SetRange(LRange(0, tl->Length()));
+		SavePane->SetRange(tl->Length());
 		SavePane->SetDescription("Saving: No errors...");
 
 		// LProgressDlg will do a SetPulse in it's OnCreate

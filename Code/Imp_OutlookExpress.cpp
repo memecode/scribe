@@ -392,7 +392,7 @@ public:
 
 		LProgressDlg Dlg(Parent);
 		Dlg.SetDescription("Reading tables...");
-		Dlg.SetRange(LRange(0, 1));
+		Dlg.SetRange(1);
 		LProgressPane *Import = Dlg.Push();
 		if (Import)
 		{
@@ -455,7 +455,7 @@ public:
 					Dlg.Value(1);
 					if (Import)
 					{
-						Import->SetRange(LRange(0, MsgList.Length()));
+						Import->SetRange(MsgList.Length());
 						Import->SetType("Mail");
 					}
 					for (auto i: MsgList)
@@ -641,7 +641,7 @@ DoFileSearch:
 			{
 				LProgressDlg PrgDlg(Parent);
 				PrgDlg.SetDescription("Importing folders...");
-				PrgDlg.SetRange(LRange(0, Files.Length()));
+				PrgDlg.SetRange(Files.Length());
 				LYield();
 
 				int Imported = 0;

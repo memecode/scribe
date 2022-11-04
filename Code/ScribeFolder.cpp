@@ -1114,7 +1114,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			if (GetObject()->GetStore()->Change(Change, FIELD_FLAGS, v, OpPlusEquals) == Store3Error)
 			{
 				LProgressDlg Prog(GetTree(), 500);
-				Prog.SetRange(LRange(0, Change.Length()));
+				Prog.SetRange(Change.Length());
 				
 				// FIXME!!
 				// Prog.SetYieldTime(200);
@@ -3552,7 +3552,7 @@ bool ScribeFolder::Import(LStreamI &f, char *MimeType)
 			PrgDlg.SetDescription(LLoadString(IDS_MBOX_READING));
 			PrgDlg.SetType("K");
 			PrgDlg.SetScale(1.0/1024.0);
-			PrgDlg.SetRange(LRange(0, f.GetSize()));
+			PrgDlg.SetRange(f.GetSize());
 			LYield();
 			
 			LDataStoreI::StoreTrans Trans = GetObject()->GetStore()->StartTransaction();
@@ -3714,7 +3714,7 @@ public:
 
 		// Setup progress UI
 		SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
-		SetRange(LRange(0, Folder->Items.Length()));
+		SetRange(Folder->Items.Length());
 		
 		switch (Folder->GetItemType())
 		{
@@ -3844,7 +3844,7 @@ bool ScribeFolder::Export(LStreamI &f, char *MimeType)
 		// Setup progress UI
 		Dlg.SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
 		Dlg.Invalidate((LRect*)0, true);
-		Dlg.SetRange(LRange(0, Items.Length()));
+		Dlg.SetRange(Items.Length());
 		Dlg.SetType(LLoadString(IDS_EMAIL));
 
 		// Process all the container's items

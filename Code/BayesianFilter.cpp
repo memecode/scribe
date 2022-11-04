@@ -978,7 +978,7 @@ bool BuildSpamDB::Process()
 		if (Folders.Length() == 0 && FolderLoads == 0)
 		{
 			Prog->SetDescription("Processing mail...");
-			Prog->SetRange(LRange(0, Items.Length()));
+			Prog->SetRange(Items.Length());
 			Prog->Value(0);
 		}
 		return false;
@@ -1236,7 +1236,7 @@ bool BayesianFilter::BuildSpamDb()
 			AddFolderToSpamDb(a->Receive.GetRootFolder());
 	}
 
-	d->Build->Prog->SetRange(LRange(0, d->Build->Folders.Length()));
+	d->Build->Prog->SetRange(d->Build->Folders.Length());
 	return true;
 }
 
@@ -1807,7 +1807,7 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 					}
 					if (d->Prog)
 					{
-						d->Prog->SetRange(LRange(0, d->Work.Length()));
+						d->Prog->SetRange(d->Work.Length());
 						d->Prog->Value(i);
 						if (d->Prog->IsCancelled())
 						{

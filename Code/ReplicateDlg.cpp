@@ -513,7 +513,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 				OverviewMsg.Printf("%i items in %i folder(s)...", Items, Folders);
 				UpdateMsg();
 				
-				SetRange(LRange(0, Items));
+				SetRange(Items);
 				break;
 			}
 			case REndTransaction:

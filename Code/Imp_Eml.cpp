@@ -197,7 +197,7 @@ void ImportEml(ScribeWnd *App)
 	{
 		int Errors = 0;
 		LProgressDlg Prog(App);
-		Prog.SetRange(LRange(0, Dlg.TotalEmail));
+		Prog.SetRange(Dlg.TotalEmail);
 		Prog.SetDescription("Email");
 		ImportEmlFolders(App, Prog.ItemAt(0), Dlg.Out, Dlg.In, &Errors);
 		if (Errors)

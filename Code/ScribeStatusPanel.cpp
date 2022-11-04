@@ -532,7 +532,7 @@ void AccountStatusPanel::OnAccountSelect(AccountStatusItem *Item)
 			char Str[256];
 			if (AccLet->Group.Range)
 			{
-				Total->SetRange(LRange(0, AccLet->Group.Range));
+				Total->SetRange(AccLet->Group.Range);
 				Total->Value(AccLet->Group.Value);
 				int Ch = sprintf_s(Str, sizeof(Str), LLoadString(IDS_EMAIL_PROGRESS), AccLet->Group.Value, AccLet->Group.Range);
 				if (AccLet->Group.Start)
@@ -556,7 +556,7 @@ void AccountStatusPanel::OnAccountSelect(AccountStatusItem *Item)
 			// Mail
 			if (AccLet->Item.Range)
 			{
-				Sub->SetRange(LRange(0, AccLet->Item.Range));
+				Sub->SetRange(AccLet->Item.Range);
 				Sub->Value(AccLet->Item.Value);
 			}
 			else

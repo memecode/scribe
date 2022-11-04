@@ -1249,7 +1249,7 @@ public:
 
 		LProgressDlg prog(this, 100);
 		prog.SetDescription("Resizing icons...");
-		prog.SetRange(LRange(0, m.Length()));
+		prog.SetRange(m.Length());
 		auto UpdateTs = LCurrentTime();
 
 		auto Sorted = m;

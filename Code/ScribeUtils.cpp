@@ -958,7 +958,7 @@ Store3Status Store3Progress::SetInt(int id, int64 i)
 		ItemAt(0)->Value(i);
 		break;
 	case Store3UiMaxPos:
-		ItemAt(0)->SetRange(LRange(0, (ssize_t)i));
+		ItemAt(0)->SetRange(i);
 		break;				
 	case Store3UiNewFormat:
 		NewFormat = (int)i;
