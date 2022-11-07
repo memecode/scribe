@@ -8,6 +8,7 @@
 #include "ScribeListAddr.h"
 #include "lgi/common/ListItemCheckBox.h"
 #include "lgi/common/ListItemRadioBtn.h"
+#include "lgi/common/TabView.h"
 
 class Calendar;
 class CalendarUi;
