@@ -4,13 +4,15 @@ project(scribe)
 if (APPLE)
 	set(CMAKE_OSX_ARCHITECTURES "x86_64;ARM64")
 	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version")
+elseif (UNIX)
+    set(LINUX TRUE)
 endif()
 set(CMAKE_CXX_STANDARD 14)
 
 # Get all the libs we need:
 add_subdirectory(../../lgi/trunk lgi)
 add_subdirectory(../libs libs)
-find_package(openssl)
+find_package(OpenSSL)
 if (NOT DEFINED OPENSSL_INCLUDE_DIR)
     message(FATAL_ERROR "No OPENSSL_INCLUDE_DIR")
 endif()
@@ -28,7 +30,7 @@ elseif (APPLE)
 	set(APP_TYPE MACOSX_BUNDLE)
     set(SPELL_CHECK ${LGI_DIR}/src/mac/cocoa/SpellCheckMac.mm)
 elseif (LINUX)
-	set(APP_ICON Resources/icon128.png)
+	set(APP_ICON Resources/About64px.png)
     set(SPELL_CHECK)
 endif()
 
@@ -77,6 +79,7 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Text/RtfHtml.cpp
     ${LGI_DIR}/src/common/Text/TextConvert.cpp
     ${LGI_DIR}/src/common/Text/vCard-vCal.cpp
+    ${LGI_DIR}/src/common/Text/SpellCheckAspell.cpp
     ${LGI_DIR}/src/common/Widgets/Editor/BlockCursor.cpp
     ${LGI_DIR}/src/common/Widgets/Editor/RichTextEdit.cpp
     ${LGI_DIR}/src/common/Widgets/Editor/RichTextEditPriv.cpp
@@ -92,25 +95,7 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Widgets/ZoomView.cpp
     ${LGI_DIR}/src/common/Widgets/MonthView.cpp
     ${LGI_DIR}/src/common/Widgets/YearView.cpp
-    ../libs/Btree/btree.c
-    ../libs/Btree/btree_delete.c
-    ../libs/Btree/btree_header.c
-    ../libs/Btree/btree_insert.c
-    ../libs/Btree/btree_lock.c
-    ../libs/Btree/btree_node.c
-    ../libs/Btree/btree_search.c
-    ../libs/Btree/btree_traverse.c
-    ../libs/Btree/config.c
-    ../libs/Btree/db.c
-    ../libs/Btree/db_blocklist.c
-    ../libs/Btree/db_blocks.c
-    ../libs/Btree/db_cache.c
-    ../libs/Btree/db_header.c
-    ../libs/Btree/db_lock.c
-    ../libs/Btree/db_utils.c
-    ../libs/Btree/gbtree.cpp
-    ../libs/Btree/hashtable.c
-    ../libs/Btree/offsetlist.c
+    ${SPELL_CHECK}
     Code/AddressSelect.cpp
     Code/BayesDlg.cpp
     Code/BayesianFilter.cpp
@@ -170,8 +155,6 @@ add_executable(scribe ${APP_TYPE}
     Code/ScribeUtils.cpp
     Code/Scripting.cpp
     Code/SecurityDlg.cpp
-    ${SPELL_CHECK}
-    Code/SpellCheckAspell.cpp
     Code/Sqlite/v3.6.14/sqlite3.c
     Code/Store3Common.cpp
     Code/Store3Imap/ScribeImap_Attachment.cpp
@@ -197,6 +180,7 @@ add_executable(scribe ${APP_TYPE}
     )
 
 if (WIN32)
+
     target_sources(scribe PRIVATE
         Code/Store3Mapi/ScribeMapi_Attachment.cpp
         Code/Store3Mapi/ScribeMapi_Calendar.cpp
@@ -207,9 +191,7 @@ if (WIN32)
         Code/Store3Mapi/ScribeMapi_Thing.cpp
         Code/ImpExp_Outlook.cpp
         )
-elseif (APPLE)
-    target_sources(scribe PRIVATE
-        )
+
 endif()
 
 target_include_directories(scribe
@@ -228,12 +210,38 @@ target_link_libraries(scribe
         chardet
         libjpeg9a
         libpng15
-        bzip2)
+        bzip2
+        btree)
 
 target_compile_definitions(scribe
     PRIVATE
         -DSCRIBE_APP)
 
 if (APPLE)
+
     macBundlePostBuild(scribe)
+
+elseif (LINUX)
+    
+    target_link_libraries(scribe
+        PRIVATE
+            dl)
+
+    add_dependencies(scribe crash-handler)
+
+    add_custom_command(TARGET scribe POST_BUILD
+        COMMENT "Copy crash handler."
+        COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:crash-handler>" "${CMAKE_CURRENT_BINARY_DIR}"
+        )
+    
+endif()
+
+if (NOT APPLE)
+
+    add_custom_command(TARGET scribe POST_BUILD
+        COMMENT "Copy resource files."
+        COMMAND cp -R "${CMAKE_CURRENT_LIST_DIR}/Resources" "${CMAKE_CURRENT_BINARY_DIR}"
+        COMMAND cp -R "${CMAKE_CURRENT_LIST_DIR}/Scripts" "${CMAKE_CURRENT_BINARY_DIR}"
+        )
+
 endif()
