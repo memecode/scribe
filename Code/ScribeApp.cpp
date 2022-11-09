@@ -681,53 +681,6 @@ bool ScribePanel::Pour(LRegion &r)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-#if 0
-#include "LTextLog.h"
-extern LString HtmlToText(char *InputHtml, const char *CharSet);
-
-class DebugWnd : public LWindow
-{
-public:
-	LTextView3 *Txt;
-
-	DebugWnd()
-	{
-		AddView(Txt = new LTextLog(100));
-		SetPos(LRect(0, 0, 1000, 1100));
-		MoveToCenter();
-		if (Attach(0))
-		{
-			Txt->SetWrapType(TEXTED_WRAP_REFLOW);
-			AttachChildren();
-			Visible(true);
-		}
-	}
-	
-	void OnThing(Thing *t)
-	{
-		Mail *m = t ? t->IsMail() : 0;
-		if (m)
-		{
-			char *Html = m->GetHtml();
-			if (Html)
-			{
-				char *Cs = m->GetHtmlCharset();
-				LString Text = HtmlToText(Html, Cs);
-				Txt->Name(Text);
-			}
-			else
-			{
-				Txt->Name("Plain text only email.");
-			}
-		}
-		else
-		{
-			Txt->Name("Not an email.");
-		}
-	}
-};
-#endif
-
 class NoContactType : public Contact
 {
 	LString NoFace80Path;
@@ -787,46 +740,46 @@ class ScribeWndPrivate :
 	public LVmDebuggerCallback,
 	public LHtmlStaticInst
 {
-	LOptionsFile::PortableType InstallMode;
+	LOptionsFile::PortableType InstallMode = LOptionsFile::UnknownMode;
 
 public:
 	ScribeWnd		*App;
 	
-	uint64          LastTs;
-	int				ClipboardFormat;
-	LFont			*PreviewFont;
-	int				PrintMaxPages;
-	char			*MulPassword;
-	int				NewMailTimeout;
-	bool			SendAfterReceive;
-	bool			IngoreOnClose;
+	uint64          LastTs = 0;
+	int				ClipboardFormat = 0;
+	LFont			*PreviewFont = NULL;
+	int				PrintMaxPages = -1;
+	int				NewMailTimeout = -1;
+	bool			SendAfterReceive = false;
+	bool			IngoreOnClose = false;
 	LAutoString		UiTags;
 	LAutoPtr<LGrowl> Growl;
 	LArray<Contact*> TrayMenuContacts;
-	bool            ExitAfterSend;
-	LToolButton		*ShowConsoleBtn;
+	bool            ExitAfterSend = false;
+	LToolButton		*ShowConsoleBtn = NULL;
+	LString			MulPassword;
 	
-	LBox			*SubSplit, *SearchSplit;
+	LBox			*SubSplit = NULL, *SearchSplit = NULL;
 	LArray<ScribeFolder*> ThingSources;
-	int				LastLayout;
-	LMenuItem		*DisableUserFilters;
-	LOptionsFile	*Options;
-	HttpImageThread	*ImageLoader;
-	int				LastMinute, LastHour;
+	int				LastLayout = 0;
+	LMenuItem		*DisableUserFilters = NULL;
+	LOptionsFile	*Options = NULL;
+	HttpImageThread	*ImageLoader = NULL;
+	int				LastMinute = -1, LastHour = -1;
 	LArray<LDataEventsI*> Store3EventCallbacks;
 	LAutoPtr<LPrinter> PrintOptions;
 	LHashTbl<IntKey<SribeResourceType,ResNone>, LString> ResFiles;
 
 	// These are for the LDataEventsI callbacks to store source context
 	// Mainly for debugging where various events came from.
-	const char		*CtxFile;
-	int				CtxLine;
+	const char		*CtxFile = NULL;
+	int				CtxLine = 0;
 
 	// Contact no face images
 	NoContactType NoContact;
 	
 	// Remote content white/blacklists
-	bool RemoteContent_Init;
+	bool RemoteContent_Init = false;
 	LString::Array RemoteWhiteLst, RemoteBlackLst;
 
 	// Spell checking
@@ -835,12 +788,12 @@ public:
 
 	// Missing caps
 	LCapabilityTarget::CapsHash MissingCaps;
-	MissingCapsBar *Bar;
+	MissingCapsBar *Bar = NULL;
 	LString ErrSource; // Script file that has an error.
-	Filter *ErrFilter; // Filter that has scripting error.
+	Filter *ErrFilter = NULL; // Filter that has scripting error.
 
 	// Load state
-	bool			FoldersLoaded;	
+	bool			FoldersLoaded = false;	
 
 	// Bayesian filter
 	LStringPipe BayesLog;
@@ -853,7 +806,7 @@ public:
 	LArray<LScript*> Scripts;
 	LArray<LScript*> CurrentScripts;
 	LScript *CurrentScript() { return CurrentScripts.Length() ? CurrentScripts.Last() : NULL; }
-	int NextToolMenuId;
+	int NextToolMenuId = IDM_TOOL_SCRIPT_BASE;
 	LAutoPtr<LScriptUi> ScriptToolbar;
 	LArray<LScriptCallback*> OnSecondTimerCallbacks;
 
@@ -882,37 +835,11 @@ public:
 	} TextControlFactory;
 
 	ScribeWndPrivate(ScribeWnd *app) :
+		App(app),
 		NoContact(app),
 		TextControlFactory(app)
 	{
-		App = app;
 		AppWndHnd = LEventSinkMap::Dispatch.AddSink(App);
-
-		CtxFile = NULL;
-		CtxLine = 0;
-		ErrFilter = NULL;
-		RemoteContent_Init = false;
-		LastTs = 0;
-		InstallMode = LOptionsFile::UnknownMode;
-		NextToolMenuId = IDM_TOOL_SCRIPT_BASE;
-		IngoreOnClose = false;
-		ImageLoader = 0;
-		DisableUserFilters = 0;
-		LastLayout = 0;
-		FoldersLoaded = false;
-		Options = 0;
-		LastMinute = LastHour = -1;
-		ExitAfterSend = false;
-		PreviewFont = 0;
-		Bar = NULL;
-		ShowConsoleBtn = NULL;
-
-		PrintMaxPages = -1;
-		MulPassword = 0;
-		NewMailTimeout = -1;
-		SendAfterReceive = false;
-		SubSplit = 0;
-		SearchSplit = NULL;
 
 		#ifdef WIN32
 		ClipboardFormat = RegisterClipboardFormat(
@@ -922,8 +849,6 @@ public:
 			"Scribe.Item"
 			#endif
 			);
-		#else
-		ClipboardFormat = 0;
 		#endif
 
 		LScribeScript::Inst = new LScribeScript(App);
@@ -935,7 +860,6 @@ public:
 	{
 		// Why do we need this? ~LView will take care of it?
 		// LEventSinkMap::Dispatch.RemoveSink(App);
-		DeleteArray(MulPassword);
 		DeleteObj(Options);
 		Scripts.DeleteObjects();
 		DeleteObj(ImageLoader);
@@ -3363,7 +3287,7 @@ bool ScribeWnd::LoadOptions()
 				if (InstLst[i].IsMul())
 				{
 					Mul = InstLst + i;
-					d->MulPassword = NewStr(Mul->Password);
+					d->MulPassword = Mul->Password;
 					break;
 				}
 			}
@@ -5075,8 +4999,8 @@ bool ScribeWnd::LoadMailStores()
 
 			if (ValidStr(d->MulPassword))
 			{
-				Verified = strcmp(d->MulPassword, FolderPsw) == 0;
-				DeleteArray(d->MulPassword);
+				Verified = d->MulPassword.Equals(FolderPsw, false);
+				d->MulPassword.Empty();
 			}
 
 			if (!Verified)

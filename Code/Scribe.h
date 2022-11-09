@@ -292,7 +292,7 @@ class ChooseFolderDlg : public LDialog
 	bool Export;
 	LList *Lst;
 
-	void InsertFile(char *f);
+	void InsertFile(const char *f);
 
 public:
 	char *DestFolder;

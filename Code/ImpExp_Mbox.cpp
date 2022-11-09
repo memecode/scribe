@@ -63,7 +63,7 @@ ChooseFolderDlg::~ChooseFolderDlg()
 	SrcFiles.DeleteArrays();
 }
 
-void ChooseFolderDlg::InsertFile(char *f)
+void ChooseFolderDlg::InsertFile(const char *f)
 {
 	if (Lst)
 	{
@@ -84,14 +84,15 @@ void ChooseFolderDlg::InsertFile(char *f)
 			LListItem *n = new LListItem;
 			if (n)
 			{
-				char *d = strrchr(f, DIR_CHAR);
-				if (d)
+				LString file = f;
+				auto parts = file.RSplit(DIR_STR, 1);
+				if (parts.Length() == 2)
 				{
-					*d = 0;				
-					n->SetText(f, 0);
-					n->SetText(d+1, 1);
+					n->SetText(parts[0], 0);
+					n->SetText(parts[1], 1);
 					Lst->Insert(n);
 				}
+				else LAssert(0);
 			}
 		}
 	}

@@ -395,6 +395,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Html.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlCommon.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlParser.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\SpellCheckAspell.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\XmlTreeUi.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\RtfHtml.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextConvert.cpp" />
@@ -494,7 +495,6 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ClCompile Include="..\Code\ScribeUtils.cpp" />
     <ClCompile Include="..\Code\Scripting.cpp" />
     <ClCompile Include="..\Code\SecurityDlg.cpp" />
-    <ClCompile Include="..\Code\SpellCheckAspell.cpp" />
     <ClCompile Include="..\Code\Sqlite\v3.6.14\sqlite3.c" />
     <ClCompile Include="..\Code\Store3Common.cpp" />
     <ClCompile Include="..\Code\Store3Imap\ScribeImap_Attachment.cpp" />

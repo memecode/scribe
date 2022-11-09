@@ -288,10 +288,7 @@ public:
 							case MAGIC_MAIL:
 							{
 								if (Prog)
-								{
 									Prog->SetDescription(FromPath);
-									LYield();
-								}
 
 								To->LoadThings();
 								From->LoadThings();
@@ -671,7 +668,6 @@ void ExportScribe(ScribeWnd *App)
 			LProgressDlg Prog(App);
 			Prog.SetDescription("Initializing...");
 			Prog.SetType("items");
-			LYield();
 
 			LMailStore *Ms = App->GetDefaultMailStore();
 			if (!Ms)
