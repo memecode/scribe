@@ -8,13 +8,14 @@
 #include "ScribeListAddr.h"
 #include "lgi/common/ListItemCheckBox.h"
 #include "lgi/common/ListItemRadioBtn.h"
+#include "lgi/common/TabView.h"
 
 class Calendar;
 class CalendarUi;
 class CalendarView;
 class Attendee;
 class CalendarSource;
-class GTimeLine;
+class LTimeLine;
 
 extern void InitCalendarView();
 
@@ -178,7 +179,7 @@ class CalendarUi :
 	LTabPage *Appointment;
 	LTabPage *AttendTab;
 	LScriptUi Commands;
-	class GAttendees *Attendees;
+	class LAttendees *Attendees;
 	bool NotifyOn;
 
 	bool OnViewKey(LView *v, LKey &k);	

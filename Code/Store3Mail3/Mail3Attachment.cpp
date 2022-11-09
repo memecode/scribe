@@ -1,7 +1,7 @@
 #include "Mail3.h"
 #include "lgi/common/TextConvert.h"
 
-Mail3BlobStream::Mail3BlobStream(GMail3Store *store, int segid, int size, const char *file, int line, bool Write)
+Mail3BlobStream::Mail3BlobStream(LMail3Store *store, int segid, int size, const char *file, int line, bool Write)
 {
 	Store = store;
 	File = file;
@@ -13,7 +13,7 @@ Mail3BlobStream::Mail3BlobStream(GMail3Store *store, int segid, int size, const 
 	WriteAccess = Write;
 	
 	#if MAIL3_TRACK_OBJS
-	GMail3Store::SqliteObjs &_d = Store->All.New();
+	LMail3Store::SqliteObjs &_d = Store->All.New();
 	_d.Stream = this;
 	#endif
 
@@ -126,20 +126,20 @@ ssize_t Mail3BlobStream::Write(const void *Buf, ssize_t Len, int Flags)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-GMail3Attachment::GMail3Attachment(GMail3Store *store) :
-	Store3Attachment<GMail3Store, GMail3Mail, GMail3Attachment>(store)
+LMail3Attachment::LMail3Attachment(LMail3Store *store) :
+	Store3Attachment<LMail3Store, LMail3Mail, LMail3Attachment>(store)
 {
 	SegId = -1;
 	BlobSize = 0;
 	InMemoryOnly = false;
 }
 
-GMail3Attachment::~GMail3Attachment()
+LMail3Attachment::~LMail3Attachment()
 {
 	_Delete();
 }
 
-void GMail3Attachment::SetInMemoryOnly(bool b)
+void LMail3Attachment::SetInMemoryOnly(bool b)
 {
 	InMemoryOnly = b;
 	for (unsigned i=0; i<Children.Length(); i++)
@@ -148,7 +148,7 @@ void GMail3Attachment::SetInMemoryOnly(bool b)
 	}
 }
 
-uint64 GMail3Attachment::Size()
+uint64 LMail3Attachment::Size()
 {
 	int64 HeaderSz = Headers ? strlen(Headers) : 0;
 	int64 NameSz = Name.Length();
@@ -168,26 +168,26 @@ uint64 GMail3Attachment::Size()
 			ImportSz;
 }
 
-uint64 GMail3Attachment::SizeChildren()
+uint64 LMail3Attachment::SizeChildren()
 {
 	uint64 s = 0;
 	for (unsigned i=0; i<Children.Length(); i++)
 	{
-		GMail3Attachment *c = Children.a[i];
+		LMail3Attachment *c = Children.a[i];
 		s += c->Size();
 		s += c->SizeChildren();
 	}
 	return s;	
 }
 
-GMail3Attachment *GMail3Attachment::Find(int64 Id)
+LMail3Attachment *LMail3Attachment::Find(int64 Id)
 {
 	if (SegId == Id)
 		return this;
 
 	for (unsigned i=0; i<Children.Length(); i++)
 	{
-		GMail3Attachment *r = Children.a[i]->Find(Id);
+		LMail3Attachment *r = Children.a[i]->Find(Id);
 		if (r)
 			return r;
 	}
@@ -195,7 +195,7 @@ GMail3Attachment *GMail3Attachment::Find(int64 Id)
 	return 0;
 }
 
-Store3CopyImpl(GMail3Attachment)
+Store3CopyImpl(LMail3Attachment)
 {
 	Headers.Reset(NewStr(p.GetStr(FIELD_INTERNET_HEADER)));
 	if (Headers)
@@ -221,7 +221,7 @@ Store3CopyImpl(GMail3Attachment)
 	return true;
 }
 
-char *GMail3Attachment::GetHeaders()
+char *LMail3Attachment::GetHeaders()
 {
 	if (!Headers)
 	{
@@ -245,7 +245,7 @@ char *GMail3Attachment::GetHeaders()
 	return Headers;
 }
 
-bool GMail3Attachment::ParseHeaders()
+bool LMail3Attachment::ParseHeaders()
 {
 	LAutoString Ct(InetGetHeaderField(Headers, "Content-Type"));
 	char *Colon = Ct ? strchr(Ct, ';') : 0;
@@ -268,7 +268,7 @@ bool GMail3Attachment::ParseHeaders()
 	return true;
 }
 
-bool GMail3Attachment::Load(GMail3Store::GStatement &s, int64 &ParentId)
+bool LMail3Attachment::Load(LMail3Store::LStatement &s, int64 &ParentId)
 {
 	SegId = s.GetInt64(0);
 	ParentId = s.GetInt64(2);
@@ -284,12 +284,12 @@ bool GMail3Attachment::Load(GMail3Store::GStatement &s, int64 &ParentId)
 	return true;
 }
 
-Store3Status GMail3Attachment::Save(LDataI *NewParent)
+Store3Status LMail3Attachment::Save(LDataI *NewParent)
 {
 	if (NewParent)
 	{
 		// Check hierarchy
-		GMail3Attachment *NewSeg = dynamic_cast<GMail3Attachment*>(NewParent);
+		LMail3Attachment *NewSeg = dynamic_cast<LMail3Attachment*>(NewParent);
 		if (NewSeg)
 		{
 			// This propagates the in mem only setting down the tree of nodes
@@ -299,7 +299,7 @@ Store3Status GMail3Attachment::Save(LDataI *NewParent)
 		}
 		else
 		{
-			GMail3Mail *NewMail = dynamic_cast<GMail3Mail*>(NewParent);
+			LMail3Mail *NewMail = dynamic_cast<LMail3Mail*>(NewParent);
 			if (NewMail)
 			{
 				if (NewMail != Mail)
@@ -322,9 +322,9 @@ Store3Status GMail3Attachment::Save(LDataI *NewParent)
 		{
 			if (SegId <= 0)
 			{
-				GMail3Attachment *Parent = GetParent();
+				LMail3Attachment *Parent = GetParent();
 
-				GMail3Store::GInsert Ins(Kit, MAIL3_TBL_MAILSEGS);
+				LMail3Store::LInsert Ins(Kit, MAIL3_TBL_MAILSEGS);
 				Ins.SetInt64(1, Mail->Id);
 				Ins.SetInt64(2, Parent ? Parent->SegId : -1);
 				Ins.SetStr(3, GetHeaders());
@@ -337,9 +337,9 @@ Store3Status GMail3Attachment::Save(LDataI *NewParent)
 			}
 			else if (Dirty)
 			{
-				GMail3Attachment *Parent = GetParent();
+				LMail3Attachment *Parent = GetParent();
 
-				GMail3Store::GUpdate Up(Kit, MAIL3_TBL_MAILSEGS, SegId, Import ? 0 : (char*)"Data");
+				LMail3Store::LUpdate Up(Kit, MAIL3_TBL_MAILSEGS, SegId, Import ? 0 : (char*)"Data");
 				Up.SetInt64(0, SegId);
 				Up.SetInt64(1, Mail->Id);
 				Up.SetInt64(2, Parent ? Parent->SegId : -1);
@@ -363,7 +363,7 @@ Store3Status GMail3Attachment::Save(LDataI *NewParent)
 	return Store3Success;
 }
 
-void GMail3Attachment::OnSave()
+void LMail3Attachment::OnSave()
 {
 	if (!Mail)
 	{
@@ -382,7 +382,7 @@ void GMail3Attachment::OnSave()
 	}
 }
 
-const char *GMail3Attachment::GetStr(int id)
+const char *LMail3Attachment::GetStr(int id)
 {
 	switch (id)
 	{
@@ -391,7 +391,7 @@ const char *GMail3Attachment::GetStr(int id)
 		    if (!Charset)
 		    {
 			    // Maybe a parent segment has a charset?
-			    for (GMail3Attachment *p = GetParent(); p; p = p->GetParent())
+			    for (LMail3Attachment *p = GetParent(); p; p = p->GetParent())
 			    {
 			        auto Cs = p->GetStr(FIELD_CHARSET);
 			        if (Cs)
@@ -462,7 +462,7 @@ const char *GMail3Attachment::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMail3Attachment::SetStr(int id, const char *str)
+Store3Status LMail3Attachment::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -501,7 +501,7 @@ Store3Status GMail3Attachment::SetStr(int id, const char *str)
 	return Store3Success;
 }
 
-int64 GMail3Attachment::GetInt(int id)
+int64 LMail3Attachment::GetInt(int id)
 {
 	switch (id)
 	{
@@ -515,13 +515,13 @@ int64 GMail3Attachment::GetInt(int id)
 	return false;
 }
 
-Store3Status GMail3Attachment::SetInt(int id, int64 i)
+Store3Status LMail3Attachment::SetInt(int id, int64 i)
 {
 	LAssert(!"Unknown id.");
 	return Store3Error;
 }
 
-Store3Status GMail3Attachment::Delete(bool ToTrash)
+Store3Status LMail3Attachment::Delete(bool ToTrash)
 {
 	if (InMemoryOnly)
 		return Store3Success;
@@ -531,7 +531,7 @@ Store3Status GMail3Attachment::Delete(bool ToTrash)
 
 	LString Sql;
 	Sql.Printf("delete from " MAIL3_TBL_MAILSEGS " where Id=" LPrintfInt64, SegId);
-	GMail3Store::GStatement s(Kit, Sql);
+	LMail3Store::LStatement s(Kit, Sql);
 	if (!s.Exec())
 		return Store3Error;
 
@@ -539,7 +539,7 @@ Store3Status GMail3Attachment::Delete(bool ToTrash)
 	return Store3Success;
 }
 
-LAutoStreamI GMail3Attachment::GetStream(const char *file, int line)
+LAutoStreamI LMail3Attachment::GetStream(const char *file, int line)
 {
 	LAutoStreamI Ret;
 
@@ -551,7 +551,7 @@ LAutoStreamI GMail3Attachment::GetStream(const char *file, int line)
 	return Ret;
 }
 
-bool GMail3Attachment::SetStream(LAutoStreamI s)
+bool LMail3Attachment::SetStream(LAutoStreamI s)
 {
 	Import = s;
 	Dirty = true;

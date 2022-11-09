@@ -537,9 +537,9 @@ bool BayesianFilter::BuildSpamDb()
 	LProgressDlg prog(App, 100);
 	auto Saved = prog.Push();
 	auto Total = inbox->Items.Length()+spam->Items.Length();
-	prog.SetRange(LRange(0, Total));
+	prog.SetRange(Total);
 	prog.SetDescription("Parsing email...");
-	Saved->SetRange(LRange(0, Total));
+	Saved->SetRange(Total);
 	Saved->SetDescription("Saving training data...");
 
 	LArray<MailItem> Items;
@@ -770,10 +770,10 @@ void BayesianFilter::BuildStats()
 
 		LProgressDlg prog;
 		prog.SetDescription("Spam...");
-		prog.SetRange(LRange(0, spam->Items.Length()));
+		prog.SetRange(spam->Items.Length());
 		auto inboxProg = prog.Push();
 		inboxProg->SetDescription("Inbox...");
-		inboxProg->SetRange(LRange(0, inbox->Items.Length()));
+		inboxProg->SetRange(inbox->Items.Length());
 
 		LString err;
 		for (auto i: spam->Items)

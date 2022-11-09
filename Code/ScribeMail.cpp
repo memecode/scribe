@@ -817,14 +817,14 @@ ItemFieldDef MailFieldDefs[] =
 };
 
 //////////////////////////////////////////////////////////////////////////////
-class GIdentityItem : public LListItem
+class LIdentityItem : public LListItem
 {
 	ScribeWnd *App;
 	ScribeAccount *Acc;
 	char *Txt;
 
 public:
-	GIdentityItem(ScribeWnd *app, ScribeAccount *acc)
+	LIdentityItem(ScribeWnd *app, ScribeAccount *acc)
 	{
 		App = app;
 		Acc = acc;
@@ -861,7 +861,7 @@ public:
 		}
 	}
 	
-	~GIdentityItem()
+	~LIdentityItem()
 	{
 		DeleteArray(Txt);
 	}
@@ -886,14 +886,14 @@ public:
 	}
 };
 
-class GIdentityDropDrop : public LPopup
+class LIdentityDropDrop : public LPopup
 {
 	ScribeWnd *App;
 	Mail *Email;
 	LList *Lst;
 
 public:
-	GIdentityDropDrop(ScribeWnd *app, Mail *mail, LView *owner) :
+	LIdentityDropDrop(ScribeWnd *app, Mail *mail, LView *owner) :
 		LPopup(owner)
 	{
 		App = app;
@@ -909,20 +909,20 @@ public:
 
 			if (App)
 			{
-				Lst->Insert(new GIdentityItem(App, 0));
+				Lst->Insert(new LIdentityItem(App, 0));
 
 				for (auto a : *App->GetAccounts())
 				{
 					if (a->Identity.Name().Str())
 					{
-						Lst->Insert(new GIdentityItem(App, a));
+						Lst->Insert(new LIdentityItem(App, a));
 					}
 				}
 				
 				/*
 				for (LListItem *i = List->First(); i; i = List->Next())
 				{
-					GIdentityItem *Item = dynamic_cast<GIdentityItem*>(i);
+					LIdentityItem *Item = dynamic_cast<LIdentityItem*>(i);
 					if (Item)
 					{
 						char *IdEmail = a->Send.IdentityEmail();
@@ -956,7 +956,7 @@ public:
 				{
 					Visible(false);
 
-					GIdentityItem *NewFrom = dynamic_cast<GIdentityItem*>(Lst->GetSelected());
+					LIdentityItem *NewFrom = dynamic_cast<LIdentityItem*>(Lst->GetSelected());
 					if (Email && NewFrom)
 					{
 						// ScribeAccount *a = NewFrom->GetAccount();
@@ -2700,7 +2700,7 @@ void MailUi::OnSave()
 		To->OnSave(Item->GetObject()->GetStore(), Item->GetTo());
 	}
 	
-	GMailStore *AccountMailStore = NULL;
+	LMailStore *AccountMailStore = NULL;
 	
 	if (FromCbo && Item->GetFrom() && FromAccountId.Length() > 0)
 	{
@@ -7798,7 +7798,7 @@ void Mail::DeleteAsSpam(LView *View)
 
 	// Move it to the spam folder if it exists.
 	auto FolderPath = ParentFolder->GetPath();
-	GToken Parts(FolderPath, "/");
+	LToken Parts(FolderPath, "/");
 	
 	if (Parts.Length() == 0)
 		LgiMsg(View, "Error: No folder path?", AppName);
@@ -7811,7 +7811,7 @@ void Mail::DeleteAsSpam(LView *View)
 		ScribeFolder *Spam = App->GetFolder(SpamPath);
 		if (!Spam)
 		{
-			GMailStore *Ms = App->GetMailStoreForPath(FolderPath);
+			LMailStore *Ms = App->GetMailStoreForPath(FolderPath);
 			if (!Ms)
 			{
 				if (ParentFolder->GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Imap)
@@ -9468,61 +9468,30 @@ bool Mail::Export(LStreamI &f, const char *MimeType)
 	}
 	else if (!Stricmp(MimeType, sMimeMessage))
 	{
-		LProgressDlg Prog(App, 500);
-		Prog.SetDescription(LLoadString(IDS_LOADING));
-		Prog.SetRange(LRange(0, TIMEOUT_OBJECT_LOAD));
-
-		int64 Start = LCurrentTime();
-		bool First = true;
-		while (GetObject())
+		// This function can't be asyncronous, it must complete with UI or waiting for a callback.
+		// Because it is used by the drag and drop system. Which won't wait.
+		auto state = GetLoaded();
+		if (state != Store3Loaded)
 		{
-			Store3State Loaded = (Store3State)GetObject()->GetInt(FIELD_LOADED);
-			if (Loaded == Store3Loaded)
-				break;
-			
-			if (First)
-			{
-				GetObject()->SetInt(FIELD_LOADED, Store3Loaded);
-				First = false;
-			}
-			
-			// Get obj could've loaded the object, so try the feld again...
-			Loaded = (Store3State)GetObject()->GetInt(FIELD_LOADED);
-			if (Loaded == Store3Loaded)
-				break;
-			
-			// Still not loaded... so wait...?
-			LgiTrace("%s:%i - Waiting for object load... %i\n", _FL, Loaded);			
-
-			auto YieldTs = LCurrentTime();
-			while (LCurrentTime() - YieldTs < 2000)
-			{
-				LSleep(30);
-				Prog.Value(LCurrentTime() - Start);
-				LYield();
-
-				if (Prog.IsCancelled())
-					return false;
-			}
-			if (LCurrentTime() - Start >= TIMEOUT_OBJECT_LOAD)
-			{
-				LAssert(!"Load failed?");
-				return false;
-			}
-		}
-		if (GetObject())
+			LAssert(!"Object not loaded.");
+			return false;
+		}			
+		if (!GetObject())
 		{
-			// New way: get the back end DB do the work of converting the message
-			// to RFC822.
-			LAutoStreamI Data = GetObject()->GetStream(_FL);
-			if (Data)
-			{
-				Data->SetPos(0);
-				
-				LCopyStreamer Cp(512<<10);
-				return Cp.Copy(Data, &f) > 0;
-			}
+			LAssert(!"No object?");
+			return false;
 		}
+		
+		auto Data = GetObject()->GetStream(_FL);
+		if (!Data)
+		{
+			LgiTrace("%s:%i - Object for export has no data.\n", _FL);
+			return false;
+		}
+		
+		Data->SetPos(0);
+		LCopyStreamer Cp(512<<10);
+		return Cp.Copy(Data, &f) > 0;
 	}
 
 	return false;

@@ -40,7 +40,7 @@ public:
 #define ScrollDaySize				10
 #define ScrollTotal					100
 
-class GTimeLine : public LLayout
+class LTimeLine : public LLayout
 {
 	static int DayStart, DayEnd;
 
@@ -103,7 +103,7 @@ class GTimeLine : public LLayout
 	}
 
 public:
-	GTimeLine(Calendar *cal, LList *lst, CalendarViewMode m)
+	LTimeLine(Calendar *cal, LList *lst, CalendarViewMode m)
 	{
 		Lst = lst;
 		Cal = cal;
@@ -328,11 +328,11 @@ public:
 	}
 };
 
-int GTimeLine::DayStart = 7;
-int GTimeLine::DayEnd = 23;
+int LTimeLine::DayStart = 7;
+int LTimeLine::DayEnd = 23;
 
 //////////////////////////////////////////////////////////////////////////////////////
-GAttendees::GAttendees() : ResObject(Res_Custom)
+LAttendees::LAttendees() : ResObject(Res_Custom)
 {
 	Cal = 0;
 	Users = 0;
@@ -349,7 +349,7 @@ GAttendees::GAttendees() : ResObject(Res_Custom)
 	}
 }
 
-void GAttendees::Save(List<Attendee> &To)
+void LAttendees::Save(List<Attendee> &To)
 {
 	if (Cal && Users)
 	{
@@ -370,12 +370,12 @@ void GAttendees::Save(List<Attendee> &To)
 	}
 }
 
-void GAttendees::Load(Calendar *cal, List<Attendee> &From)
+void LAttendees::Load(Calendar *cal, List<Attendee> &From)
 {
 	Cal = cal;
 	if (Splitter && Cal && Users && App)
 	{
-		Splitter->SetViewB(TimeLine = new GTimeLine(Cal, Users, CAL_VIEW_DAY));
+		Splitter->SetViewB(TimeLine = new LTimeLine(Cal, Users, CAL_VIEW_DAY));
 
 		Identity Id(App);
 		if (Id.GetEmail() &&
@@ -396,7 +396,7 @@ void GAttendees::Load(Calendar *cal, List<Attendee> &From)
 	}
 }
 
-void GAttendees::OnCreate()
+void LAttendees::OnCreate()
 {
 	if (Splitter)
 	{
@@ -415,13 +415,13 @@ void GAttendees::OnCreate()
 	}
 }
 
-void GAttendees::OnPosChange()
+void LAttendees::OnPosChange()
 {
 	LRect c = GetClient();
 	Splitter->SetPos(c, true);
 }
 
-int GAttendees::OnNotify(LViewI *c, int f)
+int LAttendees::OnNotify(LViewI *c, int f)
 {
 	switch (c->GetId())
 	{
@@ -445,14 +445,14 @@ int GAttendees::OnNotify(LViewI *c, int f)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-class GAttendeesFactory : public GViewFactory
+class LAttendeesFactory : public GViewFactory
 {
 	LView *NewView(const char *Class, LRect *Pos, const char *Text)
 	{
 		if (Class &&
-			_stricmp(Class, "GAttendees") == 0)
+			_stricmp(Class, "LAttendees") == 0)
 		{
-			return new GAttendees;
+			return new LAttendees;
 		}
 
 		return 0;

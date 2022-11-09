@@ -5,7 +5,7 @@
 #include "resdefs.h"
 
 //////////////////////////////////////////////////////////////////////////
-class GImportEml : public LDialog
+class LImportEml : public LDialog
 {
 	ScribeWnd *App;
 
@@ -14,7 +14,7 @@ public:
 	ScribeFolder *Out;
 	int TotalEmail;
 
-	GImportEml(ScribeWnd *app)
+	LImportEml(ScribeWnd *app)
 	{
 		Out = 0;
 		SetParent(App = app);
@@ -192,14 +192,14 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 
 void ImportEml(ScribeWnd *App)
 {
-	auto Dlg = new GImportEml(App);
+	auto Dlg = new LImportEml(App);
 	Dlg->DoModal([Dlg, App](auto dlg, auto id)
 	{
 		if (id)
 		{
 			int Errors = 0;
 			LProgressDlg Prog(App);
-			Prog.SetRange(LRange(0, Dlg->TotalEmail));
+			Prog.SetRange(Dlg->TotalEmail);
 			Prog.SetDescription("Email");
 			ImportEmlFolders(App, Prog.ItemAt(0), Dlg->Out, Dlg->In, &Errors);
 			if (Errors)

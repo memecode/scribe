@@ -777,7 +777,7 @@ bool DecodeUuencodedAttachment(LDataStoreI *Store, LArray<LDataI*> &Files, LStre
 					Last = 0;
 				}
 
-				GToken Header(s, " ", true, e - s);
+				LToken Header(s, " ", true, e - s);
 				if (Header.Length() >= 3)
 				{
 					LMemQueue File;
@@ -958,7 +958,7 @@ Store3Status Store3Progress::SetInt(int id, int64 i)
 		ItemAt(0)->Value(i);
 		break;
 	case Store3UiMaxPos:
-		ItemAt(0)->SetRange(LRange(0, (ssize_t)i));
+		ItemAt(0)->SetRange(i);
 		break;				
 	case Store3UiNewFormat:
 		NewFormat = (int)i;
@@ -1244,7 +1244,7 @@ Mailto::Mailto(ScribeWnd *app, const char *s)
 			*Question++ = 0;
 
 			// Split all the headers up
-			GToken Headers(Question, "&");
+			LToken Headers(Question, "&");
 			for (unsigned h=0; h<Headers.Length(); h++)
 			{
 				char *Header = Headers[h];

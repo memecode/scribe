@@ -284,7 +284,7 @@ class ImapAttachment : public Store3Attachment<ImapStore, ImapMail, ImapAttachme
 	/// rfc822 image is maintained by not MIME decoding into separate
 	/// segments but leaving it MIME encoded in one seg (headers and body).
 	/// At runtime the segment is loaded and parsed into a temporary tree
-	/// of GMail3Attachment objects. This flag is set for those temporary
+	/// of LMail3Attachment objects. This flag is set for those temporary
 	/// nodes.
 	bool InMemoryOnly;
 

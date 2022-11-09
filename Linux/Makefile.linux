@@ -110,7 +110,6 @@ Source =	../Utils/Tables/MailFlags.c \
 			../Code/Store3Imap/ScribeImap_Attachment.cpp \
 			../Code/Store3Common.cpp \
 			../Code/Sqlite/v3.6.14/sqlite3.c \
-			../Code/SpellCheckAspell.cpp \
 			../Code/SecurityDlg.cpp \
 			../Code/SearchView.cpp \
 			../Code/Scripting.cpp \
@@ -207,6 +206,7 @@ Source =	../Utils/Tables/MailFlags.c \
 			../../../lgi/trunk/src/common/Text/vCard-vCal.cpp \
 			../../../lgi/trunk/src/common/Text/TextView4.cpp \
 			../../../lgi/trunk/src/common/Text/TextConvert.cpp \
+			../../../lgi/trunk/src/common/Text/SpellCheckAspell.cpp \
 			../../../lgi/trunk/src/common/Text/HtmlParser.cpp \
 			../../../lgi/trunk/src/common/Text/HtmlCommon.cpp \
 			../../../lgi/trunk/src/common/Text/Html.cpp \
@@ -487,6 +487,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/include/lgi/common/List.h \
 	../../../lgi/trunk/include/lgi/common/ListItemCheckBox.h \
 	../../../lgi/trunk/include/lgi/common/ListItemRadioBtn.h \
+	../../../lgi/trunk/include/lgi/common/LMallocArray.h \
 	../../../lgi/trunk/include/lgi/common/Mail.h \
 	../../../lgi/trunk/include/lgi/common/Matrix.h \
 	../../../lgi/trunk/include/lgi/common/Mem.h \

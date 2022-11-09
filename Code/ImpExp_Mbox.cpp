@@ -209,7 +209,7 @@ void Import_UnixMBox(ScribeWnd *Parent)
 			{
 				for (auto File: Dlg->SrcFiles)
 				{
-					GTextFile F;
+					LTextFile F;
 					if (F.Open(File, O_READ))
 						Folder->Import(F, sMimeMbox);
 				}

@@ -8,7 +8,7 @@ class ManageMailStores : public LDialog, public LXmlTreeUi
 	ScribeWnd *App;
 	class LList *Lst;
 	
-	GMailStore *GetCurrentMailStore();
+	LMailStore *GetCurrentMailStore();
 
 public:
 	LXmlTag Options;

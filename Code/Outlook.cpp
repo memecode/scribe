@@ -28,13 +28,13 @@ SPropValue *MapiGetField(SRow *Row, int Field)
 }
 
 /*
-class GRow : public LListItem
+class LRow : public LListItem
 {
 	SRow *Row;
 	char **Data;
 
 public:
-	GRow(SRow *row)
+	LRow(SRow *row)
 	{
 		Row = row;
 		if (Row)
@@ -138,7 +138,7 @@ public:
 
 				for (i=0; i<Table->cRows; i++)
 				{
-					List->Insert(new GRow(Table->aRow+i));
+					List->Insert(new LRow(Table->aRow+i));
 				}
 			}
 

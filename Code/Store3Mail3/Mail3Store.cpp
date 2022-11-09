@@ -9,20 +9,20 @@
 #define SanityCheck() if (!IsOk()) return NULL;
 
 ///////////////////////////////////////////////////////////////////////////////////
-GMail3Thing::~GMail3Thing()
+LMail3Thing::~LMail3Thing()
 {
 }
 
-Store3Status GMail3Thing::Delete(bool ToTrash)
+Store3Status LMail3Thing::Delete(bool ToTrash)
 {
 	LArray<LDataI*> Del;
 	Del.Add(this);
 	return Store->Delete(Del, ToTrash);
 }
 
-Store3Status GMail3Thing::Save(LDataI *Folder)
+Store3Status LMail3Thing::Save(LDataI *Folder)
 {
-	GMail3Folder *Fld = dynamic_cast<GMail3Folder*>(Folder);
+	LMail3Folder *Fld = dynamic_cast<LMail3Folder*>(Folder);
 	if (Folder && !Fld)
 	{
 		LAssert(!"Not the right folder type");
@@ -126,7 +126,7 @@ GMail3Idx Mail3Indexes[] =
 	{"MailSegParentIdx", MAIL3_TBL_MAILSEGS, "ParentId"},
 };
 
-GMail3Store::GMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool Create) :
+LMail3Store::LMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool Create) :
 	TableStatus(0, Store3Error)
 {
 	Format = Mail3v1;
@@ -160,8 +160,8 @@ GMail3Store::GMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool C
 	}
 
 	#if _DEBUG
-	GMail3Mail m(this);
-	Store3MimeTree<GMail3Store, GMail3Mail, GMail3Attachment> Tree(&m, m.Seg);
+	LMail3Mail m(this);
+	Store3MimeTree<LMail3Store, LMail3Mail, LMail3Attachment> Tree(&m, m.Seg);
 	if (!Tree.UnitTests(this, &m))
 	{
 		LgiTrace("%s:%i - Error: Store3MimeTree unit tests failed\n", _FL);
@@ -170,13 +170,13 @@ GMail3Store::GMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool C
 	#endif
 }
 
-GMail3Store::~GMail3Store()
+LMail3Store::~LMail3Store()
 {
 	CloseDb();
 	DeleteObj(Root);
 }
 
-GMail3Folder *GMail3Store::GetSystemFolder(int Type)
+LMail3Folder *LMail3Store::GetSystemFolder(int Type)
 {
 	if (!Callback || !Root)
 		return NULL;
@@ -198,7 +198,7 @@ GMail3Folder *GMail3Store::GetSystemFolder(int Type)
 	return NULL;
 }
 
-LDataPropI *GMail3Store::GetObj(int id)
+LDataPropI *LMail3Store::GetObj(int id)
 {
 	switch (id)
 	{
@@ -215,7 +215,7 @@ LDataPropI *GMail3Store::GetObj(int id)
 	return NULL;
 }
 
-bool GMail3Store::OpenDb()
+bool LMail3Store::OpenDb()
 {
 	char f[MAX_PATH_LEN];
 	
@@ -249,7 +249,7 @@ bool GMail3Store::OpenDb()
 		
 		LArray<LAutoString> DelNames;
 		{
-			GStatement Tables(	this,
+			LStatement Tables(	this,
 								"SELECT name FROM sqlite_master "
 								"WHERE type='table' "
 								"ORDER BY name;");
@@ -264,7 +264,7 @@ bool GMail3Store::OpenDb()
 		{
 			char Sql[256];
 			sprintf_s(Sql, sizeof(Sql), "drop table %s", DelNames[i].Get());
-			GStatement Del(this, Sql);
+			LStatement Del(this, Sql);
 			if (!Del.Exec())
 			{
 				LAssert(!"Drop table failed.");
@@ -280,7 +280,7 @@ bool GMail3Store::OpenDb()
 					Mail3Indexes[i].IdxName,
 					Mail3Indexes[i].Table,
 					Mail3Indexes[i].Column);
-			GStatement s(this, f);
+			LStatement s(this, f);
 			s.Exec();
 		}
 	}
@@ -288,7 +288,7 @@ bool GMail3Store::OpenDb()
 	return true;
 }
 
-bool GMail3Store::CloseDb()
+bool LMail3Store::CloseDb()
 {
 	DeleteObj(Transaction);
 	if (Db)
@@ -314,19 +314,19 @@ bool GMail3Store::CloseDb()
 	return true;
 }
 
-GMail3Store::Mail3Trans::Mail3Trans(GMail3Store *s, GMail3Store::Mail3Trans **ptr)
+LMail3Store::Mail3Trans::Mail3Trans(LMail3Store *s, LMail3Store::Mail3Trans **ptr)
 	: LDataStoreI::LDsTransaction(s), Trans(s)
 {
 	Ptr = ptr;
 	*Ptr = this;
 }
 
-GMail3Store::Mail3Trans::~Mail3Trans()
+LMail3Store::Mail3Trans::~Mail3Trans()
 {
 	*Ptr = 0;
 }
 
-LDataStoreI::StoreTrans GMail3Store::StartTransaction()
+LDataStoreI::StoreTrans LMail3Store::StartTransaction()
 {
 	StoreTrans t;
 	if (!Transaction)
@@ -336,7 +336,7 @@ LDataStoreI::StoreTrans GMail3Store::StartTransaction()
 	return t;
 }
 
-void GMail3Store::OnNew(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new)
+void LMail3Store::OnNew(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new)
 {
 	if (!Callback)
 		return;
@@ -344,7 +344,7 @@ void GMail3Store::OnNew(const char *File, int Line, LDataFolderI *parent, LArray
 	Callback->OnNew(parent, new_items, pos, is_new);
 }
 
-bool GMail3Store::OnChange(const char *File, int Line, LArray<LDataI*> &items, int FieldHint)
+bool LMail3Store::OnChange(const char *File, int Line, LArray<LDataI*> &items, int FieldHint)
 {
 	if (!Callback)
 		return false;
@@ -352,7 +352,7 @@ bool GMail3Store::OnChange(const char *File, int Line, LArray<LDataI*> &items, i
 	return Callback->OnChange(items, FieldHint);
 }
 
-bool GMail3Store::OnMove(const char *File, int Line, LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items)
+bool LMail3Store::OnMove(const char *File, int Line, LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items)
 {
 	if (!Callback)
 		return false;
@@ -360,7 +360,7 @@ bool GMail3Store::OnMove(const char *File, int Line, LDataFolderI *new_parent, L
 	return Callback->OnMove(new_parent, old_parent, items);
 }
 
-bool GMail3Store::OnDelete(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &items)
+bool LMail3Store::OnDelete(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &items)
 {
 	if (!Callback)
 		return false;
@@ -368,7 +368,7 @@ bool GMail3Store::OnDelete(const char *File, int Line, LDataFolderI *parent, LAr
 	return Callback->OnDelete(parent, items);
 }
 
-const char *GMail3Store::GetStr(int id)
+const char *LMail3Store::GetStr(int id)
 {
 	switch (id)
 	{
@@ -383,7 +383,7 @@ const char *GMail3Store::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMail3Store::SetStr(int id, const char *s)
+Store3Status LMail3Store::SetStr(int id, const char *s)
 {
 	switch (id)
 	{
@@ -404,7 +404,7 @@ Store3Status GMail3Store::SetStr(int id, const char *s)
 	return Store3Success;
 }
 
-int64 GMail3Store::GetInt(int id)
+int64 LMail3Store::GetInt(int id)
 {
 	switch (id)
 	{
@@ -428,7 +428,7 @@ int64 GMail3Store::GetInt(int id)
 	return -1;
 }
 
-Store3Status GMail3Store::SetInt(int id, int64 i)
+Store3Status LMail3Store::SetInt(int id, int64 i)
 {
 	switch (id)
 	{
@@ -439,7 +439,7 @@ Store3Status GMail3Store::SetInt(int id, int64 i)
 	return Store3Error;
 }
 
-bool GMail3Store::Check(int Code, const char *Sql)
+bool LMail3Store::Check(int Code, const char *Sql)
 {
 	if (Code == SQLITE_OK ||
 		Code == SQLITE_DONE)
@@ -471,49 +471,49 @@ bool GMail3Store::Check(int Code, const char *Sql)
 	return false;
 }
 
-uint64 GMail3Store::Size()
+uint64 LMail3Store::Size()
 {
 	return LFileSize(DbFile);
 }
 
-LDataI *GMail3Store::Create(int Type)
+LDataI *LMail3Store::Create(int Type)
 {
 	switch ((uint32_t)Type)
 	{
 		case MAGIC_FOLDER:
-			return new GMail3Folder(this);
+			return new LMail3Folder(this);
 		case MAGIC_MAIL:
-			return new GMail3Mail(this);
+			return new LMail3Mail(this);
 		case MAGIC_FILTER:
-			return new GMail3Filter(this);
+			return new LMail3Filter(this);
 		case MAGIC_CALENDAR:
-			return new GMail3Calendar(this);
+			return new LMail3Calendar(this);
 		case MAGIC_ATTACHMENT:
-			return new GMail3Attachment(this);
+			return new LMail3Attachment(this);
 
 		case MAGIC_CONTACT:
-			return new GMail3Contact(this);
+			return new LMail3Contact(this);
 		case MAGIC_GROUP:
-			return new GMail3Group(this);
+			return new LMail3Group(this);
 	}
 
 	LAssert(0);
 	return 0;
 }
 
-LDataFolderI *GMail3Store::GetRoot(bool create)
+LDataFolderI *LMail3Store::GetRoot(bool create)
 {
 	SanityCheck()
 
 	if (!Root)
 	{
-		GStatement s(this, "select * from '" MAIL3_TBL_FOLDER "' where ParentId is null");
+		LStatement s(this, "select * from '" MAIL3_TBL_FOLDER "' where ParentId is null");
 		if (s.IsOk())
 		{
 			if (s.Row())
 			{
 				// Load existing root folder...
-				if ((Root = new GMail3Folder(this)))
+				if ((Root = new LMail3Folder(this)))
 				{
 					Root->Items.State = Store3Loaded;
 					Root->Serialize(s, false);
@@ -522,7 +522,7 @@ LDataFolderI *GMail3Store::GetRoot(bool create)
 			else
 			{
 				// Create new root folder...
-				if ((Root = new GMail3Folder(this)))
+				if ((Root = new LMail3Folder(this)))
 				{
 					Root->Items.State = Store3Loaded;
 					Root->Write(MAIL3_TBL_FOLDER, true);
@@ -541,18 +541,18 @@ LDataFolderI *GMail3Store::GetRoot(bool create)
 	#define PROF_MOVE(...)
 #endif
 
-Store3Status GMail3Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
+Store3Status LMail3Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 {
 	Store3Status Status = Store3Error;
 
-	GMail3Folder *To = dynamic_cast<GMail3Folder*>(NewFolder);
+	LMail3Folder *To = dynamic_cast<LMail3Folder*>(NewFolder);
 	if (!To)
 		return Status;
 	if (Items.Length() == 0)
 		return Store3Success;
 
 #if PROFILE_MOVE
-LProfile prof("GMail3Store::Move");
+LProfile prof("LMail3Store::Move");
 #endif
 	LDataFolderI *OldParent = NULL;
 	LArray<LDataI*> Moved;
@@ -560,8 +560,8 @@ LProfile prof("GMail3Store::Move");
 
 	for (unsigned n=0; n<Items.Length(); n++)
 	{
-		GMail3Thing *Thing = 0;
-		GMail3Folder *Fld = dynamic_cast<GMail3Folder*>(Items[n]);
+		LMail3Thing *Thing = 0;
+		LMail3Folder *Fld = dynamic_cast<LMail3Folder*>(Items[n]);
 		if (Fld)
 		{
 PROF_MOVE("0");
@@ -572,7 +572,7 @@ PROF_MOVE("0");
 				char s[256];
 				sprintf_s(s, sizeof(s), "update " MAIL3_TBL_FOLDER " set ParentId=" LPrintfInt64 " where Id=" LPrintfInt64, To->Id, Fld->Id);
 PROF_MOVE("1");
-				GStatement Stmt(this, s);
+				LStatement Stmt(this, s);
 				if (Stmt.Exec())
 				{
 PROF_MOVE("2");
@@ -598,7 +598,7 @@ PROF_MOVE("4");
 				}
 			}
 		}
-		else if ((Thing = dynamic_cast<GMail3Thing*>(Items[n])))
+		else if ((Thing = dynamic_cast<LMail3Thing*>(Items[n])))
 		{
 PROF_MOVE("5");
 			if (Thing->ParentId == To->Id)
@@ -619,7 +619,7 @@ PROF_MOVE("5");
 PROF_MOVE("6");
 				char s[256];
 				sprintf_s(s, sizeof(s), "update %s set ParentId=" LPrintfInt64 " where Id=" LPrintfInt64, Thing->GetTable(), To->Id, Thing->Id);
-				GStatement Stmt(this, s);
+				LStatement Stmt(this, s);
 				if (Stmt.Exec())
 				{
 PROF_MOVE("6");
@@ -674,13 +674,13 @@ PROF_MOVE("8");
 	return Status;
 }
 
-Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
+Store3Status LMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 {
 	if (Items.Length() == 0)
 		return Store3Error;
 
 	LVariant FolderName;
-	GMail3Folder *Trash = 0;
+	LMail3Folder *Trash = 0;
 	if (ToTrash && Callback->GetSystemPath(FOLDER_TRASH, FolderName))
 	{
 		auto t = LString(FolderName.Str()).SplitDelimit("/");
@@ -695,7 +695,7 @@ Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 		{
 			LDataI *di = Items[i];
 			
-			GMail3Thing *t = dynamic_cast<GMail3Thing*>(di);
+			LMail3Thing *t = dynamic_cast<LMail3Thing*>(di);
 			if (t && t->Parent != Trash)
 			{
 				// Move the item to the trash instead...
@@ -704,7 +704,7 @@ Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 			}
 			else
 			{			
-				GMail3Folder *f = dynamic_cast<GMail3Folder*>(di);
+				LMail3Folder *f = dynamic_cast<LMail3Folder*>(di);
 				if (f && f->Parent != Trash)
 				{
 					// Move the folder to the trash instead...
@@ -732,7 +732,7 @@ Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 	{
 		default:
 		{
-			GMail3Thing *t = dynamic_cast<GMail3Thing*>(Item);
+			LMail3Thing *t = dynamic_cast<LMail3Thing*>(Item);
 			if (!t)
 			{
 				LAssert(!"What are you trying to do?");
@@ -746,7 +746,7 @@ Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 			{
 				for (unsigned i=0; i<Items.Length(); i++)
 				{
-					if ((t = dynamic_cast<GMail3Thing*>(Items[i])))
+					if ((t = dynamic_cast<LMail3Thing*>(Items[i])))
 					{
 						if (t->DbDelete())
 						{
@@ -766,7 +766,7 @@ Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 		{
 			for (auto i: Items)
 			{
-				GMail3Attachment *a = dynamic_cast<GMail3Attachment*>(i);
+				LMail3Attachment *a = dynamic_cast<LMail3Attachment*>(i);
 				if (a)
 				{
 					a->Delete(ToTrash);
@@ -778,7 +778,7 @@ Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 		}
 		case MAGIC_FOLDER:
 		{
-			GMail3Folder *f = dynamic_cast<GMail3Folder*>(Item);
+			LMail3Folder *f = dynamic_cast<LMail3Folder*>(Item);
 			if (!f)
 				s = Store3Error;
 			else if (Callback && !Callback->OnDelete(f->Parent, Items))
@@ -787,7 +787,7 @@ Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 			{
 				for (unsigned i=0; i<Items.Length(); i++)
 				{
-					if ((f = dynamic_cast<GMail3Folder*>(Items[i])))
+					if ((f = dynamic_cast<LMail3Folder*>(Items[i])))
 					{
 						if (f->DbDelete())
 						{
@@ -808,7 +808,7 @@ Store3Status GMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 	return s;
 }
 
-Store3Status GMail3Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator)
+Store3Status LMail3Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator)
 {
 	if (Items.Length() == 0)
 		return Store3Success;
@@ -851,7 +851,7 @@ Store3Status GMail3Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &V
 		LArray<LDataI*> Chunk;
 		for (unsigned n=0; n<100 && i<Items.Length(); n++, i++)
 		{
-			auto m = dynamic_cast<GMail3Mail*>(Items[i]);
+			auto m = dynamic_cast<LMail3Mail*>(Items[i]);
 			if (!m)
 			{
 				LAssert(!"Invalid object.");
@@ -872,13 +872,13 @@ Store3Status GMail3Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &V
 		if (Chunk.Length())
 		{
 			auto Sql = p.NewGStr();
-			GStatement s(this, Sql);
+			LStatement s(this, Sql);
 			if (!s.Exec())
 				return Store3Error;
 
 			for (unsigned n=0; n<Chunk.Length(); n++)
 			{
-				GMail3Mail *m = dynamic_cast<GMail3Mail*>(Chunk[n]);
+				LMail3Mail *m = dynamic_cast<LMail3Mail*>(Chunk[n]);
 				if (m)
 				{
 					if (Operator == OpMinusEquals)
@@ -895,7 +895,7 @@ Store3Status GMail3Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &V
 	return Store3Success;
 }
 
-bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
+bool LMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 {
 	if (!Parent || !Props)
 		return false;
@@ -905,10 +905,10 @@ bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 		return true;
 	
 	bool Error = false;
-	GStatement Folders(this, "select * from " MAIL3_TBL_FOLDER);
+	LStatement Folders(this, "select * from " MAIL3_TBL_FOLDER);
 	char Sql[256];
 
-	GStatement Count(this, "select Count(*) as c from " MAIL3_TBL_FOLDER);
+	LStatement Count(this, "select Count(*) as c from " MAIL3_TBL_FOLDER);
 	if (Count.Row())
 	{
 		char *c = Count.GetStr(0);
@@ -936,7 +936,7 @@ bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 
 				// Set the parent ID on all mail rows in the sub-folder table (just to be sure)
 				sprintf_s(Sql, sizeof(Sql), "update %s set ParentId=" LPrintfInt64, TblName, Id);
-				GStatement SetId(this, Sql);
+				LStatement SetId(this, Sql);
 				if (!SetId.Exec())
 				{
 					Error = true;
@@ -945,7 +945,7 @@ bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 
 				// Now copy all the rows into the main Mail table
 				sprintf_s(Sql, sizeof(Sql), "insert into " MAIL3_TBL_MAIL " select * from %s", TblName);
-				GStatement Copy(this, Sql);
+				LStatement Copy(this, Sql);
 				if (!Copy.Exec())
 				{
 					Error = true;
@@ -954,7 +954,7 @@ bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 
 				// And drop the sub-folder table..				
 				sprintf_s(Sql, sizeof(Sql), "drop table if exists %s", TblName);
-				GStatement Del(this, Sql);
+				LStatement Del(this, Sql);
 				if (!Del.Exec())
 				{
 					Error = true;
@@ -967,7 +967,7 @@ bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 	{
 		// Change format to a table per folder of email
 		{
-			GTransaction Trans(this);
+			LTransaction Trans(this);
 			int Pos = 0;
 			while (Folders.Row())
 			{
@@ -977,7 +977,7 @@ bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 				sprintf_s(TblName, sizeof(TblName), "Mail_" LPrintfInt64, Id);
 				
 				sprintf_s(Sql, sizeof(Sql), "create table if not exists %s as select * from Mail where ParentId=" LPrintfInt64, TblName, Id);
-				GStatement Convert(this, Sql);
+				LStatement Convert(this, Sql);
 				if (!Convert.Exec())
 				{
 					Error = true;
@@ -990,7 +990,7 @@ bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 		}
 
 		sprintf_s(Sql, sizeof(Sql), "drop table if exists " MAIL3_TBL_FOLDER);
-		GStatement Del(this, Sql);
+		LStatement Del(this, Sql);
 		if (!Del.Exec())
 			Error = true;
 	}
@@ -1001,7 +1001,7 @@ bool GMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 	return !Error;
 }
 
-bool GMail3Store::Upgrade(LViewI *Parent, LDataPropI *Props)
+bool LMail3Store::Upgrade(LViewI *Parent, LDataPropI *Props)
 {
 	bool Status = true;
 
@@ -1284,7 +1284,7 @@ bool CheckPathForFile(const char *File, char *Exe, int ExeSize)
     return false;
 }
 
-bool GMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
+bool LMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
 {
 	// Is the sqlite3 shell binary available?
 	char base[MAX_PATH_LEN];
@@ -1323,7 +1323,7 @@ bool GMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
 					DownloadUrl.Get(),
 					base);
 		auto Dlg = new LAlert(p?p:Parent,
-							"GMail3Store::Repair",
+							"LMail3Store::Repair",
 							Msg,
 							"Browse Download Site & Local Folder",
 							"Cancel");
@@ -1356,10 +1356,10 @@ bool GMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
 	return Worker.Status;
 }
 
-int64 GMail3Store::GetFolderId(char *Path)
+int64 LMail3Store::GetFolderId(char *Path)
 {
 	auto Parts = LString(Path).SplitDelimit("/");
-	GMail3Folder *Root = dynamic_cast<GMail3Folder*>(GetRoot());
+	LMail3Folder *Root = dynamic_cast<LMail3Folder*>(GetRoot());
 	if (!Root)
 		return 0;
 
@@ -1369,7 +1369,7 @@ int64 GMail3Store::GetFolderId(char *Path)
 		char *p = Parts[i];
 		char Sql[256];
 		sprintf_s(Sql, sizeof(Sql), "select * from " MAIL3_TBL_FOLDER " where Name=\"%s\" and ParentId=" LPrintfInt64, p, Id);
-		GStatement s(this, Sql);
+		LStatement s(this, Sql);
 		if (s.Row())
 		{
 			Id = s.GetInt64(0);
@@ -1380,20 +1380,20 @@ int64 GMail3Store::GetFolderId(char *Path)
 	return Id;
 }
 
-bool GMail3Store::DeleteMailById(int64 Id)
+bool LMail3Store::DeleteMailById(int64 Id)
 {
 	LDataStoreI::StoreTrans Trans = StartTransaction();
 	char s[256];
 
 	// Delete all the segments...
 	sprintf_s(s, sizeof(s), "delete from " MAIL3_TBL_MAILSEGS " where MailId=" LPrintfInt64, Id);
-	GMail3Store::GStatement Del(this, s);
+	LMail3Store::LStatement Del(this, s);
 	if (!Del.Exec())
 		return false;
 
 	// Delete the mail itself
 	sprintf_s(s, sizeof(s), "delete from " MAIL3_TBL_MAIL " where Id=" LPrintfInt64, Id);
-	GMail3Store::GStatement Del2(this, s);
+	LMail3Store::LStatement Del2(this, s);
 	if (!Del2.Exec())
 		return false;
 
@@ -1404,7 +1404,7 @@ class CompactThread : public LThread, public LMutex
 {
 	bool Loop;
 	int64 InboxId;
-	GMail3Store *Store;
+	LMail3Store *Store;
 
 public:
 	LString Error;
@@ -1413,7 +1413,7 @@ public:
 	int64 Max;
 	int Return;
 	
-	CompactThread(GMail3Store *store, int64 inboxId) :
+	CompactThread(LMail3Store *store, int64 inboxId) :
 		LThread("CompactThread.Thread"),
 		LMutex("CompactThread.Mutex")
 	{
@@ -1459,7 +1459,7 @@ public:
 		// Clean up orphaned mail segments.
 		{
 			SetStatus("Cleaning up orphaned Mail segments...");
-			GMail3Store::GStatement s(Store,
+			LMail3Store::LStatement s(Store,
 				"delete from " MAIL3_TBL_MAILSEGS " where MailId not in (select Id from " MAIL3_TBL_MAIL ")");
 			if (!s.Exec())
 			{
@@ -1474,7 +1474,7 @@ public:
 		{
 			SetStatus("Cleaning up orphaned Mail...");
 
-			GMail3Store::GStatement count(Store, "select COUNT(*) from " MAIL3_TBL_MAIL " where ParentId not in (select Id from " MAIL3_TBL_FOLDER ")");
+			LMail3Store::LStatement count(Store, "select COUNT(*) from " MAIL3_TBL_MAIL " where ParentId not in (select Id from " MAIL3_TBL_FOLDER ")");
 			if (count.Row())
 			{
 				int64 Rows = count.GetInt64(0);
@@ -1482,7 +1482,7 @@ public:
 			}
 
 			LDataStoreI::StoreTrans Trn = Store->StartTransaction();
-			GMail3Store::GStatement s(Store, "select Id from " MAIL3_TBL_MAIL " where ParentId not in (select Id from " MAIL3_TBL_FOLDER ")");
+			LMail3Store::LStatement s(Store, "select Id from " MAIL3_TBL_MAIL " where ParentId not in (select Id from " MAIL3_TBL_FOLDER ")");
 			int64 RowPos = 0;
 			while (Loop && s.Row())
 			{
@@ -1496,7 +1496,7 @@ public:
 				
 				char Sql[256];
 				sprintf_s(Sql, sizeof(Sql), "update "MAIL3_TBL_MAIL" set ParentId="LPrintfInt64" where Id="LPrintfInt64, InboxId, Id);
-				GMail3Store::GStatement Move(Store, Sql);
+				LMail3Store::LStatement Move(Store, Sql);
 				if (!Move.Exec())
 				{
 					if (Lock(_FL))
@@ -1522,7 +1522,7 @@ public:
 		{
 			SetStatus("Vacuum unused space...");
 
-			GMail3Store::GStatement s(Store, "vacuum;");
+			LMail3Store::LStatement s(Store, "vacuum;");
 			if (!s.Exec())
 			{
 				SetError("Reclaiming space failed.");
@@ -1536,7 +1536,7 @@ public:
 	}
 };
 
-bool GMail3Store::Compact(LViewI *Parent, LDataPropI *Props)
+bool LMail3Store::Compact(LViewI *Parent, LDataPropI *Props)
 {
 	bool Status = false;
 	LVariant InboxPath;
@@ -1593,11 +1593,11 @@ bool GMail3Store::Compact(LViewI *Parent, LDataPropI *Props)
 	return Status;
 }
 
-void GMail3Store::OnEvent(void *Param)
+void LMail3Store::OnEvent(void *Param)
 {
 }
 
-bool GMail3Store::IsOk()
+bool LMail3Store::IsOk()
 {
 	return
 		#ifndef __llvm__
@@ -1606,12 +1606,12 @@ bool GMail3Store::IsOk()
 		Db != 0;
 }
 
-bool GMail3Store::ParseTableFormat(const char *Name, TableDefn &Defs)
+bool LMail3Store::ParseTableFormat(const char *Name, TableDefn &Defs)
 {
 	char Sql[256];
 	sprintf_s(Sql, sizeof(Sql), "SELECT * FROM sqlite_master WHERE type='table' and name='%s'", Name);
 
-	GStatement st(this, Sql);
+	LStatement st(this, Sql);
 	if (!st.IsOk())
 		return false;
 
@@ -1646,7 +1646,7 @@ bool GMail3Store::ParseTableFormat(const char *Name, TableDefn &Defs)
 	return true;
 }
 
-Store3Status GMail3Store::CheckTable(const char *Name, GMail3Def *Flds)
+Store3Status LMail3Store::CheckTable(const char *Name, GMail3Def *Flds)
 {
 	Store3Status Status = Store3Success;
 
@@ -1717,9 +1717,9 @@ Store3Status GMail3Store::CheckTable(const char *Name, GMail3Def *Flds)
 	return Status;
 }
 
-bool GMail3Store::UpdateTable(const char *Name, GMail3Def *Flds, Store3Status Check)
+bool LMail3Store::UpdateTable(const char *Name, GMail3Def *Flds, Store3Status Check)
 {
-	GStatement st(this);
+	LStatement st(this);
 	LAutoString TempTable;
 	TableDefn Defs;
 
@@ -1738,7 +1738,7 @@ bool GMail3Store::UpdateTable(const char *Name, GMail3Def *Flds, Store3Status Ch
 		char AlterSql[256];
 		sprintf_s(AlterSql, sizeof(AlterSql), "alter table %s rename to %s", Name, Tmp);
 
-		GStatement Alter(this, AlterSql);
+		LStatement Alter(this, AlterSql);
 		if (!Alter.Exec())
 		{
 			LAssert(!"Can't rename table.");
@@ -1827,7 +1827,7 @@ bool GMail3Store::UpdateTable(const char *Name, GMail3Def *Flds, Store3Status Ch
 	return true;
 }
 
-GMail3Store::GInsert::GInsert(GMail3Store *store, const char *Tbl) : GStatement(store)
+LMail3Store::LInsert::LInsert(LMail3Store *store, const char *Tbl) : LStatement(store)
 {
 	Store = store;
 	Table = Tbl;
@@ -1850,7 +1850,7 @@ GMail3Store::GInsert::GInsert(GMail3Store *store, const char *Tbl) : GStatement(
 	}
 }
 
-GMail3Store::GUpdate::GUpdate(GMail3Store *store, const char *Tbl, int64 rowid, char *ExcludeField) : GStatement(store)
+LMail3Store::LUpdate::LUpdate(LMail3Store *store, const char *Tbl, int64 rowid, char *ExcludeField) : LStatement(store)
 {
 	RowId = rowid;
 	Store = store;
@@ -1880,27 +1880,27 @@ GMail3Store::GUpdate::GUpdate(GMail3Store *store, const char *Tbl, int64 rowid, 
 }
 
 ////////////////////////////////////////////////////////////////////////
-bool GMail3Obj::Check(int r, char *sql)
+bool LMail3Obj::Check(int r, char *sql)
 {
 	return Store->Check(r, sql);
 }
 
 #define DEBUG_MAIL3_WRITE				0
 
-bool GMail3Obj::Write(const char *Table, bool Insert)
+bool LMail3Obj::Write(const char *Table, bool Insert)
 {
 #if DEBUG_MAIL3_WRITE
-LProfile Prof("GMail3Obj::Write");
+LProfile Prof("LMail3Obj::Write");
 #endif
-	LAutoPtr<GMail3Store::GStatement> s;
+	LAutoPtr<LMail3Store::LStatement> s;
 
 #if DEBUG_MAIL3_WRITE
 Prof.Add(_FL);
 #endif
 	if (Insert)
-		s.Reset(new GMail3Store::GInsert(Store, Table));
+		s.Reset(new LMail3Store::LInsert(Store, Table));
 	else
-		s.Reset(new GMail3Store::GUpdate(Store, Table, Id));
+		s.Reset(new LMail3Store::LUpdate(Store, Table, Id));
 #if DEBUG_MAIL3_WRITE
 Prof.Add(_FL);
 #endif
@@ -1936,13 +1936,13 @@ Prof.Add(_FL);
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMail3Store::GStatement::GStatement(GMail3Store *store, const char *sql)
+LMail3Store::LStatement::LStatement(LMail3Store *store, const char *sql)
 {
 	Store = store;
 	s = 0;
 
 	#if MAIL3_TRACK_OBJS
-	GMail3Store::SqliteObjs &_d = Store->All.New();
+	LMail3Store::SqliteObjs &_d = Store->All.New();
 	_d.Stat = this;
 	#endif
 
@@ -1950,7 +1950,7 @@ GMail3Store::GStatement::GStatement(GMail3Store *store, const char *sql)
 		Prepare(sql);
 }
 
-GMail3Store::GStatement::~GStatement()
+LMail3Store::LStatement::~LStatement()
 {
 	Finalize();
 
@@ -1959,12 +1959,12 @@ GMail3Store::GStatement::~GStatement()
 	#endif
 }
 
-int64 GMail3Store::GStatement::LastInsertId()
+int64 LMail3Store::LStatement::LastInsertId()
 {
 	return sqlite3_last_insert_rowid(Store->GetDb());
 }
 
-bool GMail3Store::GStatement::Prepare(const char *Sql)
+bool LMail3Store::LStatement::Prepare(const char *Sql)
 {
 	Finalize();
 	
@@ -1974,7 +1974,7 @@ bool GMail3Store::GStatement::Prepare(const char *Sql)
 	return s != 0;
 }
 
-bool GMail3Store::GStatement::Finalize()
+bool LMail3Store::LStatement::Finalize()
 {
 	if (!s)
 		return false;
@@ -1986,14 +1986,14 @@ bool GMail3Store::GStatement::Finalize()
 	return Status;
 }
 
-bool GMail3Store::GStatement::Row()
+bool LMail3Store::LStatement::Row()
 {
 	if (!IsOk()) return false;
 	int r = sqlite3_step(s);
 	return r == SQLITE_ROW;
 }
 
-bool GMail3Store::GStatement::Exec()
+bool LMail3Store::LStatement::Exec()
 {
 	if (!IsOk()) return false;
 
@@ -2049,7 +2049,7 @@ bool GMail3Store::GStatement::Exec()
 	return Status;
 }
 
-bool GMail3Store::GStatement::Reset()
+bool LMail3Store::LStatement::Reset()
 {
 	if (!IsOk()) return false;
 	return	Store->Check(sqlite3_reset(s), 0) &&
@@ -2057,33 +2057,33 @@ bool GMail3Store::GStatement::Reset()
 }
 
 /* All the getter functions use 'Col' as the first column is '0' */
-int GMail3Store::GStatement::GetSize(int Col)
+int LMail3Store::LStatement::GetSize(int Col)
 {
 	return IsOk() ? sqlite3_column_bytes(s, Col) : 0;
 }
 
-bool GMail3Store::GStatement::GetBool(int Col)
+bool LMail3Store::LStatement::GetBool(int Col)
 {
 	if (!IsOk() || sqlite3_column_type(s, Col) == SQLITE_NULL)
 		return false;
 	return sqlite3_column_int(s, Col) != 0;
 }
 
-int GMail3Store::GStatement::GetInt(int Col)
+int LMail3Store::LStatement::GetInt(int Col)
 {
 	if (!IsOk() || sqlite3_column_type(s, Col) == SQLITE_NULL)
 		return -1;
 	return sqlite3_column_int(s, Col);
 }
 
-int64 GMail3Store::GStatement::GetInt64(int Col)
+int64 LMail3Store::LStatement::GetInt64(int Col)
 {
 	if (!IsOk() || sqlite3_column_type(s, Col) == SQLITE_NULL)
 		return -1;
 	return sqlite3_column_int64(s, Col);
 }
 
-bool GMail3Store::GStatement::SetInt64(int Col, int64 n)
+bool LMail3Store::LStatement::SetInt64(int Col, int64 n)
 {
 	if (!IsOk()) return false;
 	if (n == -1)
@@ -2092,12 +2092,12 @@ bool GMail3Store::GStatement::SetInt64(int Col, int64 n)
 		return Store->Check(sqlite3_bind_int64(s, Col+1, n), 0);
 }
 
-char *GMail3Store::GStatement::GetStr(int Col)
+char *LMail3Store::LStatement::GetStr(int Col)
 {
 	return IsOk() ? (char*)sqlite3_column_text(s, Col) : 0;
 }
 
-bool GMail3Store::GStatement::GetBinary(int Col, LVariant *v)
+bool LMail3Store::LStatement::GetBinary(int Col, LVariant *v)
 {
 	if (!v)
 		return false;
@@ -2111,7 +2111,7 @@ bool GMail3Store::GStatement::GetBinary(int Col, LVariant *v)
 }
 
 /* All the setter functions use 'Col+1' as the first column is '1' */
-bool GMail3Store::GStatement::SetInt(int Col, int n)
+bool LMail3Store::LStatement::SetInt(int Col, int n)
 {
 	if (!IsOk()) return false;
 	if (n == -1)
@@ -2120,7 +2120,7 @@ bool GMail3Store::GStatement::SetInt(int Col, int n)
 		return Store->Check(sqlite3_bind_int(s, Col+1, n), 0);
 }
 
-bool GMail3Store::GStatement::SetStr(int Col, char *Str)
+bool LMail3Store::LStatement::SetStr(int Col, char *Str)
 {
 	if (!IsOk()) return false;
 	if (Str)
@@ -2129,7 +2129,7 @@ bool GMail3Store::GStatement::SetStr(int Col, char *Str)
 		return Store->Check(sqlite3_bind_null(s, Col+1), 0);
 }
 
-bool GMail3Store::GStatement::SetDate(int Col, LDateTime &Var)
+bool LMail3Store::LStatement::SetDate(int Col, LDateTime &Var)
 {
 	if (!Var.Year())
 		return Store->Check(sqlite3_bind_null(s, Col+1), 0);
@@ -2139,7 +2139,7 @@ bool GMail3Store::GStatement::SetDate(int Col, LDateTime &Var)
 	return Store->Check(sqlite3_bind_text(s, Col+1, (const char*)c, -1, SQLITE_TRANSIENT), 0);
 };
 
-bool GMail3Store::GStatement::SetStream(int Col, const char *ColName, LStreamI *Data)
+bool LMail3Store::LStatement::SetStream(int Col, const char *ColName, LStreamI *Data)
 {
 	if (!IsOk() || !Data)
 		return false;
@@ -2153,7 +2153,7 @@ bool GMail3Store::GStatement::SetStream(int Col, const char *ColName, LStreamI *
 	return Store->Check(sqlite3_bind_zeroblob(s, Col+1, (int)p.Size), 0);
 }
 
-bool GMail3Store::GStatement::SetBinary(int Col, const char *ColName, LVariant *v)
+bool LMail3Store::LStatement::SetBinary(int Col, const char *ColName, LVariant *v)
 {
 	if (!v || v->Type != GV_BINARY)
 	{
@@ -2168,7 +2168,7 @@ bool GMail3Store::GStatement::SetBinary(int Col, const char *ColName, LVariant *
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMail3Store::GTransaction::GTransaction(GMail3Store *store)
+LMail3Store::LTransaction::LTransaction(LMail3Store *store)
 {
 	Store = store;
 	
@@ -2176,7 +2176,7 @@ GMail3Store::GTransaction::GTransaction(GMail3Store *store)
 	Open = Store ? Store->Check(sqlite3_exec(Store->GetDb(), Sql, 0, 0, 0), Sql) : false;
 }
 
-GMail3Store::GTransaction::~GTransaction()
+LMail3Store::LTransaction::~LTransaction()
 {
 	if (Open)
 	{
@@ -2185,7 +2185,7 @@ GMail3Store::GTransaction::~GTransaction()
 	}
 }
 
-bool GMail3Store::GTransaction::RollBack()
+bool LMail3Store::LTransaction::RollBack()
 {
 	bool Status = false;
 
@@ -2202,5 +2202,5 @@ bool GMail3Store::GTransaction::RollBack()
 /////////////////////////////////////////////////////////////////////////
 LDataStoreI *OpenMail3(const char *Mail3Folder, LDataEventsI *Callback, bool Create)
 {
-	return new GMail3Store(Mail3Folder, Callback, Create);
+	return new LMail3Store(Mail3Folder, Callback, Create);
 }

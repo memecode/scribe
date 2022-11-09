@@ -7,9 +7,9 @@
 #include "ScribeMapi.h"
 
 /////////////////////////////////////////////////////////////////////////////
-class GMapiAdviseSink : public IMAPIAdviseSink
+class LMapiAdviseSink : public IMAPIAdviseSink
 {
-	GMapiStore *Store;
+	LMapiStore *Store;
 	volatile LONG Refs;
 
 public:
@@ -19,14 +19,14 @@ public:
 	ULONG_PTR Connection;
 	#endif
 
-	GMapiAdviseSink(GMapiStore *store)
+	LMapiAdviseSink(LMapiStore *store)
 	{
 		Store = store;
 		Refs = 1;
 		Connection = 0;
 	}
 	
-	~GMapiAdviseSink()
+	~LMapiAdviseSink()
 	{
 		LAssert(Refs == 0);
 	}
@@ -73,7 +73,7 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-GMapiStore::GMapiStore(const char *profile, const char *username, const char *password, uint64 accountId, LDataEventsI *callback)
+LMapiStore::LMapiStore(const char *profile, const char *username, const char *password, uint64 accountId, LDataEventsI *callback)
 {
 	Session = NULL;
 	MsgStore = NULL;
@@ -148,7 +148,7 @@ GMapiStore::GMapiStore(const char *profile, const char *username, const char *pa
 
 				#if 1
 				// Setup notification
-				Notify = new GMapiAdviseSink(this);
+				Notify = new LMapiAdviseSink(this);
 				if (Notify)
 				{					
 					res = MsgStore->Advise(	(ULONG)InboxEntry.Length(),
@@ -168,7 +168,7 @@ GMapiStore::GMapiStore(const char *profile, const char *username, const char *pa
 	}
 }
 
-GMapiStore::~GMapiStore()
+LMapiStore::~LMapiStore()
 {
 	MAPIUninitialize = NULL;
 	MAPIInitialize = NULL;
@@ -184,9 +184,9 @@ GMapiStore::~GMapiStore()
 		MAPIUninitialize();
 }
 
-ULONG GMapiStore::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications)
+ULONG LMapiStore::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications)
 {
-	GMapiFolder *Inbox = FindSystemFolder(Store3SystemInbox);
+	LMapiFolder *Inbox = FindSystemFolder(Store3SystemInbox);
 	if (!Inbox)
 		return S_OK;
 
@@ -199,7 +199,7 @@ ULONG GMapiStore::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications)
 		{
 			case fnevNewMail:
 			{
-				LAutoPtr<GMapiMail> nm(new GMapiMail(this));
+				LAutoPtr<LMapiMail> nm(new LMapiMail(this));
 				if (nm)
 				{
 					SPropValue e;
@@ -247,7 +247,7 @@ ULONG GMapiStore::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications)
 	return S_OK;
 }
 
-bool GMapiStore::Error(const char *Fmt, ...)
+bool LMapiStore::Error(const char *Fmt, ...)
 {
 	va_list arg;
 	va_start(arg, Fmt);
@@ -259,7 +259,7 @@ bool GMapiStore::Error(const char *Fmt, ...)
 	return false;
 }
 
-bool GMapiStore::Login()
+bool LMapiStore::Login()
 {
     char16 Cur[MAX_PATH_LEN];
     GetCurrentDirectory(CountOf(Cur), Cur);
@@ -303,7 +303,7 @@ bool GMapiStore::Login()
 	return true;
 }
 
-GMapiFolder *GMapiStore::FindSystemFolder(Store3SystemFolder Type)
+LMapiFolder *LMapiStore::FindSystemFolder(Store3SystemFolder Type)
 {
 	LDataFolderI *r = GetRoot();
 	if (!r)
@@ -314,7 +314,7 @@ GMapiFolder *GMapiStore::FindSystemFolder(Store3SystemFolder Type)
 	{
 		if (f->GetInt(FIELD_SYSTEM_FOLDER) == Type)
 		{
-			GMapiFolder *Trash = dynamic_cast<GMapiFolder*>(f);
+			LMapiFolder *Trash = dynamic_cast<LMapiFolder*>(f);
 			LAssert(Trash != NULL);
 			return Trash;
 		}
@@ -324,7 +324,7 @@ GMapiFolder *GMapiStore::FindSystemFolder(Store3SystemFolder Type)
 }
 
 
-Store3Status GMapiStore::SetInt(int id, int64 i)
+Store3Status LMapiStore::SetInt(int id, int64 i)
 {
 	switch (id)
 	{
@@ -370,7 +370,7 @@ Store3Status GMapiStore::SetInt(int id, int64 i)
 	return Store3Success;
 }
 
-int64 GMapiStore::GetInt(int id)
+int64 LMapiStore::GetInt(int id)
 {
 	switch (id)
 	{
@@ -387,7 +387,7 @@ int64 GMapiStore::GetInt(int id)
 	return -1;
 }
 
-const char *GMapiStore::GetStr(int id)
+const char *LMapiStore::GetStr(int id)
 {
 	switch (id)
 	{
@@ -399,7 +399,7 @@ const char *GMapiStore::GetStr(int id)
 	return NULL;
 }
 
-bool GMapiStore::OnChange(const char *File, int Line, LArray<LDataI*> &items, int FieldHint)
+bool LMapiStore::OnChange(const char *File, int Line, LArray<LDataI*> &items, int FieldHint)
 {
 	if (!Callback)
 		return false;
@@ -407,18 +407,18 @@ bool GMapiStore::OnChange(const char *File, int Line, LArray<LDataI*> &items, in
 	return Callback->OnChange(items, FieldHint);
 }
 
-LDataI *GMapiStore::Create(int Type)
+LDataI *LMapiStore::Create(int Type)
 {
 	switch (Type)
 	{
 		case MAGIC_MAIL:
-			return new GMapiMail(this);
+			return new LMapiMail(this);
 		case MAGIC_FOLDER:
-			return new GMapiFolder(this);
+			return new LMapiFolder(this);
 		case MAGIC_CALENDAR:
-			return new GMapiCalendar(this);
+			return new LMapiCalendar(this);
 		case MAGIC_CONTACT:
-			return new GMapiContact(this);
+			return new LMapiContact(this);
 		default:
 			LAssert(!"Unsupport item type.");
 			Error("%s:%i - Unsupported create type 0x%x\n", _FL, Type);
@@ -428,7 +428,7 @@ LDataI *GMapiStore::Create(int Type)
 	return NULL;
 }
 
-LDataFolderI *GMapiStore::GetRoot(bool create)
+LDataFolderI *LMapiStore::GetRoot(bool create)
 {
 	if (Session && !Root)
 	{
@@ -437,7 +437,7 @@ LDataFolderI *GMapiStore::GetRoot(bool create)
 			IMAPIFolder *r = NULL;
 			if (EntryRef->OpenRoot(Session, Ui, &MsgStore, &r))
 			{
-				if ((Root = new GMapiFolder(this)))
+				if ((Root = new LMapiFolder(this)))
 				{
 					Root->SetStr(FIELD_FOLDER_NAME, EntryRef->DisplayName);
 					Root->Set(r);
@@ -450,9 +450,9 @@ LDataFolderI *GMapiStore::GetRoot(bool create)
 	return Root;
 }
 
-Store3Status GMapiStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
+Store3Status LMapiStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 {
-	GMapiFolder *Dest = dynamic_cast<GMapiFolder*>(NewFolder);
+	LMapiFolder *Dest = dynamic_cast<LMapiFolder*>(NewFolder);
 	if (!Dest ||
 		Items.Length() == 0)
 	{
@@ -460,11 +460,11 @@ Store3Status GMapiStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 	}
 
 	LArray<LDataI*> Moved;
-	GMapiFolder *Source = NULL;
+	LMapiFolder *Source = NULL;
 	LArray<SBinary> Entries;
 	for (unsigned i=0; i<Items.Length(); i++)
 	{
-		GMapiThing *t = dynamic_cast<GMapiThing*>(Items[i]);
+		LMapiThing *t = dynamic_cast<LMapiThing*>(Items[i]);
 		if (t && t->Parent)
 		{
 			if (!Source)
@@ -518,7 +518,7 @@ Store3Status GMapiStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 	
 	for (unsigned i=0; i<Moved.Length(); i++)
 	{
-		GMapiThing *t = dynamic_cast<GMapiThing*>(Moved[i]);
+		LMapiThing *t = dynamic_cast<LMapiThing*>(Moved[i]);
 		if (t)
 		{
 			Source->Items.a.Delete(t);
@@ -537,19 +537,19 @@ Store3Status GMapiStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 	return Store3Success;
 }
 
-Store3Status GMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
+Store3Status LMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 {
 	if (Items.Length() == 0)
 		return Store3Error;
 
-	GMapiFolder *Trash = ToTrash ? FindSystemFolder(Store3SystemTrash) : NULL;
+	LMapiFolder *Trash = ToTrash ? FindSystemFolder(Store3SystemTrash) : NULL;
 	if (Trash)
 	{
 	    LArray<LDataI*> MoveItems;
 	    for (unsigned i=0; i<Items.Length(); i++)
 	    {
 	        LDataI *di = Items[i];
-	        GMapiThing *t = dynamic_cast<GMapiThing*>(di);
+	        LMapiThing *t = dynamic_cast<LMapiThing*>(di);
 	        if (t && t->Parent != Trash)
 	        {
 	            // Move the item to the trash instead...
@@ -576,19 +576,19 @@ Store3Status GMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 	{
 		default:
 		{
-			GMapiThing *t = dynamic_cast<GMapiThing*>(Item);
+			LMapiThing *t = dynamic_cast<LMapiThing*>(Item);
 			if (!t)
 				s = Store3Error;
 			else if (Callback && !Callback->OnDelete(t->Parent, Items))
 				s = Store3Error;
 			else
 			{
-				LArray<GMapiThing*> Del;
-				GMapiFolder *Parent = NULL;
+				LArray<LMapiThing*> Del;
+				LMapiFolder *Parent = NULL;
 
 				for (unsigned i=0; i<Items.Length(); i++)
 				{
-					t = dynamic_cast<GMapiThing*>(Items[i]);
+					t = dynamic_cast<LMapiThing*>(Items[i]);
 					if (!t)
 						continue;
 
@@ -648,7 +648,7 @@ Store3Status GMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 		{
 			for (unsigned i=0; i<Items.Length(); i++)
 			{
-				GMapiFolder *f = dynamic_cast<GMapiFolder*>(Items[i]);
+				LMapiFolder *f = dynamic_cast<LMapiFolder*>(Items[i]);
 				if (!f)
 				{
 					s = Store3Error;
@@ -695,7 +695,7 @@ Store3Status GMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 	return s;
 }
 
-Store3Status GMapiStore::Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator)
+Store3Status LMapiStore::Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator)
 {
 	switch (PropId)
 	{
@@ -732,23 +732,23 @@ Store3Status GMapiStore::Change(LArray<LDataI*> &Items, int PropId, LVariant &Va
 	return Store3Success;
 }
 
-bool GMapiStore::Compact(LViewI *Parent, LDataPropI *Props)
+bool LMapiStore::Compact(LViewI *Parent, LDataPropI *Props)
 {
 	LAssert(0);
 	return false;
 }
 
-void GMapiStore::OnEvent(void *Param)
+void LMapiStore::OnEvent(void *Param)
 {
 }
 
-bool GMapiStore::OnIdle()
+bool LMapiStore::OnIdle()
 {
 	if (Dirty.Length() > 0)
 	{
 		for (unsigned i=0; i<Dirty.Length(); i++)
 		{
-			GMapiThing *t = Dirty[i];
+			LMapiThing *t = Dirty[i];
 			if (t && t->MapiMsg)
 			{
 				HRESULT res = t->MapiMsg->SaveChanges(KEEP_OPEN_READWRITE);
@@ -766,13 +766,13 @@ bool GMapiStore::OnIdle()
 	return false;
 }
 
-LDataEventsI *GMapiStore::GetEvents()
+LDataEventsI *LMapiStore::GetEvents()
 {
 	return NULL;
 }
 
 //////////////////////////////////////////////////////
-LDataStoreI *GMapiThing::GetStore()
+LDataStoreI *LMapiThing::GetStore()
 {
 	return Store;
 }
@@ -834,5 +834,5 @@ LDataStoreI *OpenMapiStore(	const char *Profile,
 							uint64 AccountId,
 							LDataEventsI *Callback)
 {
-	return new GMapiStore(Profile, Username, Password, AccountId, Callback);
+	return new LMapiStore(Profile, Username, Password, AccountId, Callback);
 }

@@ -68,29 +68,29 @@ GMail3Def TblContact[] =
 	{0, 0}
 };
 
-GMail3Contact::GMail3Contact(GMail3Store *store) : GMail3Thing(store)
+LMail3Contact::LMail3Contact(LMail3Store *store) : LMail3Thing(store)
 {	
 }
 
-GMail3Contact::~GMail3Contact()
+LMail3Contact::~LMail3Contact()
 {
 	f.DeleteObjects();
 }
 
-bool GMail3Contact::DbDelete()
+bool LMail3Contact::DbDelete()
 {
 	char s[256];
 
 	// Delete the contact
 	sprintf_s(s, sizeof(s), "delete from " MAIL3_TBL_CONTACT " where Id=" LPrintfInt64, Id);
-	GMail3Store::GStatement Del(Store, s);
+	LMail3Store::LStatement Del(Store, s);
 	if (!Del.Exec())
 		return false;
 
 	return true;
 }
 
-Store3CopyImpl(GMail3Contact)
+Store3CopyImpl(LMail3Contact)
 {
 	f.DeleteObjects();
 
@@ -109,7 +109,7 @@ Store3CopyImpl(GMail3Contact)
 	return true;
 }
 
-bool GMail3Contact::Serialize(GMail3Store::GStatement &s, bool Write)
+bool LMail3Contact::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	int i = 0;
 
@@ -165,13 +165,13 @@ bool GMail3Contact::Serialize(GMail3Store::GStatement &s, bool Write)
 	return true;
 }
 
-const char *GMail3Contact::GetStr(int id)
+const char *LMail3Contact::GetStr(int id)
 {
 	LString *s = f.Find(id);
 	return s ? s->Get() : NULL;
 }
 
-Store3Status GMail3Contact::SetStr(int id, const char *str)
+Store3Status LMail3Contact::SetStr(int id, const char *str)
 {
 	if (str)
 	{
@@ -189,7 +189,7 @@ Store3Status GMail3Contact::SetStr(int id, const char *str)
 	return Store3Success;
 }
 
-const LDateTime *GMail3Contact::GetDate(int id)
+const LDateTime *LMail3Contact::GetDate(int id)
 {
 	switch (id)
 	{
@@ -200,7 +200,7 @@ const LDateTime *GMail3Contact::GetDate(int id)
 	return NULL;
 }
 
-Store3Status GMail3Contact::SetDate(int id, const LDateTime *i)
+Store3Status LMail3Contact::SetDate(int id, const LDateTime *i)
 {
 	switch (id)
 	{
@@ -212,7 +212,7 @@ Store3Status GMail3Contact::SetDate(int id, const LDateTime *i)
 	return Store3Error;
 }
 
-LVariant *GMail3Contact::GetVar(int id)
+LVariant *LMail3Contact::GetVar(int id)
 {
 	switch (id)
 	{
@@ -223,7 +223,7 @@ LVariant *GMail3Contact::GetVar(int id)
 	return NULL;
 }
 
-Store3Status GMail3Contact::SetVar(int id, LVariant *i)
+Store3Status LMail3Contact::SetVar(int id, LVariant *i)
 {
 	if (!i)
 		return Store3Error;

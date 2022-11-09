@@ -1,7 +1,7 @@
 #include "Store3Mail2.h"
 #include "resdefs.h"
 
-AttachmentData::AttachmentData(GMail2Store *store) : Store3Attachment<GMail2Store, MailData, AttachmentData>(store)
+AttachmentData::AttachmentData(LMail2Store *store) : Store3Attachment<LMail2Store, MailData, AttachmentData>(store)
 {
 	Content = CONTENT_NONE;
 	DataSize = 0;
@@ -386,7 +386,7 @@ GAutoStreamI AttachmentData::GetStream(const char *file, int line)
 		{
 			// Need to skip over the header data...
 			int Offset = 12 + SizeofStr(Name);
-			GSubFilePtr *Sub = dynamic_cast<GSubFilePtr*>(s);
+			LSubFilePtr *Sub = dynamic_cast<LSubFilePtr*>(s);
 			if (Sub)
 			{
 				int64 Start = 0, Len = 0;

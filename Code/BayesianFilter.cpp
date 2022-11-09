@@ -980,7 +980,7 @@ bool BuildSpamDB::Process()
 		if (Folders.Length() == 0 && FolderLoads == 0)
 		{
 			Prog->SetDescription("Processing mail...");
-			Prog->SetRange(LRange(0, Items.Length()));
+			Prog->SetRange(Items.Length());
 			Prog->Value(0);
 		}
 		return false;
@@ -1230,7 +1230,7 @@ bool BayesianFilter::BuildSpamDb()
 			AddFolderToSpamDb(a->Receive.GetRootFolder());
 	}
 
-	d->Build->Prog->SetRange(LRange(0, d->Build->Folders.Length()));
+	d->Build->Prog->SetRange(d->Build->Folders.Length());
 	return true;
 }
 
@@ -1498,7 +1498,7 @@ Store3Status BayesianFilter::IsSpam(double &Result, Mail *m, bool Analyse)
 		LVariant Wl;
 		if (App->GetOptions()->GetValue(OPT_BayesUserWhiteList, Wl))
 		{
-			GToken w(Wl.Str(), "\r\n\t ");
+			LToken w(Wl.Str(), "\r\n\t ");
 			bool IsWhite = false;
 			for (unsigned i=0; i<w.Length(); i++)
 			{
@@ -1801,7 +1801,7 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 					}
 					if (d->Prog)
 					{
-						d->Prog->SetRange(LRange(0, d->Work.Length()));
+						d->Prog->SetRange(d->Work.Length());
 						d->Prog->Value(i);
 						if (d->Prog->IsCancelled())
 						{

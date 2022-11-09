@@ -18,8 +18,8 @@
 #define MAIL3_TBL_FILTER		"Filter"
 #define MAIL3_TBL_CALENDAR		"Calendar"
 
-class GMail3Store;
-class GMail3Mail;
+class LMail3Store;
+class LMail3Mail;
 
 enum Mail3SubFormat
 {
@@ -42,7 +42,7 @@ struct GMail3Idx
 
 class Mail3BlobStream : public LStream
 {
-	GMail3Store *Store;
+	LMail3Store *Store;
 	sqlite3_blob *b;
 	int64 Pos, Size;
 	int SegId;
@@ -55,7 +55,7 @@ public:
 	const char *File;
 	int Line;
 
-	Mail3BlobStream(GMail3Store *Store, int segId, int size, const char *file, int line, bool Write = false);
+	Mail3BlobStream(LMail3Store *Store, int segId, int size, const char *file, int line, bool Write = false);
 	~Mail3BlobStream();
 	
 	int64 GetPos();
@@ -171,10 +171,10 @@ extern GMail3Def TblCalendar[];
 	}
 	
 
-class GMail3Store : public LDataStoreI
+class LMail3Store : public LDataStoreI
 {
-	friend class GMail3Obj;
-	friend class GMail3Mail;
+	friend class LMail3Obj;
+	friend class LMail3Mail;
 	friend class Mail3Trans;
 	friend class CompactThread;
 
@@ -182,7 +182,7 @@ class GMail3Store : public LDataStoreI
 	sqlite3 *Db;
 	LString Folder;
 	LString DbFile;
-	class GMail3Folder *Root;
+	class LMail3Folder *Root;
 	LHashTbl<ConstStrKey<char,false>, GMail3Def*> Fields;
 	LHashTbl<StrKey<char,false>, GMail3Idx*> Indexes;
 	Store3Status OpenStatus;
@@ -202,12 +202,12 @@ class GMail3Store : public LDataStoreI
 	bool DeleteMailById(int64 Id);
 	bool OpenDb();
 	bool CloseDb();
-	GMail3Folder *GetSystemFolder(int Type);
+	LMail3Folder *GetSystemFolder(int Type);
 
 public:
 	Mail3SubFormat Format;
 
-	class GStatement
+	class LStatement
 	{
 		struct PostBlob
 		{
@@ -219,14 +219,14 @@ public:
 		LArray<PostBlob> Post;
 
 	protected:
-		GMail3Store *Store;
+		LMail3Store *Store;
 		sqlite3_stmt *s;
 		LVariant Table;
 		LAutoString TempSql;
 		
 	public:
-		GStatement(GMail3Store *store, const char *sql = 0);
-		virtual ~GStatement();
+		LStatement(LMail3Store *store, const char *sql = 0);
+		virtual ~LStatement();
 
 		operator sqlite3_stmt *() { return s; }
 
@@ -264,32 +264,32 @@ public:
 		virtual int64 GetRowId() { LAssert(0); return -1; }
 	};
 
-	class GInsert : public GStatement
+	class LInsert : public LStatement
 	{
 	public:
-		GInsert(GMail3Store *store, const char *Tbl);
+		LInsert(LMail3Store *store, const char *Tbl);
 
 		int64 GetRowId() { return LastInsertId(); }
 	};
 
-	class GUpdate : public GStatement
+	class LUpdate : public LStatement
 	{
 		int64 RowId;
 
 	public:
-		GUpdate(GMail3Store *store, const char *Tbl, int64 rowId, char *ExcludeField = 0);
+		LUpdate(LMail3Store *store, const char *Tbl, int64 rowId, char *ExcludeField = 0);
 
 		int64 GetRowId() { return RowId; }
 	};
 
-	class GTransaction
+	class LTransaction
 	{
-		GMail3Store *Store;
+		LMail3Store *Store;
 		bool Open;
 
 	public:
-		GTransaction(GMail3Store *store);
-		~GTransaction();
+		LTransaction(LMail3Store *store);
+		~LTransaction();
 		
 		bool RollBack();
 	};
@@ -297,7 +297,7 @@ public:
 	#if MAIL3_TRACK_OBJS
 	struct SqliteObjs
 	{
-		GStatement *Stat;
+		LStatement *Stat;
 		Mail3BlobStream *Stream;
 		SqliteObjs()
 		{
@@ -325,8 +325,8 @@ public:
 	}
 	#endif
 
-	GMail3Store(const char *Mail3Folder, LDataEventsI *Callback, bool Create);
-	~GMail3Store();
+	LMail3Store(const char *Mail3Folder, LDataEventsI *Callback, bool Create);
+	~LMail3Store();
 
 	int64 GetFolderId(char *Path);
 	LDataEventsI *GetEvents() { return Callback; }
@@ -364,25 +364,25 @@ private:
 	class Mail3Trans : public LDataStoreI::LDsTransaction
 	{
 		Mail3Trans **Ptr;
-		GTransaction Trans;
+		LTransaction Trans;
 
 	public:
-		Mail3Trans(GMail3Store *s, Mail3Trans **ptr);
+		Mail3Trans(LMail3Store *s, Mail3Trans **ptr);
 		~Mail3Trans();
 	} *Transaction;
 };
 
-class GMail3Obj
+class LMail3Obj
 {
 protected:
 	bool Check(int r, char *sql);
 
 public:
-	GMail3Store *Store;
+	LMail3Store *Store;
 	int64 Id;
 	int64 ParentId;
 
-	GMail3Obj(GMail3Store *store)
+	LMail3Obj(LMail3Store *store)
 	{
 		Id = ParentId = -1;
 		Store = store;
@@ -390,15 +390,15 @@ public:
 
 	bool Write(const char *Table, bool Insert);
 
-	virtual const char *GetClass() { return "GMail3Obj"; }
-	virtual bool Serialize(GMail3Store::GStatement &s, bool Write) = 0;
-	virtual void SetStore(GMail3Store *s) { Store = s; }
+	virtual const char *GetClass() { return "LMail3Obj"; }
+	virtual bool Serialize(LMail3Store::LStatement &s, bool Write) = 0;
+	virtual void SetStore(LMail3Store *s) { Store = s; }
 };
 
-class GMail3Thing : public LDataI, public GMail3Obj 
+class LMail3Thing : public LDataI, public LMail3Obj 
 {
-	friend class GMail3Store;
-	GMail3Thing &operator =(GMail3Thing &p) = delete;
+	friend class LMail3Store;
+	LMail3Thing &operator =(LMail3Thing &p) = delete;
 
 protected:
     bool NewMail;
@@ -407,17 +407,17 @@ protected:
 	virtual void OnSave() {};
 
 public:
-	GMail3Folder *Parent;
+	LMail3Folder *Parent;
 
-	GMail3Thing(GMail3Store *store) : GMail3Obj(store)
+	LMail3Thing(LMail3Store *store) : LMail3Obj(store)
 	{
 		Parent = 0;
 		NewMail = false;
 	}
 
-	~GMail3Thing();
+	~LMail3Thing();
 
-	const char *GetClass() { return "GMail3Thing"; }
+	const char *GetClass() { return "LMail3Thing"; }
 	bool IsOnDisk() { return Id > 0; }
 	bool IsOrphan() { return false; }
 	uint64 Size() { return sizeof(*this); }
@@ -425,13 +425,13 @@ public:
 	Store3Status Delete(bool ToTrash);
 	LDataStoreI *GetStore() { return Store; }
 	LAutoStreamI GetStream(const char *file, int line) { LAssert(0); return LAutoStreamI(0); }
-	bool Serialize(GMail3Store::GStatement &s, bool Write) { LAssert(0); return false; }
+	bool Serialize(LMail3Store::LStatement &s, bool Write) { LAssert(0); return false; }
 
 	Store3Status Save(LDataI *Folder = 0);
 	virtual bool DbDelete() { LAssert(0); return false; }
 };
 
-class GMail3Folder : public LDataFolderI, public GMail3Obj
+class LMail3Folder : public LDataFolderI, public LMail3Obj
 {
 public:
 	LVariant Name;
@@ -450,17 +450,17 @@ public:
 	};
 	Store3SystemFolder System;
 
-	GMail3Folder *Parent;
-	DIterator<LDataFolderI, GMail3Folder, GMail3Store> Sub;
-	DIterator<LDataI, GMail3Thing, GMail3Store> Items;
-	DIterator<LDataPropI, Store3Field, GMail3Store> Flds;
+	LMail3Folder *Parent;
+	DIterator<LDataFolderI, LMail3Folder, LMail3Store> Sub;
+	DIterator<LDataI, LMail3Thing, LMail3Store> Items;
+	DIterator<LDataPropI, Store3Field, LMail3Store> Flds;
 
-	GMail3Folder(GMail3Store *store);
-	~GMail3Folder();
+	LMail3Folder(LMail3Store *store);
+	~LMail3Folder();
 
 	Store3CopyDecl;
-	bool Serialize(GMail3Store::GStatement &s, bool Write) override;
-	const char *GetClass() override { return "GMail3Folder"; }
+	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
+	const char *GetClass() override { return "LMail3Folder"; }
 
 	uint32_t Type() override;
 	bool IsOnDisk() override;
@@ -476,7 +476,7 @@ public:
 	LDataIterator<LDataPropI*> &Fields() override;
 	Store3Status DeleteAllChildren() override;
 	Store3Status FreeChildren() override;
-	GMail3Folder *FindSub(char *Name);
+	LMail3Folder *FindSub(char *Name);
 	bool DbDelete();
 	bool GenSizes();
 
@@ -486,7 +486,7 @@ public:
 	Store3Status SetInt(int id, int64 i) override;
 };
 
-class GMail3Attachment : public Store3Attachment<GMail3Store, GMail3Mail, GMail3Attachment>
+class LMail3Attachment : public Store3Attachment<LMail3Store, LMail3Mail, LMail3Attachment>
 {
 	int64 SegId;
 	int64 BlobSize;
@@ -503,18 +503,18 @@ class GMail3Attachment : public Store3Attachment<GMail3Store, GMail3Mail, GMail3
 	/// rfc822 image is maintained by not MIME decoding into separate
 	/// segments but leaving it MIME encoded in one seg (headers and body).
 	/// At runtime the segment is loaded and parsed into a temporary tree
-	/// of GMail3Attachment objects. This flag is set for those temporary
+	/// of LMail3Attachment objects. This flag is set for those temporary
 	/// nodes.
 	bool InMemoryOnly;
 
 public:
-	GMail3Attachment(GMail3Store *store);
-	~GMail3Attachment();
+	LMail3Attachment(LMail3Store *store);
+	~LMail3Attachment();
 
 	void SetInMemoryOnly(bool b);
 	int64 GetId() { return SegId; }
-	GMail3Attachment *Find(int64 Id);
-	bool Load(GMail3Store::GStatement &s, int64 &ParentId);
+	LMail3Attachment *Find(int64 Id);
+	bool Load(LMail3Store::LStatement &s, int64 &ParentId);
 	bool ParseHeaders() override;
 	char *GetHeaders();
 	bool HasHeaders() { return ValidStr(Headers); }
@@ -537,7 +537,7 @@ public:
 	void OnSave() override;
 };
 
-class GMail3Mail : public GMail3Thing
+class LMail3Mail : public LMail3Thing
 {
 	LAutoString TextCache;
 	LAutoString HtmlCache;
@@ -562,8 +562,8 @@ public:
 	uint32_t MarkColour; // FIELD_MARK_COLOUR, 32bit rgba colour
 
 	LVariant Subject;
-	DIterator<LDataPropI, Store3Addr, GMail3Store> To;
-	GMail3Attachment *Seg;
+	DIterator<LDataPropI, Store3Addr, LMail3Store> To;
+	LMail3Attachment *Seg;
 	Store3Addr From;
 	Store3Addr Reply;
 	LVariant Label;
@@ -576,16 +576,16 @@ public:
 	LDateTime DateReceived;
 	LDateTime DateSent;
 
-	GMail3Mail(GMail3Store *store);
-	~GMail3Mail();
+	LMail3Mail(LMail3Store *store);
+	~LMail3Mail();
 
 	Store3CopyDecl;
-	void SetStore(GMail3Store *s) override;
-	bool Serialize(GMail3Store::GStatement &s, bool Write) override;
-	const char *GetClass() override { return "GMail3Mail"; }
-	GMail3Attachment *GetAttachment(int64 Id);
-	bool FindSegs(const char *MimeType, LArray<GMail3Attachment*> &Segs, bool Create = false);
-	int GetAttachments(LArray<GMail3Attachment*> *Lst = 0);
+	void SetStore(LMail3Store *s) override;
+	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
+	const char *GetClass() override { return "LMail3Mail"; }
+	LMail3Attachment *GetAttachment(int64 Id);
+	bool FindSegs(const char *MimeType, LArray<LMail3Attachment*> &Segs, bool Create = false);
+	int GetAttachments(LArray<LMail3Attachment*> *Lst = 0);
     bool ParseHeaders() override;
     void ResetCaches();
 
@@ -608,7 +608,7 @@ public:
 	Store3Status SetRfc822(LStreamI *m) override;
 };
 
-class GMail3Contact : public GMail3Thing
+class LMail3Contact : public LMail3Thing
 {
 	const char *GetTable() override { return MAIL3_TBL_CONTACT; }
 	LHashTbl<IntKey<int64>, LString*> f;
@@ -617,13 +617,13 @@ public:
 	LVariant Image;
 	LDateTime DateMod;
 
-	GMail3Contact(GMail3Store *store);
-	~GMail3Contact();
+	LMail3Contact(LMail3Store *store);
+	~LMail3Contact();
 
 	uint32_t Type() override { return MAGIC_CONTACT; }
-	bool Serialize(GMail3Store::GStatement &s, bool Write) override;
+	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
 	Store3CopyDecl;
-	const char *GetClass() override { return "GMail3Contact"; }
+	const char *GetClass() override { return "LMail3Contact"; }
 	bool DbDelete() override;
 
 	const char *GetStr(int id) override;
@@ -638,7 +638,7 @@ public:
 	Store3Status SetDate(int id, const LDateTime *i) override;
 };
 
-class GMail3Group : public GMail3Thing
+class LMail3Group : public LMail3Thing
 {
 	const char *GetTable() override { return MAIL3_TBL_GROUP; }
 
@@ -647,13 +647,13 @@ class GMail3Group : public GMail3Thing
 	LDateTime DateMod;
 
 public:
-	GMail3Group(GMail3Store *store);
-	~GMail3Group();
+	LMail3Group(LMail3Store *store);
+	~LMail3Group();
 
 	uint32_t Type() override { return MAGIC_GROUP; }
-	bool Serialize(GMail3Store::GStatement &s, bool Write) override;
+	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
 	Store3CopyDecl;
-	const char *GetClass() override { return "GMail3Group"; }
+	const char *GetClass() override { return "LMail3Group"; }
 	bool DbDelete() override;
 
 	const char *GetStr(int id) override;
@@ -665,7 +665,7 @@ public:
 	Store3Status SetDate(int id, const LDateTime *i) override;
 };
 
-class GMail3Filter : public GMail3Thing
+class LMail3Filter : public LMail3Thing
 {
 	int Index;
 	int StopFiltering;
@@ -678,14 +678,14 @@ class GMail3Filter : public GMail3Thing
 	const char *GetTable() override { return MAIL3_TBL_FILTER; }
 
 public:
-	GMail3Filter(GMail3Store *store);
-	~GMail3Filter();
+	LMail3Filter(LMail3Store *store);
+	~LMail3Filter();
 
 	uint32_t Type() override { return MAGIC_FILTER; }
 	LDataStoreI *GetStore() override { return Store; }
-	bool Serialize(GMail3Store::GStatement &s, bool Write) override;
+	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
 	Store3CopyDecl;
-	const char *GetClass() override { return "GMail3Filter"; }
+	const char *GetClass() override { return "LMail3Filter"; }
 	bool DbDelete() override;
 
 	const char *GetStr(int id) override;
@@ -694,7 +694,7 @@ public:
 	Store3Status SetInt(int Col, int64 n) override;
 };
 
-class GMail3Calendar : public GMail3Thing
+class LMail3Calendar : public LMail3Thing
 {
 	LString ToCache;
 
@@ -735,14 +735,14 @@ private:
 	const char *GetTable() override { return MAIL3_TBL_CALENDAR; }
 
 public:
-	GMail3Calendar(GMail3Store *store);
-	~GMail3Calendar();
+	LMail3Calendar(LMail3Store *store);
+	~LMail3Calendar();
 
 	uint32_t Type() override { return MAGIC_CALENDAR; }
 	LDataStoreI *GetStore() override { return Store; }
-	bool Serialize(GMail3Store::GStatement &s, bool Write) override;
+	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
 	Store3CopyDecl;
-	const char *GetClass() override { return "GMail3Filter"; }
+	const char *GetClass() override { return "LMail3Filter"; }
 	bool DbDelete() override;
 
 	const char *GetStr(int id) override;

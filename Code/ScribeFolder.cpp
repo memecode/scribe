@@ -28,7 +28,7 @@
 #include "lgi/common/Com.h"
 #endif
 
-class GDndFilePromise
+class LDndFilePromise
 	#if defined(WINDOWS)
 	#elif defined(__GTK_H__)
 	#elif defined(MAC)
@@ -42,7 +42,7 @@ class GDndFilePromise
 	#endif
 	
 public:
-	GDndFilePromise(LDragData &dd, LStream *src, LString FileName)
+	LDndFilePromise(LDragData &dd, LStream *src, LString FileName)
 	{
 		Src = src;
 		
@@ -111,7 +111,7 @@ public:
 		#endif
 	}
 	
-	~GDndFilePromise()
+	~LDndFilePromise()
 	{
 		#if defined(WINDOWS)
 		#elif defined(__GTK_H__)
@@ -145,7 +145,7 @@ public:
 	bool InUpdateUnread = false;
 	LAutoPtr<LDisplayString> DsBase;
 	LAutoPtr<LDisplayString> DsUnread;
-	LAutoPtr<GDndFilePromise> FilePromise;
+	LAutoPtr<LDndFilePromise> FilePromise;
 
 	ThingContainerPriv()
 	{
@@ -1144,7 +1144,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			if (GetObject()->GetStore()->Change(Change, FIELD_FLAGS, v, OpPlusEquals) == Store3Error)
 			{
 				LProgressDlg Prog(GetTree(), 500);
-				Prog.SetRange(LRange(0, Change.Length()));
+				Prog.SetRange(Change.Length());
 				
 				// FIXME!!
 				// Prog.SetYieldTime(200);
@@ -3475,7 +3475,7 @@ void ScribeFolder::OnReceiveFiles(LArray<const char*> &Files)
 			// printf("[%i]=%s %s\n", i, File, MimeType.Get());
 
 			// Import the file...
-			GTextFile f;
+			LTextFile f;
 			if (f.Open(File, O_READ))
 			{
 				Import(f, MimeType);
@@ -3510,7 +3510,7 @@ class MboxParser : public LStringPipe
 			return false;
 
 		// check that it's a from line
-		GToken T(c, " \r", true);
+		LToken T(c, " \r", true);
 		if (T.Length() >= 7 &&
 			T.Length() <= 9 &&
 			!strcmp(T[0], "From"))
@@ -3626,7 +3626,7 @@ bool ScribeFolder::Import(LStreamI &f, const char *MimeType)
 			PrgDlg.SetDescription(LLoadString(IDS_MBOX_READING));
 			PrgDlg.SetType("K");
 			PrgDlg.SetScale(1.0/1024.0);
-			PrgDlg.SetRange(LRange(0, f.GetSize()));
+			PrgDlg.SetRange(f.GetSize());
 			
 			LDataStoreI::StoreTrans Trans = GetObject()->GetStore()->StartTransaction();
 
@@ -3785,7 +3785,7 @@ public:
 
 		// Setup progress UI
 		SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
-		SetRange(LRange(0, Folder->Items.Length()));
+		SetRange(Folder->Items.Length());
 		
 		switch (Folder->GetItemType())
 		{
@@ -3933,7 +3933,7 @@ void ScribeFolder::Export(LStreamI &f, const char *MimeType, std::function<void(
 		// Setup progress UI
 		Dlg.SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
 		Dlg.Invalidate((LRect*)0, true);
-		Dlg.SetRange(LRange(0, Items.Length()));
+		Dlg.SetRange(Items.Length());
 		Dlg.SetType(LLoadString(IDS_EMAIL));
 
 		// Process all the container's items

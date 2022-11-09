@@ -2,7 +2,7 @@
 #include "Scribe.h"
 #include "Calendar.h"
 
-GMapiCalendar::GMapiCalendar(GMapiStore *store) : GMapiThing(store)
+LMapiCalendar::LMapiCalendar(LMapiStore *store) : LMapiThing(store)
 {
 	ShowAs = CalBusy;
 	Priv = CalDefaultPriv;
@@ -10,18 +10,18 @@ GMapiCalendar::GMapiCalendar(GMapiStore *store) : GMapiThing(store)
 	Recur = false;
 }
 
-GMapiCalendar::~GMapiCalendar()
+LMapiCalendar::~LMapiCalendar()
 {
 }
 
-void GMapiCalendar::Set(SPropValue *entry, GMapiFolder *parent, ScribeMapiList *Lst)
+void LMapiCalendar::Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *Lst)
 {
 	if (Entry.Length(entry->Value.bin.cb))
 		memcpy(&Entry[0], entry->Value.bin.lpb, entry->Value.bin.cb);
 	Parent = parent;
 }
 
-LPMESSAGE GMapiCalendar::Handle()
+LPMESSAGE LMapiCalendar::Handle()
 {
 	if (!MapiMsg && Parent && Parent->Handle())
 	{
@@ -58,7 +58,7 @@ LPMESSAGE GMapiCalendar::Handle()
 }
 
 
-LDataPropI &GMapiCalendar::operator =(LDataPropI &p)
+LDataPropI &LMapiCalendar::operator =(LDataPropI &p)
 {
 	SetInt(FIELD_CAL_TYPE, p.GetInt(FIELD_CAL_TYPE));
 	SetInt(FIELD_CAL_COMPLETED, p.GetInt(FIELD_CAL_COMPLETED));
@@ -87,7 +87,7 @@ LDataPropI &GMapiCalendar::operator =(LDataPropI &p)
 	return *this;
 }
 
-const char *GMapiCalendar::GetStr(int id)
+const char *LMapiCalendar::GetStr(int id)
 {
 	switch (id)
 	{
@@ -113,7 +113,7 @@ const char *GMapiCalendar::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMapiCalendar::SetStr(int id, const char *str)
+Store3Status LMapiCalendar::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -143,7 +143,7 @@ Store3Status GMapiCalendar::SetStr(int id, const char *str)
 	return Store3Error;
 }
 
-int64 GMapiCalendar::GetInt(int id)
+int64 LMapiCalendar::GetInt(int id)
 {
 	switch (id)
 	{
@@ -166,7 +166,7 @@ int64 GMapiCalendar::GetInt(int id)
 	return NULL;
 }
 
-Store3Status GMapiCalendar::SetInt(int id, int64 i)
+Store3Status LMapiCalendar::SetInt(int id, int64 i)
 {
 	switch (id)
 	{
@@ -190,7 +190,7 @@ Store3Status GMapiCalendar::SetInt(int id, int64 i)
 	return Store3Error;
 }
 
-LDateTime *GMapiCalendar::GetDate(int id)
+LDateTime *LMapiCalendar::GetDate(int id)
 {
 	switch (id)
 	{
@@ -208,7 +208,7 @@ LDateTime *GMapiCalendar::GetDate(int id)
 	return NULL;
 }
 
-Store3Status GMapiCalendar::SetDate(int id, const LDateTime *i)
+Store3Status LMapiCalendar::SetDate(int id, const LDateTime *i)
 {
 	switch (id)
 	{
@@ -228,49 +228,49 @@ Store3Status GMapiCalendar::SetDate(int id, const LDateTime *i)
 	return Store3Error;
 }
 
-LDataPropI *GMapiCalendar::GetObj(int id)
+LDataPropI *LMapiCalendar::GetObj(int id)
 {
 	LAssert(0);
 	return NULL;
 }
 
-GDataIt GMapiCalendar::GetList(int id)
+GDataIt LMapiCalendar::GetList(int id)
 {
 	LAssert(0);
 	return NULL;
 }
 
-LDataI &GMapiCalendar::operator =(LDataI &p)
+LDataI &LMapiCalendar::operator =(LDataI &p)
 {
 	return *this;
 }
 
-uint32_t GMapiCalendar::Type()
+uint32_t LMapiCalendar::Type()
 {
 	return MAGIC_CALENDAR;
 }
 
-bool GMapiCalendar::IsOnDisk()
+bool LMapiCalendar::IsOnDisk()
 {
 	return true;
 }
 
-bool GMapiCalendar::IsOrphan()
+bool LMapiCalendar::IsOrphan()
 {
 	return false;
 }
 
-uint64 GMapiCalendar::Size()
+uint64 LMapiCalendar::Size()
 {
 	return 0;
 }
 
-Store3Status GMapiCalendar::Save(LDataI *Parent)
+Store3Status LMapiCalendar::Save(LDataI *Parent)
 {
 	return Store3Error;
 }
 
-Store3Status GMapiCalendar::Delete(bool ToTrash)
+Store3Status LMapiCalendar::Delete(bool ToTrash)
 {
 	return Store3Error;
 }

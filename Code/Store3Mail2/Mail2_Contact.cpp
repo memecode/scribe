@@ -1,5 +1,5 @@
 #include "Store3Mail2.h"
-#include "GMap.h"
+#include "LMap.h"
 
 #define ForAllContactFields(var) ItemFieldDef *var = 0; for (var = ContactFieldDefs; var->Option && var->FieldId; var++)
 
@@ -8,7 +8,7 @@ static const char *IdToOpt[FIELD_TIMEZONE+1];
 #define GetOpt(id) ( (id >= 0 && id < CountOf(IdToOpt) ) ? IdToOpt[id] : 0 )
 
 //////////////////////////////////////////////////////////////////////
-ContactData::ContactData(GMail2Store *s) : ThingData(s)
+ContactData::ContactData(LMail2Store *s) : ThingData(s)
 {
 	if (!Init)
 	{
@@ -102,7 +102,7 @@ bool ContactData::SetStr(int id, const char *str)
 	if (id == FIELD_ALT_EMAIL)
 	{
 		AltEmail.DeleteArrays();
-		GToken t(str, ",");
+		LToken t(str, ",");
 		for (unsigned i=0; i<t.Length(); i++)
 		{
 			AltEmail.Add(NewStr(t[i]));
@@ -210,7 +210,7 @@ bool ContactData::Serialize(LFile &f, bool Write)
 		f << (ulong) MAGIC_CONTACT;
 		f << (ulong) (Items + Plugins.Length() + AltEmail.Length());
 
-		GMap<int,int> Done;
+		LMap<int,int> Done;
 		ForAllContactFields(Fld)
 		{
 			char *c;

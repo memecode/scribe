@@ -2,7 +2,7 @@
 
 extern const GUID IID_IMessage;
 
-GMapiFolder::GMapiFolder(GMapiStore *store)
+LMapiFolder::LMapiFolder(LMapiStore *store)
 {
 	Store = store;
 	Parent = NULL;
@@ -18,20 +18,20 @@ GMapiFolder::GMapiFolder(GMapiStore *store)
 		Name = Store->GetStr(FIELD_FOLDER_NAME);
 }
 
-GMapiFolder::~GMapiFolder()
+LMapiFolder::~LMapiFolder()
 {
 	if (Store->Root == this)
 		Store->Root = NULL;
 	ReleaseHandle();
 }
 
-bool GMapiFolder::Set(LPMAPIFOLDER f)
+bool LMapiFolder::Set(LPMAPIFOLDER f)
 {
 	MapiFolder = f;
 	return MapiFolder != NULL;
 }
 
-bool GMapiFolder::Set(GMapiFolder *parent, ScribeMapiList *Lst)
+bool LMapiFolder::Set(LMapiFolder *parent, ScribeMapiList *Lst)
 {
 	SPropValue *p = Lst->GetField(PR_ENTRYID);
 	if (!p)
@@ -92,7 +92,7 @@ bool GMapiFolder::Set(GMapiFolder *parent, ScribeMapiList *Lst)
 	return true;
 }
 
-LPMAPIFOLDER GMapiFolder::Handle()
+LPMAPIFOLDER LMapiFolder::Handle()
 {
 	if (!MapiFolder)
 	{
@@ -119,7 +119,7 @@ LPMAPIFOLDER GMapiFolder::Handle()
 	return MapiFolder;
 }
 
-void GMapiFolder::ReleaseHandle()
+void LMapiFolder::ReleaseHandle()
 {
 	if (MapiFolder)
 	{
@@ -136,13 +136,13 @@ void GMapiFolder::ReleaseHandle()
 	}
 }
 
-Store3CopyImpl(GMapiFolder)
+Store3CopyImpl(LMapiFolder)
 {
 	LAssert(0);
 	return false;
 }
 
-const char *GMapiFolder::GetStr(int id)
+const char *LMapiFolder::GetStr(int id)
 {
 	switch (id)
 	{
@@ -156,7 +156,7 @@ const char *GMapiFolder::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMapiFolder::SetStr(int id, const char *str)
+Store3Status LMapiFolder::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -171,7 +171,7 @@ Store3Status GMapiFolder::SetStr(int id, const char *str)
 	return Store3Success;
 }
 
-int64 GMapiFolder::GetInt(int id)
+int64 LMapiFolder::GetInt(int id)
 {
 	switch (id)
 	{
@@ -206,7 +206,7 @@ int64 GMapiFolder::GetInt(int id)
 	return -1;
 }
 
-Store3Status GMapiFolder::SetInt(int id, int64 i)
+Store3Status LMapiFolder::SetInt(int id, int64 i)
 {
 	switch (id)
 	{
@@ -235,78 +235,78 @@ Store3Status GMapiFolder::SetInt(int id, int64 i)
 	return Store3Success;
 }
 
-const LDateTime *GMapiFolder::GetDate(int id)
+const LDateTime *LMapiFolder::GetDate(int id)
 {
 	LAssert(0);
 	return NULL;
 }
 
-Store3Status GMapiFolder::SetDate(int id, const LDateTime *i)
+Store3Status LMapiFolder::SetDate(int id, const LDateTime *i)
 {
 	LAssert(0);
 	return Store3Success;
 }
 
-LDataPropI *GMapiFolder::GetObj(int id)
+LDataPropI *LMapiFolder::GetObj(int id)
 {
 	LAssert(0);
 	return NULL;
 }
 
-GDataIt GMapiFolder::GetList(int id)
+GDataIt LMapiFolder::GetList(int id)
 {
 	LAssert(0);
 	return NULL;
 }
 
-Store3Status GMapiFolder::SetRfc822(LStreamI *m)
+Store3Status LMapiFolder::SetRfc822(LStreamI *m)
 {
 	LAssert(0);
 	return Store3Error;
 }
 
-uint32_t GMapiFolder::Type()
+uint32_t LMapiFolder::Type()
 {
 	return MAGIC_FOLDER;
 }
 
-bool GMapiFolder::IsOnDisk()
+bool LMapiFolder::IsOnDisk()
 {
 	return true;
 }
 
-bool GMapiFolder::IsOrphan()
+bool LMapiFolder::IsOrphan()
 {
 	return false;
 }
 
-uint64 GMapiFolder::Size()
+uint64 LMapiFolder::Size()
 {
 	return 0;
 }
 
-Store3Status GMapiFolder::Save(LDataI *Parent)
+Store3Status LMapiFolder::Save(LDataI *Parent)
 {
 	return Store3Success;
 }
 
-Store3Status GMapiFolder::Delete(bool ToTrash)
+Store3Status LMapiFolder::Delete(bool ToTrash)
 {
 	return Store3Error;
 }
 
-LDataStoreI *GMapiFolder::GetStore()
+LDataStoreI *LMapiFolder::GetStore()
 {
 	return Store;
 }
 
-LAutoStreamI GMapiFolder::GetStream(const char *file, int line)
+LAutoStreamI LMapiFolder::GetStream(const char *file, int line)
 {
 	LAutoStreamI s;
 	return s;
 }
 
-LDataIterator<LDataFolderI*> &GMapiFolder::SubFolders()
+LDataIterator<LDataFolderI*> &LMapiFolder::SubFolders()
 {
 	#if 1
 	if (Sub.State == Store3Unloaded &&
@@ -318,7 +318,7 @@ LDataIterator<LDataFolderI*> &GMapiFolder::SubFolders()
 		{
 			for (ScribeMapiList Lst(Folders); Lst.More(); Lst.Next())
 			{
-				GMapiFolder *SubFolder = new GMapiFolder(Store);
+				LMapiFolder *SubFolder = new LMapiFolder(Store);
 				if (SubFolder)
 				{
 					SubFolder->Set(this, &Lst);
@@ -335,7 +335,7 @@ LDataIterator<LDataFolderI*> &GMapiFolder::SubFolders()
 	return Sub;
 }
 
-LDataIterator<LDataI*> &GMapiFolder::Children()
+LDataIterator<LDataI*> &LMapiFolder::Children()
 {
 	if (Items.State == Store3Unloaded &&
 		Handle())
@@ -349,7 +349,7 @@ LDataIterator<LDataI*> &GMapiFolder::Children()
 				LAutoPtr<LDataI> t(Store->Create(ItemType));
 				if (t)
 				{
-					GMapiThing *tptr = dynamic_cast<GMapiThing*>(t.Get());
+					LMapiThing *tptr = dynamic_cast<LMapiThing*>(t.Get());
 					if (tptr)
 					{
 						tptr->Set(Lst.GetField(PR_ENTRYID), this, &Lst);
@@ -367,47 +367,47 @@ LDataIterator<LDataI*> &GMapiFolder::Children()
 	return Items;
 }
 
-LDataIterator<LDataPropI*> &GMapiFolder::Fields()
+LDataIterator<LDataPropI*> &LMapiFolder::Fields()
 {
 	return Flds;
 }
 
-Store3Status GMapiFolder::DeleteAllChildren()
+Store3Status LMapiFolder::DeleteAllChildren()
 {
 	return Store3Error;
 }
 
-Store3Status GMapiFolder::FreeChildren()
+Store3Status LMapiFolder::FreeChildren()
 {
 	return Store3Error;
 }
 
-void GMapiFolder::OnSelect(bool s)
+void LMapiFolder::OnSelect(bool s)
 {
 }
 
-void GMapiFolder::OnCommand(const char *Name)
+void LMapiFolder::OnCommand(const char *Name)
 {
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMapiFolderField::GMapiFolderField(GMapiStore *store)
+LMapiFolderField::LMapiFolderField(LMapiStore *store)
 {
 	Store = store;
 	Id = -1;
 	Width = 100;
 }
 
-GMapiFolderField::~GMapiFolderField()
+LMapiFolderField::~LMapiFolderField()
 {
 }
 
-LDataPropI &GMapiFolderField::operator =(LDataPropI &p)
+LDataPropI &LMapiFolderField::operator =(LDataPropI &p)
 {
 	return *this;
 }
 
-const char *GMapiFolderField::GetStr(int id)
+const char *LMapiFolderField::GetStr(int id)
 {
 	switch (id)
 	{
@@ -421,7 +421,7 @@ const char *GMapiFolderField::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMapiFolderField::SetStr(int id, const char *str)
+Store3Status LMapiFolderField::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -436,7 +436,7 @@ Store3Status GMapiFolderField::SetStr(int id, const char *str)
 	return Store3Success;
 }
 
-int64 GMapiFolderField::GetInt(int id)
+int64 LMapiFolderField::GetInt(int id)
 {
 	switch (id)
 	{
@@ -452,7 +452,7 @@ int64 GMapiFolderField::GetInt(int id)
 	return -1;
 }
 
-Store3Status GMapiFolderField::SetInt(int id, int64 i)
+Store3Status LMapiFolderField::SetInt(int id, int64 i)
 {
 	switch (id)
 	{
@@ -470,27 +470,27 @@ Store3Status GMapiFolderField::SetInt(int id, int64 i)
 	return Store3Success;
 }
 
-const LDateTime *GMapiFolderField::GetDate(int id)
+const LDateTime *LMapiFolderField::GetDate(int id)
 {
 	return NULL;
 }
 
-Store3Status GMapiFolderField::SetDate(int id, const LDateTime *i)
+Store3Status LMapiFolderField::SetDate(int id, const LDateTime *i)
 {
 	return Store3Error;
 }
 
-LDataPropI *GMapiFolderField::GetObj(int id)
+LDataPropI *LMapiFolderField::GetObj(int id)
 {
 	return NULL;
 }
 
-GDataIt GMapiFolderField::GetList(int id)
+GDataIt LMapiFolderField::GetList(int id)
 {
 	return NULL;
 }
 
-Store3Status GMapiFolderField::SetRfc822(LStreamI *m)
+Store3Status LMapiFolderField::SetRfc822(LStreamI *m)
 {
 	return Store3Error;
 }

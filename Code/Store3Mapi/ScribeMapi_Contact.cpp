@@ -21,22 +21,22 @@ uint32_t MapiContactEmailTags[] =
 	0	
 };
 
-GMapiContact::GMapiContact(GMapiStore *store) : GMapiThing(store)
+LMapiContact::LMapiContact(LMapiStore *store) : LMapiThing(store)
 {
 }
 
-GMapiContact::~GMapiContact()
+LMapiContact::~LMapiContact()
 {
 }
 
-void GMapiContact::Set(SPropValue *entry, GMapiFolder *parent, ScribeMapiList *lst)
+void LMapiContact::Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst)
 {
 	if (Entry.Length(entry->Value.bin.cb))
 		memcpy(&Entry[0], entry->Value.bin.lpb, entry->Value.bin.cb);
 	Parent = parent;
 }
 
-LPMESSAGE GMapiContact::Handle()
+LPMESSAGE LMapiContact::Handle()
 {
 	if (!MapiMsg && Parent && Parent->Handle())
 	{
@@ -72,13 +72,13 @@ LPMESSAGE GMapiContact::Handle()
 	return MapiMsg;
 }
 
-LDataPropI &GMapiContact::operator =(LDataPropI &p)
+LDataPropI &LMapiContact::operator =(LDataPropI &p)
 {
 	LAssert(0);
 	return *this;
 }
 
-void GMapiContact::ReadEmails()
+void LMapiContact::ReadEmails()
 {
 	if (!PrimaryEmail)
 	{
@@ -112,13 +112,13 @@ void GMapiContact::ReadEmails()
 	}
 }
 
-char *GMapiContact::CacheGetStr(LString &s, uint32_t Prop)
+char *LMapiContact::CacheGetStr(LString &s, uint32_t Prop)
 {
 	s = MapiGetPropStr(Handle(), Prop);
 	return s;
 }
 
-const char *GMapiContact::GetStr(int id)
+const char *LMapiContact::GetStr(int id)
 {
 	switch (id)
 	{
@@ -201,73 +201,73 @@ const char *GMapiContact::GetStr(int id)
 	return NULL;
 }
 
-Store3Status GMapiContact::SetStr(int id, const char *str)
+Store3Status LMapiContact::SetStr(int id, const char *str)
 {
 	return Store3Error;
 }
 
-int64 GMapiContact::GetInt(int id)
+int64 LMapiContact::GetInt(int id)
 {
 	return -1;
 }
 
-Store3Status GMapiContact::SetInt(int id, int64 i)
+Store3Status LMapiContact::SetInt(int id, int64 i)
 {
 	return Store3Error;
 }
 
-const LDateTime *GMapiContact::GetDate(int id)
+const LDateTime *LMapiContact::GetDate(int id)
 {
 	return NULL;
 }
 
-Store3Status GMapiContact::SetDate(int id, const LDateTime *i)
+Store3Status LMapiContact::SetDate(int id, const LDateTime *i)
 {
 	return Store3Error;
 }
 
-LDataPropI *GMapiContact::GetObj(int id)
+LDataPropI *LMapiContact::GetObj(int id)
 {
 	return NULL;
 }
 
-GDataIt GMapiContact::GetList(int id)
+GDataIt LMapiContact::GetList(int id)
 {
 	return NULL;
 }
 
-LDataI &GMapiContact::operator =(LDataI &p)
+LDataI &LMapiContact::operator =(LDataI &p)
 {
 	LAssert(0);
 	return *this;
 }
 
-uint32_t GMapiContact::Type()
+uint32_t LMapiContact::Type()
 {
 	return MAGIC_CONTACT;
 }
 
-bool GMapiContact::IsOnDisk()
+bool LMapiContact::IsOnDisk()
 {
 	return true;
 }
 
-bool GMapiContact::IsOrphan()
+bool LMapiContact::IsOrphan()
 {
 	return false;
 }
 
-uint64 GMapiContact::Size()
+uint64 LMapiContact::Size()
 {
 	return 0;
 }
 
-Store3Status GMapiContact::Save(LDataI *Parent)
+Store3Status LMapiContact::Save(LDataI *Parent)
 {
 	return Store3Error;
 }
 
-Store3Status GMapiContact::Delete(bool ToTrash)
+Store3Status LMapiContact::Delete(bool ToTrash)
 {
 	return Store3Error;
 }

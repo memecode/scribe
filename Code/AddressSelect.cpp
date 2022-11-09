@@ -185,7 +185,7 @@ void AddressList::Paste()
 	char *Txt = Clip.Text();
 	if (Txt)
 	{
-		GToken t(Txt, "\r\n");
+		LToken t(Txt, "\r\n");
 		for (unsigned i=0; i<t.Length(); i++)
 		{
 			ListAddr *La = new ListAddr(App);
@@ -475,7 +475,7 @@ public:
 		if (!App)
 			return false;
 
-		GToken t(Txt, " ");
+		LToken t(Txt, " ");
 		LHashTbl<StrKey<char,false>,Contact*> Contacts;
 		App->HashContacts(Contacts);
 
@@ -557,7 +557,7 @@ bool AddressBrowseLookup(ScribeWnd *App, LArray<BrowseItem*> &Items, LString s)
 }
 
 AddressBrowse::AddressBrowse(ScribeWnd *app, LView *target, LList *recip, LViewI *setto) :
-	GPopupList<BrowseItem>(target, PopupBelow, target->X(), 150)
+	LPopupList<BrowseItem>(target, PopupBelow, target->X(), 150)
 {
 	d = new AddressBrowsePrivate(this);
 	d->App = app;
@@ -638,6 +638,6 @@ int AddressBrowse::OnNotify(LViewI *c, LNotification n)
 		// printf("%s:%i - no update %i %i\n", _FL, c == d->Target, !f);
 	}
 
-	return GPopupList<BrowseItem>::OnNotify(c, n);
+	return LPopupList<BrowseItem>::OnNotify(c, n);
 }
 

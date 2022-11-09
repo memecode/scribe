@@ -370,64 +370,80 @@ static LString ExtractVer(const char *s)
 	return LString(Buf);
 }
 
-SoftwareStatus IsSoftwareUpToDate(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bool WithUI, bool IncBetas)
+void IsSoftwareUpToDate(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function<void(SoftwareStatus)> callback)
 {
 	// Software update?
 	LAutoString Proxy = Parent->GetHttpProxy();
 	LSoftwareUpdate Update(AppName, SoftwareUpdateUri, Proxy);
-	if (Update.CheckForUpdate(Info, WithUI?Parent:0, IncBetas))
-	{
-		auto LocalVer = LString(ScribeVer).SplitDelimit(".");
-		LString BuildVer = ExtractVer(Info.Build);
-		GToken OnlineVer(BuildVer, ".");
-		if (OnlineVer.Length() != LocalVer.Length())
+
+	Update.CheckForUpdate(
+		Info,
+		WithUI?Parent:0,
+		IncBetas,
+		[Info, WithUI, Parent, callback](auto status, auto errorMsg)
 		{
-			LgiTrace("%s:%i - Invalid online version number \"%s\"\n", _FL, Info.Version.Get());
-			return SwError;
-		}
+			if (status)
+			{
+				auto LocalVer = LString(ScribeVer).SplitDelimit(".");
+				LString BuildVer = ExtractVer(Info.Build);
+				LToken OnlineVer(BuildVer, ".");
+				if (OnlineVer.Length() != LocalVer.Length())
+				{
+					LgiTrace("%s:%i - Invalid online version number \"%s\"\n", _FL, Info.Version.Get());
+					if (callback)
+						callback(SwError);
+					return;
+				}
 
-		unsigned i;
-		for (i=0; i<OnlineVer.Length(); i++)
-		{
-			int l = atoi(LocalVer[i]);
-			int o = atoi(OnlineVer[i]);
-			if (l < o)
-				return SwOutOfDate;
-			if (l > o)
-				return SwUpToDate;
-		}
+				unsigned i;
+				for (i=0; i<OnlineVer.Length(); i++)
+				{
+					int l = atoi(LocalVer[i]);
+					int o = atoi(OnlineVer[i]);
+					if (l < o)
+					{
+						if (callback)
+							callback(SwOutOfDate);
+						return;
+					}
+					if (l > o)
+					{
+						if (callback)
+							callback(SwUpToDate);
+						return;
+					}
+				}
 
-		/*
-		GToken Bld(Info.Build);
-		for (i=0; i<Bld.Length(); i++)
-		{
-			if (!_stricmp(Bld[i], ScribeTag))
-				return SwUpToDate;
-		}
-		*/
+				LDateTime Compile;
+				LToken Date(__DATE__, " ");
+				Compile.Month(LDateTime::MonthFromName(Date[0]));
+				Compile.Day(atoi(Date[1]));
+				Compile.Year(atoi(Date[2]));
+				Compile.SetTime(__TIME__);
 
-		LDateTime Compile;
-		GToken Date(__DATE__, " ");
-		Compile.Month(LDateTime::MonthFromName(Date[0]));
-		Compile.Day(atoi(Date[1]));
-		Compile.Year(atoi(Date[2]));
-		Compile.SetTime(__TIME__);
+				bool DateGreaterThenCompile = Info.Date > Compile;
+				if (callback)
+					callback(DateGreaterThenCompile ? SwOutOfDate : SwUpToDate);
+				return;
+			}
+			else if (WithUI)
+			{
+				if (Info.Cancel)
+				{
+					if (callback)
+						callback(SwCancel);
+					return;
+				}
 
-		bool DateGreaterThenCompile = Info.Date > Compile;
-		return DateGreaterThenCompile ? SwOutOfDate : SwUpToDate;
-	}
-	else if (WithUI)
-	{
-		if (Info.Cancel)
-			return SwCancel;
+				LgiMsg(Parent, LLoadString(IDS_ERROR_SOFTWARE_UPDATE), AppName, MB_OK, errorMsg);
+			}
 
-		LgiMsg(Parent, LLoadString(IDS_ERROR_SOFTWARE_UPDATE), AppName, MB_OK, Update.GetErrorMessage());
-	}
-
-	return SwError;
+			if (callback)
+				callback(SwError);
+		});
 }
 
-bool UpgradeSoftware(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bool WithUI)
+bool UpgradeSoftware(const LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bool WithUI)
 {
 	bool DownloadUpdate = true;
 
@@ -455,22 +471,26 @@ bool UpgradeSoftware(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bool 
 	return Update.ApplyUpdate(Info, false, Parent);
 }
 
-bool SoftwareUpdate(ScribeWnd *Parent, bool WithUI, bool IncBetas)
+void SoftwareUpdate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function<void(bool goingToUpdate)> callback)
 {
 	// Software update?
 	LSoftwareUpdate::UpdateInfo Info;
-	SoftwareStatus s = IsSoftwareUpToDate(Info, Parent, WithUI, IncBetas);
-	if (s == SwUpToDate)
+	IsSoftwareUpToDate(Info, Parent, WithUI, IncBetas, [WithUI, Parent, Info, callback](auto s)
 	{
-		if (WithUI)
-			LgiMsg(Parent, LLoadString(IDS_SOFTWARE_CURRENT), AppName, MB_OK);
-	}
-	else if (s == SwOutOfDate)
-	{
-		return UpgradeSoftware(Info, Parent, WithUI);
-	}
-
-	return false;
+		if (s == SwUpToDate)
+		{
+			if (WithUI)
+				LgiMsg(Parent, LLoadString(IDS_SOFTWARE_CURRENT), AppName, MB_OK);
+			if (callback)
+				callback(false); // we're up to date
+		}
+		else if (s == SwOutOfDate)
+		{
+			auto status = UpgradeSoftware(Info, Parent, WithUI);
+			if (callback)
+				callback(true); // update is going to happen
+		}
+	});
 }
 
 const char *AppName = "Scribe";
@@ -687,53 +707,6 @@ bool ScribePanel::Pour(LRegion &r)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-#if 0
-#include "LTextLog.h"
-extern LString HtmlToText(char *InputHtml, const char *CharSet);
-
-class DebugWnd : public LWindow
-{
-public:
-	LTextView3 *Txt;
-
-	DebugWnd()
-	{
-		AddView(Txt = new LTextLog(100));
-		SetPos(LRect(0, 0, 1000, 1100));
-		MoveToCenter();
-		if (Attach(0))
-		{
-			Txt->SetWrapType(TEXTED_WRAP_REFLOW);
-			AttachChildren();
-			Visible(true);
-		}
-	}
-	
-	void OnThing(Thing *t)
-	{
-		Mail *m = t ? t->IsMail() : 0;
-		if (m)
-		{
-			char *Html = m->GetHtml();
-			if (Html)
-			{
-				char *Cs = m->GetHtmlCharset();
-				LString Text = HtmlToText(Html, Cs);
-				Txt->Name(Text);
-			}
-			else
-			{
-				Txt->Name("Plain text only email.");
-			}
-		}
-		else
-		{
-			Txt->Name("Not an email.");
-		}
-	}
-};
-#endif
-
 class NoContactType : public Contact
 {
 	LString NoFace80Path;
@@ -789,7 +762,7 @@ public:
 };
 
 class ScribeWndPrivate :
-	public GBrowser::GBrowserEvents,
+	public LBrowser::LBrowserEvents,
 	public LVmDebuggerCallback,
 	public LHtmlStaticInst
 {
@@ -798,41 +771,41 @@ class ScribeWndPrivate :
 public:
 	ScribeWnd		*App;
 	
-	uint64          LastTs;
-	int				ClipboardFormat;
-	LFont			*PreviewFont;
-	int				PrintMaxPages;
-	char			*MulPassword;
-	int				NewMailTimeout;
-	bool			SendAfterReceive;
-	bool			IngoreOnClose;
+	uint64          LastTs = 0;
+	int				ClipboardFormat = 0;
+	LFont			*PreviewFont = NULL;
+	int				PrintMaxPages = -1;
+	int				NewMailTimeout = -1;
+	bool			SendAfterReceive = false;
+	bool			IngoreOnClose = false;
 	LAutoString		UiTags;
 	LAutoPtr<LGrowl> Growl;
 	LArray<Contact*> TrayMenuContacts;
-	bool            ExitAfterSend;
-	LToolButton		*ShowConsoleBtn;
+	bool            ExitAfterSend = false;
+	LToolButton		*ShowConsoleBtn = NULL;
+	LString			MulPassword;
 	
-	LBox			*SubSplit, *SearchSplit;
+	LBox			*SubSplit = NULL, *SearchSplit = NULL;
 	LArray<ScribeFolder*> ThingSources;
-	int				LastLayout;
-	LMenuItem		*DisableUserFilters;
-	LOptionsFile	*Options;
-	HttpImageThread	*ImageLoader;
-	int				LastMinute, LastHour;
+	int				LastLayout = 0;
+	LMenuItem		*DisableUserFilters = NULL;
+	LOptionsFile	*Options = NULL;
+	HttpImageThread	*ImageLoader = NULL;
+	int				LastMinute = -1, LastHour = -1;
 	LArray<LDataEventsI*> Store3EventCallbacks;
 	LAutoPtr<LPrinter> PrintOptions;
 	LHashTbl<IntKey<SribeResourceType,ResNone>, LString> ResFiles;
 
 	// These are for the LDataEventsI callbacks to store source context
 	// Mainly for debugging where various events came from.
-	const char		*CtxFile;
-	int				CtxLine;
+	const char		*CtxFile = NULL;
+	int				CtxLine = 0;
 
 	// Contact no face images
 	NoContactType NoContact;
 	
 	// Remote content white/blacklists
-	bool RemoteContent_Init;
+	bool RemoteContent_Init = false;
 	LString::Array RemoteWhiteLst, RemoteBlackLst;
 
 	// Spell checking
@@ -841,12 +814,12 @@ public:
 
 	// Missing caps
 	LCapabilityTarget::CapsHash MissingCaps;
-	MissingCapsBar *Bar;
+	MissingCapsBar *Bar = NULL;
 	LString ErrSource; // Script file that has an error.
-	Filter *ErrFilter; // Filter that has scripting error.
+	Filter *ErrFilter = NULL; // Filter that has scripting error.
 
 	// Load state
-	bool			FoldersLoaded;	
+	bool			FoldersLoaded = false;	
 
 	// Bayesian filter
 	LStringPipe BayesLog;
@@ -859,7 +832,7 @@ public:
 	LArray<LScript*> Scripts;
 	LArray<LScript*> CurrentScripts;
 	LScript *CurrentScript() { return CurrentScripts.Length() ? CurrentScripts.Last() : NULL; }
-	int NextToolMenuId;
+	int NextToolMenuId = IDM_TOOL_SCRIPT_BASE;
 	LAutoPtr<LScriptUi> ScriptToolbar;
 	LArray<LScriptCallback*> OnSecondTimerCallbacks;
 
@@ -888,36 +861,11 @@ public:
 	} TextControlFactory;
 
 	ScribeWndPrivate(ScribeWnd *app) :
+		App(app),
 		NoContact(app),
 		TextControlFactory(app)
 	{
-		App = app;
 		AppWndHnd = LEventSinkMap::Dispatch.AddSink(App);
-
-		CtxFile = NULL;
-		CtxLine = 0;
-		ErrFilter = NULL;
-		RemoteContent_Init = false;
-		LastTs = 0;
-		NextToolMenuId = IDM_TOOL_SCRIPT_BASE;
-		IngoreOnClose = false;
-		ImageLoader = 0;
-		DisableUserFilters = 0;
-		LastLayout = 0;
-		FoldersLoaded = false;
-		Options = 0;
-		LastMinute = LastHour = -1;
-		ExitAfterSend = false;
-		PreviewFont = 0;
-		Bar = NULL;
-		ShowConsoleBtn = NULL;
-
-		PrintMaxPages = -1;
-		MulPassword = 0;
-		NewMailTimeout = -1;
-		SendAfterReceive = false;
-		SubSplit = 0;
-		SearchSplit = NULL;
 
 		#ifdef WIN32
 		ClipboardFormat = RegisterClipboardFormat(
@@ -927,8 +875,6 @@ public:
 			"Scribe.Item"
 			#endif
 			);
-		#else
-		ClipboardFormat = 0;
 		#endif
 
 		LScribeScript::Inst = new LScribeScript(App);
@@ -940,7 +886,6 @@ public:
 	{
 		// Why do we need this? ~LView will take care of it?
 		// LEventSinkMap::Dispatch.RemoveSink(App);
-		DeleteArray(MulPassword);
 		DeleteObj(Options);
 		Scripts.DeleteObjects();
 		DeleteObj(ImageLoader);
@@ -996,17 +941,17 @@ public:
 
 	bool CompileScript(LAutoPtr<LCompiledCode> &Output, const char *FileName, const char *Source)
 	{
-		GCompiler c;
+		LCompiler c;
 		return c.Compile(Output, Engine->GetSystemContext(), LScribeScript::Inst, FileName, Source, NULL);
 	}
 
-	bool OnSearch(GBrowser *br, const char *txt)
+	bool OnSearch(LBrowser *br, const char *txt)
 	{
 		char Path[256];
 		if (!App->GetHelpFilesPath(Path, sizeof(Path)))
 			return false;
 
-		GToken Terms(txt, ", ");
+		LToken Terms(txt, ", ");
 
 		LStringPipe p;
 		p.Print("<html>\n<body><h1>Search Results</h1>\n<ul>\n");
@@ -2431,7 +2376,7 @@ void ScribeWnd::OnCreate()
 							LScribeScript::Inst->GetLog()->Write(Msg,
 								sprintf_s(Msg, sizeof(Msg), "Compiling '%s'...\n", Dir.GetName()));
 
-							GCompiler c;
+							LCompiler c;
 							if (c.Compile(	Cur->Code,
 											d->Engine->GetSystemContext(),
 											LScribeScript::Inst,
@@ -3451,7 +3396,7 @@ bool ScribeWnd::LoadOptions()
 				if (InstLst[i].IsMul())
 				{
 					Mul = InstLst + i;
-					d->MulPassword = NewStr(Mul->Password);
+					d->MulPassword = Mul->Password;
 					break;
 				}
 			}
@@ -4560,11 +4505,12 @@ void ScribeWnd::OnHour()
 					// Check for update now...
 					LSoftwareUpdate::UpdateInfo Info;
 					GetOptions()->GetValue(OPT_SoftwareUpdateIncBeta, v);
-					if (IsSoftwareUpToDate(Info, this, false, v.CastInt32() != 0) == SwOutOfDate)
+					IsSoftwareUpToDate(Info, this, false, v.CastInt32() != 0, [Info, this](auto s)
 					{
-						if (UpgradeSoftware(Info, this, true))
-							LCloseApp();
-					}
+						if (s == SwOutOfDate)
+							if (UpgradeSoftware(Info, this, true))
+								LCloseApp();
+					});
 				}
 			}
 		}
@@ -4880,9 +4826,9 @@ bool ScribeWnd::OnFolderTask(LEventTargetI *Ptr, bool Add)
 	}
 }
 
-GMailStore *ScribeWnd::GetDefaultMailStore()
+LMailStore *ScribeWnd::GetDefaultMailStore()
 {
-	GMailStore *Def = 0;
+	LMailStore *Def = 0;
 
 	for (unsigned i=0; i<Folders.Length(); i++)
 	{
@@ -5244,8 +5190,8 @@ bool ScribeWnd::LoadMailStores()
 
 			if (ValidStr(d->MulPassword))
 			{
-				Verified = strcmp(d->MulPassword, FolderPsw) == 0;
-				DeleteArray(d->MulPassword);
+				Verified = d->MulPassword.Equals(FolderPsw, false);
+				d->MulPassword.Empty();
 			}
 
 			if (!Verified)
@@ -7343,10 +7289,10 @@ public:
 
 		LoadPane = ItemAt(0);
 		LoadPane->SetDescription("Loading objects...");
-		LoadPane->SetRange(LRange(0, tl->Length()));
+		LoadPane->SetRange(tl->Length());
 
 		SavePane = Push();
-		SavePane->SetRange(LRange(0, tl->Length()));
+		SavePane->SetRange(tl->Length());
 		SavePane->SetDescription("Saving: No errors...");
 
 		// LProgressDlg will do a SetPulse in it's OnCreate
@@ -8274,7 +8220,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 								if (!Spam)
 								{
 							
-									GMailStore *RelevantStore = GetMailStoreForPath(SpamPath.Str());
+									LMailStore *RelevantStore = GetMailStoreForPath(SpamPath.Str());
 									if (RelevantStore)
 									{
 										LString p = SpamPath.Str();
@@ -8428,8 +8374,11 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		{
 			LVariant v;
 			GetOptions()->GetValue(OPT_SoftwareUpdateIncBeta, v);
-			if (SoftwareUpdate(this, true, v.CastInt32() != 0))
-				LCloseApp();
+			SoftwareUpdate(this, true, v.CastInt32() != 0, [](auto goingToUpdate)
+			{
+				if (goingToUpdate)
+					LCloseApp();
+			});
 			break;
 		}
 		case IDM_LOGOUT:
@@ -8736,7 +8685,7 @@ bool ScribeWnd::CreateFolders(LAutoString &FileName)
 	return Status;
 }
 
-bool ScribeWnd::CompactFolders(GMailStore &Store, bool Interactive)
+bool ScribeWnd::CompactFolders(LMailStore &Store, bool Interactive)
 {
 	if (!Store.Store)
 		return false;
@@ -8898,7 +8847,7 @@ bool ScribeWnd::GetSystemPath(int Folder, LVariant &Path)
 	return GetOptions()->GetValue(KeyName, Path);
 }
 
-GMailStore *ScribeWnd::GetMailStoreForIdentity(const char *IdEmail)
+LMailStore *ScribeWnd::GetMailStoreForIdentity(const char *IdEmail)
 {
 	LVariant Tmp;
 	if (!IdEmail)
@@ -8947,7 +8896,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LDataI *s)
 	return GetFolder(Id);
 }
 
-ScribeFolder *ScribeWnd::GetFolder(int Id, GMailStore *Store, bool Quiet)
+ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 {
 	char KeyName[64];
 	sprintf_s(KeyName, sizeof(KeyName), "Folder-%i", Id);
@@ -9008,7 +8957,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, GMailStore *Store, bool Quiet)
 	return NULL;
 }
 
-bool ScribeWnd::OnMailStore(GMailStore **MailStore, bool Add)
+bool ScribeWnd::OnMailStore(LMailStore **MailStore, bool Add)
 {
 	if (!MailStore)
 	{
@@ -9040,12 +8989,12 @@ bool ScribeWnd::OnMailStore(GMailStore **MailStore, bool Add)
 	return false;
 }
 
-GMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
+LMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 {
 	if (!Path)
 		return NULL;
 
-	GToken t(Path, "/");
+	LToken t(Path, "/");
 	if (t.Length() > 0)
 	{
 		const char *First = t[0];
@@ -9067,7 +9016,7 @@ GMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 	return NULL;
 }
 
-ScribeFolder *ScribeWnd::GetFolder(const char *Name, GMailStore *s)
+ScribeFolder *ScribeWnd::GetFolder(const char *Name, LMailStore *s)
 {
 	ScribeFolder *Folder = 0;
 
@@ -9075,7 +9024,7 @@ ScribeFolder *ScribeWnd::GetFolder(const char *Name, GMailStore *s)
 	{
 		LString Sep("/");
 		auto t = LString(Name).Split(Sep);
-		GMailStore tmp;
+		LMailStore tmp;
 		LString TmpName;
 
 		if (t.Length() > 0)
@@ -9340,7 +9289,7 @@ bool ScribeWnd::GetContacts(List<Contact> &Contacts, ScribeFolder *Folder, bool 
 	This function goes through the database and checks for some
 	basic requirements and fixes things up if they aren't ok.
 */
-bool ScribeWnd::ValidateFolder(GMailStore *s, int Id)
+bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 {
 	char OptName[32];
 	sprintf_s(OptName, sizeof(OptName), "Folder-%i", Id);
@@ -9365,7 +9314,7 @@ bool ScribeWnd::ValidateFolder(GMailStore *s, int Id)
 		}
 		else
 		{
-			GMailStore *ms = GetMailStoreForPath(Path.Str());
+			LMailStore *ms = GetMailStoreForPath(Path.Str());
 			if (ms)
 			{
 				s = ms;
@@ -9398,7 +9347,7 @@ bool ScribeWnd::ValidateFolder(GMailStore *s, int Id)
 	return true;
 }
 
-void ScribeWnd::Validate(GMailStore *s)
+void ScribeWnd::Validate(LMailStore *s)
 {
 	// Check for all the basic folders
 
@@ -11058,7 +11007,7 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 						char *File = LReadTextFile(FileName);
 						if (File)
 						{
-							GToken Lines(File, "\r\n");
+							LToken Lines(File, "\r\n");
 							DeleteArray(File);
 							char *RandomLine = Lines[LRand((unsigned)Lines.Length())];
 							if (RandomLine)
@@ -11607,7 +11556,7 @@ bool ScribeWnd::LaunchHelp(const char *File)
 	if (File)
 	{
 		char *Hash = 0;
-		GBrowser *Browse = 0;
+		LBrowser *Browse = 0;
 		
 		// Find help files...
 		char Path[MAX_PATH_LEN];
@@ -11632,7 +11581,7 @@ bool ScribeWnd::LaunchHelp(const char *File)
 
 		#if USE_INTERNAL_BROWSER
 
-		Browse = new GBrowser(this, "Help");
+		Browse = new LBrowser(this, "Help");
 		if (Browse)
 		{
 			Browse->SetEvents(d);

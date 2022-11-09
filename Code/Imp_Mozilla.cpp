@@ -8,7 +8,7 @@
 #include "lgi/common/FileSelect.h"
 #include "v3.6.14/sqlite3.h"
 
-void ToRecord(GMap<int, int> &r, char *Str)
+void ToRecord(LMap<int, int> &r, char *Str)
 {
 	char *n;
 	for (char *s=strchr(Str, '('); s && *s; s=n)
@@ -35,7 +35,7 @@ void ToRecord(GMap<int, int> &r, char *Str)
 	}
 }
 
-void ToMap(GMap<int, char*> &m, char *Str)
+void ToMap(LMap<int, char*> &m, char *Str)
 {
 	char *n;
 	for (char *s=strchr(Str, '('); s && *s; s=n)
@@ -235,8 +235,8 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 
 			// Parse blocks..
 			bool Fields = true;
-			GMap<int, char*> Field;
-			GMap<int, char*> Data;
+			LMap<int, char*> Field;
+			LMap<int, char*> Data;
 
 			for (auto b: Blocks)
 			{
@@ -253,7 +253,7 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 
 			for (auto r: Records)
 			{
-				GMap<int, int> Record;
+				LMap<int, int> Record;
 				ToRecord(Record, r);
 
 				int Flds = 0;
@@ -586,7 +586,7 @@ void Import_MozillaMail(ScribeWnd *App)
 					ScribeFolder *Child = Dest->CreateSubDirectory(Name, MAGIC_MAIL);
 					if (Child)
 					{
-						GTextFile f;
+						LTextFile f;
 						if (f.Open(Src, O_READ))
 						{
 							Child->Import(f, sMimeMbox);

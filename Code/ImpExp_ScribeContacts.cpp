@@ -1,5 +1,5 @@
 #include "Scribe.h"
-#include "GToken.h"
+#include "LToken.h"
 
 void Import_ScribeContacts(ScribeWnd *Parent)
 {
@@ -41,11 +41,11 @@ void Import_ScribeContacts(ScribeWnd *Parent)
 							f.Read(Buf, Len) == Len)
 						{
 							Buf[Len] = 0;
-							GToken Lines(Buf, "\r\n");
+							LToken Lines(Buf, "\r\n");
 							if (Lines.Length() > 1)
 							{
 								// process fields
-								GToken Fields(Lines[0], "\",");
+								LToken Fields(Lines[0], "\",");
 								if (Fields.Length() > 0)
 								{
 									// read in all the contact records

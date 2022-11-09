@@ -424,9 +424,6 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SoftwareUpdate.cpp">
       <Filter>Install</Filter>
     </ClCompile>
-    <ClCompile Include="..\Code\SpellCheckAspell.cpp">
-      <Filter>SpellCheck</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\win\Lgi\SpellCheckWindows.cpp">
       <Filter>SpellCheck</Filter>
     </ClCompile>
@@ -504,6 +501,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Http.cpp">
       <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\SpellCheckAspell.cpp">
+      <Filter>SpellCheck</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

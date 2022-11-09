@@ -48,7 +48,7 @@ struct MissingCapsBarPriv
     LColour Back;
     int CountDown;
     
-    GToken Msg;
+    LToken Msg;
     LArray<LDisplayString*> Strs;
     
     MissingCapsBarPriv() : Back(0xd2, 0x40, 0x40)
@@ -257,7 +257,7 @@ void MissingCapsBar::OnPulse()
 			{
 				// Create ctrl
 				ProgCtrl = new LProgressView(-1, 0, 0, 150, 12, NULL);
-				ProgCtrl->SetRange(LRange(0, Progress->TotalSize));
+				ProgCtrl->SetRange(Progress->TotalSize);
 				ProgCtrl->Attach(this);
 			}
 			else

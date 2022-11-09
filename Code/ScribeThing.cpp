@@ -173,7 +173,7 @@ LDataI *Thing::DefaultObject(LDataI *arg)
 			App &&
 			App->GetDefaultMailStore())
 	{
-		GMailStore *Ms = App->GetDefaultMailStore();
+		LMailStore *Ms = App->GetDefaultMailStore();
 		if (Ms)
 			SetObject(Ms->Store->Create(Type()), _FL);
 	}

@@ -22,31 +22,31 @@ GMail3Def TblFilter[] =
 	{0, 0}
 };
 
-GMail3Filter::GMail3Filter(GMail3Store *store) : GMail3Thing(store)
+LMail3Filter::LMail3Filter(LMail3Store *store) : LMail3Thing(store)
 {
 	Index = 0;
 	StopFiltering = 0;
 	Direction = FilterIn | FilterInternal;
 }
 
-GMail3Filter::~GMail3Filter()
+LMail3Filter::~LMail3Filter()
 {
 }
 
-bool GMail3Filter::DbDelete()
+bool LMail3Filter::DbDelete()
 {
 	char s[256];
 
 	// Delete the filter
 	sprintf_s(s, sizeof(s), "delete from " MAIL3_TBL_FILTER " where Id=" LPrintfInt64, Id);
-	GMail3Store::GStatement Del(Store, s);
+	LMail3Store::LStatement Del(Store, s);
 	if (!Del.Exec())
 		return false;
 
 	return true;
 }
 
-bool GMail3Filter::Serialize(GMail3Store::GStatement &s, bool Write)
+bool LMail3Filter::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	int i = 0;
 
@@ -71,7 +71,7 @@ bool GMail3Filter::Serialize(GMail3Store::GStatement &s, bool Write)
 	return true;
 }
 
-Store3CopyImpl(GMail3Filter)
+Store3CopyImpl(LMail3Filter)
 {
 	Index = (int) p.GetInt(FIELD_FILTER_INDEX);
 	StopFiltering = (int) p.GetInt(FIELD_STOP_FILTERING);
@@ -86,7 +86,7 @@ Store3CopyImpl(GMail3Filter)
 	return true;
 }
 
-const char *GMail3Filter::GetStr(int id)
+const char *LMail3Filter::GetStr(int id)
 {
 	switch (id)
 	{
@@ -104,7 +104,7 @@ const char *GMail3Filter::GetStr(int id)
 	return 0;
 }
 
-Store3Status GMail3Filter::SetStr(int id, const char *str)
+Store3Status LMail3Filter::SetStr(int id, const char *str)
 {
 	switch (id)
 	{
@@ -126,7 +126,7 @@ Store3Status GMail3Filter::SetStr(int id, const char *str)
 	return Store3Error;
 }
 
-int64 GMail3Filter::GetInt(int id)
+int64 LMail3Filter::GetInt(int id)
 {
 	switch (id)
 	{
@@ -152,7 +152,7 @@ int64 GMail3Filter::GetInt(int id)
 	return -1;
 }
 
-Store3Status GMail3Filter::SetInt(int id, int64 n)
+Store3Status LMail3Filter::SetInt(int id, int64 n)
 {
 	switch (id)
 	{

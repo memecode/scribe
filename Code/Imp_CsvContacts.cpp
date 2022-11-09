@@ -6,14 +6,14 @@
 #include "lgi/common/FileSelect.h"
 
 //////////////////////////////////////////////////////////////////////////
-class GFieldMap : public LListItem
+class LFieldMap : public LListItem
 {
 	LDbField &From;
 	ItemFieldDef *To;
 	LString Txt;
 
 public:
-	GFieldMap(LDbField &from) : From(from)
+	LFieldMap(LDbField &from) : From(from)
 	{
 		To = 0;
 
@@ -122,38 +122,31 @@ public:
 	}
 };
 
-class GImpCsv : public LDialog
+class LImpCsv : public LDialog
 {
-	ScribeWnd *App;
-	LList *Map;
+	ScribeWnd *App = NULL;
+	LList *Map = NULL;
 
 public:
-	LAutoPtr<GDb> Database;
-	List<GFieldMap> Mapping;
-	ScribeFolder *Folder;
-	bool Merge;
+	LAutoPtr<LDb> Database;
+	List<LFieldMap> Mapping;
+	ScribeFolder *Folder = NULL;
+	bool Merge = false;
 
-	GImpCsv(ScribeWnd *app)
+	LImpCsv(ScribeWnd *app, LDb *db)
 	{
-		Folder = 0;
-		Map = 0;
-		Merge = false;
+		Database.Reset(db);
 		SetParent(App = app);
 		if (LoadFromResource(IDD_CSV_IMPORT))
 		{
 			MoveToCenter();
-
 			if (GetViewById(IDC_MAPPING, Map))
-			{
 				Map->DrawGridLines(true);
-			}
 		}
 
 		Folder = App->GetCurrentFolder();
 		if (Folder && Folder->GetItemType() != MAGIC_CONTACT)
-		{
 			Folder = App->GetFolder(FOLDER_CONTACTS);
-		}
 
 		if (Folder)
 			SetCtrlName(IDC_FOLDER, Folder->GetPath());
@@ -161,10 +154,12 @@ public:
 
 	void SetRecords(LDbRecordset *Rs)
 	{
+		if (!Rs)
+			return;
 		for (int i=0; i<Rs->Fields(); i++)
 		{
 			LDbField &Fld = (*Rs)[i];
-			GFieldMap *m = new GFieldMap(Fld);
+			auto m = new LFieldMap(Fld);
 			if (m)
 			{
 				Mapping.Insert(m);
@@ -184,7 +179,7 @@ public:
 			LXmlTag Root;
 			Root.SetTag("field-map");
 
-			List<GFieldMap> All;
+			List<LFieldMap> All;
 			Map->GetAll(All);
 			for (auto i: All)
 			{
@@ -222,7 +217,7 @@ public:
 
 			if (Xml.Read(&Root, &f, 0))
 			{
-				List<GFieldMap> All;
+				List<LFieldMap> All;
 				Map->GetAll(All);
 				for (auto i: All)
 				{
@@ -339,22 +334,14 @@ void ImportCsv(ScribeWnd *App)
 		if (!status || !LFileExists(s->Name()))
 			return;
 
-		LAutoPtr<GImpCsv> Dlg(new GImpCsv(App));
+		auto Db = OpenCsvDatabase(s->Name());
+		auto *Dlg = new LImpCsv(App, Db);
 		if (!Dlg)
 			return;
 
-		if (!Dlg->Database.Reset(OpenCsvDatabase(s->Name())))
-			return;
-
-		LDbRecordset *Rs = Dlg->Database->TableAt(0);
-		if (!Rs)
-			return;
-
-		Dlg->SetRecords(Rs);
-
-		Dlg.Release()->DoModal([App](auto dlg, auto id)
+		Dlg->SetRecords(Dlg->Database->TableAt(0));
+		Dlg->DoModal([Dlg, App](auto dlg, auto id)
 		{
-			GImpCsv *Dlg = dynamic_cast<GImpCsv*>(dlg);
 			LAutoPtr<LDialog> mem(dlg);
 			if (!id)
 				return;
@@ -437,7 +424,7 @@ void ImportCsv(ScribeWnd *App)
 	});
 }
 
-class GExportCsv : public LDialog
+class LExportCsv : public LDialog
 {
 	ScribeWnd *App;
 
@@ -445,7 +432,7 @@ public:
 	char *Folder;
 	bool SubFolders;
 
-	GExportCsv(ScribeWnd *app)
+	LExportCsv(ScribeWnd *app)
 	{
 		Folder = 0;
 		SubFolders = false;
@@ -469,7 +456,7 @@ public:
 		}
 	}
 
-	~GExportCsv()
+	~LExportCsv()
 	{
 		DeleteArray(Folder);
 	}
@@ -507,7 +494,7 @@ public:
 
 void ExportCsv(ScribeWnd *App)
 {
-	auto Dlg = new GExportCsv(App);
+	auto Dlg = new LExportCsv(App);
 	Dlg->DoModal([Dlg, App](auto dlg, auto id)
 	{
 		if (id)
@@ -532,7 +519,7 @@ void ExportCsv(ScribeWnd *App)
 							if (Exists)
 								FileDev->Delete(s->Name());
 
-							GDb *Db = OpenCsvDatabase(s->Name());
+							auto Db = OpenCsvDatabase(s->Name());
 							LAssert(Db != NULL);
 							if (Db)
 							{

@@ -124,8 +124,8 @@ bool Import_MailDir(ScribeWnd *App, BDirectory *Dir, ScribeFolder *Folder)
 							off_t Size = 0;
 							F.GetSize(&Size);
 							
-							GMimeStream *Ms;
-							LAutoPtr<LMime> Mime(Ms = new GMimeStream);
+							LMimeStream *Ms;
+							LAutoPtr<LMime> Mime(Ms = new LMimeStream);
 							if (Ms)
 							{
 								LAutoString Buf(new char[Size+1]);

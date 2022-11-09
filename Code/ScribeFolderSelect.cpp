@@ -104,7 +104,7 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////
-class GFolderCtrlFactory : public LViewFactory
+class LFolderCtrlFactory : public LViewFactory
 {
 	LView *NewView(const char *Class, LRect *Pos, const char *Text)
 	{
@@ -150,7 +150,7 @@ void ScribeFolderTree::Setup(FolderDlgPriv *d, ScribeFolder *Root, const char *I
 
 		if (InitSel)
 		{
-			GToken Path(InitSel, "/");
+			LToken Path(InitSel, "/");
 			LTreeNode *n = this;
 			for (unsigned i=0; i<Path.Length(); i++)
 			{
@@ -233,7 +233,7 @@ FolderDlg::FolderDlg(	LViewI *parent,
 		{
 			if (!Root)
 			{
-				GMailStore *Def = d->App->GetDefaultMailStore();
+				LMailStore *Def = d->App->GetDefaultMailStore();
 				if (Def)
 				{
 					Root = Def->Root;

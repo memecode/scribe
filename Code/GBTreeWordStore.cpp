@@ -7,7 +7,7 @@
 struct LWordStorePriv
 {
 	LString File;
-	LAutoPtr<GBTree> Tree;
+	LAutoPtr<LBTree> Tree;
 };
 
 LWordStore::LWordStore(const char *file)
@@ -36,7 +36,7 @@ bool LWordStore::Serialize(const char *file, bool Load)
 		if (!d->File)
 			d->File = file;
 
-		Status = d->Tree.Reset(new GBTree(d->File));
+		Status = d->Tree.Reset(new LBTree(d->File));
 	}
 
 	return Status;
@@ -70,7 +70,7 @@ bool LWordStore::Insert(const char *Word)
 {
 	if (!d->Tree && d->File)
 	{
-		if (!d->Tree.Reset(new GBTree(d->File)))
+		if (!d->Tree.Reset(new LBTree(d->File)))
 			return false;
 	}
 
@@ -127,7 +127,7 @@ void LWordStore::Empty()
 	d->Tree.Reset();
 	if (d->File)
 		FileDev->Delete(d->File, false);
-	d->Tree.Reset(new GBTree(d->File));
+	d->Tree.Reset(new LBTree(d->File));
 }
 
 char *LWordStore::GetFile()

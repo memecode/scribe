@@ -101,13 +101,13 @@ void LoadCalendarStringTable()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-class GColourItem : public LListItemColumn
+class LColourItem : public LListItemColumn
 {
 	LListItem *Item;
 	LView *Colour;
 
 public:
-	GColourItem(LListItem *i, int c, COLOUR col = -1) : LListItemColumn(i, c)
+	LColourItem(LListItem *i, int c, COLOUR col = -1) : LListItemColumn(i, c)
 	{
 		Item = i;
 		Colour = LViewFactory::Create("LColourSelect");
@@ -126,7 +126,7 @@ public:
 		}
 	}
 
-	~GColourItem()
+	~LColourItem()
 	{
 		DeleteObj(Colour);
 	}
@@ -809,7 +809,7 @@ void CalendarView::SetupScroll()
 	if (VScroll)
 	{
 		int Page = (int)(Calendar::DayEnd - Calendar::DayStart);
-		VScroll->SetRange(LRange(0, 24));
+		VScroll->SetRange(24);
 		VScroll->SetPage(Page);
 		VScroll->Value(Calendar::DayStart);
 	}

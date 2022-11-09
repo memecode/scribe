@@ -1260,7 +1260,7 @@ int FindWnd::OnNotify(LViewI *Col, LNotification n)
 
 						LProgressDlg prog(this, 1000);
 						prog.SetDescription("Get message id's...");
-						prog.SetRange(LRange(0, Root->Items.Length()));
+						prog.SetRange(Root->Items.Length());
 						int n = 0;
 						for (Thing *t = *it; t; t = *++it, n++)
 						{

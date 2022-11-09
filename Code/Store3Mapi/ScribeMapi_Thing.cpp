@@ -1,6 +1,6 @@
 #include "ScribeMapi.h"
 
-GMapiThing::GMapiThing(GMapiStore *store)
+LMapiThing::LMapiThing(LMapiStore *store)
 {
 	Store = store;
 	MapiMsg = NULL;
@@ -8,14 +8,14 @@ GMapiThing::GMapiThing(GMapiStore *store)
 	IsDirty = false;
 }
 
-GMapiThing::~GMapiThing()
+LMapiThing::~LMapiThing()
 {
 	if (Store && IsDirty)
 		Store->Dirty.Delete(this);
 	ReleaseHandle();		
 }
 
-void GMapiThing::ReleaseHandle()
+void LMapiThing::ReleaseHandle()
 {
 	if (MapiMsg)
 	{
@@ -24,7 +24,7 @@ void GMapiThing::ReleaseHandle()
 	}
 }
 
-void GMapiThing::SetDirty()
+void LMapiThing::SetDirty()
 {
 	if (Store)
 	{

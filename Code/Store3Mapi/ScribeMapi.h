@@ -52,13 +52,13 @@ typedef HRESULT (STDAPICALLTYPE *pWrapCompressedRTFStream)
 
 extern uint32_t MapiContactEmailTags[];
 
-class GMapiStore;
-class GMapiFolder;
-class GMapiMail;
+class LMapiStore;
+class LMapiFolder;
+class LMapiMail;
 class ScribeMapiList;
-class GMapiAdviseSink;
+class LMapiAdviseSink;
 
-class GMapiBase
+class LMapiBase
 {
 public:
 	SPropValue *MapiGetField(SRow *Row, int Field)
@@ -286,16 +286,16 @@ public:
 	}
 };
 
-class GMapiAddr : public LDataPropI
+class LMapiAddr : public LDataPropI
 {
-	GMapiStore *Store;
+	LMapiStore *Store;
 
 public:
-	GMapiMail *m;
+	LMapiMail *m;
 	int CC, Status;
 	LString Name, Email;
 
-	GMapiAddr(GMapiStore *store);
+	LMapiAddr(LMapiStore *store);
 
 	Store3CopyDecl;
 
@@ -305,24 +305,24 @@ public:
 	Store3Status SetInt(int id, int64 i);
 };
 
-class GMapiThing : public LDataI, public GMapiBase
+class LMapiThing : public LDataI, public LMapiBase
 {
-	friend class GMapiStore;
+	friend class LMapiStore;
 
 protected:
 	LArray<uint8_t> Entry;
 	LPMESSAGE MapiMsg;
 	LString Class;
-	GMapiFolder *Parent;
+	LMapiFolder *Parent;
 	bool IsDirty;
 
 public:
-	GMapiStore *Store;
+	LMapiStore *Store;
 
-	GMapiThing(GMapiStore *store);	
-	~GMapiThing();
+	LMapiThing(LMapiStore *store);	
+	~LMapiThing();
 
-	virtual void Set(SPropValue *entry, GMapiFolder *parent, ScribeMapiList *lst) {}
+	virtual void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst) {}
 	virtual LPMESSAGE Handle() { return MapiMsg; }
 	virtual void ReleaseHandle();
 	void SetDirty();
@@ -338,9 +338,9 @@ public:
 	Store3Status SetRfc822(LStreamI *m) { LAssert(0); return Store3Error; }
 };
 
-class GMapiAttachment :
-	public Store3Attachment<GMapiStore, GMapiMail, GMapiAttachment>,
-	public GMapiBase
+class LMapiAttachment :
+	public Store3Attachment<LMapiStore, LMapiMail, LMapiAttachment>,
+	public LMapiBase
 {
 	friend class AttachStream;
 	
@@ -355,11 +355,11 @@ class GMapiAttachment :
 	LString Literal;
 	
 public:
-	GMapiAttachment(GMapiStore *store);
-	~GMapiAttachment();
+	LMapiAttachment(LMapiStore *store);
+	~LMapiAttachment();
 
 	LPATTACH Handle();
-	bool Set(GMapiMail *mail, ScribeMapiList *Lst);
+	bool Set(LMapiMail *mail, ScribeMapiList *Lst);
 	bool Set(const char *Content, const char *Charset, const char *MimeType);
 
 	Store3CopyDecl;
@@ -379,12 +379,12 @@ public:
 	void OnSave();
 };
 
-class GMapiMail : public GMapiThing
+class LMapiMail : public LMapiThing
 {
 	LString Subject;
-	GMapiAddr From;
-	GMapiAddr Reply;
-	DIterator<LDataPropI, GMapiAddr, GMapiStore> To;
+	LMapiAddr From;
+	LMapiAddr Reply;
+	DIterator<LDataPropI, LMapiAddr, LMapiStore> To;
 	LDateTime Date;
 	uint64 Flags;
 	uint64 MsgSize;
@@ -394,12 +394,12 @@ class GMapiMail : public GMapiThing
 	LString MimeType;
 
 public:
-	GMapiAttachment *Seg;
+	LMapiAttachment *Seg;
 
-	GMapiMail(GMapiStore *store);
-	~GMapiMail();
+	LMapiMail(LMapiStore *store);
+	~LMapiMail();
 
-	void Set(SPropValue *entry, GMapiFolder *parent, ScribeMapiList *lst);	
+	void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst);	
 	LPMESSAGE Handle();
 
 	// LDataPropI API
@@ -425,7 +425,7 @@ public:
 	LAutoStreamI GetStream(const char *file, int line);
 };
 
-class GMapiCalendar : public GMapiThing
+class LMapiCalendar : public LMapiThing
 {
 	LDateTime StartDt, EndDt;
 	LString Subject, Location, Notes;
@@ -436,10 +436,10 @@ class GMapiCalendar : public GMapiThing
 	bool Recur;
 	
 public:
-	GMapiCalendar(GMapiStore *store);	
-	~GMapiCalendar();
+	LMapiCalendar(LMapiStore *store);	
+	~LMapiCalendar();
 
-	void Set(SPropValue *entry, GMapiFolder *parent, ScribeMapiList *lst);	
+	void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst);	
 	LPMESSAGE Handle();
 
 	// LDataPropI API
@@ -463,7 +463,7 @@ public:
 	Store3Status Delete(bool ToTrash = true);
 };
 
-class GMapiContact : public GMapiThing
+class LMapiContact : public LMapiThing
 {
 	struct Address
 	{
@@ -486,10 +486,10 @@ class GMapiContact : public GMapiThing
 	char *CacheGetStr(LString &s, uint32_t Prop);
 
 public:
-	GMapiContact(GMapiStore *store);	
-	~GMapiContact();
+	LMapiContact(LMapiStore *store);	
+	~LMapiContact();
 
-	void Set(SPropValue *entry, GMapiFolder *parent, ScribeMapiList *lst);	
+	void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst);	
 	LPMESSAGE Handle();
 
 	// LDataPropI API
@@ -513,16 +513,16 @@ public:
 	Store3Status Delete(bool ToTrash = true);
 };
 
-class GMapiFolderField : public LDataPropI
+class LMapiFolderField : public LDataPropI
 {
-	GMapiStore *Store;
+	LMapiStore *Store;
 	LString Name;
 	int Id;
 	int Width;
 	
 public:
-	GMapiFolderField(GMapiStore *store);
-	~GMapiFolderField();
+	LMapiFolderField(LMapiStore *store);
+	~LMapiFolderField();
 
 	// LDataPropI API
 	LDataPropI &operator =(LDataPropI &p);
@@ -537,15 +537,15 @@ public:
 	Store3Status SetRfc822(LStreamI *m);
 };
 
-class GMapiFolder : public LDataFolderI, public GMapiBase
+class LMapiFolder : public LDataFolderI, public LMapiBase
 {
-	friend class GMapiStore;
+	friend class LMapiStore;
 
 	LPMAPIFOLDER MapiFolder;
 	LArray<uint8_t> Entry;
 	
-	GMapiStore *Store;
-	GMapiFolder *Parent;
+	LMapiStore *Store;
+	LMapiFolder *Parent;
 	LString Name;
 	LString Class;
 	int64 Unread;
@@ -554,16 +554,16 @@ class GMapiFolder : public LDataFolderI, public GMapiBase
 	uint32_t ItemType;
 	Store3SystemFolder FolderType;
 
-	DIterator<LDataFolderI, GMapiFolder, GMapiStore> Sub;
-	DIterator<LDataI, GMapiThing, GMapiStore> Items;
-	DIterator<LDataPropI, GMapiFolderField, GMapiStore> Flds;
+	DIterator<LDataFolderI, LMapiFolder, LMapiStore> Sub;
+	DIterator<LDataI, LMapiThing, LMapiStore> Items;
+	DIterator<LDataPropI, LMapiFolderField, LMapiStore> Flds;
 	
 public:
-	GMapiFolder(GMapiStore *store);
-	~GMapiFolder();
+	LMapiFolder(LMapiStore *store);
+	~LMapiFolder();
 
 	bool Set(LPMAPIFOLDER f);
-	bool Set(GMapiFolder *parent, ScribeMapiList *Lst);
+	bool Set(LMapiFolder *parent, ScribeMapiList *Lst);
 	LPMAPIFOLDER Handle();
 	void ReleaseHandle();
 
@@ -599,7 +599,7 @@ public:
 	void OnCommand(const char *Name);
 };
 
-class ScribeMapiList : public GMapiBase
+class ScribeMapiList : public LMapiBase
 {
 	LPMAPITABLE List;
 	ULONG Rows;
@@ -683,15 +683,15 @@ public:
 	}
 };
 
-class MapiEntryRef : public GMapiBase
+class MapiEntryRef : public LMapiBase
 {
-	GMapiStore *Store;
+	LMapiStore *Store;
 	
 public:
 	LString DisplayName;
 	LArray<uint8_t> Entry;
 
-	MapiEntryRef(GMapiStore *store)
+	MapiEntryRef(LMapiStore *store)
 	{
 		Store = store;
 	}
@@ -700,14 +700,14 @@ public:
 };
 
 
-class ScribeMsgStores : public LArray<MapiEntryRef*>, public GMapiBase
+class ScribeMsgStores : public LArray<MapiEntryRef*>, public LMapiBase
 {
-	GMapiStore *Store;
+	LMapiStore *Store;
 
 public:
 	bool Status;
 
-	ScribeMsgStores(GMapiStore *store, LPMAPISESSION Session)
+	ScribeMsgStores(LMapiStore *store, LPMAPISESSION Session)
 	{
 		Store = store;
 		Status = false;
@@ -751,20 +751,20 @@ public:
 	}
 };
 
-class GMapiStore : public LDataStoreI, public LLibrary
+class LMapiStore : public LDataStoreI, public LLibrary
 {
-	friend class GMapiFolder;
-	friend class GMapiThing;
-	friend class GMapiMail;
+	friend class LMapiFolder;
+	friend class LMapiThing;
+	friend class LMapiMail;
 
 	LDataEventsI *Callback;
-	GMapiFolder *Root;
+	LMapiFolder *Root;
 	LAutoPtr<MapiEntryRef> EntryRef;
 	LString Profile, Username, Password, RootName;
 	uint64 AccountId;
 	LArray<uint8_t> InboxEntry;
-	LArray<GMapiThing*> Dirty;
-	GMapiAdviseSink *Notify;
+	LArray<LMapiThing*> Dirty;
+	LMapiAdviseSink *Notify;
 	bool MapiInitialized;
 
 	LPMAPISESSION				Session;
@@ -778,15 +778,15 @@ class GMapiStore : public LDataStoreI, public LLibrary
 	MAPIFREEBUFFER				*MAPIFreeBuffer;
 	pWrapCompressedRTFStream	WrapCompressedRTFStream;
 
-	GMapiFolder *FindSystemFolder(Store3SystemFolder Type);
+	LMapiFolder *FindSystemFolder(Store3SystemFolder Type);
 	
 public:
-	GMapiStore(	const char *Server,
+	LMapiStore(	const char *Server,
 				const char *Username,
 				const char *Password,
 				uint64 accountId,
 				LDataEventsI *callback);
-	~GMapiStore();
+	~LMapiStore();
 
 	// Util
 	IMsgStore *Handle() { return MsgStore; }

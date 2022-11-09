@@ -217,7 +217,7 @@ SpellErrorStyle::~SpellErrorStyle()
 	Options.DeleteArrays();
 }
 
-bool SpellErrorStyle::OnMenu(GSubMenu *m)
+bool SpellErrorStyle::OnMenu(LSubMenu *m)
 {
 	if (Options.Length())
 	{

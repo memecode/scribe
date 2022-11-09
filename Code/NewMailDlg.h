@@ -3,15 +3,15 @@
 #ifndef __G_NEW_MAIL_DLG_H
 #define __G_NEW_MAIL_DLG_H
 
-class GNewMailDlg : public LDialog
+class LNewMailDlg : public LDialog
 {
-	GNewMailDlg **Ptr;
+	LNewMailDlg **Ptr;
 	ScribeWnd *App;
 	List<Thing> Things;
 
 public:
-	GNewMailDlg(ScribeWnd *app, GNewMailDlg **ptr);
-	~GNewMailDlg();
+	LNewMailDlg(ScribeWnd *app, LNewMailDlg **ptr);
+	~LNewMailDlg();
 
 	void AddThings(List<Mail> *NewThings);
 

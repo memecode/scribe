@@ -100,7 +100,7 @@ public:
 	}
 };
 
-class GMail2Store : public LDataStoreI, public Storage2::StorageKitImpl
+class LMail2Store : public LDataStoreI, public Storage2::StorageKitImpl
 {
 	friend class FolderData;
 	friend class MailData;
@@ -111,9 +111,9 @@ class GMail2Store : public LDataStoreI, public Storage2::StorageKitImpl
 	LAutoString ErrorMsg;
 
 public:
-	GMail2Store(char *file, LDataEventsI *callback);
+	LMail2Store(char *file, LDataEventsI *callback);
 
-	~GMail2Store();
+	~LMail2Store();
 
 	LDataEventsI *GetEvents() { return Callback; }
 	bool OnIdle() { return false; }
@@ -140,7 +140,7 @@ class FolderData : public LDataFolderI, public StorageObj
 
 public:
 	// Glue members
-	GMail2Store *Kit;
+	LMail2Store *Kit;
 
 	// Folder data memebers
 	int32 Sort;
@@ -154,9 +154,9 @@ public:
 	Store3SystemFolder System;
 	
 	// Collections
-	DIterator<LDataPropI, Mail2Field, GMail2Store> Field;
-	DIterator<LDataFolderI, FolderData, GMail2Store> Sub;
-	DIterator<LDataI, ThingData, GMail2Store> Things;
+	DIterator<LDataPropI, Mail2Field, LMail2Store> Field;
+	DIterator<LDataFolderI, FolderData, LMail2Store> Sub;
+	DIterator<LDataI, ThingData, LMail2Store> Things;
 
 	bool Load(bool Flds, bool Things);
 
@@ -166,7 +166,7 @@ public:
 	GDataIterator<LDataPropI*> &Fields();
 
 	// Methods
-	FolderData(GMail2Store *store);
+	FolderData(LMail2Store *store);
 	~FolderData();
 	
 	LDataI &operator =(LDataI &p);
@@ -205,10 +205,10 @@ protected:
 
 public:
 	// Glue members
-	GMail2Store *Kit;
+	LMail2Store *Kit;
 	bool IsLoaded;
 
-	ThingData(GMail2Store *s)
+	ThingData(LMail2Store *s)
 	{
 		Debug = false;
 		Kit = s;
@@ -333,10 +333,10 @@ public:
 
 	Mail2Addr From;
 	Mail2Addr Reply;
-	DIterator<LDataPropI, Mail2Addr, GMail2Store> To;
+	DIterator<LDataPropI, Mail2Addr, LMail2Store> To;
 	AttachmentData *Seg;
 
-	MailData(GMail2Store *s);
+	MailData(LMail2Store *s);
 	~MailData();
 
 	LDataI &operator =(LDataI &p);
@@ -365,7 +365,7 @@ public:
 };
 
 class AttachmentData :
-	public Store3Attachment<GMail2Store, MailData, AttachmentData>,
+	public Store3Attachment<LMail2Store, MailData, AttachmentData>,
 	public StorageObj
 {
 	bool PlaceHolder;
@@ -387,7 +387,7 @@ class AttachmentData :
 public:
 	bool IsLoaded;
 
-	AttachmentData(GMail2Store *store);
+	AttachmentData(LMail2Store *store);
 	~AttachmentData();
 
 	void SetExtern(char **body = 0, char **charset = 0);
@@ -428,7 +428,7 @@ public:
 	LArray<char*> Plugins;
 	LArray<char*> AltEmail;
 
-	ContactData(GMail2Store *s);
+	ContactData(LMail2Store *s);
 	~ContactData();
 
 	LDataI &operator =(LDataI &p);
@@ -477,7 +477,7 @@ public:
 	char *Notes; // FIELD_CAL_NOTES
 
 
-	CalendarData(GMail2Store *s);
+	CalendarData(LMail2Store *s);
 	~CalendarData();
 
 	LDataI &operator =(LDataI &p);
@@ -508,14 +508,14 @@ public:
 	uint8 StopFiltering;
 	char *ConditionsXml;
 
-	DIterator<LDataPropI, FilterAction, GMail2Store> Actions;
+	DIterator<LDataPropI, FilterAction, LMail2Store> Actions;
 	LAutoString ActionXml;
 	uint8 FilterFlags;
 	uint8 Outgoing;
 	// int CombineOp;
 	// List<FilterCondition> Conditions;
 
-	FilterData(GMail2Store *s);
+	FilterData(LMail2Store *s);
 	~FilterData();
 	
 	LDataI &operator =(LDataI &p);
@@ -539,7 +539,7 @@ public:
 	char *Name;
 	char *Group;
 
-	GroupData(GMail2Store *s);
+	GroupData(LMail2Store *s);
 	~GroupData();
 	
 	LDataI &operator =(LDataI &p);
