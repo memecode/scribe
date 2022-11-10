@@ -215,7 +215,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B92638E78294D309C8F4B71;
+			remoteGlobalIDString = 63F1B6C35FC9475F8A6274EC;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -341,28 +341,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 4BD8C6B10C81477DB207C5EE;
+			remoteGlobalIDString = FAEB745E38014DB5912D04F5;
 			remoteInfo = libjpeg9a;
 		};
 		34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F507E4C9BCC14896B103C636;
+			remoteGlobalIDString = A47CE3DD6D7E44FF984E327F;
 			remoteInfo = libpng15;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = AC9223C4E8CB4724958ECB9E;
+			remoteGlobalIDString = 7D1CF078C60E4238813E5BB7;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = E4BCA0C756B64D00AC86B714;
+			remoteGlobalIDString = C84F72522656464CBED4EA91;
 			remoteInfo = libiconv;
 		};
 		34DED72523AC30C30049E01F /* PBXContainerItemProxy */ = {
@@ -450,7 +450,7 @@
 		34161497238484F700A65477 /* WebdavStorePriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebdavStorePriv.h; path = ../../Code/Store3Webdav/WebdavStorePriv.h; sourceTree = "<group>"; };
 		34161498238484F800A65477 /* WebdavThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavThread.cpp; path = ../../Code/Store3Webdav/WebdavThread.cpp; sourceTree = "<group>"; };
 		34161499238484F800A65477 /* WebdavStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebdavStore.h; path = ../../Code/Store3Webdav/WebdavStore.h; sourceTree = "<group>"; };
-		341A02B723BD702800F0FF48 /* SpellCheckAspell.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpellCheckAspell.cpp; path = ../../Code/SpellCheckAspell.cpp; sourceTree = "<group>"; };
+		341A02B723BD702800F0FF48 /* SpellCheckAspell.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpellCheckAspell.cpp; path = ../../../../lgi/trunk/src/common/Text/SpellCheckAspell.cpp; sourceTree = "<group>"; };
 		341A787F2699058600872FEB /* DatePopup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DatePopup.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/DatePopup.cpp; sourceTree = "<group>"; };
 		341BF47023231D0600BC3AB0 /* Jpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Jpeg.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Filters/Jpeg.cpp; sourceTree = "<group>"; };
 		3425DC6A23F788AE00BC025E /* SpellCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SpellCheck.h; path = ../../../../Lgi/trunk/include/lgi/common/SpellCheck.h; sourceTree = "<group>"; };
