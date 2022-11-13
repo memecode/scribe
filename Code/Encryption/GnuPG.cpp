@@ -134,11 +134,11 @@ struct GpgJob
 	LString Password;
 };
 
-struct GTempFile : public LFile
+struct LTempFile : public LFile
 {
 	LString Path;
 	
-	GTempFile(const char *path)
+	LTempFile(const char *path)
 	{
 		if (Open(path, O_READ))
 		{
@@ -146,7 +146,7 @@ struct GTempFile : public LFile
 		}
 	}
 	
-	~GTempFile()
+	~LTempFile()
 	{
 		if (Path)
 		{
@@ -585,7 +585,7 @@ private:
 					}
 					else if
 					(
-						!Resp->Data.Reset(f = new GTempFile(OutPath)) ||
+						!Resp->Data.Reset(f = new LTempFile(OutPath)) ||
 						!f->IsOpen())
 					{
 						Resp->Data.Reset();
