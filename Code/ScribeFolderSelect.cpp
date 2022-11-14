@@ -32,30 +32,36 @@ public:
 class FolderDlgPriv
 {
 public:
-	FolderDlg *Dlg;
-	ScribeWnd *App;
-	bool CreateNew;
-	int LimitTo;
+	FolderDlg *Dlg = NULL;
+	ScribeWnd *App = NULL;
+	bool CreateNew = false;
+	int LimitTo = MAGIC_NONE;
 	LString Path;
-	LAutoString DefaultNewFolderName;
-	LAutoString DialogMsg;
-	ScribeFolderTree *View;
+	LString DefaultNewFolderName;
+	LString Filter;
+	ScribeFolderTree *View = NULL;
 
 	FolderDlgPriv(ScribeWnd *app, FolderDlg *t, bool create)
 	{
 		CreateNew = create;
 		Dlg = t;
-		View = 0;
 		App = app;
-		LimitTo = MAGIC_NONE;
 	}
+
+	void OnFilter();
 };
 
 //////////////////////////////////////////////////////////////////////////////
-class FolderLeaf : public LTreeItem
+struct FolderLeaf : public LTreeItem
 {
 	FolderDlgPriv *d;
 	ScribeFolder *Folder;
+
+	FolderLeaf(FolderDlgPriv *priv, ScribeFolder *folder)
+	{
+		d = priv;
+		Folder = folder;
+	}
 
 	bool IsSelectable()
 	{
@@ -65,19 +71,12 @@ class FolderLeaf : public LTreeItem
 				(Folder && d->LimitTo == fType);
 	}
 
-public:
-	FolderLeaf(FolderDlgPriv *priv, ScribeFolder *folder)
-	{
-		d = priv;
-		Folder = folder;
-	}
-
-	const char *GetText(int i=0)
+	const char *GetText(int i=0) override
 	{
 		return (Folder) ? Folder->GetText(i) : "<error>";
 	}
 
-	int GetImage(int Flags = 0)
+	int GetImage(int Flags = 0) override
 	{
 		if (IsSelectable())
 		{
@@ -92,7 +91,7 @@ public:
 		return Folder;
 	}
 
-	void OnSelect()
+	void OnSelect() override
 	{
 		LViewI *Parent = Tree->LView::GetParent();
 		if (Parent)
@@ -103,20 +102,52 @@ public:
 	}
 };
 
+void FolderDlgPriv::OnFilter()
+{
+	// Initialize visible
+	View->ForAllItems([vis = Filter ? LCss::DispNone : LCss::DispBlock](auto i)
+	{
+		FolderLeaf *l = dynamic_cast<FolderLeaf*>(i);
+		if (!l) return;
+		
+		l->GetCss(true)->Display(vis);
+	});
+
+	// Find matching items...
+	View->ForAllItems([this](auto i)
+	{
+		FolderLeaf *l = dynamic_cast<FolderLeaf*>(i);
+		if (!l) return;
+
+		auto nm = l->GetText();
+		if (Stristr(nm, this->Filter.Get()))
+		{
+			l->GetCss(true)->Display(LCss::DispBlock);
+
+			for (auto p = l->GetParent(); p; p = p->GetParent())
+			{
+				FolderLeaf *lp = dynamic_cast<FolderLeaf*>(p);
+				if (lp) lp->GetCss(true)->Display(LCss::DispBlock);
+			}
+		}
+	});
+
+	View->UpdateAllItems();
+	View->Invalidate();
+}
+
 //////////////////////////////////////////////////////////////////////////////
 class LFolderCtrlFactory : public LViewFactory
 {
 	LView *NewView(const char *Class, LRect *Pos, const char *Text)
 	{
-		if (Class && !_stricmp(Class, "ScribeFolderTree"))
-		{
+		if (!Stricmp(Class, "ScribeFolderTree"))
 			return new ScribeFolderTree(-1, 0, 0, 100, 100);
-		}
 
 		return 0;
 	}
 
-} FolderCtrlFactory;
+}	FolderCtrlFactory;
 
 ScribeFolderTree::ScribeFolderTree(int id, int x, int y, int cx, int cy) :
 	LTree(id, x, y, cx, cy, "")
@@ -221,7 +252,7 @@ FolderDlg::FolderDlg(	LViewI *parent,
 						char *DialogMsg)
 {
 	d = new FolderDlgPriv(app, this, AllowCreate);
-	d->DefaultNewFolderName.Reset(NewStr(DefaultNewFolderName));
+	d->DefaultNewFolderName = DefaultNewFolderName;
 	d->LimitTo = LimitToType;
 	SetParent(parent);
 
@@ -273,41 +304,68 @@ int FolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 {
 	switch (Ctrl->GetId())
 	{
+		case IDC_FOLDERS:
+		{
+			if (n.Type == LNotifyItemDoubleClick)
+			{
+				if (d->View)
+					d->Path = d->View->Get2();
+
+				EndModal(1);
+			}
+			break;
+		}
 		case IDC_NEW_FOLDER:
 		{
 			auto Cur = d->View->Get2();
-			if (Cur)
+			if (!Cur)
+				break;
+
+			Store3ItemTypes Type[] = { MAGIC_MAIL, MAGIC_CONTACT, MAGIC_FILTER, MAGIC_CALENDAR, MAGIC_GROUP };
+			bool Enable[] = {true, true, true, true, true};
+			CreateSubFolderDlg Dlg(this, 0, Enable, d->DefaultNewFolderName);
+			ScribeFolder *f = d->App->GetFolder(Cur);
+			if (!f)
+				break;
+
+			ScribeFolder *Sub = f->GetSubFolder(Dlg.SubName);
+			if (!Sub)
+				Sub = f->CreateSubDirectory(Dlg.SubName, Type[Dlg.SubType]);
+			if (!Sub)
+				break;
+
+			LTreeItem *s = d->View->Selection();
+			if (!s)
+				break;
+
+			FolderLeaf *NewLeaf = new FolderLeaf(d, Sub);
+			s->Insert(NewLeaf);
+			NewLeaf->Select(true);
+			NewLeaf->ScrollTo();
+			break;
+		}
+		case IDC_FILTER:
+		{
+			LString n = Ctrl->Name();
+			if (d->Filter != n)
 			{
-				Store3ItemTypes Type[] = { MAGIC_MAIL, MAGIC_CONTACT, MAGIC_FILTER, MAGIC_CALENDAR, MAGIC_GROUP };
-				bool Enable[] = {true, true, true, true, true};
-				CreateSubFolderDlg Dlg(this, 0, Enable, d->DefaultNewFolderName);
-				ScribeFolder *f = d->App->GetFolder(Cur);
-				if (f)
-				{
-					ScribeFolder *Sub = f->GetSubFolder(Dlg.SubName);
-					if (!Sub)
-						Sub = f->CreateSubDirectory(Dlg.SubName, Type[Dlg.SubType]);
-					if (!Sub)
-						break;
-
-					LTreeItem *s = d->View->Selection();
-					if (!s)
-						break;
-
-					FolderLeaf *NewLeaf = new FolderLeaf(d, Sub);
-					s->Insert(NewLeaf);
-					NewLeaf->Select(true);
-					NewLeaf->ScrollTo();
-				}
+				d->Filter = n;
+				d->OnFilter();
 			}
+			break;
+		}
+		case IDC_CLEAR:
+		{
+			d->Filter.Empty();
+			SetCtrlName(IDC_FILTER, NULL);
+			d->OnFilter();
 			break;
 		}
 		case IDOK:
 		{
 			if (d->View)
-			{
 				d->Path = d->View->Get2();
-			}
+
 			EndModal(1);
 			break;
 		}

@@ -10,8 +10,8 @@
 		<String Ref="11" Cid="349" Define="IDC_PREVIEW_LINES" en="Preview first few lines of email in the list view" fr="Aperçu des premières lignes du courriel dans la liste" it="Mostra anteprima messaggio" cs="Náhled několika řádků zprávy v přehledu" es="Mostrar las primeras líneas del Email en la lista de mensajes" de="Anfang der E-Mails in Liste anzeigen" nl="Eerste regels van het bericht weergeven" pt_br="Visualizar primeiras linhas da mensagem" ru="Показывать первые несколько строк письма в списке" ja="リスト表示中のメールの一行目をプレビューする" pt="Mostrar primeiras linhas da mensagem" pl="Podgląd początkowych linijek wiadomości" vi="Duyệt vài dòng đầu của thư trong danh sách thư" zh_tw="列表時預覽郵件首行" sr="Prikaži prvih nekoliko redova poruke u prikazu liste" no="Vis de første linjene av hver melding i hovedliste for meldinger" lt="Rodyti keletą pirmųjų laiško teksto eilučių" fa="در فهرست ناه ها چند سطر اول هر نامه را نشان بده" da="Vis de første linjer af hver melding i hovedlisten for meldinger" sv="Förhandsgranska e-post i meddelandelistan" lg="laga layini z&apos;obubaka ezisooka mu lukalala lw&apos;amabaluwa" tr="Listede e-postanın ilk birkaç satırını görüntüle" hu="Levél első néhány sorának előnézete a listában" ko="목록보기에서 이메일 앞쪽 몇 줄 미리보기" uk="Перегляд перші кілька рядків електронної пошти у вигляді списку" />
 		<String Ref="12" Cid="1321" Define="IDC_REPAIR_MS" en="Repair Folders" fr="Réparer Dossiers" it="&Ripara file Cartelle" cs="Op&ravit soubor zpráv" es="&Reparar carpetas" de="Ordner reparieren" nl="Mappen &repareren" pt_br="&Consertar pastas" ru="Восстановить раздел" ja="フォルダの修復" pt="&Reparar pastas" pl="Napraw foldery" vi="&Sửa chữa tập tin dữ liệu" zh_tw="重建資料夾(&R)" sr="Pop&ravi omotnice" no="&Reparer mappe" lt="&Atsatyti laiškų rinkmeną" fa="تعمير پوشه ها" da="&Reparer mappe" sv="&Reparera mappar" tr="Klasörleri Ona&r" hu="Mappák &javítása" ko="폴더 수리" uk="Відновити теки" />
 		<String Ref="13" Cid="985" Define="IDC_CONFIGURE_REMOTE_CONTENT" en="..." />
-		<String Ref="15" Cid="539" Define="IDC_TABLE" />
-		<String Ref="17" Cid="539" Define="IDC_TABLE" />
+		<String Ref="15" Cid="1165" Define="IDC_TABLE" />
+		<String Ref="17" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="22" Cid="335" Define="IDC_SET_FILTERS" en="..." uk="Тільки цією мовою:" />
 		<String Ref="33" Cid="2016" Define="IDD_NEW_MAIL_NOTIFY" fr="Notification de nouveau courriel" en="New Mail Notification" cs="Oznámení nové zprávy" nl="Melding bij nieuwe post" es="Notificación de Nuevo Correo" pt_br="Notificação de nova mensagem" ru="Извещение о новом сообщении" pt="Notificação de nova mensagem" pl="Powiadomienie o nowej poczcie" it="Notifica nuovi messaggi" vi="Cảnh báo thư mới" zh_tw="新郵件通知" ja="新規メール通知" sr="Obaveštenje o novoprispeloj pošti" no="Varsel om ny epost" lt="Pranešimas apie naują laišką" fa="اعلام وصول نامه جدید" de="&apos;Neue E-Mail&apos; Benachrichtigung" da="Varsel om ny mail" sv="Meddelande om ny e-post" lg="Okukumanyisa ku baluwa empya" tr="Yeni E-postanız Var" hu="Új üzenet értesítés" ko="새로운 메일 알림" uk="Повідомлення про нову пошту" />
 		<String Ref="34" Cid="2017" Define="IDC_NEW_MAIL" pt="Nova mensagem" />
@@ -30,7 +30,7 @@
 		<String Ref="49" Cid="1033" Define="IDC_HOME_STREET" />
 		<String Ref="50" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="51" Cid="-1" Define="IDC_STATIC" en="Suburb:" fr="Localité:" it="Città:" cs="Město:" es="Localidad:" de="Ort:" nl="Plaats:" pt_br="Cidade:" ja="郊外" pt="Localidade:" pl="Miasto:" vi="Địa phương:" zh_tw="村鎮:" sr="Kvart:" no="Forsted:" lt="Miestas:" fa="محله" da="Forstad:" sv="Ort:" lg="Ekyaalo:" tr="Mahalle:" hu="Körzet:" ru="Город:" ko="교외:" uk="Місто:" />
-		<String Ref="52" Cid="539" Define="IDC_TABLE" />
+		<String Ref="52" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="53" Cid="1035" Define="IDC_HOME_SUBURB" />
 		<String Ref="54" Cid="-1" Define="IDC_STATIC" en="PostCode:" fr="Code Postal:" it="CAP:" cs="PSČ:" es="Cód. Postal:" de="PLZ:" nl="Postcode:" pt_br="CEP:" ja="郵便番号" pt="Cód. Postal:" pl="Kod Pocztowy" vi="Mã bưu điện:" zh_tw="郵遞區號:" sr="Poštanski broj:" no="Postnummer:" lt="Pašto kodas:" fa="کد پستي" da="Postnummer:" sv="Postnummer:" lg="Kooda-Posita:" tr="Posta Kodu:" hu="Irányítószám:" ru="Индекс:" ko="우편번호:" uk="Індекс:" />
 		<String Ref="55" Cid="699" Define="IDC_OTHER_TABLE" />
@@ -62,10 +62,10 @@
 		<String Ref="81" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="82" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" pt="Cancelar" ja="キャンセル" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="83" Cid="508" Define="IDC_TEXT" />
-		<String Ref="84" Cid="539" Define="IDC_TABLE" />
+		<String Ref="84" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="85" Cid="-1" Define="IDC_STATIC" en="Search:" fr="Chercher:" it="Cerca:" cs="Hledat:" es="Buscar:" de="Suche:" nl="Zoek:" pt_br="Procurar:" ru="Поиск:" pt="Procurar:" pl="Szukaj:" vi="Tìm:" zh_tw="搜尋:" ja="検索:" sr="Pretraži:" no="Søk:" lt="Ieškoti:" fa="جستجو" da="Søg:" sv="Sök:" lg="Noonya:" tr="Ara:" hu="Keresés:" ko="탐색:" uk="Пошук:" />
 		<String Ref="86" Cid="2045" Define="IDD_FOLDER_NAME" en="Folder Name" fr="Nom de dossier" it="Nome Cartella" cs="Jméno složky" es="Nombre de la Carpeta" de="Ordnername" nl="Naam van map" pt_br="Nome da pasta" ru="Имя папки" pt="Nome da pasta" pl="Nazwa folderu" vi="Tên danh mục" zh_tw="資料夾名稱" ja="フォルダ名" sr="Ime omotnice" no="Mappenavn" lt="Aplanko vardo keitimas" fa="نام پوشه" da="Mappenavn" sv="Mappnamn" lg="Erinnya lya Kabada" tr="Klasör Adı" hu="Mappa neve" ko="폴더 이름" uk="Ім`я теки" />
-		<String Ref="87" Cid="539" Define="IDC_TABLE" />
+		<String Ref="87" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="88" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" pt="Cancelar" ja="キャンセル" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="89" Cid="1002" Define="IDC_NAME" />
 		<String Ref="90" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
@@ -79,17 +79,17 @@
 		<String Ref="99" Cid="-1" Define="IDC_STATIC" en="Options requiring a restart:" cs="Nastavení vyžadující restart" ru="Опции, требующие перезапуск" nl="Opties actief na herstart programma" ja="再起動を要求するオプション" pt="Opções que requerem reinício" pl="Opcje wymagają restartu" it="Opzioni che richiedono il riavvio" vi="Tùy chọn (phải khởi động lại)" zh_tw="此操作必須重新啟動" sr="Opcije koje zahtevaju restart" es="Opciones que requieren reiniciar el programa" no="Alternativer som krever omstart" lt="Nuostatos, kurios įsigalios, programą paleidus iš naujo" fa="گزينه هاي که به راه اندازي مجدد نياز دارند" de="Diese Einstellungen erfordern Neustart" da="Optioner som kræver genstart" sv="Alternativ som kräver omstart:" pt_br="Opções que requerem um re-início do programa" lg="Eby&apos;Okweroboza ebyetagisa okutandiika kompyuta obuto" tr="Yeniden başlatma gerektiren ayarlar" hu="Beállítások újraindítást igényelnek" ko="재시작을 요구하는 옵션:" uk="Функції, що вимагають перезавантаження:" fr="Options qui requièrent un redémarage:" />
 		<String Ref="100" Cid="965" Define="IDC_DEF_REPLYALL_SETTING" />
 		<String Ref="101" Cid="189" Define="IDC_RESET_FORWARD" en="Reset" ko="리셋" uk="Скинути" de="Zurücksetzen" fr="Réinitialiser" />
-		<String Ref="102" Cid="539" Define="IDC_TABLE" />
+		<String Ref="102" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="105" Cid="736" Define="IDC_EDIT_FORWARD" en="..." />
 		<String Ref="106" Cid="735" Define="IDC_EDIT_REPLY" en="..." />
 		<String Ref="107" Cid="577" Define="IDC_CALENDER" lt="Kalendorius" pt="Calendário" />
 		<String Ref="108" Cid="1066" Define="IDC_WRAP" en="Wrap Lines at" fr="Couper lignes à" it="Vai a capo ogni" cs="Zalamovat řádky na" es="Autoajustar las líneas a" de="Zeilenumbruch nach" nl="Regels afbreken na" pt_br="Quebrar as linhas em" ru="Перенос строк больше" ja="ラインで囲む" pt="Ajustar as linhas a" pl="Łam wiersze co" vi="Xuống dòng tại" zh_tw="自動換行" sr="Završavaj redove u" no="Bryt linjer ved" lt="Laužti eilutę, ilgesnę kaip" fa="گروه بندي سطر ها به تعداد:" da="Bryd linier ved" sv="Radbryt vid" lg="Wumbawumbira layini ku" tr="Satırı böl" hu="Sortörés ennél" ko="자동 줄바꿈 위치" uk="Перенесення рядків більше" />
-		<String Ref="109" Cid="539" Define="IDC_TABLE" />
+		<String Ref="109" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="110" Cid="1051" Define="IDC_TRAY" en="&Minimize to tray icon" fr="&Minimiser dans zone de notification" it="Minimizza nella barra" cs="Minimalizovat do lišty" es="Minimizar en la barra de tareas" de="Zu Trayicon minimieren" nl="Verkleinen tot taakbalkpictogram" pt_br="Minimizar na bandeja" ru="Сворачивать в трей" ja="最小化時にタスクトレイに格納する" pt="Minimizar na bandeja" pl="Minimalizuj do zasobnika systemowego" vi="Thu gọn về khay hệ thống" zh_tw="縮小為圖示檔" sr="Minimiziraj u ikonu u treju" no="Minimer til tray ikon" lt="Mažinti iki piktogramos pranešimų srityje" fa="پنجره را به کنار ساعت کوچک کن" da="Minimer til tray ikon" sv="Minimera till meddelandefältet" lg="Ssa kafuuke akakooni" tr="Sistem bildirim alanına küçült (tray)" hu="Kicsinyítés tálcára" ko="트레이 아이콘으로 최소화" uk="Згорнути до трею в іконку" />
 		<String Ref="111" Cid="1074" Define="IDC_REGISTER_CLIENT" Tag="win32" en="&Register as Windows Email Client" fr="Verifier le client mail par defaut au démarrage" it="Controlla che Scribe sia il programma predefinito" cs="Kontrolovat výchozí poštovní klient při spuštění" es="Verificar si es el cliente de correo por defecto al iniciar" de="Als Standard-E-Mail-Client in Windows registrieren" nl="Controle op standaard epostprogramma" pt_br="Verificar se é o programa de correio padrão ao iniciar" ru="Проверять почтового клиента по умолчанию при запуске" ja="起動時にデフォルトのメールクライアントをチェックする" pt="Verificar o programa de e-mail predefinido ao iniciar" pl="Sprawdzanie domyślności programu przy starcie." vi="Kiểm tra chương trình thư điện tử mặc định khi khởi động" zh_tw="檢查是否為預設的郵件客端" sr="Proveri da li je podrazumevani e-mail klijent na startu" no="Sjekk standard epost-klient ved oppstart" lt="Paleidžiant programą, klausti, ar ją laikyti numatytąja" fa="وقت شروع برنامه اصلي پست الکترونيک را وارسي کن" da="Tjek standard epost-klient ved opstart" sv="Kontrollera standard för e-postklient vid uppstart" lg="Kebera Pulogulaamu ya e-meilo ku ntadikwa" tr="Başlarken varsayılan istemci ayarlarını kontrol et" hu="Induláskor alapértelemezett levelező ellenőrzése" ko="윈도우 이메일 클라이언트로 등록" uk="Реєстрація в якості поштового клієнта Windows" />
 		<String Ref="112" Cid="674" Define="IDD_NEWFOLDER_F" en="Create Sub Folder" fr="Création de sous-dossier" it="Crea una Sottocartella" cs="Vytvořit podsložku" es="Crear una SubCarpeta" de="Unterordner erzeugen" nl="Een submap maken" pt_br="Criar sub-pasta" ru="Создать подпапку" pt="Criar sub-pasta" pl="Utwórz podfolder" vi="Tạo danh mục con" zh_tw="建立子目錄" ja="サブフォルダの作成" sr="Kreiraj podfolder" no="Lag undermappe" lt="Sukurti aplanką aplanke" fa="يک زيرفهرست بساز" da="Indret undermappe" sv="Skapa undermapp" lg="Tondawo ka Kabada" tr="Yeni Alt Klasör Oluştur" hu="Almappa létrehozás" ko="하위 폴더 생성" uk="Створити підтеку" />
 		<String Ref="113" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
-		<String Ref="114" Cid="539" Define="IDC_TABLE" />
+		<String Ref="114" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="115" Cid="1003" Define="IDC_TYPE" en="Contains:" fr="Contient:" it="Contenuto:" cs="Obsahuje:" es="Contenido:" de="Inhalt:" nl="Inhoud:" pt_br="Contém:" ru="Тип:" pt="Contém:" pl="Zawiera:" vi="Chứa:" zh_tw="包括:" ja="コンテンツ:" sr="Sadrži:" no="Inneholder:" lt="Kuriame bus:" fa=":حاوي" da="Indholder:" sv="Innehåller:" lg="Endagiriro:" tr="İçerir:" hu="Tartalmazza:" ko="포함:" uk="Зміст:" />
 		<String Ref="116" Cid="-1" Define="IDC_STATIC" en="Scribe is not registered to handle\nmailto: links in browsers. Would you like\nto make Scribe the default email client?" fr="Scribe n&apos;est réglé pour supporter\nles liens &apos;mailto:&apos; dans les navigateurs.\nVoulez vous que Scribe soit votre client\npar défaut?" it="Scribe non è il programma di posta predefinito peri il link &apos;mailto&apos; dei browser.\nVuoi che lo sia?" cs="Scribe není nastaven jako výchozí poštovní klient.\nChcete, aby byl Scribe výchozí?" es="Scribe no está registrado para gestionar\nlos enlaces &apos;mailto:&apos; de sus navegadores.\n\n¿Registrar Scribe como cliente Email por defecto?" de="Scribe ist nicht registriet um &apos;mailto:&apos;-Links\nin Webbrowsern zu verarbeiten. Möchten\nSie Scribe zum Standard-E-Mail-Client machen." nl="Scribe is op dit moment niet uw\nstandaard epost-programma.\nWilt u dat Scribe uw standaard epost-programma is?" pt_br="Scribe não está configurado como o programa\npadrão para correio. Deseja torná-lo seu programa\nde correio padrão?" ru="Scribe не является почтовым клиентом\nпо умолчанию.\nУстановить Scribe почтовым клиентом\nпо умолчанию?" pt="O Scribe não é o programa de correio predefinido.\n\nDeseja torná-lo o programa de correio predefinido?" pl="Nie zarejestrowano Scribe do obsługi\nłączników mailto: w przeglądarce. Czy chcesz\nżeby Scribe był domyślnym klientem poczty?" vi="Hiện giờ Scribe không phải là chương trình thư điện tử mặc định. Bạn có muốn thiết lập Scribe thành chương trình mặc đinh không?" zh_tw="Scribe 尚未註冊以控制\nmailto: 鏈結於瀏覽器. 你想要\n將Scribe 設成預設的電郵端?" ja="Scribeはブラウザ中のmailto:をクリックしても開かれません。Scribeをデフォルトの電子メールクライアントに設定しますか？" sr="Scribe nije registrovan da rukuje mailto: linkovima u čitačima.\nDa li bi želeli da Scribe bude osnovni e-mail klijent?" no="Scribe er ikke registrert for å håndtere \nmailto: linker" lt="Dabar „Scribe“ nėra numatytoji sistemos pašto\nprograma. (Interneto naršyklė, sutikusi mailto:\nnuorodą, automatiškai iškvies kitą.)\nAr laikyti „Scribe“ numatytąja pašto programa?" fa="اسکرايب به عنوان مسئول لينکهاي \n مربوط به ايميل ثبت نشده آيا مايليد \nاسکرايب برنامه اصلي براي مديريت نامه هاي شما باشد؟" da="Scribe er ikke registreret for at håndtere \nmailto: links i browsere. Vil du sætte \nScribe til at være standard epost-programmet?" sv="Scribe är inte registrerad att hantera\nmailto:-länkar i webbläsare. Vill du göra\nScribe till din aktuella e-postklient?" lg="Scribe tenawandisibwa kukola ku ndagiriro\nziri mu miko. Wandiyagade okuwandiisa\nScribe nga Pulogulaamu ya Emeilo ey&apos;enkalakalira?" tr="Scribe sisteminizde varsayılan e-posta istemcisi\nolatak ayarlı değildir.mailto: istemci bağlantıları için\nScribe&apos;yi varsayılan ayarlamak istiyormusunuz?" hu="A Scribe nincs beállítva a \nmailto: linkek kezeléséhez a böngészőben. \nSzeretné, hogy a Scribe legyen az elapértelmezett levelező kliens?" ko="Scribe가 브라우져 내에서 \nmailto: 링크를 처리하도록 등록되어 있지 않습니다. Scribe를 기본 이메일 클라이언트로 \n설정하시겠습니까?" uk="Scribe не зареєстрований для обробки \MAILTO: посилання в браузерах. Хотіли б ви зробити \SCRIBE поштовим клієнтом за замовчуванням?" />
 		<String Ref="117" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
@@ -135,7 +135,7 @@
 		<String Ref="174" Cid="-1" Define="IDC_STATIC" en="Limit to field:" fr="Limiter au champs:" cs="Omezit na pole:" de="Nur Feld:" nl="Beperk tot veld:" es="Limitar al Campo:" pt_br="Limitar ao campo:" ru="Поля:" pt="Limitar ao campo:" pl="Tylko w:" it="Limita al campo:" vi="Giới hạn trong vùng:" zh_tw="範圍限制:" ja="検索範囲:" sr="Ograniči na polje:" no="Begrens til felt:" lt="Ieškoti tik lauke:" fa=":محدود کن به کادر" da="Begræns til felt:" sv="Begränsa till fält:" lg="Ekikomo ku muwaatwa:" tr="Limit alanı:" hu="Mezőkorlátozás:" ko="필드 한정:" uk="Обмеження по полю:" />
 		<String Ref="175" Cid="175" Define="IDD_FILTER_ITEMS" en="Filter Items" fr="Filtres" />
 		<String Ref="176" Cid="531" Define="IDC_MAIL_FIELD" />
-		<String Ref="177" Cid="539" Define="IDC_TABLE" />
+		<String Ref="177" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="178" Cid="-1" Define="IDC_STATIC" en="Limit to colour:" fr="Limiter à la couleur:" />
 		<String Ref="179" Cid="-1" Define="IDC_STATIC" en="Limit to:" fr="Limiter à:" />
 		<String Ref="181" Cid="673" Define="IDD_FILTER_ACTION" en="Actions" it="Azioni" cs="Akce" es="Acciones" de="Filter Einstellungen" nl="Acties" pt_br="Ações" pt="Acção do Filtro" pl="Zadania" vi="Thao tác" zh_tw="動作" ja="動作" sr="Akcije" no="Handlinger" lt="Veiksmai" fa="عمليات" da="Aktioner" sv="Filterinställning" lg="Eby&apos;Okukola" tr="İşlemler" hu="Műveletek" ru="Действия" ko="동작" uk="Дії" />
@@ -147,7 +147,7 @@
 		<String Ref="187" Cid="187" Define="IDC_SIG" />
 		<String Ref="188" Cid="877" Define="IDC_TAB2" en="HTML" />
 		<String Ref="189" Cid="186" Define="IDC_RESET_REPLY" en="Reset" ko="리셋" uk="Скинути" de="Zurücksetzen" fr="Réinitialiser" />
-		<String Ref="190" Cid="539" Define="IDC_TABLE" />
+		<String Ref="190" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="191" Cid="83" Define="IDC_COLOUR" />
 		<String Ref="193" Cid="-1" Define="IDC_STATIC" en="Server:" fr="Serveur:" es="Servidor:" pt_br="Servidor:" ru="Сервер:" ja="サーバー:" pt="Servidor:" pl="Serwer:" vi="Máy chủ:" zh_tw="伺服器:" no="Tjener:" lt="Serveris:" fa="سرور" lg="Saava:" tr="Sunucu:" hu="Kiszolgáló:" ko="서버:" uk="Сервер:" />
 		<String Ref="194" Cid="833" Define="IDC_SOCKS5_PASSWORD" />
@@ -179,7 +179,7 @@
 		<String Ref="281" Cid="1157" Define="IDC_REMOVE_FILES" en="-" />
 		<String Ref="282" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="283" Cid="1079" Define="IDC_SET_FOLDER" en="..." />
-		<String Ref="284" Cid="539" Define="IDC_TABLE" />
+		<String Ref="284" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="285" Cid="-1" Define="IDC_STATIC" en="Detail:" it="Dettagli" es="Detalle" pt_br="Detalhe" ru="Детали" pt="Detalhes" pl="Szczegóły" vi="Chi tiết" zh_tw="細節" ja="詳細" sr="Detalj" no="Detaljer" lt="Išsamiai" fa="جزئيات" de="Details" da="Detaljer" sv="Detaljerat" lg="Ebisingawo" tr="Detaylar" hu="Részlet" ko="세부 사항:" uk="Деталі:" fr="Détails:" />
 		<String Ref="286" Cid="-1" Define="IDC_STATIC" en="Source Files:" pl="Pliki źródłowe:" cs="Zdrojové soubory:" no="Kildefiler" pt="Importar de:" lt="Importuoti iš:" fa="فايل هاي مبدأ:" nl="Bronbestanden:" de="Quell-Dateien:" sr="Izvorna omotnica:" da="Kildefiler" vi="Tập tin nguồn:" sv="Källfiler:" es="Carpeta de Origen:" pt_br="Arquivos de Origem:" lg="Failo omunasowolwa" tr="Kaynak Dosyalar:" hu="Forrás fájl:" ru="Исходные файлы:" ko="소스 파일:" uk="Вихідні файли:" fr="Fichiers source:" />
 		<String Ref="316" Cid="1228" Define="IDC_STATUS" en="Status..." ko="상태..." uk="Стан..." fr="Statut..." />
@@ -203,7 +203,7 @@
 		<String Ref="335" Cid="-1" Define="IDC_STATIC" en="Inbox:" fr="Boite de réception:" it="Posta in arrivo:" cs="Příchozí:" es="Bandeja de Entrada:" de="Posteingang:" nl="Postvak In:" pt_br="Caixa de entrada:" pt="Recebido:" pl="Skrzynka odbiorcza:" vi="Hộp thư:" zh_tw="收件夾:" ja="受信箱:" sr="Dolazna kutija:" no="Innboks:" lt="Gauti:" fa="نامه هاي رسيده" da="Indgang:" sv="Inkorg:" lg="Eziyingidde:" tr="Gelen (inbox):" hu="Bejövő:" ru="Входящие:" ko="받은편지함:" uk="Вхідні:" />
 		<String Ref="336" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="337" Cid="330" Define="IDC_SET_INBOX" en="..." />
-		<String Ref="339" Cid="539" Define="IDC_TABLE" />
+		<String Ref="339" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="340" Cid="-1" Define="IDC_STATIC" en="columns" fr="colonnes" it="colonne" cs="znaků" es="columnas" de="Spalten" nl="tekens" pt_br="colunas" ru="символов" ja="列" pt="colunas" pl="kolumn" vi="cột" zh_tw="欄" sr="koloni" no="kolonner" lt="simb." fa="ستون " da="kolonner" sv="tecken" lg="emiwatwa" tr="kolonlar" hu="oszlopok" ko="행" uk="символів" />
 		<String Ref="341" Cid="-1" Define="IDC_STATIC" en="Default HTML Font:" pl="Domyślna czcionka HTML:" cs="Výchozí HTML Font:" no="Standard HTML skrifttype:" nl="Standaard HTML lettertype:" lt="Numatytasis HTML šriftas" pt="Fonte p/ HTML" fa="HTMLقلم پيشفرض براي " de="Standard HTML Schriftart:" sr="Podrazumevani HTML font:" da="Standard HTML skrifttype:" vi="Kiểu chữ HTML mặc định:" sv="Standard HTML-teckensnitt:" es="Fuente HTML por defecto:" pt_br="Fonte padrão para HTML:" lg="Omukono gw&apos;emiko ogw&apos;enkalakalira:" tr="Varsayılan HTML Yazı Tipi:" hu="Alapértelmezett HTML-betűtípus:" ru="Шрифт HTML по умолчанию:" ko="HTML 폰트 초기화:" uk="Шрифт HTML за замовчуванням:" fr="Police par défaut HTML:" />
 		<String Ref="343" Cid="382" Define="IDC_LIMIT_TO" />
@@ -266,7 +266,7 @@
 		<String Ref="454" Cid="456" Define="IDC_READY_SEND" en="Ready to Send" fr="Pret à envoyer" cs="Připravená k odeslání" de="Bereit zum Versand" nl="Klaar voor verzenden" es="Listos para Enviar" pt_br="Pronto para enviar" ru="Готово к отправке" pt="Pronto a enviar" pl="Gotowy do wysłania" it="Pronto per l&apos;invio" vi="Sẵn sàng để gửi" zh_tw="回覆並傳送" ja="送信待ち" sr="Spremno da slanje" no="Klar til å sende" lt="Paruoštas išsiųsti" fa="آماده فرستادن" da="Klar til at sende" sv="Klart att sända" lg="Ndimwetefutefu Okusindika" tr="Gönderime Hazır" hu="Küldésre kész" ko="전송 준비" uk="Готовий до відправки" />
 		<String Ref="456" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="457" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
-		<String Ref="458" Cid="539" Define="IDC_TABLE" />
+		<String Ref="458" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="459" Cid="451" Define="IDC_FORWARDED" en="Forwarded" fr="Transmi" cs="Poslaná dál" de="Weitergeleitet" nl="Doorgestuurd" es="Reenviados" pt_br="Encaminhado" ru="Переслано" pt="Encaminhado" pl="Przesłane dalej" it="Inoltrato" vi="Chuyển tiếp" zh_tw="已轉寄" ja="転送" sr="Prosleđeno" no="Videresendt" lt="Persiųstas" fa="ارسال شده به ديگران" da="Videresendt" sv="Vidarebefordrat" lg="Eziwerezeddwa" tr="Yönlendirilen" hu="Továbbított" ko="전달" uk="Переправлено" />
 		<String Ref="460" Cid="460" Define="IDD_NO_FOLDER" en="Open Folder" fr="Ouvrir dossier" cs="Otevřít složku" de="Mail-Ordner öffnen" nl="Open map" es="Abrir Carpeta" pt_br="Abrir pasta" ru="Открыть Папку" pt="Abrir pasta" pl="Otwórz folder" it="Apri cartella" vi="Mở danh mục" zh_tw="開啟資料夾" ja="フォルダを開く" sr="Otvori omotnicu" no="Åpne mappe" lt="Laiškų rinkmenos parinkimas" fa="پوشه را باز کن" da="Åben mappe" sv="Öppna mapp" lg="Gulawo Kabada" tr="Klasörü Aç" hu="Mappa megnyitása" ko="폴더 열기" uk="Відкрити теку" />
 		<String Ref="461" Cid="-1" Define="IDC_STATIC" en="Email address:" fr="Courriel:" it="Indirizzo email:" cs="Email:" es="Email:" de="E-Mail Adresse:" nl="epost-adres:" pt_br="Endereço eletrônico:" pt="e-mail:" pl="Adres e-mail:" vi="Địa chỉ email:" zh_tw="電郵住址:" ja="メールアドレス:" sr="E-mail adresa:" no="Epostadresse" lt="El. pašto adresas:" fa="Email:" da="Epost adresse:" sv="E-postadress:" lg="E-meilo Yo:" hu="Email cím:" tr="E-posta adresi:" ru="Адрес e-mail:" ko="이메일 주소:" uk="Поштова адреса:" />
@@ -334,7 +334,7 @@
 		<String Ref="533" Cid="2" Define="IDCANCEL" en="Cancel" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
 		<String Ref="534" Cid="-1" Define="IDC_STATIC" en="Signature XML:" fr="Fichier signature:" it="File firma XML:" cs="XML podpis:" es="Firma XML:" de="XML-Signatur:" nl="Handtekening:" pt_br="Assinatura XML:" ru="Подпись XML:" pt="Assinatura XML:" pl="Sygnatura XML:" vi="Chữ ký XML:" zh_tw="XML 簽名檔:" ja="XML署名:" sr="XML potpis:" no="Signatur XML" lt="XML parašas:" fa="XMLامضاي" da="Signatur XML:" sv="XML-signatur:" lg="Sayini ya XML:" tr="XML İmza:" hu="Aláírás XML:" ko="서명 XML:" uk="Підпис XML:" />
 		<String Ref="535" Cid="535" Define="IDC_ID_TABLE" />
-		<String Ref="536" Cid="539" Define="IDC_TABLE" />
+		<String Ref="536" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="537" Cid="448" Define="IDC_MAIL_DESCRIPTION" en="Description" cs="Popis" de="Beschreibung:" nl="Beschrijving" es="Descripción:" pt_br="Descrição" ru="Описание" pt="Descrição" pl="Opis" it="Descrizione" vi="Mô tả" zh_tw="目的" ja="記述" sr="Opis" no="Beskrivelse" lt="Aprašymas" fa="توصيف" da="Beskrivelse" sv="Beskrivning" lg="Ebikikwatako" tr="Açıklamalar" hu="Leírás" ko="상세설명" uk="Опис" />
 		<String Ref="538" Cid="-1" Define="IDC_STATIC" en="New email has arrived:" fr="Un nouveau email est arrivé" cs="Přišla nová zpráva:" nl="Er is nieuwe post:" es="Ha llegado Correo Nuevo:" pt_br="Chegou uma nova mensagem:" ru="Получены новые сообщения:" pt="Chegou uma nova mensagem:" pl="Odebrano nowe wiadomości:" it="Hai nuovi messaggi:" vi="Có thư mới:" zh_tw="新郵件已抵達:" ja="新着メール:" sr="Stigla je nova pošta:" no="Ny epost mottatt:" lt="Gavote naujų laiškų:" fa="نامه جدید رسیده" de="Sie haben Post:" da="Ny mail modtaget:" sv="Ny e-post har anlänt:" lg="Ofunye Ebaluwa empya:" tr="Yeni e-posta geldi:" hu="Új üzenet érkezett:" ko="새로운 이메일 도착:" uk="Отримані нові провідомлення:" />
 		<String Ref="539" Cid="-1" Define="IDC_STATIC" en="Name:" fr="Nom:" it="Nome:" cs="Jméno:" es="Nombre:" nl="Naam:" pt_br="Nome:" ru="Имя:" pt="Nome:" pl="Nazwa:" vi="Tên:" zh_tw="名稱:" ja="名前:" sr="Ime:" no="Navn:" lt="Vardas:" fa="نام" da="Navn:" sv="Namn:" lg="Erinnya" tr="İsim:" hu="Név:" ko="이름:" uk="Ім`я:" />
@@ -390,7 +390,6 @@
 		<String Ref="632" Cid="632" Define="IDD_FOLDER_PROPS" en="Folder Properties" fr="Propriétés du dossier" cs="Vlastnosti složky" nl="Eigenschappen map" es="Propiedades de Carpeta" pt_br="Propriedades da pasta" ru="Свойства папок" pt="Propriedades da pasta" pl="Właściwości folderu" it="Proprietà della cartella" vi="Thuộc tính danh mục" zh_tw="資料夾內容" ja="フォルダのプロパティ" sr="Osobine omotnice" no="Mappe-egenskaper" lt="Aplanko ypatybės" fa="مشخصات پوشه" de="Ordner Eigenschaften" da="Mappe-egenskaber" sv="Mappegenskaper" lg="Ebikwata ku Kabada" tr="Klasör Özellikleri" hu="Mappa tulajdonságai" ko="폴더 특성" uk="Властивості тек" />
 		<String Ref="633" Cid="1094" Define="IDC_NEW_FILTER_ACTION" en="New" fr="Nouveau" it="Nuovo" cs="Nová" es="Nuevo" de="Neu" nl="Nieuw" pt_br="Novo" pt="Criar" pl="Nowy" vi="Tạo mới" zh_tw="新的" ja="新規" sr="Novo" no="Ny" lt="Pridėti" fa="جديد" da="Ny" sv="Ny" lg="Empya" tr="Yeni" hu="Új" ru="Новое" ko="신규" uk="Новий" />
 		<String Ref="634" Cid="627" Define="IDC_FOLDER_MSG" en="Select a folder..." ko="폴더 선택..." uk="Виберіть теку ..." de="Ordner auswählen..." fr="Sélectionner un dossier..." />
-		<String Ref="635" Cid="2" Define="IDCANCEL" en="Cancel" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
 		<String Ref="636" Cid="714" Define="IDC_USAGE" />
 		<String Ref="637" Cid="629" Define="IDS_629" en="Folder" fr="Dossier" cs="Složka" nl="Map" es="Carpeta" pt_br="Pasta" ru="Папка" pt="Pasta" vi="Danh mục" zh_tw="資料夾" ja="フォルダ" sr="Omotnica" no="Mappe" lt="Aplankas" fa="پوشه" de="Ordner" da="Mappe" sv="Mapp" lg="Kabada" tr="Klasör" hu="Mappa" ko="폴더" uk="Тека" />
 		<String Ref="638" Cid="630" Define="IDS_630" en="Size" fr="Taille" cs="Velikost" nl="Grootte" es="Tamaño" pt_br="Tamanho" ru="Размер" pt="Tamanho" pl="Rozmiar" vi="Kích thước" zh_tw="大小" ja="サイズ" sr="Veličina" no="Størrelse" lt="Dydis" fa="اندازه" de="Grösse" da="Størrelse" sv="Storlek" lg="Obunene" tr="Boyut" hu="Méret" ko="크기" uk="Розмір" />
@@ -405,7 +404,7 @@
 		<String Ref="647" Cid="683" Define="IDC_FOLDER_READ" en="Read" pt="Leitura" cs="Čtení" pl="Czytanie" it="Lettura" vi="Đọc" zh_tw="讀取" ja="読み取り" nl="Lezen" sr="Čitaj" es="Lectura" no="Lese" lt="Skaitymas" fa="خواندن" de="Lesen" da="Læse" sv="Läs" pt_br="Leitura" lg="Ebisomeddwa" tr="Okuma" hu="Olvas" ru="Чтение" ko="읽기" uk="Читання" fr="Lire" />
 		<String Ref="648" Cid="3003" Define="IDC_FPW_NONE" en="None" cs="Bez omezení" pt="Nenhum" pl="Brak" it="Nessuno" vi="Không ai cả" zh_tw="無" ja="無し" nl="Geen" sr="Niko" es="Ninguno" no="Ingen" lt="Visiems" fa="هيچ يک" de="Niemand" da="Ingen" sv="Ingen" pt_br="Nenhum" lg="Temuli" tr="Yok" hu="Nincs" ru="Нет" ko="없음" uk="Ні" fr="Aucun" />
 		<String Ref="649" Cid="649" Define="IDD_BAYES_SETTINGS" en="Bayesian Filtering" pt="Ordenar" cs="Bayesovské třídění" pl="Filtr Bayesa" it="Filtro Bayes" vi="Bộ lọc Bayes" zh_tw="Bayesian 過濾中" ja="ベイズフィルタリング" nl="Bayesiaans filteren" sr="Bayesian filter" es="Filtro Bayesiano" no="Bayesian filtrering" lt="Bayeso nepageidaujamų laiškų filtras" de="Bayes SPAM-Filter" da="Bayesian filtrering" fa="Bayesian فيلترينگ به روش" sv="Bayesisk filtrering" pt_br="Filtragem Bayesiana" tr="Bayesian Filtreleme" hu="Bayesian szűrő" ru="Фильтр Баеса" ko="베이지안 필터링" uk="Фільтрація Байеса" fr="Filtrage bayésien" />
-		<String Ref="650" Cid="539" Define="IDC_TABLE" />
+		<String Ref="650" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="651" Cid="684" Define="IDC_ACCOUNTS_WRITE" en="Write/Delete" pt="Escrita" cs="Zápis/Výmaz" pl="Pisanie/Usuwanie" it="Scrittura/Cancellazione" vi="Ghi/Xóa" zh_tw="寫入 / 刪除" ja="書き込み/削除" nl="Schrijven/Verwijderen" sr="Piši/Briši" es="Escritura/Borrado" no="Skrive/slette" lt="Įrašymas, šalinimas" fa="نوشتن/پاک کردن" de="Schreiben/Löschen" da="Skrive/slette" sv="Skriv/Ta bort" pt_br="Escrita" lg="Wandiika/Sangula" tr="Yazma/Silme" hu="Ír/Töröl" ru="Запись/Удаление" ko="작성/삭제" uk="Запис / Видалення" fr="Écrire/Éffacer" />
 		<String Ref="652" Cid="-1" Define="IDC_STATIC" en="Borders" fr="Marges" cs="Okraje" de="Ränder" nl="Marges" es="Bordes" pt_br="Bordas" pt="Margens" pl="Marginesy" it="Margini" vi="Khung" zh_tw="邊" ja="余白" sr="Margine" no="Marger" lt="Paraštės" fa="حاشيه ها" da="Marger" sv="Marginaler" lg="Oluggo" tr="Marjlar" hu="Keret" ru="Отступ" ko="여백" uk="Межі" />
 		<String Ref="654" Cid="690" Define="IDC_APW_NONE" en="None" pt="Nenhum" cs="Bez omezení" pl="Brak" it="Nessuno" vi="Không ai cả" zh_tw="無" ja="無し" nl="Geen" sr="Niko" es="Ninguno" no="Ingen" lt="Visiems" fa="هيچ يک" de="Niemand" da="Ingen" sv="Ingen" pt_br="Nenhum" lg="Temuli" tr="Yok" hu="Nincs" ru="Нет" ko="없음" uk="Ні" fr="Aucun" />
@@ -445,7 +444,7 @@
 		<String Ref="697" Cid="-1" Define="IDC_STATIC" en="Webpage:" it="Web:" cs="WWW:" es="Página Web:" de="Homepage:" nl="Webpagina:" pt_br="Página Web:" pt="Página Web:" pl="WWW:" vi="Địa chỉ web:" zh_tw="網頁:" ja="ホームページ:" sr="Web strana:" no="Webside:" lt="Tinklalapis:" fa="www" da="Webside:" sv="Webbsida:" lg="Ekyapa:" tr="Net adresi:" hu="Honlap:" ru="Веб. страница:" ko="웹페이지:" uk="Веб. сторінка:" fr="Page WEB:" />
 		<String Ref="698" Cid="1048" Define="IDC_HOME_WEBPAGE" lt="Nuoroda į tinklalapį" />
 		<String Ref="699" Cid="1321" Define="IDC_REPAIR_MS" en="Repair Mail Store" fr="&Compacter dossier" it="Compatta &Cartelle" cs="Z&komprimovat soubor zpráv" de="Mail-Datenbank reparieren" nl="Mappen &comprimeren" es="C&omprimir carpetas" pt_br="&Compactar correio" ru="Сжать раздел" ja="フォルダを圧縮" pt="&Compactar pastas" pl="Kompaktuj magazyn" vi="T&hu gọn tập tin dữ liệu" zh_tw="壓縮資料夾(&p)" sr="&Sabij omotnice" no="&Komprimer mappe" lt="&Suspausti laiškų rinkmeną" fa="فشرده سازي پوشه‌ها" id="Menge&cilkan Map" da="&Komprimer epost mappe" sv="&Komprimera mappar" tr="Dizinleri &Sıkıştır" hu="Levéltár &tömörítés" ko="메일 사서함 압축" uk="Відновити поштову базу" />
-		<String Ref="714" Cid="539" Define="IDC_TABLE" />
+		<String Ref="714" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="715" Cid="-1" Define="IDC_STATIC" en="&Reminders:" ko="알림:" uk="Нагадування:" de="Erinnerung:" fr="&Rappels" />
 		<String Ref="724" Cid="724" Define="IDD_WEBDAV_PROPS" en="Webdav Account" />
 		<String Ref="725" Cid="725" Define="IDC_725" />
@@ -616,15 +615,15 @@
 		<String Ref="987" Cid="988" Define="IDC_ATTACHMENTS" en="Forward attachments as well." nl="Bijlage eveneens doorsturen" pt="Enviar também os anexos" pl="Prześlij dalej z załącznikami" cs="Poslat dál včetně příloh" no="Videresend også vedlegg" lt="Persiųsti su laiško priedais" fa="پيوستها را هم منتقل کن" de="Anhänge ebenfalls weiterleiten" sr="Prosledi i dodatke" da="Videresend også tillæg" vi="Chuyển tiếp tập tin đính kèm." sv="Vidarebefordra också bifogade filer" es="Enviar Archivos Adjuntos" pt_br="Encaminhar anexos também." lg="Wereza n&apos;ebiwerekera byonna" tr="Dosya eklerini de gönder" hu="Mellékleteket is továbbít." ru="Пересылать вложения" ko="첨부파일 전달." uk="Дозволити пересилку вкладень" fr="Transférez aussi les pièces jointes." />
 		<String Ref="988" Cid="994" Define="IDC_MARK_FORWARDED" en="Mark original message." nl="Markeer als doorgestuurd" pt="Marcar como encaminhado" pl="Oznacz wiadomość źródłową." cs="Nastavit jako poslanou dál" no="Merk som videresendt" lt="Pažymėti persiųstu" fa="به عنوان ارسال شده علامت بزن" de="Als weitergeleitet markieren" sr="Obeleži kao prosleđeno" da="Marker som videresendt" vi="Đánh dấu thông điệp gốc." sv="Markera som vidarebefordrat" es="Marcar mensaje original." pt_br="Marcar mensagem original" lg="Lamba nga ewerezeddwa" tr="Orijinal mesajı işaretle" hu="Eredeti üzenet jelölése" ru="Пометить исходное сообщение" ko="원본 메시지 표시." uk="Відзначити вихідне повідомлення." fr="Marquer le message d&apos;origine." />
 		<String Ref="989" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
-		<String Ref="990" Cid="539" Define="IDC_TABLE" />
+		<String Ref="990" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="992" Cid="993" Define="IDC_MARK_REPLIED" en="Mark as replied" nl="Markeer als beantwoord" pt="Marcar como respondido" pl="Oznacz jako odpowiedziany" cs="Nastavit jako zodpovězenou" no="Merk som besvart" lt="Atsakytas" fa="به عنوان جواب داده شده علامت بزن" de="Als beantwortet markieren" sr="Obeleži kao odgovoreno" da="Marker som svaret" vi="Đánh dấu đã trả lời" sv="Markera som besvarat" es="Marcar como respondido" pt_br="Marcar como Respondida" lg="Lamba nga ediddwamu" tr="Yanıtlanmış olarak işaretle" hu="Válaszolt jelölés" ru="Пометить как отвечено" ko="회신완료로 표시" uk="Відзначити як відповів" fr="Marquer répondu" />
-		<String Ref="993" Cid="539" Define="IDC_TABLE" />
+		<String Ref="993" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="994" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="996" Cid="796" Define="IDC_SET_READ" en="Set Read" no="Sett lest" lt="Skaitytas" pt="Lida" cs="Přečtená" fa="دريافت " nl="Gelezen" pl="Przeczytane" de="Gelesen" sr="Pročitano" da="Sæt læst" vi="Đã đọc" sv="Märk som läst" es="Mail Leído" pt_br="Lida" lg="Lamba Esomeddwa" tr="Okunmuş" hu="Olvasott" ru="Прочитано" ko="읽음으로 설정" uk="Прочитано" fr="Marquer Lu" />
 		<String Ref="997" Cid="581" Define="IDC_UNREAD" en="Set Unread" nl="Niet gelezen" pt="Não Lida" pl="Nieprzeczytane" cs="Nepřečtená" no="Merk ulest" lt="Neskaitytas" fa="خوانده نشده" de="Ungelesen" sr="Nepročitano" da="Marker ulæst" vi="Chưa đọc" sv="Märk oläst" es="Mail NO leído" pt_br="Não Lida" lg="Lamba Tenasomwa" tr="Okunmamış" hu="Olvasatlan" ru="Не прочитано" ko="읽지 않음으로 설정" uk="Не прочитано" fr="Marquer Non Lu" />
 		<String Ref="1000" Cid="696" Define="IDD_FILTER_SAVE_ATTACH" en="Save Attachments" nl="Sla bijlagen op" pt="Gravar anexos" pl="Zapisz załączniki" cs="Uložit přílohy" no="Lagre vedlegg" lt="Įrašyti priedus" fa="ذخيره پيوست ها" de="Anhänge speichern" sr="Snimi dodatke" da="Gem tillæg" vi="Lưu tập tin đính kèm" sv="Spara bilaga" es="Guardar Archivos Adjuntos" pt_br="Gravar anexos" lg="Tereka emperekeze" tr="E-posta Ekleri Kayıt Ayarları" hu="Mellékletek mentése" ru="Сохранить вложения" ko="첨부파일 저장" uk="Зберегти вкладення" fr="Enregistrer pièces jointes" />
 		<String Ref="1001" Cid="698" Define="IDC_TYPES" />
-		<String Ref="1002" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1002" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1003" Cid="-1" Define="IDC_STATIC" en="File types (e.g. *.gif, *.doc):" nl="Bestandsoort (bijv. *.gif, *.doc)" pt="Tipos de ficheiros (*.gif,*.doc)" pl="Typy plików (np. *.png, *.doc):" cs="Typy souborů (např. *.gif, *.doc)" no="Filtyper (f.eks. *.gif, *.doc)" lt="Rinkmenų tipai: (pvz. *.gif, *.doc):" de="Dateityp (z.B. *.gif, *.doc):" sr="Tipovi fajlova (npr. *.gif, *.doc):" da="Filtyper (f.x. *.gif, *.doc)" vi="Loại tập tin (vd: *.gif, *.doc):" sv="Filtyper (t.ex. *.gif, *.doc)" es="Tipo de Archivos (ej: *.gif, *.doc)" pt_br="Tipos de arquivo (ex: *.gif, *.doc)" lg="Ebika bya failo (nga *.gif, *.doc):" tr="Dosya tipleri (*.gif, *.doc  vs.):" hu="Fájl típus (pl.: *.gif, *.doc):" ru="Типы файлов (например. *.gif, *.doc):" ko="파일 유형(e.g *gif, *doc):" uk="Типи файлів (наприклад: *.gif, *.doc):" fr="Types de fichiers (ex.: * .gif, * .doc):" />
 		<String Ref="1004" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="1005" Cid="700" Define="IDC_BROWSE_DIR" en="..." />
@@ -685,18 +684,18 @@
 		<String Ref="1091" Cid="1235" Define="IDS_1235" en="Via direct SSL connection" sv="Via direkt SSL-anslutning" lt="Tiesioginis SSL prisijungimas" hu="Via közvetlen SSL kapcsolat" cs="Přímé SSL spojení" de="Direkte SSL Verbindung" tr="Direkt SSL bağlantısı ile" ru="Через прямое SSL соединение" pl="Bezpośrednie połączenie SSL" ko="직접적인 SSL 연결을 통해" uk="Через пряме SSL з`єднання" fr="Via une connexion SSL directe" />
 		<String Ref="1092" Cid="-1" Define="IDC_STATIC" en="Assume 8-bit text is:" cs="Kódování 8bitového textu:" de="8-Bit-Text annehmen als:" lt="Tarkime, kad 8 bitų tekstas koduotas:" da="Antag 8-bits tekst er:" fa="متن هشت بيتي را تفسير کن به:" vi="Xem văn bản 8 bit như:" sv="Förutsätt att 8-bitars text är:" es="Asumir texto 8-bit como:" pt_br="Assumir que o texto de 8 bits é:" lg="Ebigambo bwebiba bya biti 8 biba:" tr="Varsayılan 8 bit text:" hu="8bites szöveget átvesz:" ru="Принимать 8-бит текст как:" pl="Traktuj 8-bitowy tekst jako:" ko="8-bit 문서 추정 :" uk="Приймати 8-біт текст як:" fr="Supposons c&apos;est du texte 8 bits:" />
 		<String Ref="1101" Cid="896" Define="IDS_896" en="Date" vi="Ngày tháng" pt="Data" pl="Data" zh_tw="日期" ja="日付" nl="Datum" sr="Datum" es="Fecha" cs="Datum" no="Dato" lt="Data" fa="تاريخ" de="Datum" da="Dato" sv="Datum" pt_br="Data" lg="Ebiro" tr="Tarih" hu="Dátum" ru="Дата" ko="날짜" uk="Дата" />
-		<String Ref="1108" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1108" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1109" Cid="-1" Define="IDC_STATIC" en="Source mail client:" pt="Do programa de e-mail:" de="Quell-E-Mail Client:" lt="Importuojamojo pašto programa" da="Kilde epost-klient:" fa="برنامه ايميل مبدأ:" vi="Nhập thư từ:" cs="Zdrojový poštovní klient:" sv="Källas e-postklient:" es="Cliente de correo Origen" pt_br="Programa de origem  do correio:" tr="Kaynak hesap:" hu="Forrás levelező kliens:" ru="Клиент-источник:" pl="Źródłowy program pocztowy:" ko="소스 메일 클라이언트:" uk="Джерело поштового клієнту:" fr="Client de messagerie source:" />
 		<String Ref="1110" Cid="681" Define="IDC_CLIENT" />
 		<String Ref="1111" Cid="-1" Define="IDC_STATIC" en="Message stores:" fr="Stocke message" it="Localizzazione:" cs="Složka zpráv:" es="Guardar el mensaje en:" de="E-Mail-Speicherort:" nl="Importeren van:" pt_br="Guardar mensagens em:" pt="Guardar mensagens em:" pl="Magazyny poczty:" vi="Lưu thư ở:" zh_tw="訊息內容:" ja="メッセージストア:" sr="Čuvanje poruka u:" no="Meldingslager:" lt="Kur laikomi laiškai:" fa="مخزن پيام ها" da="Meldings opbevaringssted:" sv="Meddelandelager:" tr="Kayıt alanı:" hu="Üzenet tároló" ru="Хранится сообщений:" ko="메시지 사서함:" uk="Сховище повідомлень:" />
 		<String Ref="1112" Cid="1054" Define="IDC_SET_FONT" en="..." />
 		<String Ref="1113" Cid="882" Define="IDC_MSG_STORE" />
-		<String Ref="1114" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1114" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1115" Cid="1064" Define="IDC_DEL_SRC_FOLDER" en="-" />
 		<String Ref="1116" Cid="-1" Define="IDC_STATIC" en="Destination client:" no="Bestemmelsessted " pt="Para" lt="Kur eksportuoti:" cs="Cíl" fa="مقصد" nl="Doel" pl="Docelowy program pocztowy:" de="Ziel" sr="Odredište" da="Bestemmelses klient:" vi="Xuất thư ra dạng:" sv="Mottagarklient:" es="Cliente de correo Destino:" pt_br="Cliente de destino:" tr="Hedef hesap:" hu="Cél ügyfél:" ru="Конечный клиент:" ko="대상 클라이언트:" uk="Призначення клієнта:" fr="Destinateur:" />
 		<String Ref="1117" Cid="1117" Define="IDD_OUTLOOK_ADD_FLD" en="Add Folder" pt="Criar Pasta" de="Ordner hinzufügen" lt="Aplanko pridėjimas" da="Tilføj mappe" fa="افزودن پوشه" vi="Thêm danh mục" cs="Přidat složku" sv="Lägg till mapp" es="Agregar Carpeta" pt_br="Acrescentar Pasta" tr="Klasör Ekle" hu="Mappa hozzáadása" ru="Добавить папку" pl="Dodaj folder" ko="폴더 추가" uk="Додати теку" fr="Ajouter dossier" />
 		<String Ref="1118" Cid="-1" Define="IDC_STATIC" en="Destination Folder:" fr="Dossier de destination:" it="Cartella di destinazione:" cs="Cílová složka" es="Carpeta de Destino:" de="Ziel-Ordner:" nl="Berichten opslaan in:" pt_br="Pasta de destino:" ru="Конечная папка:" pt="Pasta de destino:" pl="Folder docelowy:" vi="Danh mục đích:" zh_tw="目標資料夾:" ja="受信するフォルダ:" sr="Odredišna omotnica:" no="Mappe for mottak:" lt="Importuoti į aplanką:" fa="پوشه مقصد" da="Mål mappe:" sv="Målmapp:" tr="Hedef Klasör:" hu="Cél mappa:" ko="대상 폴더:" uk="Тека призначення:" />
-		<String Ref="1119" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1119" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1120" Cid="908" Define="IDC_FOLDERS" />
 		<String Ref="1121" Cid="883" Define="IDC_SRC_FOLDERS" />
 		<String Ref="1122" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
@@ -728,11 +727,11 @@
 		<String Ref="1169" Cid="1168" Define="IDS_1168" en="Disable" vi="Tắt" de="Inaktiv" lt="Atjungta" cs="Zablokovat" sv="Stäng av" pt_br="Desabilitar" es="Desactivado" tr="Devre Dışı" hu="Letilt" ru="Выключить" pl="Wyłącz" ko="비활성화" uk="Вимкнути" fr="Désactiver" />
 		<String Ref="1185" Cid="-1" Define="IDC_STATIC" en="Enter each address on a separate line. Wildcards are accepted.\nFormat: user@isp.com[?subject=text]" vi="Nhập mỗi dòng một địa chỉ. Chấp nhận ký tự đại diện.\nĐịnh dạng: user@isp.com[?subject=text]" pt="Insira cada endereço numa linha separada. Pose usar máscaras \nFormato: &lt;e-mail&gt;[?assunto=&lt;assunto&gt;]" pl="Wpisz każdy adres w oddzielnej linijce. Znaki zastępcze są akceptowalne.\nFormat: user@isp.com[?subject=text]" ja="行単位で解釈されます。ワイルドカードが使用できます。\nフォーマット: &lt;アドレス&gt;[?件名=&lt;件名&gt;]" nl="Voer elk adres in op een aparte regel. Jokertekens zijn toegestaan.\nOpmaak: user@isp.com[?subject=text]" zh_tw="輸入每個地址於分隔線上，可大寫.\nFormat: user@isp.com[?subject=text]" sr="Upiši svaku adresu u poseban red. Izuzeci se prihvataju.\nFormat: user@isp.com[?subject=text]" es="Introduzca cada dirección en una línea. Admite comodines.\nFormato: user@isp.com[?subject=text]" cs="Vložte každou adresu na samostatný řádek.\nŽolíkové znaky jsou povoleny. Formát: user@isp.com[?subject=text]" no="Skriv hver adresse på en ny linje. Jokertegn kan brukes.\nFormat: user@isp.com[?subject=text]" lt="Adresus įvesti atskirose eilutėse. Galima naudoti raidžių pakeitimo ženklus.\nFormatas: user@isp.com[?subject=text]" fa=" Wildcards are accepted.\nFormat: user@isp.com[?subject=text]هر آدرس در يک سطر جداگانه" de="Pro E-Mail-Adresse eine eigene Zeile. Maskenzeichen erlaubt.\nFormat: &lt;Adresse&gt;[?subject=&lt;Betreff&gt;]" da="Skriv hver adresse på en ny linje. Jokertegn kan bruges.\nFormat: user@isp.com[?subject=text]" sv="Skriv var adress på egen rad. Jokertecken accepteras.\nFormat: användare@isp.domän[?subject=text]" pt_br="Coloque um endereço por linha. Caracteres coringa são aceitos. \nFormato: usuario@provedor.com(?assunto=texto)" lg="Yingizaamu, buli ndagiriro ku lunyiriri lwayo. Obukunga bukkirizibwa. \nEngeri: akozesa@kampuni.com[?omutwe=bigambo]" tr="Adresleri birer satır olarak giriniz.  Joker karakter girebilirsiniz.\nVarsayılan format: isim@sunucu-adi.com [?konu=yazı" hu="Minden címet külön sorba írja. Helyettesítő karakterek elfogadottak. /nFormátum: user@isp.com[?tárgy=szöveg]" ru="Вводите каждый адрес с новой строки. Маска допустима.\nФормат: user@isp.com[?тема=текст]" ko="각각의 주소를 줄마다 입력. Wildcards 허용.\n포맷: user@isp.com[?제목=문자]" uk="Введіть кожну адресу в окремому рядку. Символи приймаються .\n Формат: user@isp.com[?тема=текст]" fr="Saisissez chaque adresse sur une ligne distincte. Les caractères génériques sont acceptés. \nFormat: user@isp.com [? Subject = text]" />
 		<String Ref="1186" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
-		<String Ref="1187" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1187" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1188" Cid="509" Define="IDC_SEARCH" />
 		<String Ref="1189" Cid="1189" Define="IDC_OUTGOING" en="Outgoing mail" lt="Išsiuntimui" cs="odchozí zprávy" sv="Utgående e-post" de="ausgehenden E-Mails" tr="Giden e-posta" hu="Kimenő levél" ru="Исходящими письмами" pl="Poczta wychodząca" ko="발신 메일" uk="Вихідними повідомленнями" fr="Courriel sortant" />
 		<String Ref="1193" Cid="1193" Define="IDD_SCRIBE_EXPORT" en="Export To Scribe Folders" sv="Exportera till Scribe-mappar" lt="Eksportuoti į „Scribe“ aplankus" de="Export von und zu Scribe Ordnern" cs="Exportovat do složek Scribe" tr="Scribe Klasörlerine Çıkart" hu="Export a Scribe mappákba" ru="Экспорт в папки Scribe" pl="Eksportuj do folderów Scribe" ko="Scribe 폴더로 내보내기" uk="Експорт у теки Scribe" fr="Exporter vers dossiers Scribe" />
-		<String Ref="1194" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1194" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1195" Cid="-1" Define="IDC_STATIC" en="Destination mail store:" sv="Mottagarklient:" lt="Kur eksportuoti:" de="Export in Datei:" cs="Cílová složka zpráv:" tr="Hedef e-posta klasörü:" hu="Cél üzenet tároló:" ru="Конечное хранилище:" pl="Docelowy magazyn poczty:" ko="대상 메일 사서함:" uk="Місце  розташування поштової бази:" fr="Messagerie de destination:" />
 		<String Ref="1196" Cid="1196" Define="IDC_DEST" />
 		<String Ref="1197" Cid="1197" Define="IDC_SET_DEST" en="..." />
@@ -754,6 +753,7 @@
 		<String Ref="1221" Cid="940" Define="IDC_CHECK_DEFAULT" Tag="win32" en="&Check default email client on startup" fr="&Verifier le client mail par defaut au démarrage" it="Controlla che Scribe sia il programma predefinito" cs="Kontrolovat výchozí poštovní klient při spuštění" es="Verificar si es el cliente de correo por defecto al iniciar" de="Bei Start auf Standard-E-Mail-Client prüfen" nl="Controle op standaard epostprogramma" pt_br="Verificar se é o programa de correio padrão ao iniciar" ru="Проверять почтового клиента по умолчанию при запуске" ja="起動時にデフォルトのメールクライアントをチェックする" pt="Verificar o programa de e-mail predefinido ao iniciar" pl="Sprawdzanie domyślności programu przy starcie." vi="Kiểm tra chương trình thư điện tử mặc định khi khởi động" zh_tw="檢查是否為預設的郵件客端" sr="Proveri da li je podrazumevani e-mail klijent na startu" no="Sjekk standard epost-klient ved oppstart" lt="Paleidžiant programą, klausti, ar ją laikyti numatytąja" fa="وقت شروع برنامه اصلي پست الکترونيک را وارسي کن" da="Tjek standard epost-klient ved opstart" sv="Kontrollera standard för e-postklient vid uppstart" lg="Kebera Pulogulaamu ya e-meilo ku ntadikwa" tr="Başlarken varsayılan istemci ayarlarını kontrol et" hu="Induláskor alapértelemezett levelező ellenőrzése" ko="시작시 기본 이메일 클라이언트 확인" uk="Перевірка клієнта електронної пошти за замовчуванням при запуску" />
 		<String Ref="1222" Cid="-1" Define="IDC_STATIC" en="Name:" pt="Grupo:" nl="Naam:" cs="Jméno:" pl="Nazwa:" it="Nome" vi="Tên:" zh_tw="名稱:" ja="名前:" sr="Ime:" es="Nombre:" no="Navn:" lt="Vardas:" fa="نام" de="Bezeichnung:" da="Navn:" sv="Namn:" pt_br="Nome:" lg="Erinnya:" tr="İsim:" hu="Név:" ru="Имя:" ko="이름:" uk="Ім`я" fr="Nom:" />
 		<String Ref="1223" Cid="-1" Define="IDC_STATIC" en="Page range:" />
+		<String Ref="1228" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1230" Cid="1069" Define="IDC_MSG" en="Message" it="Messaggio" cs="Zpráva" es="Mensaje" de="E-Mail:" nl="Bericht" pt_br="Mensagem" ru="Сообщение" pt="Mensagem" pl="Wiadomo??" vi="Thông điệp" zh_tw="??" ja="?????" sr="Poruka" no="Melding" lt="Laiškas" fa="نامه" da="Melding" sv="Meddelande" lg="Ebaluwa" tr="Mesaj" hu="Üzenet" ko="메시지" uk="Повідомлення" />
 		<String Ref="1231" Cid="1488" Define="IDC_MSG_DEL_NEXT" en="Next" ko="다음" uk="Наступний" de="Nächste E-Mail" fr="Suivant" />
 		<String Ref="1232" Cid="476" Define="IDC_ACCOUNT" en="Account name:" fr="Nom de compte" cs="Název účtu:" nl="Account:" es="Cuenta:" pt_br="Nome da conta:" ru="Учетное запись:" pt="Nome da conta:" pl="Nazwa konta:" it="Nome account" vi="Tên tài khoản:" zh_tw="帳號名稱:" ja="アカウント名:" sr="Ime naloga" no="Kontonavn:" lt="Paskyros vardas:" fa="نام حساب" de="E-Mail-Kontoname:" da="Kontonavn:" sv="Kontonamn:" lg="Erinnya ly&apos;Akawunta:" tr="Hesap adı:" hu="Fiók név:" ko="계정 이름:" uk="Ім&apos;я облікового запису:" />
@@ -792,7 +792,7 @@
 		<String Ref="1277" Cid="1277" Define="IDS_RESIZE_IMGS" en="Resize image attachments:" ko="이미지 첨부파일 크기 재설정:" uk="Зміна розміру вкладення зображення:" de="Größe der Bildanhänge anpassen:" fr="Redimensionner images jointes:" />
 		<String Ref="1278" Cid="842" Define="IDC_HTML_IMAGES" en="Automatically load remote content." pt="Carregar imagens automáticamente nas mensagens HTML" lt="Automatiškai parodyti paveikslėlius HTML laiškuose." cs="Automaticky nahrát obrázky v HTML zobrazení" fa=" بارکن HTML به طور خودکار تصوير ها را درکنترل کننده  " nl="Afbeeldingen tonen bij HTML-weergave" pl="Automatycznie wyświetlaj grafikę w HTML" de="Automatisch Grafiken bei HTML-E-Mails anzeigen." sr="Automatski učitavaj slike pod kontrolom HTML-a." da="Automatisk hent billeder i HTML kontrollen." ja="HTML 制御の自動的にロード・イメージ。" vi="Tự động nạp hình ảnh trong các điều khiển HTML." sv="Ladda bilder automatiskt i HTML-kontrollen" es="Cargar imágenes automáticamente en mensajes HTML" pt_br="Automaticamente carregar imagens no controle HTML." lg="Ebifananyi biggulirengawo mu miko gya HTML" tr="HTML kontrolü içerisindeki resimleri otomatik yükle" hu="Képek automatikus betöltése a HTML vezérlőben." ru="Автоматически загружать изображения при HTML просмотре" ko="HTML 컨트롤에 자동으로 이미지를 로드합니다." uk="Автоматично завантажує віддалений вміст." fr="Chargez automatiquement le contenu distant." />
 		<String Ref="1279" Cid="1279" Define="IDD_REMOTE_CONTENT" en="Remote Content Settings" uk="Налаштування віддаленого вмісту" de="Einstellungen für Inhalte auf Server" fr="Paramètres de contenu à distance" />
-		<String Ref="1280" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1280" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1281" Cid="-1" Define="IDC_STATIC" en="Configure addresses to always or never load remote content.\nWild card characters &apos;*&apos; and &apos;?&apos; are supported.\n\nWhite listed senders:\n(Always load remote content from these senders)" uk="Білий лист відправників (довірені): \n  (Завжди завантажувати віддалений вміст з цих відправників)" de="Absender von weißer Liste:\n(Immer von diesen Absendern laden)" fr="Configurez les adresses pour toujours ou ne jamais charger le contenu distant. \nLes caractères &apos;*&apos; et &apos;?&apos; sont pris en charge. \n \nExpéditeurs de la liste blanche: \n (Toujours charger le contenu distant de ces expéditeurs)" />
 		<String Ref="1282" Cid="1282" Define="IDC_WHITELIST" />
 		<String Ref="1283" Cid="1" Define="IDOK" en="OK" uk="Так" />
@@ -800,11 +800,11 @@
 		<String Ref="1285" Cid="987" Define="IDC_BLACKLIST" />
 		<String Ref="1286" Cid="2" Define="IDCANCEL" en="Cancel" uk="Скасувати" de="Abbrechen" fr="Annuler" />
 		<String Ref="1288" Cid="453" Define="IDC_HAS_ATTACH" en="Has Attachments" fr="Avait un attachement" cs="S přílohami" de="Enhält Anhänge" nl="Bevat bijlagen" es="Tiene Archivos" pt_br="Possui anexos" ru="Содержит вложения" pt="Possui anexos" pl="Z załącznikami" it="Con allegati" vi="Có tập tin đính kèm" zh_tw="有附件" ja="添付ファイル有り" sr="Ima dodatke" no="Har vedlegg" lt="Turi priedų" fa="پيوست دارد" da="Har tillæg" sv="Har bifigade filer" lg="Erina failo emperekeze" tr="Ek Dosyaları Olan" hu="Melléklettel" ko="첨부파일 있음" uk="Має вкладення" />
-		<String Ref="1289" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1289" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1290" Cid="457" Define="IDC_OPEN_INSPECTOR" en="Inspect" uk="Перевірити" de="Inspizieren" fr="Inspecter" />
 		<String Ref="1292" Cid="1069" Define="IDC_MSG" en="Initializing..." hu="Elindítás..." cs="Inicializace..." de="Initialisiere..." lt="Inicializavimas..." tr="Başlatılıyor..." sv="Initialiserar..." ru="Инициализация..." pl="Rozruch..." ko="초기화..." uk="Ініціалізація ..." fr="Initialisation ..." />
 		<String Ref="1300" Cid="1300" Define="IDC_ADVANCED" />
-		<String Ref="1303" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1303" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1304" Cid="1304" Define="IDD_CSV_EXPORT" en="Csv Export" ru="Экспорт CSV" de="CSV Export" pl="Eksport w formacie CSV" ko="Csv 내보내기" uk="Експорт CSV" fr="Exporter csv" />
 		<String Ref="1305" Cid="1305" Define="IDS_1305" />
 		<String Ref="1306" Cid="-1" Define="IDC_STATIC" en="Folder:" ru="Папка:" de="Ordner:" ko="폴더:" uk="Тека:" fr="Dossier:" />
@@ -826,9 +826,11 @@
 		<String Ref="1324" Cid="1324" Define="IDC_MAIL_STORES" />
 		<String Ref="1325" Cid="1325" Define="IDS_1325" en="Folders" de="Dateiname" pl="Foldery" ko="폴더" uk="Теки" fr="Dossiers" />
 		<String Ref="1326" Cid="1326" Define="IDS_1326" en="Disable" de="Inaktiv" pl="Wyłącz" ko="비활성화" uk="Вимкнено" fr="Désactiver" />
+		<String Ref="1328" Cid="1328" Define="IDC_FILTER" />
 		<String Ref="1330" Cid="1125" Define="IDC_PAGE_RANGES" />
 		<String Ref="1331" Cid="1123" Define="IDC_PAGE_ALL" en="All" />
 		<String Ref="1332" Cid="1302" Define="IDC_PAGE_PARTIAL" en="Pages:" />
+		<String Ref="1334" Cid="2" Define="IDCANCEL" en="Cancel" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
 		<String Ref="1335" Cid="1335" Define="IDS_1335" en="Name" pl="Nazwa" ko="이름" uk="Ім`я" fr="Nom" />
 		<String Ref="1338" Cid="1338" Define="IDS_1338" en="Debugging options" pt="Registo de eventos" nl="Instellingen bij gebruik testversies" cs="Nastavení ladění (debug)" pl="Opcje odpluskwiania" it="Opzioni di debug" vi="Tùy chọn bắt lỗi" zh_tw="除錯選項" ja="デバッグオプション" sr="Opcije popravke grešaka" es="Opciones de Depuración" no="Innstillinger for feilsøking" lt="Derinimo nuostatos" fa="گزينه هاي رفع عيب" de="Optionen bei der Fehlersuche" sv="Inställning för felsökning" pt_br="Opções para Debug" lg="Okweroboza mu Dibaaga" tr="Debug ayarları" hu="Hibakeresés beállításai" ru="Опции глюколова" ko="디버그 옵션" uk="Варіанти налагодження" fr="Options de débogage" />
 		<String Ref="1339" Cid="1339" Define="IDS_1339" en="Connection log file format:" fr="Format du fichier log:" cs="Formát log souboru:" de="Format Verbindungs-Logbuch:" nl="Soort logbestand:" es="Formato Archivo Log:" pt_br="Formato do arquivo de eventos de conexão:" ru="Формат файла журнала соединения:" ja="接続ログファイルのフォーマット:" pl="Format pliku dziennika połączeń" it="Formato del file log di connessione:" zh_tw="聯絡人紀錄檔案格式" sr="Format dnevika konekcije:" no="Tilkoblingslogg filformat:" fa="قالب فايل گزارش کار:" da="Tilkoblingslog filformat:" lt="Prisijungimų statistikos žurnalo formatas:" sv="Loggfilformat för uppkopplingen:" tr="Bağlantı kütük dosyası formatı:" vi="Định dang bản ghi kết nối:" lg="Ekikula kya failo ewanula eby&apos;ennyungiriro:" pt="Formato do ficheiro:" hu="Kapcsolat naplózás fájlformátuma:" ko="로그 파일 포맷 연결:" uk="Формат файла журналу з`єднання:" />
@@ -836,7 +838,7 @@
 		<String Ref="1341" Cid="1341" Define="IDS_1341" en="Account connection debug logging:" pt="Registar erros no ficheiro &apos;Scribe.txt&apos;" nl="Plaats data van testversies in &apos;Scribe.txt&apos;" ja="&apos;Scribe.txt&apos;にデバッグトレースを出力" cs="Zapisovat ladicí hlášení do &apos;Scribe.txt&apos;" pl="Zapisuj błędy programu w &apos;Scribe.txt&apos;" it="Scrivi messaggi di debug in &apos;Scribe.txt&apos;" vi="Xuất dấu vết bắt lỗi vào tập tin &apos;Scribe.txt&apos;" zh_tw="輸出除錯追蹤聲明到 &apos;Scribe.txt&apos;" sr="Izlazne izjave tragova popravki grešaka u &apos;Scribe.txt&apos;" es="Registrar Errores de Depuración en &apos;Scribe.txt&apos;" no="Skriv feilsøkingsinformasjon til  &apos;Scribe.txt&apos;" lt="Rašyti derinimo informaciją į „Scribe.txt“" fa="قرار بده scribe.txt خروجی عمل عیب یابی را در" de="Konto-Verbindungs-Debuglogbuch" da="Skriv fejlsøgningsinformation til  &apos;Scribe.txt&apos;" sv="Skriv felsökningsinformation till &apos;Scribe.txt&apos;" pt_br="Enviar informações de debug para &apos;Scribe.txt&apos;" tr="Debug takibi kayıtlarını &apos;Scribe.txt&apos; dosyasına yaz" hu="Hibakeresés állapot kimenete a &apos;Scribe.txt&apos;-be" ru="Журнал глюколова  &apos;Scribe.txt&apos;" ko="출력 디버그 추적 진숙은 &apos;Scribe.txt&apos;로" uk="Звіт протоколювання підключення налагодження:" fr="Journalisation du débogage de la connexion au compte:" />
 		<String Ref="1342" Cid="1342" Define="IDD_REPLICATE" en="Replicate Mail Stores" pl="Powiel magazyny poczty" ko="메일 사서함 복제" uk="Реплікація поштових скриньок" de="Mail-Datenbank replizieren" fr="Réproduire dossiers courrier" />
 		<String Ref="1343" Cid="-1" Define="IDC_STATIC" en="Use secure authentication:" pl="Użyj bezpiecznego uwierzytelnienia:" ko="보안 인증 사용:" uk="Використання безпечної аутентифікації:" de="Sichere Authenifizierung verwenden:" fr="Utilisez authentification sécurisée:" />
-		<String Ref="1344" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1344" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1345" Cid="-1" Define="IDC_STATIC" en="Source folders:" pl="Foldery źródłowe:" ko="원본 폴더" uk="Теки з файлами:" de="Quellordner:" fr="Dossiers source:" />
 		<String Ref="1346" Cid="1346" Define="IDC_SRC" />
 		<String Ref="1347" Cid="-1" Define="IDC_STATIC" en="Destination folders:" pl="Foldery docelowe:" ko="대상 폴더:" uk="Тека призначення:" de="Zielordner:" fr="Dossiers destination" />
@@ -847,26 +849,27 @@
 		<String Ref="1352" Cid="698" Define="IDC_TYPES" />
 		<String Ref="1353" Cid="1353" Define="IDS_1353" en="Type" pl="Rodzaj" ko="유형" uk="Тип" de="Typ" />
 		<String Ref="1354" Cid="1354" Define="IDS_1354" en="Select" pl="Wybierz" ko="선택" uk="Виберіть" de="Auswahl" fr="Sélectionner" />
+		<String Ref="1355" Cid="1" Define="IDOK" en="Ok" ko="확인" uk="Так" />
 		<String Ref="1357" Cid="1127" Define="IDS_RESIZE_JPEG_QUAL" en="JPEG Quality (0-100):" ko="JPEG 품질(0-100):" uk="JPEG якість (0-100):" de="JPEG Qualität (0-100):" />
 		<String Ref="1358" Cid="743" Define="IDC_DATE_FORMAT" />
 		<String Ref="1359" Cid="2031" Define="IDC_GLYPH_SUB" en="Use glyph substitution when displaying text" cs="Použít substituci znaků pro zobrazování textu" ja="テキストを表示時にはグリフ代替を使用する" pt="Substituir glifos ao apresentar texto" nl="Gebruik tekensubstitutie bij weergave van tekst" pl="Użyj zastępowania symbolami w wyświetlanym tekście" it="Usa la sostituzione glyph durante la visualizzazione del testo" vi="Thay dấu khi hiện văn bản" zh_tw="顯示文字時以圖形文字替代" sr="Koristi zamenu glifova prilikom prikazivanja teksta" es="Utilizar sustitución &apos;glyph&apos; para mostrar texto" no="Bruk tegnerstatning ved visning av tekst" lt="Naudoti „glyph“ teksto šriftų pakeitimą" fa="استفاده کن glyph هنگام نمايش متن از جابجايي" de="Sonderzeichen-Ersetzung bei Anzeige verwenden" da="Brug glyf-erstatning ved visning af tekst" sv="Använd teckensymboler vid textvisning" pt_br="Usar substituição de glifos ao mostrar texto" tr="Akıllı karakter yer değiştirme kullan" hu="Használati betűkép helyettesítés mikor szöveget mutat be" ru="Использовать замену символов при отображении текста" ko="본문 보여줄때 문자 대체 사용" uk="Використовуйте заміну гліфів при відображенні тексту" fr="Utiliser la substitution de glyphe lors de l&apos;affichage de texte" />
 		<String Ref="1360" Cid="1360" Define="IDC_DELETE_LARGER" en="Delete after download if larger than" pl="Usuń większe niż" ko="설정 크기보다 클 경우 다운로드 후 삭제" uk="Видалити після завантаження, якщо більше ніж" de="Nach Download löschen wenn größer als" fr="Supprimer après le téléchargement si plus grand que" />
 		<String Ref="1361" Cid="1361" Define="IDC_DELETE_SIZE" />
 		<String Ref="1362" Cid="916" Define="IDC_TXT_SIZE" en="KB&apos;s" it="KB" es="KB" cs="kB" de="KB" nl="KB" pl="kB" ja="KB" sr="KB" no="kB" lt="KB" da="kB" vi="KB" sv="kB" lg="KB" hu="KB" tr="KB&apos;dan büyükse indirme" ru="КБ" ko="KB의" uk="КБ" />
-		<String Ref="1365" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1363" Cid="503" Define="IDC_NEW_FOLDER" en="New Folder" ko="새 폴더" uk="Нова тека" de="Neuer Ordner" fr="Nouveau dossier" />
+		<String Ref="1364" Cid="1364" Define="IDC_CLEAR" en="x" />
+		<String Ref="1365" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1366" Cid="-1" Define="IDC_STATIC" en="Rename folder to:" fr="Renommer en:" it="Rinomina la cartella in:" cs="Přejmenovat složku na:" es="Renombrar Carpeta a:" de="Ordner umbenennen:" nl="Nieuwe naam:" pt_br="Renomear pasta para:" ru="Переименовать папку:" pt="Alterar para:" pl="Zmień nazwę folderu na:" vi="Đổi tên thành:" zh_tw="資料夾更名為:" ja="フォルダ名変更:" sr="Preimenuj omotnicu u:" no="Gi mappe nytt navn:" lt="Keisti aplanko vardą į:" fa=":اسم پوشه را عوض کن به" da="Omdøb mappe til:" sv="Döp om mapp:" lg="Kyuusa Erinnya lya Kabada libe:" tr="Klasör için isim giriniz:" hu="Mappa átnevezése:" ko="폴더 이름 재설정:" uk="Перейменувати теку:" />
 		<String Ref="1371" Cid="1371" Define="IDS_SPELL_CHECK" en="Spell Check:" pl="Sprawdzanie pisowni:" ko="철자 체크:" uk="Перевірка орфографії:" de="Rechtschreibprüfung:" fr="Vérification d&apos;orthographe:" />
 		<String Ref="1372" Cid="1372" Define="IDS_SPELL_DICT" en="Dictionary:" pl="Słownik:" ko="사전:" uk="Словник:" de="Wörterbuch:" fr="Dictionnaire:" />
 		<String Ref="1376" Cid="-1" Define="IDC_STATIC" en="Start in folder:" pl="Rozpocznij w folderze:" pt="Localização das sub-pastas" nl="Begin in map:" sr="Počni u omotnici:" lt="Pradžios aplankas:" cs="Výchozí složka:" de="Start im Ordner:" da="Start i mappe:" fa="پوشه شروع:" vi="Bắt đầu trong danh mục:" sv="Starta i:" es="Iniciar en Carpeta:" pt_br="Começar na pasta:" lg="Salawo awaterekerwa bu kabada" tr="Başlangıç klasörü:" hu="Kezdő mappa" ru="Запускать в папке:" ko="시작 폴더:" uk="Запустити в теці:" fr="Débuter dans le dossier:" />
 		<String Ref="1469" Cid="1469" Define="IDD_FOLDER_SELECT" en="Select Folder" ko="폴더 선택" uk="Вибір теки" de="Ordner auswählen" fr="Sélectionner dossier" />
 		<String Ref="1470" Cid="540" Define="IDC_LAYOUT" />
-		<String Ref="1471" Cid="503" Define="IDC_NEW_FOLDER" en="New Folder" ko="새 폴더" uk="Нова тека" de="Neuer Ordner" fr="Nouveau dossier" />
 		<String Ref="1472" Cid="1472" Define="IDD_FOLDER_FORMAT" en="Mail3 Folder Format" ko="Mail3 폴더 형식" uk="Формат теки Mail3" de="Mail3 Ordnerformat" fr="Format du dossier Mail3" />
-		<String Ref="1473" Cid="1" Define="IDOK" en="Ok" ko="확인" uk="Так" />
 		<String Ref="1474" Cid="407" Define="IDS_407" en="Status:" cs="Stav:" es="Estado:" pt_br="Estado:" ru="Состояние:" ja="状態:" pt="Estado:" it="Stato:" vi="TT:" zh_tw="狀態:" lt="Būsena:" fa="وضعيت" lg="Embeera:" tr="Durum:" hu="Állapot:" ko="상태:" uk="Стан:" fr="Statut:" />
 		<String Ref="1475" Cid="908" Define="IDC_FOLDERS" />
 		<String Ref="1476" Cid="402" Define="IDS_402" en="Accounts" fr="Comptes" cs="Účty" de="E-Mail-Konten:" es="Cuentas" pt_br="Contas" ru="Учетные записи" ja="アカウント" pt="Contas" pl="Konta" it="Account" vi="Tài khoản" zh_tw="帳號" sr="Nalozi" no="Kontoer" lt="Abonentai" fa="حساب ها" da="Kontoer" sv="Konton" lg="Zi Akawunta" tr="E-posta Hesapları" hu="Fiókok" ko="계정" uk="Облікові записи" />
-		<String Ref="1477" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1477" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1478" Cid="1" Define="IDOK" en="Ok" ko="확인" uk="Так" />
 		<String Ref="1479" Cid="2" Define="IDCANCEL" en="Cancel" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
 		<String Ref="1480" Cid="893" Define="IDC_FORMAT" en="Mail3 Format:" ko="Mail3 형식:" uk="Mail3 Формат:" fr="Format de Mail3:" />
@@ -876,7 +879,7 @@
 		<String Ref="1484" Cid="1018" Define="IDC_DOWN" en="Down" ko="아래" uk="Униз" de="Runter" fr="Bas" />
 		<String Ref="1485" Cid="1485" Define="IDS_GROWL_SUPPORT" en="Growl notification support" ko="Growl 알림 지원" uk="Підтримка повідомлень Growl" de="Unterstützung von Growl-Benachrichtigungen" fr="Prise en charge des notifications Growl" />
 		<String Ref="1486" Cid="1486" Define="IDS_GROWL" en="Use growl:" ko="Growl 사용" uk="Використовувати growl:" de="Verwende Growl:" fr="Utilisez le grognement:" />
-		<String Ref="1487" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1487" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1488" Cid="-1" Define="IDC_STATIC" en="Label:" cs="Označení:" nl="Etiket:" pt_br="Rótulo:" ru="Метка:" ja="ラベル:" pt="Etiqueta:" pl="Etykieta:" it="Etichetta" vi="Nhãn:" zh_tw="標籤:" sr="Etiketa:" es="Etiqueta:" no="Etikett:" lt="Etiketė:" fa=":برچسب" de="Beschriftung:" da="Etiket:" sv="Etikett:" lg="Akapande:" tr="Etiket:" hu="Cimke:" ko="라벨:" uk="Позначка:" fr="Étiquette:" />
 		<String Ref="1489" Cid="1031" Define="IDC_QUOTE" en="&Quote when replying with:" fr="Citer en répondant avec" it="Nella risposta marca con:" cs="Znak před originálem:" es="En la respuesta marcar con:" de="Zitierte E-Mail markieren mit:" nl="Citaat aangeven met:" pt_br="Ao responder marcar mensagem original com:" ru="Цитировать при ответе" ja="返信時の引用文字" pt="Ao responder marcar com:" pl="Cytuj znakiem:" vi="Trích dẫn khi trả lời với" zh_tw="當回覆時使用引號" sr="Citiraj prilikom odgovora sa:" no="Anførselstegn ved svar:" lt="Citavimo ženklas:" fa="هنگام جواب دادن به نامه با علامت ....متن نامه را نقل کن" da="Anførselstegn ved svar:" sv="Anföringstecken vid svar (om annat än standard):" lg="Kububaka bw&apos;odamu, yongerezako:" tr="Yanıtlarken alıntı yapma koşulu" hu="Idézet amikor válaszol:" ko="회신시 인용:" uk="Цитувати при відповіді:" />
 		<String Ref="1490" Cid="-1" Define="IDC_STATIC" en="Filter Name:" fr="Nom du filtre:" it="Nome del filtro:" cs="Jméno filtru:" es="Nombre del Filtro:" de="Filterbezeichnung:" nl="Naam van het filter:" pt_br="Nome do filtro:" pt="Nome do filtro:" pl="Nazwa filtru:" vi="Tên bộ lọc:" zh_tw="過濾器名稱:" ja="フィルタ名" sr="Ime filtera:" no="Filternavn:" lt="Filtro vardas:" fa="نام فيلتر" da="Filternavn:" sv="Filternamn:" lg="Erinnya ly&apos;Akasengenja" tr="Filtre Adı:" hu="Szűrő neve:" ru="Название фильтра:" ko="필터 이름:" uk="Назва фільтру" />
@@ -910,7 +913,7 @@
 		<String Ref="1528" Cid="1528" Define="IDS_SSL_DEBUG" en="SSL connection debug logging:" ko="SSL 연결 디버그 로깅:" uk="SSL підключення налагодження (безпека):" de="SSL Verbindungs-Debuglogbuch" fr="Journalisation du débogage de la connexion SSL:" />
 		<String Ref="1531" Cid="1531" Define="IDC_SPELL_LANG" en="Language:" uk="Мова:" de="Sprache:" fr="Langue:" />
 		<String Ref="1532" Cid="1132" Define="IDD_PRINT_PREVIEW" en="Print Preview" uk="Попередній перегляд" de="Druckvorschau" fr="Avant Impression" />
-		<String Ref="1533" Cid="539" Define="IDC_TABLE" />
+		<String Ref="1533" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1534" Cid="-1" Define="IDC_STATIC" en="Render width:" uk="Задати ширину:" de="Renderbreite:" fr="Largeur de rendu:" />
 		<String Ref="1535" Cid="1535" Define="IDC_WIDTH" />
 		<String Ref="1536" Cid="548" Define="IDC_PREVIEW" />
@@ -3359,25 +3362,39 @@
 			</tr>
 		</TableLayout>
 	</Dialog>
-	<Dialog pos="7,7,359,539" ref="1469">
-		<TableLayout pos="7,7,342,503" ref="1470" cols="0.396,0.604" rows="0.064,0.860,0.076">
+	<Dialog pos="7,7,400,584" ref="1469">
+		<TableLayout pos="7,7,391,552" ref="1470" cols="1.000" rows="0.064,0.625,0.311">
 			<tr>
-				<td addr="0,0" colspan="2">
+				<td addr="0,0">
 					<StaticText pos="7,7,139,27" ref="634" />
 				</td>
 			</tr>
 			<tr>
-				<td addr="0,1" colspan="2" class="full_width">
-					<Custom pos="0,28,314,433" ref="1475" Ctrl="ScribeFolderTree" />
+				<td addr="0,1" class="full_width">
+					<Custom pos="7,41,349,355" ref="1475" Ctrl="ScribeFolderTree" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,2">
-					<Button pos="7,448,76,468" ref="1471" toggle="0" />
-				</td>
-				<td addr="1,2" align="Max">
-					<Button pos="128,448,183,468" ref="1473" toggle="0" />
-					<Button pos="196,448,244,468" ref="635" toggle="0" />
+					<TableLayout pos="7,413,370,489" ref="1228" cols="0.200,0.281,0.119,0.200,0.200" rows="1.000">
+						<tr>
+							<td addr="0,0">
+								<Button pos="7,14,62,34" ref="1363" toggle="0" />
+							</td>
+							<td addr="1,0">
+								<EditBox Pos="76,14,159,34" ref="1328" />
+							</td>
+							<td addr="2,0">
+								<Button pos="179,14,199,34" ref="1364" image="" toggle="0" />
+							</td>
+							<td addr="3,0">
+								<Button pos="220,21,275,41" ref="1355" toggle="0" />
+							</td>
+							<td addr="4,0">
+								<Button pos="292,21,340,41" ref="1334" toggle="0" />
+							</td>
+						</tr>
+					</TableLayout>
 				</td>
 			</tr>
 		</TableLayout>
@@ -4638,32 +4655,32 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
-					</Control>
-					<Control Ref="733" ControlType="" ControlTag="">
-						<Control Ref="840" ControlType="bool" ControlTag="AdjustDateTz" />
-						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
-						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
 					<Control Ref="1338" ControlType="" ControlTag="">
 						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
 						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
 						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
 						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
 						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="733" ControlType="" ControlTag="">
+						<Control Ref="840" ControlType="bool" ControlTag="AdjustDateTz" />
+						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
+						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
+					</Control>
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>
