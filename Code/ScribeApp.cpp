@@ -10454,7 +10454,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 		{
 			#if DEBUG_NEW_MAIL
 			LgiTrace("%s:%i - NEW_MAIL: OnNewMail t=%p, uid=%s, mode=%s\n",
-				_FL, (Thing*)m, m->GetServerUid(), toString(m->NewEmail));
+				_FL, (Thing*)m, m->GetServerUid().ToString().Get(), toString(m->NewEmail));
 			#endif
 
 			switch (m->NewEmail)
@@ -10463,7 +10463,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 				{
 					auto Loaded = m->GetLoaded();
 					#if DEBUG_NEW_MAIL
-					LgiTrace("%s:%i - NEW_MAIL: GetLoaded=%i uid=%s\n", _FL, (int)Loaded, m->GetServerUid());
+					LgiTrace("%s:%i - NEW_MAIL: GetLoaded=%i uid=%s\n", _FL, (int)Loaded, m->GetServerUid().ToString().Get());
 					#endif
 					if (Loaded != Store3Loaded)
 					{
@@ -10536,7 +10536,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 		{
 			#if DEBUG_NEW_MAIL
 			LgiTrace("%s:%i - NEW_MAIL: RemoveNewMail t=%p, uid=%s\n",
-				_FL, (Thing*)m, m->GetServerUid());
+				_FL, (Thing*)m, m->GetServerUid().ToString().Get());
 			#endif
 
 			Mail::NewMailLst.Delete(m);
@@ -10710,7 +10710,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 		for (unsigned i=0; i<Resort.Length(); i++)
 		{
 			#if DEBUG_NEW_MAIL
-			LAutoString Path = Resort[i]->GetPath();
+			auto Path = Resort[i]->GetPath();
 			LgiTrace("%s:%i - NEWMAIL: Folder.Resort=%s\n", _FL, Path.Get());
 			#endif
 
@@ -11977,7 +11977,7 @@ void ScribeWnd::OnNew(
 					UnreadDiff += TestFlag(m->GetFlags(), MAIL_READ) ? 0 : 1;
 
 					#if DEBUG_NEW_MAIL
-					LgiTrace("%s:%i - NEW_MAIL: t=%p uid=%s IsNew=%i\n", _FL, t, m->GetServerUid(), IsNew);
+					LgiTrace("%s:%i - NEW_MAIL: t=%p uid=%s IsNew=%i\n", _FL, t, m->GetServerUid().ToString().Get(), IsNew);
 					#endif
 
 					if (IsNew)
@@ -12125,7 +12125,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 					{
 						#if DEBUG_NEW_MAIL
 						LgiTrace("%s:%i - NEW_MAIL: OnChange->GetBody t=%p, uid=%s, mode=%s, loaded=%s (%s:%i)\n",
-							_FL, (Thing*)m, m->GetServerUid(),
+							_FL, (Thing*)m, m->GetServerUid().ToString().Get(),
 							toString(m->NewEmail), toString(Loaded),
 							d->CtxFile, d->CtxLine);
 						#endif
@@ -12136,7 +12136,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 					{
 						#if DEBUG_NEW_MAIL
 						LgiTrace("%s:%i - NEW_MAIL: OnChange->NewMail t=%p, uid=%s, mode=%s, loaded=%s (%s:%i)\n",
-							_FL, (Thing*)m, m->GetServerUid(),
+							_FL, (Thing*)m, m->GetServerUid().ToString().Get(),
 							toString(m->NewEmail), toString(Loaded),
 							d->CtxFile, d->CtxLine);
 						#endif

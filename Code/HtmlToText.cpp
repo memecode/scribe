@@ -43,7 +43,7 @@ LString TextToHtml(const char *Txt, const char *Charset)
 	if (Txt)
 	{
 		LAutoString Utf(Charset && _stricmp(Charset, "utf-8") ? (char*)LNewConvertCp("utf-8", Txt, Charset) : NewStr(Txt));
-		for (GUtf8Str u(Utf); (uint32_t)u; u++)
+		for (LUtf8Str u(Utf); (uint32_t)u; u++)
 		{
 			uint32_t c = u;
 			if (c == '\n')

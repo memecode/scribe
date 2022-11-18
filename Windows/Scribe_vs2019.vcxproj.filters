@@ -841,9 +841,6 @@
     <None Include="..\Resources\About.html">
       <Filter>Help</Filter>
     </None>
-    <None Include="..\Scripts\Add Senders To Contacts.script">
-      <Filter>Scripting</Filter>
-    </None>
     <None Include="..\Help\email.html">
       <Filter>Help</Filter>
     </None>
@@ -868,23 +865,8 @@
     <None Include="..\Help\calendar.html">
       <Filter>Help</Filter>
     </None>
-    <None Include="..\Scripts\Delete Attachments.script">
-      <Filter>Scripting</Filter>
-    </None>
-    <None Include="..\Scripts\Delete Duplicate Messages.script">
-      <Filter>Scripting</Filter>
-    </None>
-    <None Include="..\Scripts\DecrementAll.script">
-      <Filter>Scripting</Filter>
-    </None>
-    <None Include="..\Scripts\CovieRender.script">
-      <Filter>Scripting</Filter>
-    </None>
     <None Include="..\Help\contacts.html">
       <Filter>Help</Filter>
-    </None>
-    <None Include="..\Code\Store3Imap\compile-proto.bat">
-      <Filter>Scripting</Filter>
     </None>
     <None Include="..\Code\Encryption\Examples\encrypted+html+attach+key.eml">
       <Filter>TestCases</Filter>
@@ -924,12 +906,6 @@
     </None>
     <None Include="..\Help\menu.html">
       <Filter>Help</Filter>
-    </None>
-    <None Include="..\Scripts\LdapPlugin.script">
-      <Filter>Scripting</Filter>
-    </None>
-    <None Include="..\Scripts\Mail Filters Menu.script">
-      <Filter>Scripting</Filter>
     </None>
     <None Include="..\Help\plugins.html">
       <Filter>Help</Filter>
@@ -972,6 +948,27 @@
     </None>
     <None Include="Installer-64bit.nsi">
       <Filter>Install</Filter>
+    </None>
+    <None Include="..\Scripts\Add Senders To Contacts.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\CovieRender.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\Delete Attachments.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\DecrementAll.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\Delete Duplicate Messages.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\LdapPlugin.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\Mail Filters Menu.script">
+      <Filter>Scripting\Scripts</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1054,6 +1051,9 @@
     </Filter>
     <Filter Include="Controls/UI\Html">
       <UniqueIdentifier>{6fbe15c0-133a-4ae9-a441-03a9dcafe050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting\Scripts">
+      <UniqueIdentifier>{4fd600f1-77c6-4b58-b9a8-85d436233d52}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

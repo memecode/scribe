@@ -2371,6 +2371,7 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 		{
 			if (Stop)
 				break;
+
 			if (f->Test(m, Stop, LogStream))
 			{
 				f->DoActions(m, Stop, LogStream);

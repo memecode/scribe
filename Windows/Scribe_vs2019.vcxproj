@@ -651,7 +651,6 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <None Include="..\Code\Encryption\Examples\signed.eml" />
     <None Include="..\Code\Py\DomScan.py" />
     <None Include="..\Code\Py\win32_pre_build_step.py" />
-    <None Include="..\Code\Store3Imap\compile-proto.bat" />
     <None Include="..\Code\Store3Imap\Scribe.proto" />
     <None Include="..\Help\calendar.html" />
     <None Include="..\Help\contacts.html" />
