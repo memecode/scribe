@@ -3540,31 +3540,106 @@ struct TempMsg : public LTempStream
 	}
 };
 
-ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
+class FolderTask : public LProgressDlg
 {
-	if (Stricmp(mimeType, sMimeMbox) == 0 ||
-		Stricmp(mimeType, "text/x-mail") == 0)
+protected:
+	ScribeWnd *App = NULL;
+	ScribeFolder *Folder = NULL;
+	LString MimeType;
+	ThingType::IoProgress Status;
+	ThingType::IoProgressCallback onComplete;
+
+public:
+	// Minimum amount of time to do work.
+	constexpr static int WORK_SLICE_MS		= 130;
+	// This should be larger then WORK_SLICE_MS to allow message loop to process
+	constexpr static int PULSE_MS			= 200;
+
+	FolderTask(	ScribeFolder *folder,
+				LString mimeType,
+				ThingType::IoProgressCallback cb) :
+		LProgressDlg(folder->App),
+		Folder(folder),
+		MimeType(mimeType),
+		onComplete(cb),
+		Status(Store3Success)
 	{
-		DoEvery Count(500);
+		App = Folder->App;
+		Ts = LCurrentTime();
+		SetParent(Folder->GetTree());		
+		SetPulse(PULSE_MS);
+		SetAlwaysOnTop(true);
 
-		// Mail box format...
-		LProgressDlg PrgDlg(Tree);
-		PrgDlg.SetDescription(LLoadString(IDS_MBOX_READING));
-		PrgDlg.SetType("K");
-		PrgDlg.SetScale(1.0/1024.0);
-		PrgDlg.SetRange(stream->GetSize());
-		LYield();
+		App->OnFolderTask(this, true);
+	}
+	
+	virtual ~FolderTask()
+	{
+		Folder->App->OnFolderTask(this, false);
 		
-		LDataStoreI::StoreTrans Trans = GetObject()->GetStore()->StartTransaction();
+		if (onComplete)
+			onComplete(&Status);
+	}
 
+	bool OnRequestClose(bool OsClose)
+	{
+		return true;
+	}
+
+	void OnPulse()
+	{
+		LProgressDlg::OnPulse();
+
+		auto StartTs = LCurrentTime();
+		while (	!IsCancelled() &&
+				(LCurrentTime() - StartTs) < WORK_SLICE_MS)
+		{
+			if (!TimeSlice())
+			{
+				Quit();
+				break;
+			}
+		}
+	}
+	
+	/// This should use around WORK_SLICE_MS of time and then
+	/// \returns true if more work to do or false if finished.
+	virtual bool TimeSlice() = 0;
+};
+
+class ImportFolderTask : public FolderTask
+{
+	LDataStoreI::StoreTrans trans;
+	LAutoPtr<LStreamI> stream;
+	
+public:
+	ImportFolderTask(ScribeFolder *fld, LAutoPtr<LStreamI> in, LString mimeType, ThingType::IoProgressCallback cb) :
+		FolderTask(fld, mimeType, cb)
+	{
+		SetDescription(LLoadString(IDS_MBOX_READING));
+		SetType("K");
+		SetScale(1.0/1024.0);
+		SetRange(stream->GetSize());
+
+		trans = fld->GetObject()->GetStore()->StartTransaction();
+	}
+	
+	bool TimeSlice()
+	{
+		auto Start = LCurrentTime();
 		MboxParser Parser(stream);
 		TempMsg *Tm;
+		
 		LAutoStreamI Msg(Tm = new TempMsg);
 		while ( !Parser.GetEof()
 		        &&
+		        LCurrentTime() - Start < WORK_SLICE_MS
+		        &&
+		        !IsCancelled()
+		        &&
 		        Tm->ReadMessage(&Parser))
 		{
-			Mail *m = dynamic_cast<Mail*>(App->CreateItem(MAGIC_MAIL, this, false));
+			Mail *m = dynamic_cast<Mail*>(App->CreateItem(MAGIC_MAIL, Folder, false));
 			if (m)
 			{
 				m->OnAfterReceive(Msg);
@@ -3576,10 +3651,22 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 			Msg.Reset(Tm = new TempMsg);
 			Parser.SeekNext();
 
-			PrgDlg.Value(stream->GetPos());
-			if (Count.DoNow())
-				LYield();
+			Value(stream->GetPos());
 		}
+		
+		return !Parser.GetEof();
+	}
+};
+
+ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
+{
+	if (Stricmp(mimeType, sMimeMbox) == 0 ||
+		Stricmp(mimeType, "text/x-mail") == 0)
+	{
+		// Mail box format...
+		ThingType::IoProgress p(Store3Delayed);
+		p.prog = new ImportFolderTask(this, stream, mimeType, cb);
+		return p;
 	}
 	else if (Stricmp(mimeType, sMimeVCard) == 0)
 	{
@@ -3684,34 +3771,19 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 	return Store3Error;
 }
 
-class FolderExportTask : public LProgressDlg
+class ExportFolderTask : public FolderTask
 {
 	LAutoPtr<LStreamI> Out;
-	ScribeFolder *Folder = NULL;
-	LString MimeType;
 	int Idx = 0;
-	ThingType::IoProgress Status;
-	ThingType::IoProgressCallback onComplete;
 
 public:
-	// Minimum amount of time to do work.
-	constexpr static int WORK_SLICE_MS		= 130;
-	// This should be larger then WORK_SLICE_MS to allow message loop to process
-	constexpr static int PULSE_MS			= 200;
-
-	FolderExportTask(	LAutoPtr<LStreamI> out,
+	ExportFolderTask(	LAutoPtr<LStreamI> out,
 						ScribeFolder *folder,
 						LString mimeType,
 						ThingType::IoProgressCallback cb) :
-		LProgressDlg(folder->App),
-		onComplete(cb),
-		Status(Store3Success)
+		FolderTask(folder, mimeType, cb)
 	{
 		Out = out;
-		Folder = folder;
-		MimeType = mimeType;
-		Ts = LCurrentTime();
-		Folder->App->OnFolderTask(this, true);
 
 		bool Mbox = _stricmp(MimeType, sMimeMbox) == 0;
 
@@ -3745,19 +3817,36 @@ public:
 		SetAlwaysOnTop(true);
 	}
 	
-	~FolderExportTask()
+	bool TimeSlice()
 	{
-		Folder->App->OnFolderTask(this, false);
+		auto Start = LCurrentTime();
+		while (	LCurrentTime() - Start < WORK_SLICE_MS
+				&&
+		        !IsCancelled())
+		{
+			if (Idx >= (ssize_t)Folder->Items.Length())
+				return false;
+
+			// Process all the container's items
+			Thing *t = Folder->Items[Idx++];
+			if (!t)
+				return false;
+
+			LAutoPtr<LStreamI> wrapper(new LProxyStream(Out));
+			if (!t->Export(wrapper, MimeType))
+			{
+				Status.status = Store3Error;
+				Status.errMsg = "Error exporting items.";
+				return false;
+			}
+			
+			Value(Idx);
+		}
 		
-		if (onComplete)
-			onComplete(&Status);
-	}
-	
-	bool OnRequestClose(bool OsClose)
-	{
 		return true;
 	}
 	
+	/*
 	void OnPulse()
 	{
 		LProgressDlg::OnPulse();
@@ -3802,6 +3891,7 @@ public:
 
 		return LProgressDlg::OnEvent(Msg);
 	}
+	*/
 };
 
 // This is the mime type used to storage objects on disk
@@ -3828,14 +3918,23 @@ const char *ScribeFolder::GetStorageMimeType()
 
 ThingType::IoProgress ScribeFolder::Export(IoProgressImplArgs)
 {
+	IoProgress ErrStatus(Store3Error);
 	if (!mimeType)
-		return Store3Error;
+	{
+		ErrStatus.errMsg = "No mimetype.";
+		if (cb) cb(&ErrStatus);
+		return ErrStatus;
+	}
 		
 	if (!LoadThings())
-		return Store3Error;
+	{
+		ErrStatus.errMsg = "Failed to load things.";
+		if (cb) cb(&ErrStatus);
+		return ErrStatus;
+	}
 
 	IoProgress Status(Store3Delayed);
-	Status.prog = new FolderExportTask(stream, this, mimeType, cb);
+	Status.prog = new ExportFolderTask(stream, this, mimeType, cb);
 	return Status;
 }
 
