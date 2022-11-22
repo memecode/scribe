@@ -215,11 +215,9 @@ void Import_UnixMBox(ScribeWnd *Parent)
 		{
 			for (auto File: Dlg.SrcFiles)
 			{
-				LTextFile F;
-				if (F.Open(File, O_READ))
-				{
-					Folder->Import(F, sMimeMbox);
-				}
+				LAutoPtr<LTextFile> F(new LTextFile);
+				if (F->Open(File, O_READ))
+					Folder->Import(Folder->AutoCast(F), sMimeMbox);
 			}
 		}
 	}
@@ -246,11 +244,9 @@ void Export_UnixMBox(ScribeWnd *Parent)
 				if (!LFileExists(File) ||
 					LgiMsg(Parent, LLoadString(IDS_ERROR_FILE_EXISTS), AppName, MB_YESNO, File) == IDYES)
 				{
-					LFile F;
-					if (F.Open(File, O_WRITE))
-					{
-						Folder->Export(F, sMimeMbox);
-					}
+					LAutoPtr<LFile> F(new LFile);
+					if (F->Open(File, O_WRITE))
+						Folder->Export(Folder->AutoCast(F), sMimeMbox);
 				}
 			}
 		}

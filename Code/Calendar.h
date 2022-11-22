@@ -147,8 +147,8 @@ public:
 
 	// Import/Export
 	bool GetFormats(bool Export, LString::Array &MimeTypes) override;
-	bool Import(LStreamI &f, const char *MimeType) override;
-	bool Export(LStreamI &f, const char *MimeType) override;
+	IoProgress Import(IoProgressFnArgs) override;
+	IoProgress Export(IoProgressFnArgs) override;
 	char *GetDropFileName() override;
 	bool GetDropFiles(LString::Array &Files) override;
 

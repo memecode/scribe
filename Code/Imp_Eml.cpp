@@ -149,10 +149,10 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 						char c[MAX_PATH_LEN];
 						d.Path(c, sizeof(c));
 
-						LFile Eml;
-						if (Eml.Open(c, O_READ))
+						LAutoPtr<LFile> Eml(new LFile);
+						if (Eml->Open(c, O_READ))
 						{
-							if (t->Import(Eml, sMimeMessage))
+							if (t->Import(t->AutoCast(Eml), sMimeMessage))
 							{
 								t->Save(Out);
 							}

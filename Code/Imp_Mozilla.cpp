@@ -566,10 +566,10 @@ bool Import_MozillaMail(ScribeWnd *App)
 									ScribeFolder *Child = Dest->CreateSubDirectory(Name, MAGIC_MAIL);
 									if (Child)
 									{
-										LTextFile f;
-										if (f.Open(Src, O_READ))
+										LAutoPtr<LTextFile> f(new LTextFile);
+										if (f->Open(Src, O_READ))
 										{
-											Child->Import(f, sMimeMbox);
+											Child->Import(Child->AutoCast(f), sMimeMbox);
 										}
 									}
 								}

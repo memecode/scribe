@@ -1593,32 +1593,31 @@ bool Contact::GetFormats(bool Export, LString::Array &MimeTypes)
 	return MimeTypes.Length() > 0;
 }
 
-bool Contact::Import(LStreamI &f, const char *MimeType)
+Thing::IoProgress Contact::Import(IoProgressImplArgs)
 {
-	bool Status = false;
+	Store3Status Status = Store3Error;
 
-	if (MimeType)
+	if (Stricmp(mimeType, sMimeVCard) == 0)
 	{
-		if (_stricmp(MimeType, sMimeVCard) == 0)
-		{
-			VCard vCard;
-			Status = vCard.Import(GetObject(), &f);
-		}
+		VCard vCard;
+		if (vCard.Import(GetObject(), stream))
+			Status = Store3Success;
 	}
 
 	return Status;
 }
 
-bool Contact::Export(LStreamI &f, const char *MimeType)
+Thing::IoProgress Contact::Export(IoProgressImplArgs)
 {
-	bool Status = false;
+	Store3Status Status = Store3Error;
 
-	if (MimeType && GetObject())
+	if (mimeType && GetObject())
 	{
-		if (_stricmp(MimeType, sMimeVCard) == 0)
+		if (Stricmp(mimeType, sMimeVCard) == 0)
 		{
 			VCard vCard;
-			Status = vCard.Export(GetObject(), &f);
+			if (vCard.Export(GetObject(), stream))
+				Status = Store3Success;
 		}
 	}
 
@@ -1654,11 +1653,11 @@ bool Contact::GetDropFiles(LString::Array &Files)
 	{
 		if (!LFileExists(DropFileName))
 		{
-			LFile F;
-			if (F.Open(DropFileName, O_WRITE))
+			LAutoPtr<LFile> F(new LFile);
+			if (F->Open(DropFileName, O_WRITE))
 			{
-				F.SetSize(0);
-				Export(F, sMimeVCard);
+				F->SetSize(0);
+				Export(AutoCast(F), sMimeVCard);
 			}
 		}
 

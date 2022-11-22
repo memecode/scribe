@@ -2553,13 +2553,13 @@ int CalendarView::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 			{
 				for (auto f: Files)
 				{
-					LFile in;
+					LAutoPtr<LFile> in(new LFile);
 					auto type = LGetFileMimeType(f);
-					if (in.Open(f, O_READ))
+					if (in->Open(f, O_READ))
 					{
 						auto c = First->NewEvent();
 						if (c)
-							c->Import(in, type);
+							c->Import(c->AutoCast(in), type);
 					}
 				}
 			}

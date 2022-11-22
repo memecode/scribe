@@ -526,16 +526,16 @@ bool Thing::ExportAll(LViewI *Parent, const char *ExportMimeType)
 			Out = Buf;
 		}					
 	
-		LFile f;
-		if (!f.Open(Out, O_WRITE))
+		LAutoPtr<LFile> f(new LFile);
+		if (!f->Open(Out, O_WRITE))
 		{
 			LgiTrace("%s:%i - Couldn't open '%s' for writing.", _FL, Select.Name());
 			Errors++;
 		}
 		else
 		{
-			f.SetSize(0);
-			if (m->Export(f, ExportMimeType))
+			f->SetSize(0);
+			if (m->Export(m->AutoCast(f), ExportMimeType))
 				Exported++;
 			else
 				Errors++;
@@ -561,9 +561,12 @@ bool Thing::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVa
 			else
 			{
 				auto FileName = Args[0]->Str();
-				LFile f;
-				if (f.Open(FileName, O_READ))
-					*ReturnValue = Import(f, Args[1]->Str());
+				LAutoPtr<LFile> f(new LFile);
+				if (f->Open(FileName, O_READ))
+				{
+					auto status = Import(AutoCast(f), Args[1]->Str());
+					*ReturnValue = status.status;
+				}
 				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for reading.\n", _FL, FileName);
 			}
@@ -577,9 +580,12 @@ bool Thing::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVa
 			else
 			{
 				auto FileName = Args[0]->Str();
-				LFile f;
-				if (f.Open(FileName, O_WRITE))
-					*ReturnValue = Export(f, Args[1]->Str());
+				LAutoPtr<LFile> f(new LFile);
+				if (f->Open(FileName, O_WRITE))
+				{
+					auto status = Export(AutoCast(f), Args[1]->Str());
+					*ReturnValue = status.status;
+				}
 				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for writing.\n", _FL, FileName);
 			}

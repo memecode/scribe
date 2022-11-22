@@ -1049,8 +1049,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			}
 			
 			f->SetSize(0);
-			LAutoPtr<LStreamI> str(f.Release());
-			ExportAsync(str, ExportMimeType);
+			Export(AutoCast(f), ExportMimeType);
 			break;
 		}
 		case IDM_EMPTY:
@@ -3212,7 +3211,8 @@ public:
 			if (t)
 			{
 				Mem.SetSize(0);
-				if (t->Export(Mem, FolderMime))
+				LAutoPtr<LStreamI> cp(new LMemStream(Mem));
+				if (t->Export(cp, FolderMime))
 					Sz += Mem.GetSize();
 				else
 					LAssert(0);
@@ -3324,15 +3324,15 @@ bool ScribeFolder::GetData(LArray<LDragData> &Data)
 
 				if (GetDropFileName())
 				{
-					LFile f;
-					if (f.Open(DropFileName, O_WRITE))
+					LAutoPtr<LFile> f(new LFile);
+					if (f->Open(DropFileName, O_WRITE))
 					{
 						if (GetItemType() == MAGIC_MAIL)
-							Export(f, sMimeMbox);
+							Export(AutoCast(f), sMimeMbox);
 						else if (GetItemType() == MAGIC_CONTACT)
-							Export(f, sMimeVCard);
+							Export(AutoCast(f), sMimeVCard);
 						else if (GetItemType() == MAGIC_CALENDAR)
-							Export(f, sMimeVCalendar);
+							Export(AutoCast(f), sMimeVCalendar);
 					}
 				}
 
@@ -3399,11 +3399,9 @@ void ScribeFolder::OnReceiveFiles(LArray<const char*> &Files)
 			// printf("[%i]=%s %s\n", i, File, MimeType.Get());
 
 			// Import the file...
-			LTextFile f;
-			if (f.Open(File, O_READ))
-			{
-				Import(f, MimeType);
-			}
+			LAutoPtr<LTextFile> f(new LTextFile);
+			if (f->Open(File, O_READ))
+				Import(AutoCast(f), MimeType);
 		}
 	}
 }
@@ -3538,150 +3536,148 @@ struct TempMsg : public LTempStream
 	}
 };
 
-bool ScribeFolder::Import(LStreamI &f, char *MimeType)
+ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 {
-	if (MimeType)
+	if (Stricmp(mimeType, sMimeMbox) == 0 ||
+		Stricmp(mimeType, "text/x-mail") == 0)
 	{
-		if (_stricmp(MimeType, sMimeMbox) == 0 ||
-			_stricmp(MimeType, "text/x-mail") == 0)
+		DoEvery Count(500);
+
+		// Mail box format...
+		LProgressDlg PrgDlg(Tree);
+		PrgDlg.SetDescription(LLoadString(IDS_MBOX_READING));
+		PrgDlg.SetType("K");
+		PrgDlg.SetScale(1.0/1024.0);
+		PrgDlg.SetRange(stream->GetSize());
+		LYield();
+		
+		LDataStoreI::StoreTrans Trans = GetObject()->GetStore()->StartTransaction();
+
+		MboxParser Parser(stream);
+		TempMsg *Tm;
+		LAutoStreamI Msg(Tm = new TempMsg);
+		while ( !Parser.GetEof()
+		        &&
+		        Tm->ReadMessage(&Parser))
 		{
-			DoEvery Count(500);
-
-			// Mail box format...
-			LProgressDlg PrgDlg(Tree);
-			PrgDlg.SetDescription(LLoadString(IDS_MBOX_READING));
-			PrgDlg.SetType("K");
-			PrgDlg.SetScale(1.0/1024.0);
-			PrgDlg.SetRange(f.GetSize());
-			LYield();
-			
-			LDataStoreI::StoreTrans Trans = GetObject()->GetStore()->StartTransaction();
-
-			MboxParser Parser(&f);
-			TempMsg *Tm;
-			LAutoStreamI Msg(Tm = new TempMsg);
-			while ( !Parser.GetEof()
-			        &&
-			        Tm->ReadMessage(&Parser))
+			Mail *m = dynamic_cast<Mail*>(App->CreateItem(MAGIC_MAIL, this, false));
+			if (m)
 			{
-				Mail *m = dynamic_cast<Mail*>(App->CreateItem(MAGIC_MAIL, this, false));
-				if (m)
-				{
-					m->OnAfterReceive(Msg);
-					m->SetFlags(MAIL_RECEIVED|MAIL_READ);
-					m->Save();
-					m->Update();
-				}
-
-				Msg.Reset(Tm = new TempMsg);
-				Parser.SeekNext();
-
-				PrgDlg.Value(f.GetPos());
-				if (Count.DoNow())
-					LYield();
+				m->OnAfterReceive(Msg);
+				m->SetFlags(MAIL_RECEIVED|MAIL_READ);
+				m->Save();
+				m->Update();
 			}
-		}
-		else if (_stricmp(MimeType, sMimeVCard) == 0)
-		{
-			VCard Io;
-			Thing *t;
-			bool Error = false;
-			int Imported = 0;
-			int Idx = 0;
 
-			while ((t = App->CreateItem(GetItemType(), 0, false)))
+			Msg.Reset(Tm = new TempMsg);
+			Parser.SeekNext();
+
+			PrgDlg.Value(stream->GetPos());
+			if (Count.DoNow())
+				LYield();
+		}
+	}
+	else if (Stricmp(mimeType, sMimeVCard) == 0)
+	{
+		VCard Io;
+		Thing *t;
+		bool Error = false;
+		int Imported = 0;
+		int Idx = 0;
+
+		while ((t = App->CreateItem(GetItemType(), 0, false)))
+		{
+			Contact *c = t->IsContact();
+			if (!c)
 			{
-				Contact *c = t->IsContact();
-				if (!c)
+				if (t->DecRefs())
+					DeleteObj(t);
+				Error = true;
+				break;
+			}
+
+			if (Io.Import(c->GetObject(), stream))
+			{
+				const char *First = 0, *Last = 0;
+				c->GetField(FIELD_FIRST_NAME, First);
+				c->GetField(FIELD_LAST_NAME, Last);
+				LgiTrace("Import %i %s %s\n", Idx, First, Last);
+
+				if (t->Save(this))
 				{
-					if (t->DecRefs())
-						DeleteObj(t);
+					Imported++;
+				}
+				else
+				{
 					Error = true;
 					break;
 				}
-
-				if (Io.Import(c->GetObject(), &f))
-				{
-					const char *First = 0, *Last = 0;
-					c->GetField(FIELD_FIRST_NAME, First);
-					c->GetField(FIELD_LAST_NAME, Last);
-					LgiTrace("Import %i %s %s\n", Idx, First, Last);
-
-					if (t->Save(this))
-					{
-						Imported++;
-					}
-					else
-					{
-						Error = true;
-						break;
-					}
-				}
-				else
-				{
-					if (t->DecRefs())
-						DeleteObj(t);
-					break;
-				}
-
-				Idx++;
 			}
-			
-			if (Error)
+			else
 			{
-				LgiMsg(	App,
-						LLoadString(IDS_ERROR_IMPORT_COUNT),
-						AppName, MB_OK,
-						LLoadString(IDC_CONTACTS),
-						Imported);
-			}
-
-			return Error == false;
-		}
-		else if (_stricmp(MimeType, sMimeVCalendar) == 0)
-		{
-			VCal Io;
-			bool Status = false;
-			Thing *t;
-
-			while ((t = App->CreateItem(GetItemType(), 0, false)))
-			{
-				if (Io.Import(t->GetObject(), &f))
-				{
-					if (!(Status = t->Save(this)))
-					{
-						break;
-					}
-				}
-				else
-				{
-					if (t->DecRefs())
-						DeleteObj(t);
-					break;
-				}
-			}
-
-			return Status;
-		}
-		else if (GetObject())
-		{
-			Thing *t = App->CreateThingOfType(GetItemType(), GetObject()->GetStore()->Create(GetItemType()));
-			if (t)
-			{
-				if (t->Import(f, MimeType) &&
-					t->Save(this))
-				{
-					return true;
-				}
-				else if (t->DecRefs())
-				{
+				if (t->DecRefs())
 					DeleteObj(t);
+				break;
+			}
+
+			Idx++;
+		}
+		
+		if (Error)
+		{
+			LgiMsg(	App,
+					LLoadString(IDS_ERROR_IMPORT_COUNT),
+					AppName, MB_OK,
+					LLoadString(IDC_CONTACTS),
+					Imported);
+		}
+
+		return Error ? Store3Error : Store3Success;
+	}
+	else if (Stricmp(mimeType, sMimeVCalendar) == 0)
+	{
+		VCal Io;
+		bool Status = false;
+		Thing *t;
+
+		while ((t = App->CreateItem(GetItemType(), 0, false)))
+		{
+			if (Io.Import(t->GetObject(), stream))
+			{
+				if (!(Status = t->Save(this)))
+				{
+					break;
 				}
+			}
+			else
+			{
+				if (t->DecRefs())
+					DeleteObj(t);
+				break;
+			}
+		}
+
+		return Status ? Store3Success : Store3Error;
+	}
+	else if (GetObject())
+	{
+		Thing *t = App->CreateThingOfType(GetItemType(), GetObject()->GetStore()->Create(GetItemType()));
+		if (t)
+		{
+			if (t->Import(stream, mimeType) &&
+				t->Save(this))
+			{
+				return Store3Success;
+			}
+			else if (t->DecRefs())
+			{
+				DeleteObj(t);
 			}
 		}
 	}
+	else return Store3NotImpl;
 
-	return false;
+	return Store3Error;
 }
 
 class FolderExportTask : public LProgressDlg
@@ -3773,7 +3769,8 @@ public:
 				Thing *t = Folder->Items[Idx++];
 				if (t)
 				{
-					if (t->Export(*Out, MimeType))
+					LAutoPtr<LStreamI> wrapper(new LProxyStream(Out));
+					if (t->Export(wrapper, MimeType))
 					{
 						Value(Idx);
 					}
@@ -3814,6 +3811,7 @@ const char *ScribeFolder::GetStorageMimeType()
 	return NULL;
 }
 
+/*
 LProgressDlg *ScribeFolder::ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType)
 {
 	if (!MimeType)
@@ -3824,22 +3822,23 @@ LProgressDlg *ScribeFolder::ExportAsync(LAutoPtr<LStreamI> f, const char *MimeTy
 
 	return new FolderExportTask(f, this, MimeType);
 }
+*/
 
-bool ScribeFolder::Export(LStreamI &f, char *MimeType)
+ThingType::IoProgress ScribeFolder::Export(IoProgressImplArgs)
 {
-	bool Status = false;
+	Store3Status Status = Store3Error;
 
-	if (MimeType)
+	if (mimeType)
 	{
 		LoadThings();
 
-		bool Mbox = _stricmp(MimeType, sMimeMbox) == 0;
+		bool Mbox = Stricmp(mimeType, sMimeMbox) == 0;
 		LProgressDlg Dlg(App);
 		
 		App->OnFolderTask(&Dlg, true);
 
 		// Clear the files contents
-		f.SetSize(0);
+		stream->SetSize(0);
 
 		// Setup progress UI
 		Dlg.SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
@@ -3850,7 +3849,7 @@ bool ScribeFolder::Export(LStreamI &f, char *MimeType)
 		// Process all the container's items
 		for (auto i: Items)
 		{
-			Status |= i->Export(f, MimeType);
+			Status |= i->Export(stream, mimeType);
 			
 			Dlg.Value(Dlg.Value()+1);
 			Dlg.Invalidate((LRect*)0, true);
@@ -4095,9 +4094,12 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 			else
 			{
 				auto FileName = Args[0]->Str();
-				LFile f;
-				if (f.Open(FileName, O_READ))
-					*ReturnValue = Import(f, Args[1]->Str());
+				LAutoPtr<LFile> f(new LFile);
+				if (f->Open(FileName, O_READ))
+				{
+					auto p = Import(AutoCast(f), Args[1]->Str());
+					*ReturnValue = p.status;
+				}
 				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for reading.\n", _FL, FileName);
 			}
@@ -4111,9 +4113,12 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 			else
 			{
 				auto FileName = Args[0]->Str();
-				LFile f;
-				if (f.Open(FileName, O_WRITE))
-					*ReturnValue = Export(f, Args[1]->Str());
+				LAutoPtr<LFile> f(new LFile);
+				if (f->Open(FileName, O_WRITE))
+				{
+					auto p = Export(AutoCast(f), Args[1]->Str());
+					*ReturnValue = p.status;
+				}
 				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for writing.\n", _FL, FileName);
 			}

@@ -312,6 +312,9 @@ public:
 	int OnNotify(LViewI *Ctrl, LNotification n);
 };
 
+#define IoProgressImplArgs LAutoPtr<LStreamI> stream, const char *mimeType, IoProgressCallback cb
+#define IoProgressFnArgs IoProgressImplArgs = NULL
+
 class ScribeClass ThingType :
 	public LDom,
 	public LDataUserI
@@ -339,6 +342,45 @@ protected:
 	LArray<ThingEventInfo*> OnLoadCallbacks;
 
 public:
+	typedef std::function<void(struct IoProgress*)> IoProgressCallback;
+	struct IoProgress
+	{
+		// This is the main result to look at:
+		//		Store3NotImpl - typically means the mime type is wrong.
+		//		Store3Error - an error occured.
+		//		Store3Delayed - means the operation will take a long time.
+		//			However progress is report via 'prog' if not NULL.
+		//			And the 'onComplete' handler will be called at the end.
+		//		Store3Success - the operation successfully completed.
+		Store3Status status = Store3NotImpl;
+		
+		// Callback once the operation has completed. Check 'status' and 
+		// 'errMsg' for details.
+		IoProgressCallback onComplete;
+
+		// Optional progress for the operation.
+		Progress *prog = NULL;
+		
+		// Optional error message for the operation.
+		LString errMsg;
+		
+		IoProgress(Store3Status s)
+		{
+			status = s;
+		}
+		
+		operator bool()
+		{
+			return status > Store3Error;
+		}
+	};
+	
+	template<typename T>
+	LAutoPtr<LStreamI> AutoCast(LAutoPtr<T> ap)
+	{
+		return LAutoPtr<LStreamI>(ap.Release());
+	}
+
 	static LArray<ThingType*> DirtyThings;
 	ScribeWnd *App = NULL;
 
@@ -455,8 +497,8 @@ public:
 
 	// Import / Export
 	virtual bool GetFormats(bool Export, LString::Array &MimeTypes) { return false; }
-	virtual bool Import(LStreamI &f, const char *MimeType) = 0;
-	virtual bool Export(LStreamI &f, const char *MimeType) = 0;
+	virtual IoProgress Import(IoProgressFnArgs) = 0;
+	virtual IoProgress Export(IoProgressFnArgs) = 0;
 	
 	/// This exports all the selected items
 	bool ExportAll(LViewI *Parent, const char *ExportMimeType);
@@ -620,8 +662,8 @@ public:
 	LStreamI *GotoObject(const char *file, int line);
 	int Sizeof();
 	bool Serialize(LFile &f, bool Write);
-	bool Import(LStreamI &f, const char *MimeType) override { return false; }
-	bool Export(LStreamI &f, const char *MimeType) override { return false; }
+	IoProgress Import(IoProgressFnArgs) override { return Store3Error; }
+	IoProgress Export(IoProgressFnArgs) override { return Store3Error; }
 
 	bool SaveTo(char *FileName, bool Quite = false, LView *Parent = 0);
 
@@ -700,8 +742,8 @@ public:
 
 	// Import/Export
 	bool GetFormats(bool Export, LString::Array &MimeTypes) override;
-	bool Import(LStreamI &f, const char *MimeType) override;
-	bool Export(LStreamI &f, const char *MimeType) override;
+	IoProgress Import(IoProgressFnArgs) override;
+	IoProgress Export(IoProgressFnArgs) override;
 	char *GetDropFileName() override;
 	bool GetDropFiles(LString::Array &Files) override;
 };
@@ -742,8 +784,8 @@ public:
 	Store3ItemTypes Type() override { return MAGIC_GROUP; }
 	ThingUi *DoUI(MailContainer *c = 0) override;
 	int Compare(LListItem *Arg, ssize_t Field) override;
-	bool Import(LStreamI &f, const char *MimeType) override { return false; }
-	bool Export(LStreamI &f, const char *MimeType) override { return false; }
+	IoProgress Import(IoProgressFnArgs) override { return NULL; }
+	IoProgress Export(IoProgressFnArgs) override { return NULL; }
 	bool GetAddresses(List<char> &a);
 	LString::Array GetAddresses();
 	char *GetDropFileName() override;
@@ -1078,8 +1120,8 @@ public:
 
 	// Import / Export
 	bool GetFormats(bool Export, LString::Array &MimeTypes) override;
-	bool Import(LStreamI &f, const char *MimeType) override;
-	bool Export(LStreamI &f, const char *MimeType) override;
+	IoProgress Import(IoProgressFnArgs) override;
+	IoProgress Export(IoProgressFnArgs) override;
 
 	// ListItem
 	void Update() override;
@@ -1269,9 +1311,8 @@ public:
 
 	// Import/Export
 	bool GetFormats(bool Export, LString::Array &MimeTypes);
-	bool Import(LStreamI &f, char *MimeType);
-	bool Export(LStreamI &f, char *MimeType);
-	LProgressDlg *ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType);
+	IoProgress Import(IoProgressFnArgs);
+	IoProgress Export(IoProgressFnArgs);
 	const char *GetStorageMimeType();
 
 	// Dom
@@ -1398,8 +1439,8 @@ public:
 	char *GetDropFileName() override;
 	bool GetDropFiles(LString::Array &Files) override;
 	bool GetFormats(bool Export, LString::Array &MimeTypes) override;
-	bool Import(LStreamI &f, const char *MimeType) override;
-	bool Export(LStreamI &f, const char *MimeType) override;
+	IoProgress Import(IoProgressFnArgs) override;
+	IoProgress Export(IoProgressFnArgs) override;
 
 	// Dom
 	bool Evaluate(char *s, LVariant &v);

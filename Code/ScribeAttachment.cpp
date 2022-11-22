@@ -408,7 +408,7 @@ void Attachment::OnOpen(LView *Parent, char *Dest)
 			LAutoPtr<LStreamI> f(GotoObject(_FL));
 			if (f)
 			{
-				if (c->Import(*f, GetMimeType()))
+				if (c->Import(f, GetMimeType()))
 				{
 					c->DoUI();
 				}
@@ -886,7 +886,7 @@ void Attachment::OnMouseClick(LMouse &m)
 							LAutoPtr<LStreamI> f(GotoObject(_FL));
 							if (f)
 							{
-								if (c->Import(*f, mt))
+								if (c->Import(c->AutoCast(f), mt))
 								{
 									c->Save(Cal);
 									c->DoUI();

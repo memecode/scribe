@@ -1697,34 +1697,34 @@ bool Calendar::GetFormats(bool Export, LString::Array &MimeTypes)
 	return MimeTypes.Length() > 0;
 }
 
-bool Calendar::Import(LStreamI &f, const char *MimeType)
+Thing::IoProgress Calendar::Import(IoProgressImplArgs)
 {
-	bool Status = false;
+	Store3Status Status = Store3Error;
+	
 	if
 	(
-		MimeType &&
-		(
-			_stricmp(MimeType, sMimeVCalendar) == 0
-			||
-			_stricmp(MimeType, sMimeICalendar) == 0
-		)
+		Stricmp(mimeType, sMimeVCalendar) == 0
+		||
+		Stricmp(mimeType, sMimeICalendar) == 0
 	)
 	{
 		VCal vCal;
-		Status = vCal.Import(GetObject(), &f);
+		if (vCal.Import(GetObject(), stream))
+			Status = Store3Success;
 	}
 
 	return Status;
 }
 
-bool Calendar::Export(LStreamI &f, const char *MimeType)
+Thing::IoProgress Calendar::Export(IoProgressImplArgs)
 {
-	bool Status = false;
+	Store3Status Status = Store3Error;
 
-	if (MimeType && _stricmp(MimeType, sMimeVCalendar) == 0)
+	if (Stricmp(mimeType, sMimeVCalendar) == 0)
 	{
 		VCal vCal;
-		Status = vCal.Export(GetObject(), &f);
+		if (vCal.Export(GetObject(), stream))
+			Status = Store3Success;
 	}
 
 	return Status;
@@ -1749,11 +1749,11 @@ bool Calendar::GetDropFiles(LString::Array &Files)
 	{
 		if (!LFileExists(DropFileName))
 		{
-			LFile F;
-			if (F.Open(DropFileName, O_WRITE))
+			LAutoPtr<LFile> F(new LFile);
+			if (F->Open(DropFileName, O_WRITE))
 			{
-				F.SetSize(0);
-				Export(F, sMimeVCalendar);
+				F->SetSize(0);
+				Export(AutoCast(F), sMimeVCalendar);
 			}
 		}
 

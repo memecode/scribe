@@ -3317,7 +3317,7 @@ bool Mail::AddCalendarEvent(LViewI *Parent, bool AddPopupReminder, LString *Msg)
 			LAutoPtr<LStreamI> Data(a->GotoObject(_FL));
 			if (Data)
 			{
-				if (Event->Import(*Data, Mt))
+				if (Event->Import(AutoCast(Data), Mt))
 				{
 					auto c = Event->IsCalendar();
 					auto obj = c ? c->GetObject() : NULL;
@@ -5975,11 +5975,11 @@ bool Mail::GetDropFiles(LString::Array &Files)
 
 	if (!LFileExists(DropFileName))
 	{
-		LFile F;
-		if (F.Open(DropFileName, O_WRITE))
+		LAutoPtr<LFile> F(new LFile);
+		if (F->Open(DropFileName, O_WRITE))
 		{
-			F.SetSize(0);
-			if (!Export(F, sMimeMessage))
+			F->SetSize(0);
+			if (!Export(AutoCast(F), sMimeMessage))
 				return false;
 		}
 		else return false;
@@ -9339,16 +9339,16 @@ bool Mail::GetFormats(bool Export, LString::Array &MimeTypes)
 	return MimeTypes.Length() > 0;
 }
 
-bool Mail::Import(LStreamI &f, const char *MimeType)
+Thing::IoProgress Mail::Import(IoProgressImplArgs)
 {
-	if (!MimeType)
-		return false;
+	if (!mimeType)
+		return Store3Error;
 
-	if (_stricmp(MimeType, sMimeMessage))
-		return false;
+	if (Stricmp(mimeType, sMimeMessage))
+		return Store3NotImpl;
 
 	// Single email..
-	OnAfterReceive(&f);
+	OnAfterReceive(stream);
 
 	int Flags = GetFlags();
 	Flags &= ~MAIL_CREATED;
@@ -9357,20 +9357,20 @@ bool Mail::Import(LStreamI &f, const char *MimeType)
 
 	Update();
 
-	return true;
+	return Store3Success;
 }
 
 #define TIMEOUT_OBJECT_LOAD		20000
 
-bool Mail::Export(LStreamI &f, const char *MimeType)
+Thing::IoProgress Mail::Export(IoProgressImplArgs)
 {
-	if (!MimeType)
+	if (!mimeType)
 	{
 		LAssert(!"No mimetype.");
-		return false;
+		return Store3Error;
 	}
 
-	if (!Stricmp(MimeType, "text/plain"))
+	if (!Stricmp(mimeType, "text/plain"))
 	{
 		LStringPipe Buf;
 		char Str[256];
@@ -9418,19 +9418,18 @@ bool Mail::Export(LStreamI &f, const char *MimeType)
 		char *s = Buf.NewStr();
 		if (s)
 		{
-			f.Write(s, strlen(s));
+			stream->Write(s, strlen(s));
 			DeleteArray(s);
 		}
 		else
 		{
-			return false;
+			return Store3Error;
 		}
 
-		return true;
+		return Store3Success;
 	}
-	else if (!Stricmp(MimeType, sMimeMbox))
+	else if (!Stricmp(mimeType, sMimeMbox))
 	{
-		bool Status = false;
 		char Temp[256];
 		
 		// generate from header
@@ -9453,13 +9452,13 @@ bool Mail::Export(LStreamI &f, const char *MimeType)
 		strcat(Temp, "\r\n");
 		
 		// write mail
-		f.Write(Temp, strlen(Temp));
-		Status = Export(f, sMimeMessage);
-		f.Write((char*)"\r\n.\r\n", 2);
+		stream->Write(Temp, strlen(Temp));
+		auto Status = Export(stream, sMimeMessage);
+		stream->Write((char*)"\r\n.\r\n", 2);
 
 		return Status;
 	}
-	else if (!Stricmp(MimeType, sMimeMessage))
+	else if (!Stricmp(mimeType, sMimeMessage))
 	{
 		// This function can't be asyncronous, it must complete with UI or waiting for a callback.
 		// Because it is used by the drag and drop system. Which won't wait.
@@ -9467,27 +9466,27 @@ bool Mail::Export(LStreamI &f, const char *MimeType)
 		if (state != Store3Loaded)
 		{
 			LAssert(!"Object not loaded.");
-			return false;
+			return Store3Error;
 		}			
 		if (!GetObject())
 		{
 			LAssert(!"No object?");
-			return false;
+			return Store3Error;
 		}
 		
 		auto Data = GetObject()->GetStream(_FL);
 		if (!Data)
 		{
 			LgiTrace("%s:%i - Object for export has no data.\n", _FL);
-			return false;
+			return Store3Error;
 		}
 		
 		Data->SetPos(0);
 		LCopyStreamer Cp(512<<10);
-		return Cp.Copy(Data, &f) > 0;
+		return Cp.Copy(Data, stream) > 0 ? Store3Success : Store3Error;
 	}
 
-	return false;
+	return Store3NotImpl;
 }
 
 char *Mail::GetNewText(int Max, const char *AsCp)
@@ -9983,10 +9982,10 @@ bool Mail::LoadFromFile(char *File)
 {
 	if (File)
 	{
-		LFile f;
-		if (f.Open(File, O_READ))
+		LAutoPtr<LFile> f(new LFile);
+		if (f->Open(File, O_READ))
 		{
-			return Import(f, sMimeMessage);
+			return Import(AutoCast(f), sMimeMessage);
 		}
 	}
 

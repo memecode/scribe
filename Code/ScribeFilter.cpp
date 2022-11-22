@@ -1373,15 +1373,15 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 			auto Fn = m->GetDropFileName();
 			p += LGetLeaf(Fn);
 			
-			LFile out;
-			if (!out.Open(p, O_WRITE))
+			LAutoPtr<LFile> out(new LFile);
+			if (!out->Open(p, O_WRITE))
 			{
 				if (Log)
 					Log->Print("\tACTION_EXPORT(%s) failed: couldn't open file: %s.\n", Arg1.Get(), p.GetFull().Get());
 				break;
 			}
 			
-			if (!m->Export(out, sMimeMessage))
+			if (!m->Export(m->AutoCast(out), sMimeMessage))
 			{
 				if (Log)
 					Log->Print("\tACTION_EXPORT(%s) failed: couldn't export file.\n", Arg1.Get());
@@ -2233,85 +2233,84 @@ bool Filter::GetDropFiles(LString::Array &Files)
 {
 	char Tmp[MAX_PATH_LEN];
 	LMakePath(Tmp, sizeof(Tmp), ScribeTempPath(), GetDropFileName());
-	LFile Out;
-	if (!Out.Open(Tmp, O_WRITE))
+	LAutoPtr<LFile> Out(new LFile);
+	if (!Out->Open(Tmp, O_WRITE))
 		return false;
 
-	if (!Export(Out, sTextXml))
+	if (!Export(AutoCast(Out), sTextXml))
 		return false;
 
 	Files.Add(Tmp);
 	return true;
 }
 
-bool Filter::Import(LStreamI &f, const char *MimeType)
+Thing::IoProgress Filter::Import(IoProgressImplArgs)
 {
-	bool Status = false;
+	if (Stricmp(mimeType, sTextXml) &&
+	    Stricmp(mimeType, sMimeXml))
+	    return Store3NotImpl;
 
-	if (!_stricmp(MimeType, sTextXml) ||
-	    !_stricmp(MimeType, sMimeXml))
+	LXmlTree Tree;
+	LXmlTag r;
+	if (!Tree.Read(&r, stream))
+		return Store3Error;
+
+	if (!r.IsTag("Filter"))
+		return Store3Error;
+
+	Empty();
+
+	LXmlTag *t = r.GetChildTag("Name");
+	if (t && t->GetContent())
+		SetName(t->GetContent());
+	SetIndex(r.GetAsInt("index"));
+
+	Store3Status status = Store3Error;
+	if ((t = r.GetChildTag(ELEMENT_CONDITIONS)))
 	{
-		LXmlTree Tree;
-		LXmlTag r;
-		if (Tree.Read(&r, &f))
+		LStringPipe p;
+		if (Tree.Write(t, &p))
 		{
-			if (r.IsTag("Filter"))
+			LAutoString s(p.NewStr());
+			ConditionsCache.Reset();
+			SetConditionsXml(s);
+		}
+
+		if ((t = r.GetChildTag("Actions")))
+		{
+			LStringPipe p;
+			if (Tree.Write(t, &p))
 			{
-				Empty();
-
-				LXmlTag *t = r.GetChildTag("Name");
-				if (t && t->GetContent())
-					SetName(t->GetContent());
-				SetIndex(r.GetAsInt("index"));
-
-				if ((t = r.GetChildTag(ELEMENT_CONDITIONS)))
-				{
-					LStringPipe p;
-					if (Tree.Write(t, &p))
-					{
-						LAutoString s(p.NewStr());
-						ConditionsCache.Reset();
-						SetConditionsXml(s);
-					}
-
-					if ((t = r.GetChildTag("Actions")))
-					{
-						LStringPipe p;
-						if (Tree.Write(t, &p))
-						{
-							LAutoString s(p.NewStr());
-							SetActionsXml(s);
-							Status = true;
-						}
-					}
-				}
+				LAutoString s(p.NewStr());
+				SetActionsXml(s);
+				status = Store3Success;
 			}
 		}
 	}
-
-	return Status;
+	
+	return status;
 }
 
-bool Filter::Export(LStreamI &f, const char *MimeType)
+Thing::IoProgress Filter::Export(IoProgressImplArgs)
 {
-	if (!_stricmp(MimeType, sMimeXml))
-	{
-		LXmlTag r("Filter");
-		LXmlTag *t;
-		if ((t = r.CreateTag("Name")))
-			t->SetContent(GetName());
-		r.SetAttr("index", GetIndex());
-
-		LAutoPtr<LXmlTag> Cond = Parse(false);
-		r.InsertTag(Cond.Release());
-		LAutoPtr<LXmlTag> Act = Parse(true);
-		r.InsertTag(Act.Release());
+	if (Stricmp(mimeType, sMimeXml))
+		return Store3NotImpl;
 		
-		LXmlTree tree;
-		return tree.Write(&r, &f);
-	}
 
-	return false;
+	LXmlTag r("Filter");
+	LXmlTag *t;
+	if ((t = r.CreateTag("Name")))
+		t->SetContent(GetName());
+	r.SetAttr("index", GetIndex());
+
+	LAutoPtr<LXmlTag> Cond = Parse(false);
+	r.InsertTag(Cond.Release());
+	LAutoPtr<LXmlTag> Act = Parse(true);
+	r.InsertTag(Act.Release());
+	
+	LXmlTree tree;
+
+	return tree.Write(&r, stream) ? Store3Success : Store3Error;
 }
 
 /// This filters a list of email. The email will have it's NewEmail state set to

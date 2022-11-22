@@ -6259,10 +6259,10 @@ void ScribeWnd::OnReceiveFiles(LArray<const char*> &Files)
 
 				if (t)
 				{
-					LFile str;
-					if (str.Open(f, O_READ))
+					LAutoPtr<LFile> str(new LFile);
+					if (str->Open(f, O_READ))
 					{
-						if (t->Import(str, MimeType))
+						if (t->Import(t->AutoCast(str), MimeType))
 						{
 							if (HasSend)
 							{
@@ -11479,12 +11479,12 @@ void ScribeWnd::MailMerge(LArray<ListAddr*> &Contacts, const char *FileName, Mai
 		LAutoPtr<Mail> ImportEmail;
 		if (FileName)
 		{
-			LFile File;
-			if (File.Open(FileName, O_READ))
+			LAutoPtr<LFile> File(new LFile);
+			if (File->Open(FileName, O_READ))
 			{
 				Thing *t = CreateItem(MAGIC_MAIL, Outbox, false);
 				ImportEmail.Reset(Source = t->IsMail());
-				if (!Source->Import(File, sMimeMessage))
+				if (!Source->Import(Source->AutoCast(File), sMimeMessage))
 				{
 					Source = 0;
 				}
