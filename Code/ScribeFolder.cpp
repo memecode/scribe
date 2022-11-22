@@ -3760,11 +3760,14 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 			IoProgressError("Failed to create contact");
 
 		if (!t->Import(stream, mimeType))
+		{
+			if (t->DecRefs()) DeleteObj(t);
 			IoProgressError("Contact import failed.");
+		}
+
 		if (!t->Save(this))
 		{
-			if (t->DecRefs())
-				DeleteObj(t);
+			if (t->DecRefs()) DeleteObj(t);
 			IoProgressError("Contact save failed.");
 		}
 
