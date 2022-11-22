@@ -2248,15 +2248,15 @@ Thing::IoProgress Filter::Import(IoProgressImplArgs)
 {
 	if (Stricmp(mimeType, sTextXml) &&
 	    Stricmp(mimeType, sMimeXml))
-	    return Store3NotImpl;
+	    IoProgressNotImpl();
 
 	LXmlTree Tree;
 	LXmlTag r;
 	if (!Tree.Read(&r, stream))
-		return Store3Error;
+		IoProgressError("Xml parse error.");
 
 	if (!r.IsTag("Filter"))
-		return Store3Error;
+		IoProgressError("No filter tag.");
 
 	Empty();
 
@@ -2265,7 +2265,6 @@ Thing::IoProgress Filter::Import(IoProgressImplArgs)
 		SetName(t->GetContent());
 	SetIndex(r.GetAsInt("index"));
 
-	Store3Status status = Store3Error;
 	if ((t = r.GetChildTag(ELEMENT_CONDITIONS)))
 	{
 		LStringPipe p;
@@ -2283,12 +2282,12 @@ Thing::IoProgress Filter::Import(IoProgressImplArgs)
 			{
 				LAutoString s(p.NewStr());
 				SetActionsXml(s);
-				status = Store3Success;
 			}
+			else IoProgressError("Xml write failed.");
 		}
 	}
 	
-	return status;
+	IoProgressSuccess();
 }
 
 Thing::IoProgress Filter::Export(IoProgressImplArgs)

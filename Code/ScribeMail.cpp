@@ -9342,10 +9342,10 @@ bool Mail::GetFormats(bool Export, LString::Array &MimeTypes)
 Thing::IoProgress Mail::Import(IoProgressImplArgs)
 {
 	if (!mimeType)
-		return Store3Error;
+		IoProgressError("No mime type.");
 
 	if (Stricmp(mimeType, sMimeMessage))
-		return Store3NotImpl;
+		IoProgressNotImpl();
 
 	// Single email..
 	OnAfterReceive(stream);
@@ -9357,18 +9357,15 @@ Thing::IoProgress Mail::Import(IoProgressImplArgs)
 
 	Update();
 
-	return Store3Success;
+	IoProgressSuccess();
 }
 
 #define TIMEOUT_OBJECT_LOAD		20000
 
 Thing::IoProgress Mail::Export(IoProgressImplArgs)
 {
-	if (!mimeType)
-	{
-		LAssert(!"No mimetype.");
-		return Store3Error;
-	}
+	if (!mimeType)	
+		IoProgressError("No mimetype.");
 
 	if (!Stricmp(mimeType, "text/plain"))
 	{
@@ -9415,18 +9412,12 @@ Thing::IoProgress Mail::Export(IoProgressImplArgs)
 		Buf.Push(GetBody());
 
 		// Write the output
-		char *s = Buf.NewStr();
-		if (s)
-		{
-			stream->Write(s, strlen(s));
-			DeleteArray(s);
-		}
-		else
-		{
-			return Store3Error;
-		}
+		auto s = Buf.NewGStr();
+		if (!s)
+			IoProgressError("No data to output.");
+		stream->Write(s.Get(), s.Length());
 
-		return Store3Success;
+		IoProgressSuccess();
 	}
 	else if (!Stricmp(mimeType, sMimeMbox))
 	{
@@ -9453,40 +9444,43 @@ Thing::IoProgress Mail::Export(IoProgressImplArgs)
 		
 		// write mail
 		stream->Write(Temp, strlen(Temp));
-		auto Status = Export(stream, sMimeMessage);
-		stream->Write((char*)"\r\n.\r\n", 2);
+		auto Status = Export(stream, sMimeMessage, [cb](auto io, auto stream)
+		{
+			if (io->status == Store3Success)
+				stream->Write((char*)"\r\n.\r\n", 2);
+			else if (io->status == Store3Delayed)
+				LAssert(!"We should never get delayed here... it's the callback!");
+
+			if (cb)
+				cb(io, stream);
+		});
 
 		return Status;
 	}
 	else if (!Stricmp(mimeType, sMimeMessage))
 	{
-		// This function can't be asyncronous, it must complete with UI or waiting for a callback.
+		// This function can't be asynchronous, it must complete with UI or waiting for a callback.
 		// Because it is used by the drag and drop system. Which won't wait.
 		auto state = GetLoaded();
 		if (state != Store3Loaded)
-		{
-			LAssert(!"Object not loaded.");
-			return Store3Error;
-		}			
+			IoProgressError("Mail not loaded.");
+
 		if (!GetObject())
-		{
-			LAssert(!"No object?");
-			return Store3Error;
-		}
+			IoProgressError("No store object.");
 		
 		auto Data = GetObject()->GetStream(_FL);
 		if (!Data)
-		{
-			LgiTrace("%s:%i - Object for export has no data.\n", _FL);
-			return Store3Error;
-		}
+			IoProgressError("Mail for export has no data.");
 		
 		Data->SetPos(0);
 		LCopyStreamer Cp(512<<10);
-		return Cp.Copy(Data, stream) > 0 ? Store3Success : Store3Error;
+		if (Cp.Copy(Data, stream) <= 0)
+			IoProgressError("Mail copy stream failed.");
+
+		IoProgressSuccess();
 	}
 
-	return Store3NotImpl;
+	IoProgressNotImpl();
 }
 
 char *Mail::GetNewText(int Max, const char *AsCp)

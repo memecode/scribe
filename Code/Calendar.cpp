@@ -1699,35 +1699,28 @@ bool Calendar::GetFormats(bool Export, LString::Array &MimeTypes)
 
 Thing::IoProgress Calendar::Import(IoProgressImplArgs)
 {
-	Store3Status Status = Store3Error;
-	
-	if
-	(
-		Stricmp(mimeType, sMimeVCalendar) == 0
-		||
-		Stricmp(mimeType, sMimeICalendar) == 0
-	)
-	{
-		VCal vCal;
-		if (vCal.Import(GetObject(), stream))
-			Status = Store3Success;
-	}
+	if (Stricmp(mimeType, sMimeVCalendar) &&
+		Stricmp(mimeType, sMimeICalendar))
+		IoProgressNotImpl();
 
-	return Status;
+
+	VCal vCal;
+	if (!vCal.Import(GetObject(), stream))
+		IoProgressError("vCal import failed.");
+
+	IoProgressSuccess();
 }
 
 Thing::IoProgress Calendar::Export(IoProgressImplArgs)
 {
-	Store3Status Status = Store3Error;
+	if (Stricmp(mimeType, sMimeVCalendar))
+		IoProgressNotImpl();
 
-	if (Stricmp(mimeType, sMimeVCalendar) == 0)
-	{
-		VCal vCal;
-		if (vCal.Export(GetObject(), stream))
-			Status = Store3Success;
-	}
+	VCal vCal;
+	if (!vCal.Export(GetObject(), stream))
+		IoProgressError("vCal export failed.");
 
-	return Status;
+	IoProgressSuccess();
 }
 
 char *Calendar::GetDropFileName()

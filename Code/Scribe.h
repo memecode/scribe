@@ -314,6 +314,24 @@ public:
 
 #define IoProgressImplArgs		LAutoPtr<LStreamI> stream, const char *mimeType, IoProgressCallback cb
 #define IoProgressFnArgs		IoProgressImplArgs = NULL
+#define IoProgressError(err)	\
+	{ \
+		IoProgress p(Store3Error, err); \
+		if (cb) cb(&p, stream); \
+		return p; \
+	}
+#define IoProgressSuccess()	\
+	{ \
+		IoProgress p(Store3Success); \
+		if (cb) cb(&p, stream); \
+		return p; \
+	}
+#define IoProgressNotImpl()	\
+	{ \
+		IoProgress p(Store3NotImpl); \
+		if (cb) cb(&p, stream); \
+		return p; \
+	}
 
 class ScribeClass ThingType :
 	public LDom,
@@ -343,7 +361,7 @@ protected:
 
 public:
 	struct IoProgress;
-	typedef std::function<void(IoProgress*)> IoProgressCallback;
+	typedef std::function<void(IoProgress*,LStreamI*)> IoProgressCallback;
 	struct IoProgress
 	{
 		// This is the main result to look at:
@@ -363,9 +381,11 @@ public:
 		// status == Store3Error.
 		LString errMsg;
 		
-		IoProgress(Store3Status s)
+		IoProgress(Store3Status s, const char *err = NULL)
 		{
 			status = s;
+			if (err)
+				errMsg = err;
 		}
 		
 		operator bool()
@@ -496,6 +516,12 @@ public:
 
 	// Import / Export
 	virtual bool GetFormats(bool Export, LString::Array &MimeTypes) { return false; }
+
+	// Anything implementing 2 functions should mostly be using one of these 
+	// to "return" an IoProgress and process any callback:
+	//		IoProgressError(msg)
+	//		IoProgressNotImpl()
+	//		IoProgressSuccess()
 	virtual IoProgress Import(IoProgressFnArgs) = 0;
 	virtual IoProgress Export(IoProgressFnArgs) = 0;
 	
@@ -783,8 +809,8 @@ public:
 	Store3ItemTypes Type() override { return MAGIC_GROUP; }
 	ThingUi *DoUI(MailContainer *c = 0) override;
 	int Compare(LListItem *Arg, ssize_t Field) override;
-	IoProgress Import(IoProgressFnArgs) override { return NULL; }
-	IoProgress Export(IoProgressFnArgs) override { return NULL; }
+	IoProgress Import(IoProgressFnArgs) override { return Store3NotImpl; }
+	IoProgress Export(IoProgressFnArgs) override { return Store3NotImpl; }
 	bool GetAddresses(List<char> &a);
 	LString::Array GetAddresses();
 	char *GetDropFileName() override;

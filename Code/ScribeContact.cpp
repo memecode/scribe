@@ -1595,33 +1595,26 @@ bool Contact::GetFormats(bool Export, LString::Array &MimeTypes)
 
 Thing::IoProgress Contact::Import(IoProgressImplArgs)
 {
-	Store3Status Status = Store3Error;
+	if (Stricmp(mimeType, sMimeVCard))
+		IoProgressNotImpl();
+	
+	VCard vCard;
+	if (!vCard.Import(GetObject(), stream))
+		IoProgressError("vCard import failed.");
 
-	if (Stricmp(mimeType, sMimeVCard) == 0)
-	{
-		VCard vCard;
-		if (vCard.Import(GetObject(), stream))
-			Status = Store3Success;
-	}
-
-	return Status;
+	IoProgressSuccess();
 }
 
 Thing::IoProgress Contact::Export(IoProgressImplArgs)
 {
-	Store3Status Status = Store3Error;
+	if (Stricmp(mimeType, sMimeVCard))
+		IoProgressNotImpl();
 
-	if (mimeType && GetObject())
-	{
-		if (Stricmp(mimeType, sMimeVCard) == 0)
-		{
-			VCard vCard;
-			if (vCard.Export(GetObject(), stream))
-				Status = Store3Success;
-		}
-	}
+	VCard vCard;
+	if (!vCard.Export(GetObject(), stream))
+		IoProgressError("vCard export failed.");
 
-	return Status;
+	IoProgressSuccess();
 }
 
 char *Contact::GetDropFileName()

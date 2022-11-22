@@ -3545,7 +3545,11 @@ class FolderTask : public LProgressDlg
 protected:
 	ScribeWnd *App = NULL;
 	ScribeFolder *Folder = NULL;
+	
 	LString MimeType;
+	
+	LAutoPtr<LStreamI> Stream;
+
 	ThingType::IoProgress Status;
 	ThingType::IoProgressCallback onComplete;
 
@@ -3556,10 +3560,12 @@ public:
 	constexpr static int PULSE_MS			= 200;
 
 	FolderTask(	ScribeFolder *folder,
+				LAutoPtr<LStreamI> stream,
 				LString mimeType,
 				ThingType::IoProgressCallback cb) :
 		LProgressDlg(folder->App),
 		Folder(folder),
+		Stream(stream),
 		MimeType(mimeType),
 		onComplete(cb),
 		Status(Store3Success)
@@ -3578,7 +3584,7 @@ public:
 		Folder->App->OnFolderTask(this, false);
 		
 		if (onComplete)
-			onComplete(&Status);
+			onComplete(&Status, Stream);
 	}
 
 	bool OnRequestClose(bool OsClose)
@@ -3610,16 +3616,15 @@ public:
 class ImportFolderTask : public FolderTask
 {
 	LDataStoreI::StoreTrans trans;
-	LAutoPtr<LStreamI> stream;
 	
 public:
 	ImportFolderTask(ScribeFolder *fld, LAutoPtr<LStreamI> in, LString mimeType, ThingType::IoProgressCallback cb) :
-		FolderTask(fld, mimeType, cb)
+		FolderTask(fld, in, mimeType, cb)
 	{
 		SetDescription(LLoadString(IDS_MBOX_READING));
 		SetType("K");
 		SetScale(1.0/1024.0);
-		SetRange(stream->GetSize());
+		SetRange(Stream->GetSize());
 
 		trans = fld->GetObject()->GetStore()->StartTransaction();
 	}
@@ -3627,7 +3632,7 @@ public:
 	bool TimeSlice()
 	{
 		auto Start = LCurrentTime();
-		MboxParser Parser(stream);
+		MboxParser Parser(Stream);
 		TempMsg *Tm;
 		
 		LAutoStreamI Msg(Tm = new TempMsg);
@@ -3651,7 +3656,7 @@ public:
 			Msg.Reset(Tm = new TempMsg);
 			Parser.SeekNext();
 
-			Value(stream->GetPos());
+			Value(Stream->GetPos());
 		}
 		
 		return !Parser.GetEof();
@@ -3721,24 +3726,22 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 					AppName, MB_OK,
 					LLoadString(IDC_CONTACTS),
 					Imported);
+			IoProgressError("Contact import error.");
 		}
 
-		return Error ? Store3Error : Store3Success;
+		IoProgressSuccess();
 	}
 	else if (Stricmp(mimeType, sMimeVCalendar) == 0)
 	{
 		VCal Io;
-		bool Status = false;
 		Thing *t;
 
 		while ((t = App->CreateItem(GetItemType(), 0, false)))
 		{
 			if (Io.Import(t->GetObject(), stream))
 			{
-				if (!(Status = t->Save(this)))
-				{
-					break;
-				}
+				if (!t->Save(this))
+					IoProgressError("Contact save failed.");
 			}
 			else
 			{
@@ -3748,47 +3751,44 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 			}
 		}
 
-		return Status ? Store3Success : Store3Error;
+		IoProgressSuccess();
 	}
 	else if (GetObject())
 	{
 		Thing *t = App->CreateThingOfType(GetItemType(), GetObject()->GetStore()->Create(GetItemType()));
-		if (t)
-		{
-			if (t->Import(stream, mimeType) &&
-				t->Save(this))
-			{
-				return Store3Success;
-			}
-			else if (t->DecRefs())
-			{
-				DeleteObj(t);
-			}
-		}
-	}
-	else return Store3NotImpl;
+		if (!t)
+			IoProgressError("Failed to create contact");
 
-	return Store3Error;
+		if (!t->Import(stream, mimeType))
+			IoProgressError("Contact import failed.");
+		if (!t->Save(this))
+		{
+			if (t->DecRefs())
+				DeleteObj(t);
+			IoProgressError("Contact save failed.");
+		}
+
+		IoProgressSuccess();
+	}
+	
+	IoProgressNotImpl();
 }
 
 class ExportFolderTask : public FolderTask
 {
-	LAutoPtr<LStreamI> Out;
 	int Idx = 0;
 
 public:
-	ExportFolderTask(	LAutoPtr<LStreamI> out,
-						ScribeFolder *folder,
+	ExportFolderTask(	ScribeFolder *folder,
+						LAutoPtr<LStreamI> out,
 						LString mimeType,
 						ThingType::IoProgressCallback cb) :
-		FolderTask(folder, mimeType, cb)
+		FolderTask(folder, out, mimeType, cb)
 	{
-		Out = out;
-
 		bool Mbox = _stricmp(MimeType, sMimeMbox) == 0;
 
 		// Clear the files contents
-		Out->SetSize(0);
+		Stream->SetSize(0);
 
 		// Setup progress UI
 		SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
@@ -3832,7 +3832,7 @@ public:
 			if (!t)
 				return false;
 
-			LAutoPtr<LStreamI> wrapper(new LProxyStream(Out));
+			LAutoPtr<LStreamI> wrapper(new LProxyStream(Stream));
 			if (!t->Export(wrapper, MimeType))
 			{
 				Status.status = Store3Error;
@@ -3922,19 +3922,19 @@ ThingType::IoProgress ScribeFolder::Export(IoProgressImplArgs)
 	if (!mimeType)
 	{
 		ErrStatus.errMsg = "No mimetype.";
-		if (cb) cb(&ErrStatus);
+		if (cb) cb(&ErrStatus, NULL);
 		return ErrStatus;
 	}
 		
 	if (!LoadThings())
 	{
 		ErrStatus.errMsg = "Failed to load things.";
-		if (cb) cb(&ErrStatus);
+		if (cb) cb(&ErrStatus, NULL);
 		return ErrStatus;
 	}
 
 	IoProgress Status(Store3Delayed);
-	Status.prog = new ExportFolderTask(stream, this, mimeType, cb);
+	Status.prog = new ExportFolderTask(this, stream, mimeType, cb);
 	return Status;
 }
 
