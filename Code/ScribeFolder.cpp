@@ -3211,7 +3211,11 @@ public:
 			if (t)
 			{
 				Mem.SetSize(0);
-				LAutoPtr<LStreamI> cp(new LMemStream(Mem));
+				
+				// We can't allow Export to delete the Mem object, we own it.
+				// So create a proxy object for it.
+				LAutoPtr<LStreamI> cp(new LProxyStream(&Mem));
+				
 				if (t->Export(cp, FolderMime))
 					Sz += Mem.GetSize();
 				else
@@ -3245,7 +3249,7 @@ public:
 	LStreamI *Clone()
 	{
 		LAssert(0);
-		return 0;
+		return NULL;
 	}
 };
 
@@ -3683,10 +3687,11 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 class FolderExportTask : public LProgressDlg
 {
 	LAutoPtr<LStreamI> Out;
-	ScribeFolder *Folder;
+	ScribeFolder *Folder = NULL;
 	LString MimeType;
-	int Idx;
-	bool HasError = false;
+	int Idx = 0;
+	ThingType::IoProgress Status;
+	ThingType::IoProgressCallback onComplete;
 
 public:
 	// Minimum amount of time to do work.
@@ -3694,12 +3699,17 @@ public:
 	// This should be larger then WORK_SLICE_MS to allow message loop to process
 	constexpr static int PULSE_MS			= 200;
 
-	FolderExportTask(LAutoPtr<LStreamI> out, ScribeFolder *folder, LString mimeType) : LProgressDlg(folder->App)
+	FolderExportTask(	LAutoPtr<LStreamI> out,
+						ScribeFolder *folder,
+						LString mimeType,
+						ThingType::IoProgressCallback cb) :
+		LProgressDlg(folder->App),
+		onComplete(cb),
+		Status(Store3Success)
 	{
 		Out = out;
 		Folder = folder;
 		MimeType = mimeType;
-		Idx = 0;
 		Ts = LCurrentTime();
 		Folder->App->OnFolderTask(this, true);
 
@@ -3738,6 +3748,9 @@ public:
 	~FolderExportTask()
 	{
 		Folder->App->OnFolderTask(this, false);
+		
+		if (onComplete)
+			onComplete(&Status);
 	}
 	
 	bool OnRequestClose(bool OsClose)
@@ -3776,8 +3789,10 @@ public:
 					}
 					else
 					{
-						HasError = true;
-						LgiMsg(this, "Error exporting items.", AppName);
+						Status.status = Store3Error;
+						Status.errMsg = "Error exporting items.";
+						if (!onComplete)
+							LgiMsg(this, "%s", AppName, MB_OK, Status.errMsg.Get());
 						Quit();
 					}
 				}
@@ -3811,54 +3826,16 @@ const char *ScribeFolder::GetStorageMimeType()
 	return NULL;
 }
 
-/*
-LProgressDlg *ScribeFolder::ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType)
-{
-	if (!MimeType)
-		return NULL;
-
-	if (!LoadThings())
-		return NULL;
-
-	return new FolderExportTask(f, this, MimeType);
-}
-*/
-
 ThingType::IoProgress ScribeFolder::Export(IoProgressImplArgs)
 {
-	Store3Status Status = Store3Error;
-
-	if (mimeType)
-	{
-		LoadThings();
-
-		bool Mbox = Stricmp(mimeType, sMimeMbox) == 0;
-		LProgressDlg Dlg(App);
+	if (!mimeType)
+		return Store3Error;
 		
-		App->OnFolderTask(&Dlg, true);
+	if (!LoadThings())
+		return Store3Error;
 
-		// Clear the files contents
-		stream->SetSize(0);
-
-		// Setup progress UI
-		Dlg.SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
-		Dlg.Invalidate((LRect*)0, true);
-		Dlg.SetRange(Items.Length());
-		Dlg.SetType(LLoadString(IDS_EMAIL));
-
-		// Process all the container's items
-		for (auto i: Items)
-		{
-			Status |= i->Export(stream, mimeType);
-			
-			Dlg.Value(Dlg.Value()+1);
-			Dlg.Invalidate((LRect*)0, true);
-		}
-
-		// all done
-		App->OnFolderTask(&Dlg, false);
-	}
-
+	IoProgress Status(Store3Delayed);
+	Status.prog = new FolderExportTask(stream, this, mimeType, cb);
 	return Status;
 }
 

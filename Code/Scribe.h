@@ -312,8 +312,8 @@ public:
 	int OnNotify(LViewI *Ctrl, LNotification n);
 };
 
-#define IoProgressImplArgs LAutoPtr<LStreamI> stream, const char *mimeType, IoProgressCallback cb
-#define IoProgressFnArgs IoProgressImplArgs = NULL
+#define IoProgressImplArgs		LAutoPtr<LStreamI> stream, const char *mimeType, IoProgressCallback cb
+#define IoProgressFnArgs		IoProgressImplArgs = NULL
 
 class ScribeClass ThingType :
 	public LDom,
@@ -342,7 +342,8 @@ protected:
 	LArray<ThingEventInfo*> OnLoadCallbacks;
 
 public:
-	typedef std::function<void(struct IoProgress*)> IoProgressCallback;
+	struct IoProgress;
+	typedef std::function<void(IoProgress*)> IoProgressCallback;
 	struct IoProgress
 	{
 		// This is the main result to look at:
@@ -354,14 +355,12 @@ public:
 		//		Store3Success - the operation successfully completed.
 		Store3Status status = Store3NotImpl;
 		
-		// Callback once the operation has completed. Check 'status' and 
-		// 'errMsg' for details.
-		IoProgressCallback onComplete;
-
-		// Optional progress for the operation.
+		// Optional progress for the operation. Really only relevant for
+		// status == Store3Delayed.
 		Progress *prog = NULL;
 		
-		// Optional error message for the operation.
+		// Optional error message for the operation. Relevant if
+		// status == Store3Error.
 		LString errMsg;
 		
 		IoProgress(Store3Status s)
