@@ -33,9 +33,6 @@ int FindCompare(LListItem *a, LListItem *b, NativeInt Data);
 
 LMarkColourSelect::LMarkColourSelect() : ResObject(Res_Custom)
 {
-	Pad = 6;
-	ColPx = 16;
-	ZeroObj(ColSel);
 }
 
 LArray<uint32_t> LMarkColourSelect::GetSelected()
@@ -60,12 +57,12 @@ bool LMarkColourSelect::OnLayout(LViewLayoutInfo &Inf)
 	{
 		LFont *f = GetFont();
 		None.Reset(new LDisplayString(f, LLoadString(IDS_NONE)));
-		Any.Reset(new LDisplayString(f, LLoadString(IDS_ANY)));
+		AnyTxt.Reset(new LDisplayString(f, LLoadString(IDS_ANY)));
 			
-		if (None && Any)
+		if (None && AnyTxt)
 		{
-			Inf.Width.Max = None->X() + Any->X() + (IDM_MARK_MAX * (ColPx + Pad)) + (Pad * 3) + 2;
-			Inf.Width.Min = None->X() + Any->X() + IDM_MARK_MAX + (Pad * 4) + 2;
+			Inf.Width.Max = None->X() + AnyTxt->X() + (IDM_MARK_MAX * (ColPx + Pad)) + (Pad * 3) + 2;
+			Inf.Width.Min = None->X() + AnyTxt->X() + IDM_MARK_MAX + (Pad * 4) + 2;
 		}
 		else
 		{
@@ -80,12 +77,16 @@ bool LMarkColourSelect::OnLayout(LViewLayoutInfo &Inf)
 void LMarkColourSelect::OnPressColour(size_t i)
 {
 	ColSel[i] = !ColSel[i];
+	if (!ColSel[i])
+		Any = false;
+
 	Invalidate();
 	SendNotify(LNotifyValueChanged);
 }
 
 void LMarkColourSelect::SelectNone()
 {
+	Any = false;
 	memset(ColSel, 0, sizeof(ColSel));
 	Invalidate();
 	SendNotify(LNotifyValueChanged);
@@ -93,6 +94,7 @@ void LMarkColourSelect::SelectNone()
 
 void LMarkColourSelect::SelectAll()
 {
+	Any = true;
 	for (int i=0; i<IDM_MARK_MAX; i++)
 		ColSel[i] = true;
 	Invalidate();
@@ -167,16 +169,15 @@ void LMarkColourSelect::OnPaint(LSurface *pDC)
 		}
 		x += r.X() + Pad;
 	}
-	if (Any)
+	if (AnyTxt)
 	{
-		Any->GetFont()->Colour(txt, bk);
-		AnyRc.ZOff(Any->X()-1, Any->Y()-1);
+		AnyTxt->GetFont()->Colour(txt, bk);
+		AnyRc.ZOff(AnyTxt->X()-1, AnyTxt->Y()-1);
 		AnyRc.Offset(cli.x1+x, cli.y1+Pad); 
-		Any->Draw(pDC, cli.x1 + x, cli.x1 + Pad);
+		AnyTxt->Draw(pDC, cli.x1 + x, cli.x1 + Pad);
 		AnyRc.Inset(-Pad, -Pad);
-		x += Any->X() + Pad;
+		x += AnyTxt->X() + Pad;
 	}
-
 }
 
 class LMarkColourSelectFactory : public LViewFactory

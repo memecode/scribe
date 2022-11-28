@@ -812,6 +812,7 @@ ItemFieldDef MailFieldDefs[] =
 	{"ImapSeq", SdFile, 					GV_INT32,		FIELD_IMAP_SEQ},
 	{"ImapUid", SdImapFlags, 				GV_INT32,		FIELD_SERVER_UID},
 	{"ReceivedDomain", SdReceivedDomain,	GV_STRING,		FIELD_RECEIVED_DOMAIN},
+	{"MessageId", SdMessageId,				GV_STRING,		FIELD_MESSAGE_ID},
 	
 	{0}
 };
@@ -5805,7 +5806,8 @@ bool Mail::SetVariant(const char *Name, LVariant &Value, const char *Array)
 		}
 		case SdColour:
 		{
-			if (!SetMarkColour(Value.CastInt32()))
+			auto u32 = Value.IsNull() ? 0 : (uint32_t)Value.CastInt32();
+			if (!SetMarkColour(u32))
 				return false;
 			break;
 		}
@@ -7505,47 +7507,38 @@ int Mail::Compare(LListItem *t, ssize_t Field)
 	return -1;
 }
 
-#define MAIL_FLAG_MAX		8
-
 class MailPropDlg : public LDialog
 {
 	List<Mail> Lst;
-	int Flag[MAIL_FLAG_MAX];
-	int Ctrl[MAIL_FLAG_MAX];
-	LViewI *Table;
+	LViewI *Table = NULL;
+
+	struct FlagInfo
+	{
+		int Flag = 0, Ctrl = 0;
+
+		void Set(int f, int c)
+		{
+			Flag = f;
+			Ctrl = c;
+		}
+	};
+	LArray<FlagInfo> Flags;
 
 public:
 	MailPropDlg(LView *Parent, List<Mail> &lst)
 	{
-		Table = 0;
 		SetParent(Parent);
 		
-		for (auto m: lst)
-		{
-			Lst.Insert(m);
-		}
+		Lst = lst;
 
-		int Index = 0;
-		Flag[Index++] = MAIL_SENT;
-		Flag[Index++] = MAIL_RECEIVED;
-		Flag[Index++] = MAIL_CREATED;
-		Flag[Index++] = MAIL_FORWARDED;
-		Flag[Index++] = MAIL_REPLIED;
-		Flag[Index++] = MAIL_ATTACHMENTS;
-		Flag[Index++] = MAIL_READ;
-		//Flag[Index++] = MAIL_MARK;
-		Flag[Index++] = MAIL_READY_TO_SEND;
-
-		Index = 0;
-		Ctrl[Index++] = IDC_SENT;
-		Ctrl[Index++] = IDC_RECEIVED;
-		Ctrl[Index++] = IDC_CREATED;
-		Ctrl[Index++] = IDC_FORWARDED;
-		Ctrl[Index++] = IDC_REPLIED;
-		Ctrl[Index++] = IDC_HAS_ATTACH;
-		Ctrl[Index++] = IDC_READ;
-		// Ctrl[Index++] = IDC_MARKED;
-		Ctrl[Index++] = IDC_READY_SEND;
+		Flags.New().Set(MAIL_SENT, IDC_SENT);
+		Flags.New().Set(MAIL_RECEIVED, IDC_RECEIVED);
+		Flags.New().Set(MAIL_CREATED, IDC_CREATED);
+		Flags.New().Set(MAIL_FORWARDED, IDC_FORWARDED);
+		Flags.New().Set(MAIL_REPLIED, IDC_REPLIED);
+		Flags.New().Set(MAIL_ATTACHMENTS, IDC_HAS_ATTACH);
+		Flags.New().Set(MAIL_READ, IDC_READ);
+		Flags.New().Set(MAIL_READY_TO_SEND, IDC_READY_SEND);
 
 		if (LoadFromResource(IDD_MAIL_PROPERTIES))
 		{
@@ -7553,29 +7546,26 @@ public:
 			LAssert(Table != NULL);
 			SetCtrlEnabled(IDC_OPEN_INSPECTOR, Lst.Length() == 1);
 			
-			for (int i=0; i<MAIL_FLAG_MAX; i++)
+			for (auto &i: Flags)
 			{
 				int Set = 0;
 				for (auto m: Lst)
 				{
-					if (m->GetFlags() & Flag[i])
-					{
+					if (m->GetFlags() & i.Flag)
 						Set++;
-					}
 				}
 				
 				if (Set == Lst.Length())
 				{
-					SetCtrlValue(Ctrl[i], 1);
+					SetCtrlValue(i.Ctrl, LCheckBox::CheckOn);
 				}
 				else if (Set)
 				{
 					LCheckBox *Cb;
-					if (GetViewById(Ctrl[i], Cb))
-					{
+					if (GetViewById(i.Ctrl, Cb))
 						Cb->ThreeState(true);
-					}
-					SetCtrlValue(Ctrl[i], 2);
+
+					SetCtrlValue(i.Ctrl, LCheckBox::CheckPartial);
 				}
 			}
 
@@ -7585,30 +7575,23 @@ public:
 			if (Lst.Length() == 1)
 			{
 				Mail *m = Lst[0];
+				auto mObj = m->GetObject();
+				if (mObj)
+				{
+					auto dt = mObj->GetDate(FIELD_DATE_RECEIVED);
+					sprintf_s(	Msg, sizeof(Msg),
+								LLoadString(IDS_MAIL_PROPS_DLG),
+								LFormatSize(mObj->GetInt(FIELD_SIZE)).Get(),
+								dt ? dt->Get().Get() : LLoadString(IDS_NONE),
+								mObj->GetStr(FIELD_DEBUG));
 
-				#if 0 // def _DEBUG
-				sprintf_s(Msg, sizeof(Msg), "Sizeof: %i\nStore: %i of %i\n",
-					Lst.First()->Sizeof(),
-					Lst.First()->Store ? Lst.First()->Store->GetObjectSize() : -1,
-					Lst.First()->Store ? Lst.First()->Store->GetTotalSize() : -1);
-				#else
-
-				char DateReceivedStr[32];
-				m->GetObject()->GetDate(FIELD_DATE_RECEIVED)->Get(DateReceivedStr, sizeof(DateReceivedStr));
-				
-				char Size[32];
-				LFormatSize(Size, sizeof(Size), m->GetObject()->GetInt(FIELD_SIZE));
-
-				auto Debug = m->GetObject()->GetStr(FIELD_DEBUG);
-				const char *Fmt = LLoadString(IDS_MAIL_PROPS_DLG);
-				
-				sprintf_s(Msg, sizeof(Msg), Fmt, Size, DateReceivedStr, Debug);
-
-				#endif
+					SetCtrlName(IDC_MSG_ID, mObj->GetStr(FIELD_MESSAGE_ID));
+				}
 			}
 			else
 			{
 				sprintf_s(Msg, sizeof(Msg), LLoadString(IDS_MULTIPLE_ITEMS), Lst.Length());
+				SetCtrlEnabled(IDC_MSG_ID, false);
 			}
 			SetCtrlName(IDC_MAIL_DESCRIPTION, Msg);
 
@@ -7638,21 +7621,17 @@ public:
 			}
 			case IDOK:
 			{
-				for (int i=0; i<MAIL_FLAG_MAX; i++)
+				for (auto &i: Flags)
 				{
-					int v = (int)GetCtrlValue(Ctrl[i]);
-					LAssert(v >= 0); // the control couldn't be found... check the .lr file
+					auto v = GetCtrlValue(i.Ctrl);
+					LAssert(v >= 0); // the control couldn't be found... check the .lr8 file
 					
 					for (auto m: Lst)
 					{
 						if (v == 1)
-						{
-							m->SetFlags(m->GetFlags() | Flag[i]);
-						}
+							m->SetFlags(m->GetFlags() | i.Flag);
 						else if (v == 0)
-						{
-							m->SetFlags(m->GetFlags() & ~Flag[i]);
-						}
+							m->SetFlags(m->GetFlags() & ~i.Flag);
 					}
 				}
 				// fall thru

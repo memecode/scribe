@@ -472,6 +472,12 @@ const char *ImapMail::GetStr(int id)
 
 	switch (id)
 	{
+		case FIELD_DEBUG:
+		{
+			static char s[64];
+			sprintf_s(s, sizeof(s), "Imap.ServerUid=%i", Uid);
+			return s;
+		}
 		case FIELD_INTERNET_HEADER:
 		{
 			if (Seg && Seg->GetSeg())

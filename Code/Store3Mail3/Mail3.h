@@ -555,15 +555,15 @@ class LMail3Mail : public LMail3Thing
 	bool Utf8Check(LAutoString &v);
 
 public:
-	int Priority;
-	int Flags;
-	int AccountId;
-	int64 MailSize;
-	uint32_t MarkColour; // FIELD_MARK_COLOUR, 32bit rgba colour
+	int Priority = MAIL_PRIORITY_NORMAL;
+	int Flags = 0;
+	int AccountId = 0;
+	int64 MailSize = 0;
+	uint32_t MarkColour = Rgba32(0, 0, 0, 0); // FIELD_MARK_COLOUR, 32bit rgba colour
 
 	LVariant Subject;
 	DIterator<LDataPropI, Store3Addr, LMail3Store> To;
-	LMail3Attachment *Seg;
+	LMail3Attachment *Seg = NULL;
 	Store3Addr From;
 	Store3Addr Reply;
 	LVariant Label;

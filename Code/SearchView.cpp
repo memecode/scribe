@@ -96,13 +96,16 @@ bool LSearchView::TestThing(Thing *Thing)
 				}
 			}
 
-			Status = Unmatch.Length() == 0;
+			Status &= Unmatch.Length() == 0;
 		}
 
-		if (Colours.Length() && m)
+		if (m)
 		{
-			auto c = m->GetMarkColour();
-			Status = c > 0 && Colours.HasItem((uint32_t)c);
+			if (Colours.Length() || AnyColour)
+			{
+				auto c = m->GetMarkColour();
+				Status &= c > 0 && (Colours.HasItem((uint32_t)c) || AnyColour);
+			}
 		}
 	}
 
@@ -233,10 +236,11 @@ int LSearchView::OnNotify(LViewI *c, LNotification n)
 			if (n.Type == LNotifyValueChanged)
 			{
 				auto a = Mcs->GetSelected();
-				if (a.Length() != Colours.Length() ||
-					memcmp(a.AddressOf(), Colours.AddressOf(), sizeof(uint32_t)*a.Length()))
+				if (Colours != a ||
+					AnyColour != Mcs->Any)
 				{
 					Colours = a;
+					AnyColour = Mcs->Any;
 					Update = true;
 				}
 			}

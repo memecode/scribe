@@ -390,6 +390,7 @@
 		<String Ref="632" Cid="632" Define="IDD_FOLDER_PROPS" en="Folder Properties" fr="Propriétés du dossier" cs="Vlastnosti složky" nl="Eigenschappen map" es="Propiedades de Carpeta" pt_br="Propriedades da pasta" ru="Свойства папок" pt="Propriedades da pasta" pl="Właściwości folderu" it="Proprietà della cartella" vi="Thuộc tính danh mục" zh_tw="資料夾內容" ja="フォルダのプロパティ" sr="Osobine omotnice" no="Mappe-egenskaper" lt="Aplanko ypatybės" fa="مشخصات پوشه" de="Ordner Eigenschaften" da="Mappe-egenskaber" sv="Mappegenskaper" lg="Ebikwata ku Kabada" tr="Klasör Özellikleri" hu="Mappa tulajdonságai" ko="폴더 특성" uk="Властивості тек" />
 		<String Ref="633" Cid="1094" Define="IDC_NEW_FILTER_ACTION" en="New" fr="Nouveau" it="Nuovo" cs="Nová" es="Nuevo" de="Neu" nl="Nieuw" pt_br="Novo" pt="Criar" pl="Nowy" vi="Tạo mới" zh_tw="新的" ja="新規" sr="Novo" no="Ny" lt="Pridėti" fa="جديد" da="Ny" sv="Ny" lg="Empya" tr="Yeni" hu="Új" ru="Новое" ko="신규" uk="Новий" />
 		<String Ref="634" Cid="627" Define="IDC_FOLDER_MSG" en="Select a folder..." ko="폴더 선택..." uk="Виберіть теку ..." de="Ordner auswählen..." fr="Sélectionner un dossier..." />
+		<String Ref="635" Cid="-1" Define="IDC_STATIC" en="Message ID:" />
 		<String Ref="636" Cid="714" Define="IDC_USAGE" />
 		<String Ref="637" Cid="629" Define="IDS_629" en="Folder" fr="Dossier" cs="Složka" nl="Map" es="Carpeta" pt_br="Pasta" ru="Папка" pt="Pasta" vi="Danh mục" zh_tw="資料夾" ja="フォルダ" sr="Omotnica" no="Mappe" lt="Aplankas" fa="پوشه" de="Ordner" da="Mappe" sv="Mapp" lg="Kabada" tr="Klasör" hu="Mappa" ko="폴더" uk="Тека" />
 		<String Ref="638" Cid="630" Define="IDS_630" en="Size" fr="Taille" cs="Velikost" nl="Grootte" es="Tamaño" pt_br="Tamanho" ru="Размер" pt="Tamanho" pl="Rozmiar" vi="Kích thước" zh_tw="大小" ja="サイズ" sr="Veličina" no="Størrelse" lt="Dydis" fa="اندازه" de="Grösse" da="Størrelse" sv="Storlek" lg="Obunene" tr="Boyut" hu="Méret" ko="크기" uk="Розмір" />
@@ -826,6 +827,7 @@
 		<String Ref="1324" Cid="1324" Define="IDC_MAIL_STORES" />
 		<String Ref="1325" Cid="1325" Define="IDS_1325" en="Folders" de="Dateiname" pl="Foldery" ko="폴더" uk="Теки" fr="Dossiers" />
 		<String Ref="1326" Cid="1326" Define="IDS_1326" en="Disable" de="Inaktiv" pl="Wyłącz" ko="비활성화" uk="Вимкнено" fr="Désactiver" />
+		<String Ref="1327" Cid="1327" Define="IDC_MSG_ID" />
 		<String Ref="1328" Cid="1328" Define="IDC_FILTER" />
 		<String Ref="1330" Cid="1125" Define="IDC_PAGE_RANGES" />
 		<String Ref="1331" Cid="1123" Define="IDC_PAGE_ALL" en="All" />
@@ -3506,56 +3508,64 @@
 			</tr>
 		</TableLayout>
 	</Dialog>
-	<Dialog pos="7,7,357,327" ref="414">
-		<TableLayout pos="7,14,335,272" ref="536" cols="0.500,0.500" rows="0.143,0.143,0.143,0.143,0.143,0.143,0.143">
+	<Dialog pos="7,7,384,376" ref="414">
+		<TableLayout pos="7,14,363,335" ref="536" cols="0.500,0.500" rows="0.125,0.125,0.125,0.125,0.125,0.125,0.125,0.125">
 			<tr>
 				<td addr="0,0" colspan="2" style="padding-bottom: 1em;">
 					<StaticText pos="0,0,139,27" ref="537" />
 				</td>
 			</tr>
 			<tr>
-				<td addr="0,1" style="width: 45%;">
-					<CheckBox pos="0,35,125,48" ref="449" />
+				<td addr="0,1">
+					<StaticText pos="7,49,118,69" ref="635" />
 				</td>
-				<td addr="1,1" style="width: 45%;">
-					<CheckBox pos="158,35,304,48" ref="1288" />
+				<td addr="1,1">
+					<EditBox Pos="182,42,300,62" Style="width:70%;" ref="1327" />
 				</td>
 			</tr>
 			<tr>
-				<td addr="0,2">
-					<CheckBox pos="0,70,125,83" ref="448" />
+				<td addr="0,2" style="width: 45%;">
+					<CheckBox pos="0,76,125,89" ref="449" />
 				</td>
-				<td addr="1,2">
-					<CheckBox pos="158,70,304,83" ref="452" />
+				<td addr="1,2" style="width: 45%;">
+					<CheckBox pos="172,76,318,89" ref="1288" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,3">
-					<CheckBox pos="0,105,125,118" ref="450" />
+					<CheckBox pos="0,114,125,127" ref="448" />
 				</td>
 				<td addr="1,3">
-					<CheckBox pos="158,105,297,118" ref="453" />
+					<CheckBox pos="172,114,318,127" ref="452" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,4">
-					<CheckBox pos="0,140,125,153" ref="459" />
+					<CheckBox pos="0,152,125,165" ref="450" />
 				</td>
 				<td addr="1,4">
-					<CheckBox pos="158,140,304,153" ref="454" />
+					<CheckBox pos="172,152,311,165" ref="453" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,5">
-					<CheckBox pos="0,175,125,188" ref="451" />
+					<CheckBox pos="0,190,125,203" ref="459" />
 				</td>
-				<td addr="1,5" />
+				<td addr="1,5">
+					<CheckBox pos="172,190,318,203" ref="454" />
+				</td>
 			</tr>
 			<tr>
-				<td addr="0,6" colspan="2" align="Max" style="padding-top: 1em;">
-					<Button pos="14,222,111,242" ref="1290" toggle="0" />
-					<Button pos="147,222,216,242" ref="457" toggle="0" />
-					<Button pos="245,222,314,242" ref="456" toggle="0" />
+				<td addr="0,6">
+					<CheckBox pos="0,228,125,241" ref="451" />
+				</td>
+				<td addr="1,6" />
+			</tr>
+			<tr>
+				<td addr="0,7" colspan="2" align="Max" style="padding-top: 1em;">
+					<Button pos="14,278,111,298" ref="1290" toggle="0" />
+					<Button pos="147,278,216,298" ref="457" toggle="0" />
+					<Button pos="245,278,314,298" ref="456" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -4655,32 +4665,32 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="840" ControlType="bool" ControlTag="AdjustDateTz" />
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>

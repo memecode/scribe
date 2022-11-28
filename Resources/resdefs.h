@@ -1066,6 +1066,7 @@
 #define IDC_MAIL_STORES							1324
 #define IDS_1325								1325
 #define IDS_1326								1326
+#define IDC_MSG_ID								1327
 #define IDC_FILTER								1328
 #define IDS_GNUPG_ERR_WRONG_SEGS				1329
 #define IDS_1335								1335

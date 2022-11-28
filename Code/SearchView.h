@@ -7,6 +7,7 @@ class LSearchView : public LLayout, public ThingFilter, public LResourceLoad
 
 	bool Unread;
 	int LimitField;
+	bool AnyColour = false;
 	LArray<uint32_t> Colours;
 	LString::Array Keywords;
 

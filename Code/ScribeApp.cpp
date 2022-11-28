@@ -9195,12 +9195,7 @@ void ScribeWnd::Validate(LMailStore *s)
 
 ThingFilter *ScribeWnd::GetThingFilter()
 {
-	if (SearchView)
-	{
-		return SearchView;
-	}
-
-	return 0;
+	return SearchView;
 }
 
 ScribeAccount *ScribeWnd::GetSendAccount()

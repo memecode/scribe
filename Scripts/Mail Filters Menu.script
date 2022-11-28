@@ -125,55 +125,59 @@ function AddFromToGroup(App, Thing, CallbackId)
 
 function CreateFilterMenu(App, Thing, Menu)
 {
-	// Print("Thing.Type=" + Thing.Type + " ScribeItemMail=" + ScribeItemMail + "\n");
-	if (Thing.Type == ScribeItemMail)
+	if (Thing.Type != ScribeItemMail)
 	{
-		Sub = MenuAddSubmenu(Menu, "&Create Filter", Menu.Length - 2);
-		if (Sub)
-		{
-			ListId = ExtractMailList(Thing);
-			if (ListId != NULL)
-			{
-				if (ListId.Length)
-				{
-					MenuAddItem(Sub, -1, "New filter for email from mailing list '" + ListId + "'", -1, "CreateMailingListFilter", 3000);
-				}
-				else Print("ListId has no length\n");
-			}
-			// else Print("CreateFilterMenu: ListId is NULL\n");
-
-			MailFrom = Thing.From.Email;
-
-			MenuAddItem(Sub, -1, "New filter for email from '" + MailFrom + "'", -1, "CreateFromFilter", 3001);
-			Sm = MenuAddSubmenu(Sub, "Add '" + MailFrom + "' to existing filter", -1);
-			if (Sm)
-			{
-				Items = GetSortedFilters();
-				for (i = 0; i < Items.Length; i++)
-				{
-					f = Items[i];		
-					Txt = "(" + f.Index + ") " + f.Name;			
-					MenuAddItem(Sm, -1, Txt, -1, "AddFromToFilter", 4000 + i);
-				}
-			}
-			else Print("CreateFilterMenu: MenuAddSubmenu failed\n");
-
-			Sm2 = MenuAddSubmenu(Sub, "Add '" + MailFrom + "' to contact group", -1);
-			if (Sm2)
-			{
-				Items = GetAllGroups();
-				for (i = 0; i < Items.Length; i++)
-				{
-					grp = Items[i];			
-					Str = grp.Name;
-					MenuAddItem(Sm2, -1, Str, -1, "AddFromToGroup", 5000 + i);
-				}
-			}
-			else Print("CreateFilterMenu: MenuAddSubmenu failed\n");
-		}
-		else Print("CreateFilterMenu: Can't create sub.\n");
+		// This isn't an error...
+		return false;
 	}
-	else Print("CreateFilterMenu: Not an email.\n");
+
+	Sub = MenuAddSubmenu(Menu, "&Create Filter", Menu.Length - 2);
+	if (!Sub)
+	{
+		Print("CreateFilterMenu.Error: MenuAddSubmenu failed.\n");
+		return false;
+	}
+
+	ListId = ExtractMailList(Thing);
+	if (ListId != NULL)
+	{
+		if (ListId.Length)
+		{
+			MenuAddItem(Sub, -1, "New filter for email from mailing list '" + ListId + "'", -1, "CreateMailingListFilter", 3000);
+		}
+		else Print("ListId has no length\n");
+	}
+
+	MailFrom = Thing.From.Email;
+
+	MenuAddItem(Sub, -1, "New filter for email from '" + MailFrom + "'", -1, "CreateFromFilter", 3001);
+	Sm = MenuAddSubmenu(Sub, "Add '" + MailFrom + "' to existing filter", -1);
+	if (Sm)
+	{
+		Items = GetSortedFilters();
+		for (i = 0; i < Items.Length; i++)
+		{
+			f = Items[i];		
+			Txt = "(" + f.Index + ") " + f.Name;			
+			MenuAddItem(Sm, -1, Txt, -1, "AddFromToFilter", 4000 + i);
+		}
+	}
+	else Print("CreateFilterMenu: MenuAddSubmenu failed\n");
+
+	Sm2 = MenuAddSubmenu(Sub, "Add '" + MailFrom + "' to contact group", -1);
+	if (Sm2)
+	{
+		Items = GetAllGroups();
+		for (i = 0; i < Items.Length; i++)
+		{
+			grp = Items[i];			
+			Str = grp.Name;
+			MenuAddItem(Sm2, -1, Str, -1, "AddFromToGroup", 5000 + i);
+		}
+	}
+	else Print("CreateFilterMenu: MenuAddSubmenu failed\n");
+
+	return true;
 }
 
 function Main(App)

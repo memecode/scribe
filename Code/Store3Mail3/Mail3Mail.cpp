@@ -114,12 +114,6 @@ LMail3Mail::LMail3Mail(LMail3Store *store) :
 	From(store),
 	Reply(store)
 {
-	Priority = MAIL_PRIORITY_NORMAL;
-	Flags = 0;
-	AccountId = 0;
-	Seg = 0;
-	MarkColour = 0;
-	MailSize = 0;
 	To.State = Store3Loaded;
 }
 
@@ -806,7 +800,7 @@ const char *LMail3Mail::GetStr(int id)
 		case FIELD_DEBUG:
 		{
 			static char s[64];
-			sprintf_s(s, sizeof(s), "Id=" LPrintfInt64, Id);
+			sprintf_s(s, sizeof(s), "Mail3.Id=" LPrintfInt64, Id);
 			return s;
 		}
 		case FIELD_SUBJECT:
@@ -1322,7 +1316,10 @@ Store3Status LMail3Mail::SetInt(int id, int64 i)
 			AccountId = (int)i;
 			return Store3Success;
 		case FIELD_COLOUR:
-			MarkColour = (int)i;
+			if (i < 0)
+				MarkColour = Rgba32(0, 0, 0, 0); // transparent
+			else
+				MarkColour = (uint32_t)i;
 			return Store3Success;
 	}
 

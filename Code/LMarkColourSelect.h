@@ -5,13 +5,14 @@ class LMarkColourSelect : public LView, public ResObject
 {
 	LRect NoneRc, AnyRc;
 	LAutoPtr<LDisplayString> None;
-	LAutoPtr<LDisplayString> Any;
-	int Pad;
-	int ColPx;
+	LAutoPtr<LDisplayString> AnyTxt;
+	int Pad = 6;
+	int ColPx = 16;
 	LArray<LRect> ColRc;
 
 public:
-	bool ColSel[IDM_MARK_MAX];
+	bool Any = false;
+	bool ColSel[IDM_MARK_MAX] = {};
 
 	LMarkColourSelect();
 
