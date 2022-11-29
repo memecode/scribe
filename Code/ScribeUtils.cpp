@@ -78,9 +78,9 @@ const char *ScribeResourcePath()
 				strcpy_s(Res, sizeof(Res), p.GetFull());
 				break;
 			}
-
-			LgiTrace("Resource folder: '%s' doesn't exist.\n", p.GetFull().Get());
 		}
+		if (!Found)
+			LgiTrace("Resource folder: '%s' doesn't exist.\n", Res);
 
 		#ifdef _DEBUG
 		if (!Found)
