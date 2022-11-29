@@ -20,6 +20,11 @@ if (NOT DEFINED LGI_DIR)
     message(FATAL_ERROR "Lgi should be defining LGI_DIR")
 endif()
 
+get_filename_component(ASPELL_DIR ${CMAKE_CURRENT_LIST_DIR}/../libs/aspell-0.60.6.1 ABSOLUTE)
+if (NOT EXISTS ${ASPELL_DIR})
+    message(FATAL_ERROR "Missing ASPELL_DIR=${ASPELL_DIR}")
+endif()
+
 # Platform settings
 if (WIN32)
 	set(APP_TYPE WIN32)
@@ -200,8 +205,10 @@ target_include_directories(scribe
         Code/Sqlite
         Resources
         Utils/Tables
+        $<TARGET_PROPERTY:libpng16,INCLUDE_DIRECTORIES>
+        $<TARGET_PROPERTY:libjpeg9a,INCLUDE_DIRECTORIES>
         ${LGI_DIR}/private/common
-        ../libs/aspell-0.60.6.1/interfaces/cc
+        ${ASPELL_DIR}/interfaces/cc
         ${OPENSSL_INCLUDE_DIR})
 
 target_link_libraries(scribe
@@ -209,7 +216,7 @@ target_link_libraries(scribe
         lgi
         chardet
         libjpeg9a
-        libpng15
+        libpng16
         bzip2
         btree)
 
@@ -233,7 +240,91 @@ elseif (LINUX)
         COMMENT "Copy crash handler."
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:crash-handler>" "${CMAKE_CURRENT_BINARY_DIR}"
         )
-    
+
+    set(DEPLOY ${CODELIB}/appimagetool-x86_64.AppImage)
+    if (NOT EXISTS ${DEPLOY})
+        message(WARNING "No appimage tool at '${DEPLOY}', skipping 'dist' target.")
+    else()
+
+        execute_process(COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/Utils/getversion.py
+            OUTPUT_VARIABLE VERSION
+            RESULT_VARIABLE result
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if (result)
+            message(FATAL_ERROR "Error getting scribe version. result=${result}")
+        endif()
+
+        message("VERSION=${VERSION}")
+
+        set(APPIMG ${VERSION}.AppImage)
+        set(APPDIR ${VERSION}.AppDir)
+        set(BINDIR ${APPDIR}/usr/bin)
+        set(LIBDIR ${APPDIR}/usr/lib)
+        set(RESDIR ${APPDIR}/usr/share/applications)
+
+        add_custom_target(dist
+            COMMAND rm -rf ${APPDIR}
+            COMMAND echo "Building AppDir..."
+            COMMAND mkdir -p ${BINDIR}
+            COMMAND mkdir -p ${LIBDIR}
+            COMMAND mkdir -p ${RESDIR}
+            COMMAND echo "Copying binaries..."
+            # executables:
+            COMMAND cp $<TARGET_FILE:scribe>        ${BINDIR}
+            COMMAND cp $<TARGET_FILE:crash-handler> ${BINDIR}
+            # libraries:
+            COMMAND cp $<TARGET_FILE:lgi>           ${LIBDIR}
+            COMMAND cp $<TARGET_FILE:aspell>        ${LIBDIR}
+            COMMAND cp $<TARGET_FILE:chardet>       ${LIBDIR}
+            COMMAND cp $<TARGET_FILE:libpng16>      ${LIBDIR}
+            COMMAND ln -s ./$<TARGET_FILE_NAME:libpng16> ${LIBDIR}/libpng16.so 
+            COMMAND cp $<TARGET_FILE:zlib>          ${LIBDIR}
+            COMMAND cp $<TARGET_FILE:libjpeg9a>     ${LIBDIR}
+            # Resources:
+            COMMAND echo "Copy resources..."
+            COMMAND chmod 700 ${CMAKE_CURRENT_LIST_DIR}/Resources/AppRun
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/AppRun               ${APPDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Linux/scribe.desktop ${APPDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/About64px.png        ${APPDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Scribe.lr8           ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Flags.png            ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Icons-16.png         ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/xgate-icons-32.png   ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/About.html           ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/About64px.png        ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Title.html           ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Title.png            ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/NoFace*.png          ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/EmojiMap.png         ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Preview*.html        ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/tray_*.png           ${RESDIR}
+            # Help and scripting:
+            COMMAND echo "Creating DOM documentation..."
+            COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/Code/Py/DomScan.py > ${RESDIR}/Dom.txt
+            COMMAND mkdir -p ${RESDIR}/Help/scripting
+            COMMAND echo "Help files..."
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Help/*.html                    ${RESDIR}/Help
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Help/*.css                     ${RESDIR}/Help
+            COMMAND cp ${LGI_DIR}/docs/scripting/*.html                         ${RESDIR}/Help/scripting
+            COMMAND cp ${LGI_DIR}/docs/scripting/*.css                          ${RESDIR}/Help/scripting
+            COMMAND mkdir -p ${RESDIR}/Scripts
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Scripts/*.script               ${RESDIR}/Scripts
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Scripts/ScribeScripts.h        ${RESDIR}/Scripts
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/resdefs.h            ${RESDIR}/Scripts
+            # Spell check:
+            COMMAND mkdir -p ${RESDIR}/Aspell/data
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/aspell-languages.csv ${RESDIR}/Aspell
+            COMMAND cp ${ASPELL_DIR}/data/*.cmap ${RESDIR}/Aspell/data
+            COMMAND cp ${ASPELL_DIR}/data/*.cset ${RESDIR}/Aspell/data
+            COMMAND cp ${ASPELL_DIR}/data/*.kbd ${RESDIR}/Aspell/data
+            # Output appimage:
+            COMMAND @echo "Building AppImage..."
+            COMMAND ${DEPLOY} ${APPDIR}
+        )
+
+
+    endif()
+
 endif()
 
 if (NOT APPLE)

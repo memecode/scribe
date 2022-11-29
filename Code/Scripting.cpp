@@ -279,12 +279,19 @@ LAutoString LScribeScript::GetDataFolder()
 char *LScribeScript::GetIncludeFile(char *FileName)
 {
 	LString Path;
+	const char *Search[] = {
+		"./Scripts",
+		"../Scripts",
+		"../../Scripts",
+		NULL
+	};
 	LFile::Path p(ScribeResourcePath());
 	p += FileName;
 	
-	if (!p.Exists())
+	for (int i=0; Search[i] && !p.Exists(); i++)
 	{
-		p += "../../Scripts";
+		p = ScribeResourcePath();
+		p += Search[i];
 		p += FileName;
 	}
 	

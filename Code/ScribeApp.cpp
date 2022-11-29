@@ -2244,9 +2244,6 @@ void ScribeWnd::OnCreate()
 			// Run scripts in './Scripts' folder
 			char s[MAX_PATH_LEN];
 			LMakePath(s, sizeof(s), ScribeResourcePath(),
-				#ifndef MAC
-				"../"
-				#endif
 				"Scripts");
 			if (!LDirExists(s))
 				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
