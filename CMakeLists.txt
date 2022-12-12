@@ -25,6 +25,8 @@ if (NOT EXISTS ${ASPELL_DIR})
     message(FATAL_ERROR "Missing ASPELL_DIR=${ASPELL_DIR}")
 endif()
 
+add_subdirectory(ScribeMapi)
+
 # Platform settings
 if (WIN32)
 	set(APP_TYPE WIN32)
@@ -195,6 +197,7 @@ if (WIN32)
         Code/Store3Mapi/ScribeMapi_Store.cpp
         Code/Store3Mapi/ScribeMapi_Thing.cpp
         Code/ImpExp_Outlook.cpp
+        ${LGI_DIR}/src/common/Coding/ExternCall.asm
         )
 
 endif()
@@ -218,7 +221,8 @@ target_link_libraries(scribe
         libjpeg9a
         libpng16
         bzip2
-        btree)
+        btree
+        ntlm)
 
 target_compile_definitions(scribe
     PRIVATE
@@ -262,7 +266,7 @@ elseif (LINUX)
         set(LIBDIR ${APPDIR}/usr/lib)
         set(RESDIR ${APPDIR}/usr/share/applications)
 
-        add_custom_target(dist
+        add_custom_target(dist-linux
             COMMAND rm -rf ${APPDIR}
             COMMAND echo "Building AppDir..."
             COMMAND mkdir -p ${BINDIR}
@@ -322,6 +326,47 @@ elseif (LINUX)
             COMMAND ${DEPLOY} ${APPDIR}
         )
 
+
+    endif()
+
+elseif (WIN32)
+
+    target_include_directories(scribe
+        PRIVATE
+            ../libs/mapi)
+
+    if (CMAKE_BUILD_TYPE MATCHES Release)
+    
+        # get_cmake_property(_variableNames VARIABLES)
+        # list (SORT _variableNames)
+        # foreach (_variableName ${_variableNames})
+        #     message(STATUS "${_variableName}=${${_variableName}}")
+        # endforeach()
+
+        find_program(NSIS
+            makensis.exe
+            PATHS "C:/Program Files (x86)/NSIS/Bin")
+        if (NOT EXISTS ${NSIS})
+            message(WARNING "No NSIS installed, skipping dist target.")
+        else()
+            set(NSI_IN "${CMAKE_CURRENT_LIST_DIR}/Windows/Installer-64bit.nsi.in")
+            if (NOT EXISTS ${NSI_IN})
+                message(FATAL_ERROR "Expecting to see ${NSI_IN}")
+            endif()
+            set(NSI_OUT "${CMAKE_BINARY_DIR}/installer-${CMAKE_INSTALL_CONFIG_NAME}.nsi")
+
+            file(READ ${NSI_IN} NSI_CONTENT)
+            file(GENERATE
+                OUTPUT ${NSI_OUT}
+                CONTENT "${NSI_CONTENT}"
+            )
+
+            # file(TO_NATIVE_PATH ${NSI} NSI)
+
+            add_custom_target(dist-win
+                COMMAND echo "cmd: ${NSIS} ${NSI_OUT}"
+                COMMAND ${NSIS} ${NSI_OUT})
+        endif()
 
     endif()
 
