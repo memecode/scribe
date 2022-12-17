@@ -335,40 +335,51 @@ elseif (WIN32)
         PRIVATE
             ../libs/mapi)
 
-    if (CMAKE_BUILD_TYPE MATCHES Release)
+    if (FALSE)
+        get_cmake_property(_variableNames VARIABLES)
+        list (SORT _variableNames)
+        foreach (_variableName ${_variableNames})
+            message(STATUS "${_variableName}=${${_variableName}}")
+        endforeach()
+    endif()
+
+    find_program(NSIS
+        makensis.exe
+        PATHS "C:/Program Files (x86)/NSIS/Bin")
+
+    if (NOT EXISTS ${NSIS})
+
+        message(WARNING "No NSIS installed, skipping dist target.")
+
+    else()
     
-        # get_cmake_property(_variableNames VARIABLES)
-        # list (SORT _variableNames)
-        # foreach (_variableName ${_variableNames})
-        #     message(STATUS "${_variableName}=${${_variableName}}")
+        # foreach (CFG in ${CMAKE_CONFIGURATION_TYPES})
+    
+        set(NSI_IN "${CMAKE_CURRENT_LIST_DIR}/Windows/Installer-64bit.nsi.in")
+        if (NOT EXISTS ${NSI_IN})
+            message(FATAL_ERROR "Expecting to see ${NSI_IN}")
+        endif()
+        set(NSI_OUT "${CMAKE_BINARY_DIR}/installer.nsi")
+
+        file(READ ${NSI_IN} NSI_CONTENT)
+        #file(GENERATE
+        #    OUTPUT ${NSI_OUT}
+        #    CONDITION "$<CONFIG:${CFG}>"
+        #    CONTENT "dir $<TARGET_FILE:scribe>"
+        #)
+        # ${NSI_CONTENT}
+
+        # file(TO_NATIVE_PATH ${NSI} NSI)
+
+        add_custom_target(dist-win
+            COMMAND echo "${NSI_CONTENT}" > ${NSI_OUT}
+            COMMAND echo "cmd: ${NSIS} ${NSI_OUT}"
+            COMMAND ${NSIS} ${NSI_OUT})
+    
         # endforeach()
 
-        find_program(NSIS
-            makensis.exe
-            PATHS "C:/Program Files (x86)/NSIS/Bin")
-        if (NOT EXISTS ${NSIS})
-            message(WARNING "No NSIS installed, skipping dist target.")
-        else()
-            set(NSI_IN "${CMAKE_CURRENT_LIST_DIR}/Windows/Installer-64bit.nsi.in")
-            if (NOT EXISTS ${NSI_IN})
-                message(FATAL_ERROR "Expecting to see ${NSI_IN}")
-            endif()
-            set(NSI_OUT "${CMAKE_BINARY_DIR}/installer-${CMAKE_INSTALL_CONFIG_NAME}.nsi")
-
-            file(READ ${NSI_IN} NSI_CONTENT)
-            file(GENERATE
-                OUTPUT ${NSI_OUT}
-                CONTENT "${NSI_CONTENT}"
-            )
-
-            # file(TO_NATIVE_PATH ${NSI} NSI)
-
-            add_custom_target(dist-win
-                COMMAND echo "cmd: ${NSIS} ${NSI_OUT}"
-                COMMAND ${NSIS} ${NSI_OUT})
-        endif()
-
     endif()
+
 
 endif()
 

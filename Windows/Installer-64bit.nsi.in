@@ -2,7 +2,7 @@
 !include LogicLib.nsh
 ; !include WinVer.nsh
 
-!system '"C:\Program Files\Python39\python.exe" ..\Utils\Store\check-build.py' = 0
+!system '"C:\Program Files\Python39\python.exe" ${CMAKE_CURRENT_LIST_DIR}\Utils\Store\check-build.py' = 0
 
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"

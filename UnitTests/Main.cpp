@@ -90,7 +90,7 @@ bool Func(UnitTests *u)
 	return u->OnIdle();
 }
 
-int main(int Args, char **Arg)
+int main(int Args, const char **Arg)
 {
 	OsAppArguments AppArgs(Args, Arg);
 	LApp a(AppArgs, "ScribeUnitTests");
