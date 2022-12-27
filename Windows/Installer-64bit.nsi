@@ -136,12 +136,12 @@ Section ""
 	; Do CRT check
 	ExecWait '"$INSTDIR\Scribe.exe" -crtcheck' $0
 	${If} $0 != 0
-		inetc::get /caption "Visual Studio 2015 Redistributable" /popup "" "http://memecode.com/scribe/data/vcredist_vc14x64.exe" "$INSTDIR\vcredist_vc19x64.exe" /end
+		inetc::get /caption "Visual Studio 2015 Redistributable" /popup "" "http://memecode.com/scribe/data/vcredist_vs2019x64.exe" "$INSTDIR\vcredist_vs2019x64.exe" /end
 		Pop $0 # return value = exit code, "OK" means OK
 		DetailPrint "Download: $0"
 		${If} $0 == "OK"
-				ExecWait "$INSTDIR\vcredist_vc19x64.exe"
-				Delete "$INSTDIR\vcredist_vc19x64.exe"
+				ExecWait "$INSTDIR\vcredist_vs2019x64.exe"
+				Delete "$INSTDIR\vcredist_vs2019x64.exe"
 		${EndIf}
 	${EndIf}
 
