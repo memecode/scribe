@@ -970,6 +970,9 @@
     <None Include="..\Scripts\Mail Filters Menu.script">
       <Filter>Scripting\Scripts</Filter>
     </None>
+    <None Include="Installer-64bit.nsi.in">
+      <Filter>Install</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Utils\Tables\MailFlags.txt">

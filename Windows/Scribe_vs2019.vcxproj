@@ -683,6 +683,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <None Include="..\Utils\Store\check-build.py" />
     <None Include="..\Utils\Store\store.py" />
     <None Include="Installer-64bit.nsi" />
+    <None Include="Installer-64bit.nsi.in" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Icons\app.ico" />
