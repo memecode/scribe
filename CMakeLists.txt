@@ -207,6 +207,13 @@ if (WIN32)
         ${LGI_DIR}/src/common/Coding/ExternCall.asm
         )
 
+    target_compile_options(scribe PRIVATE
+        $<IF:$<CONFIG:Release>,/Zi,>
+        )
+
+    target_link_options(scribe PRIVATE
+        $<IF:$<CONFIG:Release>,/DEBUG /OPT:REF /OPT:ICF,>)
+
 endif()
 
 target_include_directories(scribe
