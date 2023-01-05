@@ -4,6 +4,15 @@ import shutil
 import fnmatch
 import re
 
+scriptDir = os.path.abspath(os.path.join(os.path.realpath(__file__), ".."))
+rootDir = os.path.abspath(os.path.join(scriptDir, "..", ".."))
+isCmake = os.path.exists(os.path.join(rootDir, "CMakeCache.txt"))
+
+if isCmake:
+	codeDir = os.path.abspath(os.path.join(rootDir, "..", "trunk_os", "code"))
+else:
+	codeDir = os.path.abspath(os.path.join(rootDir, "code"))
+
 if len(sys.argv) != 6:
 	print("Incorrect args:", len(sys.argv))
 	print(sys.argv)
@@ -29,7 +38,7 @@ else:
 	
 	name = "Scribe"
 	version = None
-	hdr = open("..\\code\\scribeinc.h", "r").read().split("\n")
+	hdr = open(os.path.join(codeDir, "scribeinc.h"), "r").read().split("\n")
 	for h in hdr:
 		if h.find("#define ScribeVer") >= 0:
 			p = h.split()
@@ -76,4 +85,5 @@ else:
 			# print("cwd:", os.getcwd())
 			print("inpath:", in_path, "out_path:", out_path)
 
+			print("cp:", in_path, out_path)
 			result = shutil.copyfile(in_path, out_path)

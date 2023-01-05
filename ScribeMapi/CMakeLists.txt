@@ -1,6 +1,6 @@
 
 
-add_library(scribe-mapi SHARED
+add_library(ScribeMapi SHARED
 	${LGI_DIR}/src/common/Gdc2/Colour.cpp
     ${LGI_DIR}/src/common/Hash/md5/md5.c
     ${LGI_DIR}/src/common/Net/Base64.cpp
@@ -15,15 +15,15 @@ add_library(scribe-mapi SHARED
     Code/ScribeMapi.cpp
 	)
 
-target_link_libraries(scribe-mapi
+target_link_libraries(ScribeMapi
     PRIVATE
         lgi-stub)
 
-target_include_directories(scribe-mapi
+target_include_directories(ScribeMapi
     PRIVATE
         )
 
-target_compile_definitions(scribe-mapi
+target_compile_definitions(ScribeMapi
     PRIVATE
         LGI_STATIC
         WINDOWS

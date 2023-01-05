@@ -14,8 +14,16 @@ else:
 	
 # setup paths
 basepath = os.path.abspath(os.path.join(os.path.realpath(__file__), "..\\..\\.."))
-exe = os.path.join(basepath, "Windows", build_folder, "Scribe.exe")
-hdr = os.path.join(basepath, "code\\scribeinc.h")
+is_cmake = os.path.exists(os.path.join(basepath, "CMakeCache.txt"))
+
+if is_cmake:
+	exe = os.path.join(basepath, "Release", "Scribe.exe")
+	hdr = os.path.join(basepath, "..", "trunk_os", "code", "scribeinc.h")
+else:
+	exe = os.path.join(basepath, "Windows", build_folder, "Scribe.exe")
+	hdr = os.path.join(basepath, "code\\scribeinc.h")
+print("exe:", exe)
+
 print("basepath:", basepath)
 if not os.path.exists(exe):
 	print("exe doesn't exist':", exe)

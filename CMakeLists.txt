@@ -6,6 +6,10 @@ if (APPLE)
 	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version")
 elseif (UNIX)
     set(LINUX TRUE)
+elseif (WIN32)
+    # Turn on symbols for release build, before we include other targets
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 endif()
 set(CMAKE_CXX_STANDARD 14)
 
@@ -25,7 +29,9 @@ if (NOT EXISTS ${ASPELL_DIR})
     message(FATAL_ERROR "Missing ASPELL_DIR=${ASPELL_DIR}")
 endif()
 
-add_subdirectory(ScribeMapi)
+if (WIN32)
+    add_subdirectory(ScribeMapi)
+endif()
 
 # Platform settings
 if (WIN32)
@@ -197,6 +203,7 @@ if (WIN32)
         Code/Store3Mapi/ScribeMapi_Store.cpp
         Code/Store3Mapi/ScribeMapi_Thing.cpp
         Code/ImpExp_Outlook.cpp
+        Code/Resource.rc
         ${LGI_DIR}/src/common/Coding/ExternCall.asm
         )
 
@@ -352,32 +359,26 @@ elseif (WIN32)
         message(WARNING "No NSIS installed, skipping dist target.")
 
     else()
-    
-        # foreach (CFG in ${CMAKE_CONFIGURATION_TYPES})
-    
+
+        # Copy in the files that the installer will reference:
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Utils/Store DESTINATION ${CMAKE_BINARY_DIR}/Utils)
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Code/Py DESTINATION ${CMAKE_BINARY_DIR}/Code)
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Resources DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Scripts DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Help DESTINATION ${CMAKE_BINARY_DIR})
+        
+        # Generate the installer:
         set(NSI_IN "${CMAKE_CURRENT_LIST_DIR}/Windows/Installer-64bit.nsi.in")
         if (NOT EXISTS ${NSI_IN})
             message(FATAL_ERROR "Expecting to see ${NSI_IN}")
         endif()
-        set(NSI_OUT "${CMAKE_BINARY_DIR}/installer.nsi")
+        file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/installer-$<CONFIG>.nsi" INPUT ${NSI_IN})
 
-        file(READ ${NSI_IN} NSI_CONTENT)
-        #file(GENERATE
-        #    OUTPUT ${NSI_OUT}
-        #    CONDITION "$<CONFIG:${CFG}>"
-        #    CONTENT "dir $<TARGET_FILE:scribe>"
-        #)
-        # ${NSI_CONTENT}
-
-        # file(TO_NATIVE_PATH ${NSI} NSI)
-
+        # Add a target for it:
         add_custom_target(dist-win
-            COMMAND echo "${NSI_CONTENT}" > ${NSI_OUT}
-            COMMAND echo "cmd: ${NSIS} ${NSI_OUT}"
-            COMMAND ${NSIS} ${NSI_OUT})
+            DEPENDS scribe ScribeMapi aspell Updater
+            COMMAND "${NSIS}" "${CMAKE_BINARY_DIR}/installer-$<CONFIG>.nsi")
     
-        # endforeach()
-
     endif()
 
 

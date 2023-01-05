@@ -2,34 +2,34 @@
 !include LogicLib.nsh
 ; !include WinVer.nsh
 
-!system '"C:\Program Files\Python39\python.exe" ${CMAKE_CURRENT_LIST_DIR}\Utils\Store\check-build.py' = 0
+!system '"C:\Program Files\Python39\python.exe" Utils\Store\check-build.py' = 0
 
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"
 
-!system "copy $<TARGET_FILE:scribe> scribe-setup" = 0
-!system "copy $<TARGET_FILE:scribe-mapi> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:scribe>> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:ScribeMapi>> scribe-setup" = 0
 
-!system "copy $<TARGET_FILE:aspell> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:aspell>> scribe-setup" = 0
 
-!system "copy $<TARGET_FILE:libjpeg9a> scribe-setup" = 0
-!system "copy $<TARGET_FILE:libpng16> scribe-setup" = 0
-!system "copy $<TARGET_FILE:zlib> scribe-setup" = 0
-!system "copy $<TARGET_FILE:chardet> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:libjpeg9a>> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:libpng16>> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:zlib>> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:chardet>> scribe-setup" = 0
 
-!system "copy $<TARGET_FILE:lgi> scribe-setup" = 0
-!system "copy $<TARGET_FILE:ntlm> scribe-setup" = 0
-!system "copy $<TARGET_FILE:Updater> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:lgi>> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:ntlm>> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:Updater>> scribe-setup" = 0
 
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.exe'
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.dll'
 
 ; Generate the DOM documentation
-!system "py ${CMAKE_CURRENT_LIST_DIR}\Code\Py\DomScan.py > scribe-setup\Dom.txt"
+!system "py Code\Py\DomScan.py > scribe-setup\Dom.txt"
 
-!system "python ${CMAKE_CURRENT_LIST_DIR}\Utils\Store\store.py .\x64ReleaseNoOptimize19\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
-!system "python ${CMAKE_CURRENT_LIST_DIR}\Utils\Store\store.py .\x64Release19\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0
-!system "python ${CMAKE_CURRENT_LIST_DIR}\Utils\Store\store.py ..\..\..\Lgi\trunk\lib\Lgi19x64nop.pdb Lgi ${__DATE__} ${__TIME__}" = 0
+!system "python Utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:scribe>>\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
+!system "python Utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:ScribeMapi>>\*.pdb Mapi ${__DATE__} ${__TIME__}" = 0
+!system "python Utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:lgi>>\*.pdb Lgi ${__DATE__} ${__TIME__}" = 0
 
 ;--------------------------------
 SetCompressor lzma
@@ -67,81 +67,73 @@ Section ""
 	Delete $INSTDIR\Lgi*.dll
 
 	; Program files
-	File .\scribe-setup\Scribe.exe
-	File .\scribe-setup\Updater.exe
-	File .\scribe-setup\ScribeMapi.dll
-	File .\scribe-setup\aspell-dist-0.60.dll
-	File .\scribe-setup\Lgi19x64nop.dll
-	File .\scribe-setup\libntlm19x64nop.dll
-	File .\scribe-setup\libjpeg9a_19x64.dll
-	File .\scribe-setup\libpng15_19x64.dll
-	File .\scribe-setup\zlib_19x64.dll
-	File .\scribe-setup\chardet19x64.dll
+	File .\scribe-setup\*.exe
+	File .\scribe-setup\*.dll
 
 	; Resources
 	CreateDirectory $INSTDIR\Resources
 	SetOutPath $INSTDIR\Resources
-	File ..\Resources\Scribe.lr8
-	File ..\Resources\Flags.png
-	File ..\Resources\Icons-16.png
-	File ..\Resources\xgate-icons-32.png
-	File ..\Resources\About64px.png
-	File ..\Resources\About.html
-	File ..\Resources\Title.html
-	File ..\Resources\Title.png
-	File ..\Resources\NoFace*.png
-	File ..\Resources\EmojiMap.png
-	File ..\Resources\Preview*.html
+	File Resources\Scribe.lr8
+	File Resources\Flags.png
+	File Resources\Icons-16.png
+	File Resources\xgate-icons-32.png
+	File Resources\About64px.png
+	File Resources\About.html
+	File Resources\Title.html
+	File Resources\Title.png
+	File Resources\NoFace*.png
+	File Resources\EmojiMap.png
+	File Resources\Preview*.html
 
 	CreateDirectory $INSTDIR\Resources\Themes
 	SetOutPath $INSTDIR\Resources\Themes
-	File ..\Resources\Themes\readme.txt
+	File Resources\Themes\readme.txt
 
 	CreateDirectory $INSTDIR\Resources\Themes\Dark
 	SetOutPath $INSTDIR\Resources\Themes\Dark
-	File ..\Resources\Themes\Dark\*
+	File Resources\Themes\Dark\*
  
 	; Aspell support
 	CreateDirectory $INSTDIR\Aspell
 	SetOutPath $INSTDIR\Aspell
-	File ..\Resources\aspell-languages.csv
+	File Resources\aspell-languages.csv
 	CreateDirectory $INSTDIR\Aspell\data
 	SetOutPath $INSTDIR\Aspell\data
-	File ..\..\libs\aspell-0.60.6.1\data\*.cmap
-	File ..\..\libs\aspell-0.60.6.1\data\*.cset
-	File ..\..\libs\aspell-0.60.6.1\data\*.kbd
+	File libs\aspell-0.60.6.1\data\*.cmap
+	File libs\aspell-0.60.6.1\data\*.cset
+	File libs\aspell-0.60.6.1\data\*.kbd
  
 	; Scripts
 	CreateDirectory $INSTDIR\Scripts
 	SetOutPath $INSTDIR\Scripts
 	File .\scribe-setup\Dom.txt
-	File ..\Resources\resdefs.h
+	File Resources\resdefs.h
 
-	File "..\Scripts\ScribeScripts.h"
-	File "..\Scripts\Add Senders To Contacts.script"
-	File "..\Scripts\Delete Attachments.script"
-	File "..\Scripts\Delete Duplicate Messages.script"
-	File "..\Scripts\Mail Filters Menu.script"
+	File Scripts\ScribeScripts.h
+	File "Scripts\Add Senders To Contacts.script"
+	File "Scripts\Delete Attachments.script"
+	File "Scripts\Delete Duplicate Messages.script"
+	File "Scripts\Mail Filters Menu.script"
 
 	; Help files
 	CreateDirectory $INSTDIR\Help
 	SetOutPath $INSTDIR\Help
-	File ..\Help\*.html
-	File ..\Help\*.css
+	File Help\*.html
+	File Help\*.css
 	CreateDirectory $INSTDIR\Help\scripting
 	SetOutPath $INSTDIR\Help\scripting
-	File ..\..\..\Lgi\trunk\docs\scripting\*.html
-	File ..\..\..\Lgi\trunk\docs\scripting\*.css
+	File ..\..\Lgi\trunk\docs\scripting\*.html
+	File ..\..\Lgi\trunk\docs\scripting\*.css
   
 	; Do CRT check
 	ExecWait '"$INSTDIR\Scribe.exe" -crtcheck' $0
 	${If} $0 != 0
-		inetc::get /caption "Visual Studio 2015 Redistributable" /popup "" "http://memecode.com/scribe/data/vcredist_vs2019x64.exe" "$INSTDIR\vcredist_vs2019x64.exe" /end
+		inetc::get /caption "Visual Studio 2019 Redistributable" /popup "" "http://memecode.com/scribe/data/vcredist_vs2019x64.exe" "$INSTDIR\vcredist_vs2019x64.exe" /end
 		Pop $0 # return value = exit code, "OK" means OK
 		DetailPrint "Download: $0"
 		${If} $0 == "OK"
-				ExecWait "$INSTDIR\vcredist_vs2019x64.exe"
-				Delete "$INSTDIR\vcredist_vs2019x64.exe"
+			ExecWait "$INSTDIR\vcredist_vs2019x64.exe"
+			Delete "$INSTDIR\vcredist_vs2019x64.exe"
 		${EndIf}
 	${EndIf}
 
@@ -228,4 +220,4 @@ SectionEnd
 
 ; !system "del /Q .\scribe-setup"
 ; !system "rmdir .\scribe-setup"
-!finalize "python ..\Utils\Store\store.py ${OUTFILE} . ${__DATE__} ${__TIME__}"
+!finalize "python Utils\Store\store.py ${OUTFILE} . ${__DATE__} ${__TIME__}"

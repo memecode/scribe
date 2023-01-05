@@ -4,6 +4,7 @@ import sys
 import re
 
 src = []
+scriptDir = os.path.abspath(os.path.join(os.path.realpath(__file__), ".."))
 roots = ["..", "../../../../lgi/trunk"]
 	
 def scan(path):
@@ -15,16 +16,16 @@ def scan(path):
 			scan(full)
 		else:		
 			ext = f.lower().split(".")[-1]
-			if f.find("GHtml2.cpp") >= 0:
+			if f.find("Html2.cpp") >= 0:
 				continue
-			if ext == "h" or f.find("GVariant.cpp") >= 0:
+			if ext == "h" or f.find("Variant.cpp") >= 0:
 				# put headers first, we need the OPT_ defs before we parse the Contacts
 				src = [full] + src
 			elif ext == "cpp":
 				src.append(full)
 
 for root in roots:
-	root = os.path.abspath(os.path.join(os.path.realpath(__file__), "..", root.replace("/", os.sep)))
+	root = os.path.abspath(os.path.join(scriptDir, root.replace("/", os.sep)))
 	scan(root)
 
 def ObjectNameFromLine(parts):
@@ -35,7 +36,6 @@ def ObjectNameFromLine(parts):
 		else:
 			obj += "::" + parts[i]
 	return obj
-	
 
 class Object:
 	Name = None
@@ -44,7 +44,6 @@ class Object:
 	def __init__(self):
 		self.Fields = []
 		self.Methods = []
-
 
 obj = None
 scribe_props = dict()
