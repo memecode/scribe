@@ -1069,6 +1069,7 @@
 #define IDC_MSG_ID								1327
 #define IDC_FILTER								1328
 #define IDS_GNUPG_ERR_WRONG_SEGS				1329
+#define IDS_RELATIVE_TIMES						1333
 #define IDS_1335								1335
 #define IDS_CHECKING_OBJECTS					1336
 #define IDS_ERROR_FOLDER_NOT_LOADED				1337

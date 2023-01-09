@@ -143,6 +143,7 @@
 #define OPT_AccPermRead				"AccPermRd"			//(ScribePerm)
 #define OPT_AccPermWrite			"AccPermWr"			//(ScribePerm)
 #define OPT_SizeInKiB				"SizeInKiB"			//(bool)
+#define OPT_RelativeDates			"RelativeDates"		//(bool)
 
 #define OPT_BayesFilterMode			"BayesMode"			//(ScribeBayesianFilterMode)
 #define OPT_BayesMoveTo				"BayesMvTo"			//(char*)

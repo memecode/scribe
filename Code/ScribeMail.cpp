@@ -8085,14 +8085,18 @@ const char *Mail::GetFieldText(int Field)
 
 			    if (AdjustDateTz)
 			    {
-			        LDateTime dt = *GetDateSent();
                     if (dt.GetTimeZone() != LDateTime::SystemTimeZone())
     			        dt.SetTimeZone(LDateTime::SystemTimeZone(), true);
-			        dt.Get(Buf, sizeof(Buf));
-			    }
-			    else
-			    {
-				    GetDateSent()->Get(Buf, sizeof(Buf));
+				}
+
+				if (ShowRelativeDates)
+				{
+					auto rel = RelativeTime(dt);
+					strcpy_s(Buf, sizeof(Buf), rel ? rel : "#error:RelativeTime");
+				}
+				else
+				{
+					dt.Get(Buf, sizeof(Buf));
 				}
 			}
 			else
@@ -8103,19 +8107,26 @@ const char *Mail::GetFieldText(int Field)
 		}
 		case FIELD_DATE_RECEIVED:
 		{
-			if (GetDateReceived()->Year())
+			auto DateReceived = GetDateReceived();
+			if (DateReceived->Year())
 			{
+		        LDateTime dt = *DateReceived;
 			    if (AdjustDateTz)
 			    {
-			        LDateTime dt = *GetDateReceived();
                     if (dt.GetTimeZone() != LDateTime::SystemTimeZone())
     			        dt.SetTimeZone(LDateTime::SystemTimeZone(), true);
-			        dt.Get(Buf, sizeof(Buf));
 			    }
-			    else
-			    {
-    				GetDateReceived()->Get(Buf, sizeof(Buf));
-    			}
+
+				dt.Get(Buf, sizeof(Buf));
+				if (ShowRelativeDates)
+				{
+					auto rel = RelativeTime(dt);
+					strcpy_s(Buf, sizeof(Buf), rel ? rel : "#error:RelativeTime");
+				}
+				else
+				{
+				    dt.Get(Buf, sizeof(Buf));
+				}
 			}
 			else
 			{

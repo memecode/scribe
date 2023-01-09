@@ -190,6 +190,7 @@ size_t ScribeClipboardFmt::Sizeof()
 }
 
 bool OptionSizeInKiB = false;
+bool ShowRelativeDates = false;
 const char *MailAddressDelimiters = "\t\r\n;,";
 
 char16 SpellDelim[] =
@@ -3476,6 +3477,8 @@ bool ScribeWnd::LoadOptions()
 
 		if (GetOptions()->GetValue(OPT_SizeInKiB, v))
 			OptionSizeInKiB = v.CastInt32() != 0;	
+		if (GetOptions()->GetValue(OPT_RelativeDates, v))
+			ShowRelativeDates = v.CastInt32() != 0;	
 
 		// date format
 		if (GetOptions()->GetValue(OPT_DateFormat, v))

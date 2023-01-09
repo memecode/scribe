@@ -531,7 +531,7 @@ const char *RelativeTime(LDateTime &Then)
 	uint64 n, t;
 	Now.Get(n);
 	Then.Get(t);
-	int64 Diff = (int64)t - (int64)n;
+	int64_t Diff = (int64)t - (int64)n;
 
 	int Yrs = 0;
 	int Months = 0;
@@ -540,24 +540,44 @@ const char *RelativeTime(LDateTime &Then)
 	int Mins = 0;
 	LDateTime i = Now;
 	int Inc = Then > Now ? 1 : -1;
+	char DirIndcator = Then > Now ? '+' : '-';
 	while (ABS(Diff) >= YEAR_1)
 	{
 		Yrs++;
 		i.Year(i.Year()+Inc);
 		i.Get(n);
 		Diff = (int64)t - (int64)n;
-	}	
-	if (ABS(i.DiffMonths(Then)) > 1)
-	{
-		Months = i.DiffMonths(Then);
-		i.AddMonths(Months);
-		Months = abs(Months);
-		i.Get(n);
-		Diff = (int64)t - (int64)n;
 	}
+
+	int TotalDays = 0;
 	if (ABS(Diff) > DAY_1)
 	{
-		Days = (int) (Diff / DAY_1);
+		TotalDays = Days = (int) (Diff / DAY_1);
+
+		while (true)
+		{
+			LDateTime first = i;
+			first.AddMonths(Inc);
+			if (	
+				(Inc < 0 && first > Then) // Tracking back in time..
+				||
+				(Inc > 0 && Then > first) // Forward in time..
+			)
+			{
+				Months += Inc;
+				i = first;
+			}
+			else break;
+		}
+
+		if (Months)
+		{
+			uint64 remaining;
+			i.Get(remaining);
+			Diff = (int64_t)t - (int64_t)remaining;
+			Days = (int) (Diff / DAY_1);
+		}
+
 		Diff -= (int64) Days * DAY_1;
 	}
 	if (ABS(Diff) > HOUR_1)
@@ -574,47 +594,57 @@ const char *RelativeTime(LDateTime &Then)
 	if (Yrs)
 	{
 		// Years + months
-		sprintf_s(Val, sizeof(Val), "%+iy %im", Yrs, abs(Months));
+		sprintf_s(Val, sizeof(Val), "%c%iy %im", DirIndcator, abs(Yrs), abs(Months));
 	}
 	else if (Months)
 	{
 		// Months + days
-		sprintf_s(Val, sizeof(Val), "%+im %id", Months, abs(Days));
+		sprintf_s(Val, sizeof(Val), "%c%im %id (%i)", DirIndcator, abs(Months), abs(Days), TotalDays);
 	}
 	else if (Days)
 	{
-		// Days + hours...
-		sprintf_s(Val, sizeof(Val), "%+id %ih", Days, abs(Hrs));
+		if (abs(Days) >= 7)
+		{
+			// Weeks + days...
+			sprintf_s(Val, sizeof(Val), "%c%iw %id (%id)", DirIndcator, abs(Days)/7, abs(Days)%7, TotalDays);
+		}
+		else
+		{
+			// Days + hours...
+			sprintf_s(Val, sizeof(Val), "%c%id %ih", DirIndcator, abs(Days), abs(Hrs));
+		}
 	}
 	else if (Hrs)
 	{
 		// Hours + min
-		sprintf_s(Val, sizeof(Val), "%+ih %im", Hrs, abs(Mins));
+		sprintf_s(Val, sizeof(Val), "%c%ih %im", DirIndcator, abs(Hrs), abs(Mins));
 	}
 	else
 	{
 		// Mins
-		sprintf_s(Val, sizeof(Val), "%+im", Mins);
+		sprintf_s(Val, sizeof(Val), "%c%im", DirIndcator, abs(Mins));
 	}
 
-	LDateTime Dt;
+	if (Yrs != 0 || Months != 0)
 	{
-		LDateTime a = Then, b = Now;
-		a.SetTime("0:0:0");
-		b.SetTime("0:0:0");
-		Dt = a - b;
+		sprintf_s(s, sizeof(s), "%s", Val);
+		return s;
 	}
+
+	auto NowDay = n / DAY_1;
+	auto ThenDay = t / DAY_1;
+	auto DaysDiff = (int64_t)ThenDay - (int64_t)NowDay;
 
 	int Ch = 0;
-	if (Now.IsSameDay(Then))
+	if (NowDay == ThenDay)
 		Ch = sprintf_s(s, sizeof(s), "%s", LLoadString(IDS_TODAY));
-	else if (Dt.Day() == -1)
+	else if (DaysDiff == -1)
 		Ch = sprintf_s(s, sizeof(s), "%s", LLoadString(IDS_YESTERDAY));
-	else if (Dt.Day() == 1)
+	else if (DaysDiff == 1)
 		Ch = sprintf_s(s, sizeof(s), "%s", LLoadString(IDS_TOMORROW));
-	else if (Dt.Day() > 1 && Dt.Day() < 7)
+	else if (DaysDiff > 1 && DaysDiff < 7)
 		Ch = sprintf_s(s, sizeof(s), LLoadString(IDS_THIS_WEEK), LLoadString(Id[Then.DayOfWeek()]));
-	else if (Dt.Day() >= 7 && Dt.Day() < 14)
+	else if (DaysDiff >= 7 && DaysDiff < 14)
 		Ch = sprintf_s(s, sizeof(s), LLoadString(IDS_NEXT_WEEK), LLoadString(Id[Then.DayOfWeek()]));
 	else
 	{

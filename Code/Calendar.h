@@ -18,6 +18,7 @@ class CalendarSource;
 class LTimeLine;
 
 extern void InitCalendarView();
+extern const char *RelativeTime(LDateTime &Then);
 
 enum CalRecurEndType {
 	CalEndError,

@@ -32,6 +32,7 @@ extern char MailToStr[];
 extern char SubjectStr[];
 extern char ContentTypeDefault[];
 extern bool OptionSizeInKiB;
+extern bool ShowRelativeDates;
 
 // Mime types
 extern char sMimeVCard[];

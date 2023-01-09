@@ -1056,7 +1056,9 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 			}
 			
 			if (Opts->GetValue(OPT_SizeInKiB, v))
-				OptionSizeInKiB = v.CastInt32() != 0;	
+				OptionSizeInKiB = v.CastInt32() != 0;
+			if (Opts->GetValue(OPT_RelativeDates, v))
+				ShowRelativeDates = v.CastInt32() != 0;
 			
 			CalendarViewWnd::OnOptionsChange();
 
