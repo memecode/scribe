@@ -944,7 +944,6 @@ bool BuildSpamDB::Process()
 			if (Debug)
 				Debug->Print("%s:%i - add folder '%s', Type=%i\n", _FL, Path.Get(), Type);
 
-			auto ItemType = f->GetItemType();
 			auto Parent = f->GetParent();
 
 			if (Type != BayesMailUnknown && Parent)
@@ -1001,7 +1000,7 @@ bool BuildSpamDB::Process()
 				{
 					MailLoads++;
 
-					auto loaded = i.m->GetLoaded();
+					// auto loaded = i.m->GetLoaded();
 
 					i.m->WhenLoaded(_FL, [this, mail = i.m, type = i.type]
 					{

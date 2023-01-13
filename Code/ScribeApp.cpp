@@ -463,7 +463,7 @@ void SoftwareUpdate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function
 		{
 			auto status = UpgradeSoftware(Info, Parent, WithUI);
 			if (callback)
-				callback(true); // update is going to happen
+				callback(status); // update is going to happen
 		}
 	});
 }

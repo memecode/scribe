@@ -7891,10 +7891,6 @@ void Mail::SetFlagsCache(int64_t NewFlags, bool IgnoreReceipt, bool UpdateScreen
 				App->OnBayesianMailEvent(this, BayesMailUnknown, BayesMailHam);
 			}
 		}
-		else
-		{
-			int asd=0;
-		}
 
 		if (UpdateScreen)
 		{

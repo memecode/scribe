@@ -59,12 +59,6 @@ bool ThingType::IsLoaded(int Set)
 		{
 			Loaded = true;
 
-			if (GetObject() &&
-				GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Imap)
-			{
-				int asd=0;
-			}
-
 			for (auto cb: OnLoadCallbacks)
 			{
 				// LgiTrace("OnLoadCallbacks %s:%i\n", cb.File, cb.Line);
