@@ -2248,7 +2248,7 @@ void ScribeWnd::OnCreate()
 				"Scripts");
 			if (!LDirExists(s))
 				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
-					#if defined(WINDOWS) && defined(_DEBUG)
+					#if defined(LINUX) || defined(WINDOWS)
 					"..\\"
 					#endif
 					"Scripts");
