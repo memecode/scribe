@@ -208,15 +208,11 @@ ScribeFolder::~ScribeFolder()
 	}
 
 	Thing *t;
-	while ((t = Items[0]))
+	int i = 0;
+	while ((t = Items[i]))
 	{
-		t->SetObject(NULL, true, _FL);
-		if (t->DecRefs())
-		{
-			DeleteObj(t);
-		}
-		else
-			Items.Delete(t);
+		if (!t->DecRef())
+			i++;
 	}
 
 	Update();
@@ -553,14 +549,8 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 				Thing *t;
 				while ((t = Items[0]))
 				{
-					if (t->DecRefs())
-					{
-						DeleteObj(t);
-					}
-					else
-					{
-						Items.Delete(t);
-					}
+					t->DecRef();
+					Items.Delete(t);
 				}
 				
 				// Delete the child folders...
@@ -650,12 +640,9 @@ bool ScribeFolder::DeleteThing(Thing *t)
 
 		if (t->GetObject()->Delete())
 		{
-			Items.Delete(t);
-			t->ParentFolder = 0;
+			t->SetParentFolder(NULL);
 			if (View())
-			{
 				View()->Remove(t);
-			}
 		}
 	}
 
@@ -1416,12 +1403,8 @@ bool ScribeFolder::UnloadThings()
 				t->Save(0);
 			}
 
-			// t->Store->Object = 0;
 			t->SetObject(NULL, false, _FL);
-
-			// Dels++;
-			if (t->DecRefs())
-				DeleteObj(t);
+			t->DecRef();
 		}
 
 		Items.Empty();
@@ -1495,12 +1478,7 @@ Store3State ScribeFolder::LoadThings(LViewI *Parent)
 			else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
 			{
 				t->SetObject(c, false, _FL);
-				t->App = App;
-
-				t->ParentFolder = this;
-				LAssert(!Items.HasItem(t));
-				Items.Insert(t);
-						
+				t->SetParentFolder(this);
 				t->OnSerialize(false);
 			}
 		}
@@ -2127,16 +2105,13 @@ public:
 	{
 		SetFlags(MAIL_READ | MAIL_CREATED);
 		Container = c;
-		ParentFolder = f;
+		SetParentFolder(f);
 		SetSubject((char*)LLoadString(IDS_MISSING_PARENT));
 	}
 
 	~NullMail()
 	{
-		if (ParentFolder && !ParentFolder->Items.HasItem(this))
-		{
-			ParentFolder->Items.Insert(this);
-		}
+		SetParentFolder(NULL);
 	}
 
 	bool IsPlaceHolder() override
@@ -2858,8 +2833,7 @@ bool ScribeFolder::Delete(LArray<Thing*> &Items, bool ToTrash)
 	{
 		if (i->IsPlaceHolder())
 		{
-			if (i->DecRefs())
-				delete this;
+			i->DecRef();
 		}
 		else
 		{
@@ -3686,8 +3660,7 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 			Contact *c = t->IsContact();
 			if (!c)
 			{
-				if (t->DecRefs())
-					DeleteObj(t);
+				t->DecRef();
 				Error = true;
 				break;
 			}
@@ -3711,8 +3684,7 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 			}
 			else
 			{
-				if (t->DecRefs())
-					DeleteObj(t);
+				t->DecRef();
 				break;
 			}
 
@@ -3745,8 +3717,7 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 			}
 			else
 			{
-				if (t->DecRefs())
-					DeleteObj(t);
+				t->DecRef();
 				break;
 			}
 		}
@@ -3761,13 +3732,13 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 
 		if (!t->Import(stream, mimeType))
 		{
-			if (t->DecRefs()) DeleteObj(t);
+			t->DecRef();
 			IoProgressError("Contact import failed.");
 		}
 
 		if (!t->Save(this))
 		{
-			if (t->DecRefs()) DeleteObj(t);
+			t->DecRef();
 			IoProgressError("Contact save failed.");
 		}
 

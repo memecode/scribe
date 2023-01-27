@@ -691,11 +691,6 @@ public:
 	NoContactType(ScribeWnd *wnd) : Contact(wnd)
 	{
 	}
-	
-	~NoContactType()
-	{
-		RefCount--;
-	}
 
 	Thing &operator =(Thing &c) override
 	{
@@ -777,7 +772,7 @@ public:
 	int				CtxLine = 0;
 
 	// Contact no face images
-	NoContactType NoContact;
+	LAutoRefPtr<NoContactType> NoContact;
 	
 	// Remote content white/blacklists
 	bool RemoteContent_Init = false;
@@ -837,9 +832,10 @@ public:
 
 	ScribeWndPrivate(ScribeWnd *app) :
 		App(app),
-		NoContact(app),
 		TextControlFactory(app)
 	{
+		NoContact = new NoContactType(app);
+		NoContact->DecRef(); // 2->1
 		AppWndHnd = LEventSinkMap::Dispatch.AddSink(App);
 
 		#ifdef WIN32
@@ -2786,7 +2782,7 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		}
 		case SdNoContact: // Type: Contact
 		{
-			Value = (LDom*)&d->NoContact;
+			Value = (NoContactType*)d->NoContact;
 			break;
 		}
 		case SdAccounts:
@@ -5980,8 +5976,7 @@ Thing *ScribeWnd::CreateItem(int Type, ScribeFolder *Folder, bool Ui)
 
 			if (!m->GetObject())
 			{
-				if (m->DecRefs())
-					DeleteObj(m);
+				m->DecRef();
 				return 0;
 			}
 
@@ -6834,9 +6829,9 @@ bool ScribeWnd::MailForward(Mail *m)
 				NewMail->DoUI();
 				Status = true;
 			}
-			else if (NewMail->DecRefs())
+			else
 			{
-				DeleteObj(NewMail);
+				NewMail->DecRef();
 			}
 		}
 	}
@@ -11449,12 +11444,12 @@ void ScribeWnd::MailMerge(LArray<ListAddr*> &Contacts, const char *FileName, Mai
 				ListAddr *la = Contacts[i];
 				RecipientItem *ri = (*la)[0];
 				Contact *c = ri ? ri->GetContact() : 0;
-				Contact temp(this);
+				Contact *temp = new Contact(this);
 				if (!c)
 				{
-					temp.SetFirst(la->sName);
-					temp.SetEmail(la->sAddr);
-					c = &temp;
+					temp->SetFirst(la->sName);
+					temp->SetEmail(la->sAddr);
+					c = temp;
 				}
 
 				Dom.Con = c;
@@ -11479,7 +11474,8 @@ void ScribeWnd::MailMerge(LArray<ListAddr*> &Contacts, const char *FileName, Mai
 
 					Msgs.Insert(Dom.Email);
 				}
-				temp.DecRefs();
+
+				temp->DecRef();
 			}
 
 			// Ask user what to do
@@ -11999,10 +11995,8 @@ bool ScribeWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArra
 
 	bool Status = false;
 
-	for (unsigned c=0; c<d->Store3EventCallbacks.Length(); c++)
-	{
-		d->Store3EventCallbacks[c]->OnMove(new_parent, old_parent, items);
-	}
+	for (auto cb: d->Store3EventCallbacks)
+		cb->OnMove(new_parent, old_parent, items);
 
 	ScribeFolder *New = CastFolder(new_parent);
 	ScribeFolder *Old = old_parent ? CastFolder(old_parent) : NULL;
@@ -12031,12 +12025,8 @@ bool ScribeWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArra
 					{
 						int UnreadMail = t->IsMail() ? !TestFlag(t->IsMail()->GetFlags(), MAIL_READ) : false;
 
-						if (Old)
-						{
-							LAssert(Old->Items.HasItem(t));
-							Old->Items.Delete(t);
-							if (UnreadMail) Old->OnUpdateUnRead(-1, false);
-						}
+						if (Old && UnreadMail)
+							Old->OnUpdateUnRead(-1, false);
 
 						if (t->GetList())
 						{
@@ -12049,7 +12039,7 @@ bool ScribeWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArra
 						if (New->GetSystemFolderType() == Store3SystemTrash)
 							t->SetUI();
 
-						t->SetParentFolder(New);				
+						t->SetParentFolder(New);
 						if (New->Select())
 						{
 							MailList->Insert(t);
@@ -12194,11 +12184,7 @@ bool ScribeWnd::OnDelete(LDataFolderI *Parent, LArray<LDataI*> &Items)
 				t->SetParentFolder(NULL);
 				t->SetObject(NULL, false, _FL);
 
-				if (t->DecRefs())
-				{
-					DeleteObj(t);
-				}
-				else
+				if (!t->DecRef())
 				{
 					t->SetDirty(false);
 					t->SetWillDirty(false);

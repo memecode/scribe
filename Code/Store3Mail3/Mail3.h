@@ -401,18 +401,16 @@ class LMail3Thing : public LDataI, public LMail3Obj
 	LMail3Thing &operator =(LMail3Thing &p) = delete;
 
 protected:
-    bool NewMail;
+    bool NewMail = false;
 
 	virtual const char *GetTable() { LAssert(0); return  0; }
 	virtual void OnSave() {};
 
 public:
-	LMail3Folder *Parent;
+	LMail3Folder *Parent = NULL;
 
 	LMail3Thing(LMail3Store *store) : LMail3Obj(store)
 	{
-		Parent = 0;
-		NewMail = false;
 	}
 
 	~LMail3Thing();

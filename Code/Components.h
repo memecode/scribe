@@ -31,11 +31,11 @@ struct InstallProgress : public LMutex, public LRefCount
 	{
 	}
 
-	void AddRef()
+	void IncRef()
 	{
 		if (Lock(_FL))
 		{
-			LRefCount::AddRef();
+			IncRef();
 			Unlock();
 		}
 	}

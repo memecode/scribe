@@ -813,7 +813,7 @@ public:
 		void Set(Mail *mail, ScribeMailType Type)
 		{
 			m = mail;
-			m->IncRefs();
+			m->IncRef();
 			type = Type;
 			loading = false;
 		}
@@ -1090,8 +1090,7 @@ void BuildSpamDB::ProcessMail(Mail *m, ScribeMailType Type)
 	m->SetFlags(flags);
 
 	// Delete our reference...
-	if (m->DecRefs())
-		delete m;
+	m->DecRef();
 }
 
 #ifdef _DEBUG
@@ -1675,7 +1674,7 @@ Store3Status BayesianFilter::OnBayesianMailEvent(Mail *m, ScribeMailType OldType
 
 	auto &w = d->Work.New();
 	w.m = m;
-	w.m->IncRefs();
+	w.m->IncRef();
 	w.Loading = false;
 	w.Done = false;
 	w.OldType = OldType;
@@ -1709,8 +1708,11 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 			{
 				for (auto j: d->Work)
 				{
-					if (!j.Done && j.m && j.m->DecRefs())
-						delete j.m;
+					if (!j.Done && j.m)
+					{
+						j.m->DecRef();
+						j.m = NULL;
+					}
 				}
 				d->Work.Length(0);
 			};
@@ -1778,8 +1780,7 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 					flags |= MAIL_BAYES_SPAM;
 				job.m->SetFlags(flags);
 
-				if (job.m->DecRefs())
-					delete job.m;
+				job.m->DecRef();
 				job.m = NULL;
 				job.Done = true;
 				processedCount++;

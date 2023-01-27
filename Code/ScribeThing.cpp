@@ -121,10 +121,8 @@ LArray<ThingType*> ThingType::DirtyThings;
 Thing::Thing(ScribeWnd *app, LDataI *object)
 {
 	_UserPtr = this;
-	RefCount = 1;
-	ParentFolder = 0;
-	Data = 0;
 	App = app;
+	IncRef(); // Someone always starts with owning this object.
 	SetObject(object, false, _FL);
 }
 
@@ -135,16 +133,10 @@ Thing::~Thing()
 		LAssert(!"Really, should we still be linked to a UI here?");
 	}
 
-	LAssert(RefCount == 0);
 	DirtyThings.Delete(this);
 	DeleteObj(Data);
 
-	if (ParentFolder)
-	{
-		LAssert(ParentFolder->Items.HasItem(this));
-
-		ParentFolder->Items.Delete(this);
-	}
+	SetParentFolder(NULL);
 
 	auto o = GetObject();
 	if (o)
@@ -198,21 +190,21 @@ bool Thing::OnKey(LKey &k)
 
 void Thing::SetParentFolder(ScribeFolder *f)
 {
-	if (ParentFolder == f)
+	if (GetFolder() == f)
 		return;
 	
-	if (ParentFolder)
+	if (_ParentFolder)
 	{
-		LAssert(ParentFolder->Items.HasItem(this));
-		ParentFolder->Items.Delete(this);
+		LAssert(_ParentFolder->Items.HasItem(this));
+		_ParentFolder->Items.Delete(this);
 	}
 
-	ParentFolder = f;
+	_ParentFolder = f;
 
-	if (ParentFolder)
+	if (_ParentFolder)
 	{
-		LAssert(!ParentFolder->Items.HasItem(this));
-		ParentFolder->Items.Insert(this);
+		LAssert(!_ParentFolder->Items.HasItem(this));
+		_ParentFolder->Items.Insert(this);
 	}
 }
 
@@ -241,7 +233,7 @@ Store3Status Thing::SetFolder(ScribeFolder *New, int Param)
 				if (Moved == Store3Success)
 				{
 					LAssert(!Old->Items.HasItem(this));
-					LAssert(ParentFolder == New);
+					LAssert(GetFolder() == New);
 					LAssert(New->Items.HasItem(this));
 				}
 			}
@@ -368,8 +360,7 @@ bool Thing::OnDelete()
 
 	if (IsPlaceHolder())
 	{
-		if (DecRefs())
-			delete this;
+		DecRef();
 		return true;
 	}
 

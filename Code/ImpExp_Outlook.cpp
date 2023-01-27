@@ -1962,8 +1962,7 @@ bool OutlookIO::ImportEmail(ScribeFolder *Folder, Mail *&To, IMessage *From, boo
 	
 	if (!From)
 	{
-	    if (To->DecRefs())
-	        DeleteObj(To);
+	    To->DecRef();
 	    return false;
 	}
 	
@@ -2013,8 +2012,7 @@ bool OutlookIO::ImportEmail(ScribeFolder *Folder, Mail *&To, IMessage *From, boo
 	Mail *Match = MatchEmail(Folder, To);
 	if (Match)
 	{
-	    if (To->DecRefs())
-	        DeleteObj(To);
+	    To->DecRef();
 		return true;
 	}
 
@@ -2569,8 +2567,7 @@ bool OutlookIO::ImportItem(ScribeFolder *Out, IMAPIFolder *In, SPropValue *Entry
 									Calendar *Match = MatchCalendar(Out, c);
 									if (Match)
 									{
-									    if (c->DecRefs())
-										    DeleteObj(c);
+									    c->DecRef();
 										c = Match;
 									}
 

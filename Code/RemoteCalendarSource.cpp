@@ -30,8 +30,7 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 	~RemoteCalendarSourcePriv()
 	{
 		for (auto c: Events)
-			if (c->DecRefs())
-				delete c;
+			c->DecRef();
 	}
 
 	void Post(int m, LMessage::Param a = 0, LMessage::Param b = 0)
@@ -65,9 +64,9 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 						LgiTrace("outsize=" LPrintfInt64 "\n", out.GetSize());
 						if (imp.Import(c->GetObject(), &out))
 							Events.Add(c);
-						else if (c->DecRefs())
+						else
 						{
-							delete c;
+							c->DecRef();
 							break;
 						}
 					}

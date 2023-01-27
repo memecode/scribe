@@ -468,15 +468,17 @@ class ThingUi;
 class ScribeClass Thing :
 	public ThingType,
 	public LListItem,
-	public LDragDropSource
+	public LDragDropSource,
+	public LRefCount
 {
 	friend class ScribeWnd;
 	friend class ScribeFolder;
 
+	ScribeFolder *_ParentFolder = NULL;
+
 protected:
 	LArray<int> FieldArray;
 	LAutoString DropFileName;
-	ScribeFolder *ParentFolder;
 
 	// This structure allows the app to move objects between
 	// mail stores. After a delayed write to the new mail store
@@ -494,17 +496,11 @@ protected:
 		}
 	}	DeleteOnAdd;
 
-	/// Extra refs by systems other than the folder tree.
-	int RefCount;
-
 public:
-	ThingStorage *Data;
+	ThingStorage *Data = NULL;
 
 	Thing(ScribeWnd *app, LDataI *object = 0);
 	~Thing();
-
-	void IncRefs() { RefCount++; }
-	bool DecRefs() { RefCount--; return RefCount <= 0; }
 
 	// Dom
 	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
@@ -532,7 +528,7 @@ public:
 	bool OnKey(LKey &k) override;
 
 	// Thing
-	ScribeFolder *GetFolder() override { return ParentFolder; }
+	ScribeFolder *GetFolder() override { return _ParentFolder; }
 	void SetParentFolder(ScribeFolder *f);
 	Store3Status SetFolder(ScribeFolder *f, int Param = -1) override;
 	LDataI *DefaultObject(LDataI *arg = 0);
@@ -1204,7 +1200,7 @@ protected:
 	LArray<int> FieldArray;
 	void SerializeFieldWidths(bool Write = false);
 	void EmptyFieldList();
-	void SetLoadFolder(Thing *t) { if (t) t->ParentFolder = this; }
+	void SetLoadFolder(Thing *t) { if (t) t->SetParentFolder(this); }
 	bool HasFieldId(int Id);
 
 	// Tree item stuff

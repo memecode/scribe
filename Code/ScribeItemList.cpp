@@ -94,8 +94,7 @@ void ThingList::DeletePlaceHolders()
 	while ((t = PlaceHolders[0]))
 	{
 		PlaceHolders.Delete(t);
-		if (t->DecRefs())
-			DeleteObj(t);
+		t->DecRef();
 	}
 }
 

@@ -11,6 +11,8 @@
 ///////////////////////////////////////////////////////////////////////////////////
 LMail3Thing::~LMail3Thing()
 {
+	if (Parent)
+		Parent->Items.a.Delete(this);
 }
 
 Store3Status LMail3Thing::Delete(bool ToTrash)

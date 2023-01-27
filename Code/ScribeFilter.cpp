@@ -2346,7 +2346,7 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 		bool Act = false;
 		bool Stop = false;
 
-		m->IncRefs();
+		m->IncRef();
 		for (auto f: Filters)
 		{
 			if (Stop)
@@ -2358,8 +2358,9 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 				Act = true;
 			}
 		}
-		if (m->DecRefs())
-			DeleteObj(m);
+		
+		m->DecRef();
+		m = NULL;
 
 		if (Act)
 		{
@@ -3241,7 +3242,7 @@ bool Filter::Save(ScribeFolder *Into)
 	
 	if (Into)
 	{
-		ParentFolder = Into;
+		SetParentFolder(Into);
 
 		if (ChkIncoming)
 			SetIncoming(ChkIncoming->Value()!=0);

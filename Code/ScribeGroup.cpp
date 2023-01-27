@@ -547,18 +547,12 @@ bool ContactGroup::Save(ScribeFolder *Into)
 	// Pre save checks
 
 	// Save
-	if (!ParentFolder)
-	{
-		ParentFolder = GetFolder();
-	}
-	if (!ParentFolder && App)
-	{
-		ParentFolder = App->GetFolder(FOLDER_GROUPS);
-	}
+	if (!GetFolder() && App)
+		SetParentFolder(App->GetFolder(FOLDER_GROUPS));
 
-	if (ParentFolder)
+	if (GetFolder())
 	{
-		Status = ParentFolder->WriteThing(this) != Store3Error;
+		Status = GetFolder()->WriteThing(this) != Store3Error;
 		if (Status)
 			SetDirty(false);
 	}

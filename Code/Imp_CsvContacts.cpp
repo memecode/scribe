@@ -392,8 +392,8 @@ void ImportCsv(ScribeWnd *App)
 										}
 										
 										m->Save();
-										if (c->DecRefs())
-											DeleteObj(c);
+										c->DecRef();
+										c = NULL;
 										m->Update();
 									}
 									else

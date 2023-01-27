@@ -3400,8 +3400,8 @@ bool Mail::AddCalendarEvent(LViewI *Parent, bool AddPopupReminder, LString *Msg)
 			}
 			else LgiTrace("%s:%i - GotoObject failed.\n", _FL);
 
-			if (Event && Event->DecRefs())
-				delete Event;
+			if (Event)
+				Event->DecRef();
 		}
 		else LgiTrace("%s:%i - CreateThingOfType failed.\n", _FL);
 	}
@@ -4003,8 +4003,8 @@ LMessage::Result MailUi::OnEvent(LMessage *Msg)
 						else
 						{
 							LAssert(0);
-							if (Match->DecRefs())
-								delete Match;
+							Match->DecRef();
+							Match = NULL;
 						}
 						
 						if (CmdAfterResize)
@@ -4919,17 +4919,11 @@ void Mail::ClearCachedItems()
 	PreviewCache.DeleteObjects();
 
 	Attachment *a;
-	while ((a = Attachments[0]))
+	int i = 0;
+	while ((a = Attachments[i]))
 	{
-		if (a->DecRefs())
-		{
-			delete a;
-		}
-		else
-		{
-			LAssert(0);
-			break;
-		}
+		if (!a->DecRef())
+			i++;
 	}
 }
 
@@ -6198,8 +6192,8 @@ bool Mail::DeleteAttachment(Attachment *File)
 				}
 			}
 
-			if (File->DecRefs())
-				DeleteObj(File);
+			File->DecRef();
+			File = NULL;
 
 			if (Attachments.Length() == 0)
 			{
@@ -6224,14 +6218,8 @@ bool Mail::UnloadAttachments()
 	for (auto it = Attachments.begin(); it != Attachments.end(); )
 	{
 		Attachment *a = *it;
-		if (a->DecRefs())
-		{
-			DeleteObj(a); // this deletes the object from the Attachments list
-		}
-		else
-		{
+		if (!a->DecRef())
 			it++;
-		}
 	}
 
 	return true;
@@ -6626,7 +6614,7 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 							}
 						}
 						
-						ParentFolder->Delete(Items, true);
+						GetFolder()->Delete(Items, true);
 
 						if (Index >= 0)
 						{
@@ -7769,7 +7757,7 @@ void Mail::DeleteAsSpam(LView *View)
 	}
 
 	// Move it to the spam folder if it exists.
-	auto FolderPath = ParentFolder->GetPath();
+	auto FolderPath = GetFolder()->GetPath();
 	LToken Parts(FolderPath, "/");
 	
 	if (Parts.Length() == 0)
@@ -7786,7 +7774,7 @@ void Mail::DeleteAsSpam(LView *View)
 			LMailStore *Ms = App->GetMailStoreForPath(FolderPath);
 			if (!Ms)
 			{
-				if (ParentFolder->GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Imap)
+				if (GetFolder()->GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Imap)
 				{
 					Ms = App->GetDefaultMailStore();
 					if (Ms && Ms->Root)
@@ -8299,9 +8287,9 @@ bool Mail::AttachFile(Attachment *File)
 				}
 			}
 		}
-		else if (File->DecRefs())
+		else
 		{
-			DeleteObj(File);
+			File->DecRef();
 		}
 	}
 
@@ -8348,8 +8336,8 @@ Attachment *Mail::AttachFile(LView *Parent, const char *FileName)
 		else
 		{
 			LgiMsg(Parent, LLoadString(IDS_ERROR_FILE_EMPTY), AppName);
-			if (File->DecRefs())
-				DeleteObj(File);
+			File->DecRef();
+			File = NULL;
 		}
 	}
 
@@ -8362,21 +8350,21 @@ bool Mail::Save(ScribeFolder *Into)
 
 	if (!Into)
 	{
-	    if (ParentFolder)
-		    Into = ParentFolder;
+	    if (GetFolder())
+		    Into = GetFolder();
 		else
 			Into = App->GetFolder(FOLDER_OUTBOX);
 	}
 
 	if (Into)
 	{
-		ScribeFolder *Old = ParentFolder;
+		ScribeFolder *Old = GetFolder();
 
-        if (!ParentFolder)
+        if (!GetFolder())
         {
-	        ParentFolder = Into;
+	        SetParentFolder(Into);
 	    }
-	    else if (ParentFolder != Into)
+	    else if (GetFolder() != Into)
 	    {
             // If this fails, you should really by using ScribeFolder::MoveTo to move
             // the item from it's existing location to the new folder...
@@ -8405,8 +8393,7 @@ bool Mail::Save(ScribeFolder *Into)
 		}
 		else
 		{
-			// LAssert(0);
-			ParentFolder = Old;
+			SetParentFolder(Old);
 		}
 	}
 	

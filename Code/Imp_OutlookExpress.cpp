@@ -164,10 +164,10 @@ public:
 class ImportDBX
 {
 private:
-	ScribeWnd *Parent;
-	ScribeFolder *ParentFolder;
+	ScribeWnd *Parent = NULL;
+	ScribeFolder *ParentFolder = NULL;
 	LFile F;
-	uint64 FileSize;
+	uint64 FileSize = 0;
 	List<ssize_t> Used;
 	
 	class MsgInfo

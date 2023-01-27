@@ -753,14 +753,14 @@ InstallProgress *CapabilityInstaller::StartAction(MissingCapsBar *Bar, LCapabili
 		p = new InstallProgress;
 		if (p)
 		{
-			p->AddRef(); // for the UI view...
+			p->IncRef(); // for the UI view...
 			p->Ui = Bar;
 
 			for (auto k : *Components)
 			{
 				CapabilityInstallerPriv::InstallJob *j = new CapabilityInstallerPriv::InstallJob;
 				j->Prog = p;
-				p->AddRef(); // The job owns a reference...
+				p->IncRef(); // The job owns a reference...
 				j->Component.Reset(NewStr(k.key));
 
 				#if DEBUG_CAPABILITIES
