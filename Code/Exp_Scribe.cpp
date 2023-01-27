@@ -329,9 +329,7 @@ public:
 												{
 													*n = (Thing&)*m;
 													n->SetParentFolder(To);
-													To->Items.Insert(n);
-
-													n->SetObject(To->GetObject()->GetStore()->Create(MAGIC_MAIL), _FL);
+													n->SetObject(To->GetObject()->GetStore()->Create(MAGIC_MAIL), false, _FL);
 													if (n->GetObject())
 													{
 														MailCreated++;
@@ -346,7 +344,7 @@ public:
 																if (NewAttachment)
 																{
 																	n->AttachFile(NewAttachment);
-																	NewAttachment->SetObject(n->GetObject()->GetStore()->Create(MAGIC_ATTACHMENT), _FL);
+																	NewAttachment->SetObject(n->GetObject()->GetStore()->Create(MAGIC_ATTACHMENT), false, _FL);
 																}
 															}
 														}
@@ -414,17 +412,6 @@ public:
 												{
 													*n = (Thing&)*c;
 													n->SetParentFolder(To);
-													To->Items.Insert(n);
-
-													/*
-													n->Store = To->Store->CreateSub(n);
-													if (n->Store)
-													{
-														n->Store->Object = n;
-														ContactCreated++;
-													}
-													else ContactErrors++;
-													*/
 												}
 												else ContactErrors++;
 											}

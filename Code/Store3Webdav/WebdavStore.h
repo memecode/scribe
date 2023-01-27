@@ -57,7 +57,7 @@ public:
 
 	// LDataStoreI impl
 	uint64 Size() { return 0; }
-	LDataI *Create(int Type) { return NULL; }
+	LDataI *Create(int Type);
 	LDataFolderI *GetRoot(bool create = false);
 	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items) { return Store3Error; }
 	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash);
@@ -192,7 +192,7 @@ public:
 	_(FIELD_CAL_ALL_DAY, AddDay) \
 	_(FIELD_CAL_PRIVACY, Privacy) \
 	_(FIELD_COLOUR, Colour) \
-	_(FIELD_STATUS, Status)
+	_(FIELD_STATUS, StoreStatus)
 
 #define WebdavCalendarStrings() \
 	_(FIELD_UID, Uid) \
@@ -202,7 +202,8 @@ public:
 	_(FIELD_CAL_REMINDERS, Reminders) \
 	_(FIELD_CAL_RECUR_FILTER_POS, FilterPos) \
 	_(FIELD_CAL_RECUR_FILTER_YEARS, FilterYears) \
-	_(FIELD_CAL_NOTES, Notes)
+	_(FIELD_CAL_NOTES, Notes) \
+	_(FIELD_CAL_STATUS, CalStatus)
 
 class WebdavCalendar : public WebdavObj
 {

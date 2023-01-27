@@ -696,7 +696,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
 
 						    LDataFolderI *r = DataStore->GetRoot();
 							if (r)
-    							Root->SetObject(r, _FL);
+    							Root->SetObject(r, false, _FL);
 
     						Wnd->Tree->Insert(Root);
     					}
@@ -729,7 +729,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
     						{
     							Root->App = Account->GetApp();
     							Root->SetLoadOnDemand();
-    							Root->SetObject(r, _FL);
+    							Root->SetObject(r, false,_FL);
     							Wnd->Tree->Insert(Root);
     						}
     					}

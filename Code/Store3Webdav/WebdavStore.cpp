@@ -82,6 +82,25 @@ Store3Status WebdavStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 	return Deleted == Items.Length() ? Store3Success : Store3Error;
 }
 
+LDataI *WebdavStore::Create(int Type)
+{
+	switch (Type)
+	{
+		case MAGIC_CALENDAR:
+		{
+			return new WebdavCalendar(this, NULL);
+			break;
+		}
+		case MAGIC_CONTACT:
+		{
+			return new WebdavContact(this, NULL);
+			break;
+		}
+	}
+
+	return NULL;
+}
+
 void WebdavStore::OnChanged()
 {
 	// Get the current settings

@@ -9,8 +9,11 @@
 /////////////////////////////////////////////////////////////////////////////////////
 WebdavCalendar::WebdavCalendar(WebdavStore *store, WebdavEvent *e) : WebdavObj(store)
 {
-	Href = e->Href;
-	vCal = e->Data;
+	if (e)
+	{
+		Href = e->Href;
+		vCal = e->Data;
+	}
 
 	#define _(f,v) v = 0;
 	WebdavCalendarInts()
@@ -67,9 +70,9 @@ Store3Status WebdavCalendar::Save(LDataI *parent)
 		if (Parent->Thread)
 		{
 			Ret = Parent->Thread->Save(Href, vCal);
-			if (Status != Ret)
+			if (StoreStatus != Ret)
 			{
-				Status = Ret;
+				StoreStatus = Ret;
 				FireOnChange(FIELD_STATUS);
 			}
 		}

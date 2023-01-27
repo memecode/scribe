@@ -125,7 +125,7 @@ Thing::Thing(ScribeWnd *app, LDataI *object)
 	ParentFolder = 0;
 	Data = 0;
 	App = app;
-	SetObject(object, _FL);
+	SetObject(object, false, _FL);
 }
 
 Thing::~Thing()
@@ -146,11 +146,10 @@ Thing::~Thing()
 		ParentFolder->Items.Delete(this);
 	}
 
-	if (GetObject() && !GetObject()->IsOnDisk()) // FIXME: This call is crashing sometimes...
+	auto o = GetObject();
+	if (o)
 	{
-		// The backend does a check that the 'Object' member is NULL.
-		LDataI *o = GetObject();
-		SetObject(NULL, _FL);
+		SetObject(NULL, true, _FL);
 		DeleteObj(o);
 	}
 }
@@ -161,7 +160,7 @@ LDataI *Thing::DefaultObject(LDataI *arg)
 
 	if (arg)
 	{
-		SetObject(arg, _FL);
+		SetObject(arg, false, _FL);
 	}
 	else if (!GetObject() &&
 			App &&
@@ -169,7 +168,7 @@ LDataI *Thing::DefaultObject(LDataI *arg)
 	{
 		LMailStore *Ms = App->GetDefaultMailStore();
 		if (Ms)
-			SetObject(Ms->Store->Create(Type()), _FL);
+			SetObject(Ms->Store->Create(Type()), false, _FL);
 	}
 
 	return GetObject();
@@ -195,6 +194,26 @@ bool Thing::OnKey(LKey &k)
 	#endif
 	
 	return false;
+}
+
+void Thing::SetParentFolder(ScribeFolder *f)
+{
+	if (ParentFolder == f)
+		return;
+	
+	if (ParentFolder)
+	{
+		LAssert(ParentFolder->Items.HasItem(this));
+		ParentFolder->Items.Delete(this);
+	}
+
+	ParentFolder = f;
+
+	if (ParentFolder)
+	{
+		LAssert(!ParentFolder->Items.HasItem(this));
+		ParentFolder->Items.Insert(this);
+	}
 }
 
 Store3Status Thing::SetFolder(ScribeFolder *New, int Param)
@@ -241,7 +260,7 @@ Store3Status Thing::SetFolder(ScribeFolder *New, int Param)
 
 						// Copy the current data into the new object
 						NewObject->CopyProps(*GetObject());
-						SetObject(NewObject, _FL);
+						SetObject(NewObject, false, _FL);
 
 						// Try writing it to the store...
 						// bool InOld = Old->Items.HasItem(this);
@@ -252,7 +271,7 @@ Store3Status Thing::SetFolder(ScribeFolder *New, int Param)
 							case Store3Error:
 							{
 								// It failed, delete the new object...
-								SetObject(OldObject, _FL);
+								SetObject(OldObject, false, _FL);
 								DeleteObj(NewObject);
 								break;
 							}
@@ -263,7 +282,7 @@ Store3Status Thing::SetFolder(ScribeFolder *New, int Param)
 								Moved = OldObject->Delete(false);
 								if (Moved == Store3Error)
 								{
-									SetObject(OldObject, _FL);
+									SetObject(OldObject, false, _FL);
 									DeleteObj(NewObject);
 								}
 								else if (Moved == Store3Success)
@@ -306,7 +325,7 @@ Store3Status Thing::SetFolder(ScribeFolder *New, int Param)
 								// us later, and still know whats going on.
 								LAssert(Old->Items.HasItem(this));	// The old folder needs to have 
 																		// a pointer to us until "OnNew".
-								SetObject(OldObject, _FL);
+								SetObject(OldObject, false, _FL);
 
 								// Setup a new Thing for the new Object...
 								Thing *t = App->CreateThingOfType(Type(), NewObject);

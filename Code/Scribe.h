@@ -533,7 +533,7 @@ public:
 
 	// Thing
 	ScribeFolder *GetFolder() override { return ParentFolder; }
-	void SetParentFolder(ScribeFolder *f) { ParentFolder = f; }
+	void SetParentFolder(ScribeFolder *f);
 	Store3Status SetFolder(ScribeFolder *f, int Param = -1) override;
 	LDataI *DefaultObject(LDataI *arg = 0);
 
@@ -999,7 +999,7 @@ public:
 	Mail(ScribeWnd *app, LDataI *object = 0);
 	~Mail();
 
-	bool SetObject(LDataI *o, const char *File, int Line) override;
+	bool SetObject(LDataI *o, bool InDataDestuctor, const char *File, int Line) override;
 
 	LDATA_STR_PROP(Label, FIELD_LABEL);
 	LDATA_STR_PROP(FwdMsgId, FIELD_FWD_MSG_ID);
@@ -1231,7 +1231,7 @@ public:
 	// Object
 	LArray<int> &GetFieldArray() { return FieldArray; }
 	LDataFolderI *GetFldObj() { return dynamic_cast<LDataFolderI*>(GetObject()); }
-	bool SetObject(LDataI *o, const char *File, int Line) override;
+	bool SetObject(LDataI *o, bool InDataDestuctor, const char *File, int Line) override;
 
 	// ThingType
 	Store3ItemTypes Type() override { return GetObject() ? (Store3ItemTypes)GetObject()->Type() : MAGIC_NONE; }

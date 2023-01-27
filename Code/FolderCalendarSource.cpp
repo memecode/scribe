@@ -211,7 +211,7 @@ Calendar *FolderCalendarSource::NewEvent()
 		return NULL;
 	}
 
-	c->SetObject(Ms->Create(c->Type()), _FL);
+	c->SetObject(Ms->Create(c->Type()), false, _FL);
 	SetParentFolder(c, Folder);
 
 	return c;

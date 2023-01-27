@@ -6193,7 +6193,7 @@ bool Mail::DeleteAttachment(Attachment *File)
 					auto o = File->GetObject();
 					if (o->IsOrphan())
 						o = NULL; // SetObject will delete...
-					File->SetObject(NULL, _FL);
+					File->SetObject(NULL, false, _FL);
 					DeleteObj(o);
 				}
 			}
@@ -7307,9 +7307,9 @@ bool Mail::SetServerUid(LVariant &v)
 	return s > Store3Error;
 }
 
-bool Mail::SetObject(LDataI *o, const char *File, int Line)
+bool Mail::SetObject(LDataI *o, bool IsDestructor, const char *File, int Line)
 {
-	bool b = LDataUserI::SetObject(o, File, Line);
+	bool b = LDataUserI::SetObject(o, IsDestructor, File, Line);
 	if (b)
 	{
 		// Clear out stale attachment objects...

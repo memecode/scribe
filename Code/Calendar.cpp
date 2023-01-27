@@ -513,7 +513,7 @@ void Calendar::CheckReminders()
 const char *RelativeTime(LDateTime &Then)
 {
 	static char s[256];
-	int Id[] =
+	static const int Id[] =
 	{
 		IDS_CAL_LDAY_SUN,
 		IDS_CAL_LDAY_MON,
@@ -599,14 +599,14 @@ const char *RelativeTime(LDateTime &Then)
 	else if (Months)
 	{
 		// Months + days
-		sprintf_s(Val, sizeof(Val), "%c%im %id (%i)", DirIndcator, abs(Months), abs(Days), TotalDays);
+		sprintf_s(Val, sizeof(Val), "%c%im %id", DirIndcator, abs(Months), abs(Days));
 	}
 	else if (Days)
 	{
 		if (abs(Days) >= 7)
 		{
 			// Weeks + days...
-			sprintf_s(Val, sizeof(Val), "%c%iw %id (%id)", DirIndcator, abs(Days)/7, abs(Days)%7, TotalDays);
+			sprintf_s(Val, sizeof(Val), "%c%iw %id", DirIndcator, abs(Days)/7, abs(Days)%7);
 		}
 		else
 		{
@@ -1687,7 +1687,8 @@ bool Calendar::Save(ScribeFolder *Folder)
 	if (GetObject() &&
 		GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Webdav)
 	{
-		Store3Status s = GetObject()->Save();
+		auto ParentObj = Folder ? Folder->GetObject() : NULL;
+		Store3Status s = GetObject()->Save(ParentObj);
 		Status = s > Store3Error;
 		if (Status)
 			SetDirty(false);

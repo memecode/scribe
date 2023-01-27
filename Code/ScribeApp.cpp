@@ -5042,7 +5042,7 @@ bool ScribeWnd::LoadMailStores()
 				if (Mailbox)
 				{
 					Mailbox->App = this;
-					Mailbox->SetObject(Root, _FL);
+					Mailbox->SetObject(Root, false, _FL);
 
 					Root->SetStr(FIELD_FOLDER_NAME, StoreName);
 					Root->SetInt(FIELD_FOLDER_TYPE, MAGIC_NONE);
@@ -5933,26 +5933,44 @@ void ScribeWnd::SetupUi()
 
 Thing *ScribeWnd::CreateItem(int Type, ScribeFolder *Folder, bool Ui)
 {
+	auto FolderStore = Folder && Folder->GetObject() ? Folder->GetObject()->GetStore() : NULL;
+	auto DefaultStore = GetDefaultMailStore();
+	auto Store = FolderStore ? FolderStore : (DefaultStore ? DefaultStore->Store : NULL);
+	if (!Store)
+	{
+		LAssert(!"no store");
+		LgiTrace("%s:%i - No store for creating calendar object.\n", _FL);
+		return NULL;
+	}
+
+	auto Obj = Store->Create(Type);
+	if (!Obj)
+	{
+		LAssert(!"create failed");
+		LgiTrace("%s:%i - store failed to create object.\n", _FL);
+		return NULL;
+	}
+
+	#define HANDLE_CREATE_ITEM(Magic, Type)					\
+		case Magic:											\
+		{													\
+			auto o = new Type(this, Obj);					\
+			if (!o)											\
+			{												\
+				LgiTrace("%s:%i - Alloc failed.\n", _FL);	\
+				break;										\
+			}												\
+			if (Folder) o->SetParentFolder(Folder);			\
+			if (Ui) o->DoUI();								\
+			return o;										\
+		}
+
+
 	switch ((uint32_t)Type)
 	{
 		case MAGIC_MAIL:
 		{
 			// create a new mail message
-			auto DefaultStore = GetDefaultMailStore() ? GetDefaultMailStore()->Store : NULL;
-			auto Store = Folder && Folder->GetObject() ? Folder->GetObject()->GetStore() : DefaultStore;
-			if (!Store)
-			{
-				LgiTrace("%s:%i - No store to create mail.\n", _FL);
-				break;
-			}
-
-			auto Obj = Store->Create(MAGIC_MAIL);
-			if (!Obj)
-			{
-				LgiTrace("%s:%i - Store failed to create mail.\n", _FL);
-				break;
-			}
-
 			Mail *m = new Mail(this, Obj);
 			if (!m)
 			{
@@ -5974,85 +5992,19 @@ Thing *ScribeWnd::CreateItem(int Type, ScribeFolder *Folder, bool Ui)
 
 			if (Ui)
 				m->DoUI();
+
 			return m;
 		}
-		case MAGIC_CONTACT:
-		{
-			// create a new contact
-			LDataI *Obj = Folder && Folder->GetObject() ? Folder->GetObject()->GetStore()->Create(MAGIC_CONTACT) : 0;
-			Contact *c = new Contact(this, Obj);
-			if (c)
-			{
-				if (Folder)
-				{
-					c->SetParentFolder(Folder);
-				}
-
-				if (Ui)
-				{
-					c->DoUI();
-				}
-			}
-			return c;
-		}
-		case MAGIC_CALENDAR:
-		{
-			// Create a calender event
-			LDataI *Obj = Folder && Folder->GetObject() ? Folder->GetObject()->GetStore()->Create(MAGIC_CALENDAR) : 0;
-			Calendar *c = new Calendar(this, Obj);
-			if (c)
-			{
-				if (Folder)
-				{
-					c->SetParentFolder(Folder);
-				}
-
-				if (Ui)
-				{
-					c->DoUI();
-				}
-			}
-			return c;
-		}
-		case MAGIC_FILTER:
-		{
-			LDataI *Obj = Folder && Folder->GetObject() ? Folder->GetObject()->GetStore()->Create(MAGIC_FILTER) : 0;
-			Filter *f = new Filter(this, Obj);
-			if (f)
-			{
-				if (Folder)
-				{
-					f->SetParentFolder(Folder);
-				}
-
-				if (Ui)
-				{
-					f->DoUI();
-				}
-			}
-			return f;
-		}
-		case MAGIC_GROUP:
-		{
-			LDataI *Obj = Folder && Folder->GetObject() ? Folder->GetObject()->GetStore()->Create(MAGIC_GROUP) : 0;
-			ContactGroup *g = new ContactGroup(this, Obj);
-			if (g)
-			{
-				if (Folder)
-				{
-					g->Save(Folder);
-				}
-
-				if (Ui)
-				{
-					g->DoUI();
-				}
-			}
+		HANDLE_CREATE_ITEM(MAGIC_CONTACT, Contact)
+		HANDLE_CREATE_ITEM(MAGIC_CALENDAR, Calendar)
+		HANDLE_CREATE_ITEM(MAGIC_FILTER, Filter)
+		HANDLE_CREATE_ITEM(MAGIC_GROUP, ContactGroup)
+		default:
+			LAssert(!"Unhandled object type.");
 			break;
-		}
 	}
 
-	return 0;
+	return NULL;
 }
 
 void ScribeWnd::OnPaint(LSurface *pDC)
@@ -11675,7 +11627,7 @@ void ScribeWnd::OnNew(
 				if ((Sub = new ScribeFolder))
 				{
 					Sub->App = this;
-					Sub->SetObject(SubObject, _FL);
+					Sub->SetObject(SubObject, false, _FL);
 
 					Fld->Insert(Sub);
 				}
@@ -11716,11 +11668,7 @@ void ScribeWnd::OnNew(
 				}
 
 				t->SetParentFolder(Fld);
-				if (!Fld->Items.HasItem(t))
-				{
-					Fld->Items.Insert(t);
-					Fld->Update();
-				}
+				Fld->Update();
 
 				if (Fld->Select())
 				{
@@ -12102,8 +12050,6 @@ bool ScribeWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArra
 							t->SetUI();
 
 						t->SetParentFolder(New);				
-						LAssert(!New->Items.HasItem(t));
-						New->Items.Insert(t);
 						if (New->Select())
 						{
 							MailList->Insert(t);
@@ -12245,8 +12191,8 @@ bool ScribeWnd::OnDelete(LDataFolderI *Parent, LArray<LDataI*> &Items)
 				}
 
 				t->SetUI();
-				t->SetParentFolder(0);
-				t->SetObject(NULL, _FL);
+				t->SetParentFolder(NULL);
+				t->SetObject(NULL, false, _FL);
 
 				if (t->DecRefs())
 				{

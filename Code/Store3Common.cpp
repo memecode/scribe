@@ -44,7 +44,7 @@ LDataI *LDataUserI::GetObject()
 	return Object;
 }
 
-bool LDataUserI::SetObject(LDataI *o, const char *File, int Line)
+bool LDataUserI::SetObject(LDataI *o, bool InDestuctor, const char *File, int Line)
 {
 	if (o == Object)
 		return true;
@@ -52,10 +52,9 @@ bool LDataUserI::SetObject(LDataI *o, const char *File, int Line)
 	if (Object)
 	{
 		Object->UserData = NULL;
-		if (Object->IsOrphan())
-		{
-			DeleteObj(Object);
-		}
+		if (!InDestuctor && Object->IsOrphan())
+			delete Object;
+		Object = NULL;
 	}
 
 	Object = o;

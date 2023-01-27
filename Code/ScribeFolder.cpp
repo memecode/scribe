@@ -210,7 +210,7 @@ ScribeFolder::~ScribeFolder()
 	Thing *t;
 	while ((t = Items[0]))
 	{
-		t->SetObject(NULL, _FL);
+		t->SetObject(NULL, true, _FL);
 		if (t->DecRefs())
 		{
 			DeleteObj(t);
@@ -234,7 +234,7 @@ ScribeFolder::~ScribeFolder()
 	// Don't delete 'Object' here, it's owned by the backend storage object
 }
 
-bool ScribeFolder::SetObject(LDataI *o, const char *File, int Line)
+bool ScribeFolder::SetObject(LDataI *o, bool InDestructor, const char *File, int Line)
 {
 	if (CurState != FldState_Idle)
 	{
@@ -242,7 +242,7 @@ bool ScribeFolder::SetObject(LDataI *o, const char *File, int Line)
 		return false;
 	}
 
-	return LDataUserI::SetObject(o, File, Line);
+	return LDataUserI::SetObject(o, InDestructor, File, Line);
 }
 
 void ScribeFolder::UpdateOsUnread()
@@ -574,7 +574,7 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 				Dst->CopyProps(*GetObject());
 				
 				LDataFolderI *Old = GetFldObj();
-				SetObject(Dst, _FL);				
+				SetObject(Dst, false, _FL);				
 
 				// Save the object to the new store...
 				Store3Status s = GetObject()->Save(f->GetObject());
@@ -673,7 +673,7 @@ Store3Status ScribeFolder::WriteThing(Thing *t)
 		// Generic thing storage..
 		bool Create = !t->GetObject();
 		if (Create)
-			t->SetObject(GetObject()->GetStore()->Create(t->Type()), _FL);
+			t->SetObject(GetObject()->GetStore()->Create(t->Type()), false, _FL);
 
 		if (!t->GetObject())
 		{
@@ -694,7 +694,7 @@ Store3Status ScribeFolder::WriteThing(Thing *t)
 		else
 		{
 			if (Create)
-				t->SetObject(NULL, _FL);
+				t->SetObject(NULL, false, _FL);
 		    LgiTrace("%s:%i - Object->Save returned %i.\n", _FL, Status);
 			return Store3Error;
 		}
@@ -1266,7 +1266,7 @@ bool ScribeFolder::LoadFolders()
 			if (n)
 			{
 				n->App = App;
-				n->SetObject(s, _FL);
+				n->SetObject(s, false, _FL);
 				Insert(n);
 
 				SetWillDirty(false);
@@ -1417,7 +1417,7 @@ bool ScribeFolder::UnloadThings()
 			}
 
 			// t->Store->Object = 0;
-			t->SetObject(NULL, _FL);
+			t->SetObject(NULL, false, _FL);
 
 			// Dels++;
 			if (t->DecRefs())
@@ -1461,7 +1461,7 @@ Store3State ScribeFolder::LoadThings(LViewI *Parent)
 
 		// Emptying the item list, leave the store nodes around though
 		for (auto t: Items)
-			t->SetObject(NULL, _FL);
+			t->SetObject(NULL, false, _FL);
 
 		Items.Empty();
 		IsLoaded(false);
@@ -1494,7 +1494,7 @@ Store3State ScribeFolder::LoadThings(LViewI *Parent)
 			}
 			else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
 			{
-				t->SetObject(c, _FL);
+				t->SetObject(c, false, _FL);
 				t->App = App;
 
 				t->ParentFolder = this;
@@ -2822,7 +2822,7 @@ ScribeFolder *ScribeFolder::CreateSubDirectory(const char *Name, int Type)
 				if (NewFolder)
 				{
 					NewFolder->App = App;
-					NewFolder->SetObject(Obj, _FL);
+					NewFolder->SetObject(Obj, false, _FL);
 
 					// Set name and type
 					NewFolder->SetName(Name, true);
@@ -3736,7 +3736,7 @@ ThingType::IoProgress ScribeFolder::Import(IoProgressImplArgs)
 		VCal Io;
 		Thing *t;
 
-		while ((t = App->CreateItem(GetItemType(), 0, false)))
+		while ((t = App->CreateItem(GetItemType(), this, false)))
 		{
 			if (Io.Import(t->GetObject(), stream))
 			{

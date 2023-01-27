@@ -9,8 +9,11 @@
 /////////////////////////////////////////////////////////////////////////////////////
 WebdavContact::WebdavContact(WebdavStore *store, WebdavEvent *e) : WebdavObj(store)
 {
-	Href = e->Href;
-	vCard = e->Data;
+	if (e)
+	{
+		Href = e->Href;
+		vCard = e->Data;
+	}
 
 	#define _(f,v) v = 0;
 	WebdavContactInts()
