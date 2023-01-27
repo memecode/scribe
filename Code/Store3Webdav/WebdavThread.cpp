@@ -34,6 +34,12 @@ void WebdavThread::PostStore(void *Param)
 
 Store3Status WebdavThread::Save(LString Href, LString Data)
 {
+	if (!Href)
+	{
+		LAssert(!"No address.");
+		return Store3Error;
+	}
+
 	if (!Lock(_FL))
 		return Store3Error;
 		

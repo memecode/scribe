@@ -15,10 +15,6 @@ WebdavContact::WebdavContact(WebdavStore *store, WebdavEvent *e) : WebdavObj(sto
 		vCard = e->Data;
 	}
 
-	#define _(f,v) v = 0;
-	WebdavContactInts()
-	#undef _
-
 	LMemStream m(vCard.Get(), vCard.Length(), false);
 	VCard convert;
 	Converted = convert.Import(this, &m);
@@ -68,6 +64,9 @@ Store3Status WebdavContact::Save(LDataI *parent)
 		// Now save the vCal object to the WebDav server...
 		if (Parent && Parent->Thread)
 		{
+			if (!Href)
+				Href = Parent->AllocateAddress();
+
 			Ret = Parent->Thread->Save(Href, vCard);
 			if (Status != Ret)
 			{

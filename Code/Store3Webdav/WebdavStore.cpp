@@ -107,8 +107,8 @@ void WebdavStore::OnChanged()
 	auto t = LockSettings(_FL);
 	if (t)
 	{
-		ContactUrl = t->GetAttr(OPT_MailStoreContactUrl);
-		CalUrl = t->GetAttr(OPT_MailStoreCalendarUrl);
+		ContactUrl  = t->GetAttr(OPT_MailStoreContactUrl);
+		CalUrl      = t->GetAttr(OPT_MailStoreCalendarUrl);
 		Remote.User = t->GetAttr(OPT_MailStoreUserName);
 		Remote.Pass = t->GetAttr(OPT_MailStorePassword);
 
@@ -121,6 +121,8 @@ void WebdavStore::OnChanged()
 		if (!ContactFolder)
 		{
 			ContactFolder = new WebdavFolder(this, Root);
+			ContactFolder->Url = ContactUrl;
+			ContactFolder->Extension = "vcf";
 			ContactFolder->SetInt(FIELD_FOLDER_TYPE, MAGIC_CONTACT);
 			ContactFolder->SetStr(FIELD_FOLDER_NAME, "Contacts");
 		}
@@ -137,6 +139,8 @@ void WebdavStore::OnChanged()
 		if (!CalFolder)
 		{
 			CalFolder = new WebdavFolder(this, Root);
+			CalFolder->Url = CalUrl;
+			CalFolder->Extension = "ics";
 			CalFolder->SetInt(FIELD_FOLDER_TYPE, MAGIC_CALENDAR);
 			CalFolder->SetStr(FIELD_FOLDER_NAME, "Calendar");
 		}

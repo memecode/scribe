@@ -61,7 +61,7 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 					while (true)
 					{
 						Calendar *c = new Calendar(Source->GetApp());
-						LgiTrace("outsize=" LPrintfInt64 "\n", out.GetSize());
+						// LgiTrace("outsize=" LPrintfInt64 "\n", out.GetSize());
 						if (imp.Import(c->GetObject(), &out))
 							Events.Add(c);
 						else

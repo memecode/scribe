@@ -138,12 +138,16 @@ class WebdavFolder : public LDataFolderI
 	Store3State State = Store3Unloaded;
 
 public:
+	LString Url;
+	const char *Extension = NULL;
 	DIterator<LDataI,       WebdavObj,    WebdavStore> Items;
 	DIterator<LDataFolderI, WebdavFolder, WebdavStore> Sub;
 	DIterator<LDataPropI,   WebdavFld,    WebdavStore> Field;
 	LAutoPtr<WebdavThread> Thread;
 
 	WebdavFolder(WebdavStore *store, WebdavFolder *parent = NULL);
+
+	LString AllocateAddress();
 
 	// LDataPropI impl
 	bool CopyProps(LDataPropI &p);
@@ -212,7 +216,7 @@ class WebdavCalendar : public WebdavObj
 	#define _(f,v) LDateTime v;
 	WebdavCalendarDates()
 	#undef _
-	#define _(f,v) uint64_t v;
+	#define _(f,v) uint64_t v = 0;
 	WebdavCalendarInts()
 	#undef _
 	#define _(f,v) LString v;
@@ -300,7 +304,7 @@ class WebdavContact : public WebdavObj
 	#define _(f,v) LVariant v;
 	WebdavContactVariants()
 	#undef _
-	#define _(f,v) int64 v;
+	#define _(f,v) int64 v = 0;
 	WebdavContactInts()
 	#undef _
 	#define _(f,v) LString v;

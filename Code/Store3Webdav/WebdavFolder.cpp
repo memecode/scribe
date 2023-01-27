@@ -19,6 +19,16 @@ WebdavFolder::WebdavFolder(WebdavStore *store, WebdavFolder *parent)
 	}
 }
 
+LString WebdavFolder::AllocateAddress()
+{
+	LAssert(Url && Extension);
+
+	LString u;
+	u.Printf("scribe-%x.%s", LRand(), Extension);
+
+	return u;
+}
+
 bool WebdavFolder::CopyProps(LDataPropI &p)
 {
 	LAssert(!"Impl me.");

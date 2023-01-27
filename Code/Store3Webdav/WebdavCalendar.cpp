@@ -15,9 +15,6 @@ WebdavCalendar::WebdavCalendar(WebdavStore *store, WebdavEvent *e) : WebdavObj(s
 		vCal = e->Data;
 	}
 
-	#define _(f,v) v = 0;
-	WebdavCalendarInts()
-	#undef _
 	Colour = -1;
 
 	LMemStream m(vCal.Get(), vCal.Length(), false);
@@ -69,6 +66,9 @@ Store3Status WebdavCalendar::Save(LDataI *parent)
 		// Now save the vCal object to the WebDav server...
 		if (Parent->Thread)
 		{
+			if (!Href)
+				Href = Parent->AllocateAddress();
+
 			Ret = Parent->Thread->Save(Href, vCal);
 			if (StoreStatus != Ret)
 			{
