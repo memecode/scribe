@@ -84,7 +84,7 @@ Store3Status WebdavStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 
 LDataI *WebdavStore::Create(int Type)
 {
-	switch (Type)
+	switch ((Store3ItemTypes)Type)
 	{
 		case MAGIC_CALENDAR:
 		{
@@ -94,6 +94,11 @@ LDataI *WebdavStore::Create(int Type)
 		case MAGIC_CONTACT:
 		{
 			return new WebdavContact(this, NULL);
+			break;
+		}
+		default:
+		{
+			LgiTrace("%s:%i - Unhandled type %x\n", _FL, Type);
 			break;
 		}
 	}
