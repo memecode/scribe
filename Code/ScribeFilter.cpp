@@ -2338,7 +2338,6 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 		Prog->SetRange(Email.Length());
 		Prog->SetDescription("Filtering...");
 		Prog->SetType("email");
-		LYield();
 	}
 
 	for (auto m: Email)
@@ -2359,9 +2358,6 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 			}
 		}
 		
-		m->DecRef();
-		m = NULL;
-
 		if (Act)
 		{
 			Status++;
@@ -2374,6 +2370,9 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 		{
 			m->NewEmail = Mail::NewEmailBayes;
 		}
+
+		m->DecRef();
+		m = NULL;
 
 		if (Prog)
 		{

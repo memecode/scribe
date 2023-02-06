@@ -4774,58 +4774,56 @@ LDataStoreI *ScribeWnd::CreateDataStore(char *Full, bool CreateIfMissing)
 	return NULL;
 }
 
-class MailStoreUpgrade
+class MailStoreUpgrade :
+	public LProgressDlg,
+	public LThread,
+	public LDataPropI
 {
 public:
-	LAutoPtr<LProgressDlg> Prog;
 	ScribeWnd *App = NULL;
 	LDataStoreI *Ds = NULL;
-	class MailStoreUpgradeThread *Thread = NULL;
 	int Status = -1;
 	LString Error;
 
-	MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds);
-	~MailStoreUpgrade();
-
-	bool Run()
+	MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds)
+		: LThread("MailStoreUpgrade")
 	{
-		while (Status < 0)
-		{
-			LYield();
-			LSleep(1);
-		}
-
-		Prog.Reset();
-		if (!Status)
-			LgiMsg(App, Error?Error.Get():(char*)"<unknown error>", AppName);
-
-		return Status > 0;
-	}
-};
-
-class MailStoreUpgradeThread : public LThread, public LDataPropI
-{
-	MailStoreUpgrade *Up;
-
-public:
-	MailStoreUpgradeThread(MailStoreUpgrade *up) : LThread("MailStoreUpgradeThread")
-	{
-		Up = up;
+		App = app;
+		Ds = ds;
+		SetCanCancel(false);
+		SetDescription("Upgrading mail store...");
 		Run();
 	}
 
-	~MailStoreUpgradeThread()
+	~MailStoreUpgrade()
 	{
+		Cancel();
 		WaitForExit();
 	}
 
-	LDataPropI &operator =(LDataPropI &p) { LAssert(0); return *this; }
+	void OnPulse() override
+	{
+		if (IsCancelled())
+		{
+			EndModal(0);
+			return;
+		}
+
+		return LProgressDlg::OnPulse();
+	}
+
+	LDataPropI &operator =(LDataPropI &p)
+	{
+		LAssert(0);
+		return *this;
+	}
+
 	Store3Status SetStr(int id, const char *str)
 	{
 		switch (id)
 		{
 			case Store3UiError:
-				Up->Error = str;
+				Error = str;
 				break;
 			default:
 				LAssert(!"Impl me.");
@@ -4838,24 +4836,11 @@ public:
 
 	int Main()
 	{
-		Up->Status = Up->Ds->Upgrade(Up->Prog, this);
+		Status = Ds->Upgrade(this, this);
+		Cancel();
 		return 0;
 	}
 };
-
-MailStoreUpgrade::MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds) : Prog(new LProgressDlg(app))
-{
-	App = app;
-	Ds = ds;
-
-	Prog->SetDescription("Upgrading mail store...");
-	Thread = new MailStoreUpgradeThread(this);
-}
-
-MailStoreUpgrade::~MailStoreUpgrade()
-{
-	DeleteObj(Thread);
-}
 
 bool ScribeWnd::LoadMailStores()
 {
@@ -4963,8 +4948,7 @@ bool ScribeWnd::LoadMailStores()
 						ValidStr(Details)?Details:"n/a") == IDYES)
 			{
 				MailStoreUpgrade Prog(this, Store);
-				if (!Prog.Run())
-					continue;
+				Prog.DoModal();
 			}
 			else
 			{
@@ -10199,7 +10183,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 		if (Add)
 		{
 			#if DEBUG_NEW_MAIL
-			LgiTrace("%s:%i - NEW_MAIL: OnNewMail t=%p, uid=%s, mode=%s\n",
+			LgiTrace("%s:%i - NewMail.OnNewMail t=%p, uid=%s, mode=%s\n",
 				_FL, (Thing*)m, m->GetServerUid().ToString().Get(), toString(m->NewEmail));
 			#endif
 
@@ -10209,7 +10193,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 				{
 					auto Loaded = m->GetLoaded();
 					#if DEBUG_NEW_MAIL
-					LgiTrace("%s:%i - NEW_MAIL: GetLoaded=%i uid=%s\n", _FL, (int)Loaded, m->GetServerUid().ToString().Get());
+					LgiTrace("%s:%i - NewMail.OnNewMail.GetLoaded=%i uid=%s\n", _FL, (int)Loaded, m->GetServerUid().ToString().Get());
 					#endif
 					if (Loaded != Store3Loaded)
 					{
@@ -10281,7 +10265,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 		else
 		{
 			#if DEBUG_NEW_MAIL
-			LgiTrace("%s:%i - NEW_MAIL: RemoveNewMail t=%p, uid=%s\n",
+			LgiTrace("%s:%i - NewMail.OnNewMail.RemoveNewMail t=%p, uid=%s\n",
 				_FL, (Thing*)m, m->GetServerUid().ToString().Get());
 			#endif
 
@@ -10308,10 +10292,10 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 			{
 				// Run the filters
 				#if DEBUG_NEW_MAIL
-				LgiTrace("%s:%i - NEW_MAIL: Filtering %i mail through %i filters\n",
+				LgiTrace("%s:%i - NewMail.OnNewMail.Filtering %i mail through %i filters\n",
 					_FL, (int)NeedsFiltering.Length(), (int)Filters.Length());
 				#endif
-				Filter::ApplyFilters(0, Filters, NeedsFiltering);
+				Filter::ApplyFilters(NULL, Filters, NeedsFiltering);
 				
 				// All the email not filtered now needs to be sent to the bayes filter.
 				for (auto m: NeedsFiltering)
@@ -10319,7 +10303,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 					if (m->NewEmail == Mail::NewEmailBayes)
 					{
 						#if DEBUG_NEW_MAIL
-						LgiTrace("%s:%i - NEW_MAIL: Filter->NeedsBayes t=%p, msgid=%s\n",
+						LgiTrace("%s:%i - NewMail.OnNewMail.NeedsBayes t=%p, msgid=%s\n",
 							_FL, (Thing*)m, m->GetMessageId());
 						#endif
 
@@ -10328,7 +10312,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 					else if (m->NewEmail == Mail::NewEmailGrowl)
 					{
 						#if DEBUG_NEW_MAIL
-						LgiTrace("%s:%i - NEW_MAIL: Filter->NeedsGrowl t=%p, msgid=%s\n",
+						LgiTrace("%s:%i - NewMail.OnNewMail.NeedsGrowl t=%p, msgid=%s\n",
 							_FL, (Thing*)m, m->GetMessageId());
 						#endif
 
@@ -10368,7 +10352,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 						{
 							// Not spam... so on to growl
 							#if DEBUG_NEW_MAIL
-							LgiTrace("%s:%i - NEW_MAIL: Bayes->NeedsGrowl t=%p, msgid=%s\n",
+							LgiTrace("%s:%i - NewMail.Bayes.NeedsGrowl t=%p, msgid=%s\n",
 								_FL, (Thing*)m, m->GetMessageId());
 							#endif
 
@@ -10437,7 +10421,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 				m->NewEmail = Mail::NewEmailTray;
 
 				#if DEBUG_NEW_MAIL
-				LgiTrace("%s:%i - NEW_MAIL: Growl->Tray t=%p, msgid=%s\n",
+				LgiTrace("%s:%i - NewMail.OnNewMail.Growl->Tray t=%p, msgid=%s\n",
 					_FL, (Thing*)m, m->GetMessageId());
 				#endif
 
@@ -10457,7 +10441,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 		{
 			#if DEBUG_NEW_MAIL
 			auto Path = Resort[i]->GetPath();
-			LgiTrace("%s:%i - NEWMAIL: Folder.Resort=%s\n", _FL, Path.Get());
+			LgiTrace("%s:%i - NewMail.OnNewMail.Resort=%s\n", _FL, Path.Get());
 			#endif
 
 			Resort[i]->ReSort();
@@ -11586,7 +11570,7 @@ void ScribeWnd::OnNew(
 
 		#if DEBUG_NEW_MAIL
 		LDataFolderI *p = dynamic_cast<LDataFolderI*>(Parent);
-		LgiTrace("%s:%i - NEW_MAIL: no UI object for '%s'\n", _FL, p ? p->GetStr(FIELD_FOLDER_NAME) : NULL);
+		LgiTrace("%s:%i - NewMail.OnNew no UI object for '%s'\n", _FL, p ? p->GetStr(FIELD_FOLDER_NAME) : NULL);
 		#endif
 		return;
 	}
@@ -11685,7 +11669,7 @@ void ScribeWnd::OnNew(
 					UnreadDiff += TestFlag(m->GetFlags(), MAIL_READ) ? 0 : 1;
 
 					#if DEBUG_NEW_MAIL
-					LgiTrace("%s:%i - NEW_MAIL: t=%p uid=%s IsNew=%i\n", _FL, t, m->GetServerUid().ToString().Get(), IsNew);
+					LgiTrace("%s:%i - NewMail.OnNew t=%p uid=%s IsNew=%i\n", _FL, t, m->GetServerUid().ToString().Get(), IsNew);
 					#endif
 
 					if (IsNew)
@@ -11832,7 +11816,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 					if (Loaded < Store3Loaded)
 					{
 						#if DEBUG_NEW_MAIL
-						LgiTrace("%s:%i - NEW_MAIL: OnChange->GetBody t=%p, uid=%s, mode=%s, loaded=%s (%s:%i)\n",
+						LgiTrace("%s:%i - NewMail.OnChange.GetBody t=%p, uid=%s, mode=%s, loaded=%s (%s:%i)\n",
 							_FL, (Thing*)m, m->GetServerUid().ToString().Get(),
 							toString(m->NewEmail), toString(Loaded),
 							d->CtxFile, d->CtxLine);
@@ -11843,7 +11827,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 					else
 					{
 						#if DEBUG_NEW_MAIL
-						LgiTrace("%s:%i - NEW_MAIL: OnChange->NewMail t=%p, uid=%s, mode=%s, loaded=%s (%s:%i)\n",
+						LgiTrace("%s:%i - NewMail.OnChange.NewMail t=%p, uid=%s, mode=%s, loaded=%s (%s:%i)\n",
 							_FL, (Thing*)m, m->GetServerUid().ToString().Get(),
 							toString(m->NewEmail), toString(Loaded),
 							d->CtxFile, d->CtxLine);
@@ -12279,7 +12263,7 @@ bool ScribeWnd::OnTransfer()
 		
 		Accountlet *Acc = Transfer->Account;
 		#if DEBUG_NEW_MAIL
-		LgiTrace(	"%s:%i - NEW_MAIL: OnTransfer t=%p receive=%i act=%i\n",
+		LgiTrace(	"%s:%i - NewMail.OnTransfer t=%p receive=%i act=%i\n",
 					_FL, Transfer, Acc->IsReceive(), Transfer->Action);
 		#endif
 		if (Acc->IsReceive())
@@ -12434,7 +12418,7 @@ bool ScribeWnd::OnTransfer()
 		}
 
 		#if DEBUG_NEW_MAIL
-		LgiTrace(	"%s:%i - NEW_MAIL: OnTransfer t=%p NewStatus=%i\n",
+		LgiTrace(	"%s:%i - NewMail.OnTransfer t=%p NewStatus=%i\n",
 					_FL, Transfer, NewStatus);
 		#endif
 
