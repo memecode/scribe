@@ -27,6 +27,10 @@
 #define MAIL_POSTED_TO_GUI			0x0001
 #define MAIL_EXPLICIT				0x0002
 
+#define SECONDS(i)					((i)*1000)
+#define TRANSFER_WAIT_TIMEOUT		SECONDS(30)
+#define DEFAULT_SOCKET_TIMEOUT		SECONDS(15)
+
 LColour SocketMsgTypeToColour(LSocketI::SocketMsgType flags)
 {
 	LColour col;
@@ -195,12 +199,12 @@ const char *ReceiveActionName(ReceiveAction i)
 {
 	switch (i)
 	{
-		case MailNoop: return "MailNoop";
-		case MailDelete: return "MailDelete";
-		case MailDownloadAndDelete: return "MailDownloadAndDelete";
-		case MailDownload: return "MailDownload";
-		case MailUpload: return "MailUpload";
-		case MailHeaders: return "MailHeaders";
+		case MailNoop:				return "MailNoop";
+		case MailDelete:			return "MailDelete";
+		case MailDownloadAndDelete:	return "MailDownloadAndDelete";
+		case MailDownload:			return "MailDownload";
+		case MailUpload:			return "MailUpload";
+		case MailHeaders:			return "MailHeaders";
 	}
 
 	return "(Error)";
@@ -210,19 +214,20 @@ const char *ReceiveStatusName(ReceiveStatus i)
 {
 	switch (i)
 	{
-		case MailReceivedNone: return "ReceiveNone";
-		case MailReceivedWaiting: return "ReceiveWaiting";
-		case MailReceivedOk: return "ReceiveOk";
-		case MailReceivedError: return "ReceiveError";
+		case MailReceivedNone:		return "ReceiveNone";
+		case MailReceivedWaiting:	return "ReceiveWaiting";
+		case MailReceivedOk:		return "ReceiveOk";
+		case MailReceivedError:		return "ReceiveError";
 	}
 	
 	return "(none)";
 }
 
 
-void WaitForTransfers(List<MailTransferEvent> &Files)
+bool Accountlet::WaitForTransfers(List<MailTransferEvent> &Files)
 {
 	LArray<int> Counts;
+	auto StartTs = LCurrentTime();
 	do
 	{
 		Counts.Length(0);
@@ -231,8 +236,23 @@ void WaitForTransfers(List<MailTransferEvent> &Files)
 			Counts[e->Status]++;
 
 		LSleep(100);
+		
+		if (LCurrentTime() - StartTs > TRANSFER_WAIT_TIMEOUT)
+		{
+			LgiTrace("%s:%i - WaitForTransfers timed out.\n", _FL);
+			for (ReceiveStatus rs = MailReceivedNone; rs < MailReceivedMax; rs = (ReceiveStatus)(((int)rs)+1))
+				LgiTrace("...%s=%i\n", ReceiveStatusName(rs), Counts[rs]);
+			return false;
+		}
+		else if (Thread && Thread->IsCancelled())
+		{
+			LgiTrace("%s:%i - WaitForTransfers exiting because thread is cancelled.\n", _FL);
+			return false;
+		}
 	}
 	while (Counts[MailReceivedWaiting] > 0);
+	
+	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -416,7 +436,7 @@ bool Accountlet::GetVariant(const char *Name, LVariant &Value, const char *Array
 {
 	char k[128];
 	bool mapped = Account->IsMapped(OptionName(Name, k, sizeof(k)));
-	LOptionsFile *Opts = GetApp()->GetOptions();
+	auto Opts = GetApp()->GetOptions();
 	Value.Empty();
 	if (mapped)
 		Opts->GetValue(k, Value);
@@ -428,7 +448,7 @@ bool Accountlet::SetVariant(const char *Name, LVariant &Value, const char *Array
 {
 	char k[128];
 	bool mapped = Account->IsMapped(OptionName(Name, k, sizeof(k)));
-	LOptionsFile *Opts = GetApp()->GetOptions();
+	auto Opts = GetApp()->GetOptions();
 	if (mapped)
 		Opts->SetValue(k, Value);
 
@@ -505,7 +525,7 @@ LSocketI *Accountlet::CreateSocket(bool Sending, LCapabilityClient *Caps, bool R
 	{
 		Socket = new SslSocket(this, Caps, SslMode == SSL_DIRECT, RawLFCheck);
 	}
-	else if (GetApp()->GetOptions()->GetValue(OPT_UseSocks, UseSocks) &&
+	else if (	GetApp()->GetOptions()->GetValue(OPT_UseSocks, UseSocks) &&
 				UseSocks.CastInt32() &&
 				GetApp()->GetOptions()->GetValue(OPT_Socks5Server, Socks5Proxy) &&
 				ValidStr(Socks5Proxy.Str()))
@@ -529,7 +549,7 @@ LSocketI *Accountlet::CreateSocket(bool Sending, LCapabilityClient *Caps, bool R
 
 	if (Socket)
 	{
-		Socket->SetTimeout(15 * 1000);
+		Socket->SetTimeout(DEFAULT_SOCKET_TIMEOUT);
 
 		if (File.Str())
 		{
@@ -1116,13 +1136,19 @@ if (DebugTrace) LgiTrace("Send(%i) connecting to SMTP server\n", Account->GetInd
 								Sink->SetOAuthParams(Params);
 							}
 							
-							if (Sink->Open(	CreateSocket(true, GetAccount(), true),
+							if (!Sink->Open(CreateSocket(true, GetAccount(), true),
 											_Server.Str(),
 											_Domain.Str(),
 											_UserName.Str(),
 											_Password,
 											Port(),
 											OpenFlags))
+							{
+if (DebugTrace) LgiTrace("Send(%i) %s:%i\n", Account->GetIndex(), _FL);
+								Err.Push(LLoadString(IDS_NO_CONNECTION_TO_SERVER));
+								Err.Push("\n");
+							}
+							else
 							{
 if (DebugTrace) LgiTrace("Send(%i) connected\n", Account->GetIndex());
 
@@ -1234,7 +1260,6 @@ if (DebugTrace) LgiTrace("Send(%i) Item(%i) success\n", Account->GetIndex(), Gro
 
 												e->Account = this;
 												e->Status = MailReceivedWaiting;
-
 												GetApp()->OnMailTransferEvent(e);
 											}
 											else
@@ -1285,17 +1310,11 @@ if (DebugTrace) LgiTrace("Send(%i) %s:%i\n", Account->GetIndex(), _FL);
 								Item.Value = 0;
 								Item.Range = 0;
 
-								WaitForTransfers(Thread->Files);
-							}
-							else
-							{
-if (DebugTrace) LgiTrace("Send(%i) %s:%i\n", Account->GetIndex(), _FL);
-								Err.Push(LLoadString(IDS_NO_CONNECTION_TO_SERVER));
-								Err.Push("\n");
+								Status &= WaitForTransfers(Thread->Files);
 							}
 
 if (DebugTrace) LgiTrace("Send(%i) %s:%i, status=%i\n", Account->GetIndex(), _FL, Status);
-							if (!Status) //  && !IsCancelled())
+							if (!Status)
 							{
 if (DebugTrace) LgiTrace("Send(%i) %s:%i, Client=%p\n", Account->GetIndex(), _FL, Client);
 								if (ValidStr(Client->ErrMsgFmt))
@@ -2125,7 +2144,6 @@ if (DebugTrace) LgiTrace("Receive(%i) starting main action loop, time=%i\n", Acc
 				Group.Start = LCurrentTime();
 				bool Error = false;
 				LArray<MailTransaction*> Trans;
-				// uint64 Start = LCurrentTime();
 				char NotLoaded[256];
 				sprintf_s(	NotLoaded, sizeof(NotLoaded),
 							"%s: %s",
@@ -2137,30 +2155,10 @@ if (DebugTrace) LgiTrace("Receive(%i) starting main action loop, time=%i\n", Acc
 					it--)
 				{
 					MailTransferEvent *t = *it;
-					if (!t) break;
+					if (!t)
+						continue;
+						
 					bool Ok = false;
-
-/*
-if (DebugTrace)
-{
-	switch (t->Action)
-	{
-		case MailDownload:
-			LgiTrace("Receive(%i) Item(%i) MailDownload\n", Account->GetIndex(), t->Index);
-			break;
-		case MailDownloadAndDelete:
-			LgiTrace("Receive(%i) Item(%i) MailDownloadAndDelete\n", Account->GetIndex(), t->Index);
-			break;
-		case MailHeaders:
-			LgiTrace("Receive(%i) Item(%i) MailHeaders\n", Account->GetIndex(), t->Index);
-			break;
-		default:
-			LgiTrace("Receive(%i) Item(%i) Noop\n", Account->GetIndex(), t->Index);
-			break;
-	}
-}
-*/
-
 					switch (t->Action)
 					{
 						case MailDownload:
@@ -2224,10 +2222,7 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) headers=%p, time=%i\n", Account->
 							if (Headers)
 							{
 								if (!t->Msg)
-								{
 									t->Msg = new AccountMessage(Account);
-								}
-
 								if (t->Msg)
 								{
 									bool Attachments = false;
@@ -2276,8 +2271,7 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) headers=%p, time=%i\n", Account->
 					{
 						Status = true;
 						t->Account = this;
-						t->Status = MailReceivedWaiting;
-							
+						t->Status = MailReceivedWaiting;							
 						GetApp()->OnMailTransferEvent(t);
 					}
 					else
@@ -2290,7 +2284,6 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Error, time=%i\n", Account->GetIn
 
 				if (Trans.Length() > 0)
 				{
-					// MailSizeLimit ? MailSizeLimit << 10 : -1
 					MailCallbacks Callbacks;
 					ZeroObj(Callbacks);
 					Callbacks.CallbackData = &Params;
@@ -2304,6 +2297,8 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Error, time=%i\n", Account->GetIn
 						MailTransaction *Tran = Trans[i];
 						MailTransferEvent *t = Thread->Files[Tran->Index];
 						if (t)
+							LgiTrace("%s:%i - No 't' ptr.\n", _FL);
+						else
 						{
 							if (Tran->Oversize)
 							{
@@ -2323,7 +2318,6 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Posting WM_SCRIBE_THREAD_ITEM, ti
 									{
 										// Ask the gui thread to load the mail in
 										t->Status = MailReceivedWaiting;
-										// GetApp()->PostEvent(M_SCRIBE_THREAD_ITEM, (int)t, (int)Thread);
 										GetApp()->OnMailTransferEvent(t);
 									}
 								}
@@ -2339,10 +2333,6 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Posting WM_SCRIBE_THREAD_ITEM, ti
 								t->Action = MailNoop;
 							}
 						}
-						else
-						{
-							LgiTrace("%s:%i - No 't' ptr.\n", _FL);
-						}
 					}
 					Trans.DeleteObjects();
 				}
@@ -2352,7 +2342,8 @@ if (DebugTrace) LgiTrace("Receive(%i) Waiting for main thread, time=%i\n", Accou
 				Thread->SetState(ThreadWaiting);
 
 				// Wait for the main thread to finish with all the items we sent over
-				WaitForTransfers(Thread->Files);
+				if (!WaitForTransfers(Thread->Files))
+					Error = true;
 
 				if (!Error)
 				{

@@ -4474,15 +4474,12 @@ void ScribeWnd::OnPulse()
 {
 	if (ScribeState == ScribeRunning)
 	{
-		// LProfile prof("OnPulse", 20);
-
 		OnIdle();
 		
 		uint64 Now = LCurrentTime();
 		if (Now - d->LastTs >= 1000)
 		{
 			d->LastTs = Now;
-			// prof.Add("OnPulseSecond");
 			OnPulseSecond();
 		}
 	}
@@ -12209,20 +12206,20 @@ bool ScribeWnd::RemoveStore3EventHandler(LDataEventsI *callback)
 
 bool ScribeWnd::OnMailTransferEvent(MailTransferEvent *e)
 {
-	bool Status;
-	if ((Status = Lock(_FL)))
-	{
-		d->Transfers.Add(e);
-		Unlock();
-	}
-	return Status;
+	if (!Lock(_FL))
+		return false;
+
+	d->Transfers.Add(e);
+	Unlock();
+	
+	return true;
 }
 
 bool ScribeWnd::OnTransfer()
 {
 	LVariant v;
 	LArray<MailTransferEvent*> Local;
-
+	
 	// Lock the transfer list
 	if (Lock(_FL))
 	{
@@ -12250,9 +12247,8 @@ bool ScribeWnd::OnTransfer()
 			Trans.New() = Folders[s].Store->StartTransaction();
 	}
 
-	for (unsigned i=0; i<Local.Length(); i++)
+	for (auto Transfer: Local)
 	{
-		MailTransferEvent *Transfer = Local[i];
 		ReceiveStatus NewStatus = MailReceivedError;
 
 		if (!Transfer)
@@ -12260,6 +12256,9 @@ bool ScribeWnd::OnTransfer()
 			LAssert(0);
 			continue;
 		}
+		
+		// We have to set Transfer->Status to something other than "waiting"
+		// in all branches of this loop. Othewise the account thread will hang.
 		
 		Accountlet *Acc = Transfer->Account;
 		#if DEBUG_NEW_MAIL
@@ -12339,12 +12338,6 @@ bool ScribeWnd::OnTransfer()
 						Lst->Insert(Transfer->Msg);
 						NewStatus = MailReceivedOk;
 					}
-					else
-					{
-						// This event is probably received after the receiving window
-						// got closed.
-						// LgiTrace("Empty Lst=%p\n", Lst);
-					}
 					break;
 				}
 			}
@@ -12354,66 +12347,66 @@ bool ScribeWnd::OnTransfer()
 			ScribeFolder *Outbox = GetFolder(Transfer->Send->SourceFolder);
 			if (!Outbox)
 				Outbox = GetFolder(FOLDER_OUTBOX);
-			if (!Outbox)
-				break;
-			
-			Mail *m = Outbox->GetMessageById(Transfer->Send->MsgId);
-			if (!m)
-			{
-				LAssert(!"Where is the email?");
-				LgiTrace("%s:%i - Can't find outbox for msg id '%s'\n", _FL, Transfer->Send->MsgId.Get());
-			}
-			else
-			{
-				if (Transfer->OutgoingHeaders)
+			if (Outbox)
+			{			
+				Mail *m = Outbox->GetMessageById(Transfer->Send->MsgId);
+				if (!m)
 				{
-					m->SetInternetHeader(Transfer->OutgoingHeaders);
-					DeleteArray(Transfer->OutgoingHeaders);
+					LAssert(!"Where is the email?");
+					LgiTrace("%s:%i - Can't find outbox for msg id '%s'\n", _FL, Transfer->Send->MsgId.Get());
 				}
-				
-				m->OnAfterSend();
-				m->Save();
-
-				// Do filtering
-				LVariant DisableFilters;
-				GetOptions()->GetValue(OPT_DisableUserFilters, DisableFilters);
-				if (!DisableFilters.CastInt32())
+				else
 				{
-					// Run the filters
-					List<Filter> Filters;
-					GetFilters(Filters, false, true, false);
-					if (Filters[0])
-					{													
-						List<Mail> In;
-						In.Insert(m);
-						
-						Filter::ApplyFilters(0, Filters, In);
-					}
-				}
-
-				// Add to bayesian spam whitelist...
-				LVariant v;
-				ScribeBayesianFilterMode FilterMode = BayesOff;
-				GetOptions()->GetValue(OPT_BayesFilterMode, v);
-				FilterMode = (ScribeBayesianFilterMode) v.CastInt32();
-
-				if (FilterMode != BayesOff &&
-					m->GetObject())
-				{
-					GDataIt To = m->GetObject()->GetList(FIELD_TO);
-					if (To)
+					if (Transfer->OutgoingHeaders)
 					{
-						for (LDataPropI *a = To->First();
-							a;
-							a = To->Next())
-						{
-							if (a->GetStr(FIELD_EMAIL))
-								WhiteListIncrement(a->GetStr(FIELD_EMAIL));
+						m->SetInternetHeader(Transfer->OutgoingHeaders);
+						DeleteArray(Transfer->OutgoingHeaders);
+					}
+					
+					m->OnAfterSend();
+					m->Save();
+
+					// Do filtering
+					LVariant DisableFilters;
+					GetOptions()->GetValue(OPT_DisableUserFilters, DisableFilters);
+					if (!DisableFilters.CastInt32())
+					{
+						// Run the filters
+						List<Filter> Filters;
+						GetFilters(Filters, false, true, false);
+						if (Filters[0])
+						{													
+							List<Mail> In;
+							In.Insert(m);
+							
+							Filter::ApplyFilters(0, Filters, In);
 						}
 					}
-				}
 
-				NewStatus = MailReceivedOk;
+					// Add to bayesian spam whitelist...
+					LVariant v;
+					ScribeBayesianFilterMode FilterMode = BayesOff;
+					GetOptions()->GetValue(OPT_BayesFilterMode, v);
+					FilterMode = (ScribeBayesianFilterMode) v.CastInt32();
+
+					if (FilterMode != BayesOff &&
+						m->GetObject())
+					{
+						GDataIt To = m->GetObject()->GetList(FIELD_TO);
+						if (To)
+						{
+							for (LDataPropI *a = To->First();
+								a;
+								a = To->Next())
+							{
+								if (a->GetStr(FIELD_EMAIL))
+									WhiteListIncrement(a->GetStr(FIELD_EMAIL));
+							}
+						}
+					}
+
+					NewStatus = MailReceivedOk;
+				}
 			}
 		}
 

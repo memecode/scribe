@@ -1537,7 +1537,8 @@ enum ReceiveStatus
 	MailReceivedNone,
 	MailReceivedWaiting,	// This has been given to the main thread
 	MailReceivedOk,			// and one of "Ok" or "Error" has to be
-	MailReceivedError		// set to continue.
+	MailReceivedError,		// set to continue.
+	MailReceivedMax,
 };
 
 ScribeFunc const char *AccountThreadStateName(AccountThreadState i);
@@ -1678,6 +1679,7 @@ protected:
 
 	// Members
 	LSocketI *CreateSocket(bool Sending, LCapabilityClient *Caps, bool RawLFCheck);
+	bool WaitForTransfers(List<MailTransferEvent> &Files);
 
 	void StrOption(const char *Opt, LVariant &v, const char *Set);
 	void IntOption(const char *Opt, LVariant &v, int Set);
