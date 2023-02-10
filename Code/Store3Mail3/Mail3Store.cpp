@@ -1399,58 +1399,83 @@ bool LMail3Store::DeleteMailById(int64 Id)
 	return true;
 }
 
-class CompactThread : public LThread, public LMutex
-{
-	bool Loop;
-	int64 InboxId;
-	LMail3Store *Store;
+/*
+	while
+	(
+		!Props->GetInt(Store3UiCancel)
+		&&            
+		(Thread.Return < 0 || !Thread.IsExited())
+	)
+	{
+		LSleep(100);
+				
+		if (Thread.Lock(_FL))
+		{
+			if (Thread.Status)
+			{
+				Props->SetStr(Store3UiStatus, Thread.Status);
+				Thread.Status.Empty();
+			}
+			if (Thread.Error)
+			{
+				
+				Thread.Error.Empty();
+			}
+			if (Thread.Max > 0)
+			{
+				Props->SetInt(Store3UiMaxPos, Thread.Max);
+				Thread.Max = -1;
+			}
+			if (Thread.Value >= 0)
+			{
+				Props->SetInt(Store3UiCurrentPos, Thread.Value);
+				Thread.Value = -1;
+			}
+			Thread.Unlock();
+		}
+				
+		LYield();
+	}
+			
+	Status = Thread.Return > 0;
+*/
 
-public:
-	LString Error;
-	LString Status;
-	int64 Value;
-	int64 Max;
-	int Return;
+class CompactThread : public LThread, public LCancel
+{
+	int64 InboxId = 0;
+	LMail3Store *Store = NULL;
+	LDataPropI *Props = NULL;
+	int64 Value = -1;
+	int64 Max = -1;
+
+	std::function<void(bool)> OnStatus;
 	
-	CompactThread(LMail3Store *store, int64 inboxId) :
-		LThread("CompactThread.Thread"),
-		LMutex("CompactThread.Mutex")
+public:
+	CompactThread(LMail3Store *store, int64 inboxId, LDataPropI *props, std::function<void(bool)> onStatus) :
+		LThread("CompactThread")
 	{
 		Store = store;
-		Loop = true;
-		Return = -1;
 		InboxId = inboxId;
-		Value = -1;
-		Max = -1;
+		Props = props;
+		OnStatus = onStatus;
+
 		Run();
 	}
 	
 	~CompactThread()
 	{
-		Loop = false;
-		while (!IsExited())
-		{
-			LSleep(20);
-			LYield();
-		}
+		Cancel();
+		WaitForExit();
 	}
 
 	void SetError(const char *s)
 	{
-		if (Lock(_FL))
-		{
-			Error = s;
-			Unlock();
-		}
+		Props->SetStr(Store3UiError, s);
 	}
 	
 	void SetStatus(const char *s)
 	{
-		if (Lock(_FL))
-		{
-			Status = s;
-			Unlock();
-		}
+		Props->SetStr(Store3UiStatus, s);
 	}
 	
 	int Main()
@@ -1463,13 +1488,13 @@ public:
 			if (!s.Exec())
 			{
 				SetError("Failed to delete orphaned segments.");
-				Return = false;
-				return 0;
+				OnStatus(false);
+				return -1;
 			}
 		}
 
 		// Clean up orphaned mail.
-		if (Loop)
+		if (!IsCancelled())
 		{
 			SetStatus("Cleaning up orphaned Mail...");
 
@@ -1483,32 +1508,10 @@ public:
 			LDataStoreI::StoreTrans Trn = Store->StartTransaction();
 			LMail3Store::LStatement s(Store, "select Id from " MAIL3_TBL_MAIL " where ParentId not in (select Id from " MAIL3_TBL_FOLDER ")");
 			int64 RowPos = 0;
-			while (Loop && s.Row())
+			while (!IsCancelled() && s.Row())
 			{
 				int64 Id = s.GetInt64(0);
-
-				#if 1
-				
 				Store->DeleteMailById(Id);
-				
-				#else
-				
-				char Sql[256];
-				sprintf_s(Sql, sizeof(Sql), "update "MAIL3_TBL_MAIL" set ParentId="LPrintfInt64" where Id="LPrintfInt64, InboxId, Id);
-				LMail3Store::LStatement Move(Store, Sql);
-				if (!Move.Exec())
-				{
-					if (Lock(_FL))
-					{
-						SetError("Failed to move orphaned mail.");
-						Unlock();
-					}
-					Return = false;
-					return 0;
-				}
-				
-				#endif
-				
 				Value = ++RowPos;
 			}
 			
@@ -1517,7 +1520,7 @@ public:
 		}
 
 		// Vacuum
-		if (Loop)
+		if (!IsCancelled())
 		{
 			SetStatus("Vacuum unused space...");
 
@@ -1525,18 +1528,21 @@ public:
 			if (!s.Exec())
 			{
 				SetError("Reclaiming space failed.");
-				Return = false;
-				return 0;
+				OnStatus(false);
+				return -1;
 			}
 		}
 		
-		Return = true;
+		OnStatus(true);
 		return 0;
 	}
 };
 
-bool LMail3Store::Compact(LViewI *Parent, LDataPropI *Props)
+void LMail3Store::Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus)
 {
+	if (!Props || !Callback)
+		return;
+
 	bool Status = false;
 	LVariant InboxPath;
 	if (!Callback->GetSystemPath(FOLDER_INBOX, InboxPath))
@@ -1547,49 +1553,12 @@ bool LMail3Store::Compact(LViewI *Parent, LDataPropI *Props)
 		if (!InboxId)
 			Props->SetStr(Store3UiError, "Couldn't get Inbox ID.");
 		{
-			CompactThread Thread(this, InboxId);
-			while
-			(
-				!Props->GetInt(Store3UiCancel)
-				&&            
-				(Thread.Return < 0 || !Thread.IsExited())
-			)
-			{
-				LSleep(100);
-				
-				if (Thread.Lock(_FL))
-				{
-					if (Thread.Status)
-					{
-						Props->SetStr(Store3UiStatus, Thread.Status);
-						Thread.Status.Empty();
-					}
-					if (Thread.Error)
-					{
-						Props->SetStr(Store3UiError, Thread.Error);
-						Thread.Error.Empty();
-					}
-					if (Thread.Max > 0)
-					{
-						Props->SetInt(Store3UiMaxPos, Thread.Max);
-						Thread.Max = -1;
-					}
-					if (Thread.Value >= 0)
-					{
-						Props->SetInt(Store3UiCurrentPos, Thread.Value);
-						Thread.Value = -1;
-					}
-					Thread.Unlock();
-				}
-				
-				LYield();
-			}
-			
-			Status = Thread.Return > 0;
+			new CompactThread(this, InboxId, Props, OnStatus);
+			return; // without calling OnStatus, the CompactThread will do it.
 		}
 	}
 	
-	return Status;
+	OnStatus(Status);
 }
 
 void LMail3Store::OnEvent(void *Param)

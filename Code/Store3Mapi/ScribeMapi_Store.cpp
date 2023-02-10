@@ -732,10 +732,10 @@ Store3Status LMapiStore::Change(LArray<LDataI*> &Items, int PropId, LVariant &Va
 	return Store3Success;
 }
 
-bool LMapiStore::Compact(LViewI *Parent, LDataPropI *Props)
+void LMapiStore::Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus)
 {
-	LAssert(0);
-	return false;
+	if (OnStatus)
+		OnStatus(true);
 }
 
 void LMapiStore::OnEvent(void *Param)

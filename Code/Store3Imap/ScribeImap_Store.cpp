@@ -560,9 +560,10 @@ Store3Status ImapStore::Change(LArray<LDataI*> &Items, int PropId, LVariant &Val
 	return Store3Error;
 }
 
-bool ImapStore::Compact(LViewI *Parent, LDataPropI *Props)
+void ImapStore::Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus)
 {
-	return true;
+	if (OnStatus)
+		OnStatus(true);
 }
 
 bool ImapStore::PostThread(ImapMsg *m, bool UiPriority)

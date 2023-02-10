@@ -8443,12 +8443,11 @@ bool ScribeWnd::CompactFolders(LMailStore &Store, bool Interactive)
 		WorkOffline->Checked(true);
 	}
 
-	Store.Store->Compact(this, &Dlg); //Dlg.ItemAt(0), true
-
-	if (WorkOffline)
+	Store.Store->Compact(this, &Dlg, [this, Offline](auto status)
 	{
-		WorkOffline->Checked(Offline);
-	}
+		if (WorkOffline)
+			WorkOffline->Checked(Offline);
+	});
 
 	return true;
 }

@@ -344,7 +344,7 @@ public:
 	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items);
 	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash);
 	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator);
-	bool Compact(LViewI *Parent, LDataPropI *Props);
+	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
 	bool Upgrade(LViewI *Parent, LDataPropI *Props);
 	bool Repair(LViewI *Parent, LDataPropI *Props);
 	bool SetFormat(LViewI *Parent, LDataPropI *Props);

@@ -62,7 +62,7 @@ public:
 	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items) { return Store3Error; }
 	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash);
 	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator) { return Store3Error; }	
-	bool Compact(LViewI *Parent, LDataPropI *Props) { return false; }	
+	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus) { if (OnStatus) OnStatus(true); }	
 	void OnEvent(void *Param);
 	bool OnIdle() { return true; }
 	LDataEventsI *GetEvents() { return NULL; }
