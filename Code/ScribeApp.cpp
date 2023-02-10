@@ -4815,7 +4815,7 @@ public:
 		return *this;
 	}
 
-	Store3Status SetStr(int id, const char *str)
+	Store3Status SetStr(int id, const char *str) override
 	{
 		switch (id)
 		{
@@ -4831,7 +4831,7 @@ public:
 		return Store3Success;
 	}
 
-	int Main()
+	int Main() override
 	{
 		Status = Ds->Upgrade(this, this);
 		Cancel();

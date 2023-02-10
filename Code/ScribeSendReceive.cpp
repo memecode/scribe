@@ -205,9 +205,10 @@ const char *ReceiveActionName(ReceiveAction i)
 		case MailDownload:			return "MailDownload";
 		case MailUpload:			return "MailUpload";
 		case MailHeaders:			return "MailHeaders";
+		default:					break;
 	}
 
-	return "(Error)";
+	return "(error)";
 }
 
 const char *ReceiveStatusName(ReceiveStatus i)
@@ -218,6 +219,7 @@ const char *ReceiveStatusName(ReceiveStatus i)
 		case MailReceivedWaiting:	return "ReceiveWaiting";
 		case MailReceivedOk:		return "ReceiveOk";
 		case MailReceivedError:		return "ReceiveError";
+		default:					break;
 	}
 	
 	return "(none)";
