@@ -527,16 +527,21 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 			LMailStore *ms = GetCurrentMailStore();
 			if (ms)
 			{
-				Store3Progress Prog(App, true);
-				if (!ms->Store->Repair(this, &Prog))
+				auto Prog = new Store3Progress(App, true);
+				ms->Store->Repair(this, Prog, [this, Prog](auto status)
 				{
-					auto Err = Prog.GetStr(Store3UiError);
-					LgiMsg(	this,
-							"Repair failed: %s",
-							AppName,
-							MB_OK,
-							Err?Err:"Unsupported method.");
-				}
+					if (!status)
+					{
+						auto Err = Prog->GetStr(Store3UiError);
+						LgiMsg(	this,
+								"Repair failed: %s",
+								AppName,
+								MB_OK,
+								Err?Err:"Unsupported method.");
+					}
+
+					delete Prog;
+				});
 			}
 			else LgiMsg(this, "Error: No mail store selected.", AppName);
 			break;

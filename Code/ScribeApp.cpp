@@ -4773,7 +4773,6 @@ LDataStoreI *ScribeWnd::CreateDataStore(char *Full, bool CreateIfMissing)
 
 class MailStoreUpgrade :
 	public LProgressDlg,
-	public LThread,
 	public LDataPropI
 {
 public:
@@ -4783,24 +4782,25 @@ public:
 	LString Error;
 
 	MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds)
-		: LThread("MailStoreUpgrade")
 	{
 		App = app;
 		Ds = ds;
 		SetCanCancel(false);
 		SetDescription("Upgrading mail store...");
-		Run();
+
+		Ds->Upgrade(this, this, [this](auto status)
+		{
+			Status = status;
+		});
 	}
 
 	~MailStoreUpgrade()
 	{
-		Cancel();
-		WaitForExit();
 	}
 
 	void OnPulse() override
 	{
-		if (IsCancelled())
+		if (Status >= 0)
 		{
 			EndModal(0);
 			return;
@@ -4829,13 +4829,6 @@ public:
 		}
 		
 		return Store3Success;
-	}
-
-	int Main() override
-	{
-		Status = Ds->Upgrade(this, this);
-		Cancel();
-		return 0;
 	}
 };
 

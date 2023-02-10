@@ -1003,13 +1003,12 @@ bool LMail3Store::SetFormat(LViewI *Parent, LDataPropI *Props)
 	return !Error;
 }
 
-bool LMail3Store::Upgrade(LViewI *Parent, LDataPropI *Props)
+void LMail3Store::Upgrade(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus)
 {
 	bool Status = true;
 
 	LStringPipe p;
-	// const char *Tbl;
-	// for (GMail3Def *Flds=Fields.First(&Tbl); Flds; Flds=Fields.Next(&Tbl))
+
 	for (auto it : Fields)
 	{
 		Store3Status s = TableStatus.Find(it.key);
@@ -1029,7 +1028,8 @@ bool LMail3Store::Upgrade(LViewI *Parent, LDataPropI *Props)
 		Props->SetStr(Store3UiError, a);
 	}
 
-	return Status;
+	if (OnStatus)
+		OnStatus(Status);
 }
 
 class SqliteRepairThread : public LThread
@@ -1286,7 +1286,7 @@ bool CheckPathForFile(const char *File, char *Exe, int ExeSize)
     return false;
 }
 
-bool LMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
+void LMail3Store::Repair(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus)
 {
 	// Is the sqlite3 shell binary available?
 	char base[MAX_PATH_LEN];
@@ -1336,7 +1336,9 @@ bool LMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
 			LExecute(base);
 		}
 	
-		return true;
+		if (OnStatus)
+			OnStatus(true);
+		return;
 	}
 	
 	// Close our database...
@@ -1352,7 +1354,9 @@ bool LMail3Store::Repair(LViewI *Parent, LDataPropI *Props)
 	
 	OpenDb();
 	
-	return Worker.Status;
+	if (OnStatus)
+		OnStatus(Worker.Status);
+	return;
 }
 
 int64 LMail3Store::GetFolderId(char *Path)

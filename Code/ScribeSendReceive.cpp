@@ -1021,7 +1021,7 @@ void SendAccountlet::Enabled(bool b)
 
 void SendAccountlet::Main(AccountletThread *Thread)
 {
-	int Status = false;
+	bool Status = false;
 	bool MissingConfig = false;
 	LStringPipe Err;
 

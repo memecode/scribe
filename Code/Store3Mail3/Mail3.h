@@ -345,8 +345,8 @@ public:
 	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash);
 	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator);
 	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
-	bool Upgrade(LViewI *Parent, LDataPropI *Props);
-	bool Repair(LViewI *Parent, LDataPropI *Props);
+	void Upgrade(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
+	void Repair(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
 	bool SetFormat(LViewI *Parent, LDataPropI *Props);
 	void OnEvent(void *Param);
 	bool Check(int Code, const char *Sql);
