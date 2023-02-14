@@ -12196,12 +12196,13 @@ bool ScribeWnd::RemoveStore3EventHandler(LDataEventsI *callback)
 	return true;
 }
 
-bool ScribeWnd::OnMailTransferEvent(MailTransferEvent *e)
+bool ScribeWnd::OnMailTransferEvent(MailTransferEvent *t)
 {
 	if (!Lock(_FL))
 		return false;
 
-	d->Transfers.Add(e);
+	LAssert(t);
+	d->Transfers.Add(t);
 	Unlock();
 	
 	return true;
@@ -12218,11 +12219,12 @@ bool ScribeWnd::OnTransfer()
 		// Take out a bunch of emails...
 		for (int i=0; i<5 && d->Transfers.Length() > 0; i++)
 		{
-			MailTransferEvent *Transfer = d->Transfers[0];
+			auto t = d->Transfers[0];
+			LAssert(t);
 			d->Transfers.DeleteAt(0, true);
 
 			// Save them to a local array
-			Local.Add(Transfer);
+			Local.Add(t);
 		}
 
 		Unlock();

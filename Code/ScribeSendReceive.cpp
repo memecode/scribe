@@ -2299,7 +2299,13 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Error, time=%i\n", Account->GetIn
 						MailTransaction *Tran = Trans[i];
 						MailTransferEvent *t = Thread->Files[Tran->Index];
 						if (t)
-							LgiTrace("%s:%i - No 't' ptr.\n", _FL);
+						{
+							LgiTrace("%s:%i - Trans[%i]: No 't' ptr for idx=%i files.len=%i.\n",
+								_FL,
+								i,
+								Tran->Index,
+								(int)Thread->Files.Length());
+						}
 						else
 						{
 							if (Tran->Oversize)
@@ -2347,7 +2353,11 @@ if (DebugTrace) LgiTrace("Receive(%i) Waiting for main thread, time=%i\n", Accou
 				if (!WaitForTransfers(Thread->Files))
 					Error = true;
 
-				if (!Error)
+				if (Error)
+				{
+					LgiTrace("%s:%i - Error receiving mail.\n", _FL);
+				}
+				else
 				{
 					// Do delete's
 if (DebugTrace) LgiTrace("Receive(%i) Delete phase, time=%i\n", Account->GetIndex(), TimeDelta());
@@ -2388,10 +2398,6 @@ if (DebugTrace) LgiTrace("Receive(%i) Delete(%i) Deleting, time=%i\n", Account->
 							Group.Value++;
 						}
 					}
-				}
-				else
-				{
-					LgiTrace("%s:%i - Error receiving mail.\n", _FL);
 				}
 
 				Thread->Files.DeleteObjects();
