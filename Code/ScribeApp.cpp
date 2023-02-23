@@ -4969,7 +4969,7 @@ bool ScribeWnd::ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName
 	if (Mailbox)
 	{
 		Mailbox->App = this;
-		Mailbox->SetObject(Root, _FL);
+		Mailbox->SetObject(Root, false, _FL);
 
 		Root->SetStr(FIELD_FOLDER_NAME, StoreName);
 		Root->SetInt(FIELD_FOLDER_TYPE, MAGIC_NONE);
@@ -5127,8 +5127,8 @@ bool ScribeWnd::LoadMailStores()
 						Folders[StoreIdx].Path.Get(),
 						ValidStr(Details)?Details:"n/a") == IDYES)
 			{
-				MailStoreUpgrade Prog(this, Store);
-				Prog.DoModal();
+				auto Prog = new MailStoreUpgrade(this, Store);
+				Prog->DoModal(NULL);
 			}
 			else
 			{
@@ -12572,7 +12572,10 @@ bool ScribeWnd::OnTransfer()
 			ScribeFolder *Outbox = GetFolder(Transfer->Send->SourceFolder);
 			if (!Outbox)
 				Outbox = GetFolder(FOLDER_OUTBOX);
-			Outbox->GetMessageById(Transfer->Send->MsgId, [&](auto m)
+			if (!Outbox)
+				break;
+				
+			Outbox->GetMessageById(Transfer->Send->MsgId, [this, Transfer](auto m)
 			{
 				if (!m)
 				{
@@ -12629,10 +12632,10 @@ bool ScribeWnd::OnTransfer()
 						}
 					}
 
-					NewStatus = MailReceivedOk;
+					// FIXME:
+					// NewStatus = MailReceivedOk;
 				}
 			});
-			}
 		}
 
 		#if DEBUG_NEW_MAIL

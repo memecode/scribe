@@ -1600,7 +1600,7 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 
 		// Emptying the item list, leave the store nodes around though
 		for (auto t: Items)
-			t->SetObject(NULL, _FL);
+			t->SetObject(NULL, false, _FL);
 
 		Items.Empty();
 		IsLoaded(false);
@@ -3945,6 +3945,115 @@ public:
 	*/
 };
 
+class FolderExportTask : public LProgressDlg
+{
+	LAutoPtr<LStreamI> Out;
+	ScribeFolder *Folder;
+	LString MimeType;
+	int Idx;
+	bool HasError = false;
+
+public:
+	// Minimum amount of time to do work.
+	constexpr static int WORK_SLICE_MS		= 130;
+	// This should be larger then WORK_SLICE_MS to allow message loop to process
+	constexpr static int PULSE_MS			= 200;
+
+	FolderExportTask(LAutoPtr<LStreamI> out, ScribeFolder *folder, LString mimeType) : LProgressDlg(folder->App)
+	{
+		Out = out;
+		Folder = folder;
+		MimeType = mimeType;
+		Idx = 0;
+		Ts = LCurrentTime();
+		Folder->App->OnFolderTask(this, true);
+
+		bool Mbox = _stricmp(MimeType, sMimeMbox) == 0;
+
+		// Clear the files contents
+		Out->SetSize(0);
+
+		// Setup progress UI
+		SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
+		SetRange(Folder->Items.Length());
+		
+		switch (Folder->GetItemType())
+		{
+			case MAGIC_MAIL:
+				SetType(LLoadString(IDS_EMAIL));
+				break;
+			case MAGIC_CALENDAR:
+				SetType(LLoadString(IDS_CALENDAR));
+				break;
+			case MAGIC_CONTACT:
+				SetType(LLoadString(IDS_CONTACT));
+				break;
+			case MAGIC_GROUP:
+				SetType("Groups");
+				break;
+			default:
+				SetType("Objects");
+				break;
+		}
+
+		SetPulse(PULSE_MS);
+		SetAlwaysOnTop(true);
+	}
+	
+	~FolderExportTask()
+	{
+		Folder->App->OnFolderTask(this, false);
+	}
+	
+	bool OnRequestClose(bool OsClose)
+	{
+		return true;
+	}
+	
+	void OnPulse()
+	{
+		LProgressDlg::OnPulse();
+		PostEvent(M_EXPORT_NEXT);
+	}
+	
+	LMessage::Result OnEvent(LMessage *Msg)
+	{
+		if (Msg->Msg() == M_EXPORT_NEXT)
+		{
+			auto StartTs = LCurrentTime();
+			while (	!IsCancelled() &&
+					(LCurrentTime() - StartTs) < WORK_SLICE_MS)
+			{
+				if (Idx >= (ssize_t)Folder->Items.Length())
+				{
+					Quit();
+					break;
+				}
+
+				// Process all the container's items
+				Thing *t = Folder->Items[Idx++];
+				if (t)
+				{
+					if (t->Export(Out, MimeType, NULL))
+					{
+						Value(Idx);
+					}
+					else
+					{
+						HasError = true;
+						LgiMsg(this, "Error exporting items.", AppName);
+						Quit();
+					}
+				}
+			}			
+			return 0;
+		}
+
+		return LProgressDlg::OnEvent(Msg);
+	}
+};
+
+
 // This is the mime type used to storage objects on disk
 const char *ScribeFolder::GetStorageMimeType()
 {
@@ -3978,62 +4087,34 @@ void ScribeFolder::ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, std::
 
 	LoadThings(NULL, [&](auto Status)
 	{
+		FolderExportTask *Task = NULL;
 		if (Status == Store3Success)
-		{
-			auto Task = new FolderExportTask(f, this, MimeType);
-			if (Callback) Callback(Task);
-		}
-		else if (Callback)
-			Callback(NULL);
+			Task = new FolderExportTask(f, this, MimeType);
+		if (Callback)
+			Callback(Task);
 	});
 }
 
-void ScribeFolder::Export(LStreamI &f, const char *MimeType, std::function<void(Store3Status)> Callback)
+ThingType::IoProgress ScribeFolder::Export(IoProgressImplArgs)
 {
-	if (!MimeType)
+	IoProgress ErrStatus(Store3Error);
+	if (!mimeType)
 	{
-		if (Callback) Callback(Store3Error);
-		return;
+		ErrStatus.errMsg = "No mimetype.";
+		if (cb) cb(&ErrStatus, NULL);
+		return ErrStatus;
+	}
+		
+	if (!LoadThings())
+	{
+		ErrStatus.errMsg = "Failed to load things.";
+		if (cb) cb(&ErrStatus, NULL);
+		return ErrStatus;
 	}
 
-	LoadThings(NULL, [&](auto Status)
-	{
-		if (Status != Store3Loaded)
-		{
-			if (Callback) Callback(Status);
-			return;
-		}
-
-		bool Mbox = _stricmp(MimeType, sMimeMbox) == 0;
-		LProgressDlg Dlg(App);
-		
-		App->OnFolderTask(&Dlg, true);
-
-		// Clear the files contents
-		f.SetSize(0);
-
-		// Setup progress UI
-		Dlg.SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
-		Dlg.Invalidate((LRect*)0, true);
-		Dlg.SetRange(Items.Length());
-		Dlg.SetType(LLoadString(IDS_EMAIL));
-
-		// Process all the container's items
-		int Error = 0;
-		for (auto i: Items)
-		{
-			if (!i->Export(f, MimeType))
-				Error++;
-			
-			Dlg.Value(Dlg.Value()+1);
-			Dlg.Invalidate((LRect*)0, true);
-		}
-
-		// all done
-		App->OnFolderTask(&Dlg, false);
-
-		if (Callback) Callback(Error ? Store3Error : Store3Success);
-	});
+	IoProgress Status(Store3Delayed);
+	Status.prog = new ExportFolderTask(this, stream, mimeType, cb);
+	return Status;
 }
 
 size_t ScribeFolder::Length()
@@ -4298,16 +4379,8 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 					auto p = Export(AutoCast(f), Args[1]->Str());
 					*ReturnValue = p.status;
 				}
+				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for writing.\n", _FL, FileName);
-					break;
-				}
-
-				Export(f, Args[1]->Str(), [&](auto Status)
-				{
-					*ReturnValue = Status == Store3Success;
-				});
-
-				WaitForVariant(*ReturnValue);
 			}
 			break;
 		}

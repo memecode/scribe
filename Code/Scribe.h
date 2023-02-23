@@ -1341,8 +1341,6 @@ public:
 	bool GetFormats(bool Export, LString::Array &MimeTypes);
 	IoProgress Import(IoProgressFnArgs);
 	IoProgress Export(IoProgressFnArgs);
-	bool Import(LStreamI &f, const char *MimeType);
-	void Export(LStreamI &f, const char *MimeType, std::function<void(Store3Status)> Callback = NULL);
 	void ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, std::function<void(LProgressDlg*)> Callback = NULL);
 	const char *GetStorageMimeType();
 
