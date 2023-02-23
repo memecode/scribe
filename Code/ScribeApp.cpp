@@ -1249,235 +1249,8 @@ ScribeWnd::ScribeWnd() :
 	else DeleteObj(ScribeIpc);
 
 	#ifndef WIN32
-	LString App = GetFullAppName(true);
-	printf("%s\n", App.Get());
+	printf("%s\n", GetFullAppName(true).Get());
 	#endif
-
-	LgiTrace("const this=%p\n", this);
-
-	auto AppConstruct1 = [this]()
-	{
-		if (!d->Options && !LoadOptions())
-		{
-			ScribeState = ScribeExiting;
-			return;
-		}
-		ScribeOptionsDefaults(d->Options);
-
-		LVariant GlyphSub;
-		if (GetOptions()->GetValue(OPT_GlyphSub, GlyphSub))
-		{
-			bool UseGlyphSub = GlyphSub.CastInt32() != 0;
-			LSysFont->SubGlyphs(UseGlyphSub);
-			LSysBold->SubGlyphs(UseGlyphSub);
-			LFontSystem::Inst()->SetDefaultGlyphSub(UseGlyphSub);
-		}
-		else
-		{
-			GetOptions()->SetValue(OPT_GlyphSub, GlyphSub = LFontSystem::Inst()->GetDefaultGlyphSub());
-		}
-
-		{
-			// Limit the size of the 'Scribe.txt' log file
-			char p[MAX_PATH_LEN];
-			if (LgiTraceGetFilePath(p, sizeof(p)))
-			{
-				int64 Sz = LFileSize(p);
-				#define MiB * 1024 * 1024
-				if (Sz > (3 MiB))
-					FileDev->Delete(p);
-			}
-		}
-
-		// Process pre-UI options
-		LVariant SizeAdj;
-		int SzAdj = SizeAdj.CastInt32();
-		if (GetOptions()->GetValue(OPT_UiFontSize, SizeAdj) &&
-			(SzAdj = SizeAdj.CastInt32()) >= 0 &&
-			SzAdj < 5)
-		{
-			SzAdj -= 2;
-			if (SzAdj)
-			{
-				int Pt = LSysFont->PointSize();
-			
-				LSysFont->PointSize(Pt + SzAdj);
-				LSysFont->Create();
-
-				LSysBold->PointSize(Pt + SzAdj);
-				LSysBold->Create();
-			
-				LFont *m = LMenu::GetFont();
-				if (m)
-				{
-					m->PointSize(m->PointSize() + SzAdj);
-					m->Create();
-				}
-			}
-		}
-		else
-		{
-			GetOptions()->SetValue(OPT_UiFontSize, SizeAdj = 2);
-		}
-
-		// Resources and languages
-		auto SetLanguage = [this]()
-		{
-			LVariant LangId;
-			if (GetOptions()->GetValue(OPT_UiLanguage, LangId))
-			{
-				// Set the language to load...
-				LAppInst->SetConfig("Language", LangId.Str());
-			}
-			LResources::SetLoadStyles(true);
-
-			// Load the resources (with the current lang)
-			if (!LgiGetResObj(true, "Scribe"))
-			{
-				LgiMsg(NULL, "The resource file 'Scribe.lr8' is missing.", AppName);
-				ScribeState = ScribeExiting;
-				LCloseApp();
-			}
-		};
-
-		SetLanguage();
-
-		auto AppConstruct2 = [this]()
-		{
-			#if 1
-			auto CurRes = LgiGetResObj(false);
-			LVariant Theme;
-			if (CurRes && GetOptions()->GetValue(OPT_Theme, Theme))
-			{
-				auto Paths = ScribeThemePaths();
-				auto NoTheme = LLoadString(IDS_DEFAULT);
-				if (Theme.Str() &&
-					Stricmp(NoTheme, Theme.Str()))
-				{
-					for (auto p: Paths)
-					{
-						LFile::Path Inst(p);
-						Inst += Theme.Str();
-						if (Inst.Exists())
-						{
-							CurRes->SetThemeFolder(Inst);
-							d->Static->OnSystemColourChange();
-							break;
-						}
-					}
-				}
-			}
-			#endif
-
-			LoadCalendarStringTable();
-
-			ZeroObj(DefaultFolderNames);
-			DefaultFolderNames[FOLDER_INBOX]     = LLoadString(IDS_FOLDER_INBOX, "Inbox");
-			DefaultFolderNames[FOLDER_OUTBOX]    = LLoadString(IDS_FOLDER_OUTBOX, "Outbox");
-			DefaultFolderNames[FOLDER_SENT]      = LLoadString(IDS_FOLDER_SENT, "Sent");
-			DefaultFolderNames[FOLDER_TRASH]     = LLoadString(IDS_FOLDER_TRASH, "Trash");
-			DefaultFolderNames[FOLDER_CONTACTS]  = LLoadString(IDS_FOLDER_CONTACTS, "Contacts");
-			DefaultFolderNames[FOLDER_TEMPLATES] = LLoadString(IDS_FOLDER_TEMPLATES, "Templates");
-			DefaultFolderNames[FOLDER_FILTERS]   = LLoadString(IDS_FOLDER_FILTERS, "Filters");
-			DefaultFolderNames[FOLDER_CALENDAR]  = LLoadString(IDS_FOLDER_CALENDAR, "Calendar");
-			DefaultFolderNames[FOLDER_GROUPS]    = LLoadString(IDS_FOLDER_GROUPS, "Groups");
-			DefaultFolderNames[FOLDER_SPAM]      = LLoadString(IDS_SPAM, "Spam");
-
-			LStringPipe RfXml;
-			RfXml.Print(DefaultRfXml,
-						LLoadString(IDS_ORIGINAL_MESSAGE),
-						LLoadString(FIELD_TO),
-						LLoadString(FIELD_FROM),
-						LLoadString(FIELD_SUBJECT),
-						LLoadString(IDS_DATE));
-			{
-				LAutoString Xml(RfXml.NewStr());
-				UpgradeRfOption(this, OPT_TextReplyFormat, "ReplyXml", Xml);
-				UpgradeRfOption(this, OPT_TextForwardFormat, "ForwardXml", Xml);
-			}
-
-			LFontType t;
-			if (t.GetSystemFont("small"))
-			{
-				d->PreviewFont = t.Create();
-				if (d->PreviewFont)
-				{
-					#if defined WIN32
-					d->PreviewFont->PointSize(8);
-					#endif
-				}
-			}
-
-			MoveOnScreen();
-
-			// Load global graphics
-			LoadImageResources();
-
-			// Load time threads
-			// Window name
-			Name(AppName);
-			SetSnapToEdge(true);
-			ClearTempPath();
-
-			#if WINNATIVE
-			SetStyle(GetStyle() & ~WS_VISIBLE);
-			SetExStyle(GetExStyle() & ~WS_EX_ACCEPTFILES);
-			CreateClassW32(AppName, LoadIcon(LProcessInst(), MAKEINTRESOURCE(IDI_APP)));
-			#endif
-
-			#if defined LINUX
-			SetIcon("About64px.png");
-			LFinishXWindowsStartup(this);
-			#endif
-
-			ScribeState = ScribeInitializing;
-			#if LGI_VIEW_HANDLE
-			if (Handle())
-			#endif
-				OnCreate();
-		};
-
-		// If no language set...
-		LVariant LangId;
-		if (!GetOptions()->GetValue(OPT_UiLanguage, LangId))
-		{
-			// Ask the user...
-			auto Dlg = new LanguageDlg(this);
-			if (!Dlg->Ok)
-			{
-				delete Dlg;
-				LgiMsg(this, "Failed to create language selection dialog.", "Scribe Error");
-				ScribeState = ScribeExiting;
-				LCloseApp();
-			}
-			else
-			{
-				Dlg->DoModal([this, Dlg, SetLanguage, AppConstruct2](auto dlg, auto id)
-				{
-					if (id)
-					{
-						// Set the language in the options file
-						LVariant v;
-						GetOptions()->SetValue(OPT_UiLanguage, v = Dlg->Lang.Get());
-			
-						// Reload the resource file... to get the new lang.
-						LResources *Cur = LgiGetResObj(false);
-						DeleteObj(Cur);
-
-						SetLanguage();
-						AppConstruct2();
-					}
-					else // User canceled
-					{
-						ScribeState = ScribeExiting;
-						LCloseApp();
-					}
-					delete dlg;
-				});
-			}
-		}
-		else AppConstruct2();
-	};
 
 	auto Type = d->GetInstallMode();
 
@@ -1489,18 +1262,477 @@ ScribeWnd::ScribeWnd() :
 
 	if (Type == LOptionsFile::UnknownMode)
 	{
-		d->AskUserForInstallMode([this, AppConstruct1](auto selectedMode)
+		d->AskUserForInstallMode([this](auto selectedMode)
 		{
 			d->SetInstallMode(selectedMode);
-			AppConstruct1();
+			Construct1();
 		});
 	}
-	else AppConstruct1();
+	else Construct1();
 }
 
-int StrSort(char *a, char *b, int d)
+void ScribeWnd::Construct1()
 {
-	return _stricmp(a, b);
+	if (!d->Options && !LoadOptions())
+	{
+		ScribeState = ScribeExiting;
+		return;
+	}
+	ScribeOptionsDefaults(d->Options);
+
+	LVariant GlyphSub;
+	if (GetOptions()->GetValue(OPT_GlyphSub, GlyphSub))
+	{
+		bool UseGlyphSub = GlyphSub.CastInt32() != 0;
+		LSysFont->SubGlyphs(UseGlyphSub);
+		LSysBold->SubGlyphs(UseGlyphSub);
+		LFontSystem::Inst()->SetDefaultGlyphSub(UseGlyphSub);
+	}
+	else
+	{
+		GetOptions()->SetValue(OPT_GlyphSub, GlyphSub = LFontSystem::Inst()->GetDefaultGlyphSub());
+	}
+
+	{
+		// Limit the size of the 'Scribe.txt' log file
+		char p[MAX_PATH_LEN];
+		if (LgiTraceGetFilePath(p, sizeof(p)))
+		{
+			int64 Sz = LFileSize(p);
+			#define MiB * 1024 * 1024
+			if (Sz > (3 MiB))
+				FileDev->Delete(p);
+		}
+	}
+
+	// Process pre-UI options
+	LVariant SizeAdj;
+	int SzAdj = SizeAdj.CastInt32();
+	if (GetOptions()->GetValue(OPT_UiFontSize, SizeAdj) &&
+		(SzAdj = SizeAdj.CastInt32()) >= 0 &&
+		SzAdj < 5)
+	{
+		SzAdj -= 2;
+		if (SzAdj)
+		{
+			int Pt = LSysFont->PointSize();
+		
+			LSysFont->PointSize(Pt + SzAdj);
+			LSysFont->Create();
+
+			LSysBold->PointSize(Pt + SzAdj);
+			LSysBold->Create();
+		
+			LFont *m = LMenu::GetFont();
+			if (m)
+			{
+				m->PointSize(m->PointSize() + SzAdj);
+				m->Create();
+			}
+		}
+	}
+	else
+	{
+		GetOptions()->SetValue(OPT_UiFontSize, SizeAdj = 2);
+	}
+
+	// Resources and languages
+	SetLanguage();
+
+	// If no language set...
+	LVariant LangId;
+	if (!GetOptions()->GetValue(OPT_UiLanguage, LangId))
+	{
+		// Ask the user...
+		auto Dlg = new LanguageDlg(this);
+		if (!Dlg->Ok)
+		{
+			delete Dlg;
+			LgiMsg(this, "Failed to create language selection dialog.", "Scribe Error");
+			ScribeState = ScribeExiting;
+			LCloseApp();
+		}
+		else
+		{
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
+			{
+				if (id)
+				{
+					// Set the language in the options file
+					LVariant v;
+					GetOptions()->SetValue(OPT_UiLanguage, v = Dlg->Lang.Get());
+		
+					// Reload the resource file... to get the new lang.
+					LResources *Cur = LgiGetResObj(false);
+					DeleteObj(Cur);
+
+					SetLanguage();
+					Construct2();
+				}
+				else // User canceled
+				{
+					ScribeState = ScribeExiting;
+					LCloseApp();
+				}
+				delete dlg;
+			});
+		}
+	}
+	else Construct2();
+}
+
+void ScribeWnd::Construct2()
+{
+	#if 1
+	auto CurRes = LgiGetResObj(false);
+	LVariant Theme;
+	if (CurRes && GetOptions()->GetValue(OPT_Theme, Theme))
+	{
+		auto Paths = ScribeThemePaths();
+		auto NoTheme = LLoadString(IDS_DEFAULT);
+		if (Theme.Str() &&
+			Stricmp(NoTheme, Theme.Str()))
+		{
+			for (auto p: Paths)
+			{
+				LFile::Path Inst(p);
+				Inst += Theme.Str();
+				if (Inst.Exists())
+				{
+					CurRes->SetThemeFolder(Inst);
+					d->Static->OnSystemColourChange();
+					break;
+				}
+			}
+		}
+	}
+	#endif
+
+	LoadCalendarStringTable();
+
+	ZeroObj(DefaultFolderNames);
+	DefaultFolderNames[FOLDER_INBOX]     = LLoadString(IDS_FOLDER_INBOX, "Inbox");
+	DefaultFolderNames[FOLDER_OUTBOX]    = LLoadString(IDS_FOLDER_OUTBOX, "Outbox");
+	DefaultFolderNames[FOLDER_SENT]      = LLoadString(IDS_FOLDER_SENT, "Sent");
+	DefaultFolderNames[FOLDER_TRASH]     = LLoadString(IDS_FOLDER_TRASH, "Trash");
+	DefaultFolderNames[FOLDER_CONTACTS]  = LLoadString(IDS_FOLDER_CONTACTS, "Contacts");
+	DefaultFolderNames[FOLDER_TEMPLATES] = LLoadString(IDS_FOLDER_TEMPLATES, "Templates");
+	DefaultFolderNames[FOLDER_FILTERS]   = LLoadString(IDS_FOLDER_FILTERS, "Filters");
+	DefaultFolderNames[FOLDER_CALENDAR]  = LLoadString(IDS_FOLDER_CALENDAR, "Calendar");
+	DefaultFolderNames[FOLDER_GROUPS]    = LLoadString(IDS_FOLDER_GROUPS, "Groups");
+	DefaultFolderNames[FOLDER_SPAM]      = LLoadString(IDS_SPAM, "Spam");
+
+	LStringPipe RfXml;
+	RfXml.Print(DefaultRfXml,
+				LLoadString(IDS_ORIGINAL_MESSAGE),
+				LLoadString(FIELD_TO),
+				LLoadString(FIELD_FROM),
+				LLoadString(FIELD_SUBJECT),
+				LLoadString(IDS_DATE));
+	{
+		LAutoString Xml(RfXml.NewStr());
+		UpgradeRfOption(this, OPT_TextReplyFormat, "ReplyXml", Xml);
+		UpgradeRfOption(this, OPT_TextForwardFormat, "ForwardXml", Xml);
+	}
+
+	LFontType t;
+	if (t.GetSystemFont("small"))
+	{
+		d->PreviewFont = t.Create();
+		if (d->PreviewFont)
+		{
+			#if defined WIN32
+			d->PreviewFont->PointSize(8);
+			#endif
+		}
+	}
+
+	MoveOnScreen();
+
+	// Load global graphics
+	LoadImageResources();
+
+	// Load time threads
+	// Window name
+	Name(AppName);
+	SetSnapToEdge(true);
+	ClearTempPath();
+
+	#if WINNATIVE
+	SetStyle(GetStyle() & ~WS_VISIBLE);
+	SetExStyle(GetExStyle() & ~WS_EX_ACCEPTFILES);
+	CreateClassW32(AppName, LoadIcon(LProcessInst(), MAKEINTRESOURCE(IDI_APP)));
+	#endif
+
+	#if defined LINUX
+	SetIcon("About64px.png");
+	LFinishXWindowsStartup(this);
+	#endif
+
+	OnCreate();
+}
+
+void ScribeWnd::Construct3()
+{
+	if (ScribeState == ScribeConstructing)
+	{
+		// Constructor is still running, probably showing some UI.
+		// Don't complete setup at this point.
+		return;
+	}
+
+	// Load the styles
+	LResources::StyleElement(this);
+
+	// Main menu
+	Menu = new LMenu(AppName);
+	if (Menu)
+	{
+		Menu->Attach(this);
+		if (Menu->Load(this, "ID_MENU", GetUiTags()))
+		{
+			LAssert(ImageList != NULL);
+			Menu->SetImageList(ImageList, false);
+
+			auto IdentityItem = Menu->FindItem(IDM_NO_IDENTITIES);
+			if (IdentityItem)
+			{
+				IdentityMenu = IdentityItem->GetParent();
+			}
+
+			CmdSend.MenuItem = Menu->FindItem(IDM_SEND_MAIL);
+			auto NewMailMenu = Menu->FindItem(IDM_NEW_EMAIL);
+			if (NewMailMenu)
+			{
+				MailMenu = NewMailMenu->GetParent();
+			}
+
+			LVariant v;
+			WorkOffline = Menu->FindItem(IDM_WORK_OFFLINE);
+			if (WorkOffline && GetOptions()->GetValue(OPT_WorkOffline, v))
+			{
+				WorkOffline->Checked(v.CastInt32() != 0);
+			}
+
+			if ((d->DisableUserFilters = Menu->FindItem(IDM_FILTERS_DISABLE)))
+			{
+				if (GetOptions()->GetValue(OPT_DisableUserFilters, v))
+				{
+					d->DisableUserFilters->Checked(v.CastInt32() != 0);
+				}
+			}
+
+			#if RUN_STARTUP_SCRIPTS
+			// Run scripts in './Scripts' folder
+			char s[MAX_PATH_LEN];
+			LMakePath(s, sizeof(s), ScribeResourcePath(),
+				"Scripts");
+			if (!LDirExists(s))
+				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
+					#if defined(LINUX) || defined(WINDOWS)
+					"..\\"
+					#endif
+					"Scripts");
+			if (!LDirExists(s))
+				LgiTrace("%s:%i - Error: the scripts folder '%s' doesn't exist.\n", _FL, s);
+			else
+			{
+				bool ErrorDsp = false;
+				LDirectory Dir;
+				for (int b = Dir.First(s); b; b = Dir.Next())
+				{
+					if (Dir.IsDir())
+						continue;
+
+					char *Ext = LGetExtension(Dir.GetName());
+					if (!Ext || _stricmp(Ext, "script") != 0)
+						continue;
+
+					Dir.Path(s, sizeof(s));
+
+					LStringPipe Log;
+					char *Source = LReadTextFile(s);
+					if (Source)
+					{
+						LScript *Cur = new LScript;
+						if (Cur)
+						{
+							char Msg[256];
+							d->CurrentScripts.Add(Cur);
+							LScribeScript::Inst->GetLog()->Write(Msg,
+								sprintf_s(Msg, sizeof(Msg), "Compiling '%s'...\n", Dir.GetName()));
+
+							LCompiler c;
+							if (c.Compile(	Cur->Code,
+											d->Engine->GetSystemContext(),
+											LScribeScript::Inst,
+											s,
+											Source,
+											NULL))
+							{
+								LFunctionInfo *Main = Cur->Code->GetMethod("Main");
+								if (Main)
+								{
+									LVirtualMachine Vm(d);
+									
+									LScriptArguments Args(&Vm);
+									Args.New() = new LVariant((LDom*)this);
+									d->Scripts.Add(Cur);
+									if (Vm.ExecuteFunction(	Cur->Code,
+															Main,
+															Args,
+															LScribeScript::Inst->GetLog()) &&
+										Args.GetReturn()->CastInt32())
+									{
+										d->CurrentScripts.Delete(Cur, true);
+										Cur = NULL;
+									}
+									else
+									{
+										LgiTrace("Error: Script's main failed (%s)\n", Cur->Code->GetFileName());
+										if (Cur->Callbacks.Length())
+											d->DeleteCallbacks(Cur->Callbacks);
+										d->Scripts.Delete(Cur);
+									}
+
+									Args.DeleteObjects();
+								}
+							}
+							else if (!ErrorDsp)
+							{
+								ErrorDsp = true;
+								OnScriptCompileError(Source, NULL);
+							}
+
+							if (Cur)
+							{
+								d->CurrentScripts.Delete(Cur, true);
+								DeleteObj(Cur);
+							}
+						}
+
+						DeleteArray(Source);
+					}
+				}
+
+			}
+			#endif
+
+			#define EnableItem(id, en) { auto i = Menu->FindItem(id); if (i) i->Enabled(en); }
+			#define SetMenuIcon(id, ico) { auto i = Menu->FindItem(id); if (i) i->Icon(ico); }
+			
+			EnableItem(IDM_IMPORT_OUTLOOK_ITEMS, true);
+			
+			// SetMenuIcon(IDM_OPEN_FOLDERS, ICON_OPEN_FOLDER);
+			SetMenuIcon(IDM_OPTIONS, ICON_OPTIONS);
+			SetMenuIcon(IDM_SECURITY, ICON_LOCK);
+
+			SetMenuIcon(IDM_CUT, ICON_CUT);
+			SetMenuIcon(IDM_COPY, ICON_COPY);
+			SetMenuIcon(IDM_PASTE, ICON_PASTE);
+
+			SetMenuIcon(IDM_LAYOUT1, ICON_LAYOUT1);
+			SetMenuIcon(IDM_LAYOUT2, ICON_LAYOUT2);
+			SetMenuIcon(IDM_LAYOUT3, ICON_LAYOUT3);
+			SetMenuIcon(IDM_LAYOUT4, ICON_LAYOUT4);
+			SetMenuIcon(IDM_NEW_EMAIL, ICON_UNSENT_MAIL);
+			SetMenuIcon(IDM_SET_READ, ICON_READ_MAIL);
+			SetMenuIcon(IDM_SET_UNREAD, ICON_UNREAD_MAIL);
+			SetMenuIcon(IDM_NEW_CONTACT, ICON_CONTACT);
+			SetMenuIcon(IDM_NEW_GROUP, ICON_CONTACT_GROUP);
+			SetMenuIcon(IDM_REPLY, ICON_FLAGS_REPLY);
+			SetMenuIcon(IDM_REPLY_ALL, ICON_FLAGS_REPLY);
+			SetMenuIcon(IDM_FORWARD, ICON_FLAGS_FORWARD);
+			SetMenuIcon(IDM_BOUNCE, ICON_FLAGS_BOUNCE);
+			SetMenuIcon(IDM_NEW_FILTER, ICON_FILTER);
+			SetMenuIcon(IDM_FILTER_CURRENT_FOLDER, ICON_FOLDER_FILTERS);
+			SetMenuIcon(IDM_MEMECODE, ICON_LINK);
+			SetMenuIcon(IDM_HOMEPAGE, ICON_LINK);
+			SetMenuIcon(IDM_SCRIBE_FAQ, ICON_LINK);
+			SetMenuIcon(IDM_INSCRIBE_LINK, ICON_LINK);
+			SetMenuIcon(IDM_VERSION_HISTORY, ICON_LINK);
+			SetMenuIcon(IDM_DEBUG_INFO, ICON_LINK);
+			SetMenuIcon(IDM_TUTORIALS, ICON_LINK);
+			SetMenuIcon(IDM_FEEDBACK, ICON_UNREAD_MAIL);
+			SetMenuIcon(IDM_HELP, ICON_HELP);
+
+			LMenuItem *mi;
+			if
+			(
+				GetOptions()->GetValue(OPT_EditControl, v) &&
+				(mi = Menu->FindItem(IDM_HTML_EDITOR))
+			)
+				mi->Checked(v.CastInt32() != 0);
+
+			Menu->SetPrefAndAboutItems(IDM_OPTIONS, IDM_ABOUT);
+		}
+	}
+
+	// Initialize user interface
+	SetupUi();
+
+	// Get some of the base submenu pointers. These are needed
+	// for SetupAccounts to work correctly, e.g. populate the
+	// send/receive/preview submenus. Folders need to be loaded
+	// before this for the templates folder
+	BuildDynMenus();
+
+	// Load accounts
+	SetupAccounts();
+
+	// Recursively load folder tree
+	LoadFolders([&](auto status)
+	{
+		// Redo it for the templates... now that load folders has completed.
+		BuildDynMenus();
+
+		if (ScribeState == ScribeExiting)
+			return;
+
+		// Process command line
+		OnCommandLine();
+
+		// Update the templates sub-menu now that the folders are loaded
+		BuildDynMenus();
+
+		// Check registry settings
+		SetDefaultHandler();
+
+		// Run on load scripts...
+		LArray<LScriptCallback*> OnLoadCallbacks;
+		if (GetScriptCallbacks(LOnLoad, OnLoadCallbacks))
+		{
+			for (auto r: OnLoadCallbacks)
+			{
+				LVirtualMachine Vm;
+				LScriptArguments Args(&Vm);
+				Args.New() = new LVariant(this);
+				ExecuteScriptCallback(*r, Args);
+				Args.DeleteObjects();
+			}
+		}
+	
+		ScribeState = ScribeRunning;
+	});
+}
+
+void ScribeWnd::SetLanguage()
+{
+	LVariant LangId;
+	if (GetOptions()->GetValue(OPT_UiLanguage, LangId))
+	{
+		// Set the language to load...
+		LAppInst->SetConfig("Language", LangId.Str());
+	}
+	LResources::SetLoadStyles(true);
+
+	// Load the resources (with the current lang)
+	if (!LgiGetResObj(true, "Scribe"))
+	{
+		LgiMsg(NULL, "The resource file 'Scribe.lr8' is missing.", AppName);
+		ScribeState = ScribeExiting;
+		LCloseApp();
+	}
 }
 
 ScribeWnd::~ScribeWnd()
@@ -2282,246 +2514,12 @@ char *ScribeWnd::GetUiTags()
 
 void ScribeWnd::OnCreate()
 {
-	if (ScribeState == ScribeConstructing)
+	printf("ScribeWnd::OnCreate. ScribeState=%i\n", ScribeState);
+	if (IsAttached() && ScribeState == ScribeConstructing)
 	{
-		// Constructor is still running, probably showing some UI.
-		// Don't complete setup at this point.
-		return;
+		ScribeState = ScribeInitializing;
+		Construct3();
 	}
-
-	// Load the styles
-	LResources::StyleElement(this);
-
-	// Main menu
-	Menu = new LMenu(AppName);
-	if (Menu)
-	{
-		Menu->Attach(this);
-		if (Menu->Load(this, "ID_MENU", GetUiTags()))
-		{
-			LAssert(ImageList != NULL);
-			Menu->SetImageList(ImageList, false);
-
-			auto IdentityItem = Menu->FindItem(IDM_NO_IDENTITIES);
-			if (IdentityItem)
-			{
-				IdentityMenu = IdentityItem->GetParent();
-			}
-
-			CmdSend.MenuItem = Menu->FindItem(IDM_SEND_MAIL);
-			auto NewMailMenu = Menu->FindItem(IDM_NEW_EMAIL);
-			if (NewMailMenu)
-			{
-				MailMenu = NewMailMenu->GetParent();
-			}
-
-			LVariant v;
-			WorkOffline = Menu->FindItem(IDM_WORK_OFFLINE);
-			if (WorkOffline && GetOptions()->GetValue(OPT_WorkOffline, v))
-			{
-				WorkOffline->Checked(v.CastInt32() != 0);
-			}
-
-			if ((d->DisableUserFilters = Menu->FindItem(IDM_FILTERS_DISABLE)))
-			{
-				if (GetOptions()->GetValue(OPT_DisableUserFilters, v))
-				{
-					d->DisableUserFilters->Checked(v.CastInt32() != 0);
-				}
-			}
-
-			#if RUN_STARTUP_SCRIPTS
-			// Run scripts in './Scripts' folder
-			char s[MAX_PATH_LEN];
-			LMakePath(s, sizeof(s), ScribeResourcePath(),
-				"Scripts");
-			if (!LDirExists(s))
-				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
-					#if defined(LINUX) || defined(WINDOWS)
-					"..\\"
-					#endif
-					"Scripts");
-			if (!LDirExists(s))
-				LgiTrace("%s:%i - Error: the scripts folder '%s' doesn't exist.\n", _FL, s);
-			else
-			{
-				bool ErrorDsp = false;
-				LDirectory Dir;
-				for (int b = Dir.First(s); b; b = Dir.Next())
-				{
-					if (Dir.IsDir())
-						continue;
-
-					char *Ext = LGetExtension(Dir.GetName());
-					if (!Ext || _stricmp(Ext, "script") != 0)
-						continue;
-
-					Dir.Path(s, sizeof(s));
-
-					LStringPipe Log;
-					char *Source = LReadTextFile(s);
-					if (Source)
-					{
-						LScript *Cur = new LScript;
-						if (Cur)
-						{
-							char Msg[256];
-							d->CurrentScripts.Add(Cur);
-							LScribeScript::Inst->GetLog()->Write(Msg,
-								sprintf_s(Msg, sizeof(Msg), "Compiling '%s'...\n", Dir.GetName()));
-
-							LCompiler c;
-							if (c.Compile(	Cur->Code,
-											d->Engine->GetSystemContext(),
-											LScribeScript::Inst,
-											s,
-											Source,
-											NULL))
-							{
-								LFunctionInfo *Main = Cur->Code->GetMethod("Main");
-								if (Main)
-								{
-									LVirtualMachine Vm(d);
-									
-									LScriptArguments Args(&Vm);
-									Args.New() = new LVariant((LDom*)this);
-									d->Scripts.Add(Cur);
-									if (Vm.ExecuteFunction(	Cur->Code,
-															Main,
-															Args,
-															LScribeScript::Inst->GetLog()) &&
-										Args.GetReturn()->CastInt32())
-									{
-										d->CurrentScripts.Delete(Cur, true);
-										Cur = NULL;
-									}
-									else
-									{
-										LgiTrace("Error: Script's main failed (%s)\n", Cur->Code->GetFileName());
-										if (Cur->Callbacks.Length())
-											d->DeleteCallbacks(Cur->Callbacks);
-										d->Scripts.Delete(Cur);
-									}
-
-									Args.DeleteObjects();
-								}
-							}
-							else if (!ErrorDsp)
-							{
-								ErrorDsp = true;
-								OnScriptCompileError(Source, NULL);
-							}
-
-							if (Cur)
-							{
-								d->CurrentScripts.Delete(Cur, true);
-								DeleteObj(Cur);
-							}
-						}
-
-						DeleteArray(Source);
-					}
-				}
-
-			}
-			#endif
-
-			#define EnableItem(id, en) { auto i = Menu->FindItem(id); if (i) i->Enabled(en); }
-			#define SetMenuIcon(id, ico) { auto i = Menu->FindItem(id); if (i) i->Icon(ico); }
-			
-			EnableItem(IDM_IMPORT_OUTLOOK_ITEMS, true);
-			
-			// SetMenuIcon(IDM_OPEN_FOLDERS, ICON_OPEN_FOLDER);
-			SetMenuIcon(IDM_OPTIONS, ICON_OPTIONS);
-			SetMenuIcon(IDM_SECURITY, ICON_LOCK);
-
-			SetMenuIcon(IDM_CUT, ICON_CUT);
-			SetMenuIcon(IDM_COPY, ICON_COPY);
-			SetMenuIcon(IDM_PASTE, ICON_PASTE);
-
-			SetMenuIcon(IDM_LAYOUT1, ICON_LAYOUT1);
-			SetMenuIcon(IDM_LAYOUT2, ICON_LAYOUT2);
-			SetMenuIcon(IDM_LAYOUT3, ICON_LAYOUT3);
-			SetMenuIcon(IDM_LAYOUT4, ICON_LAYOUT4);
-			SetMenuIcon(IDM_NEW_EMAIL, ICON_UNSENT_MAIL);
-			SetMenuIcon(IDM_SET_READ, ICON_READ_MAIL);
-			SetMenuIcon(IDM_SET_UNREAD, ICON_UNREAD_MAIL);
-			SetMenuIcon(IDM_NEW_CONTACT, ICON_CONTACT);
-			SetMenuIcon(IDM_NEW_GROUP, ICON_CONTACT_GROUP);
-			SetMenuIcon(IDM_REPLY, ICON_FLAGS_REPLY);
-			SetMenuIcon(IDM_REPLY_ALL, ICON_FLAGS_REPLY);
-			SetMenuIcon(IDM_FORWARD, ICON_FLAGS_FORWARD);
-			SetMenuIcon(IDM_BOUNCE, ICON_FLAGS_BOUNCE);
-			SetMenuIcon(IDM_NEW_FILTER, ICON_FILTER);
-			SetMenuIcon(IDM_FILTER_CURRENT_FOLDER, ICON_FOLDER_FILTERS);
-			SetMenuIcon(IDM_MEMECODE, ICON_LINK);
-			SetMenuIcon(IDM_HOMEPAGE, ICON_LINK);
-			SetMenuIcon(IDM_SCRIBE_FAQ, ICON_LINK);
-			SetMenuIcon(IDM_INSCRIBE_LINK, ICON_LINK);
-			SetMenuIcon(IDM_VERSION_HISTORY, ICON_LINK);
-			SetMenuIcon(IDM_DEBUG_INFO, ICON_LINK);
-			SetMenuIcon(IDM_TUTORIALS, ICON_LINK);
-			SetMenuIcon(IDM_FEEDBACK, ICON_UNREAD_MAIL);
-			SetMenuIcon(IDM_HELP, ICON_HELP);
-
-			LMenuItem *mi;
-			if
-			(
-				GetOptions()->GetValue(OPT_EditControl, v) &&
-				(mi = Menu->FindItem(IDM_HTML_EDITOR))
-			)
-				mi->Checked(v.CastInt32() != 0);
-
-			Menu->SetPrefAndAboutItems(IDM_OPTIONS, IDM_ABOUT);
-		}
-	}
-
-	// Initialize user interface
-	SetupUi();
-
-	// Get some of the base submenu pointers. These are needed
-	// for SetupAccounts to work correctly, e.g. populate the
-	// send/receive/preview submenus. Folders need to be loaded
-	// before this for the templates folder
-	BuildDynMenus();
-
-	// Load accounts
-	SetupAccounts();
-
-	// Recursively load folder tree
-	LoadFolders([&](auto status)
-	{
-		// Redo it for the templates... now that load folders has completed.
-		BuildDynMenus();
-
-		if (ScribeState == ScribeExiting)
-			return;
-
-		// Process command line
-		OnCommandLine();
-
-		// Update the templates sub-menu now that the folders are loaded
-		BuildDynMenus();
-
-		// Check registry settings
-		SetDefaultHandler();
-
-		// Run on load scripts...
-		LArray<LScriptCallback*> OnLoadCallbacks;
-		if (GetScriptCallbacks(LOnLoad, OnLoadCallbacks))
-		{
-			for (auto r: OnLoadCallbacks)
-			{
-				LVirtualMachine Vm;
-				LScriptArguments Args(&Vm);
-				Args.New() = new LVariant(this);
-				ExecuteScriptCallback(*r, Args);
-				Args.DeleteObjects();
-			}
-		}
-	
-		ScribeState = ScribeRunning;
-	});
 }
 
 ScribeAccount *ScribeWnd::GetAccountByEmail(const char *Email)

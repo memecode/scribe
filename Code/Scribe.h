@@ -2316,6 +2316,11 @@ protected:
 
 public:
 	ScribeWnd();
+	void Construct1();
+	void Construct2();
+	void Construct3();
+	void SetLanguage();
+
 	~ScribeWnd();
 
 	static bool IsUnitTest;
