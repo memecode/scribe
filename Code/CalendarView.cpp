@@ -3121,7 +3121,7 @@ int CalendarViewWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			if (Printer)
 			{
 				CalendarViewPrint Cvp(Cv);
-				Printer->Print(&Cvp, "Scribe Calendar", -1, this);
+				Printer->Print(&Cvp, NULL, "Scribe Calendar", -1, this);
 			}				
 			break;
 		}
@@ -3278,47 +3278,55 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 					{
 						case IDM_ADD_LOCAL_CAL:
 						{
-							FolderDlg Dlg(this, App, MAGIC_CALENDAR);
-							if (Dlg.DoModal())
+							auto Dlg = new FolderDlg(this, App, MAGIC_CALENDAR);
+							Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 							{
-								auto Key = UnusedKey();
-								auto Parts = Key.SplitDelimit(".");
-
-								// Create the source...
-								FolderCalendarSource *cs = new FolderCalendarSource(App, Parts.Last());
-								if (cs)
+								if (ctrlId)
 								{
-									cs->SetPath(Dlg.Get());
-									cs->SetColour(CalendarSource::FindUnusedColour());
-									CalLst->Insert(cs); // CalLst doesn't own the ptr
-									cs->Write();
-								}
+									auto Key = UnusedKey();
+									auto Parts = Key.SplitDelimit(".");
+
+									// Create the source...
+									FolderCalendarSource *cs = new FolderCalendarSource(App, Parts.Last());
+									if (cs)
+									{
+										cs->SetPath(Dlg->Get());
+										cs->SetColour(CalendarSource::FindUnusedColour());
+										CalLst->Insert(cs); // CalLst doesn't own the ptr
+										cs->Write();
+									}
 									
-								App->SaveOptions();
-							}
+									App->SaveOptions();
+								}
+								delete dlg;
+							});
 							break;
 						}
 						case IDM_ADD_CAL_URL:
 						{
-							LInput dlg(this);
-							if (dlg.DoModal())
+							auto dlg = new LInput(this);
+							dlg->DoModal([this, dlg](auto dialog, auto ctrlId)
 							{
-								auto Key = UnusedKey();
-								auto Parts = Key.SplitDelimit(".");
-								auto Url = dlg.GetStr();
-									
-								// Create the source...
-								RemoteCalendarSource *cs = new RemoteCalendarSource(App, Parts.Last());
-								if (cs)
+								if (ctrlId)
 								{
-									cs->SetColour(CalendarSource::FindUnusedColour());
-									cs->SetUri(Url);
-									CalLst->Insert(cs); // CalLst doesn't own the ptr
-									cs->Write();
-								}
+									auto Key = UnusedKey();
+									auto Parts = Key.SplitDelimit(".");
+									auto Url = dlg->GetStr();
 									
-								App->SaveOptions();
-							}
+									// Create the source...
+									RemoteCalendarSource *cs = new RemoteCalendarSource(App, Parts.Last());
+									if (cs)
+									{
+										cs->SetColour(CalendarSource::FindUnusedColour());
+										cs->SetUri(Url);
+										CalLst->Insert(cs); // CalLst doesn't own the ptr
+										cs->Write();
+									}
+									
+									App->SaveOptions();
+								}
+								delete dialog;
+							});
 							break;
 						}
 						case IDM_EDIT:

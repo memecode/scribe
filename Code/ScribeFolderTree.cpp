@@ -568,103 +568,112 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 							// just quit out now...
 							return DROPEFFECT_NONE;
 						}
-							
-						int Res = 2;
-						bool CopyOp = (KeyState & LGI_EF_CTRL) != 0;
-						if (Leaf->GetFolder() != NULL)
-						{
-							LAlert Dlg(	this,
-										LLoadString(CopyOp ? IDS_COPY_FOLDER : IDS_MOVE_FOLDER),
-										LLoadString(IDS_MOVE_ATTACH),
-										LLoadString(IDS_NEXT_FOLDER),
-										LLoadString(IDS_SUB_FOLDER),
-										LLoadString(IDS_CANCEL));
-							Res = Dlg.DoModal();
-						}
-						// else it's a top level folder, which doesn't have a "next" option.
-							
-						int SystemFolder = App->GetFolderType(Folder);
-						auto OldPath = Folder->GetPath();
-						Store3Status Status = Store3Error;
-						ScribeFolder *OldParent = Folder->GetFolder();
-						ScribeFolder *NewParent = NULL;
-						int Index = 0;
 
-						if (Res == 1)
+						bool CopyOp = (KeyState & LGI_EF_CTRL) != 0;
+
+						auto FinishFolderOp = [&](int Res)
 						{
-							// Attach next
-							NewParent = Leaf->GetFolder();
-							if (NewParent)
+							int SystemFolder = App->GetFolderType(Folder);
+							auto OldPath = Folder->GetPath();
+							Store3Status Status = Store3Error;
+							ScribeFolder *OldParent = Folder->GetFolder();
+							ScribeFolder *NewParent = NULL;
+							int Index = 0;
+
+							if (Res == 1)
 							{
-								// Work out the index
-								for (LTreeItem *Item = NewParent->GetChild(); Item && Item!=Leaf; Item=Item->GetNext())
+								// Attach next
+								NewParent = Leaf->GetFolder();
+								if (NewParent)
 								{
+									// Work out the index
+									for (LTreeItem *Item = NewParent->GetChild(); Item && Item!=Leaf; Item=Item->GetNext())
+									{
+										Index++;
+									}
 									Index++;
 								}
-								Index++;
 							}
-						}
-						else if (Res == 2)
-						{
-							// Attach child
-							NewParent = Leaf;
-						}
-						else continue;
-
-						if (SystemFolder >= 0 &&
-							NewParent->GetObject()->GetStore() != OldParent->GetObject()->GetStore())
-						{
-							LgiMsg(App, "Can't move system folders to a different mail store.", AppName, MB_OK);
-							break;
-						}
-
-						if (CopyOp)
-						{
-							// Copy
-							Status = Folder->CopyTo(NewParent, Index);
-						}
-						else
-						{
-							LDataFolderI *fo = Folder->GetFldObj();
-							if (NewParent == OldParent)
+							else if (Res == 2)
 							{
-								// Re-index only...
-								// int64 OldIndex = fo->GetInt(FIELD_FOLDER_INDEX);
-								if (fo->SetInt(FIELD_FOLDER_INDEX, Index))
-								{
-									// Change the UI to match...
-									NewParent->Sort(FolderItemCmp);
-									Status = Store3Success;
-								}
+								// Attach child
+								NewParent = Leaf;
+							}
+							else return;
+
+							if (SystemFolder >= 0 &&
+								NewParent->GetObject()->GetStore() != OldParent->GetObject()->GetStore())
+							{
+								LgiMsg(App, "Can't move system folders to a different mail store.", AppName, MB_OK);
+								return;
+							}
+
+							if (CopyOp)
+							{
+								// Copy
+								Status = Folder->CopyTo(NewParent, Index);
 							}
 							else
 							{
-								// Move
-								Status = Folder->SetFolder(NewParent, Index);
-								if (Status)
+								LDataFolderI *fo = Folder->GetFldObj();
+								if (NewParent == OldParent)
 								{
-									NewParent->Sort(FolderItemCmp);
+									// Re-index only...
+									// int64 OldIndex = fo->GetInt(FIELD_FOLDER_INDEX);
+									if (fo->SetInt(FIELD_FOLDER_INDEX, Index))
+									{
+										// Change the UI to match...
+										NewParent->Sort(FolderItemCmp);
+										Status = Store3Success;
+									}
+								}
+								else
+								{
+									// Move
+									Status = Folder->SetFolder(NewParent, Index);
+									if (Status)
+									{
+										NewParent->Sort(FolderItemCmp);
+									}
 								}
 							}
-						}
-							
-						if (Status == Store3Success &&
-							SystemFolder >= 0 &&
-							!CopyOp)
-						{
-							// Update the system path location if it's changed...
-							auto NewPath = Folder->GetPath();
-							if (OldPath &&
-								NewPath &&
-								strcmp(OldPath, NewPath) != 0)
+								
+							if (Status == Store3Success &&
+								SystemFolder >= 0 &&
+								!CopyOp)
 							{
-								LVariant v;
-								v = NewPath;
-								LString SysFolderName;
-								SysFolderName.Printf("Folder-%i", SystemFolder);
-								App->GetOptions()->SetValue(SysFolderName, v);
+								// Update the system path location if it's changed...
+								auto NewPath = Folder->GetPath();
+								if (OldPath &&
+									NewPath &&
+									strcmp(OldPath, NewPath) != 0)
+								{
+									LVariant v;
+									v = NewPath;
+									LString SysFolderName;
+									SysFolderName.Printf("Folder-%i", SystemFolder);
+									App->GetOptions()->SetValue(SysFolderName, v);
+								}
 							}
+						};
+
+						int Res = 2;
+						if (Leaf->GetFolder() != NULL)
+						{
+							auto Dlg = new LAlert(	this,
+													LLoadString(CopyOp ? IDS_COPY_FOLDER : IDS_MOVE_FOLDER),
+													LLoadString(IDS_MOVE_ATTACH),
+													LLoadString(IDS_NEXT_FOLDER),
+													LLoadString(IDS_SUB_FOLDER),
+													LLoadString(IDS_CANCEL));
+							Dlg->DoModal([this, Dlg, FinishFolderOp](auto dlg, auto Res)
+							{
+								if (Res > 0)
+									FinishFolderOp(Res);
+								delete dlg;
+							});
 						}
+						else FinishFolderOp(Res);
 					}
 				}
 			}

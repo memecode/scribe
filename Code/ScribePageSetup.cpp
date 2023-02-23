@@ -199,12 +199,12 @@ int ScribePageSetup::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_BROWSE_FONT:
 		{
-			char s[256];
-			if (Font.DoUI(this) &&
-				Font.GetDescription(s, sizeof(s)))
+			Font.DoUI(this, [&](auto fontType)
 			{
+				char s[256];				
+				Font.GetDescription(s, sizeof(s));
 				SetCtrlName(IDC_FONT, s);
-			}
+			});
 			break;
 		}
 		case IDOK:

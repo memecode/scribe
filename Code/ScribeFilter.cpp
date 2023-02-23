@@ -462,13 +462,14 @@ public:
 		{
 			case IDC_BROWSE_DIR:
 			{
-				LFileSelect s;
-				s.Parent(this);
-				s.Name(GetCtrlName(IDC_DIR));
-				if (s.OpenFolder())
+				auto s = new LFileSelect(this);
+				s->Name(GetCtrlName(IDC_DIR));
+				s->OpenFolder([&](auto dlg, auto status)
 				{
-					SetCtrlName(IDC_DIR, s.Name());
-				}
+					if (status)
+						SetCtrlName(IDC_DIR, s->Name());
+					delete dlg;
+				});
 				break;
 			}
 			case IDOK:
@@ -1921,17 +1922,24 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_COPY:
 		case ACTION_EMPTY_FOLDER:
 		{
-			FolderDlg Dlg(Parent, App, MAGIC_MAIL);
-			if (Dlg.DoModal())
-				Arg1.Reset(NewStr(Dlg.Get()));
+			auto Dlg = new FolderDlg(Parent, App, MAGIC_MAIL);
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
+			{
+				if (id)
+					Arg1.Reset(NewStr(Dlg->Get()));
+				delete dlg;
+			});
 			break;
 		}
 		case ACTION_EXPORT:
 		{
-			LFileSelect s;
-			s.Parent(Parent);
-			if (s.OpenFolder())
-				Arg1.Reset(NewStr(s.Name()));
+			auto s = new LFileSelect(Parent);
+			s->OpenFolder([&](auto dlg, auto status)
+			{
+				if (status)
+					Arg1.Reset(NewStr(s->Name()));
+				delete dlg;
+			});
 			break;
 		}
 		case ACTION_DELETE:
@@ -2057,60 +2065,70 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_PLAY_SOUND:
 		case ACTION_EXECUTE:
 		{
-			LFileSelect Select;
+			auto Select = new LFileSelect(Parent);
 
-			Select.Parent(Parent);
+			Select->Parent(Parent);
 			if (Type == ACTION_PLAY_SOUND)
 			{
-				Select.Type("Wave files", "*.wav");
+				Select->Type("Wave files", "*.wav");
 			}
 			else
 			{
-				Select.Type("Executables", "*.exe");
-				Select.Type("All Files", LGI_ALL_FILES);
+				Select->Type("Executables", "*.exe");
+				Select->Type("All Files", LGI_ALL_FILES);
 			}
-			Select.Name(Arg1);
+			Select->Name(Arg1);
 
-			if (Select.Open())
+			Select->Open([this](auto dlg, auto id)
 			{
-				Arg1.Reset(NewStr(Select.Name()));
-			}
+				if (id)
+					Arg1.Reset(NewStr(dlg->Name()));
+				delete dlg;
+			});
 			break;
 		}
 		case ACTION_REPLY:
 		{
-			BrowseReply Dlg(App, Parent, Arg1);
-			if (Dlg.DoModal())
+			auto Dlg = new BrowseReply(App, Parent, Arg1);
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
-				Arg1.Reset(NewStr(Dlg.Arg));
-			}
+				if (id)
+					Arg1.Reset(NewStr(Dlg->Arg));
+				delete dlg;
+			});
 			break;
 		}
 		case ACTION_FORWARD:
 		{
-			BrowseForward Dlg(App, Parent, Arg1, true);
-			if (Dlg.DoModal())
+			auto Dlg = new BrowseForward(App, Parent, Arg1, true);
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
-				Arg1.Reset(NewStr(Dlg.Arg));
-			}
+				if (id)
+					Arg1.Reset(NewStr(Dlg->Arg));
+				delete dlg;
+			});
 			break;
 		}
 		case ACTION_BOUNCE:
 		{
-			BrowseForward Dlg(App, Parent, Arg1, false);
-			if (Dlg.DoModal())
+			auto Dlg = new BrowseForward(App, Parent, Arg1, false);
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
-				Arg1.Reset(NewStr(Dlg.Arg));
-			}
+				if (id)
+					Arg1.Reset(NewStr(Dlg->Arg));
+				delete dlg;
+			});
 			break;
 		}
 		case ACTION_SAVE_ATTACHMENTS:
 		{
-			BrowseSaveAttach Dlg(App, Parent, Arg1);
-			if (Dlg.DoModal())
+			auto Dlg = new BrowseSaveAttach(App, Parent, Arg1);
+			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
-				Arg1.Reset(NewStr(Dlg.Arg));
-			}
+				if (id)
+					Arg1.Reset(NewStr(Dlg->Arg));
+				delete dlg;
+			});
 			break;
 		}
 		case ACTION_CHANGE_CHARSET:
@@ -3316,7 +3334,7 @@ void Filter::OnMouseClick(LMouse &m)
 					}
 					case IDM_EXPORT:
 					{
-						ExportAll(GetList(), sTextXml);
+						ExportAll(GetList(), sTextXml, NULL);
 						break;
 					}
 				}

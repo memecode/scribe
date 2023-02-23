@@ -229,13 +229,17 @@ void FolderCalendarSource::EditPath(LView *parent, CalendarView *cv)
 	if (!GetPath())
 		return;
 
-	FolderDlg Dlg(parent, App, MAGIC_CALENDAR);
-	if (!Dlg.DoModal())
-		return;
-
-	SetPath(Dlg.Get());
-	if (cv)
-		cv->OnContentsChanged(this);
+	auto Dlg = new FolderDlg(parent, App, MAGIC_CALENDAR);
+	Dlg->DoModal([this, Dlg, cv](auto dlg, auto ctrlId)
+	{
+		if (ctrlId)
+		{
+			SetPath(Dlg->Get());
+			if (cv)
+				cv->OnContentsChanged(this);
+		}
+		delete dlg;
+	});
 }
 
 bool FolderCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArray<TimePeriod> &Events)
@@ -251,77 +255,77 @@ bool FolderCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArra
 	End.ToUtc();
 
 	LArray<Calendar*> Search;
-	if (Folder)
-	{
-		Folder->LoadThings();		
+	if (!Folder)
+		return false;
 
-        for (auto t : Folder->Items)
+	Folder->LoadThings(NULL, [&](auto Status)
+	{
+		for (auto t : Folder->Items)
 		{
 			Calendar *c = t->IsCalendar();
 			if (c)
 				Search.Add(c);
 		}
-	}
-	else return false;
 
-	for (auto c: Search)
-	{
-		LDateTime s, e;
-		if (c->GetCalType() == CalEvent &&
-			c->GetField(FIELD_CAL_START_UTC, s))
+		for (auto c: Search)
 		{
-			int Recur = 0;
-			c->GetField(FIELD_CAL_RECUR, Recur);
-
-			const char *Sub = NULL;
-			c->GetField(FIELD_CAL_SUBJECT, Sub);
-
-			if (Recur)
+			LDateTime s, e;
+			if (c->GetCalType() == CalEvent &&
+				c->GetField(FIELD_CAL_START_UTC, s))
 			{
-				LArray<TimePeriod> Times;
-				if (c->GetTimes(Start, End, Times))
-				{						    
-					SetCalendarsSource(c);
-					for (auto &t: Times)
-					{
-						t.src = this;
-						Events.Add(t);
+				int Recur = 0;
+				c->GetField(FIELD_CAL_RECUR, Recur);
+
+				const char *Sub = NULL;
+				c->GetField(FIELD_CAL_SUBJECT, Sub);
+
+				if (Recur)
+				{
+					LArray<TimePeriod> Times;
+					if (c->GetTimes(Start, End, Times))
+					{						    
+						SetCalendarsSource(c);
+						for (auto &t: Times)
+						{
+							t.src = this;
+							Events.Add(t);
+						}
 					}
-				}
-			}
-			else
-			{
-				if (!c->GetField(FIELD_CAL_END_UTC, e))
-				{
-					e = s;
-					e.AddHours(1);
-				}
-
-				#if 0
-				printf("%s: %s > %s, %s < %s\n",
-					Sub,
-					s.Get().Get(),
-					End.Get().Get(),
-					e.Get().Get(),
-					Start.Get().Get());
-				#endif
-				if (s > End || e < Start)
-				{
-					// Is before/after the range
 				}
 				else
 				{
-					TimePeriod &tp = Events.New();
-					tp.src = this;
-					tp.c = c;
-					tp.s = s;
-					tp.e = e;
-					tp.ToLocal();
-					SetCalendarsSource(c);
+					if (!c->GetField(FIELD_CAL_END_UTC, e))
+					{
+						e = s;
+						e.AddHours(1);
+					}
+
+					#if 0
+					printf("%s: %s > %s, %s < %s\n",
+						Sub,
+						s.Get().Get(),
+						End.Get().Get(),
+						e.Get().Get(),
+						Start.Get().Get());
+					#endif
+					if (s > End || e < Start)
+					{
+						// Is before/after the range
+					}
+					else
+					{
+						TimePeriod &tp = Events.New();
+						tp.src = this;
+						tp.c = c;
+						tp.s = s;
+						tp.e = e;
+						tp.ToLocal();
+						SetCalendarsSource(c);
+					}
 				}
 			}
 		}
-	}
+	});
 
 	return true;
 }

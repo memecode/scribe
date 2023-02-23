@@ -67,48 +67,49 @@ public:
 		Txt = 0;
 
 		Folder = folder;
-		if (Folder)
+		if (!Folder)
 		{
-			SetParent(Folder->App);
-
-			if (LoadFromResource(IDD_FOLDER_PROPS))
-			{
-				MoveToCenter();
-
-				GetViewById(IDC_TAB, Tab);
-				GetViewById(IDC_FOLDER_MSG, Txt);
-				GetViewById(IDC_USAGE, Usage);
-			}
-
-			auto Path = Folder->GetPath();
-			SetCtrlName(IDC_PATH, Path);
-
-			ScribePerm p = Folder->GetFolderPerms(ScribeReadAccess);
-			if (p == PermRequireAdmin)
-			{
-				SetCtrlEnabled(IDC_FPR_NONE, false);
-				SetCtrlEnabled(IDC_FPR_USER, false);
-			}
-			else
-			{
-				SetCtrlEnabled(IDC_FPR_ADMIN, false);
-			}
-			SetCtrlValue(IDC_FOLDER_READ, p);
-
-			p = Folder->GetFolderPerms(ScribeWriteAccess);
-			if (p == PermRequireAdmin)
-			{
-				SetCtrlEnabled(IDC_FPW_NONE, false);
-				SetCtrlEnabled(IDC_FPW_USER, false);
-			}
-			else
-			{
-				SetCtrlEnabled(IDC_FPW_ADMIN, false);
-			}
-			SetCtrlValue(IDC_FOLDER_WRITE, p);
-
-			DoModal();
+			LAssert(!"No folder.");
+			return;
 		}
+
+		SetParent(Folder->App);
+
+		if (LoadFromResource(IDD_FOLDER_PROPS))
+		{
+			MoveToCenter();
+
+			GetViewById(IDC_TAB, Tab);
+			GetViewById(IDC_FOLDER_MSG, Txt);
+			GetViewById(IDC_USAGE, Usage);
+		}
+
+		auto Path = Folder->GetPath();
+		SetCtrlName(IDC_PATH, Path);
+
+		ScribePerm p = Folder->GetFolderPerms(ScribeReadAccess);
+		if (p == PermRequireAdmin)
+		{
+			SetCtrlEnabled(IDC_FPR_NONE, false);
+			SetCtrlEnabled(IDC_FPR_USER, false);
+		}
+		else
+		{
+			SetCtrlEnabled(IDC_FPR_ADMIN, false);
+		}
+		SetCtrlValue(IDC_FOLDER_READ, p);
+
+		p = Folder->GetFolderPerms(ScribeWriteAccess);
+		if (p == PermRequireAdmin)
+		{
+			SetCtrlEnabled(IDC_FPW_NONE, false);
+			SetCtrlEnabled(IDC_FPW_USER, false);
+		}
+		else
+		{
+			SetCtrlEnabled(IDC_FPW_ADMIN, false);
+		}
+		SetCtrlValue(IDC_FOLDER_WRITE, p);
 	}
 
 	~FolderPropertiesDlg()
@@ -138,13 +139,30 @@ public:
 		{
 			case IDOK:
 			{
-				if (!Folder->SetFolderPerms(this, ScribeReadAccess, (ScribePerm) GetCtrlValue(IDC_FOLDER_READ)))
-					break;
+				auto Err = [&]()
+				{
+					LgiMsg(this, "Failed to set permissions.", AppName);
+					return false;
+				};
 
-				if (!Folder->SetFolderPerms(this, ScribeWriteAccess, (ScribePerm) GetCtrlValue(IDC_FOLDER_WRITE)))
-					break;
+				Folder->SetFolderPerms(this, ScribeReadAccess, (ScribePerm) GetCtrlValue(IDC_FOLDER_READ), [&](auto status)
+				{
+					if (!status)
+						return Err();
 
-				// fall thru
+					this->Folder->SetFolderPerms(this, ScribeWriteAccess, (ScribePerm) this->GetCtrlValue(IDC_FOLDER_WRITE), [&](auto status)
+					{
+						if (!status)
+							return Err();
+
+						EndModal(1);
+
+						return true;
+					});
+
+					return true;
+				});
+				break;
 			}
 			case IDCANCEL:
 			{

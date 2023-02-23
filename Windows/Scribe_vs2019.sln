@@ -4,7 +4,7 @@ VisualStudioVersion = 16.0.32413.511
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scribe", "Scribe_vs2019.vcxproj", "{540DDE64-0927-4E67-B927-2E3BE7ECB029}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lgi", "..\..\..\Lgi\trunk\Lgi_vs2019.vcxproj", "{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lgi", "..\..\..\lgi\trunk\Lgi_vs2019.vcxproj", "{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScribeMapi", "..\ScribeMapi\ScribeMapi_vs2019.vcxproj", "{148574CE-4DA6-4B8A-9EC6-FF68ADC2A046}"
 EndProject

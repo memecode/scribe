@@ -761,9 +761,9 @@ extern LView *OpenFinder(ScribeWnd *App, ScribeFolder *Folder);
 extern void Import_NetscapeContacts(ScribeWnd *Parent);
 extern void Import_UnixMBox(ScribeWnd *Parent);
 extern void Import_OutlookExpress(ScribeWnd *Parent, bool v5 = true);
-extern bool Import_EudoraAddressBook(ScribeWnd *App);
-extern bool Import_MozillaAddressBook(ScribeWnd *App);
-extern bool Import_MozillaMail(ScribeWnd *App);
+extern void Import_EudoraAddressBook(ScribeWnd *App);
+extern void Import_MozillaAddressBook(ScribeWnd *App);
+extern void Import_MozillaMail(ScribeWnd *App);
 
 extern void Import_OutlookContacts(ScribeWnd *Parent);
 extern MailSource *NewOutlookMailSource(ScribeWnd *Parent, ScribeAccount *Account);

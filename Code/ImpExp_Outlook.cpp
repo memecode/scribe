@@ -450,8 +450,6 @@ public:
 					List->Insert(new LRow(Table->aRow+i));
 				}
 			}
-
-			DoModal();
 		}
 	}
 
@@ -471,7 +469,8 @@ void ViewTable(LPMAPITABLE Table, LView *Wnd)
 	LMapiList Lst(Table);
 	if (Lst.Current())
 	{
-		LShowTable Tbl(Wnd, Lst.Current());
+		auto Tbl = new LShowTable(Wnd, Lst.Current());
+		Tbl->DoModal(NULL);
 	}
 }
 #endif // _DEBUG
@@ -662,14 +661,16 @@ public:
 		{
 			case IDC_SET_FOLDER:
 			{
-				FolderDlg Dlg(this, App);
-				if (Folder)
+				if (!Folder)
+					break;
+
+				auto Dlg = new FolderDlg(this, App);
+				Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 				{
-					if (Dlg.DoModal())
-					{
-						Folder->LView::Name(Dlg.Get());
-					}
-				}
+					if (ctrlId)
+						this->Folder->LView::Name(Dlg->Get());
+					delete dlg;
+				});
 				break;
 			}
 			case IDOK:
@@ -788,7 +789,7 @@ public:
 					IMAPIFolder *In,
 					ScribeFolder *Out,
 					LString::Array &Path);
-	bool ImportPersonalAddressBook();
+	void ImportPersonalAddressBook(std::function<void(bool)> callback);
 
 	// Export functions
 	bool Export(	ExportParams *P,
@@ -1132,13 +1133,15 @@ public:
 		if (Stores)
 		{
 			EntryRef *e = (*Stores)[(int)GetCtrlValue(IDC_MSG_STORE)];
-			if (e)
+			if (!e)
 			{
-				AddFolderDlg Dlg(this, Io, e);
-				if (Dlg.DoModal())
+				auto Dlg = new AddFolderDlg(this, Io, e);
+				Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 				{
-					AddPath(Dlg.Path);
-				}
+					if (ctrlId)
+						AddPath(Dlg->Path);
+					delete dlg;
+				});
 			}
 		}
 	}
@@ -1151,11 +1154,13 @@ public:
 		{
 			case IDC_SET_FOLDER:
 			{
-				FolderDlg Dlg(this, App);
-				if (Dlg.DoModal())
+				auto Dlg = new FolderDlg(this, App);
+				Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 				{
-					SetCtrlName(IDC_FOLDER, Dlg.Get());
-				}
+					if (ctrlId)
+						SetCtrlName(IDC_FOLDER, Dlg->Get());
+					delete dlg;
+				});
 				break;
 			}
 			case IDOK:
@@ -1283,11 +1288,13 @@ public:
 
 	void AddFolder()
 	{
-		FolderDlg Fs(this, App);
-		if (Fs.DoModal() && Fs.Get())
+		auto Fs = new FolderDlg(this, App);
+		Fs->DoModal([this, Fs](auto dlg, auto ctrlId)
 		{
-			AddPath(Fs.Get());
-		}
+			if (ctrlId && Fs->Get())
+				AddPath(Fs->Get());
+			delete dlg;
+		});
 	}
 
 	LComPtr<IMAPIFolder> GetSubFolderByName(IMAPIFolder *f, char *name)
@@ -1329,11 +1336,13 @@ public:
 					EntryRef *e = (*Stores)[(int)GetCtrlValue(IDC_MSG_STORE)];
 					if (e)
 					{
-						AddFolderDlg Dlg(this, Io, e);
-						if (Dlg.DoModal() == IDOK)
+						auto Dlg = new AddFolderDlg(this, Io, e);
+						Dlg->DoModal([this, Dlg](auto dlg, auto id)
 						{
-							SetCtrlName(IDC_FOLDER, Dlg.Path);
-						}
+							if (id)
+								SetCtrlName(IDC_FOLDER, Dlg->Path);
+							delete dlg;
+						});
 					}
 				}
 				break;
@@ -1472,6 +1481,7 @@ OutlookIO::OutlookIO(ScribeWnd *Wnd, int Flags, ScribeAccount *account)
 	LComPtr<IMAPIFolder> MapiFolder;
 	ScribeFolder *OurFolder = NULL;
 
+	#if 0 // FIXME
 	if (Flags == IMP_OUTLOOK)
 	{
 		ImportDlg Dlg(Wnd, &IParams, this, &MapiFolder, OurFolder);
@@ -1557,6 +1567,7 @@ OutlookIO::OutlookIO(ScribeWnd *Wnd, int Flags, ScribeAccount *account)
 			}
 		}
 	}
+	#endif
 
 	if (MsgStore)
 		MsgStore.Release();
@@ -2436,8 +2447,6 @@ Calendar *MatchCalendar(ScribeFolder *f, Calendar *c1)
 
 bool OutlookIO::ImportItem(ScribeFolder *Out, IMAPIFolder *In, SPropValue *EntryId)
 {
-	LYield();
-
 	bool Status = false;
 	if (Out && In && EntryId)
 	{
@@ -2703,7 +2712,6 @@ bool OutlookIO::Import(	ImportParams *P,
 			char FolderStr[256];
 			sprintf_s(FolderStr, sizeof(FolderStr), "Folder: '%s'", FolderName);
 			P->Prog->SetDescription(FolderStr);
-			LYield();
 		}
 
 		bool ImportThisFolder = P->AllFolders;
@@ -2824,161 +2832,168 @@ bool OutlookIO::Import(	ImportParams *P,
 	return Status;
 }
 
-bool OutlookIO::ImportPersonalAddressBook()
+void OutlookIO::ImportPersonalAddressBook(std::function<void(bool)> callback)
 {
-	bool Status = false;;
-	IAddrBook *AddrBook = 0;
-	HRESULT Error = S_OK;
-	ScribeFolder *DestFolder = 0;
-
-	FolderDlg Dlg(App, App, MAGIC_CONTACT);
-	if (Dlg.DoModal())
+	auto Dlg = new FolderDlg(App, App, MAGIC_CONTACT);
+	Dlg->DoModal([this, Dlg, callback](auto dlg, auto ctrlId)
 	{
-		DestFolder = App->GetFolder(Dlg.Get());
-	}
-
-	if (DestFolder &&
-		(Error = Session->OpenAddressBook(Ui, NULL, 0, &AddrBook)) == S_OK &&
-		AddrBook)
-	{
-		ULONG EntryIDSize = 0;
-		ENTRYID *PersonalAddrBook = 0;
-		if (AddrBook->GetPAB(&EntryIDSize, &PersonalAddrBook) == S_OK &&
-			PersonalAddrBook)
+		if (!ctrlId)
 		{
-			ULONG Type = 0;
-			IDistList *DistList = 0;
-			if (AddrBook->OpenEntry(EntryIDSize,
-									PersonalAddrBook,
-									NULL,
-									0,
-									&Type,
-									(IUnknown**)&DistList) == S_OK &&
-				DistList)
+			delete dlg;
+			if (callback)
+				callback(false);
+			return;
+		}
+
+		bool Status = false;
+		HRESULT Error = S_OK;
+		IAddrBook *AddrBook = 0;
+		auto DestFolder = App->GetFolder(Dlg->Get());
+		if (DestFolder &&
+			(Error = Session->OpenAddressBook(Ui, NULL, 0, &AddrBook)) == S_OK &&
+			AddrBook)
+		{
+			ULONG EntryIDSize = 0;
+			ENTRYID *PersonalAddrBook = 0;
+			if (AddrBook->GetPAB(&EntryIDSize, &PersonalAddrBook) == S_OK &&
+				PersonalAddrBook)
 			{
-				int NewContacts = 0;
-				LPMAPITABLE DistContents = 0;
-				if (DistList->GetContentsTable(0, &DistContents) == S_OK &&
-					DistContents)
+				ULONG Type = 0;
+				IDistList *DistList = 0;
+				if (AddrBook->OpenEntry(EntryIDSize,
+										PersonalAddrBook,
+										NULL,
+										0,
+										&Type,
+										(IUnknown**)&DistList) == S_OK &&
+					DistList)
 				{
-					for (LMapiList Lst(DistContents); Lst.More(); Lst.Next())
+					int NewContacts = 0;
+					LPMAPITABLE DistContents = 0;
+					if (DistList->GetContentsTable(0, &DistContents) == S_OK &&
+						DistContents)
 					{
-						SPropValue *v = Lst.GetField(PR_ENTRYID);
-						if (v)
+						for (LMapiList Lst(DistContents); Lst.More(); Lst.Next())
 						{
-							ULONG type = 0;
-							IMailUser *User = 0;
-							if (DistList->OpenEntry(	v->Value.bin.cb,
-														(LPENTRYID) v->Value.bin.lpb,
-														0,
-														0,
-														&type,
-														(IUnknown**)&User) == S_OK &&
-								User)
+							SPropValue *v = Lst.GetField(PR_ENTRYID);
+							if (v)
 							{
-								SPropValue *Array = 0;
-								ULONG Values = 0;
-
-								if (User->GetProps(	NULL, // Props
-													0,
-													&Values,
-													&Array) == S_OK &&
-									Array)
+								ULONG type = 0;
+								IMailUser *User = 0;
+								if (DistList->OpenEntry(	v->Value.bin.cb,
+															(LPENTRYID) v->Value.bin.lpb,
+															0,
+															0,
+															&type,
+															(IUnknown**)&User) == S_OK &&
+									User)
 								{
-									Contact *Person = (Contact*)App->CreateItem(MAGIC_CONTACT, DestFolder, false);
-									if (Person)
+									SPropValue *Array = 0;
+									ULONG Values = 0;
+
+									if (User->GetProps(	NULL, // Props
+														0,
+														&Values,
+														&Array) == S_OK &&
+										Array)
 									{
-										for (unsigned n=0; n<Values; n++)
+										Contact *Person = (Contact*)App->CreateItem(MAGIC_CONTACT, DestFolder, false);
+										if (Person)
 										{
-											switch (Array[n].ulPropTag)
+											for (unsigned n=0; n<Values; n++)
 											{
-												case PR_DISPLAY_NAME:
+												switch (Array[n].ulPropTag)
 												{
-													auto Name = LFromNativeCp(Array[n].Value.lpszA);
-													if (Name)
+													case PR_DISPLAY_NAME:
 													{
-														int Spaces = 0;
-														for (int k=0; Name.Get()[k]; k++)
+														auto Name = LFromNativeCp(Array[n].Value.lpszA);
+														if (Name)
 														{
-															if (Name.Get()[k] == ' ') Spaces++;
-														}
+															int Spaces = 0;
+															for (int k=0; Name.Get()[k]; k++)
+															{
+																if (Name.Get()[k] == ' ') Spaces++;
+															}
 
-														if (Spaces == 1)
-														{
-															char *Space = strchr(Name, ' ');
-															*Space = 0;
-															Person->Set(OPT_First, Name);
-															Person->Set(OPT_Last, Space+1);
+															if (Spaces == 1)
+															{
+																char *Space = strchr(Name, ' ');
+																*Space = 0;
+																Person->Set(OPT_First, Name);
+																Person->Set(OPT_Last, Space+1);
 
-															const char *Last = 0;
-															Person->Get(OPT_Last, Last);
-															int n=0;
+																const char *Last = 0;
+																Person->Get(OPT_Last, Last);
+																int n=0;
+															}
+															else
+															{
+																Person->Set(OPT_First, Name);
+															}
 														}
-														else
-														{
-															Person->Set(OPT_First, Name);
-														}
+														break;
 													}
-													break;
-												}
-												case PR_EMAIL_ADDRESS:
-												case PR_SMTP_ADDRESS:
-												{
-													char *Addr = Array[n].Value.lpszA;
-													if (strchr(Addr, '@'))
-													{
-														Person->Set(OPT_Email, Array[n].Value.lpszA);
-													}
-													break;
-												}
-												default:
-												{
-													if (PROP_ID(Array[n].ulPropTag) >= 0x8000 &&
-														PROP_ID(Array[n].ulPropTag) <= 0x8100 &&
-														PROP_TYPE(Array[n].ulPropTag) == PT_STRING8)
+													case PR_EMAIL_ADDRESS:
+													case PR_SMTP_ADDRESS:
 													{
 														char *Addr = Array[n].Value.lpszA;
 														if (strchr(Addr, '@'))
 														{
 															Person->Set(OPT_Email, Array[n].Value.lpszA);
 														}
+														break;
 													}
-													break;
+													default:
+													{
+														if (PROP_ID(Array[n].ulPropTag) >= 0x8000 &&
+															PROP_ID(Array[n].ulPropTag) <= 0x8100 &&
+															PROP_TYPE(Array[n].ulPropTag) == PT_STRING8)
+														{
+															char *Addr = Array[n].Value.lpszA;
+															if (strchr(Addr, '@'))
+															{
+																Person->Set(OPT_Email, Array[n].Value.lpszA);
+															}
+														}
+														break;
+													}
 												}
 											}
-										}
 
-										Person->Save();
-										NewContacts++;
+											Person->Save();
+											NewContacts++;
+										}
 									}
 								}
 							}
 						}
 					}
+
+					char Msg[256];
+					sprintf_s(Msg, sizeof(Msg), "%i contacts imported from Outlook.", NewContacts);
+					LgiMsg(App, Msg, AppName, MB_OK);
+
+					Status = true;
 				}
-
-				char Msg[256];
-				sprintf_s(Msg, sizeof(Msg), "%i contacts imported from Outlook.", NewContacts);
-				LgiMsg(App, Msg, AppName, MB_OK);
-
-				Status = true;
+				else
+				{
+					LgiMsg(App, "Couldn't open the personal address book.", "Error", MB_OK);
+				}
 			}
 			else
 			{
-				LgiMsg(App, "Couldn't open the personal address book.", "Error", MB_OK);
+				LgiMsg(App, "No personal address book.", "Error", MB_OK);
 			}
 		}
 		else
 		{
-			LgiMsg(App, "No personal address book.", "Error", MB_OK);
+			LgiMsg(App, "Couldn't open the address book.", "Error", MB_OK);
 		}
-	}
-	else
-	{
-		LgiMsg(App, "Couldn't open the address book.", "Error", MB_OK);
-	}
 
-	return Status;
+		delete dlg;
+		if (callback)
+			callback(Status);
+	});
 }
 
 void Import_OutlookContacts(ScribeWnd *Parent)
@@ -3221,7 +3236,6 @@ bool OutlookIO::Export(	ExportParams *P,
 						char s[256];
 						sprintf_s(s, sizeof(s), "Loading %s...", FolderPath ? FolderPath.Get() : InName.Get());
 						P->Prog->SetDescription(s);
-						LYield();
 					}
 
 					// Export all the contained items, by first scanning existing entries so
@@ -3279,7 +3293,6 @@ bool OutlookIO::Export(	ExportParams *P,
 						char s[256];
 						sprintf_s(s, sizeof(s), "Exporting %s...", FolderPath ? FolderPath.Get() : InName.Get());
 						P->Prog->SetDescription(s);
-						LYield();
 					}
 					if (P->ItemProg)
 					{
@@ -3287,7 +3300,6 @@ bool OutlookIO::Export(	ExportParams *P,
 						P->ItemProg->SetRange(In->Items.Length());
 						P->ItemProg->SetType("email");
 						P->ItemProg->Cancel(false);
-						LYield();
 					}
 					for (auto t: In->Items)
 					{
@@ -3544,17 +3556,11 @@ bool OutlookIO::Export(	ExportParams *P,
 						}
 
 						if (P->ItemProg)
-						{
 							P->ItemProg->Value(P->ItemProg->Value()+1);
-						}
-						LYield();
 					}
 
 					if (P->Prog)
-					{
 						P->Prog->Value(P->Prog->Value()+1);
-						LYield();
-					}
 
 					if (!WasLoaded)
 					{
@@ -3593,6 +3599,7 @@ protected:
 	List<MapiEntry> Entries;
 
 	bool ListEntries();
+	bool OnMsgStore(HRESULT Result);
 
 public:
 	MailMapiSource(ScribeWnd *parent, ScribeAccount *account);
@@ -3635,6 +3642,55 @@ MailMapiSource::~MailMapiSource()
 	}
 
 	DeleteObj(Mapi);
+}
+
+bool MailMapiSource::OnMsgStore(HRESULT Result)
+{
+	if (FAILED(Result))
+		return false;
+
+	if (!MsgStore)
+		return false;
+
+	SPropValue *SubTree = MapiGetProp(MsgStore, PR_IPM_SUBTREE_ENTRYID);
+	if (!SubTree)
+		return false;
+
+	ULONG ObjType;
+	IMAPIFolder *Root = 0;
+	if (MsgStore->OpenEntry(SubTree->Value.bin.cb, (LPENTRYID)SubTree->Value.bin.lpb, NULL, MAPI_BEST_ACCESS, &ObjType, (IUnknown**) &Root) != S_OK ||
+		!Root)
+		return false;
+
+	LPMAPITABLE Folders = 0;
+	if (Root->GetHierarchyTable(0, &Folders) != S_OK)
+		return false;
+
+	// Loop through all the folders
+	bool Status = false;
+	for (LMapiList Lst(Folders); Lst.More(); Lst.Next())
+	{
+		SPropValue *v = Lst.GetField(PR_ENTRYID);
+		SPropValue *Name = Lst.GetField(PR_DISPLAY_NAME);
+		if (v && Name)
+		{
+			char *FolderName = MapiCastString(Name);
+			if (FolderName &&
+				_stricmp(FolderName, "Inbox") == 0)
+			{
+				ULONG Type;
+				Status |= Root->OpenEntry(v->Value.bin.cb,
+										(LPENTRYID)v->Value.bin.lpb,
+										NULL,
+										MAPI_BEST_ACCESS,
+										&Type,
+										(IUnknown**)&pFolder) == S_OK &&
+										pFolder;
+			}
+		}
+	}
+
+	return Status;
 }
 
 bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const char *User, const char *Password, LDom *SettingStore, int Flags)
@@ -3694,24 +3750,32 @@ bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const c
 
 		if (Mapi->Session)
 		{
-			HRESULT Error = S_OK;
-
 			LVariant UserName = Account->Receive.UserName();
 			if (!ValidStr(UserName.Str()))
 			{
-				ChooseMessageStoreDlg Dlg(Parent, Mapi->Session, false);
-				if (Dlg.InitCheck() &&
-					Dlg.DoModal() == IDOK &&
-					Dlg.Ref)
+				auto Dlg = new ChooseMessageStoreDlg(Parent, Mapi->Session, false);
+				if (!Dlg->InitCheck())
 				{
-					Account->Receive.UserName(Dlg.Ref->DisplayName);
+					delete Dlg;
+				}
+				else
+				{
+					Dlg->DoModal([this, Dlg](auto dlg, auto id)
+					{
+						if (id && Dlg->Ref)
+						{
+							Account->Receive.UserName(Dlg->Ref->DisplayName);
 
-					Error = Mapi->Session->OpenMsgStore(Ui,
-														Dlg.Ref->Size, // entry bytes
-														Dlg.Ref->Entry, // ptr to entry
-														NULL, // default interface: IMsgStore
-														MAPI_BEST_ACCESS,
-														&MsgStore);
+							auto Error = Mapi->Session->OpenMsgStore(Ui,
+																Dlg->Ref->Size, // entry bytes
+																Dlg->Ref->Entry, // ptr to entry
+																NULL, // default interface: IMsgStore
+																MAPI_BEST_ACCESS,
+																&MsgStore);
+							OnMsgStore(Error);
+						}
+						delete dlg;
+					});
 				}
 			}
 			else
@@ -3724,56 +3788,15 @@ bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const c
 						if (e->DisplayName &&
 							_stricmp(e->DisplayName, UserName.Str()) == 0)
 						{
-							Error = Mapi->Session->OpenMsgStore(Ui,
+							auto Error = Mapi->Session->OpenMsgStore(Ui,
 																e->Size, // entry bytes
 																e->Entry, // ptr to entry
 																NULL, // default interface: IMsgStore
 																MAPI_BEST_ACCESS,
 																&MsgStore);
-							break;
+							if (OnMsgStore(Error))
+								break;
 						}
-					}
-				}
-			}
-
-			if (MsgStore)
-			{
-				SPropValue *SubTree = MapiGetProp(MsgStore, PR_IPM_SUBTREE_ENTRYID);
-				if (SubTree)
-				{
-					ULONG ObjType;
-					IMAPIFolder *Root = 0;
-					if (MsgStore->OpenEntry(SubTree->Value.bin.cb, (LPENTRYID)SubTree->Value.bin.lpb, NULL, MAPI_BEST_ACCESS, &ObjType, (IUnknown**) &Root) == S_OK &&
-						Root)
-					{
-						LPMAPITABLE Folders = 0;
-						if (Root->GetHierarchyTable(0, &Folders) == S_OK)
-						{
-							// Loop through all the folders
-							for (LMapiList Lst(Folders); Lst.More(); Lst.Next())
-							{
-								SPropValue *v = Lst.GetField(PR_ENTRYID);
-								SPropValue *Name = Lst.GetField(PR_DISPLAY_NAME);
-								if (v && Name)
-								{
-									char *FolderName = MapiCastString(Name);
-									if (FolderName &&
-										_stricmp(FolderName, "Inbox") == 0)
-									{
-										ULONG Type;
-										Status = Root->OpenEntry(v->Value.bin.cb,
-																(LPENTRYID)v->Value.bin.lpb,
-																NULL,
-																MAPI_BEST_ACCESS,
-																&Type,
-																(IUnknown**)&pFolder) == S_OK &&
-																pFolder;
-									}
-								}
-							}
-						}
-
-						// Root->Release();
 					}
 				}
 			}

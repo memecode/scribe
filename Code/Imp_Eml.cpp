@@ -10,7 +10,7 @@ class LImportEml : public LDialog
 	ScribeWnd *App;
 
 public:
-	LAutoString In;
+	LString In;
 	ScribeFolder *Out;
 	int TotalEmail;
 
@@ -76,46 +76,50 @@ public:
 		{
 			case IDC_SET_IN:
 			{
-				LFileSelect s;
-				s.Parent(this);
-				s.Type("Email Files", "*.eml");
-				s.Type("All Files", LGI_ALL_FILES);
-				if (s.Open())
+				auto s = new LFileSelect(this);
+				s->Type("Email Files", "*.eml");
+				s->Type("All Files", LGI_ALL_FILES);
+				s->Open([this](auto dlg, auto status)
 				{
-					char p[MAX_PATH_LEN];
-					strcpy_s(p, sizeof(p), s.Name());
-					LTrimDir(p);
-					SetCtrlName(IDC_IN_FOLDER, p);
-					
-					if (LDirExists(p))
+					if (status)
 					{
-						LTree *t;
-						if (GetViewById(IDC_TREE, t))
+						char p[MAX_PATH_LEN];
+						strcpy_s(p, sizeof(p), dlg->Name());
+						LTrimDir(p);
+						SetCtrlName(IDC_IN_FOLDER, p);
+					
+						if (LDirExists(p))
 						{
-							TotalEmail = Scan(t, p);
+							LTree *t;
+							if (GetViewById(IDC_TREE, t))
+							{
+								TotalEmail = Scan(t, p);
+							}
 						}
 					}
-				}
+					delete dlg;
+				});
 				break;
 			}
 			case IDC_SET_OUT:
 			{
-				FolderDlg d(this, App, MAGIC_MAIL);
-				if (d.DoModal())
+				auto Dlg = new FolderDlg(this, App, MAGIC_MAIL);
+				Dlg->DoModal([this, Dlg](auto dlg, auto id)
 				{
-					char *NewPath = d.Get();
-					if (NewPath)
+					if (id)
 					{
-						Out = App->GetFolder(NewPath);
+						Out = App->GetFolder(Dlg->Get());
 						if (Out)
 							SetCtrlName(IDC_OUT_FOLDER, Out->GetPath());
 					}
-				}
+					delete dlg;
+				});
 				break;
 			}
 			case IDOK:
 			{
-				In.Reset(NewStr(GetCtrlName(IDC_IN_FOLDER)));
+				In = GetCtrlName(IDC_IN_FOLDER);
+				// fall through
 			}
 			case IDCANCEL:
 			{
@@ -133,8 +137,6 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 	LDirectory d;
 	
 	{
-		DoEvery Timer(300);
-		
 		LDataStoreI::StoreTrans Trans = Out->GetObject()->GetStore()->StartTransaction();
 		for (int b=d.First(In); b && !Prog->IsCancelled(); b=d.Next())
 		{
@@ -163,8 +165,6 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 					else (*Errors)++;
 					
 					Prog->Value(Prog->Value() + 1);
-					if (Timer.DoNow())
-						LYield();
 				}
 			}
 		}
@@ -192,18 +192,22 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 
 void ImportEml(ScribeWnd *App)
 {
-	LImportEml Dlg(App);
-	if (Dlg.DoModal())
+	auto Dlg = new LImportEml(App);
+	Dlg->DoModal([Dlg, App](auto dlg, auto id)
 	{
-		int Errors = 0;
-		LProgressDlg Prog(App);
-		Prog.SetRange(Dlg.TotalEmail);
-		Prog.SetDescription("Email");
-		ImportEmlFolders(App, Prog.ItemAt(0), Dlg.Out, Dlg.In, &Errors);
-		if (Errors)
+		if (id)
 		{
-			Prog.Visible(false);
-			LgiMsg(App, "%i email failed to import.", AppName, MB_OK, Errors);
+			int Errors = 0;
+			LProgressDlg Prog(App);
+			Prog.SetRange(Dlg->TotalEmail);
+			Prog.SetDescription("Email");
+			ImportEmlFolders(App, Prog.ItemAt(0), Dlg->Out, Dlg->In, &Errors);
+			if (Errors)
+			{
+				Prog.Visible(false);
+				LgiMsg(App, "%i email failed to import.", AppName, MB_OK, Errors);
+			}
 		}
-	}
+		delete dlg;
+	});
 }

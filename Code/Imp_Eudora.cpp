@@ -111,7 +111,7 @@ bool ImportEudoraAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 									else n = Next;
 								}
 
-								Status |= (Folder->WriteThing(c) != Store3Error);
+								Status |= (Folder->WriteThing(c, NULL) != Store3Error);
 							}
 						}
 					}
@@ -123,27 +123,25 @@ bool ImportEudoraAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 	return Status;
 }
 
-bool Import_EudoraAddressBook(ScribeWnd *App)
+void Import_EudoraAddressBook(ScribeWnd *App)
 {
-	bool Status = false;
-
 	char Str[256] = "/";
 	#ifdef WIN32
-	HKEY hKey;
-	if (RegOpenKeyA(HKEY_LOCAL_MACHINE, EudoraPathKey, &hKey) == ERROR_SUCCESS)
-	{
-		DWORD Type = 0;
-		DWORD Size = sizeof(Str);
-		RegQueryValueExA(hKey, "Path", 0, &Type, (uchar*)Str, &Size);
-		RegCloseKey(hKey);
-	}
+		HKEY hKey;
+		if (RegOpenKeyA(HKEY_LOCAL_MACHINE, EudoraPathKey, &hKey) == ERROR_SUCCESS)
+		{
+			DWORD Type = 0;
+			DWORD Size = sizeof(Str);
+			RegQueryValueExA(hKey, "Path", 0, &Type, (uchar*)Str, &Size);
+			RegCloseKey(hKey);
+		}
 	#endif
 
-	LArray<char*> Files;
+	LString::Array Files;
 	LMakePath(Str, sizeof(Str), Str, "NNdbase.txt");
 	if (LFileExists(Str))
 	{
-		Files.Add(NewStr(Str));
+		Files.Add(Str);
 	}
 
 	// Get default path..
@@ -163,19 +161,17 @@ bool Import_EudoraAddressBook(ScribeWnd *App)
 	}
 
 	// Ask user...
-	ChooseFolderDlg Dlg(App,
+	auto Dlg = new ChooseFolderDlg(App,
 						false,
 						"Eudora",
 						LLoadString(IDS_SELECT_IO),
 						DefaultFolder,
 						MAGIC_CONTACT,
 						&Files);
-	if (Dlg.DoModal() && Dlg.SrcFiles[0])
+	Dlg->DoModal([App, Dlg](auto dlg, auto id)
 	{
-		Status = ImportEudoraAddresss(App, App->GetFolder(Dlg.DestFolder), Dlg.SrcFiles[0]);
-	}
-
-	Files.DeleteArrays();
-
-	return Status;    
+		if (id && Dlg->SrcFiles[0])
+			ImportEudoraAddresss(App, App->GetFolder(Dlg->DestFolder), Dlg->SrcFiles[0]);
+		delete dlg;
+	});
 }

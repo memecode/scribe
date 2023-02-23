@@ -22,6 +22,8 @@ ScribeExtern LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes C
 ScribeFunc const char *ScribeResourcePath();
 ScribeExtern LString::Array ScribeThemePaths();
 ScribeExtern LString DetectCharset(LString s);
+ScribeExtern void WaitForVariant(LVariant &var);
+ScribeExtern void WaitForString(LString &var);
 extern LAutoString ConvertThreadIndex(char *ThreadIndex, int TruncateChars = 0);
 
 /// Parses HTML into a tree and then evaluates 'SearchExp' on each node.
@@ -47,8 +49,10 @@ extern bool SearchHtml
 	const char *ResultExp
 );
 
-extern int LHtmlMsg
+extern void LHtmlMsg
 (
+	/// The callback to receive the status
+	std::function<void(int)> Callback,
 	/// The parent view or NULL if none available
 	LViewI *Parent,
 	/// The message's text. This is a printf format string that you can pass arguments to

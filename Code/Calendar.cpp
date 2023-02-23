@@ -1501,7 +1501,7 @@ void Calendar::DoContextMenu(LMouse &m, LView *Parent)
 			}
 			case IDM_EXPORT:
 			{
-				ExportAll(GetList(), sMimeVCalendar);
+				ExportAll(GetList(), sMimeVCalendar, NULL);
 				break;
 			}
 			case IDM_INSPECT:
@@ -1684,6 +1684,16 @@ bool Calendar::Save(ScribeFolder *Folder)
 		}
 	}
 
+	auto ChangeEvent = [&]()
+	{
+		auto View = GetView();
+		if (View && Status)
+		{
+			View->OnContentsChanged(Source);
+			OnSerialize(true);
+		}
+	};
+
 	if (GetObject() &&
 		GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Webdav)
 	{
@@ -1692,6 +1702,8 @@ bool Calendar::Save(ScribeFolder *Folder)
 		Status = s > Store3Error;
 		if (Status)
 			SetDirty(false);
+
+		ChangeEvent();
 	}
 	else
 	{
@@ -1704,18 +1716,18 @@ bool Calendar::Save(ScribeFolder *Folder)
 			Folder = App->GetFolder(FOLDER_CALENDAR);
 		}
 
+		// FIXME: This can't wait for WriteThing to finish it's call back...
+		Status = true;
 		if (Folder)
 		{
-			if ((Status = (Folder->WriteThing(this) != Store3Error)))
-				SetDirty(false);
+			Folder->WriteThing(this, [&](auto Status)
+			{
+				if (Status > Store3Error)
+					SetDirty(false);
+				ChangeEvent();
+			});
 		}
-	}
-
-	auto View = GetView();
-	if (View && Status)
-	{
-		View->OnContentsChanged(Source);
-		OnSerialize(true);
+		else ChangeEvent();
 	}
 
 	return Status;
@@ -2848,23 +2860,28 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 			if (!Ctrl->Value())
 				break;
 
-			LRecurDlg Dlg(this);
-			if (!Dlg.DoModal())
+			auto Dlg = new LRecurDlg(this);
+			Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 			{
-				SetCtrlValue(IDC_REPEAT, 0);
-			}
+				if (ctrlId)
+					SetCtrlValue(IDC_REPEAT, 0);
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_TIMEZONE:
 		{
 			auto Tz = Item->GetObject()->GetStr(FIELD_CAL_TIMEZONE);
-			LInput Dlg(this, Tz, "Time zone:", "Calendar Event Timezone");
-			int Result = Dlg.DoModal();
-			if (Result)
+			auto Dlg = new LInput(this, Tz, "Time zone:", "Calendar Event Timezone");
+			Dlg->DoModal([this, Dlg](auto dlg, auto Result)
 			{
-				Item->GetObject()->SetStr(FIELD_CAL_TIMEZONE, Dlg.GetStr());
-				Item->SetDirty();
-			}
+				if (Result)
+				{
+					Item->GetObject()->SetStr(FIELD_CAL_TIMEZONE, Dlg->GetStr());
+					Item->SetDirty();
+				}
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_REMINDER_ADD:

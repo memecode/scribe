@@ -729,14 +729,12 @@ char *RepairFile::GetFolderName(int i)
 //////////////////////////////////////////////////////////////////
 void Scribe_Repair(ScribeWnd *Parent)
 {
-	LFileSelect Select;
-
-	Select.Parent(Parent);
-	Select.Type("Mail folders", "*.mail");
-
-	if (Select.Open())
+	auto Select = new LFileSelect(Parent);
+	Select->Type("Mail folders", "*.mail");
+	Select->Open([&](auto dlg, auto status)
 	{
 		// FIXME RepairFile Worker(Parent, Select.Name());
-	}
+		delete dlg;
+	});
 }
 

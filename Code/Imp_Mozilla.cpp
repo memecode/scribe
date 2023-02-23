@@ -324,7 +324,7 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 
 					if (Flds > 0)
 					{
-						Folder->WriteThing(c);
+						Folder->WriteThing(c, NULL);
 						Status = true;
 					}
 					else
@@ -409,7 +409,7 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 		
 		Status = Map.Length() > 0;
 		for (auto p: Map)
-			Folder->WriteThing(p.value);
+			Folder->WriteThing(p.value, NULL);
 	}
 	else
 	{
@@ -419,11 +419,10 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 	return Status;
 }
 
-bool Import_MozillaAddressBook(ScribeWnd *App)
+void Import_MozillaAddressBook(ScribeWnd *App)
 {
-	bool Status = false;
 	LFileSelect Select;
-	LArray<char*> Files;
+	LArray<char*> FindFiles;
 	LArray<const char*> Ext;
 
 	LFile::Path Str(
@@ -439,7 +438,7 @@ bool Import_MozillaAddressBook(ScribeWnd *App)
 	Ext.Add("abook.mab");
 	Ext.Add("abook.sqlite");
 	LgiTrace("Searching '%s' for thunderbird address book files.\n", Str.GetFull().Get());
-	LRecursiveFileSearch(Str, &Ext, &Files);
+	LRecursiveFileSearch(Str, &Ext, &FindFiles);
 
 	// Get default path..
 	char DefaultFolder[256] = "/Contacts";
@@ -455,22 +454,25 @@ bool Import_MozillaAddressBook(ScribeWnd *App)
 			strcpy_s(DefaultFolder, sizeof(DefaultFolder), p);
 	}
 
+	LString::Array Files;
+	for (auto f: FindFiles)
+		Files.Add(f);
+	FindFiles.DeleteArrays();
+
 	// Ask user...
-	ChooseFolderDlg Dlg(App,
+	auto Dlg = new ChooseFolderDlg(App,
 						false,
 						AppName,
 						"Select input files and destination directory",
 						DefaultFolder,
 						MAGIC_CONTACT,
 						&Files);
-	if (Dlg.DoModal() && Dlg.SrcFiles[0])
+	Dlg->DoModal([App, Dlg](auto dlg, auto id)
 	{
-		Status = ImportMozillaAddresss(App, App->GetFolder(Dlg.DestFolder), Dlg.SrcFiles[0]);
-	}
-
-	Files.DeleteArrays();
-
-	return Status;    
+		if (id && Dlg->SrcFiles[0])
+			ImportMozillaAddresss(App, App->GetFolder(Dlg->DestFolder), Dlg->SrcFiles[0]);
+		delete dlg;
+	});
 }
 
 #ifndef WIN32
@@ -487,113 +489,116 @@ int GetPrivateProfileStringA(const char *lpAppName,
 }
 #endif
 
-bool Import_MozillaMail(ScribeWnd *App)
+void Import_MozillaMail(ScribeWnd *App)
 {
 	char Path[MAX_PATH_LEN];
-	if (LGetSystemPath(LSP_USER_APP_DATA, Path, sizeof(Path)))
+	if (!LGetSystemPath(LSP_USER_APP_DATA, Path, sizeof(Path)))
+		return;
+
+	LMakePath(Path, sizeof(Path), Path, "Thunderbird\\profiles.ini");
+	if (!LFileExists(Path))
 	{
-		LMakePath(Path, sizeof(Path), Path, "Thunderbird\\profiles.ini");
-		if (LFileExists(Path))
+		LgiMsg(App, LLoadString(IDS_ERROR_FILE_DOESNT_EXIST), AppName, MB_OK, Path);
+		return;
+	}
+
+	char s[128];
+	if (GetPrivateProfileStringA("Profile0", "Path", "", s, sizeof(s), Path) <= 0)
+		return;
+
+	if (LIsRelativePath(s))
+	{
+		LTrimDir(Path);
+		LMakePath(Path, sizeof(Path), Path, s);
+	}
+	else
+	{
+		strcpy_s(Path, sizeof(Path), s);
+	}
+	LMakePath(Path, sizeof(Path), Path, "Mail");
+	if (!LDirExists(Path))
+	{
+		LgiMsg(App, LLoadString(IDS_ERROR_FOLDER_DOESNT_EXIST), AppName, MB_OK, Path);
+		return;
+	}
+		
+	LArray<char*> FindFiles;
+	if (!LRecursiveFileSearch(Path, 0, &FindFiles))
+		return;
+
+	// Clear out index files...
+	for (unsigned i=0; i<FindFiles.Length(); i++)
+	{
+		auto f = FindFiles[i];
+		int64 Size = LFileSize(f);
+		char *Ext = strrchr(f, '.');
+		if
+		(
+			Size == 0
+			||
+			(
+				Ext
+				&&
+				(
+					_stricmp(Ext, ".msf") == 0
+					||
+					_stricmp(Ext, ".dat") == 0
+				)
+			)
+		)
 		{
-			char s[128];
-			if (GetPrivateProfileStringA("Profile0", "Path", "", s, sizeof(s), Path) > 0)
-			{
-				if (LIsRelativePath(s))
-				{
-					LTrimDir(Path);
-					LMakePath(Path, sizeof(Path), Path, s);
-				}
-				else
-				{
-					strcpy_s(Path, sizeof(Path), s);
-				}
-				LMakePath(Path, sizeof(Path), Path, "Mail");
-				if (LDirExists(Path))
-				{
-					LArray<char*> Files;
-					if (LRecursiveFileSearch(Path, 0, &Files))
-					{
-						// Clear out index files...
-						for (unsigned i=0; i<Files.Length(); i++)
-						{
-							char *f = Files[i];
-							int64 Size = LFileSize(f);
-							char *Ext = strrchr(f, '.');
-							if
-							(
-								Size == 0
-								||
-								(
-									Ext
-									&&
-									(
-										_stricmp(Ext, ".msf") == 0
-										||
-										_stricmp(Ext, ".dat") == 0
-									)
-								)
-							)
-							{
-								Files.DeleteAt(i);
-								DeleteArray(f);
-								i--;
-							}
-						}
-
-						// Do UI
-						ScribeFolder *Cur = App->GetCurrentFolder();
-						LString CurPath;
-						if (Cur)
-						    CurPath = Cur->GetPath();
-						ChooseFolderDlg Dlg(App,
-											false,
-											"Mozilla/Thunderbird",
-											LLoadString(IDS_IMPORT),
-											CurPath,
-											MAGIC_MAIL,
-											&Files);
-						if (Dlg.DoModal() && Dlg.DestFolder)
-						{
-							ScribeFolder *Dest = App->GetFolder(Dlg.DestFolder);
-							if (Dest)
-							{
-								for (auto Src: Dlg.SrcFiles)
-								{
-									char *Name = strrchr(Src, DIR_CHAR);
-									if (!Name) Name = Src;
-									else Name++;
-
-									ScribeFolder *Child = Dest->CreateSubDirectory(Name, MAGIC_MAIL);
-									if (Child)
-									{
-										LAutoPtr<LTextFile> f(new LTextFile);
-										if (f->Open(Src, O_READ))
-										{
-											Child->Import(Child->AutoCast(f), sMimeMbox);
-										}
-									}
-								}
-
-								Dest->Expanded(true);
-							}
-							else
-							{
-								LgiMsg(App, LLoadString(IDS_ERROR_FOLDER_DOESNT_EXIST), AppName, MB_OK, Dlg.DestFolder);
-							}
-						}
-					}
-				}
-				else
-				{
-					LgiMsg(App, LLoadString(IDS_ERROR_FOLDER_DOESNT_EXIST), AppName, MB_OK, Path);
-				}
-			}
-		}
-		else
-		{
-			LgiMsg(App, LLoadString(IDS_ERROR_FILE_DOESNT_EXIST), AppName, MB_OK, Path);
+			FindFiles.DeleteAt(i);
+			DeleteArray(f);
+			i--;
 		}
 	}
 
-	return false;
+	LString::Array Files;
+	for (auto f: FindFiles)
+		Files.New() = f;
+	FindFiles.DeleteArrays();
+
+	// Do UI
+	ScribeFolder *Cur = App->GetCurrentFolder();
+	LString CurPath;
+	if (Cur)
+		CurPath = Cur->GetPath();
+	auto Dlg = new ChooseFolderDlg(App,
+						false,
+						"Mozilla/Thunderbird",
+						LLoadString(IDS_IMPORT),
+						CurPath,
+						MAGIC_MAIL,
+						&Files);
+	Dlg->DoModal([App, Dlg](auto dlg, auto id)
+	{
+		if (id && Dlg->DestFolder)
+		{
+			ScribeFolder *Dest = App->GetFolder(Dlg->DestFolder);
+			if (Dest)
+			{
+				for (auto Src: Dlg->SrcFiles)
+				{
+					char *Name = strrchr(Src, DIR_CHAR);
+					if (!Name) Name = Src;
+					else Name++;
+
+					ScribeFolder *Child = Dest->CreateSubDirectory(Name, MAGIC_MAIL);
+					if (Child)
+					{
+						LAutoPtr<LTextFile> f(new LTextFile);
+						if (f->Open(Src, O_READ))
+						{
+							Child->Import(Child->AutoCast(f), sMimeMbox);
+						}
+					}
+				}
+
+				Dest->Expanded(true);
+			}
+			else LgiMsg(App, LLoadString(IDS_ERROR_FOLDER_DOESNT_EXIST), AppName, MB_OK, Dlg->DestFolder);
+		}
+
+		delete dlg;
+	});
 }

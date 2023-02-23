@@ -395,10 +395,7 @@ public:
 		Dlg.SetRange(1);
 		LProgressPane *Import = Dlg.Push();
 		if (Import)
-		{
 			Import->SetDescription("Importing messages...");
-			LYield();
-		}
 
 		if (Parent &&
 			ParentFolder &&
@@ -462,10 +459,7 @@ public:
 					{
 						ReadMessage(i->Pos, i->IsNews, Folder);
 						if (Import)
-						{
 							Import->Value(Import->Value()+1);
-							LYield();
-						}
 					}
 
 					/* 
@@ -562,56 +556,73 @@ public:
 
 };
 
-
-void Import_OutlookExpress(ScribeWnd *Parent, bool v5)
+struct ImportOe : public LProgressDlg
 {
-	// Get the base directory
-	char Dir[256] = "";
-	if (!LGetSystemPath(LSP_LOCAL_APP_DATA, Dir, sizeof(Dir)))
-	{
-		// Just in case
-		LGetSystemPath(LSP_OS, Dir, sizeof(Dir));
-	}
-	
-	// Search for the folder files
-DoFileSearch:
+	ScribeWnd *App;
+	bool v5;
+	int Imported = 0, TotalFiles = 0;
+	LString Dir;
 	LArray<char*> Files;
 	LArray<const char*> Ext;
-	if (v5)
-		Ext.Add("*.dbx");
-	else
-		Ext.Add("*.mbx");
+	LString::Array FileArr;
+	ScribeFolder *Folder = NULL;
 
-	LRecursiveFileSearch(Dir, &Ext, &Files);
-
-	if (Files.Length() == 0)
+	ImportOe(ScribeWnd *app, bool ver5) :
+		App(app),
+		v5(ver5),
+		LProgressDlg(app)
 	{
-		if (LgiMsg(	Parent,
-					"%i outlook express data files found in:\n"
-					"%s\n"
-					"Do you want to select a different directory to search?",
-					AppName,
-					MB_YESNO,
-					Files.Length(),
-					Dir) == IDYES)
+		// Get the base directory
+		auto Dir = LGetSystemPath(LSP_LOCAL_APP_DATA);
+		if (!Dir)
+			// Just in case
+			Dir = LGetSystemPath(LSP_OS);
+	
+		// Search for the folder files
+		Ext.Add(v5 ? "*.dbx" : "*.mbx");
+
+		DoFileSearch();
+		if (Files.Length() == 0)
 		{
-			LFileSelect Select;
-			Select.Parent(Parent);
-			if (Select.OpenFolder())
+			if (LgiMsg(	App,
+						"%i outlook express data files found in:\n"
+						"%s\n"
+						"Do you want to select a different directory to search?",
+						AppName,
+						MB_YESNO,
+						(int)Files.Length(),
+						Dir.Get()) == IDYES)
 			{
-				strcpy_s(Dir, sizeof(Dir), Select.Name());
-				goto DoFileSearch;
+				auto Select = new LFileSelect(App);
+				Select->OpenFolder([&](auto dlg, auto status)
+				{
+					if (status)
+					{
+						strcpy_s(Dir, sizeof(Dir), Select->Name());
+						DoFileSearch();
+						ProcessFiles();
+					}
+					delete dlg;
+				});
 			}
 		}
+		else ProcessFiles();
 	}
 
-	if (Files.Length() > 0)
+	void DoFileSearch()
 	{
+		LRecursiveFileSearch(Dir, &Ext, &Files);
+	}
+
+	void ProcessFiles()
+	{
+		if (Files.Length() == 0)
+			return;
+
 		// Strip files
 		for (unsigned i=0; i<Files.Length(); i++)
 		{
-			char *f = Files[i];
-
+			auto f = Files[i];
 			if (stristr(f, "Folders.") ||
 				stristr(f, "Pop3uidl.") ||
 				stristr(f, "Deleted Items."))
@@ -622,61 +633,87 @@ DoFileSearch:
 			}
 		}
 
+		FileArr.Length(0);
+		for (auto s: Files)
+			FileArr.New() = s;
+		Files.DeleteArrays();
+
 		// Ask the user where to put them..
-		ScribeFolder *Current = Parent->GetCurrentFolder();
+		auto Current = App->GetCurrentFolder();
 		LString CurrentPath;
 		if (Current)
-		    CurrentPath = Current->GetPath();
-		ChooseFolderDlg Dlg(Parent,
-							false,
-							AppName,
-							LLoadString(IDS_OE_IMPORT),
-							CurrentPath,
-							MAGIC_MAIL,
-							&Files);
-		if (Dlg.DoModal())
+			CurrentPath = Current->GetPath();
+
+		auto Dlg = new ChooseFolderDlg(	App,
+										false,
+										AppName,
+										LLoadString(IDS_OE_IMPORT),
+										CurrentPath,
+										MAGIC_MAIL,
+										&FileArr);
+		Dlg->DoModal([this, Dlg](auto dlg, auto id)
 		{
-			ScribeFolder *Folder = Parent->GetFolder(Dlg.DestFolder);
-			if (Folder)
+			LAutoPtr<LDialog> mem(dlg);
+
+			if (!id)
+				return;
+
+			ScribeFolder *Folder = App->GetFolder(Dlg->DestFolder);
+			if (!Folder)
 			{
-				LProgressDlg PrgDlg(Parent);
-				PrgDlg.SetDescription("Importing folders...");
-				PrgDlg.SetRange(Files.Length());
-				LYield();
+				LgiMsg(App, "Error locating that folder.", AppName, MB_OK);
+				return;
+			}
 
-				int Imported = 0;
-				int i=1;
-				for (auto FileName: Dlg.SrcFiles)
-				{
-					if (v5)
-					{
-						ImportDBX Filter(Parent);
-						if (Filter.Import(Folder, FileName))
-						{
-							Imported++;
-						}
-					}
-					else
-					{
-						if (ImportMBX(Parent, Folder, FileName))
-						{
-							Imported++;
-						}
-					}
+			SetDescription("Importing folders...");
+			SetRange(FileArr.Length());
 
-					PrgDlg.Value(i);
-					LYield();
-					i++;
-				}
+			FileArr = Dlg->SrcFiles;
+			TotalFiles = (int)FileArr.Length();
+			
+			SetPulse(100); // Start processing... each timeout allows the message loop to run a bit
+		});
+	};
 
-				PrgDlg.Visible(false);
-				char *FileType = (v5) ? (char*)"DBX" : (char*)"MBX";
-				LgiMsg(Parent, "%i of %i %s files imported successfully.", AppName, MB_OK, Imported, Files.Length(), FileType);
+	void OnFinished()
+	{
+		LgiMsg(	App,
+				"%i of %i %s files imported successfully.",
+				AppName,
+				MB_OK,
+				Imported,
+				TotalFiles,
+				(v5) ? (char*)"DBX" : (char*)"MBX");
+
+		delete this;
+	}
+
+	void OnPulse()
+	{
+		if (FileArr.Length())
+		{
+			auto FileName = FileArr.Last();
+			FileArr.PopLast();
+
+			if (v5)
+			{
+				ImportDBX Filter(App);
+				if (Filter.Import(Folder, FileName))
+					Imported++;
 			}
 			else
 			{
-				LgiMsg(Parent, "Error locating that folder.", AppName, MB_OK);
+				if (ImportMBX(App, Folder, FileName))
+					Imported++;
 			}
+
+			(*this)++; // inc progress bar...
 		}
+		else OnFinished();
 	}
+};
+
+void Import_OutlookExpress(ScribeWnd *Parent, bool v5)
+{
+	new ImportOe(Parent, v5);
 }

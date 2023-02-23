@@ -34,7 +34,7 @@ ifeq ($(Build),Debug)
 		-L../../libs/aspell-0.60.6.1/linux/$(BuildDir) \
 		-lbzip2$(Tag) \
 		-L../../libs/bzip2-1.0.6/linux/$(BuildDir) \
-		-llgi-gtk3$(Tag) \
+		-llgi-dev$(Tag) \
 		-L../../../lgi/trunk/$(BuildDir)
 	Inc =  \
 		`pkg-config --cflags gtk+-3.0` \
@@ -68,7 +68,7 @@ else
 		-L../../libs/aspell-0.60.6.1/linux/$(BuildDir) \
 		-lbzip2$(Tag) \
 		-L../../libs/bzip2-1.0.6/linux/$(BuildDir) \
-		-llgi-gtk3$(Tag) \
+		-llgi-dev$(Tag) \
 		-L../../../lgi/trunk/$(BuildDir)
 	Inc =  \
 		`pkg-config --cflags gtk+-3.0` \
@@ -250,7 +250,7 @@ Objects := $(addprefix $(BuildDir)/,$(SourceLst))
 
 # Target
 # Executable target
-$(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).so ../../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a ../../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
+$(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).so ../../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a ../../../lgi/trunk/$(BuildDir)/liblgi-dev$(Tag).so $(Objects)
 	mkdir -p $(BuildDir)
 	@echo Linking $(Target) [$(Build)]...
 	$(CPP) -Wl,-export-dynamic,-R. -o \
@@ -421,7 +421,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	export Build=$(Build); \
 	$(MAKE) -C ../../libs/bzip2-1.0.6/linux -f Makefile.linux
 
-../../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so : ../../../lgi/trunk/include/lgi/common/App.h \
+../../../lgi/trunk/$(BuildDir)/liblgi-dev$(Tag).so : ../../../lgi/trunk/include/lgi/common/App.h \
 	../../../lgi/trunk/include/lgi/common/Array.h \
 	../../../lgi/trunk/include/lgi/common/AutoPtr.h \
 	../../../lgi/trunk/include/lgi/common/Base64.h \
@@ -622,15 +622,12 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/src/common/Lgi/MenuCommon.cpp \
 	../../../lgi/trunk/src/common/Lgi/Mru.cpp \
 	../../../lgi/trunk/src/common/Lgi/Mutex.cpp \
-	../../../lgi/trunk/src/common/Lgi/Object.cpp \
 	../../../lgi/trunk/src/common/Lgi/OptionsFile.cpp \
 	../../../lgi/trunk/src/common/Lgi/Rand.cpp \
 	../../../lgi/trunk/src/common/Lgi/Stream.cpp \
 	../../../lgi/trunk/src/common/Lgi/SubProcess.cpp \
 	../../../lgi/trunk/src/common/Lgi/ThreadCommon.cpp \
 	../../../lgi/trunk/src/common/Lgi/ThreadEvent.cpp \
-	../../../lgi/trunk/src/common/Lgi/ToolTip.cpp \
-	../../../lgi/trunk/src/common/Lgi/TrayIcon.cpp \
 	../../../lgi/trunk/src/common/Lgi/Variant.cpp \
 	../../../lgi/trunk/src/common/Lgi/ViewCommon.cpp \
 	../../../lgi/trunk/src/common/Lgi/WindowCommon.cpp \
@@ -671,6 +668,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/src/common/Widgets/TextLabel.cpp \
 	../../../lgi/trunk/src/common/Widgets/ToolBar.cpp \
 	../../../lgi/trunk/src/common/Widgets/Tree.cpp \
+	../../../lgi/trunk/src/haiku/ShowFileProp_Haiku.cpp \
 	../../../lgi/trunk/src/linux/General/File.cpp \
 	../../../lgi/trunk/src/linux/General/Mem.cpp \
 	../../../lgi/trunk/src/linux/General/ShowFileProp_Linux.cpp \

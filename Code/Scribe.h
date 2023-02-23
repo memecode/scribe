@@ -85,6 +85,7 @@ class ContactGroup;
 class ScribeBehaviour;
 class AccountletThread;
 class ThingList;
+class LSpellCheck;
 
 ////////////////////////////////////////////////////////////////////////
 // Scripting support
@@ -286,7 +287,6 @@ public:
 class ChooseFolderDlg : public LDialog
 {
     ScribeWnd *App;
-	// LTextLabel *Message;
 	LEdit *Folder;
 	int Type;
 	bool Export;
@@ -295,8 +295,8 @@ class ChooseFolderDlg : public LDialog
 	void InsertFile(const char *f);
 
 public:
-	char *DestFolder;
-	List<char> SrcFiles;
+	LString DestFolder;
+	LString::Array SrcFiles;
 
 	ChooseFolderDlg
 	(
@@ -304,11 +304,11 @@ public:
 		bool IsExport,
 		const char *Title,
 		const char *Msg,
-		char *DefFolder = 0,
+		char *DefFolder = NULL,
 		int FolderType = MAGIC_MAIL,
-		LArray<char*> *Files = 0
+		LString::Array *Files = NULL
 	);
-	~ChooseFolderDlg();
+
 	int OnNotify(LViewI *Ctrl, LNotification n);
 };
 
@@ -422,7 +422,7 @@ public:
 	// Printing
 	virtual void OnPrintHeaders(struct ScribePrintContext &Context) { LAssert(!"Impl me."); }
 	virtual void OnPrintText(ScribePrintContext &Context, LPrintPageRanges &Pages) { LAssert(!"Impl me."); }
-	virtual void OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml) { LAssert(!"Impl me."); }
+	virtual int OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml) { LAssert(!"Impl me."); return 0; }
 };
 
 class MailContainerIter;
@@ -522,7 +522,7 @@ public:
 	virtual IoProgress Export(IoProgressFnArgs) = 0;
 	
 	/// This exports all the selected items
-	bool ExportAll(LViewI *Parent, const char *ExportMimeType);
+	void ExportAll(LViewI *Parent, const char *ExportMimeType, std::function<void(bool)> Callback);
 
 	// UI
 	bool OnKey(LKey &k) override;
@@ -1088,7 +1088,7 @@ public:
 	// Printing
 	void OnPrintHeaders(ScribePrintContext &Context) override;
 	void OnPrintText(ScribePrintContext &Context, LPrintPageRanges &Pages) override;
-	void OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml) override;
+	int OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSurface *RenderedHtml) override;
 
 	// Misc	
 	uint32_t GetFlags() override;
@@ -1276,11 +1276,11 @@ public:
 	void SetDefaultFields(bool Force = false);
 	bool Thread();
 	ScribePerm GetFolderPerms(ScribeAccessType Access); 
-	bool SetFolderPerms(LView *Parent, ScribeAccessType Access, ScribePerm Perm); 
+	void SetFolderPerms(LView *Parent, ScribeAccessType Access, ScribePerm Perm, std::function<void(bool)> Callback); 
 	bool GetThreaded();
 	void SetThreaded(bool t);
 	// void Update();
-	Mail *GetMessageById(char *Id);
+	void GetMessageById(const char *Id, std::function<void(Mail*)> Callback);
 	void SetLoadOnDemand();
 	void SortSubfolders();
 	void DoContextMenu(LMouse &m);
@@ -1288,25 +1288,32 @@ public:
 	bool IsInTrash();
 	bool SortItems();
 	
-	// Virtuals
-	virtual Store3Status WriteThing(Thing *t);
-	virtual bool DeleteThing(Thing *t);
-	virtual bool DeleteAllThings();
-	virtual bool LoadFolders();
-	virtual Store3State LoadThings(LViewI *Parent = 0);
-	virtual bool UnloadThings();
-	virtual bool IsWriteable() { return true; }
-	virtual bool IsPublicFolders() { return false; }
+	// Virtuals:
+		/// 
+		/// These methods can be used in a synchronous or asynchronous manner:
+		///		sync:	Call with 'Callback=NULL' and use the return value.
+		///				If the function needs to show a dialog (like to get permissions from
+		///				the user) then it'll return Store3Delayed immediately.
+		///		async:	Call with a valid callback, and the method will possibly wait 
+		///				for the user and then either return Store3Error or Store3Success.
+		virtual Store3Status LoadThings(LViewI *Parent = NULL,	std::function<void(Store3Status)> Callback = NULL);
+		virtual Store3Status WriteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
+		virtual Store3Status DeleteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
+		virtual Store3Status DeleteAllThings(					std::function<void(Store3Status)> Callback = NULL);
+		virtual bool LoadFolders();
+		virtual bool UnloadThings();
+		virtual bool IsWriteable() { return true; }
+		virtual bool IsPublicFolders() { return false; }
 
-	virtual void OnProperties(int Tab = -1) override;
-	virtual ScribeFolder *CreateSubDirectory(const char *Name, int Type);
-	virtual void OnRename(char *NewName);
-	virtual void OnDelete();
-	virtual LString GetPath();
-	virtual ScribeFolder *GetSubFolder(const char *Path);
-	virtual void Populate(ThingList *List);
-	virtual bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL) { return GetItemType() != MAGIC_ANY; }
-	virtual void OnRethread();
+		virtual void OnProperties(int Tab = -1) override;
+		virtual ScribeFolder *CreateSubDirectory(const char *Name, int Type);
+		virtual void OnRename(char *NewName);
+		virtual void OnDelete();
+		virtual LString GetPath();
+		virtual ScribeFolder *GetSubFolder(const char *Path);
+		virtual void Populate(ThingList *List);
+		virtual bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL) { return GetItemType() != MAGIC_ANY; }
+		virtual void OnRethread();
 
 	// Name
 	void SetName(const char *Name, bool Encode);
@@ -1334,6 +1341,9 @@ public:
 	bool GetFormats(bool Export, LString::Array &MimeTypes);
 	IoProgress Import(IoProgressFnArgs);
 	IoProgress Export(IoProgressFnArgs);
+	bool Import(LStreamI &f, const char *MimeType);
+	void Export(LStreamI &f, const char *MimeType, std::function<void(Store3Status)> Callback = NULL);
+	void ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, std::function<void(LProgressDlg*)> Callback = NULL);
 	const char *GetStorageMimeType();
 
 	// Dom
@@ -1665,7 +1675,7 @@ protected:
 	bool ConnectionStatus;
 	MailProtocol *Client;
 	uint64 LastOnline;
-	char *TempPsw;
+	LString TempPsw;
 	bool Quiet;
 	LView *Parent;
 
@@ -2065,7 +2075,7 @@ public:
 	void SetDefaults();
 
 	// User interface
-	bool InitUI(LView *Parent, int Tab = 0);
+	void InitUI(LView *Parent, int Tab, std::function<void(bool)> callback);
 	bool InitMenus();
 	void SerializeUi(LView *Wnd, bool Load);
 	int OnNotify(LViewI *Ctrl, LNotification &n);
@@ -2209,8 +2219,9 @@ public:
 
 	enum AppState
 	{
-	    ScribeInitializing,
-	    ScribeRunning,
+	    ScribeConstructing, // 1) In ScribeWnd constructor OR one of it's dialogs.
+	    ScribeInitializing, // 2) In the ScribeWnd::OnCreate event.
+	    ScribeRunning,		// 3) Normal fully initialized runtime.
 	    ScribeExiting,
 	    ScribeLoadingFolders,
 	    ScribeUnloadingFolders,
@@ -2288,8 +2299,9 @@ protected:
 	int				AdjustAllObjectSizes(LDataI *Item);
 	bool			CleanFolders(ScribeFolder *f);
 	LDataStoreI		*CreateDataStore(char *Full, bool CreateIfMissing);
-	bool			LoadFolders();
+	void			LoadFolders(std::function<void(bool)> Callback);
 	bool			LoadMailStores();
+	bool			ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName);
 	bool			UnLoadFolders();
 	void			AddFolderToMru(char *FileName);
 	void			AddContactsToMenu(LSubMenu *Menu);
@@ -2339,7 +2351,7 @@ public:
 
 	void			Update(int What = 0);
 	void			UpdateUnRead(ScribeFolder *Folder, int Delta);
-	bool			ThingPrint(ThingType *m, LPrinter *Info = 0, LView *Parent = 0, int MaxPage = -1);
+	void			ThingPrint(std::function<void(bool)> Callback, ThingType *m, LPrinter *Info = NULL, LView *Parent = NULL, int MaxPage = -1);
 	bool			OpenAMail(ScribeFolder *Folder);
 	void			BuildDynMenus();
 	LDocView		*CreateTextControl(int Id, const char *MimeType, bool Editor, Mail *m = 0);
@@ -2354,6 +2366,7 @@ public:
 	void			RemoteContent_AddSender(const char *Addr, bool WhiteList);
 
 	void			SetDefaultHandler();
+	void			OnSetDefaultHandler(bool Error, bool OldAssert);
 	void			SetCurrentIdentity(int i=-1);
 	int				GetCurrentIdentity();
 
@@ -2427,12 +2440,12 @@ public:
 	LToolBar		*LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LImageList> &Img);
 	class LVmDebuggerCallback *GetDebuggerCallback();
 	class GpgConnector *GetGpgConnector();
-	LString			GetUserInput(LView *Parent, LString Msg, bool Password = false);
+	void			GetUserInput(LView *Parent, LString Msg, bool Password, std::function<void(LString)> Callback);
 
 	int				GetCalendarSources(LArray<CalendarSource*> &Sources);
 
-	bool			GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName);
-	bool			GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType);
+	Store3Status	GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback);
+	void			GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType, std::function<void(bool)> Callback);
 	const char*		EditCtrlMimeType();
 	LAutoString		GetReplyXml(const char *MimeType);
 	LAutoString		GetForwardXml(const char *MimeType);
@@ -2467,7 +2480,7 @@ public:
 
 	// Scripting support
 	bool GetScriptCallbacks(LScriptCallbackType Type, LArray<LScriptCallback*> &Callbacks);
-	LScriptCallback GetCallback(char *CallbackMethodName);
+	LScriptCallback GetCallback(const char *CallbackMethodName);
 	bool RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args);
 	LStream *ShowScriptingConsole();
 	bool ExecuteScriptCallback(LScriptCallback &c, LScriptArguments &Args, bool ReturnArgs = false);

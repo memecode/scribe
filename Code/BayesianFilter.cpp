@@ -347,7 +347,7 @@ public:
 		return 0;
 	}
 
-	bool PostEvent(int Cmd, LMessage::Param a = 0, LMessage::Param b = 0)
+	bool PostEvent(int Cmd, LMessage::Param a = 0, LMessage::Param b = 0, int64_t TimeoutMs = -1) override
 	{
 		LMessage m(Cmd, a, b);
 		OnEvent(&m);
@@ -965,6 +965,8 @@ bool BuildSpamDB::Process()
 					FolderLoads--;
 					(*Prog)++;
 				});
+
+				// FIXME: does this need to do something on callback?
 				f->LoadThings();
 			}
 			else
@@ -1198,14 +1200,6 @@ void BayesianFilter::BuildStats()
 
 	prob->LoadThings();
 	inbox->LoadThings();
-
-	for (auto t: prob->Items)
-	{
-		auto m = t->IsMail();
-		if (m)
-		{
-		}
-	}
 }
 
 bool BayesianFilter::BuildSpamDb()

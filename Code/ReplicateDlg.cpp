@@ -794,7 +794,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 			case RReloadFolders:
 			{
 				Pop(w);
-				App->LoadFolders();
+				App->LoadFolders(NULL);
 				break;
 			}
 			case ROpenMailStore:

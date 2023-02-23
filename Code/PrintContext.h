@@ -7,9 +7,6 @@
 struct ScribePrintContext : public LCss, public LPrintEvents
 {
 public:
-	constexpr static int OnBeginPrintError = -1;
-	constexpr static int OnBeginPrintCancel = 0;
-
 	ScribeWnd *App = NULL;
 	LSurface *pDC = NULL;
 	LPrintDC *PrintDC = NULL;
@@ -32,7 +29,7 @@ public:
     LDisplayString *Text(const char *str, int x = -1);
 
 	// LPrintEvents impl	
-	int OnBeginPrint(LPrintDC *pdc);
+	void OnBeginPrint(LPrintDC *pdc, std::function<void(int)> callback);
 	bool OnPrintPage(LPrintDC *pdc, int PageIndex);
 	LPrintPageRanges *GetPageRanges() { return PageRanges; }
 

@@ -2,9 +2,11 @@
 #include "ScribePrivate.h"
 #include "lgi/common/Scripting.h"
 #include "lgi/common/TextView3.h"
-#include "resdefs.h"
 #include "lgi/common/ThreadEvent.h"
 #include "lgi/common/LgiRes.h"
+
+#include "resdefs.h"
+#include "../src/common/Coding/ScriptingPriv.h"
 
 extern GHostFunc Methods[];
 
@@ -22,7 +24,7 @@ extern GHostFunc Methods[];
 
 LScribeScript *LScribeScript::Inst = 0;
 
-LView *CastGView(LVariant *v)
+LView *CastLView(LVariant *v)
 {
 	if (v)
 	{
@@ -387,21 +389,47 @@ bool LScribeScript::GetSourceFolders(LScriptArguments &Args)
 
 bool LScribeScript::BrowseFolder(LScriptArguments &Args)
 {
-	ARG_CHECK(!=, 3);
+	ARG_CHECK(<, 4);
 
-	LView *Parent = CastGView(Args[0]);
-	FolderDlg d(Parent,
-				App,
-				MAGIC_ANY, // limit to
-				0, // root
-				0, // init sel
-				true,
-				Args[2]->Str(),
-				Args[1]->Str());
-	if (d.DoModal())
+	LView *Parent = CastLView(Args[0]);
+	LString MessageTxt = Args[1]->Str();
+	LString DefaultFolderName = Args[2]->Str();
+	LString CallbackName = Args[3]->Str();
+
+	if (!CallbackName)
 	{
-		*Args.GetReturn() = d.Get();
+		*Args.GetReturn() = false;
+		return true;
 	}
+
+	*Args.GetReturn() = true;
+
+	auto d = new FolderDlg(	Parent,
+							App,
+							MAGIC_ANY, // limit to
+							0, // root
+							0, // init sel
+							true,
+							DefaultFolderName,
+							MessageTxt);
+	d->DoModal([this, d, CallbackName](auto dlg, auto id)
+	{
+		if (id)
+		{
+			auto FolderPath = d->Get();
+			auto cb = App->GetCallback(CallbackName);
+			if (cb.Func)
+			{
+				LVirtualMachine Vm;
+				LScriptArguments Args(&Vm);
+				LVariant vFolderPath = FolderPath;
+				Args.Add(&vFolderPath);		
+				App->ExecuteScriptCallback(cb, Args);
+			}
+			else LgiTrace("%s:%i - No callback called '%s'\n", _FL, CallbackName.Get());
+		}
+		delete dlg;
+	});
 
 	return true;
 }
@@ -552,7 +580,7 @@ bool LScribeScript::LookupContact(LScriptArguments &Args)
 
 bool LScribeScript::MsgBox(LScriptArguments &Args)
 {
-	LViewI *Parent = CastGView(Args[0]);
+	LViewI *Parent = CastLView(Args[0]);
 	LgiMsg(Parent, "The 'MsgBox' function is deprecated. Please use 'MessageDlg' (it has the same arguments).", AppName);
 	*Args.GetReturn() = 0;
 	return true;

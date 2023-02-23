@@ -323,27 +323,37 @@ void ScribeFolder::SetLoadOnDemand()
 	}
 }
 
-Mail *ScribeFolder::GetMessageById(char *Id)
+void ScribeFolder::GetMessageById(const char *Id, std::function<void(Mail*)> Callback)
 {
 	if (!Id)
-		return NULL;
-
-	auto s = LoadThings();
-	if (s == Store3Loading)
-		return NULL;
-
-	for (auto t : Items)
 	{
-		Mail *r = t->IsMail();
-		if (!r)
-			continue;
-		
-		auto rid = r->GetMessageId();
-		if (!Stricmp(rid, Id))
-			return r;
+		if (Callback) Callback(NULL);
+		return;
 	}
 
-	return NULL;
+	LoadThings(NULL, [&](auto s)
+	{
+		if (s <= Store3Loading)
+		{
+			if (Callback) Callback(NULL);
+			return;
+		}
+
+		for (auto t : Items)
+		{
+			Mail *r = t->IsMail();
+			if (!r)
+				continue;
+		
+			auto rid = r->GetMessageId();
+			if (!Stricmp(rid, Id))
+			{
+				if (Callback)
+					Callback(r);
+				return;
+			}
+		}
+	});
 }
 
 bool ScribeFolder::InsertThing(Thing *t)
@@ -407,25 +417,29 @@ bool ScribeFolder::HasFieldId(int Id)
 	return false;
 }
 
-bool ScribeFolder::SetFolderPerms(LView *Parent, ScribeAccessType Access, ScribePerm Perm)
+void ScribeFolder::SetFolderPerms(LView *Parent, ScribeAccessType Access, ScribePerm Perm, std::function<void(bool)> Callback)
 {
-	bool Status = false;
 	ScribePerm Current = GetFolderPerms(Access);	
 	int Field = (Access == ScribeReadAccess) ? FIELD_FOLDER_PERM_READ : FIELD_FOLDER_PERM_WRITE;
 
 	if (GetObject() && Current != Perm)
 	{
-		bool Allow = App->GetAccessLevel(Parent, Current, GetPath());
-		if (Allow)
+		App->GetAccessLevel(Parent, Current, GetPath(), [&](auto Allow)
 		{
-			GetObject()->SetInt(Field, Perm);
-			SetDirty();
-			Status = true;
-		}				
+			if (Allow)
+			{
+				GetObject()->SetInt(Field, Perm);
+				SetDirty();
+			}
+			if (Callback)
+				Callback(Allow);
+		});
 	}
-	else Status = true; // i.e. not changing
-	
-	return Status;
+	else
+	{
+		if (Callback)
+			Callback(true); // i.e. not changing
+	}
 }
 
 ScribePerm ScribeFolder::GetFolderPerms(ScribeAccessType Access)
@@ -602,16 +616,15 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 	return Moved;
 }
 
-bool ScribeFolder::DeleteAllThings()
+Store3Status ScribeFolder::DeleteAllThings(std::function<void(Store3Status)> Callback)
 {
 	if (!GetFldObj())
-		return false;
+		return Store3Error;
 		
 	Store3Status r = GetFldObj()->DeleteAllChildren();
 	if (r == Store3Error)
 	{
 		LAssert(!"DeleteAllChildren failed.");
-		return false;
 	}
 	else if (r == Store3Success)
 	{
@@ -620,12 +633,12 @@ bool ScribeFolder::DeleteAllThings()
 		Update();
 	}
 
-	return true;
+	return r;
 }
 
-bool ScribeFolder::DeleteThing(Thing *t)
+Store3Status ScribeFolder::DeleteThing(Thing *t, std::function<void(Store3Status)> Callback)
 {
-	bool Status = false;
+	Store3Status Status = Store3Error;
 
 	if (t && t->GetObject())
 	{
@@ -649,13 +662,17 @@ bool ScribeFolder::DeleteThing(Thing *t)
 	return Status;
 }
 
-Store3Status ScribeFolder::WriteThing(Thing *t)
+Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)> Callback)
 {
-	Store3Status Status = Store3Error;
+	if (!t)
+	{
+		if (Callback) Callback(Store3Error);
+		return Store3Error;
+	}
 
 	auto Path = GetFolder()->GetPath();
-	bool Allow = t && (!App || App->GetAccessLevel(App, GetWriteAccess(), Path));
-	if (Allow)
+
+	auto OnAllow = [&]()
 	{
 		// Generic thing storage..
 		bool Create = !t->GetObject();
@@ -664,36 +681,41 @@ Store3Status ScribeFolder::WriteThing(Thing *t)
 
 		if (!t->GetObject())
 		{
-		    LAssert(!"No object?");
-		    LgiTrace("%s:%i - No object to save.\n", _FL);
-		    return Store3Error;
+			LAssert(!"No object?");
+			LgiTrace("%s:%i - No object to save.\n", _FL);
+			if (Callback) Callback(Store3Error);
+			return;
 		}
 
 		// saving a thing that already has an item on disk
 		auto Obj = GetObject();
-		Status = t->GetObject()->Save(Obj);
+		auto Status = t->GetObject()->Save(Obj);
 		if (Status != Store3Error)
 		{
-            // The ScribeWnd::OnNew will take care of inserting the item into the
-            // right folder, updating the unread count, any filtering etc.
+			// The ScribeWnd::OnNew will take care of inserting the item into the
+			// right folder, updating the unread count, any filtering etc.
 			t->OnSerialize(true);
+			if (Callback) Callback(Status);
 		}
 		else
 		{
 			if (Create)
 				t->SetObject(NULL, false, _FL);
-		    LgiTrace("%s:%i - Object->Save returned %i.\n", _FL, Status);
-			return Store3Error;
+			LgiTrace("%s:%i - Object->Save returned %i.\n", _FL, Status);
+			if (Callback) Callback(Store3Error);
 		}
-	}
+	};
 
-	if (!Status)
-	{
-		// You need to implement the writer for this object type
-		LAssert(0);
-	}
-	
-	return Status;
+	if (App)
+		App->GetAccessLevel(App, GetWriteAccess(), Path, [&](auto Allow)
+		{
+			if (Allow)
+				OnAllow();
+		});
+	else
+		OnAllow();	
+
+	return Store3Success;
 }
 
 int ThingContainerNameCmp(LTreeItem *a, LTreeItem *b, NativeInt d)
@@ -815,6 +837,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			ScribeFolder *f = App->GetFolder(FOLDER_TEMPLATES);
 			if (f)
 			{
+				// FIXME
 				f->LoadThings();
 
 				auto Merge = s.Sub->AppendSub(LLoadString(IDS_MERGE_TEMPLATE));
@@ -979,29 +1002,32 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 		}
 		case IDM_RENAME:
 		{
-			FolderNameDlg Dlg(mt, GetName(true));
-			if (Dlg.DoModal() &&
-				ValidStr(Dlg.Name))
+			auto Dlg = new FolderNameDlg(mt, GetName(true));
+			Dlg->DoModal([this, Dlg, mt](auto dlg, auto id)
 			{
-				// check for folder name conflicts...
-				ScribeFolder *ParentFolder = GetFolder();
-				LString Path;
-				if (ParentFolder)
-				    Path = ParentFolder->GetPath();
-				if (Path)
+				if (id && ValidStr(Dlg->Name))
 				{
-					char s[256];
-					sprintf_s(s, sizeof(s), "%s/%s", Path.Get(), Dlg.Name);
-					if (App->GetFolder(s))
+					// check for folder name conflicts...
+					ScribeFolder *ParentFolder = GetFolder();
+					LString Path;
+					if (ParentFolder)
+					    Path = ParentFolder->GetPath();
+					if (Path)
 					{
-						LgiMsg(mt, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);
-						return;
+						char s[256];
+						sprintf_s(s, sizeof(s), "%s/%s", Path.Get(), Dlg->Name);
+						if (App->GetFolder(s))
+						{
+							LgiMsg(mt, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);
+							return;
+						}
 					}
-				}
 
-				// change the folders name...
-				OnRename(Dlg.Name);
-			}
+					// change the folders name...
+					OnRename(Dlg->Name);
+				}
+				delete dlg;
+			});
 			break;
 		}
 		case IDM_EXPORT:
@@ -1013,38 +1039,41 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 				break;
 			}
 
-			LFileSelect s;
-			s.Name(DropName);
-			s.Parent(mt);
-			if (!s.Save())
-				break;
-
-			if (LFileExists(s.Name()))
+			auto s = new LFileSelect(mt);
+			s->Name(DropName);
+			s->Save([&](auto dlg, auto status)
 			{
-				LString a, b;
-				a.Printf(LLoadString(IDS_ERROR_FILE_EXISTS), s.Name());
-				b.Printf("\n%s\n", LLoadString(IDS_ERROR_FILE_OVERWRITE));
-				if (LgiMsg(GetTree(), a + b, AppName, MB_YESNO) == IDNO)
-					break;
-			}
+				LAutoPtr<LFileSelect> mem(dlg);
+				if (status)
+				{
+					if (LFileExists(s->Name()))
+					{
+						LString a, b;
+						a.Printf(LLoadString(IDS_ERROR_FILE_EXISTS), s->Name());
+						b.Printf("\n%s\n", LLoadString(IDS_ERROR_FILE_OVERWRITE));
+						if (LgiMsg(GetTree(), a + b, AppName, MB_YESNO) == IDNO)
+							return;
+					}
 
-			LAutoPtr<LFile> f(new LFile);
-			if (!f || !f->Open(s.Name(), O_WRITE))
-			{
-				LgiTrace("%s:%i - Failed to open '%s' for writing.\n", _FL, s.Name());
-				break;
-			}
-			
-			f->SetSize(0);
-			Export(AutoCast(f), ExportMimeType);
+					LAutoPtr<LFile> f(new LFile);
+					if (!f || !f->Open(s->Name(), O_WRITE))
+					{
+						LgiTrace("%s:%i - Failed to open '%s' for writing.\n", _FL, s->Name());
+						return;
+					}
+					
+					f->SetSize(0);
+					LAutoPtr<LStreamI> str(f.Release());
+					ExportAsync(str, ExportMimeType);
+				}
+			});
 			break;
 		}
 		case IDM_EMPTY:
 		{
 			if (App->GetMailList())
 			{
-				App->GetMailList()->RemoveAll();							
-				LYield();
+				App->GetMailList()->RemoveAll();
 				
 				LArray<LDataI*> Del;
 				for (ScribeFolder *c = GetChildFolder(); c; c = c->GetNextFolder())
@@ -1052,8 +1081,10 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 				if (Del.Length())
 					GetObject()->GetStore()->Delete(Del, false);
 
-				DeleteAllThings();
-				mt->Invalidate();
+				DeleteAllThings([&](auto status)
+				{
+					mt->Invalidate();
+				});
 			}
 			break;
 		}
@@ -1123,19 +1154,22 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 		}
 		case IDM_MERGE_FILE:
 		{
-			LFileSelect s;
-			s.Parent(mt);
-			s.Type("Email Template", "*.txt;*.eml");
-			if (s.Open())
+			auto s = new LFileSelect(mt);
+			s->Type("Email Template", "*.txt;*.eml");
+			s->Open([this](auto dlg, auto id)
 			{
-				LArray<ListAddr*> Recip;
-				for (auto i: Items)
+				if (id)
 				{
-					Recip.Add(new ListAddr(i->IsContact()));
+					LArray<ListAddr*> Recip;
+					for (auto i: Items)
+					{
+						Recip.Add(new ListAddr(i->IsContact()));
+					}
+					App->MailMerge(Recip, dlg->Name(), 0);
+					Recip.DeleteObjects();
 				}
-				App->MailMerge(Recip, s.Name(), 0);
-				Recip.DeleteObjects();
-			}
+				delete dlg;
+			});
 			break;
 		}
 		case IDM_UNDELETE:
@@ -1423,129 +1457,162 @@ bool ScribeFolder::UnloadThings()
 	#define PROFILE(str)
 #endif
 
-
-Store3State ScribeFolder::LoadThings(LViewI *Parent)
+Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback)
 {
-	Store3State Status = Store3Loaded;
 	int OldUnRead = GetUnRead();
 
 	auto FldObj = GetFldObj();
 	if (!FldObj)
 	{
 		LgiTrace("%s:%i - No folder object.\n", _FL);
-		return Store3Unloaded;
+		return Store3Error;
 	}
 
-	auto Path = GetPath();
-	if (App && !App->GetAccessLevel(Parent ? Parent : App, GetReadAccess(), Path))
+	if (!Parent)
+		Parent = App;
+
+	auto ContinueLoading = [&]()
 	{
+		WhenLoaded(_FL,
+			[&]()
+			{
+				// This is called when all the Store3 objects are loaded
+				int Unread = OldUnRead;
+				if (Unread < 0)
+					Unread = GetUnRead();
+
+				Loading.Reset();
+
+				auto &Children = GetFldObj()->Children();
+				if (Children.GetState() != Store3Loaded)
+				{
+					LAssert(!"Really should be loaded by now.");
+					return;
+				}
+
+				for (auto c = Children.First(); c; c = Children.Next())
+				{
+					auto t = CastThing(c);
+					if (t)
+					{
+						// LAssert(Items.HasItem(t));
+					}
+					else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
+					{
+						t->SetObject(c, false, _FL);
+						t->SetParentFolder(this);
+						t->OnSerialize(false);
+					}
+				}
+
+				int NewUnRead = 0;
+				for (auto t: Items)
+				{
+					if (t->GetFolder() != this)
+					{
+						#ifdef _DEBUG
+						char s[256];
+						sprintf_s(s, sizeof(s),
+							"%s:%i - Error, thing not parented correctly: this='%s', child='%x'\n",
+							_FL,
+							GetText(0),
+							t->GetObject() ? t->GetObject()->Type() : 0);
+						printf("%s", s);
+						LgiMsg(App, s, AppName);
+						#endif
+			
+						t->SetFolder(this);
+					}
+
+					Mail *m = t->IsMail();
+					if (m)
+						NewUnRead += (m->GetFlags() & MAIL_READ) ? 0 : 1;
+
+					t->SetFieldArray(FieldArray);
+				}
+
+				if (Unread != NewUnRead)
+					OnUpdateUnRead(NewUnRead - Unread, false);
+
+				Update();
+
+				if (d->IsInbox < 0 && App)
+				{
+					d->IsInbox = App->GetFolder(FOLDER_INBOX) == this;
+					if (d->IsInbox > 0)
+						UpdateOsUnread();
+				}
+
+				if (Callback)
+					Callback(Store3Success);
+			},
+			0);
+
+		if (!IsLoaded())
+		{
+			bool Ui = Tree ? Tree->InThread() : false;
+			if (Ui)
+				Tree->Capture(false);
+
+			auto &Children = FldObj->Children();
+			auto Status = Children.GetState();
+			if (Status != Store3Loaded)
+			{
+				if (View() && Loading.Reset(Ui ? new LoadingItem(&Children) : NULL))
+					View()->Insert(Loading);
+
+				return Status; // Ie deferred or error...
+			}
+
+			IsLoaded(true);
+		}
+
+		return Store3Loaded;
+	};
+
+	auto Path = GetPath();
+	if (!App || !Path)
+	{
+		LAssert(!"We should probably always have an 'App' and 'Path' ptrs...");
+		return Store3Error;
+	}
+
+	std::function<void(bool)> AccessCb;
+	if (Callback)
+	{
+		AccessCb = [&](bool Access)
+		{
+			if (Access)
+				ContinueLoading();
+			else
+				Callback(Store3Error);
+		};
+	}
+
+	auto Access = App->GetAccessLevel(	Parent,
+										GetReadAccess(),
+										Path,
+										AccessCb);
+	if (Access == Store3Error)
+	{		
 		// No read access:
 		LgiTrace("%s:%i - Folder read access denied.\n", _FL);
 
 		// Emptying the item list, leave the store nodes around though
 		for (auto t: Items)
-			t->SetObject(NULL, false, _FL);
+			t->SetObject(NULL, _FL);
 
 		Items.Empty();
 		IsLoaded(false);
 		
 		Update();
-		return Store3Unloaded;
 	}
-
-	WhenLoaded(_FL, [this, OldUnRead]()
+	else if (Access == Store3Success)
 	{
-		int Unread = OldUnRead;
-		if (Unread < 0)
-			Unread = GetUnRead();
-
-		Loading.Reset();
-
-		auto &Children = GetFldObj()->Children();
-		if (Children.GetState() != Store3Loaded)
-		{
-			LAssert(!"Really should be loaded by now.");
-			return;
-		}
-
-		for (auto c = Children.First(); c; c = Children.Next())
-		{
-			auto t = CastThing(c);
-			if (t)
-			{
-				// LAssert(Items.HasItem(t));
-			}
-			else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
-			{
-				t->SetObject(c, false, _FL);
-				t->SetParentFolder(this);
-				t->OnSerialize(false);
-			}
-		}
-
-		int NewUnRead = 0;
-		for (auto t: Items)
-		{
-			if (t->GetFolder() != this)
-			{
-				#ifdef _DEBUG
-				char s[256];
-				sprintf_s(s, sizeof(s),
-					"%s:%i - Error, thing not parented correctly: this='%s', child='%x'\n",
-					_FL,
-					GetText(0),
-					t->GetObject() ? t->GetObject()->Type() : 0);
-				printf("%s", s);
-				LgiMsg(App, s, AppName);
-				#endif
-			
-				t->SetFolder(this);
-			}
-
-			Mail *m = t->IsMail();
-			if (m)
-				NewUnRead += (m->GetFlags() & MAIL_READ) ? 0 : 1;
-
-			t->SetFieldArray(FieldArray);
-		}
-
-		if (Unread != NewUnRead)
-			OnUpdateUnRead(NewUnRead - Unread, false);
-
-		Update();
-
-		if (d->IsInbox < 0 && App)
-		{
-			d->IsInbox = App->GetFolder(FOLDER_INBOX) == this;
-			if (d->IsInbox > 0)
-				UpdateOsUnread();
-		}
-	},	0);
-
-	if (!IsLoaded())
-	{
-		bool Ui = Tree ? Tree->InThread() : false;
-		if (Ui)
-			Tree->Capture(false);
-
-		// auto Now = LCurrentTime();
-		auto &Children = FldObj->Children();
-		Status = Children.GetState();
-		// printf("%s:%i - Children.GetState=%i %ims\n", _FL, Status, (int)(LCurrentTime()-Now));
-		if (Status != Store3Loaded)
-		{
-			// LgiTrace("%s:%i - ScribeFolder::LoadThings(%s) incomplete...\n", _FL, Path.Get());
-
-			if (View() && Loading.Reset(Ui ? new LoadingItem(&Children) : NULL))
-				View()->Insert(Loading);
-
-			return Status; // Ie deferred or error...
-		}
-
-		IsLoaded(true);
+		ContinueLoading();
 	}
-
-	return Status;
+		
+	return Access;
 }
 
 void ScribeFolder::OnRename(char *NewName)
@@ -2596,6 +2663,7 @@ Prof.Add("Set def fields");
 		}
 
 Prof.Add("Load things");
+		// FIXME:
 		LoadThings();
 	}
 
@@ -2645,7 +2713,6 @@ Prof.Add("Filtering");
 				s.Printf(LPrintfInt64 " of " LPrintfInt64 ", %.1f%%",
 					Pos, Items.Length(), (double)Pos * 100 / Items.Length());
 				Loading->SetText(s);
-				LYield();
 			}
 			FilterStart = LCurrentTime();
 		}
@@ -2938,83 +3005,92 @@ bool ScribeFolder::MoveTo(LArray<Thing*> &Items, bool CopyOnly, LArray<Store3Sta
 			OldBayesType = App->BayesTypeFromPath(t->IsMail());
 		}
 
-		bool Allow = (App) ? App->GetAccessLevel(App, Old->GetFolderPerms(ScribeWriteAccess), Path) : true;
-		if (!Allow)
+		auto DoMove = [&]()
 		{
-			MoveToStatus(i, Store3NoPermissions);
-			continue;
-		}
-
-		int OldFolderType = Old ? App->GetFolderType(Old) : -1;
-		if ( (OldFolderType == FOLDER_TRASH || OldFolderType == FOLDER_SENT) &&
-			  NewFolderType == FOLDER_TRASH)
-		{
-			// Delete for good
-			bool Success = Old && Old->DeleteThing(t);
-			MoveToStatus(i, Success ? Store3Success : Store3Error);
-			if (Success)
-				t->OnMove();
-		}
-		else
-		{
-			// If this folder is currently selected...
-			if (Select())
+			int OldFolderType = Old ? App->GetFolderType(Old) : -1;
+			if ( (OldFolderType == FOLDER_TRASH || OldFolderType == FOLDER_SENT) &&
+				  NewFolderType == FOLDER_TRASH)
 			{
-				// Insert item into list
-				t->SetFieldArray(FieldArray);
-			}
-
-			if (CopyOnly)
-			{
-				LDataI *NewT = ThisStore->Create(t->Type());
-				if (NewT)
-				{
-					NewT->CopyProps(*t->GetObject());
-					auto s = NewT->Save(GetObject());
-					MoveToStatus(i, s);
-				}
-				else
-				{
-					MoveToStatus(i, Store3Error);
-				}
+				// Delete for good
+				auto Success = Old ? Old->DeleteThing(t, NULL) : Store3Error;
+				MoveToStatus(i, Success ? Store3Success : Store3Error);
+				if (Success)
+					t->OnMove();
 			}
 			else
 			{
-				if (NewFolderType != FOLDER_TRASH &&
-					OldBayesType != NewBayesType)
+				// If this folder is currently selected...
+				if (Select())
 				{
-					App->OnBayesianMailEvent(t->IsMail(), OldBayesType, NewBayesType);
+					// Insert item into list
+					t->SetFieldArray(FieldArray);
 				}
 
-				// Move to this folder
-				auto o = t->GetObject();
-				if (o && o->GetStore() == ThisStore)
+				if (CopyOnly)
 				{
-					InStoreMove.Add(o);
-					Map.Add(i, true);
+					LDataI *NewT = ThisStore->Create(t->Type());
+					if (NewT)
+					{
+						NewT->CopyProps(*t->GetObject());
+						auto s = NewT->Save(GetObject());
+						MoveToStatus(i, s);
+					}
+					else
+					{
+						MoveToStatus(i, Store3Error);
+					}
 				}
 				else
 				{
-					// Out of store more... use the old single object method... for the moment..
-					Store3Status s = t->SetFolder(this);
-					MoveToStatus(i, s);
-					if (s == Store3Success)
+					if (NewFolderType != FOLDER_TRASH &&
+						OldBayesType != NewBayesType)
 					{
-						// Remove from the list..
-						if (Old && Old->Select() && App->MailList)
-							App->MailList->Remove(t);
-	
-						t->OnMove();
+						App->OnBayesianMailEvent(t->IsMail(), OldBayesType, NewBayesType);
 					}
-					else if (s == Store3Error)
+
+					// Move to this folder
+					auto o = t->GetObject();
+					if (o && o->GetStore() == ThisStore)
 					{
-						LgiTrace("%s:%i - SetFolder failed.\n", _FL);
+						InStoreMove.Add(o);
+						Map.Add(i, true);
+					}
+					else
+					{
+						// Out of store more... use the old single object method... for the moment..
+						Store3Status s = t->SetFolder(this);
+						MoveToStatus(i, s);
+						if (s == Store3Success)
+						{
+							// Remove from the list..
+							if (Old && Old->Select() && App->MailList)
+								App->MailList->Remove(t);
+	
+							t->OnMove();
+						}
+						else if (s == Store3Error)
+						{
+							LgiTrace("%s:%i - SetFolder failed.\n", _FL);
+						}
 					}
 				}
 			}
-		}	
+		};
+
+		if (App)
+		{
+			App->GetAccessLevel(App, Old->GetFolderPerms(ScribeWriteAccess), Path, [&](bool Allow)
+			{
+				if (Allow)
+					DoMove();
+				else
+					MoveToStatus(i, Store3NoPermissions);
+			});
+		}
+		else DoMove();
 	}
 
+	// FIXME: This code that runs at the end needs to wait for the DoMove events to complete somehow...
 	if (InStoreMove.Length())
 	{
 		auto Fld = dynamic_cast<LDataFolderI*>(GetObject());
@@ -3348,20 +3424,21 @@ void ScribeFolder::CollectSubFolderMail(ScribeFolder *To)
 {
 	if (!To) To = this;
 
-	LoadThings();
-
-	LArray<Thing*> Items;
-	for (auto Item: Items)
+	LoadThings(NULL, [&](auto Status)
 	{
-		if (To != this && Item->IsMail())
-			Items.Add(Item);
-	}
-	To->MoveTo(Items);
+		LArray<Thing*> Items;
+		for (auto Item: Items)
+		{
+			if (To != this && Item->IsMail())
+				Items.Add(Item);
+		}
+		To->MoveTo(Items);
 
-	for (ScribeFolder *f = GetChildFolder(); f; f = f->GetNextFolder())
-	{
-		f->CollectSubFolderMail(To);
-	}
+		for (ScribeFolder *f = GetChildFolder(); f; f = f->GetNextFolder())
+		{
+			f->CollectSubFolderMail(To);
+		}
+	});
 }
 
 void ScribeFolder::OnReceiveFiles(LArray<const char*> &Files)
@@ -3890,26 +3967,73 @@ const char *ScribeFolder::GetStorageMimeType()
 	return NULL;
 }
 
-ThingType::IoProgress ScribeFolder::Export(IoProgressImplArgs)
+void ScribeFolder::ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, std::function<void(LProgressDlg*)> Callback)
 {
-	IoProgress ErrStatus(Store3Error);
-	if (!mimeType)
+	if (!MimeType)
 	{
-		ErrStatus.errMsg = "No mimetype.";
-		if (cb) cb(&ErrStatus, NULL);
-		return ErrStatus;
-	}
-		
-	if (!LoadThings())
-	{
-		ErrStatus.errMsg = "Failed to load things.";
-		if (cb) cb(&ErrStatus, NULL);
-		return ErrStatus;
+		LAssert(!"No Mimetype");
+		if (Callback) Callback(NULL);
+		return;
 	}
 
-	IoProgress Status(Store3Delayed);
-	Status.prog = new ExportFolderTask(this, stream, mimeType, cb);
-	return Status;
+	LoadThings(NULL, [&](auto Status)
+	{
+		if (Status == Store3Success)
+		{
+			auto Task = new FolderExportTask(f, this, MimeType);
+			if (Callback) Callback(Task);
+		}
+		else if (Callback)
+			Callback(NULL);
+	});
+}
+
+void ScribeFolder::Export(LStreamI &f, const char *MimeType, std::function<void(Store3Status)> Callback)
+{
+	if (!MimeType)
+	{
+		if (Callback) Callback(Store3Error);
+		return;
+	}
+
+	LoadThings(NULL, [&](auto Status)
+	{
+		if (Status != Store3Loaded)
+		{
+			if (Callback) Callback(Status);
+			return;
+		}
+
+		bool Mbox = _stricmp(MimeType, sMimeMbox) == 0;
+		LProgressDlg Dlg(App);
+		
+		App->OnFolderTask(&Dlg, true);
+
+		// Clear the files contents
+		f.SetSize(0);
+
+		// Setup progress UI
+		Dlg.SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
+		Dlg.Invalidate((LRect*)0, true);
+		Dlg.SetRange(Items.Length());
+		Dlg.SetType(LLoadString(IDS_EMAIL));
+
+		// Process all the container's items
+		int Error = 0;
+		for (auto i: Items)
+		{
+			if (!i->Export(f, MimeType))
+				Error++;
+			
+			Dlg.Value(Dlg.Value()+1);
+			Dlg.Invalidate((LRect*)0, true);
+		}
+
+		// all done
+		App->OnFolderTask(&Dlg, false);
+
+		if (Callback) Callback(Error ? Store3Error : Store3Success);
+	});
 }
 
 size_t ScribeFolder::Length()
@@ -3993,13 +4117,13 @@ bool ScribeFolder::GetVariant(const char *Name, LVariant &Value, const char *Arr
 		}
 		case SdItem: // Type: Thing[]
 		{
-			if (Items.Length() == 0)
-				LoadThings();
-					
+			Value.Empty();
+
+			LoadThings(); // Use in sync mode, no callback
+
+			// This call back HAS to set value one way or another...
 			if (Array)
 			{
-				Value.Empty();
-
 				bool IsNumeric = true;
 				for (auto *v = Array; *v; v++)
 				{
@@ -4014,7 +4138,10 @@ bool ScribeFolder::GetVariant(const char *Name, LVariant &Value, const char *Arr
 				{
 					int Idx = atoi(Array);
 					if (Idx >= 0 && Idx < (ssize_t)Items.Length())
+					{
 						Value = (LDom*) Items[Idx];
+						return true;
+					}
 				}
 				else // Is message ID?
 				{
@@ -4028,20 +4155,16 @@ bool ScribeFolder::GetVariant(const char *Name, LVariant &Value, const char *Arr
 						if (Id && !strcmp(Id, Array))
 						{
 							Value = (LDom*)t;
-							break;
+							return true;
 						}
 					}
 				}
 			}
-			else
+			else if (Value.SetList())
 			{
-				if (Value.SetList())
-				{
-					for (auto t : Items)
-					{
-						Value.Value.Lst->Insert(new LVariant((LDom*)t));
-					}
-				}
+				for (auto t : Items)
+					Value.Value.Lst->Insert(new LVariant((LDom*)t));
+				return true;
 			}
 			break;
 		}
@@ -4128,7 +4251,13 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 	{
 		case SdLoad: // Type: ()
 		{
-			*ReturnValue = LoadThings(App);
+			LoadThings(App, [&](auto Status)
+			{
+				*ReturnValue = Status == Store3Success;
+			});
+
+			// Convert the async LoadFolders call back to sync.
+			WaitForVariant(*ReturnValue);
 			return true;
 		}
 		case SdSelect: // Type: ()
@@ -4169,8 +4298,16 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 					auto p = Export(AutoCast(f), Args[1]->Str());
 					*ReturnValue = p.status;
 				}
-				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for writing.\n", _FL, FileName);
+					break;
+				}
+
+				Export(f, Args[1]->Str(), [&](auto Status)
+				{
+					*ReturnValue = Status == Store3Success;
+				});
+
+				WaitForVariant(*ReturnValue);
 			}
 			break;
 		}

@@ -574,10 +574,13 @@ public:
 	{
 		if (Ctrl->GetId() == 100)
 		{
-			LFileSelect s;
-			s.Parent(this);
-			if (s.Open())
-				Load(s.Name());
+			auto s = new LFileSelect(this);
+			s->Open([this](auto dlg, auto status)
+			{
+				if (status)
+					Load(dlg->Name());
+				delete dlg;
+			});
 		}
 		
 		return 0;
@@ -1526,7 +1529,7 @@ void Contact::OnMouseClick(LMouse &m)
 					}
 					case IDM_EXPORT:
 					{
-						ExportAll(GetList(), sMimeVCard);
+						ExportAll(GetList(), sMimeVCard, NULL);
 						break;
 					}
 					default:

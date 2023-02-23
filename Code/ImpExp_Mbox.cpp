@@ -21,7 +21,7 @@ ChooseFolderDlg::ChooseFolderDlg
 	const char *Msg,
 	char *DefFolder,
 	int FolderType,
-	LArray<char*> *Files
+	LString::Array *Files
 )
 {
 	Type = FolderType;
@@ -47,9 +47,7 @@ ChooseFolderDlg::ChooseFolderDlg
 			if (Files)
 			{
 				for (unsigned i=0; i<Files->Length(); i++)
-				{
 					InsertFile((*Files)[i]);
-				}
 			}
 		}
 	}
@@ -57,45 +55,38 @@ ChooseFolderDlg::ChooseFolderDlg
 	MoveToCenter();
 }
 
-ChooseFolderDlg::~ChooseFolderDlg()
-{
-	DeleteArray(DestFolder);
-	SrcFiles.DeleteArrays();
-}
-
 void ChooseFolderDlg::InsertFile(const char *f)
 {
-	if (Lst)
-	{
-		bool Has = false;
-		for (auto n : *Lst)
-		{
-			char Path[MAX_PATH_LEN];
-			LMakePath(Path, sizeof(Path), n->GetText(0), n->GetText(1));
-			if (_stricmp(Path, f) == 0)
-			{
-				Has = true;
-				break;
-			}
-		}
+	if (!Lst)
+		return;
 
-		if (!Has)
+	bool Has = false;
+	for (auto n : *Lst)
+	{
+		char Path[MAX_PATH_LEN];
+		LMakePath(Path, sizeof(Path), n->GetText(0), n->GetText(1));
+		if (_stricmp(Path, f) == 0)
 		{
-			LListItem *n = new LListItem;
-			if (n)
-			{
-				LString file = f;
-				auto parts = file.RSplit(DIR_STR, 1);
-				if (parts.Length() == 2)
-				{
-					n->SetText(parts[0], 0);
-					n->SetText(parts[1], 1);
-					Lst->Insert(n);
-				}
-				else LAssert(0);
-			}
+			Has = true;
+			break;
 		}
 	}
+
+	if (Has)
+		return;
+	
+	LListItem *n = new LListItem;
+	if (!n)
+		return;
+
+	auto parts = LString(f).RSplit(DIR_STR, 1);
+	if (parts.Length() == 2)
+	{
+		n->SetText(parts[0], 0);
+		n->SetText(parts[1], 1);
+		Lst->Insert(n);
+	}
+	else delete n;
 }
 
 int ChooseFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
@@ -128,47 +119,47 @@ int ChooseFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_PICK_FILES:
 		{
-			if (Lst)
+			if (!Lst)
+				break;
+
+			auto s = new LFileSelect(this);
+
+			s->MultiSelect(!Export);
+			s->Type("All Files", LGI_ALL_FILES);
+			s->Type("MBOX Files", "*.mbx;*.mbox");
+			s->Type("Outlook Express Folders", "*.mbx;*.dbx");
+			s->Type("Mozilla Address Book", "*.mab");
+			s->Type("Eudora Address Book", "NNdbase.txt");
+			s->Open([this](auto dlg, auto status)
 			{
-				LFileSelect s;
-
-				s.Parent(this);
-				s.MultiSelect(!Export);
-				s.Type("All Files", LGI_ALL_FILES);
-				s.Type("MBOX Files", "*.mbx;*.mbox");
-				s.Type("Outlook Express Folders", "*.mbx;*.dbx");
-				s.Type("Mozilla Address Book", "*.mab");
-				s.Type("Eudora Address Book", "NNdbase.txt");
-
-				if (s.Open())
+				if (status)
 				{
 					if (Export)
-					{
 						Lst->Empty();
-					}
 
-					for (int i=0; i<s.Length(); i++)
-					{
-						InsertFile(s[i]);
-					}
+					for (int i=0; i<dlg->Length(); i++)
+						InsertFile((*dlg)[i]);
 				}
-			}
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_SET_FOLDER:
 		{
-			FolderDlg Dlg(this, App, Type);
-			if (Folder)
+			if (!Folder)
+				break;
+
+			auto Dlg = new FolderDlg(this, App, Type);
+			Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 			{
-				if (Dlg.DoModal())
+				if (ctrlId)
 				{
-					char *f = Dlg.Get();
+					auto f = Dlg->Get();
 					if (f)
-					{
-						Folder->Name(f);
-					}
+						this->Folder->Name(f);
 				}
-			}
+				delete dlg;
+			});
 			break;
 		}
 		case IDOK:
@@ -179,7 +170,7 @@ int ChooseFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 				{
 					char Path[MAX_PATH_LEN];
 					LMakePath(Path, sizeof(Path), n->GetText(0), n->GetText(1));
-					SrcFiles.Insert(NewStr(Path));
+					SrcFiles.Add(Path);
 				}
 			}
 
@@ -207,20 +198,25 @@ void Import_UnixMBox(ScribeWnd *Parent)
 	LString Path;
 	if (Cur)
 	    Path = Cur->GetPath();
-	ChooseFolderDlg Dlg(Parent, false, LLoadString(IDS_MBOX_IMPORT), LLoadString(IDS_MBOX_SELECT_FOLDER), Path);
-	if (Dlg.DoModal() && Dlg.DestFolder)
+	
+	auto Dlg = new ChooseFolderDlg(Parent, false, LLoadString(IDS_MBOX_IMPORT), LLoadString(IDS_MBOX_SELECT_FOLDER), Path);
+	Dlg->DoModal([Dlg, Parent](auto dlg, auto ctrlId)
 	{
-		ScribeFolder *Folder = Parent->GetFolder(Dlg.DestFolder);
-		if (Folder)
+		if (ctrlId && Dlg->DestFolder)
 		{
-			for (auto File: Dlg.SrcFiles)
+			ScribeFolder *Folder = Parent->GetFolder(Dlg->DestFolder);
+			if (Folder)
 			{
-				LAutoPtr<LTextFile> F(new LTextFile);
-				if (F->Open(File, O_READ))
-					Folder->Import(Folder->AutoCast(F), sMimeMbox);
+				for (auto File: Dlg->SrcFiles)
+				{
+					LAutoPtr<LTextFile> F(new LTextFile);
+					if (F->Open(File, O_READ))
+						Folder->Import(Folder->AutoCast(F), sMimeMbox);
+				}
 			}
 		}
-	}
+		delete dlg;
+	});
 }
 
 void Export_UnixMBox(ScribeWnd *Parent)
@@ -229,26 +225,30 @@ void Export_UnixMBox(ScribeWnd *Parent)
 	LString Path;
 	if (Cur)
 	    Path = Cur->GetPath();
-	ChooseFolderDlg Dlg(Parent,
+	auto Dlg = new ChooseFolderDlg(Parent,
 						true,
 						LLoadString(IDS_MBOX_EXPORT),
 						LLoadString(IDS_MBOX_EXPORT_FOLDER),
 						Path);
-	if (Dlg.DoModal() && Dlg.DestFolder)
+	Dlg->DoModal([Dlg, Parent](auto dlg, auto ctrlId)
 	{
-		ScribeFolder *Folder = Parent->GetFolder(Dlg.DestFolder);
-		if (Folder)
+		if (ctrlId && Dlg->DestFolder)
 		{
-			for (auto File: Dlg.SrcFiles)
+			ScribeFolder *Folder = Parent->GetFolder(Dlg->DestFolder);
+			if (Folder)
 			{
-				if (!LFileExists(File) ||
-					LgiMsg(Parent, LLoadString(IDS_ERROR_FILE_EXISTS), AppName, MB_YESNO, File) == IDYES)
+				for (auto File: Dlg->SrcFiles)
 				{
-					LAutoPtr<LFile> F(new LFile);
-					if (F->Open(File, O_WRITE))
-						Folder->Export(Folder->AutoCast(F), sMimeMbox);
+					if (!LFileExists(File) ||
+						LgiMsg(Parent, LLoadString(IDS_ERROR_FILE_EXISTS), AppName, MB_YESNO, File) == IDYES)
+					{
+						LAutoPtr<LFile> F(new LFile);
+						if (F->Open(File, O_WRITE))
+							Folder->Export(Folder->AutoCast(F), sMimeMbox);
+					}
 				}
 			}
 		}
-	}
+		delete dlg;
+	});
 }

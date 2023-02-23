@@ -956,19 +956,21 @@ void ListAddr::OnMouseClick(LMouse &m)
 				}
 				case IDM_EDIT:
 				{
-					LInput Dlg(Parent, sAddr);
-					if (Dlg.DoModal() == IDOK)
+					auto Dlg = new LInput(Parent, sAddr);
+					Dlg->DoModal([this, Dlg](auto dlg, auto id)
 					{
-						sAddr = Dlg.GetStr();
-
-						OnFind();
-						Update();
-
-						if (LListItem::GetList())
+						if (id == IDOK)
 						{
-							LListItem::GetList()->OnNotify(LListItem::GetList(), LNotifyItemChange);
+							sAddr = Dlg->GetStr();
+
+							OnFind();
+							Update();
+
+							if (LListItem::GetList())
+								LListItem::GetList()->OnNotify(LListItem::GetList(), LNotifyItemChange);
 						}
-					}
+						delete dlg;
+					});
 					break;
 				}
 				case IDM_DELETE:
