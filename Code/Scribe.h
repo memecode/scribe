@@ -1591,6 +1591,17 @@ public:
 
 	// Other
 	class Accountlet *Account = NULL;
+
+	MailTransferEvent()
+	{
+	}
+
+	~MailTransferEvent()
+	{
+		#ifndef LGI_STATIC
+		LStackTrace("%p::~MailTransferEvent\n", this);
+		#endif
+	}
 };
 
 #define RoProp(Type, Name)					\

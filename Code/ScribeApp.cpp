@@ -5182,6 +5182,7 @@ bool ScribeWnd::LoadMailStores()
 		}
 		else ProcessFolder(Store, StoreIdx, StoreName);
 		
+		Status = true;
 		StoreIdx++;
 	}
 
@@ -5209,14 +5210,14 @@ bool ScribeWnd::LoadMailStores()
 		List<Contact> c;
 		GetContacts(c);
 
-		// Set selected folder to inbox by default
+		// Set selected folder to Inbox by default
 		// if the user hasn't selected a folder already
 		if (ScribeState != ScribeExiting && Tree && !Tree->Selection())
 		{
 			LVariant StartInFolder;
 			GetOptions()->GetValue(OPT_StartInFolder, StartInFolder);
 
-			ScribeFolder *Start = 0;
+			ScribeFolder *Start = NULL;
 			if (ValidStr(StartInFolder.Str()))
 			{
 				Start = GetFolder(StartInFolder.Str());
