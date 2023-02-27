@@ -479,23 +479,6 @@ public:
 		LHashTbl<StrKey<char,false>,Contact*> Contacts;
 		App->HashContacts(Contacts);
 
-		// Poll the contact sources
-		LArray<ScribeFolder*> Srcs = App->GetThingSources(MAGIC_CONTACT);
-		for (auto Src: Srcs)
-		{
-			for (auto t: Src->Items)
-			{
-				Contact *c = t->IsContact();
-				if (!c)
-					continue;
-
-				auto emails = c->GetEmails();
-				for (auto e: emails)
-					if (Contacts.Find(e))
-						Contacts.Add(e, c);
-			}
-		}
-
 		for (auto c : Contacts)
 		{
 			const char *First = 0, *Last = 0, *Nick = 0;

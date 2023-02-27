@@ -9130,6 +9130,25 @@ void ScribeWnd::HashContacts(LHashTbl<StrKey<char,false>,Contact*> &Contacts, Sc
 	{
 		// Default item is the contacts folder
 		Folder = GetFolder(FOLDER_CONTACTS);
+
+		// Also look at all the contact sources...
+		auto Srcs = GetThingSources(MAGIC_CONTACT);
+		for (auto Src: Srcs)
+		{
+			for (auto t: Src->Items)
+			{
+				Contact *c = t->IsContact();
+				if (!c)
+					continue;
+
+				auto emails = c->GetEmails();
+				for (auto e: emails)
+				{
+					if (!Contacts.Find(e))
+						Contacts.Add(e, c);
+				}
+			}
+		}
 	}
 
 	// recurse through each folder and make a list
@@ -9150,7 +9169,7 @@ void ScribeWnd::HashContacts(LHashTbl<StrKey<char,false>,Contact*> &Contacts, Sc
 			}
 		}
 
-		for (ScribeFolder *f = Folder->GetChildFolder(); Deep && f; f = f->GetNextFolder())
+		for (auto f = Folder->GetChildFolder(); Deep && f; f = f->GetNextFolder())
 		{
 			HashContacts(Contacts, f, Deep);
 		}
@@ -12461,10 +12480,10 @@ bool ScribeWnd::OnTransfer()
 	}
 
 	LArray<LDataStoreI::StoreTrans> Trans;
-	for (unsigned s=0; s<Folders.Length(); s++)
+	for (auto &f: Folders)
 	{
-		if (Folders[s].Store)
-			Trans.New() = Folders[s].Store->StartTransaction();
+		if (f.Store)
+			Trans.New() = f.Store->StartTransaction();
 	}
 
 	for (auto Transfer: Local)
@@ -12478,7 +12497,7 @@ bool ScribeWnd::OnTransfer()
 		}
 		
 		// We have to set Transfer->Status to something other than "waiting"
-		// in all branches of this loop. Othewise the account thread will hang.
+		// in all branches of this loop. Otherwise the account thread will hang.
 		
 		Accountlet *Acc = Transfer->Account;
 		#if DEBUG_NEW_MAIL

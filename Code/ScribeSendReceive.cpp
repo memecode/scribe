@@ -2374,6 +2374,7 @@ if (DebugTrace) LgiTrace("Receive(%i) Delete(%i) Deleting, time=%i\n", Account->
 					}
 				}
 
+				WaitForTransfers(Thread->Files);
 				Thread->Files.DeleteObjects();
 				Group.Empty();
 			}
