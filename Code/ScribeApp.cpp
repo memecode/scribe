@@ -12288,7 +12288,7 @@ bool ScribeWnd::OnDelete(LDataFolderI *Parent, LArray<LDataI*> &Items)
 		d->Store3EventCallbacks[c]->OnDelete(Parent, Items);
 	}
 
-	ScribeFolder *Fld = 0;
+	ScribeFolder *Fld = NULL;
 	for (unsigned i=0; i<Items.Length(); i++)
 	{
 		LDataI *Item = Items[i];
@@ -12376,16 +12376,12 @@ bool ScribeWnd::OnDelete(LDataFolderI *Parent, LArray<LDataI*> &Items)
 					Mail::NewMailLst.Delete(m);
 				}
 
-				if (Fld)
-				{
-					LAssert(Fld->Items.HasItem(t));
-					Fld->Items.Delete(t);
-					Fld->Update();
-				}
-
 				t->SetUI();
 				t->SetParentFolder(NULL);
 				t->SetObject(NULL, false, _FL);
+
+				if (Fld)
+					Fld->Update();
 
 				if (!t->DecRef())
 				{

@@ -345,6 +345,7 @@ public:
 	LMessage::Result OnEvent(LMessage *Msg);
 	void OnPosChange();
 	int OnCommand(int Cmd, int Event, OsView Window);
+	int HandleCmd(int Cmd);
 	void OnReceiveFiles(LArray<const char*> &Files);
 	bool OnViewKey(LView *v, LKey &k);
 	void OnAttachmentsChange();

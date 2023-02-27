@@ -195,7 +195,10 @@ void Thing::SetParentFolder(ScribeFolder *f)
 	
 	if (_ParentFolder)
 	{
-		LAssert(_ParentFolder->Items.HasItem(this));
+		if (!_ParentFolder->Items.HasItem(this))
+		{
+			LAssert(!"_ParentFolder->Items incorrect.");
+		}
 		_ParentFolder->Items.Delete(this);
 	}
 

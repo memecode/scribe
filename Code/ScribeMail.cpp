@@ -3009,15 +3009,8 @@ bool MailUi::SeekMsg(int delta)
 	return Status;
 }
 
-int MailUi::OnCommand(int Cmd, int Event, OsView From)
+int MailUi::HandleCmd(int Cmd)
 {
-	if (GpgUi)
-	{
-		int r = GpgUi->OnCommand(Cmd, Event, From);
-		if (r)
-			return r;
-	}
-
 	switch (Cmd)
 	{
 		case IDM_READ_RECEIPT:
@@ -3252,9 +3245,29 @@ int MailUi::OnCommand(int Cmd, int Event, OsView From)
 		}
 		default:
 		{
-			Commands.ExecuteCallbacks(App, this, GetItem(), Cmd);
-			break;
+			if (Commands.ExecuteCallbacks(App, this, GetItem(), Cmd))
+				return true;
+			
+			return false;
 		}
+	}
+
+	return true;
+}
+
+int MailUi::OnCommand(int Cmd, int Event, OsView From)
+{
+	if (GpgUi)
+	{
+		GpgUi->DoCommand(Cmd, [this, Cmd](auto r)
+		{
+			if (!r)
+				HandleCmd(Cmd);
+		});
+	}
+	else
+	{
+		HandleCmd(Cmd);
 	}
 
 	return LWindow::OnCommand(Cmd, Event, From);

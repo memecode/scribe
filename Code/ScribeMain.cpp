@@ -113,7 +113,7 @@ int LgiMain(OsAppArguments &AppArgs)
 		LgiTrace("Memory alloc failed.\n");
 		return -2;
 	}
-	
+
     if (Wnd->GetScribeState() != ScribeWnd::ScribeExiting)
     {
         if (App.AppWnd->Attach(0))

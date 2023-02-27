@@ -109,9 +109,6 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Gif.cpp">
       <Filter>Lgi</Filter>
     </ClCompile>
-    <ClCompile Include="..\Code\GNewMailDlg.cpp">
-      <Filter>Controls/UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Graph.cpp">
       <Filter>Lgi</Filter>
     </ClCompile>
@@ -505,6 +502,9 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\SpellCheckAspell.cpp">
       <Filter>SpellCheck</Filter>
     </ClCompile>
+    <ClCompile Include="..\Code\NewMailDlg.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\Btree\btree.h">
@@ -587,9 +587,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\GdcTools.h">
       <Filter>Lgi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Code\GNewMailDlg.h">
-      <Filter>Controls/UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Graph.h">
       <Filter>Lgi</Filter>
@@ -692,9 +689,6 @@
     </ClInclude>
     <ClInclude Include="..\Code\DomType.h">
       <Filter>Lgi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Code\GSearchView.h">
-      <Filter>Controls/UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Homoglyphs.h">
       <Filter>Mail</Filter>

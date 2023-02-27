@@ -90,7 +90,11 @@ public:
 	void DoCommand(int Cmd, std::function<void(int)> callback);
 	LMessage::Result OnEvent(LMessage *Msg);
 
-	int OnCommand(int Cmd, int Event, OsView Wnd) { LAssert(!"Call DoCommand..."); return 0; }
+	int OnCommand(int Cmd, int Event, OsView Wnd)
+	{
+		LAssert(!"Call DoCommand...");
+		return 0;
+	}
 };
 
 #endif

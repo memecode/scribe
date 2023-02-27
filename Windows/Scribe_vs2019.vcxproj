@@ -445,7 +445,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ClCompile Include="..\Code\Exp_Scribe.cpp" />
     <ClCompile Include="..\Code\FolderCalendarSource.cpp" />
     <ClCompile Include="..\Code\GBTreeWordStore.cpp" />
-    <ClCompile Include="..\Code\GNewMailDlg.cpp" />
+    <ClCompile Include="..\Code\NewMailDlg.cpp" />
     <ClCompile Include="..\Code\RemoteCalendarSource.cpp" />
     <ClCompile Include="..\Code\SearchView.cpp" />
     <ClCompile Include="..\Code\HtmlToText.cpp" />
@@ -595,8 +595,6 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ClInclude Include="..\Code\DomType.h" />
     <ClInclude Include="..\Code\DomTypeValues.h" />
     <ClInclude Include="..\Code\Encryption\GnuPG.h" />
-    <ClInclude Include="..\Code\GNewMailDlg.h" />
-    <ClInclude Include="..\Code\GSearchView.h" />
     <ClInclude Include="..\Code\Imp_Outlook.h" />
     <ClInclude Include="..\Code\ManageMailStores.h" />
     <ClInclude Include="..\Code\ObjectInspector.h" />

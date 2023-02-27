@@ -317,11 +317,6 @@ public:
 	}
 };
 
-LListItem *CreateStoreItem(void *User)
-{
-	return new StoreItem((ScribeWnd*)User);
-}
-
 ManageMailStores::ManageMailStores(ScribeWnd *app)
 {
 	Lst = 0;
@@ -349,7 +344,10 @@ ManageMailStores::ManageMailStores(ScribeWnd *app)
 			App->GetOptions()->Unlock();
 		}
 
-		Map(OPT_MailStores, IDC_MAIL_STORES, CreateStoreItem, OPT_MailStore, App);
+		Map(OPT_MailStores, IDC_MAIL_STORES, OPT_MailStore, [this]()
+		{
+			return new StoreItem(App);
+		});
 		Map(OPT_StartInFolder, IDC_START_IN, GV_STRING);
 
 		Convert(&Options, this, true);
