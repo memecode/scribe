@@ -769,6 +769,7 @@ public:
 	bool GetDropFiles(LString::Array &Files) override;
 };
 
+#define ContactGroupObj					"ContactGroup"
 #define ContactGroupName				"Name"
 #define ContactGroupList				"List"
 #define ContactGroupDateModified		"DateModified"
@@ -805,12 +806,8 @@ public:
 	Store3ItemTypes Type() override { return MAGIC_GROUP; }
 	ThingUi *DoUI(MailContainer *c = 0) override;
 	int Compare(LListItem *Arg, ssize_t Field) override;
-	IoProgress Import(IoProgressFnArgs) override { return Store3NotImpl; }
-	IoProgress Export(IoProgressFnArgs) override { return Store3NotImpl; }
 	bool GetAddresses(List<char> &a);
 	LString::Array GetAddresses();
-	char *GetDropFileName() override;
-	bool GetDropFiles(LString::Array &Files) override;
 
 	// Serialization
 	bool Save(ScribeFolder *Into = 0) override;
@@ -820,6 +817,13 @@ public:
 	int *GetDefaultFields() override;
 	const char *GetFieldText(int Field) override;
 	int GetImage(int Flags = 0) override { return ICON_CONTACT_GROUP; }
+
+	// Import / Export
+	char *GetDropFileName() override;
+	bool GetDropFiles(LString::Array &Files) override;
+	bool GetFormats(bool Export, LString::Array &MimeTypes) override;
+	IoProgress Import(IoProgressFnArgs) override;
+	IoProgress Export(IoProgressFnArgs) override;
 };
 
 struct LGroupMapArray : public LArray<ContactGroup*>

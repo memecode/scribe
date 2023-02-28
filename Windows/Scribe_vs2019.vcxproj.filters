@@ -172,9 +172,6 @@
     <ClCompile Include="..\Code\ManageMailStores.cpp">
       <Filter>Controls/UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Code\PreviewPanel.cpp">
-      <Filter>Controls/UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\OAuth2.cpp">
       <Filter>Network</Filter>
     </ClCompile>
@@ -505,6 +502,9 @@
     <ClCompile Include="..\Code\NewMailDlg.cpp">
       <Filter>Controls/UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Code\PreviewPanel.cpp">
+      <Filter>Controls/UI\PreviewPanel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\Btree\btree.h">
@@ -616,9 +616,6 @@
       <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="..\Code\ManageMailStores.h">
-      <Filter>Controls/UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Code\PreviewPanel.h">
       <Filter>Controls/UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OAuth2.h">
@@ -801,6 +798,9 @@
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Http.h">
       <Filter>Network</Filter>
     </ClInclude>
+    <ClInclude Include="..\Code\PreviewPanel.h">
+      <Filter>Controls/UI\PreviewPanel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Icons\app.ico">
@@ -904,12 +904,6 @@
     <None Include="..\Help\plugins.html">
       <Filter>Help</Filter>
     </None>
-    <None Include="..\Resources\PreviewContact.html">
-      <Filter>Help</Filter>
-    </None>
-    <None Include="..\Resources\PreviewMail.html">
-      <Filter>Help</Filter>
-    </None>
     <None Include="..\Help\help.css">
       <Filter>Help</Filter>
     </None>
@@ -966,6 +960,15 @@
     </None>
     <None Include="Installer-64bit.nsi.in">
       <Filter>Install</Filter>
+    </None>
+    <None Include="..\Resources\PreviewContact.html">
+      <Filter>Controls/UI\PreviewPanel</Filter>
+    </None>
+    <None Include="..\Resources\PreviewMail.html">
+      <Filter>Controls/UI\PreviewPanel</Filter>
+    </None>
+    <None Include="..\Resources\PreviewGroup.html">
+      <Filter>Controls/UI\PreviewPanel</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1051,6 +1054,9 @@
     </Filter>
     <Filter Include="Scripting\Scripts">
       <UniqueIdentifier>{4fd600f1-77c6-4b58-b9a8-85d436233d52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI\PreviewPanel">
+      <UniqueIdentifier>{22d7ec0d-a127-4b05-b6f0-937c3255224a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -2311,8 +2311,7 @@ Thing::IoProgress Filter::Import(IoProgressImplArgs)
 Thing::IoProgress Filter::Export(IoProgressImplArgs)
 {
 	if (Stricmp(mimeType, sMimeXml))
-		return Store3NotImpl;
-		
+		IoProgressNotImpl();
 
 	LXmlTag r("Filter");
 	LXmlTag *t;
@@ -2327,7 +2326,10 @@ Thing::IoProgress Filter::Export(IoProgressImplArgs)
 	
 	LXmlTree tree;
 
-	return tree.Write(&r, stream) ? Store3Success : Store3Error;
+	if (!tree.Write(&r, stream))
+		IoProgressError("Failed to write xml.");
+
+	IoProgressSuccess();
 }
 
 /// This filters a list of email. The email will have it's NewEmail state set to

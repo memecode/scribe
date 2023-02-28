@@ -168,15 +168,103 @@ char *ContactGroup::GetDropFileName()
 {
 	if (!DropFileName)
 	{
-		LAssert(!"FIXME");
+		auto Name = GetName();
+		DropFileName.Reset(MakeFileName(Name ? Name : "group", "xml"));
 	}
+	
 	return DropFileName;
 }
 
 bool ContactGroup::GetDropFiles(LString::Array &Files)
 {
-	LAssert(!"FIXME");
-	return false;
+	auto fn = GetDropFileName();
+	if (!fn)
+		return false;
+
+	if (!LFileExists(fn))
+	{
+		LAutoPtr<LFile> F(new LFile);
+		if (F->Open(fn, O_WRITE))
+		{
+			F->SetSize(0);
+			Export(AutoCast(F), sMimeXml);
+		}
+	}
+
+	if (!LFileExists(DropFileName))
+		return false;
+
+	Files.Add(DropFileName.Get());
+	
+	return true;
+}
+
+bool ContactGroup::GetFormats(bool Export, LString::Array &MimeTypes)
+{
+	MimeTypes.Add(sTextXml);
+	return MimeTypes.Length() > 0;
+}
+
+Thing::IoProgress ContactGroup::Import(IoProgressImplArgs)
+{
+	if (Stricmp(mimeType, sTextXml) &&
+	    Stricmp(mimeType, sMimeXml))
+	    IoProgressNotImpl();
+
+	LXmlTree Tree;
+	LXmlTag r, *t;
+	if (!Tree.Read(&r, stream))
+		IoProgressError("Xml parse error.");
+
+	if (!r.IsTag(ContactGroupObj))
+		IoProgressError("No ContactGroup tag.");
+
+	if (t = r.GetChildTag(ContactGroupName))
+		GetObject()->SetStr(FIELD_GROUP_NAME, t->GetContent());
+	else
+		IoProgressError("No Name tag.");
+
+	if (t = r.GetChildTag(ContactGroupList))
+		GetObject()->SetStr(FIELD_GROUP_LIST, t->GetContent());
+	else
+		IoProgressError("No List tag.");
+
+	if (t = r.GetChildTag(ContactGroupDateModified))
+	{
+		LDateTime dt;
+		if (dt.Set(t->GetContent()))
+			GetObject()->SetDate(FIELD_DATE_MODIFIED, &dt);
+	}
+
+	IoProgressSuccess();
+}
+
+Thing::IoProgress ContactGroup::Export(IoProgressImplArgs)
+{
+	if (Stricmp(mimeType, sMimeXml))
+		IoProgressNotImpl();
+
+	auto Name = GetName();
+	LVariant Addr;
+	GetVariant(ContactGroupList, Addr);
+	auto Modified = GetObject()->GetDate(FIELD_DATE_MODIFIED);
+
+	LXmlTag r(ContactGroupObj), *t;
+
+	if ((t = r.CreateTag(ContactGroupName)))
+		t->SetContent(Name);
+	if ((t = r.CreateTag(ContactGroupList)))
+		t->SetContent(Addr.Str());
+	if (Modified &&
+		Modified->IsValid() &&
+		(t = r.CreateTag(ContactGroupDateModified)))
+		t->SetContent(Modified->Get());
+	
+	LXmlTree tree;
+	if (tree.Write(&r, stream))
+		IoProgressError("Failed to write xml.");
+	
+	IoProgressSuccess();
 }
 
 LString::Array ContactGroup::GetAddresses()
@@ -417,9 +505,11 @@ void ContactGroup::OnMouseClick(LMouse &m)
 							{
 								for (auto i: Del)
 								{
-									Filter *m = dynamic_cast<Filter*>(i);
-									if (m)
-										m->OnDelete();
+									auto obj = dynamic_cast<ContactGroup*>(i);
+									if (obj)
+										obj->OnDelete();
+									else
+										LAssert(!"What type of object is this?");
 								}
 							}
 						}
@@ -545,20 +635,20 @@ int ContactGroup::Compare(LListItem *Arg, ssize_t Field)
 
 bool ContactGroup::Save(ScribeFolder *Into)
 {
-	bool Status = false;
-
-	// Pre save checks
-
-	// Save
-	if (!GetFolder() && App)
-		SetParentFolder(App->GetFolder(FOLDER_GROUPS));
-
-	if (GetFolder())
+	if (!GetFolder())
 	{
-		Status = GetFolder()->WriteThing(this) != Store3Error;
-		if (Status)
-			SetDirty(false);
+		if (Into)
+			SetParentFolder(Into);
+		else if (App)
+			SetParentFolder(App->GetFolder(FOLDER_GROUPS));
 	}
+
+	if (!GetFolder())
+		return false;
+
+	auto Status = GetFolder()->WriteThing(this) != Store3Error;
+	if (Status)
+		SetDirty(false);
 
 	return Status;
 }
@@ -672,8 +762,12 @@ void GroupUi::OnSave()
 	ResolveAll();
 	
 	// Save the group of contacts
+	LDateTime Now;
+	Now.SetNow();
+
 	Item->SetDirty();
 	SerializeUi(GroupFieldDefs, Item->GetObject(), this, false);
+	Item->GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now);
 	Item->Save();
 	Item->Update();
 }
@@ -684,9 +778,8 @@ int GroupUi::OnNotify(LViewI *c, LNotification n)
 	{
 		case IDOK:
 		{
-			OnSave();
-			
-			PostEvent(M_CLOSE);
+			OnSave();			
+			Quit();
 			break;
 		}
 	}
