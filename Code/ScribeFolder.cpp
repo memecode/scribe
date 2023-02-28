@@ -138,25 +138,21 @@ public:
 int FoldersCurrentlyLoading =		0;
 
 char ScribeFolderObject[] = "com.memecode.Folder";
-class ThingContainerPriv
+
+class ScribeFolderPriv
 {
 public:
-	int8 IsInbox;
+	int8 IsInbox = -1;
 	bool InUpdateUnread = false;
 	LAutoPtr<LDisplayString> DsBase;
 	LAutoPtr<LDisplayString> DsUnread;
 	LAutoPtr<LDndFilePromise> FilePromise;
-
-	ThingContainerPriv()
-	{
-		IsInbox = -1;
-	}
 };
 
 //////////////////////////////////////////////////////////////////////////////
 ScribeFolder::ScribeFolder()
 {
-	d = new ThingContainerPriv;
+	d = new ScribeFolderPriv;
 }
 
 ScribeFolder::~ScribeFolder()
@@ -2832,20 +2828,24 @@ void ScribeFolder::SerializeFieldWidths(bool Write)
 
 void ScribeFolder::OnProperties(int Tab)
 {
-	if (GetObject())
+	if (!GetObject())
+		return;
+
+	SerializeFieldWidths();
+	if (View())
 	{
-		SerializeFieldWidths();
-		if (View())
-		{
-			SetSort(View()->GetSortCol(), View()->GetSortAscending());
-		}
-		if (OpenFolderProperties(this, Tab))
+		SetSort(View()->GetSortCol(), View()->GetSortAscending());
+	}
+
+	OpenFolderProperties(this, Tab, [this](auto repop)
+	{
+		if (repop)
 		{
 			SetDirty();
 			SerializeFieldWidths(true);
 			Populate(View());
 		}
-	}
+	});
 }
 
 ScribeFolder *ScribeFolder::CreateSubDirectory(const char *Name, int Type)
@@ -3474,23 +3474,20 @@ bool ScribeFolder::GetFormats(bool Export, LString::Array &MimeTypes)
 
 class MboxParser : public LStringPipe
 {
-	LStreamI *Src;
-	int Hdrs;
-	bool NewMsg;
+	LStreamI *Src = NULL;
+	int Hdrs = 0;
+	bool NewMsg = true;
 	LArray<char> Buf;
-	int64 Pos;
-	bool Eof;
+	int64 Pos = 0;
+	bool Eof = false;
 	
-	bool IsMessageHdr(char *c)
+	bool IsMessageHdr(LString c)
 	{
-		if (!c)
-			return false;
-
 		// check that it's a from line
-		LToken T(c, " \r", true);
-		if (T.Length() >= 7 &&
-			T.Length() <= 9 &&
-			!strcmp(T[0], "From"))
+		auto parts = c.SplitDelimit(" \r");
+		if (parts.Length() >= 7 &&
+			parts.Length() <= 9 &&
+			parts[0].Equals("From"))
 		{
 			return true;
 		}
@@ -3498,96 +3495,241 @@ class MboxParser : public LStringPipe
 		return false;
 	}
 
+	struct Blk
+	{
+		uint8_t *ptr;
+		ssize_t size;
+	};
+
+	struct Blocks : public LArray<Blk>
+	{
+		ssize_t Bytes = 0;
+
+		Blocks(LMemQueue *q)
+		{
+			q->Iterate([this](auto ptr, auto size)
+			{
+				auto &b = New();
+				
+				b.ptr = ptr;
+				b.size = size;
+				Bytes += size;
+
+				return true;
+			});
+		}
+
+		LString GetLine(size_t idx, size_t offset)
+		{
+			char buf[256];
+			int ch = 0;
+
+			for (size_t i = idx; i < Length(); i++)
+			{
+				auto &b = (*this)[i];
+				auto p = b.ptr + offset;
+				auto end = b.ptr + b.size;
+				while (p < end)
+				{
+					if (*p == '\n' || ch == sizeof(buf)-1)
+						return LString(buf, ch);
+
+					buf[ch++] = *p++;
+				}
+			}
+
+			return LString();
+		}
+
+		bool ValidateSeparator(LString ln)
+		{
+			auto p = ln.SplitDelimit();
+
+			if (p.Length() < 7)
+				return false;
+
+			if (!p[0].Equals("From"))
+				return false;
+
+			if (p[1].Find("@") < 0)
+				return false;
+
+			bool hasYear = false;
+			bool hasTime = false;
+			for (int i=2; i<p.Length(); i++)
+			{
+				auto &s = p[i];
+				if (s.Length() == 4)
+				{
+					auto val = s.Int();
+					if (val >= 1800 && val < 2200)
+						hasYear = true;
+				}
+				else if (s.Find(":") > 0)
+				{
+					int colons = 0, nonDigits = 0;
+					for (auto p = s.Get(); *p; p++)
+						if (*p == ':')
+							colons++;
+						else if (!IsDigit(*p))
+							nonDigits++;
+					if (colons == 2 && nonDigits == 0)
+						hasTime = true;
+				}
+			}
+
+			return hasYear && hasTime;
+		}
+
+		ssize_t FindBoundary(ssize_t start)
+		{
+			const char *key = "\nFrom ";
+			const char *k = key + 1;
+			size_t idx = 0;
+			ssize_t offset = 0;
+
+			if (Bytes == 0)
+				return -1;
+
+			if (start < 0 || start >= Bytes)
+			{
+				LAssert(!"Start out of range.");
+				return -1;
+			}
+
+			// Seek to the right starting block...
+			while (idx < Length())
+			{
+				auto &b = (*this)[idx];
+				if (start < b.size)
+					break;
+				start -= b.size;
+				offset += b.size;
+				idx++;
+			}
+			
+			// Start searching for the key...
+			while (idx < Length())
+			{
+				auto &b = (*this)[idx];
+				
+				auto end = b.ptr + b.size;
+				for (auto p = b.ptr + start; p < end; p++)
+				{
+					if (*k == *p)
+					{
+						if (*++k == 0)
+						{
+							// Found the "From " part, but lets check the rest of the line.
+							// Should be in the format:
+							//		From sender date more-info
+							auto blkAddr = (p - b.ptr) - 4;
+							LString ln = GetLine(idx, blkAddr);
+							if (ln && ValidateSeparator(ln))
+								return offset + blkAddr;
+						}
+					}
+					else k = key;
+				}
+
+				offset += b.size;
+				idx++;
+			}
+
+			return -1;
+		}
+
+		LRange FindMsg(MboxParser &parser)
+		{
+			auto start = FindBoundary(0);
+			if (start > 0)
+				LgiTrace("%s:%i - Usually the start should be 0, but it's " LPrintfSSizeT "?\n",
+					_FL, start);
+
+			if (start >= 0)
+			{
+				auto end = FindBoundary(start + 5);
+				if (end > start)
+				{
+					return LRange(start, end - start);
+				}
+				else if (parser.Eof)
+				{
+					return LRange(start, Bytes);
+				}
+			}
+
+			return LRange(-1, 0);
+		}
+	};
+
 public:
-	MboxParser(LStreamI *s)
+	MboxParser(LStreamI *s) : LStringPipe(128 << 10)
 	{
 		Src = s;
-		Hdrs = 0;
-		Pos = 0;
-		NewMsg = true;
-		Eof = false;
+		// _debug = true;
 		Buf.Length(128 << 10);
 	}
 
-    void SeekNext()
-    {
-        if (!NewMsg)
-        {
-            char b[256];
-            int r;
-            while
-            (
-                !NewMsg &&
-                (r = Pop(b, sizeof(b)) > 0)
-            )
-                ;
-        }
-    }
-    
-    bool GetEof()
-    {
-        return Eof;
-    }
-
-	ssize_t Pop(char *Str, ssize_t BufSize)
+	bool ReadSource()
 	{
+		auto rd = Src->Read(Buf.AddressOf(), Buf.Length());
+		if (rd <= 0)
+		{
+			// Src stream is empty or in an error state..
+			Eof = true;
+			return false;
+		}
+
+		auto wr = Write(Buf.AddressOf(), Buf.Length());
+		if (wr <= 0)
+		{
+			LgiTrace("%s:%i - Failed to write to local buffer.\n", _FL);
+			return false;
+		}
+
+		return true;
+	}
+
+	LAutoPtr<LStreamI> ReadMessage()
+	{
+		LAutoPtr<LStreamI> m;
+
 		while (true)
 		{
-			ssize_t r = LStringPipe::Pop(Str, BufSize);
-			
-			if (r <= 0 && Src)
+			Blocks blks(this);
+			auto r = blks.FindMsg(*this);
+			if (r.Start >= 0)
 			{
-				r = Src ? Src->Read(&Buf[0], Buf.Length()) : 0;
-				if (r > 0)
-				{
-					Push(&Buf[0], r);
-				}
-				else
-				{
-				    Eof = true;
-					return 0;
-				}
+				LMemStream *ms = NULL;
+
+				/*
+				LgiTrace("ReadMsg " LPrintfInt64 " %s\n", Pos, r.GetStr());
+				auto InitPos = Pos;
+				*/
+
+				Pos += r.Len;
+				m.Reset(ms = new LMemStream(this, r.Start, r.Len));
+
+				/* Debugging...
+				auto key = "The package name is vmware_addons.";
+				auto base = ms->GetBasePtr();
+				auto result = Strnistr(base, key, m->GetSize());
+				if (result)
+					LgiTrace("Found the Key @ " LPrintfInt64 "\n", InitPos + (result - base));
+				*/
+				break;
 			}
-			else if (IsMessageHdr(Str))
+			else if (!ReadSource())
 			{
-			    Pos += r;
-				NewMsg = true;
-				if (Hdrs++)
-					return 0;
-			}
-			else
-			{
-				NewMsg = false;
-				Pos += r;
-				return r;
+				r = blks.FindMsg(*this);
+				if (r.Start >= 0)
+					m.Reset(new LMemStream(this, r.Start, r.Len));
+				break;
 			}
 		}
 
-		return 0;
-	}
-};
-
-struct TempMsg : public LTempStream
-{
-	TempMsg() : LTempStream(ScribeTempPath())
-	{
-	}
-	
-	bool ReadMessage(LStringPipe *p)
-	{
-		LArray<char> Buf(128<<10);
-		ssize_t Bytes;
-		bool Status = true;
-		
-		char *Ptr = &Buf[0];
-		ssize_t Len = Buf.Length();
-		
-		while ( (Bytes = p->Pop(Ptr, Len)) > 0)
-		{
-			Status &= Write(&Buf[0], Bytes) == Bytes;
-		}
-		
-		return Status;
+		return m;
 	}
 };
 
@@ -3667,6 +3809,7 @@ public:
 class ImportFolderTask : public FolderTask
 {
 	LDataStoreI::StoreTrans trans;
+	LAutoPtr<MboxParser> Parser;
 	
 public:
 	ImportFolderTask(ScribeFolder *fld, LAutoPtr<LStreamI> in, LString mimeType, ThingType::IoProgressCallback cb) :
@@ -3683,34 +3826,44 @@ public:
 	bool TimeSlice()
 	{
 		auto Start = LCurrentTime();
-		MboxParser Parser(Stream);
-		TempMsg *Tm;
-		
-		LAutoStreamI Msg(Tm = new TempMsg);
-		while ( !Parser.GetEof()
-		        &&
-		        LCurrentTime() - Start < WORK_SLICE_MS
-		        &&
-		        !IsCancelled()
-		        &&
-		        Tm->ReadMessage(&Parser))
-		{
-			Mail *m = dynamic_cast<Mail*>(App->CreateItem(MAGIC_MAIL, Folder, false));
-			if (m)
-			{
-				m->OnAfterReceive(Msg);
-				m->SetFlags(MAIL_RECEIVED|MAIL_READ);
-				m->Save();
-				m->Update();
-			}
+		bool Eof = false;
 
-			Msg.Reset(Tm = new TempMsg);
-			Parser.SeekNext();
+		if (!Parser)
+			Parser.Reset(new MboxParser(Stream));
+		
+		while ( Parser
+				&&
+				LCurrentTime() - Start < WORK_SLICE_MS
+		        &&
+		        !IsCancelled())
+		{
+			auto Msg = Parser->ReadMessage();
+			if (Msg)
+			{
+				Mail *m = dynamic_cast<Mail*>(App->CreateItem(MAGIC_MAIL, Folder, false));
+				if (m)
+				{
+					m->OnAfterReceive(Msg);
+					m->SetFlags(MAIL_RECEIVED|MAIL_READ);
+					m->Save();
+					m->Update();
+				}
+				else
+				{
+					Eof = true;
+					break;
+				}
+			}
+			else
+			{
+				Eof = true;
+				break;
+			}
 
 			Value(Stream->GetPos());
 		}
 		
-		return !Parser.GetEof();
+		return !Eof;
 	}
 };
 

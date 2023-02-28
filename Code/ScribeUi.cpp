@@ -31,9 +31,6 @@
 //////////////////////////////////////////////////////////////////////////////
 CreateSubFolderDlg::CreateSubFolderDlg(LView *parent, int defaulttype, bool *Enable, char *default_name)
 {
-	SubType = -1;
-	SubName = 0;
-
 	SetParent(parent);
 	LRect r(0, 0, 380, 195);
 	SetPos(r);
@@ -61,11 +58,6 @@ CreateSubFolderDlg::CreateSubFolderDlg(LView *parent, int defaulttype, bool *Ena
 	}
 }
 
-CreateSubFolderDlg::~CreateSubFolderDlg()
-{
-	DeleteArray(SubName);
-}
-
 int CreateSubFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 {
 	switch (Ctrl->GetId())
@@ -73,19 +65,10 @@ int CreateSubFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		case IDOK:
 		{
 			if (FolderName)
-			{
-				auto n = FolderName->NameW();
-				if (ValidStrW(n))
-				{
-					SubName = WideToUtf8(n);
-					// n belongs to the control
-				}
-			}
+				SubName = FolderName->Name();
 
 			if (FolderType)
-			{
 				SubType = (int)FolderType->Value();
-			}
 
 			EndModal(1);
 			break;

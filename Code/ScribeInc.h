@@ -8,7 +8,7 @@
 #define FilterSupport
 
 // Debug flags
-#define DEBUG_NEW_MAIL				1
+#define DEBUG_NEW_MAIL				0
 #define DEBUG_PRINT_MAIL			0
 #define DEBUG_BUILD_WORD_DB			0
 

@@ -385,7 +385,7 @@ public:
 		Opts->GetValue(OPT_ResizeMaxKb, SizeLimit);
 
 		LAutoStreamI Input = Job->Data;
-		LAutoStreamI MemBuf(new GMemFile(4 << 10));
+		LAutoStreamI MemBuf(new LMemFile(4 << 10));
 		int64 FileSize = Input->GetSize();
 
 		LStream *sImg = dynamic_cast<LStream*>(Input.Get());

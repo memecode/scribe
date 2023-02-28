@@ -360,8 +360,13 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////
-bool OpenFolderProperties(ScribeFolder *Parent, int Tab)
+void OpenFolderProperties(ScribeFolder *Parent, int Tab, std::function<void(bool)> callback)
 {
-	FolderPropertiesDlg Dlg(Parent, Tab);
-	return Dlg.RePopulate;
+	auto Dlg = new FolderPropertiesDlg(Parent, Tab);
+	Dlg->DoModal([callback, Dlg](auto dlg, auto code)
+	{
+		if (code && callback)
+			callback(Dlg->RePopulate);
+		delete dlg;
+	});
 }

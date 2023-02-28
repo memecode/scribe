@@ -418,27 +418,36 @@ void MailTree::OnCreateSubDirectory(ScribeFolder *Item)
 		Item->CanHaveSubFolders(MAGIC_CALENDAR),
 		Item->CanHaveSubFolders(MAGIC_GROUP)
 	};
-	CreateSubFolderDlg Dlg(this, i, Enable);
-
-	if (ValidStr(Dlg.SubName) &&
-		Dlg.SubType >= 0)
+	
+	auto Dlg = new CreateSubFolderDlg(this, i, Enable);
+	Dlg->DoModal([this, Dlg, Item, Type](auto dlg, auto code)
 	{
-		// check the name doesn't conflict..
-		auto Path = Item->GetPath();
-		if (Path)
+		if (code &&
+			ValidStr(Dlg->SubName) &&
+			Dlg->SubType >= 0)
 		{
-			char s[256];
-			sprintf_s(s, sizeof(s), "%s/%s", Path.Get(), Dlg.SubName);
-			if (App->GetFolder(s))
+			// check the name doesn't conflict..
+			auto Path = Item->GetPath();
+			if (Path)
 			{
-				LgiMsg(this, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);
-				return;
+				LString s;
+				s.Printf("%s/%s", Path.Get(), Dlg->SubName);
+				if (App->GetFolder(s))
+				{
+					LgiMsg(this, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);
+					Dlg->SubName.Empty();
+				}
+			}
+
+			if (Dlg->SubName)
+			{
+				// insert the folder...
+				Item->CreateSubDirectory(Dlg->SubName, Type[Dlg->SubType]);
 			}
 		}
 
-		// insert the folder...
-		Item->CreateSubDirectory(Dlg.SubName, Type[Dlg.SubType]);
-	}
+		delete dlg;
+	});
 }
 
 void MailTree::OnDelete(ScribeFolder *Item, bool Force)

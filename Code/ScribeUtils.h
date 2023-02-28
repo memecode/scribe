@@ -170,10 +170,10 @@ public:
 	void Empty() { s->SetSize(0); }
 	int64 GetSize() { return s->GetSize(); }
 
-	void *New(int AddBytes = 0)
+	void *New(ssize_t AddBytes = 0)
 	{
 		char *Buf = 0;
-		int Len = (int)s->GetSize();
+		auto Len = s->GetSize();
 		if (Len > 0)
 		{
 			Buf = new char[Len + AddBytes];
@@ -191,12 +191,13 @@ public:
 		return Buf;
 	}
 
-	int64 Peek(uchar *Ptr, int Size)
+	int64 Peek(uchar *Ptr, ssize_t Size)
 	{
 		LAssert(0);
 		return 0;
 	}
-	int64 Peek(LStreamI *Ptr, int Size)
+
+	int64 Peek(LStreamI *Ptr, ssize_t Size)
 	{
 		LAssert(0);
 		return 0;

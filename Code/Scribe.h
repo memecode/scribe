@@ -1185,7 +1185,7 @@ class ScribeClass ScribeFolder :
 	friend class ScribeWnd;
 
 protected:
-	class ThingContainerPriv *d;
+	class ScribeFolderPriv *d;
 	ThingList *View();
 	LString DropFileName;
 
@@ -1599,7 +1599,7 @@ public:
 	~MailTransferEvent()
 	{
 		#ifndef LGI_STATIC
-		LStackTrace("%p::~MailTransferEvent\n", this);
+		// LStackTrace("%p::~MailTransferEvent\n", this);
 		#endif
 	}
 };

@@ -570,23 +570,21 @@ public:
 // UI
 class CreateSubFolderDlg : public LDialog
 {
-
-	LEdit		*FolderName;
-	LRadioGroup	*FolderType;
+	LEdit		*FolderName = NULL;
+	LRadioGroup	*FolderType = NULL;
 
 public:
-	int SubType;
-	char *SubName;
+	int SubType = -1;
+	LString SubName;
 
 	CreateSubFolderDlg(LView *parent, int defaulttype = 0, bool *enable = 0, char *default_name = 0);
-	~CreateSubFolderDlg();
 
 	int OnNotify(LViewI *Ctrl, LNotification n);
 };
 
 class LanguageDlg : public LDialog
 {
-	class LanguageDlgPrivate *d;
+	class LanguageDlgPrivate *d = NULL;
 
 public:
 	bool Ok;
@@ -753,7 +751,7 @@ extern void Scribe_Repair(ScribeWnd *Parent);
 
 // Scribe windows
 extern bool OpenPopView(ScribeWnd *Parent, LArray<ScribeAccount*> &Lst);
-extern bool OpenFolderProperties(ScribeFolder *Parent, int Tab);
+extern void OpenFolderProperties(ScribeFolder *Parent, int Tab, std::function<void(bool)> callback);
 extern LView *OpenFinder(ScribeWnd *App, ScribeFolder *Folder);
 
 // Import
