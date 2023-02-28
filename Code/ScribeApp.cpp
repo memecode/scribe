@@ -1256,8 +1256,9 @@ ScribeWnd::ScribeWnd() :
 
 	if (Type == LOptionsFile::UnknownMode)
 	{
-		LoadOptions(); // This may make the mode more clear...
-		Type = d->GetInstallMode();
+		 // This may make the mode more clear...
+		if (LoadOptions())
+			Type = d->GetInstallMode();
 	}
 
 	if (Type == LOptionsFile::UnknownMode)
@@ -1265,6 +1266,10 @@ ScribeWnd::ScribeWnd() :
 		d->AskUserForInstallMode([this](auto selectedMode)
 		{
 			d->SetInstallMode(selectedMode);
+
+			if (!d->Options)
+				d->Options = new LOptionsFile(selectedMode, OptionsFileName);
+
 			Construct1();
 		});
 	}
@@ -1469,6 +1474,7 @@ void ScribeWnd::Construct2()
 	LFinishXWindowsStartup(this);
 	#endif
 
+	ScribeState = ScribeConstructed;
 	OnCreate();
 }
 
@@ -2514,8 +2520,8 @@ char *ScribeWnd::GetUiTags()
 
 void ScribeWnd::OnCreate()
 {
-	printf("ScribeWnd::OnCreate. ScribeState=%i\n", ScribeState);
-	if (IsAttached() && ScribeState == ScribeConstructing)
+	LgiTrace("ScribeWnd::OnCreate. ScribeState=%i\n", ScribeState);
+	if (IsAttached() && ScribeState == ScribeConstructed)
 	{
 		ScribeState = ScribeInitializing;
 		Construct3();
@@ -3516,7 +3522,8 @@ bool ScribeWnd::LoadOptions()
 
 	if (!d->Options)
 	{
-		d->Options = new LOptionsFile(d->GetInstallMode(), OptionsFileName);
+		// d->Options = new LOptionsFile(d->GetInstallMode(), OptionsFileName);
+		return false;
 	}
 
 	if (d->Options)
