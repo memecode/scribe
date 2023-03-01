@@ -8617,9 +8617,9 @@ bool ScribeWnd::CompactFolders(LMailStore &Store, bool Interactive)
 	if (!Store.Store)
 		return false;
 
-	Store3Progress Dlg(this, Interactive);
+	auto Dlg = new Store3Progress(this, Interactive);
 
-	Dlg.SetDescription(LLoadString(IDS_CHECKING_OBJECTS));
+	Dlg->SetDescription(LLoadString(IDS_CHECKING_OBJECTS));
 
 	bool Offline = false;
 	if (WorkOffline)
@@ -8628,10 +8628,11 @@ bool ScribeWnd::CompactFolders(LMailStore &Store, bool Interactive)
 		WorkOffline->Checked(true);
 	}
 
-	Store.Store->Compact(this, &Dlg, [this, Offline](auto status)
+	Store.Store->Compact(this, Dlg, [this, Offline, Dlg](auto status)
 	{
 		if (WorkOffline)
 			WorkOffline->Checked(Offline);
+		delete Dlg;
 	});
 
 	return true;
