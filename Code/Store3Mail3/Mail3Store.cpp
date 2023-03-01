@@ -1455,16 +1455,13 @@ class CompactThread : public LThread, public LCancel
 	int64 Value = -1;
 	int64 Max = -1;
 
-	std::function<void(bool)> OnStatus;
-	
 public:
-	CompactThread(LMail3Store *store, int64 inboxId, LDataPropI *props, std::function<void(bool)> onStatus) :
+	CompactThread(LMail3Store *store, int64 inboxId, LDataPropI *props) :
 		LThread("CompactThread")
 	{
 		Store = store;
 		InboxId = inboxId;
 		Props = props;
-		OnStatus = onStatus;
 
 		Run();
 	}
@@ -1483,6 +1480,14 @@ public:
 	void SetStatus(const char *s)
 	{
 		Props->SetStr(Store3UiStatus, s);
+	}
+
+	void OnStatus(bool s)
+	{
+		// Send status event back to the store...
+		auto msg = new LMail3StoreMsg(LMail3StoreMsg::MsgCompactComplete);
+		msg->Int = s;
+		Store->PostStore(msg);
 	}
 	
 	int Main()
@@ -1560,7 +1565,13 @@ void LMail3Store::Compact(LViewI *Parent, LDataPropI *Props, std::function<void(
 		if (!InboxId)
 			Props->SetStr(Store3UiError, "Couldn't get Inbox ID.");
 		{
-			new CompactThread(this, InboxId, Props, OnStatus);
+			// Save this locally, because the thread isn't suitable for calling it.
+			// Instead it will send us a message, and then the store can call it from
+			// the GUI thread. This way any client implementing the callback can talk
+			// to or delete UI elements.
+			CompactOnStatus = OnStatus;
+
+			new CompactThread(this, InboxId, Props);
 			return; // without calling OnStatus, the CompactThread will do it.
 		}
 	}
@@ -1570,6 +1581,16 @@ void LMail3Store::Compact(LViewI *Parent, LDataPropI *Props, std::function<void(
 
 void LMail3Store::OnEvent(void *Param)
 {
+	auto msg = (LMail3StoreMsg*)Param;
+	switch (msg->Msg)
+	{
+		case LMail3StoreMsg::MsgCompactComplete:
+		{
+			if (CompactOnStatus)
+				CompactOnStatus(msg->Int);
+			break;
+		}
+	}
 }
 
 bool LMail3Store::IsOk()

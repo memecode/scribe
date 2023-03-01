@@ -8630,8 +8630,11 @@ bool ScribeWnd::CompactFolders(LMailStore &Store, bool Interactive)
 
 	Store.Store->Compact(this, Dlg, [this, Offline, Dlg](auto status)
 	{
+		LAssert(InThread());
+
 		if (WorkOffline)
 			WorkOffline->Checked(Offline);
+
 		delete Dlg;
 	});
 

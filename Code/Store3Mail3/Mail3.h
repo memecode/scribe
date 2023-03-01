@@ -170,6 +170,22 @@ extern GMail3Def TblCalendar[];
 		} \
 	}
 	
+struct LMail3StoreMsg
+{
+	enum Type
+	{
+		MsgNone,
+		MsgCompactComplete,
+	}	Msg;
+
+	int64_t Int;
+	LString Str;
+
+	LMail3StoreMsg(Type type)
+	{
+		Msg = type;
+	}
+};
 
 class LMail3Store : public LDataStoreI
 {
@@ -190,6 +206,7 @@ class LMail3Store : public LDataStoreI
 	LString ErrorMsg;
 	LString StatusMsg;
 	LString TempPath;
+	std::function<void(bool)> CompactOnStatus;
 
 	struct TableDefn : LArray<GMail3Def>
 	{
@@ -348,6 +365,7 @@ public:
 	void Upgrade(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
 	void Repair(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
 	bool SetFormat(LViewI *Parent, LDataPropI *Props);
+	void PostStore(LMail3StoreMsg *m) { Callback->Post(this, m); }
 	void OnEvent(void *Param);
 	bool Check(int Code, const char *Sql);
 	GMail3Def *GetFields(const char *t) { return Fields.Find(t); }
