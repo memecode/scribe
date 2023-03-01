@@ -1034,24 +1034,25 @@ void LMail3Store::Upgrade(LViewI *Parent, LDataPropI *Props, std::function<void(
 
 class SqliteRepairThread : public LThread
 {
+	LMail3Store *Store;
 	LString Exe;
 	LString Db;
 	LString RepairSql;
 	LString OldDb;
 	
-	LViewI *Parent;
-	LDataPropI *Props;
+	LViewI *Parent = NULL;
+	LDataPropI *Props = NULL;
 	LAutoPtr<LSubProcess> Shell;
-	ssize_t Ch;
-	char Line[512];
+	ssize_t Ch = 0;
+	char Line[512] = {};
 
 public:
-	bool Status;
+	bool Status = false;
 
-	SqliteRepairThread(LString exe, LString db, LViewI *parent, LDataPropI *props) : LThread("SqliteRepairThread")
+	SqliteRepairThread(LMail3Store *store, LString exe, LString db, LViewI *parent, LDataPropI *props) :
+		Store(store),
+		LThread("SqliteRepairThread")
 	{
-		Status = false;
-		Ch = 0;
 		Exe = exe;
 		Db = db;
 		Parent = parent;
@@ -1126,6 +1127,16 @@ public:
 			Props->SetStr(Store3UiStatus, msg);
 		}
 	}
+
+	int OnStatus(int s)
+	{
+		// Send status event back to the store...
+		auto msg = new LMail3StoreMsg(LMail3StoreMsg::MsgRepairComplete);
+		msg->Int = s;
+		Store->PostStore(msg);
+
+		return s;
+	}
 	
 	int Main()
 	{
@@ -1139,13 +1150,13 @@ public:
 		LString Args;
 		Args.Printf("-interactive %s", Db.Get());
 		if (!Shell.Reset(new LSubProcess(Exe, Args)))
-			return -1;
+			return OnStatus(-1);
 		
 		if (!Shell->Start(true, true))
 		{
 			if (Props)
 				Props->SetStr(Store3UiError, "Couldn't execute sqlite3 shell.");
-			return false;
+			return OnStatus(-2);
 		}		
 
 		// http://froebe.net/blog/2015/05/27/error-sqlite-database-is-malformed-solved/
@@ -1157,7 +1168,7 @@ public:
 		// .dump
 		// .exit
 		if (!GetPrompt())
-			return -2;
+			return OnStatus(-3);
 		StatusMsg("Setting mode...");
 			
 		LString Cmd;
@@ -1165,21 +1176,21 @@ public:
 		Shell->Write(Cmd, Cmd.Length());
 		
 		if (!GetPrompt())
-			return -3;
+			return OnStatus(-4);
 		StatusMsg("Setting output file...");
 		
 		Cmd.Printf(".output \"%s\"\r\n", RepairSql.Get());
 		Shell->Write(Cmd, Cmd.Length());
 
 		if (!GetPrompt())
-			return -4;
+			return OnStatus(-5);
 		StatusMsg("Dumping SQL...");
 
 		Cmd.Printf(".dump\r\n");
 		Shell->Write(Cmd, Cmd.Length());
 
 		if (!GetPrompt())
-			return -5;
+			return OnStatus(-6);
 
 		Cmd.Printf(".exit\r\n");
 		Shell->Write(Cmd, Cmd.Length());
@@ -1244,8 +1255,7 @@ public:
 		StatusMsg("Deleting temporary files...");
 		FileDev->Delete(RepairSql, false);
 
-		Status = true;
-		return 0;
+		return OnStatus(0);
 	}
 };
 
@@ -1348,18 +1358,8 @@ void LMail3Store::Repair(LViewI *Parent, LDataPropI *Props, std::function<void(b
 	CloseDb();	
 	
 	// Do the repair in a thread
-	SqliteRepairThread Worker(exe, DbFile, Parent, Props);
-	while (!Worker.IsExited())
-	{
-		LSleep(20);
-		LYield();
-	}
-	
-	OpenDb();
-	
-	if (OnStatus)
-		OnStatus(Worker.Status);
-	return;
+	RepairOnStatus = OnStatus;
+	new SqliteRepairThread(this, exe, DbFile, Parent, Props);
 }
 
 int64 LMail3Store::GetFolderId(char *Path)
@@ -1587,7 +1587,27 @@ void LMail3Store::OnEvent(void *Param)
 		case LMail3StoreMsg::MsgCompactComplete:
 		{
 			if (CompactOnStatus)
+			{
 				CompactOnStatus(msg->Int);
+				CompactOnStatus = NULL;
+			}
+			else LgiTrace("%s:%i - No CompactOnStatus to call on MsgCompactComplete.\n", _FL);
+			break;
+		}
+		case LMail3StoreMsg::MsgRepairComplete:
+		{
+			OpenDb();
+	
+			if (RepairOnStatus)
+			{
+				RepairOnStatus(msg->Int >= 0);
+				RepairOnStatus = NULL;
+			}
+			break;
+		}
+		default:
+		{
+			LgiTrace("%s:%i - Unhandled mail3store event.\n", _FL);
 			break;
 		}
 	}

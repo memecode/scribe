@@ -176,6 +176,7 @@ struct LMail3StoreMsg
 	{
 		MsgNone,
 		MsgCompactComplete,
+		MsgRepairComplete,
 	}	Msg;
 
 	int64_t Int;
@@ -206,7 +207,9 @@ class LMail3Store : public LDataStoreI
 	LString ErrorMsg;
 	LString StatusMsg;
 	LString TempPath;
+
 	std::function<void(bool)> CompactOnStatus;
+	std::function<void(bool)> RepairOnStatus;
 
 	struct TableDefn : LArray<GMail3Def>
 	{
