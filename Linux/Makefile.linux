@@ -149,6 +149,7 @@ Source =	../Utils/Tables/MailFlags.c \
 			../Code/PreviewPanel.cpp \
 			../Code/OptionsDlg.cpp \
 			../Code/ObjectInspector.cpp \
+			../Code/NewMailDlg.cpp \
 			../Code/MContainer.cpp \
 			../Code/ManageMailStores.cpp \
 			../Code/ImpExp_Mbox.cpp \
@@ -159,7 +160,6 @@ Source =	../Utils/Tables/MailFlags.c \
 			../Code/Imp_Eml.cpp \
 			../Code/Imp_CsvContacts.cpp \
 			../Code/HtmlToText.cpp \
-			../Code/GNewMailDlg.cpp \
 			../Code/GBTreeWordStore.cpp \
 			../Code/FolderCalendarSource.cpp \
 			../Code/Exp_Scribe.cpp \

@@ -143,29 +143,42 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
-LVariant FolderFullPath(const char *Path)
+LString FolderFullPath(const char *Path)
 {
 	char f[MAX_PATH_LEN];
 	if (LIsRelativePath(Path))
 	{
 		LMakePath(f, sizeof(f), LGetExePath(), Path);
-		return f;
+		Path = f;
 	}
-
+	
+	auto Ext = LGetExtension(Path);
+	if (!Stricmp(Ext, "sqlite"))
+	{
+		LString s = Path;
+		LTrimDir(s);
+		return s;
+	}
+	
 	return Path;
 }
 
 int GetFolderVersion(const char *f)
 {
-	LVariant Path = FolderFullPath(f);
-	if (LDirExists(Path.Str()))
+	auto Path = FolderFullPath(f);
+	if (LDirExists(Path))
 	{
 		char p[MAX_PATH_LEN];
-		LMakePath(p, sizeof(p), Path.Str(), MAIL3_DB_FILE);
+		LMakePath(p, sizeof(p), Path, MAIL3_DB_FILE);
 		if (LFileExists(p))
-		{
+			Path = p;
+	}
+	
+	if (LFileExists(Path))
+	{
+		auto Ext = LGetExtension(Path);
+		if (!Stricmp(Ext, "sqlite"))
 			return 3;
-		}
 	}
 
 	return 0;
@@ -364,7 +377,9 @@ ManageMailStores::~ManageMailStores()
 void ManageMailStores::OnItemSelect()
 {
 	LListItem *s = Lst->GetSelected();
-	int Ver = s ? GetFolderVersion(s->GetText(1)) : 0;
+	auto Name = s ? s->GetText(1) : NULL;
+	auto Ver = Name ? GetFolderVersion(Name) : 0;
+	
 	SetCtrlEnabled(IDC_COMPACT_MS, Ver > 0);
 	SetCtrlEnabled(IDC_CONVERT_MS, Ver == 3);
 	SetCtrlEnabled(IDC_REPAIR_MS, true);
@@ -375,13 +390,14 @@ LMailStore *ManageMailStores::GetCurrentMailStore()
 	LListItem *s = Lst->GetSelected();
 	if (s)
 	{
-		LVariant p = FolderFullPath(s->GetText(1));
+		auto p = FolderFullPath(s->GetText(1));
 
 		for (unsigned i=0; i<App->GetStorageFolders().Length(); i++)
 		{
 			LMailStore &s = App->GetStorageFolders()[i];
 
-			if (s.Path && !_stricmp(s.Path, p.Str()))
+			printf("GetCur %s %s\n", p.Get(), s.Path.Get());
+			if (s.Path && s.Path.Equals(p))
 			{
 				if (s.Store)
 					return &s;

@@ -257,7 +257,7 @@
 			<Node File="../Code/BayesDlg.cpp" Type="2" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/Widgets/ControlTree.cpp" Type="2" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/General/Growl.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/GNewMailDlg.cpp" Type="2" Platforms="15" />
+			<Node File="../Code/NewMailDlg.cpp" Type="2" Platforms="15" />
 			<Node File="../Code/NewMailDlg.h" Type="3" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/Widgets/ZoomView.cpp" Type="2" Platforms="15" />
 			<Node File="../Code/ManageMailStores.cpp" Type="2" Platforms="15" />
