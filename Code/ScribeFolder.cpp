@@ -1470,7 +1470,7 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 	auto ContinueLoading = [&]()
 	{
 		WhenLoaded(_FL,
-			[&]()
+			[this, OldUnRead, Callback]()
 			{
 				// This is called when all the Store3 objects are loaded
 				int Unread = OldUnRead;

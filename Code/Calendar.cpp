@@ -1684,7 +1684,7 @@ bool Calendar::Save(ScribeFolder *Folder)
 		}
 	}
 
-	auto ChangeEvent = [&]()
+	auto ChangeEvent = [this](bool Status)
 	{
 		auto View = GetView();
 		if (View && Status)
@@ -1703,7 +1703,7 @@ bool Calendar::Save(ScribeFolder *Folder)
 		if (Status)
 			SetDirty(false);
 
-		ChangeEvent();
+		ChangeEvent(Status);
 	}
 	else
 	{
@@ -1720,14 +1720,14 @@ bool Calendar::Save(ScribeFolder *Folder)
 		Status = true;
 		if (Folder)
 		{
-			Folder->WriteThing(this, [&](auto Status)
+			Folder->WriteThing(this, [this, ChangeEvent](auto Status)
 			{
 				if (Status > Store3Error)
 					SetDirty(false);
-				ChangeEvent();
+				ChangeEvent(Status);
 			});
 		}
-		else ChangeEvent();
+		else ChangeEvent(Status);
 	}
 
 	return Status;

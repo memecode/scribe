@@ -1,28 +1,23 @@
+
 #include "Scribe.h"
+
 #include "lgi/common/List.h"
-#include "ScribeFolderSelect.h"
 #include "lgi/common/ProgressDlg.h"
-#include "../Resources/resdefs.h"
 #include "lgi/common/Store3.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/FileSelect.h"
 
-/*
-#define OPT_ScribeExpSrcPaths		"ExpSrcPaths"		//(char*)
-#define OPT_ScribeExpDstPath		"ExpDstPath"		//(char*)
-#define OPT_ScribeExpFolders		"ExpFlds"			//(char*)
-#define OPT_ScribeExpAll			"ExpAll"			//(bool)
-#define OPT_ScribeExpExclude		"ExpExc"			//(bool)
-*/
+#include "ScribeFolderSelect.h"
+#include "../Resources/resdefs.h"
 
 class ScribeExport : public LDialog, public LDataEventsI
 {
-	ScribeWnd *App;
-	LDataStoreI *Folders;
-	ScribeFolder *Mailbox;
-	LList *Lst;
-	ScribeFolder *Spam;
-	ScribeFolder *Trash;
+	ScribeWnd *App = NULL;
+	LAutoPtr<LDataStoreI> Folders;
+	ScribeFolder *Mailbox = NULL;
+	LList *Lst = NULL;
+	ScribeFolder *Spam = NULL;
+	ScribeFolder *Trash = NULL;
 
 	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new)
 	{
@@ -44,53 +39,33 @@ class ScribeExport : public LDialog, public LDataEventsI
 	}
 
 public:
-	bool AllFolders;
-	bool ExceptTrashSpam;
-	char *DestPath;
-	LArray<char*> SrcPaths;
+	bool AllFolders = false;
+	bool ExceptTrashSpam = false;
+	LString DestPath;
+	LString::Array SrcPaths;
 
-	int MailCreated;
-	int MailSkipped;
-	int MailErrors;
-	int ContactCreated;
-	int ContactSkipped;
-	int ContactErrors;
+	int MailCreated = 0;
+	int MailSkipped = 0;
+	int MailErrors = 0;
+	int ContactCreated = 0;
+	int ContactSkipped = 0;
+	int ContactErrors = 0;
 
 	ScribeExport(ScribeWnd *app)
 	{
-		Folders = 0;
-		Lst = 0;
-		Mailbox = 0;
-		DestPath = 0;
-		MailCreated = 0;
-		MailSkipped = 0;
-		MailErrors = 0;
-		ContactCreated = 0;
-		ContactSkipped = 0;
-		ContactErrors = 0;
-		Spam = 0;
-		Trash = 0;
-
 		SetParent(App = app);
 		if (LoadFromResource(IDD_SCRIBE_EXPORT))
 		{
 			MoveToCenter();
-			EnableCtrls(false);
+			// EnableCtrls(false);
 			GetViewById(IDC_SRC_FOLDERS, Lst);
 
 			LVariant s;
 			if (Lst && App->GetOptions()->GetValue(OPT_ScribeExpSrcPaths, s) && s.Str())
 			{
-				LToken t(s.Str(), ":");
-				for (unsigned i=0; Lst && i<t.Length(); i++)
-				{
-					LListItem *n = new LListItem;
-					if (n)
-					{
-						n->SetText(t[i]);
-						Lst->Insert(n);
-					}
-				}
+				SrcPaths = LString(s.Str()).SplitDelimit(":");
+				for (auto p: SrcPaths)
+					Lst->Insert(new LListItem(p));
 
 				Lst->ResizeColumnsToContent();
 			}
@@ -123,7 +98,7 @@ public:
 			if (App->GetOptions()->GetValue(OPT_ScribeExpFolders, s) && s.Str())
 			{
 				SetCtrlName(IDC_DEST, s.Str());
-				OnSelectFolders();
+				LoadFolders();
 			}
 
 			OnAll();
@@ -132,8 +107,7 @@ public:
 
 	~ScribeExport()
 	{
-		DeleteObj(Folders);
-		DeleteArray(DestPath);
+		UnloadFolders();
 		SrcPaths.DeleteArrays();
 	}
 
@@ -144,41 +118,7 @@ public:
 		SetCtrlEnabled(IDC_DEL_SRC_FOLDER, !GetCtrlValue(IDC_ALL));
 	}
 
-	void OnSelectFolders()
-	{
-		const char *s = GetCtrlName(IDC_DEST);
-		if (LFileExists(s))
-		{
-			for (unsigned i=0; i<App->GetStorageFolders().Length(); i++)
-			{
-				/* FIXME
-				char *f = App->GetStorageFolders()->GetFileName();
-				if (f)
-				{
-					if (_stricmp(f, s) == 0)
-					{
-						LgiMsg(this, LLoadString(IDS_ERROR_CANT_OPEN_FOLDERS), AppName, MB_OK, s);
-						EnableCtrls(false);
-						return;
-					}
-				}
-				*/
-			}
-
-			DeleteObj(Folders);
-			Folders = OpenMail3(s, this, false);
-			if (Folders && Folders->GetInt(FIELD_STATUS) == Store3Success)
-			{
-				EnableCtrls(true);
-			}
-			else
-			{
-				LgiMsg(this, LLoadString(IDS_ERROR_CANT_OPEN_FOLDERS), AppName, MB_OK, s);
-				EnableCtrls(false);
-			}
-		}
-	}
-
+	/*
 	void EnableCtrls(bool e)
 	{
 		SetCtrlEnabled(IDC_DEST, !e);
@@ -191,23 +131,29 @@ public:
 		SetCtrlEnabled(IDC_SET_FOLDER, e);
 		SetCtrlEnabled(IDOK, e);
 	}
+	*/
+
+	void UnloadFolders()
+	{
+		DeleteObj(Mailbox);
+		Folders.Reset();
+	}
 
 	void LoadFolders()
 	{
-		if (!Mailbox)
+		if (!Folders)
 		{
-			// StorageItem *Root = Folders->GetRoot();
-			LDataFolderI *Root = Folders->GetRoot();
-			if (Root)
+			auto path = GetCtrlName(IDC_DEST);
+			Folders.Reset(App->CreateDataStore(path, true));
+		}
+
+		if (Folders)
+		{
+			Mailbox = new ScribeFolder;
+			if (Mailbox)
 			{
-				/*
-				Root->SetObject(Mailbox = new ScribeFolder("MailBox", MAGIC_NONE));
-				if (Mailbox)
-				{
-					Mailbox->Store = Root;
-					Mailbox->LoadFolders();
-				}
-				*/
+				Mailbox->App = App;
+				Mailbox->SetObject(Folders->GetRoot(), false, _FL);
 			}
 		}
 	}
@@ -265,205 +211,211 @@ public:
 		return p;
 	}
 
-	bool ExportFolder(char *ToPath, const char *FromPath, bool Children, LProgressDlg *Prog)
+	#define ExportFolderStatus(b) \
+		{ if (onStatus) onStatus(b); \
+		return; }
+
+	void ExportFolder(	LString ToPath,
+						LString FromPath,
+						bool Children,
+						LProgressDlg *Prog,
+						std::function<void(bool)> onStatus)
 	{
-		bool Status = false;
+		if (!ToPath || !FromPath)
+			ExportFolderStatus(false);
 
-		if (ToPath && FromPath)
+		ScribeFolder *From = App->GetFolder(FromPath);
+		if (!From)
+			ExportFolderStatus(false);
+
+		if (!((!Spam  || From != Spam) &&
+			(!Trash || From != Trash)))
+			ExportFolderStatus(false);
+
+		ScribeFolder *To = GetFolder(ToPath, From);
+		if (!To)
+			ExportFolderStatus(false);
+
+		bool FromLoaded = From->IsLoaded();
+		bool ToLoaded = From->IsLoaded();
+
+		auto ProcessItem = [this, To, Prog, FromPath, From, FromLoaded, ToLoaded, Children, ToPath, onStatus]()
 		{
-			ScribeFolder *From = App->GetFolder(FromPath);
-			if (From)
+			bool Status = true;
+
+			switch ((uint32_t)To->GetItemType())
 			{
-				if ((!Spam || From != Spam) &&
-					(!Trash || From != Trash))
+				case MAGIC_MAIL:
 				{
-					ScribeFolder *To = GetFolder(ToPath, From);
-					if (To)
+					if (Prog)
+						Prog->SetDescription(FromPath);
+
+					LHashTbl<ConstStrKey<char>,Mail*> ToMsgs;
+					for (auto t: To->Items)
 					{
-						bool FromLoaded = From->IsLoaded();
-						bool ToLoaded = From->IsLoaded();
-
-						auto ProcessItem = [&]()
+						Mail *m = t->IsMail();
+						if (m)
 						{
-							switch ((uint32_t)To->GetItemType())
+							auto Id = m->GetMessageId(true);
+							if (Id)
 							{
-								case MAGIC_MAIL:
-								{
-									if (Prog)
-										Prog->SetDescription(FromPath);
-
-									LHashTbl<ConstStrKey<char>,Mail*> ToMsgs;
-									for (auto t: To->Items)
-									{
-										Mail *m = t->IsMail();
-										if (m)
-										{
-											auto Id = m->GetMessageId(true);
-											if (Id)
-											{
-												ToMsgs.Add(Id, m);
-											}
-										}
-									}
-
-									int InitMailErrors = MailErrors;
-								
-									for (auto t: From->Items)
-									{
-										if (Prog && Prog->IsCancelled())
-											break;
-									
-										Mail *m = t->IsMail();
-										if (m)
-										{
-											auto Id = m->GetMessageId(true);
-											if (Id)
-											{
-												if (!ToMsgs.Find(Id))
-												{
-													// Create new mail...
-													Mail *n = new Mail(App);
-													if (n)
-													{
-														*n = (Thing&)*m;
-														n->SetParentFolder(To);
-														n->SetObject(To->GetObject()->GetStore()->Create(MAGIC_MAIL), false, _FL);
-														if (n->GetObject())
-														{
-															MailCreated++;
-
-															// Now create all the attachments
-															List<Attachment> Att;
-															if (m->GetAttachments(&Att))
-															{
-																for (auto OldAttachment: Att)
-																{
-																	Attachment *NewAttachment = new Attachment(m->App, OldAttachment);
-																	if (NewAttachment)
-																	{
-																		n->AttachFile(NewAttachment);
-																		NewAttachment->SetObject(n->GetObject()->GetStore()->Create(MAGIC_ATTACHMENT), false, _FL);
-																	}
-																}
-															}
-														}
-														else MailErrors++;
-
-													}
-													else MailErrors++;
-												}
-												else MailSkipped++;
-											}
-											else MailErrors++;
-										}
-
-										if (Prog)
-											Prog->Value(Prog->Value() + 1);
-									}
-
-									Status |= MailErrors == InitMailErrors;
-									break;
-								}
-								case MAGIC_CONTACT:
-								{
-									LHashTbl<StrKey<char>,Contact*> ToContacts;
-									for (auto t: To->Items)
-									{
-										Contact *c = t->IsContact();
-										if (c)
-										{
-											auto k = ContactKey(c);
-											if (k)
-												ToContacts.Add(k, c);
-										}
-									}
-
-									int InitContactErrors = ContactErrors;
-									uint64 Last = LCurrentTime();
-									for (auto t: From->Items)
-									{
-										if (Prog && Prog->IsCancelled())
-											break;
-										
-										Contact *c = t->IsContact();
-										if (c)
-										{
-											auto k = ContactKey(c);
-											if (k)
-											{
-												if (!ToContacts.Find(k))
-												{
-													Contact *n = new Contact(App);
-													if (n)
-													{
-														*n = (Thing&)*c;
-														n->SetParentFolder(To);
-													}
-													else ContactErrors++;
-												}
-												else ContactSkipped++;
-											}
-											else ContactErrors++;
-										}
-
-										if (Prog)
-											Prog->Value(Prog->Value() + 1);
-									}
-
-									Status |= ContactErrors == InitContactErrors;
-									break;
-								}
-
-								if (!FromLoaded)
-								{
-									From->UnloadThings();
-								}
-								if (!ToLoaded)
-								{
-									To->UnloadThings();
-								}
-
-								if (Children)
-								{
-									char t[256];
-									char f[256];
-									LString n;
-
-									for (ScribeFolder *c = From->GetChildFolder(); c && (!Prog || !Prog->IsCancelled()); c = c->GetNextFolder())
-									{
-										n = c->GetName(true);
-										if (n)
-										{
-											strcpy_s(t, sizeof(t), ToPath);
-											char *e = t + strlen(t) - 1;
-											if (*e++ != '/') *e++ = '/';
-											strcpy_s(e, sizeof(t)-(e-t), n);
-
-											strcpy_s(f, sizeof(f), FromPath);
-											e = f + strlen(f) - 1;
-											if (*e++ != '/') *e++ = '/';
-											strcpy_s(e, sizeof(f)-(e-f), n);
-									
-											ExportFolder(t, f, true, Prog);
-										}
-									}
-								}
+								ToMsgs.Add(Id, m);
 							}
-						};
+						}
+					}
 
-						To->LoadThings(NULL, [&](auto status)
+					int InitMailErrors = MailErrors;
+								
+					for (auto t: From->Items)
+					{
+						if (Prog && Prog->IsCancelled())
+							break;
+									
+						Mail *m = t->IsMail();
+						if (m)
 						{
-							From->LoadThings(NULL, [&](auto status)
+							auto Id = m->GetMessageId(true);
+							if (Id)
 							{
-								ProcessItem();
-							});
-						});
+								if (!ToMsgs.Find(Id))
+								{
+									// Create new mail...
+									Mail *n = new Mail(App);
+									if (n)
+									{
+										*n = (Thing&)*m;
+										n->SetParentFolder(To);
+										n->SetObject(To->GetObject()->GetStore()->Create(MAGIC_MAIL), false, _FL);
+										if (n->GetObject())
+										{
+											MailCreated++;
+
+											// Now create all the attachments
+											List<Attachment> Att;
+											if (m->GetAttachments(&Att))
+											{
+												for (auto OldAttachment: Att)
+												{
+													Attachment *NewAttachment = new Attachment(m->App, OldAttachment);
+													if (NewAttachment)
+													{
+														n->AttachFile(NewAttachment);
+														NewAttachment->SetObject(n->GetObject()->GetStore()->Create(MAGIC_ATTACHMENT), false, _FL);
+													}
+												}
+											}
+										}
+										else MailErrors++;
+
+									}
+									else MailErrors++;
+								}
+								else MailSkipped++;
+							}
+							else MailErrors++;
+						}
+
+						if (Prog)
+							Prog->Value(Prog->Value() + 1);
+					}
+
+					Status |= MailErrors == InitMailErrors;
+					break;
+				}
+				case MAGIC_CONTACT:
+				{
+					LHashTbl<StrKey<char>,Contact*> ToContacts;
+					for (auto t: To->Items)
+					{
+						Contact *c = t->IsContact();
+						if (c)
+						{
+							auto k = ContactKey(c);
+							if (k)
+								ToContacts.Add(k, c);
+						}
+					}
+
+					int InitContactErrors = ContactErrors;
+					uint64 Last = LCurrentTime();
+					for (auto t: From->Items)
+					{
+						if (Prog && Prog->IsCancelled())
+							break;
+										
+						Contact *c = t->IsContact();
+						if (c)
+						{
+							auto k = ContactKey(c);
+							if (k)
+							{
+								if (!ToContacts.Find(k))
+								{
+									Contact *n = new Contact(App);
+									if (n)
+									{
+										*n = (Thing&)*c;
+										n->SetParentFolder(To);
+									}
+									else ContactErrors++;
+								}
+								else ContactSkipped++;
+							}
+							else ContactErrors++;
+						}
+
+						if (Prog)
+							Prog->Value(Prog->Value() + 1);
+					}
+
+					Status |= ContactErrors == InitContactErrors;
+					break;
+				}
+
+				if (!FromLoaded)
+				{
+					From->UnloadThings();
+				}
+				if (!ToLoaded)
+				{
+					To->UnloadThings();
+				}
+
+				if (Children)
+				{
+					char t[256];
+					char f[256];
+					LString n;
+
+					for (ScribeFolder *c = From->GetChildFolder(); c && (!Prog || !Prog->IsCancelled()); c = c->GetNextFolder())
+					{
+						n = c->GetName(true);
+						if (n)
+						{
+							strcpy_s(t, sizeof(t), ToPath);
+							char *e = t + strlen(t) - 1;
+							if (*e++ != '/') *e++ = '/';
+							strcpy_s(e, sizeof(t)-(e-t), n);
+
+							strcpy_s(f, sizeof(f), FromPath);
+							e = f + strlen(f) - 1;
+							if (*e++ != '/') *e++ = '/';
+							strcpy_s(e, sizeof(f)-(e-f), n);
+									
+							ExportFolder(t, f, true, Prog, [](auto ok){});
+						}
 					}
 				}
 			}
-		}
+		};
 
-		return Status;
+		To->LoadThings(NULL, [From, ProcessItem](auto status)
+		{
+			From->LoadThings(NULL, [ProcessItem](auto status)
+			{
+				ProcessItem();
+			});
+		});
 	}
 
 	int OnNotify(LViewI *c, LNotification n)
@@ -484,10 +436,9 @@ public:
 				{
 					if (status)
 					{
-						DeleteObj(Folders);
-						EnableCtrls(false);
+						UnloadFolders();
 						SetCtrlName(IDC_DEST, dlg->Name());
-						OnSelectFolders();
+						LoadFolders();
 					}
 					delete dlg;
 				});
@@ -569,7 +520,7 @@ public:
 					Trash = App->GetFolder(FOLDER_TRASH);
 				}
 
-				DestPath = NewStr(GetCtrlName(IDC_FOLDER));
+				DestPath = GetCtrlName(IDC_FOLDER);
 				if (Lst)
 				{
 					for (auto i : *Lst)
@@ -673,7 +624,7 @@ void ExportScribe(ScribeWnd *App)
 
 				if (Dlg->AllFolders)
 				{
-					Dlg->ExportFolder(Dlg->DestPath, "/", true, &Prog);
+					Dlg->ExportFolder(Dlg->DestPath, "/", true, &Prog, NULL);
 				}
 				else
 				{
@@ -685,11 +636,7 @@ void ExportScribe(ScribeWnd *App)
 						if (*e == '/') *e = 0;
 						strcat(Dest, Dlg->SrcPaths[i]);
 
-						bool s = Dlg->ExportFolder(Dest, Dlg->SrcPaths[i], false, &Prog);
-						if (!s)
-						{
-							break;
-						}
+						Dlg->ExportFolder(Dest, Dlg->SrcPaths[i], false, &Prog, NULL);
 					}
 				}
 			}

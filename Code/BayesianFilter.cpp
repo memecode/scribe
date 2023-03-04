@@ -514,11 +514,12 @@ public:
 				return i > 0 ? 1 : 0;
 			}
 		};
-		LArray<Entry> entries;
 
-		size_t nextErr = 0;
-		ProcessWords(t->Words, [&](auto w)
+		LArray<Entry> entries;
+		ProcessWords(t->Words, [this, t, &entries](auto w)
 		{
+			size_t nextErr = 0;
+	
 			Entry &e = entries.New();
 			e.word = w;
 			e.spam = Spam->GetWordCount(w);
@@ -650,7 +651,7 @@ public:
 			return;
 		}
 
-		ProcessWords(c->Words, [&](auto w)
+		ProcessWords(c->Words, [this, Ws, Add, &status](auto w)
 		{
 			ssize_t c = Ws->GetWordCount(w);
 			if (Add)
@@ -1048,7 +1049,7 @@ void BuildSpamDB::ProcessMail(Mail *m, ScribeMailType Type)
 		return;
 	}
 
-	ProcessWords(Words, [&](auto w)
+	ProcessWords(Words, [this, Type](auto w)
 	{
 		if (Type == BayesMailSpam)
 			b->InsertSpamWords(w);
@@ -1419,7 +1420,7 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 			if (ValidStr(s.Str()))
 				TokeniseText(s.Str(), Email, Temp);
 		}
-		ProcessWords(LString("").Join(Temp), [&](auto w)
+		ProcessWords(LString("").Join(Temp), [&Ignore](auto w)
 		{
 			Ignore.Add(w, true);
 		});

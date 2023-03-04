@@ -4860,9 +4860,10 @@ bool HasMailStore(LXmlTag *MailStores, char *Name)
 	return false;
 }
 
-LDataStoreI *ScribeWnd::CreateDataStore(char *Full, bool CreateIfMissing)
+LDataStoreI *ScribeWnd::CreateDataStore(const char *_Full, bool CreateIfMissing)
 {
-	char *Ext = LGetExtension(Full);
+	LString Full(_Full);
+	auto Ext = LGetExtension(Full);
 	if (Ext)
 	{
 		if (!_stricmp(Ext, "mail2"))
@@ -5155,7 +5156,6 @@ bool ScribeWnd::LoadMailStores()
 			});
 			continue;
 		}
-
 
 		// check password
 		LString FolderPsw;

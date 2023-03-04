@@ -2312,7 +2312,6 @@ protected:
 	void			SetupAccounts();
 	int				AdjustAllObjectSizes(LDataI *Item);
 	bool			CleanFolders(ScribeFolder *f);
-	LDataStoreI		*CreateDataStore(char *Full, bool CreateIfMissing);
 	void			LoadFolders(std::function<void(bool)> Callback);
 	bool			LoadMailStores();
 	bool			ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName);
@@ -2351,6 +2350,7 @@ public:
 	// ---------------------------------------------------------------------
 	// Methods
 	LAutoString		GetDataFolder();
+	LDataStoreI		*CreateDataStore(const char *Full, bool CreateIfMissing);
 	Thing			*CreateThingOfType(Store3ItemTypes Type, LDataI *obj = 0);
 	Thing			*CreateItem(int Type, ScribeFolder *Folder = 0, bool Ui = true);
 	Mail			*CreateMail(Contact *c = 0, const char *Email = 0, const char *Name = 0);

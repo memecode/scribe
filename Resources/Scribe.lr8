@@ -4666,23 +4666,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4690,9 +4676,23 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>
@@ -5027,7 +5027,7 @@
 			<String Ref="1403" Cid="40020" Define="IDM_IMPORT_NS_CONTACTS" en="&Netscape Contacts File" fr="Fichier contacts &Netscape" it="Contatti da &Netscape" cs="Kontakty &Netscape" es="&Netscape Fichero Contactos " de="&Netscape Kontakte" nl="&Netscape contactpersonen" pt_br="Contatos do &Netscape" pt="Contactos do &Netscape" pl="Kontakty &Netscape" vi="Dữ liệu liên hệ của Netscape" zh_tw="Netscape 聯絡檔(&N)" ja="Netscapeコンタクトファイル(&N)" sr="Fajl &Netscape kontakata" lt="&Netscape asmenų adresus" da="&Netscape kontakter fil" fa="Netscape فايل نشاني‌هاي" sv="&Netscape kontaktfil" tr="&Netscape İrtibatlar Dosyası" hu="&Netscape kapcsolat fájl" ru="Файл контактов &Netscape" ko="&Netscape  연락처 파일" uk="Файл контактів Netscape" />
 			<String Ref="1402" en="Export" fr="Exporter" it="Esporta" es="&Exportar" nl="&Exporteren" pt_br="&Exportar" ja="エクスポート" pt="&Exportar" pl="Eksportuj" vi="Xuất ra" zh_tw="匯出" sr="Izvoz" no="&Eksporter" lt="&Eksportuoti" fa="صادر کردن" da="&Eksport" sv="&Exportera" tr="Dışa Ver" ru="Экспорт" ko="내보내기" uk="Експорт" />
 			<String Ref="1401" en="Scribe" sv="&Scribe" />
-			<String Ref="1400" Cid="41161" Define="IDM_EXPORT_SCRIBE" en="Export to mail2 folder" sv="&Exportera till mail2 mapp" lt="Eksportavimas į mail2 aplanką  (Scribe formatas)" de="Im mail2-Dateiformat exportieren" cs="Export do složek mail2" tr="Mail2 Klasörüne Çıkart" hu="Export mail2 mappába" ru="Экспорт в папку mail2" pl="Eksportuj do formatu mail2" ko="mail2 폴더로 내보내기r\tF7" uk="Експорт в теку mail2" fr="Exporter vers le dossier mail2" />
+			<String Ref="1400" Cid="41161" Define="IDM_EXPORT_SCRIBE" en="Export to mail3 folder" sv="&Exportera till mail2 mapp" lt="Eksportavimas į mail2 aplanką  (Scribe formatas)" de="Im mail2-Dateiformat exportieren" cs="Export do složek mail2" tr="Mail2 Klasörüne Çıkart" hu="Export mail2 mappába" ru="Экспорт в папку mail2" pl="Eksportuj do formatu mail2" ko="mail2 폴더로 내보내기r\tF7" uk="Експорт в теку mail2" fr="Exporter vers le dossier mail2" />
 			<String Ref="1399" en="Text" fr="Texte" it="Testo" es="Texto" pt_br="Texto" nl="Tekst" pt="Texto" pl="Tekst" vi="Văn bản" zh_tw="文字" sr="Tekst" no="Tekst" lt="Tekstą" fa="متن" da="Tekst" ja="テキスト" tr="Yazı (text)" sv="&Text" hu="Szöveg" ru="Текст" uk="Текст" />
 			<String Ref="1398" Cid="40048" Define="IDM_EXPORT_TEXT_MBOX" en="Unix MBOX" pt="MBOX (Unix)" nl="Unix Mbox" sv="&Unix MBOX..." pt_br="MBOX (Unix)" es="MBOX (Unix)" fr="MBOX Unix" />
 			<String Ref="1397" Cid="41085" Define="IDM_EXPORT_CSV" en="CSV Contacts" cs="Kontakty (CSV)" pl="Kontakty (CSV)" it="Contatti CSV" vi="Tập tin CSV" zh_tw="CSV 聯絡簿" nl="CSV adresboek" pt="Contactos (CSV)" sr="CSV Kontakti" lt="CSV adresus" de="Kontakte (CSV)" da="CSV kontakter" sv="&CSV-kontakter..." pt_br="Contatos (CSV)" es="Contactos (CSV)" tr="CSV İrtibatlar" hu="CSV kapcsolatok" ru="Контакты CSV" uk="Контакти CSV" fr="Contacts CSV" />
