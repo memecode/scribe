@@ -1434,7 +1434,7 @@ void Mailto::Apply(Mail *m)
 
 		for (auto t: To)
 		{
-			GDataIt To = m->GetObject()->GetList(FIELD_TO);
+			LDataIt To = m->GetObject()->GetList(FIELD_TO);
 			if (To)
 			{
 				LDataPropI *Addr = To->Create(m->GetObject()->GetStore());

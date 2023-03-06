@@ -244,7 +244,7 @@ public:
 		return Results.Length() > 0;
 	}
 
-	GDataIt GetList(int id)
+	LDataIt GetList(int id)
 	{
 		if (id == FIELD_MIME_SEG)
 			return &Children;

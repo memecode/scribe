@@ -74,7 +74,7 @@ void AddressList::OnCreate()
 	SetWindow(this);
 }
 
-void AddressList::OnInit(GDataIt l)
+void AddressList::OnInit(LDataIt l)
 {
 	Empty();
 
@@ -91,7 +91,7 @@ void AddressList::OnInit(GDataIt l)
 	Invalidate();
 }
 
-void AddressList::OnSave(LDataStoreI *store, GDataIt l)
+void AddressList::OnSave(LDataStoreI *store, LDataIt l)
 {
 	l->DeleteObjects();
 

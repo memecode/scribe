@@ -253,7 +253,7 @@ LDataPropI *LMapiFolder::GetObj(int id)
 	return NULL;
 }
 
-GDataIt LMapiFolder::GetList(int id)
+LDataIt LMapiFolder::GetList(int id)
 {
 	LAssert(0);
 	return NULL;
@@ -485,7 +485,7 @@ LDataPropI *LMapiFolderField::GetObj(int id)
 	return NULL;
 }
 
-GDataIt LMapiFolderField::GetList(int id)
+LDataIt LMapiFolderField::GetList(int id)
 {
 	return NULL;
 }

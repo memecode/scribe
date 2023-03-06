@@ -214,7 +214,7 @@ InspectTreeItem::InspectTreeItem(ObjectInspector *parent, LDataPropI *seg)
 	s.Printf("Mime: %s", MimeType);
 	SetText(s);
 	
-	GDataIt Ch = Seg->GetList(FIELD_MIME_SEG);
+	LDataIt Ch = Seg->GetList(FIELD_MIME_SEG);
 	if (Ch)
 	{
 		for (LDataPropI *c = Ch->First(); c; c = Ch->Next())

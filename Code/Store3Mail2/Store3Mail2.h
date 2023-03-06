@@ -358,7 +358,7 @@ public:
 	LDateTime *GetDate(int id);
 	bool SetDate(int id, LDateTime *t);
 	LDataPropI *GetObj(int id);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 	bool SetMime(LAutoPtr<LMime> m);
 	int Sizeof();
 	bool Serialize(LFile &Stream, bool Write);
@@ -440,7 +440,7 @@ public:
 	bool SetStr(int id, const char *str);
 	int64 GetInt(int id);
 	bool SetInt(int id, int64 i);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 	int Type();
 	int Sizeof();
 	bool Serialize(LFile &f, bool Write);
@@ -490,7 +490,7 @@ public:
 	bool SetInt(int id, int64 i);
 	LDateTime *GetDate(int id);
 	bool SetDate(int id, LDateTime *t);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 
 	int Type();
 	int Sizeof();
@@ -525,7 +525,7 @@ public:
 	bool SetStr(int id, const char *str);
 	int64 GetInt(int id);
 	bool SetInt(int id, int64 i);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 	int Type();
 	int Sizeof();
 	bool Serialize(LFile &f, bool Write);

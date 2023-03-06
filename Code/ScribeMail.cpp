@@ -151,7 +151,7 @@ void CollectAttachments(LArray<LDataI*> *Attachments,
 	
 	// printf("Collect %s %s\n", (char*)Mt, FileName);
 	
-	LDataI *Att = dynamic_cast<LDataI*>(d);
+	auto Att = dynamic_cast<LDataI*>(d);
 	if (ParentMime && Att && ParentMime->IsRelated() && Related)
 	{
 		auto Id = d->GetStr(FIELD_CONTENT_ID);
@@ -197,10 +197,10 @@ void CollectAttachments(LArray<LDataI*> *Attachments,
 		*/
 	}
 
-	GDataIt It = d->GetList(FIELD_MIME_SEG);
+	auto It = d->GetList(FIELD_MIME_SEG);
 	if (It)
 	{
-		for (LDataPropI *i=It->First(); i; i=It->Next())
+		for (auto i = It->First(); i; i = It->Next())
 			CollectAttachments(Attachments, Related, Text, Html, i, Mt.IsMultipart() ? &Mt : NULL);
 	}
 }
@@ -5265,7 +5265,7 @@ LDataPropI *FindMimeSeg(LDataPropI *s, char *Type)
 	if (!_stricmp(Type, Mt))
 		return s;
 
-	GDataIt c = s->GetList(FIELD_MIME_SEG);
+	LDataIt c = s->GetList(FIELD_MIME_SEG);
 	if (!c)
 		return 0;
 
@@ -5296,7 +5296,7 @@ void DescribeMime(LStream &p, LDataI *Seg)
 	if (Cs) p.Print("&nbsp;-&nbsp;%s", Cs);
 	p.Print("<br>\n");
 
-	GDataIt c = Seg->GetList(FIELD_MIME_SEG);
+	LDataIt c = Seg->GetList(FIELD_MIME_SEG);
 	if (c && c->First())
 	{
 		p.Print("<div style='padding-left:1em;'>\n");
@@ -5348,7 +5348,7 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		{
 			if (Array)
 			{
-				GDataIt To = GetTo();
+				LDataIt To = GetTo();
 
 				int Idx = atoi(Array);
 				bool Create = false;
@@ -5371,7 +5371,7 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 			}
 			else if (Value.SetList())
 			{
-				GDataIt To = GetTo();
+				LDataIt To = GetTo();
 				for (LDataPropI *a=To->First(); a; a=To->Next())
 				{
 					LVariant *Recip = new LVariant;
@@ -6239,51 +6239,54 @@ bool Mail::UnloadAttachments()
 	return true;
 }
 
-bool Mail::GetAttachments(List<Attachment> *Files)
+LArray<Attachment*> Mail::GetAttachments()
 {
-	bool Status = false;
-	if (Files)
-	{
-		LArray<LDataI*> Lst;
-		if (GetAttachmentObjs(Lst))
-		{
-			LHashTbl<PtrKey<LDataI*>, bool> Loaded;
-			for (size_t i=0; i<Attachments.Length(); i++)
-			{
-				Loaded.Add(Attachments[i]->GetObject(), true);
-			}
+	LArray<Attachment*> result;
 
-			// Load attachments
-			for (unsigned i=0; i<Lst.Length(); i++)
+	LArray<LDataI*> Lst;
+	if (GetAttachmentObjs(Lst))
+	{
+		LHashTbl<PtrKey<LDataI*>, bool> Loaded;
+		for (size_t i=0; i<Attachments.Length(); i++)
+		{
+			Loaded.Add(Attachments[i]->GetObject(), true);
+		}
+
+		// Load attachments
+		for (unsigned i=0; i<Lst.Length(); i++)
+		{
+			LDataI *Att = Lst[i];
+			if (!Loaded.Find(Att))
 			{
-				LDataI *Att = Lst[i];
-				if (!Loaded.Find(Att))
+				Attachment *k = new Attachment(App, Att);
+				if (k)
 				{
-					Attachment *k = new Attachment(App, Att);
-					if (k)
-					{
-						k->SetOwner(this);
-						Attachments.Insert(k);
-					}
+					k->SetOwner(this);
+					Attachments.Insert(k);
 				}
 			}
 		}
+	}
 
-		for (auto a: Attachments)
-		{
-			if (a->GetObject()->UserData != a)
-			{
-				LAssert(!"Wut?");
-			}
-			Files->Insert(a);
-		}
-		Status = true;
-	}
-	else
+	for (auto a: Attachments)
 	{
-		Status = Attachments.Length() > 0;
+		if (a->GetObject()->UserData != a)
+			LAssert(!"Wut?");
+		else
+			result.Add(a);
 	}
-	return Status;
+	
+	return result;
+}
+
+bool Mail::GetAttachments(List<Attachment> *Files)
+{
+	if (!Files)
+		return false;
+	auto files = GetAttachments();
+	for (auto a: files)
+		Files->Add(a);
+	return true;
 }
 
 int64 Mail::TotalSizeof()
@@ -7013,7 +7016,7 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 	}
 
 	Out->From = GetFromStr(FIELD_EMAIL);
-	GDataIt To = GetTo();
+	LDataIt To = GetTo();
 	ContactGroup *Group = NULL;
 	for (LDataPropI *t = To->First(); t; t = To->Next())
 	{
@@ -7968,7 +7971,7 @@ const char *Mail::GetFieldText(int Field)
 			size_t ch = 0;
 			Buf[0] = 0;
 			
-			GDataIt To = GetTo();
+			LDataIt To = GetTo();
 			for (LDataPropI *a=To->First(); a; a=To->Next())
 			{
 				if (ch > 0)
@@ -8223,13 +8226,15 @@ LDataI *Mail::GetFileAttachPoint()
 		LAssert(!"No object ptr.");
 		return 0;
 	}
+
+	auto Store = GetObject()->GetStore();
 	
 	// Check existing root node for "multipart/mixed"?
-	LDataI *r = dynamic_cast<LDataI*>(GetObject()->GetObj(FIELD_MIME_SEG));
+	auto r = dynamic_cast<LDataI*>(GetObject()->GetObj(FIELD_MIME_SEG));
 	if (!r)
 	{
 		// Create one...
-		r = GetObject()->GetStore()->Create(MAGIC_ATTACHMENT);
+		r = Store->Create(MAGIC_ATTACHMENT);
 		if (!r)
 		{		
 			LAssert(!"No MIME segment ptr.");
@@ -8245,35 +8250,35 @@ LDataI *Mail::GetFileAttachPoint()
 	}
 
 	auto Mt = r->GetStr(FIELD_MIME_TYPE);
-	if (Mt && !_stricmp(Mt, sMultipartMixed))
+	if (!Stricmp(Mt, sMultipartMixed))
 	{
 		// Yes is it mixed... return that...
 		return r;
 	}
 
-	// No, a different type of segment, make the parent seg a "mixed", and attach the old segment to the mixed
-	LDataI *Mixed = GetObject()->GetStore()->Create(MAGIC_ATTACHMENT);
+	// No, a different type of segment, make the parent segment a "mixed", and attach the old segment to the mixed
+	auto Mixed = Store->Create(MAGIC_ATTACHMENT);
 	if (!Mixed)
 	{
 		LAssert(!"Failed to create MAGIC_ATTACHMENT.");
-		return 0;
+		return NULL;
 	}
 
 	// Set the type...
 	Mixed->SetStr(FIELD_MIME_TYPE, sMultipartMixed);
 
-	// Reparent the content to the mixed
+	// Re-parent the content to the mixed
 	if (!r->Save(Mixed))
 	{
 		LAssert(!"Can't reparent the content into the mixed seg.");
-		return 0;
+		return NULL;
 	}
 
-	// Reparent the mixed to the mail object
+	// Re-parent the mixed to the mail object
 	if (!Mixed->Save(GetObject()))
 	{
 		LAssert(!"Can't reparent the mixed seg into the mail object.");
-		return 0;
+		return NULL;
 	}
 
 	return Mixed;
@@ -8320,22 +8325,22 @@ Attachment *Mail::AttachFile(LView *Parent, const char *FileName)
 {
 	LString MimeType = ScribeGetFileMimeType(FileName);
 	LVariant Resize = false;
-	if (MimeType && !_strnicmp(MimeType, "image/", 6))
+	if (!Strnicmp(MimeType.Get(), "image/", 6))
 	{
 		// Check if we have to do a image resize
 		App->GetOptions()->GetValue(OPT_ResizeImgAttachments, Resize);
 	}
 
-	LDataI *AttachPoint = GetFileAttachPoint();
+	auto AttachPoint = GetFileAttachPoint();
 	if (!AttachPoint)
 	{
 		LAssert(!"No attachment point in MIME heirarchy for file");
 		return NULL;
 	}
 	
-	Attachment *File = new Attachment(	App,
-										GetObject()->GetStore()->Create(MAGIC_ATTACHMENT),
-										FileName);
+	auto File = new Attachment(	App,
+								GetObject()->GetStore()->Create(MAGIC_ATTACHMENT),
+								FileName);
 	if (File)
 	{
 		File->App = App;
@@ -10114,7 +10119,7 @@ bool CreateMailHeaders(ScribeWnd *App, LStream &Out, LDataI *Mail, MailProtocol 
 	}
 
 	// To:
-	GDataIt Addr = Mail->GetList(FIELD_TO);
+	LDataIt Addr = Mail->GetList(FIELD_TO);
 	LArray<Store3Addr*> Objs;
 	LArray<LDataPropI*> To, Cc;
 	ContactGroup *Group;

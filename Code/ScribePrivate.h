@@ -199,8 +199,8 @@ public:
 
 	void OnCreate();
 	bool OnKey(LKey &k);
-	void OnInit(GDataIt l);
-	void OnSave(LDataStoreI *store, GDataIt l);
+	void OnInit(LDataIt l);
+	void OnSave(LDataStoreI *store, LDataIt l);
 	void OnItemClick(LListItem *Item, LMouse &m);
 
 	void Copy();
@@ -772,6 +772,7 @@ extern void Export_UnixMBox(ScribeWnd *Parent);
 extern void ImportCsv(ScribeWnd *App);
 extern void ExportCsv(ScribeWnd *App);
 extern void ImportEml(ScribeWnd *App);
+extern void ExportScribe(ScribeWnd *App, LMailStore *Store);
 
 // DOM stuff
 extern void InitStrToDom();

@@ -1036,7 +1036,7 @@ public:
 		return GetObject() ? GetObject()->GetObj(FIELD_REPLY) : 0;
 	}
 
-	GDataIt GetTo()
+	LDataIt GetTo()
 	{
 		return GetObject() ? GetObject()->GetList(FIELD_TO) : 0;
 	}
@@ -1139,6 +1139,7 @@ public:
 	Attachment *AttachFile(LView *Parent, const char *FileName);
 	bool AttachFile(Attachment *File);
 	bool DeleteAttachment(Attachment *File);
+	LArray<Attachment*> GetAttachments();
 	bool GetAttachments(List<Attachment> *Attachments);
 	bool HasAttachments() { return Attachments.Length() > 0; }
 	bool UnloadAttachments();

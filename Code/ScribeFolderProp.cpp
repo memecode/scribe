@@ -187,7 +187,7 @@ public:
 			Size += Seg->Size();
 
 			// Add the children...
-			GDataIt Children = Seg->GetList(FIELD_MIME_SEG);
+			LDataIt Children = Seg->GetList(FIELD_MIME_SEG);
 			if (Children)
 			{
 				for (LDataPropI *Child = Children->First(); Child; Child = Children->Next())

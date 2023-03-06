@@ -359,7 +359,7 @@ Store3Status LMapiMail::SetObj(int id, LDataPropI *i)
 	return Store3Error;
 }
 
-GDataIt LMapiMail::GetList(int id)
+LDataIt LMapiMail::GetList(int id)
 {
 	switch (id)
 	{

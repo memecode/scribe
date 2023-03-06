@@ -1141,7 +1141,7 @@ int MailUiGpg::OnNotify(LViewI *Ctrl, LNotification n)
 
 void DeleteChildSegments(LDataPropI *d)
 {
-	GDataIt It = d->GetList(FIELD_MIME_SEG);
+	LDataIt It = d->GetList(FIELD_MIME_SEG);
 	for (unsigned i=0; i<It->Length(); )
 	{
 		LDataPropI *c = (*It)[i];
@@ -1300,7 +1300,7 @@ void MailUiGpg::Decrypt(std::function<void(int)> callback)
 				Map.Add(Email, a);
 		}
 	}
-	GDataIt ToLst = m->GetTo();
+	LDataIt ToLst = m->GetTo();
 	LString::Array ToEmail;
 	if (ToLst)
 	{
@@ -1551,7 +1551,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	
 			if (uEncrypt)
 			{
-				GDataIt To = m->GetTo();
+				LDataIt To = m->GetTo();
 				for (LDataPropI *Recip = To->First(); Recip; Recip = To->Next())
 				{
 					auto Email = Recip->GetStr(FIELD_EMAIL);

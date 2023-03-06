@@ -312,7 +312,7 @@ const char *Store3ItemTypeName(Store3ItemTypes t)
 	return "(error)";
 }
 
-void SetRecipients(ScribeWnd *App, char *Start, GDataIt l, EmailAddressType CC)
+void SetRecipients(ScribeWnd *App, char *Start, LDataIt l, EmailAddressType CC)
 {
 	while (Start && *Start)
 	{
@@ -8241,8 +8241,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_EXPORT_SCRIBE:
 		{
-			extern void ExportScribe(ScribeWnd *App);
-			ExportScribe(this);
+			ExportScribe(this, NULL/* default mail store */);
 			break;
 		}
 		case IDM_IMPORT_TEXT_MBOX:
@@ -11308,7 +11307,7 @@ void ScribeWnd::Send(int Which, bool Quiet)
 			if (!TestFlag(Flags, MAIL_SENT) &&
 				TestFlag(Flags, MAIL_READY_TO_SEND))
 			{
-				GDataIt To = m->GetObject()->GetList(FIELD_TO);
+				LDataIt To = m->GetObject()->GetList(FIELD_TO);
 				if (To && To->Length())
 				{
 					LAutoPtr<ScribeEnvelope> Out(new ScribeEnvelope);
@@ -11620,8 +11619,8 @@ bool MergeSegments(LDataPropI *DstProp, LDataPropI *SrcProp, LDom *Dom)
 	}
 
 	// Merge children segments as well
-	GDataIt Sc = Src->GetList(FIELD_MIME_SEG);
-	GDataIt Dc = Dst->GetList(FIELD_MIME_SEG);
+	LDataIt Sc = Src->GetList(FIELD_MIME_SEG);
+	LDataIt Dc = Dst->GetList(FIELD_MIME_SEG);
 	if (Dc && Sc)
 	{
 		for (unsigned i=0; i<Sc->Length(); i++)
@@ -12644,7 +12643,7 @@ bool ScribeWnd::OnTransfer()
 					if (FilterMode != BayesOff &&
 						m->GetObject())
 					{
-						GDataIt To = m->GetObject()->GetList(FIELD_TO);
+						LDataIt To = m->GetObject()->GetList(FIELD_TO);
 						if (To)
 						{
 							for (LDataPropI *a = To->First();

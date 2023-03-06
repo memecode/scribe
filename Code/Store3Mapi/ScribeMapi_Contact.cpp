@@ -231,7 +231,7 @@ LDataPropI *LMapiContact::GetObj(int id)
 	return NULL;
 }
 
-GDataIt LMapiContact::GetList(int id)
+LDataIt LMapiContact::GetList(int id)
 {
 	return NULL;
 }

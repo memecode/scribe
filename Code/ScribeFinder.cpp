@@ -640,7 +640,7 @@ class FindThread : public LThread, public LMutex
 			
 			if (Field == FIELD_TO || Field == FIELD_CC || Field < 0)
 			{
-				GDataIt To = mail->GetTo();
+				LDataIt To = mail->GetTo();
 				for (LDataPropI *a = To->First(); a; a = To->Next())
 				{
 					Status |= MatchAddress(a, Text, Field == FIELD_CC);

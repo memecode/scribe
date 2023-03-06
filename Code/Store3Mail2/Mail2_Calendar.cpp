@@ -333,7 +333,7 @@ bool CalendarData::SetDate(int id, LDateTime *t)
 	return 0;
 }
 
-GDataIt CalendarData::GetList(int id)
+LDataIt CalendarData::GetList(int id)
 {
 	Load();
 

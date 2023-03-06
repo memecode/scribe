@@ -259,7 +259,7 @@ bool ImapTest::Test01_LoadInbox()
 						if (n < 20)
 						{
 							printf("\t[%i] %.90s\n\t\tTo: ", n, m->GetStr(FIELD_SUBJECT));
-							GDataIt It = m->GetList(FIELD_TO);
+							LDataIt It = m->GetList(FIELD_TO);
 							int k = 0;
 							for (LDataPropI *i=It->First(); i && k < 3; i=It->Next(), k++)
 							{

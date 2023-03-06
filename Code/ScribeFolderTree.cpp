@@ -200,8 +200,8 @@ bool CompareSegments(LDataI *MailA, LDataI *MailB, LDataI *a, LDataI *b, LStream
 		return false;
 	}
 
-	GDataIt ac = a->GetList(FIELD_MIME_SEG);
-	GDataIt bc = b->GetList(FIELD_MIME_SEG);
+	LDataIt ac = a->GetList(FIELD_MIME_SEG);
+	LDataIt bc = b->GetList(FIELD_MIME_SEG);
 	if (ac && bc)
 	{
 		if (ac->Length() != bc->Length())
@@ -335,7 +335,7 @@ void CompareDumpSegs(LStream &p, LDataI *mail, LDataI *s, int depth = 0)
 	LAutoStreamI Data = s->GetStream(_FL);
 	p.Print("%s%p - %s (%I64i)\r\n", sp, s, ContentType.Get(), Data?Data->GetSize():-1);
 
-	GDataIt c = s->GetList(FIELD_MIME_SEG);
+	LDataIt c = s->GetList(FIELD_MIME_SEG);
 	if (c)
 	{
 		for (LDataI *a = dynamic_cast<LDataI*>(c->First()); a; a = dynamic_cast<LDataI*>(c->Next()))

@@ -1340,7 +1340,7 @@ const char *Attachment::GetText(int i)
 
 bool Attachment::Get(char **ptr, ssize_t *size)
 {
-	if (!ptr || !size || *size <= 0)
+	if (!ptr || !size)
 		return false;
 
 	LStreamI *f = GotoObject(_FL);
@@ -1353,7 +1353,6 @@ bool Attachment::Get(char **ptr, ssize_t *size)
 	{
 		auto r = f->Read(*ptr, *size);
 		(*ptr)[r] = 0;
-
 	}
 
 	DeleteObj(f);

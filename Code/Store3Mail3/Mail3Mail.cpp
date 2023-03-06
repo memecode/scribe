@@ -98,7 +98,7 @@ bool Mail3_CopySegs(LMail3Mail *m, LMail3Attachment *parent, LDataI *in)
 	else
 		out->AttachTo(m);
 
-	GDataIt It = in->GetList(FIELD_MIME_SEG);
+	LDataIt It = in->GetList(FIELD_MIME_SEG);
 	for (LDataPropI *c = It->First(); c; c = It->Next())
 	{
 		LDataI *child = dynamic_cast<LDataI*>(c);
@@ -164,7 +164,7 @@ Prof.Add(_FL);
 Prof.Add(_FL);
 #endif
 	To.DeleteObjects();
-	GDataIt pTo = p.GetList(FIELD_TO);
+	LDataIt pTo = p.GetList(FIELD_TO);
 	for (unsigned n=0; n<pTo->Length(); n++)
 	{
 		To.Insert(new Store3Addr(GetStore(), (*pTo)[n]), -1, true);
@@ -662,7 +662,7 @@ int LMail3Mail::GetAttachments(LArray<LMail3Attachment*> *Lst)
 	int Count = 0;
 	if (Seg->IsMultipart())
 	{
-		GDataIt It = Seg->GetList(FIELD_MIME_SEG);
+		LDataIt It = Seg->GetList(FIELD_MIME_SEG);
 		if (It)
 		{
 			for (LDataPropI *i=It->First(); i; i=It->Next())
@@ -1448,7 +1448,7 @@ Store3Status LMail3Mail::SetObj(int id, LDataPropI *i)
 	return Store3Success;
 }
 
-GDataIt LMail3Mail::GetList(int id)
+LDataIt LMail3Mail::GetList(int id)
 {
 	switch (id)
 	{

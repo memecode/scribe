@@ -189,7 +189,7 @@ void CopyAttachments(MailData *Mail, LDataI *Source, AttachmentData *&Mixed, int
 					_stricmp(Mt, sAlternative);
 
 	// Iterate over tree of segments
-	GDataIt Children = Source->GetList(FIELD_MIME_SEG);
+	LDataIt Children = Source->GetList(FIELD_MIME_SEG);
 	for (LDataPropI *i=Children->First(); i; i=Children->Next())
 	{
 		LDataI *d = dynamic_cast<LDataI*>(i);
@@ -253,7 +253,7 @@ LDataI &MailData::operator =(LDataI &p)
 	To.DeleteObjects();
 	
 	unsigned n;
-	GDataIt pTo = p.GetList(FIELD_TO);
+	LDataIt pTo = p.GetList(FIELD_TO);
 	for (n=0; n<pTo->Length(); n++)
 	{
 		To.Insert(new Mail2Addr(GetStore(), (*pTo)[n]));
@@ -680,7 +680,7 @@ LDataPropI *MailData::GetObj(int id)
 	return 0;
 }
 
-GDataIt MailData::GetList(int id)
+LDataIt MailData::GetList(int id)
 {
 	Load();
 

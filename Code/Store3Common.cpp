@@ -348,7 +348,7 @@ bool Store3ToGMime(LMime *Out, LDataPropI *InInterface)
 	int Type = In->Type();
 	if (Type == MAGIC_MAIL)
 	{
-		GDataIt Sub = In->GetList(FIELD_MIME_SEG);
+		LDataIt Sub = In->GetList(FIELD_MIME_SEG);
 		LDataPropI *Child = Sub->First();
 		if (Child)
 		{
@@ -383,7 +383,7 @@ bool Store3ToGMime(LMime *Out, LDataPropI *InInterface)
 			}
 		}
 
-		GDataIt Sub = In->GetList(FIELD_MIME_SEG);
+		LDataIt Sub = In->GetList(FIELD_MIME_SEG);
 		for (LDataPropI *Child = Sub->First(); Child; Child = Sub->Next())
 		{
 			LMime *NewSeg = Out->NewChild();

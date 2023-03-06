@@ -22,6 +22,7 @@
 #include "Calendar.h"
 #include "resdefs.h"
 #include "ReplicateDlg.h"
+#include "FolderTask.h"
 
 //////////////////////////////////////////////////////////////////////////////
 #if WINNATIVE
@@ -666,9 +667,10 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 		return Store3Error;
 	}
 
-	auto Path = GetFolder()->GetPath();
+	auto ParentFolder = GetFolder();
+	auto Path = ParentFolder ? ParentFolder->GetPath() : NULL;
 
-	auto OnAllow = [&]()
+	auto OnAllow = [this, t, Callback]()
 	{
 		// Generic thing storage..
 		bool Create = !t->GetObject();
@@ -703,11 +705,14 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 	};
 
 	if (App)
-		App->GetAccessLevel(App, GetWriteAccess(), Path, [&](auto Allow)
-		{
-			if (Allow)
-				OnAllow();
-		});
+		App->GetAccessLevel(App,
+							GetWriteAccess(),
+							Path,
+							[OnAllow](auto Allow)
+							{
+								if (Allow)
+									OnAllow();
+							});
 	else
 		OnAllow();	
 
@@ -3731,79 +3736,6 @@ public:
 
 		return m;
 	}
-};
-
-class FolderTask : public LProgressDlg
-{
-protected:
-	ScribeWnd *App = NULL;
-	ScribeFolder *Folder = NULL;
-	
-	LString MimeType;
-	
-	LAutoPtr<LStreamI> Stream;
-
-	ThingType::IoProgress Status;
-	ThingType::IoProgressCallback onComplete;
-
-public:
-	// Minimum amount of time to do work.
-	constexpr static int WORK_SLICE_MS		= 130;
-	// This should be larger then WORK_SLICE_MS to allow message loop to process
-	constexpr static int PULSE_MS			= 200;
-
-	FolderTask(	ScribeFolder *folder,
-				LAutoPtr<LStreamI> stream,
-				LString mimeType,
-				ThingType::IoProgressCallback cb) :
-		LProgressDlg(folder->App),
-		Folder(folder),
-		Stream(stream),
-		MimeType(mimeType),
-		onComplete(cb),
-		Status(Store3Success)
-	{
-		App = Folder->App;
-		Ts = LCurrentTime();
-		SetParent(Folder->GetTree());		
-		SetPulse(PULSE_MS);
-		SetAlwaysOnTop(true);
-
-		App->OnFolderTask(this, true);
-	}
-	
-	virtual ~FolderTask()
-	{
-		Folder->App->OnFolderTask(this, false);
-		
-		if (onComplete)
-			onComplete(&Status, Stream);
-	}
-
-	bool OnRequestClose(bool OsClose)
-	{
-		return true;
-	}
-
-	void OnPulse()
-	{
-		LProgressDlg::OnPulse();
-
-		auto StartTs = LCurrentTime();
-		while (	!IsCancelled() &&
-				(LCurrentTime() - StartTs) < WORK_SLICE_MS)
-		{
-			if (!TimeSlice())
-			{
-				Quit();
-				break;
-			}
-		}
-	}
-	
-	/// This should use around WORK_SLICE_MS of time and then
-	/// \returns true if more work to do or false if finished.
-	virtual bool TimeSlice() = 0;
 };
 
 class ImportFolderTask : public FolderTask

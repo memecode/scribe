@@ -222,7 +222,7 @@ bool FilterData::SetInt(int id, int64 i)
 	return 0;
 }
 
-GDataIt FilterData::GetList(int id)
+LDataIt FilterData::GetList(int id)
 {
 	Load();
 

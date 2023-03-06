@@ -412,7 +412,7 @@ public:
 	Store3Status SetDate(int id, const LDateTime *i);
 	LDataPropI *GetObj(int id);
 	Store3Status SetObj(int id, LDataPropI *i);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 	Store3Status SetRfc822(LStreamI *m);
 
 	// LDataI API
@@ -451,7 +451,7 @@ public:
 	LDateTime *GetDate(int id);
 	Store3Status SetDate(int id, const LDateTime *i);
 	LDataPropI *GetObj(int id);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 
 	// LDataI API
 	LDataI &operator =(LDataI &p);
@@ -501,7 +501,7 @@ public:
 	const LDateTime *GetDate(int id);
 	Store3Status SetDate(int id, const LDateTime *i);
 	LDataPropI *GetObj(int id);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 
 	// LDataI API
 	LDataI &operator =(LDataI &p);
@@ -533,7 +533,7 @@ public:
 	const LDateTime *GetDate(int id);
 	Store3Status SetDate(int id, const LDateTime *i);
 	LDataPropI *GetObj(int id);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 	Store3Status SetRfc822(LStreamI *m);
 };
 
@@ -576,7 +576,7 @@ public:
 	const LDateTime *GetDate(int id);
 	Store3Status SetDate(int id, const LDateTime *i);
 	LDataPropI *GetObj(int id);
-	GDataIt GetList(int id);
+	LDataIt GetList(int id);
 	Store3Status SetRfc822(LStreamI *m);
 
 	// LDataI API

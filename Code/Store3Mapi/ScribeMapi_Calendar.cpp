@@ -234,7 +234,7 @@ LDataPropI *LMapiCalendar::GetObj(int id)
 	return NULL;
 }
 
-GDataIt LMapiCalendar::GetList(int id)
+LDataIt LMapiCalendar::GetList(int id)
 {
 	LAssert(0);
 	return NULL;

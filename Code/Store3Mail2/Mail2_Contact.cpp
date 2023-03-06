@@ -147,7 +147,7 @@ bool ContactData::SetInt(int id, int64 i)
 	return 0;
 }
 
-GDataIt ContactData::GetList(int id)
+LDataIt ContactData::GetList(int id)
 {
 	Load();
 

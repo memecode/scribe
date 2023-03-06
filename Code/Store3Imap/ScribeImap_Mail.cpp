@@ -719,8 +719,8 @@ void CopyImapSegs(ImapMail *Mail, LDataPropI *Dst, LDataPropI *Src)
 	}
 	
 	DDst->CopyProps(*DSrc);
-	GDataIt DstLst = Dst->GetList(FIELD_MIME_SEG);
-	GDataIt SrcLst = Src->GetList(FIELD_MIME_SEG);
+	LDataIt DstLst = Dst->GetList(FIELD_MIME_SEG);
+	LDataIt SrcLst = Src->GetList(FIELD_MIME_SEG);
 	ImapAttachment *ParentAtt = dynamic_cast<ImapAttachment*>(Dst);
 	LMime *ParentMime = ParentAtt->GetSeg();
 
@@ -777,7 +777,7 @@ Store3CopyImpl(ImapMail)
 	
 	To.DeleteObjects();
 
-	GDataIt pTo = p.GetList(FIELD_TO);
+	LDataIt pTo = p.GetList(FIELD_TO);
 	for (unsigned n=0; n<pTo->Length(); n++)
 	{
 		Store3Addr *a = new Store3Addr(GetStore(), (*pTo)[n]);
@@ -1195,7 +1195,7 @@ Store3Status ImapMail::SetObj(int id, LDataPropI *i)
 	return Store3Error;
 }
 
-GDataIt ImapMail::GetList(int id)
+LDataIt ImapMail::GetList(int id)
 {
 	Load();
 	switch (id)

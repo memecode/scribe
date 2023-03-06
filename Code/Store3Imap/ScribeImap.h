@@ -399,7 +399,7 @@ public:
 	Store3Status SetDate(int id, const LDateTime *i) override;
 	LDataPropI *GetObj(int id) override;
 	Store3Status SetObj(int id, LDataPropI *i) override;
-	GDataIt GetList(int id) override;
+	LDataIt GetList(int id) override;
 	Store3Status Save(LDataI *Folder = 0) override;
 	LAutoStreamI GetStream(const char *file, int line) override;
 	bool SetStream(LAutoStreamI stream) override;
@@ -556,7 +556,7 @@ public:
 	const LDateTime *GetDate(int id) override;
 	Store3Status SetDate(int id, const LDateTime *i) override;
 	LDataPropI *GetObj(int id) override;
-	GDataIt GetList(int id) override;
+	LDataIt GetList(int id) override;
 	LDataIterator<LDataFolderI*> &SubFolders() override;
 	LDataIterator<LDataI*> &Children() override;
 	LDataIterator<LDataPropI*> &Fields() override;

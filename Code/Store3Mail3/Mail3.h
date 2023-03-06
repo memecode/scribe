@@ -623,7 +623,7 @@ public:
 	Store3Status SetDate(int id, const LDateTime *t) override;
 	LDataPropI *GetObj(int id) override;
 	Store3Status SetObj(int id, LDataPropI *i) override;
-	GDataIt GetList(int id) override;
+	LDataIt GetList(int id) override;
 	Store3Status SetRfc822(LStreamI *m) override;
 };
 

@@ -2128,7 +2128,7 @@ LDataPropI *ImapFolder::GetObj(int id)
 	return NULL;
 }
 
-GDataIt ImapFolder::GetList(int id)
+LDataIt ImapFolder::GetList(int id)
 {
 	LAssert(0);
 	return NULL;

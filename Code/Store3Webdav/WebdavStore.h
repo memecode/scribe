@@ -108,7 +108,7 @@ public:
 	bool ParseHeaders() { return false; }
 	LDataPropI *GetObj(int id) { EmptyVirtual(NULL); }	
 	Store3Status SetObj(int id, LDataPropI *i) { EmptyVirtual(Store3Error); }	
-	GDataIt GetList(int id) { EmptyVirtual(NULL); }		
+	LDataIt GetList(int id) { EmptyVirtual(NULL); }		
 	Store3Status SetRfc822(LStreamI *Rfc822Msg) { return Store3Error; }
 };
 
