@@ -123,7 +123,7 @@ struct Mail3Folders
 				{
 					c = f->CreateSubDirectory(p, CreateItemType);
 					if (!c)
-						return false;
+						return NULL;
 				}
 				else return NULL;
 			}
