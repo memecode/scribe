@@ -313,8 +313,8 @@ bool ExtractHtmlContent(LString &OutHtml,
 
 	LStringPipe p;
 	t.Write(&r, &p);
-	OutHtml = p.NewGStr();
-	Styles = Style.NewGStr();
+	OutHtml = p.NewLStr();
+	Styles = Style.NewLStr();
 
 	#if 0
 	LgiTrace("InHtml=%s\n", InHtml);
@@ -535,7 +535,7 @@ public:
 							while (!IsCancelled() && (Rd = p.Read(Buf, sizeof(Buf))) > 0)
 								Out.Write(Buf, Rd);
 
-							// LgiTrace("%s:%i - Process:\n%s\n", _FL, Out.NewGStr().Get());
+							// LgiTrace("%s:%i - Process:\n%s\n", _FL, Out.NewLStr().Get());
 							if (p.IsRunning())
 								p.Kill();
 							else
@@ -4862,10 +4862,12 @@ void Mail::Update()
 	LListItem::Update();
 }
 
-void ParseIdList(char *In, List<char> &Out)
+LString::Array ParseIdList(const char *In)
 {
+	LString::Array result;
+
     if (!In)
-        return;
+        return result;
         
     while (*In && strchr(WhiteSpace, *In))
         In++;
@@ -4873,16 +4875,17 @@ void ParseIdList(char *In, List<char> &Out)
     if (*In == '<')
     {
         // Standard msg-id list..
-	    for (char *s=In; s && *s; )
+	    for (auto s = In; s && *s; )
 	    {
 		    s = strchr(s, '<');
-		    if (!s) break;
+		    if (!s)
+				break;
 		    while (*s == '<') s++;
 
             char *e = strchr(s, '>');
             if (e)
             {
-	            Out.Insert(NewStr(s, e-s));
+	            result.New().Set(s, e-s);
 	            s = e + 1;
             }
             else break;
@@ -4892,19 +4895,23 @@ void ParseIdList(char *In, List<char> &Out)
     {
         // Non compliant msg-id list...
         const char Delim[] = ", \t\r\n";
-	    for (char *s=In; s && *s; )
+	    for (auto s = In; s && *s; )
 	    {
 	        if (strchr(Delim, *s))
 	            s++;
 		    else
 		    {
-	            char *Start = s;
+	            auto Start = s;
+
 	            while (*s && !strchr(Delim, *s))
 	                s++;
-	            Out.Insert(NewStr(Start, s - Start));
+	            
+				result.New().Set(Start, s - Start);
 		    }
 	    }
 	}
+
+	return result;
 }
 
 void Base36(char *Out, uint64 In)
@@ -5122,11 +5129,8 @@ const char *Mail::GetMessageId(bool Create)
 			LAssert(InThread);
 			if (InThread)
 			{
-				List<char> Ids;
-				ParseIdList(Header, Ids);
-				SetMessageId(Ids[0]);
-				Ids.DeleteArrays();
-				d->MsgIdCache = GetObject()->GetStr(FIELD_MESSAGE_ID);
+				auto Ids = ParseIdList(Header);
+				SetMessageId(d->MsgIdCache = Ids[0]);
 			}
 		}
 
@@ -5182,22 +5186,21 @@ const char *Mail::GetMessageId(bool Create)
 	return d->MsgIdCache;
 }
 
-bool Mail::GetReferences(List<char> &Ids)
+bool Mail::GetReferences(LString::Array &Ids)
 {
 	LAutoString References(InetGetHeaderField(GetInternetHeader(), "References"));
 	if (References)
 	{
-		ParseIdList(References, Ids);
+		Ids = ParseIdList(References);
 	}
 
 	LAutoString InReplyTo(InetGetHeaderField(GetInternetHeader(), "In-Reply-To"));
 	if (InReplyTo)
 	{
-		List<char> To;
-		ParseIdList(InReplyTo, To);
+		auto To = ParseIdList(InReplyTo);
 		
 		bool Has = false;
-		char *r = To[0];
+		auto &r = To[0];
 		if (r)
 		{
 		    for (auto h: Ids)
@@ -5209,7 +5212,7 @@ bool Mail::GetReferences(List<char> &Ids)
 		    if (!Has)
 		    {
 			    To.Delete(r);
-			    Ids.Insert(r);
+			    Ids.New() = r;
 		    }
 		}
 		
@@ -5225,7 +5228,7 @@ bool Mail::GetReferences(List<char> &Ids)
             size_t Bytes = Len >> 1;
             if (Bytes >= 22)
             {
-                Ids.Insert(Id.Release());
+                Ids.New() = Id.Get();
             }
         }
 	}
@@ -9410,7 +9413,7 @@ Thing::IoProgress Mail::Export(IoProgressImplArgs)
 		Buf.Push(GetBody());
 
 		// Write the output
-		auto s = Buf.NewGStr();
+		auto s = Buf.NewLStr();
 		if (!s)
 			IoProgressError("No data to output.");
 		stream->Write(s.Get(), s.Length());

@@ -960,10 +960,8 @@ const char *LMail3Mail::GetStr(int id)
 				LAutoString Header(InetGetHeaderField(GetStr(FIELD_INTERNET_HEADER), "Message-ID"));
 				if (Header)
 				{
-					List<char> Ids;
-					ParseIdList(Header, Ids);
+					auto Ids = ParseIdList(Header);
 					MessageID = Ids[0];
-					Ids.DeleteArrays();
 				}
 			}
 			return MessageID.Str();

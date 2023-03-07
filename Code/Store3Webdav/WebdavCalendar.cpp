@@ -36,7 +36,7 @@ bool WebdavCalendar::ConvertToText()
 	VCal convert;
 	Converted = convert.Export(this, &p);
 	if (Converted)
-		vCal = p.NewGStr();
+		vCal = p.NewLStr();
 	else
 		vCal.Empty();
 

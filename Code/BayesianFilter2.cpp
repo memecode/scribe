@@ -403,7 +403,7 @@ LString BayesianFilter::MakeMailWordList(Mail *m)
 
 		LStringPipe p;
 		if (m->Export(p, sMimeMessage))
-			return p.NewGStr();
+			return p.NewLStr();
 
 		return NULL;
 

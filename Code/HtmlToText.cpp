@@ -61,5 +61,5 @@ LString TextToHtml(const char *Txt, const char *Charset)
 	}
 
 	p.Print("</body></html>\n");
-	return p.NewGStr();
+	return p.NewLStr();
 }

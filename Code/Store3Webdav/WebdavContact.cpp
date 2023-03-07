@@ -34,7 +34,7 @@ bool WebdavContact::ConvertToText()
 	VCard convert;
 	Converted = convert.Export(this, &p);
 	if (Converted)
-		vCard = p.NewGStr();
+		vCard = p.NewLStr();
 	else
 		vCard.Empty();
 

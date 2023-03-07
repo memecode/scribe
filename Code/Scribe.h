@@ -879,7 +879,7 @@ public:
 	int			Index;
 
 	// Cache data
-	List<char> RefCache;
+	LString::Array RefCache;
 	
 	// Debug
 	#ifdef _DEBUG
@@ -909,6 +909,7 @@ extern int ListItemCompare(LListItem *a, LListItem *b, NativeInt Data);
 extern int ContainerIndexer(Thing *a, Thing *b, NativeInt Data);
 extern int GetFolderVersion(const char *Path);
 extern bool CreateMailHeaders(ScribeWnd *App, LStream &Out, LDataI *Mail, MailProtocol *Protocol);
+extern void Base36(char *Out, uint64 In);
 
 ////////////////////////////////////////////////////////////
 // Thing sorting
@@ -1058,7 +1059,7 @@ public:
 	
 	static Mail *GetMailFromId(const char *Id);
 	bool MailMessageIdMap(bool Add = true);
-	bool GetReferences(List<char> &Ids);
+	bool GetReferences(LString::Array &Ids);
 	void GetThread(List<Mail> &Thread);
 	LString GetMailRef();
 	bool ResizeImage(Attachment *a);

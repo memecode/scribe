@@ -421,7 +421,7 @@ public:
 				LStringPipe NewPath(256);
 				auto ParentPath = ParentFolder->GetPath();
 				NewPath.Print("/%s/%s", ParentPath.Get(), Ls);
-				auto BaseNewPath = NewPath.NewGStr();
+				auto BaseNewPath = NewPath.NewLStr();
 				LString NewPathStr = BaseNewPath.Get();
 
 				while (Parent->GetFolder(NewPathStr))
@@ -434,7 +434,7 @@ public:
 
 					int i = atoi(Num);
 					NewPath.Print("%s%i", BaseNewPath.Get(), i+1);
-					NewPathStr = NewPath.NewGStr();
+					NewPathStr = NewPath.NewLStr();
 				}
 
 				// Create output folder

@@ -1315,7 +1315,7 @@ int ImapThread::Main()
 									if (i) n.Print(",");
 									n.Print("%s", Numbers[i].Get());
 								}
-								auto Range = n.NewGStr();
+								auto Range = n.NewLStr();
 
 								LAutoPtr<ImapMsg> New(new ImapMsg(IMAP_ON_NEW, _FL));
 								if (d->Imap->Fetch(true, Range, GetListingParts(d->CurrentFolder), ListingCallback, New))

@@ -419,7 +419,7 @@ bool ImapFolder::Serialize(bool Write)
 			if (Debug)
 				LgiTrace("%s:%i - Buf has %s.\n", _FL, LFormatSize(Buf.GetSize()).Get());
 
-			auto Xml = Buf.NewGStr();
+			auto Xml = Buf.NewLStr();
 			if (WriteThread.Reset(new ImapFolderWriterThread(XmlPath, Xml)))
 			{
 				if (e)

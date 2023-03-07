@@ -2765,7 +2765,7 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 				}
 			}
 			
-			Value = p.NewGStr().Get();
+			Value = p.NewLStr().Get();
 			break;
 		}
 		case SdExecute: // Type: String
@@ -3816,7 +3816,7 @@ bool ScribeWnd::SaveOptions()
 	
 	if (!Status)
 	{
-		LString a = Log.NewGStr();
+		LString a = Log.NewLStr();
 		LgiMsg(this, "Saving options failed:\n%s", AppName, MB_OK, a.Get());
 	}
 	
@@ -6023,7 +6023,7 @@ void ScribeWnd::SetupUi()
 	{
 		s.Print(" [%s]", UserName.Str());
 	}
-	auto AppTitle = s.NewGStr();
+	auto AppTitle = s.NewLStr();
 	TrayIcon.Name(AppTitle);
 	Name(AppTitle);
 
@@ -10921,7 +10921,7 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 		}
 	}
 
-	return p.NewGStr();
+	return p.NewLStr();
 }
 
 LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)

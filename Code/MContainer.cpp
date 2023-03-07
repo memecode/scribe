@@ -109,7 +109,7 @@ int MContainer::CountMessages()
 
 void MContainer::SetMail(Mail *m)
 {
-	RefCache.DeleteArrays();
+	RefCache.Empty();
 
 	if ((Message = m))
 	{

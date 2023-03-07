@@ -132,7 +132,7 @@ struct ScribeExportTask : public FolderTask
 	ScribeFolder *DstFolder = NULL;
 	LDataFolderI *DstObj = NULL;
 	LDataStoreI *DstStore = NULL;
-	LHashTbl<ConstStrKey<char>,LDataI*> DstMsgIds;
+	LHashTbl<ConstStrKey<char>,LDataI*> DstObjMap;
 
 	ScribeExportTask(struct ScribeExportDlg *dlg);
 
@@ -207,23 +207,132 @@ struct ScribeExportTask : public FolderTask
 					"<body style='background:ThreeDFace;'><div>Mail export complete.</div>\n"
 					"<br>\n"
 					"<table style='border-spacing: 1px; background:#aaa;'>\n"
-					"<tr><th>Object <th>Created <th>Errors <th>Skipped </tr>\n");
+					"<tr><th>Type <th>Created <th>Errors <th>Skipped </tr>\n");
 		for (int i=0; i<CountOf(types); i++)
 		{
 			auto type    = types[i];
-			auto name    = Store3ItemTypeName(type);
+			auto name    = LString(Store3ItemTypeName(type)).Replace("MAGIC_");
+			StrLwr(name.Get() + 1);
 			auto created = Created.Find(type);
 			auto errors  = Errors.Find(type);
 			auto skipped = Skipped.Find(type);
 			auto errStyle = errors ? " style='color:red'" : "";
 
 			html.Print("<tr><td>%s <td>%i <td%s>%i <td>%i </tr>\n",
-				name, created, errStyle, errors, skipped);
+				name.Get(), created, errStyle, errors, skipped);
 		}
 
-		html.Print("</table></body>\n");
+		html.Print("</table>\n"
+					"<br>\n"
+					"<b>Created:</b> new item created in destination store.<br>\n"
+					"<b>Error:</b> there was an error replicating item.<br>\n"
+					"<b>Skipped:</b> the item already existed in the destination store.<br>\n"
+					);
 
-		LHtmlMsg(NULL, this, html.NewGStr(), "Export", MB_OK);
+		LHtmlMsg(NULL, App, html.NewLStr(), "Export", MB_OK);
+	}
+
+	LString ObjToId(LDataI &obj)
+	{
+		switch (obj.Type())
+		{
+			case MAGIC_MAIL:
+			{
+				auto msgId = obj.GetStr(FIELD_MESSAGE_ID);
+				if (msgId)
+					return msgId;
+				
+				// Check the headers:
+				auto hdrs = obj.GetStr(FIELD_INTERNET_HEADER);
+				if (hdrs)
+				{
+					LAutoString Header(InetGetHeaderField(hdrs, "Message-ID"));
+					if (Header)
+					{
+						auto ids = ParseIdList(Header);
+						auto id = ids[0];
+						obj.SetStr(FIELD_MESSAGE_ID, id);
+						return id;
+					}
+				}
+
+				// Msg has no ID and no header... create one.
+				auto from = obj.GetObj(FIELD_FROM);
+				if (!from)
+					break;
+				auto fromEmail = from->GetStr(FIELD_EMAIL);
+				if (!fromEmail)
+					break;
+					
+				const char *At = fromEmail ? strchr(fromEmail, '@') : NULL;
+				if (!At)
+				{
+					LVariant Email;
+					if (App->GetOptions()->GetValue(OPT_Email, Email) && Email.Str())
+						At = strchr(Email.Str(), '@');
+					else
+						At = "@domain.com";
+				}
+				if (!At)
+					break;
+
+				char m[96], a[32], b[32];
+				Base36(a, LCurrentTime());
+				Base36(b, LRand(RAND_MAX));
+				sprintf_s(m, sizeof(m), "<%s.%i%s%s>", a, LRand(RAND_MAX), b, At);
+				obj.SetStr(FIELD_MESSAGE_ID, m);
+				return m;
+			}
+			case MAGIC_CONTACT:
+			{
+				auto fn = obj.GetStr(FIELD_FIRST_NAME);
+				auto ln = obj.GetStr(FIELD_LAST_NAME);
+				auto em = obj.GetStr(FIELD_EMAIL);
+				LString s;
+				s.Printf("%s,%s,%s", fn, ln, em);
+				return s;
+			}
+			case MAGIC_CALENDAR:
+			{
+				auto sub = obj.GetStr(FIELD_CAL_SUBJECT);
+				auto start = obj.GetDate(FIELD_CAL_START_UTC);
+				LString s;
+				s.Printf("%s," LPrintfInt64, sub, start?start->Ts():0);
+				return s;
+				break;
+			}
+			case MAGIC_GROUP:
+			{
+				return obj.GetStr(FIELD_GROUP_NAME);
+			}
+			case MAGIC_FILTER:
+			{
+				return obj.GetStr(FIELD_FILTER_NAME);
+			}
+			default:
+			{
+				LAssert(!"Impl me.");
+				break;
+			}
+		}
+
+		return LString();
+	}
+
+	void MakeDstObjMap()
+	{
+		DstObjMap.Empty();
+
+		if (!DstFolder || !DstObj)
+			return;
+
+		auto &c = DstObj->Children();
+		for (auto t = c.First(); t; t = c.Next())
+		{
+			auto Id = ObjToId(*t);
+			if (Id)
+				DstObjMap.Add(Id, t);
+		}
 	}
 };
 
@@ -432,7 +541,7 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 				}
 
 				App->GetOptions()->SetValue(OPT_ScribeExpDstPath, v = GetCtrlName(IDC_FOLDER));
-				App->GetOptions()->SetValue(OPT_ScribeExpAll, v = (int)GetCtrlValue(IDC_ALL));
+				App->GetOptions()->SetValue(OPT_ScribeExpAll,     v = (int)GetCtrlValue(IDC_ALL));
 				App->GetOptions()->SetValue(OPT_ScribeExpExclude, v = (int)GetCtrlValue(IDC_NO_SPAM_TRASH));
 				App->GetOptions()->SetValue(OPT_ScribeExpFolders, v = GetCtrlName(IDC_DEST));
 
@@ -516,12 +625,6 @@ bool ScribeExportTask::TimeSlice()
 				return true;
 			}
 
-			auto Path = SrcFolder->GetPath();
-			if (Stristr(Path.Get(), "/Inbox"))
-			{
-				int asd=0;
-			}
-
 			DstStore = NULL;
 			DstFolder = GetFolder(dst, SrcFolder->GetItemType());
 			if (!DstFolder)
@@ -561,24 +664,7 @@ bool ScribeExportTask::TimeSlice()
 							else
 								LAssert(!"No object?");
 
-							DstMsgIds.Empty();
-							if (DstFolder->GetItemType() == MAGIC_MAIL)
-							{
-								// Make a map of destination folder message IDs
-								if (DstObj)
-								{
-									auto &c = DstObj->Children();
-									for (auto t = c.First(); t; t = c.Next())
-									{
-										if (t->Type() != MAGIC_MAIL)
-											continue;
-
-										auto Id = t->GetStr(FIELD_MESSAGE_ID);
-										if (Id)
-											DstMsgIds.Add(Id, t);
-									}
-								}
-							}
+							MakeDstObjMap();
 						}
 						else
 							State = ExpGetNext;
@@ -622,7 +708,7 @@ bool ScribeExportTask::TimeSlice()
 						if (!Id)
 							OnError("%s:%i - Email has no MsgId\n", _FL)
 
-						if (DstMsgIds.Find(Id))
+						if (DstObjMap.Find(Id))
 							OnSkip()
 
 						// Create new mail...
@@ -673,6 +759,11 @@ bool ScribeExportTask::TimeSlice()
 					}
 					default:
 					{
+						// Is the object already in the dst map?
+						auto Id = ObjToId(*in);
+						if (DstObjMap.Find(Id))
+							OnSkip();
+
 						auto outObj = DstStore->Create(in->Type());
 						if (!outObj)
 						{

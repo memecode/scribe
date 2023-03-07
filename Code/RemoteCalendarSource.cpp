@@ -53,7 +53,7 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 				if (r)
 				{
 					/*
-					auto s = out.NewGStr();
+					auto s = out.NewLStr();
 					LgiTrace("s='%s'\n", s.Get());
 					*/
 

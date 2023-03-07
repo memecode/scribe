@@ -875,7 +875,7 @@ Store3Status LMail3Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &V
 
 		if (Chunk.Length())
 		{
-			auto Sql = p.NewGStr();
+			auto Sql = p.NewLStr();
 			LStatement s(this, Sql);
 			if (!s.Exec())
 				return Store3Error;
