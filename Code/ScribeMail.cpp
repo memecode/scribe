@@ -5142,9 +5142,9 @@ const char *Mail::GetMessageId(bool Create)
 			{
 				auto FromEmail = GetFromStr(FIELD_EMAIL);
 				const char *At = FromEmail ? strchr(FromEmail, '@') : 0;
+				LVariant Email;
 				if (!At)
 				{
-					LVariant Email;
 					if (App->GetOptions()->GetValue(OPT_Email, Email) && Email.Str())
 					{
 						At = strchr(Email.Str(), '@');

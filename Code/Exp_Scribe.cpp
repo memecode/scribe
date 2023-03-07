@@ -232,56 +232,67 @@ struct ScribeExportTask : public FolderTask
 		LHtmlMsg(NULL, App, html.NewLStr(), "Export", MB_OK);
 	}
 
+	LString GetOrCreateMessageId(LDataI &obj)
+	{
+		auto msgId = obj.GetStr(FIELD_MESSAGE_ID);
+		if (msgId)
+			return msgId;
+
+		// Check the headers:
+		auto hdrs = obj.GetStr(FIELD_INTERNET_HEADER);
+		if (hdrs)
+		{
+			LAutoString Header(InetGetHeaderField(hdrs, "Message-ID"));
+			if (Header)
+			{
+				auto ids = ParseIdList(Header);
+				auto id = ids[0];
+				obj.SetStr(FIELD_MESSAGE_ID, id);
+				obj.Save();
+				return id;
+			}
+		}
+
+		// Msg has no ID and no header... create one.
+		auto from = obj.GetObj(FIELD_FROM);
+		if (!from)
+		{
+			LgiTrace("%s:%i - No from for email: %p\n", _FL, &obj);
+			return LString();
+		}
+
+		auto fromEmail = from->GetStr(FIELD_EMAIL);
+		LVariant Email;
+		const char *At = fromEmail ? strchr(fromEmail, '@') : NULL;
+		if (!At)
+		{
+			if (App->GetOptions()->GetValue(OPT_Email, Email) && Email.Str())
+				At = strchr(Email.Str(), '@');
+			else
+				At = "@domain.com";
+		}
+		if (!At)
+		{
+			LgiTrace("%s:%i - No at in email: %p\n", _FL, &obj);
+			return LString();
+		}
+
+		char m[96], a[32], b[32];
+		Base36(a, LCurrentTime());
+		Base36(b, LRand(RAND_MAX));
+		sprintf_s(m, sizeof(m), "<%s.%i%s%s>", a, LRand(RAND_MAX), b, At);
+		obj.SetStr(FIELD_MESSAGE_ID, m);
+		obj.Save();
+		return m;
+	}
+
 	LString ObjToId(LDataI &obj)
 	{
 		switch (obj.Type())
 		{
 			case MAGIC_MAIL:
 			{
-				auto msgId = obj.GetStr(FIELD_MESSAGE_ID);
-				if (msgId)
-					return msgId;
-				
-				// Check the headers:
-				auto hdrs = obj.GetStr(FIELD_INTERNET_HEADER);
-				if (hdrs)
-				{
-					LAutoString Header(InetGetHeaderField(hdrs, "Message-ID"));
-					if (Header)
-					{
-						auto ids = ParseIdList(Header);
-						auto id = ids[0];
-						obj.SetStr(FIELD_MESSAGE_ID, id);
-						return id;
-					}
-				}
-
-				// Msg has no ID and no header... create one.
-				auto from = obj.GetObj(FIELD_FROM);
-				if (!from)
-					break;
-				auto fromEmail = from->GetStr(FIELD_EMAIL);
-				if (!fromEmail)
-					break;
-					
-				const char *At = fromEmail ? strchr(fromEmail, '@') : NULL;
-				if (!At)
-				{
-					LVariant Email;
-					if (App->GetOptions()->GetValue(OPT_Email, Email) && Email.Str())
-						At = strchr(Email.Str(), '@');
-					else
-						At = "@domain.com";
-				}
-				if (!At)
-					break;
-
-				char m[96], a[32], b[32];
-				Base36(a, LCurrentTime());
-				Base36(b, LRand(RAND_MAX));
-				sprintf_s(m, sizeof(m), "<%s.%i%s%s>", a, LRand(RAND_MAX), b, At);
-				obj.SetStr(FIELD_MESSAGE_ID, m);
-				return m;
+				return obj.GetStr(FIELD_MESSAGE_ID);
 			}
 			case MAGIC_CONTACT:
 			{
@@ -704,9 +715,9 @@ bool ScribeExportTask::TimeSlice()
 				{
 					case MAGIC_MAIL:
 					{
-						auto Id = in->GetStr(FIELD_MESSAGE_ID);
+						auto Id = GetOrCreateMessageId(*in);
 						if (!Id)
-							OnError("%s:%i - Email has no MsgId\n", _FL)
+							OnError("%s:%i - Email %p has no MsgId\n", _FL, in)
 
 						if (DstObjMap.Find(Id))
 							OnSkip()
