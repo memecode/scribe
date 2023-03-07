@@ -11,40 +11,21 @@
 #include "../Resources/resdefs.h"
 #include "FolderTask.h"
 
-/*
-
-	int CountItems(ScribeFolder *f, bool Children)
-	{
-		int Status = 0;
-
-		if (f && f->Store)
-		{
-			for (StorageItem *i = f->Store->GetChild(); i; i = i->GetNext())
-			{
-				if (i->GetType() == MAGIC_MAIL ||
-					i->GetType() == MAGIC_CONTACT)
-				{
-					Status++;
-				}
-			}
-
-			if (Children)
-			{
-				for (ScribeFolder *c = f->GetChildFolder(); c; c = c->GetNextFolder())
-				{
-					if ((!Spam || c != Spam) &&
-						(!Trash || c != Trash))
-					{
-						Status += CountItems(c, Children);
-					}
-				}
-			}
-		}
-
-		return Status;
-	}
-
-*/
+#define OnError(...) \
+{ \
+	Errors.Add(in->Type(), Errors.Find(in->Type()) + 1); \
+	LgiTrace(__VA_ARGS__); \
+	break; \
+}
+#define OnSkip() \
+{ \
+	Skipped.Add(in->Type(), Skipped.Find(in->Type()) + 1); \
+	break; \
+}
+#define OnCreate() \
+{ \
+	Created.Add(in->Type(), Created.Find(in->Type()) + 1); \
+}
 
 struct ExportParams
 {
@@ -63,7 +44,6 @@ struct Mail3Folders
 
 	Mail3Folders(ScribeWnd *app) : App(app)
 	{
-		int asd=0;
 	}
 
 	Mail3Folders(Mail3Folders &src)
@@ -104,34 +84,21 @@ struct Mail3Folders
 		Store.Reset();
 	}
 
-	ScribeFolder *GetFolder(LString Path, Store3ItemTypes CreateItemType = MAGIC_NONE)
+	bool CheckDirty(ScribeFolder *f)
+	{
+		if (f->GetDirty())
+			return true;
+		for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
+			if (CheckDirty(c))
+				return true;
+		return false;
+	}
+
+	bool IsDirty()
 	{
 		if (!Root)
-		{
-			LAssert(!"No root loaded.");
-			return NULL;
-		}
-
-		auto parts = Path.SplitDelimit("/");
-		ScribeFolder *f = Root;
-		for (auto p: parts)
-		{
-			auto c = f->GetSubFolder(p);
-			if (!c)
-			{
-				if (CreateItemType != MAGIC_NONE)
-				{
-					c = f->CreateSubDirectory(p, CreateItemType);
-					if (!c)
-						return NULL;
-				}
-				else return NULL;
-			}
-
-			f = c;
-		}
-
-		return f;
+			return false;
+		return CheckDirty(Root);
 	}
 };
 
@@ -139,16 +106,7 @@ struct ScribeExportTask : public FolderTask
 {
 	int FolderLoadErrors = 0;
 
-	int MailCreated = 0;
-	int MailSkipped = 0;
-	int MailErrors = 0;
-
-	int ContactCreated = 0;
-	int ContactSkipped = 0;
-	int ContactErrors = 0;
-
-	int ObjectCreated = 0;
-	int ObjectErrors = 0;
+	LHashTbl<IntKey<int>,int> Created, Errors, Skipped;
 
 	LMailStore *SrcStore = NULL; // Source data store
 	Mail3Folders Dst;
@@ -165,6 +123,7 @@ struct ScribeExportTask : public FolderTask
 		ExpLoadFolders,
 		ExpItems,
 		ExpFinished,
+		ExpCleanup
 	}	State = ExpNone;
 
 	LString::Array InputPaths;
@@ -183,7 +142,7 @@ struct ScribeExportTask : public FolderTask
 
 	LString MakePath(LString path)
 	{
-		LString sep;
+		LString sep = "/";
 		auto p = Params.DestPath.SplitDelimit(sep);
 		p += path.Strip(sep).SplitDelimit(sep).Slice(1);
 		return sep + sep.Join(p);
@@ -196,21 +155,75 @@ struct ScribeExportTask : public FolderTask
 			CollectPaths(c, paths);
 	}
 
+	ScribeFolder *GetFolder(LString Path, Store3ItemTypes CreateItemType = MAGIC_NONE)
+	{
+		if (!Dst.Root)
+		{
+			LAssert(!"No root loaded.");
+			return NULL;
+		}
+
+		Dst.Root->LoadFolders();
+
+		bool Create = false;
+		auto parts = Path.SplitDelimit("/");
+		ScribeFolder *f = Dst.Root;
+		for (auto p: parts)
+		{
+			auto c = f->GetSubFolder(p);
+			if (!c)
+			{
+				if (CreateItemType != MAGIC_NONE)
+				{
+					c = f->CreateSubDirectory(p, CreateItemType);
+					if (!c)
+					{
+						Errors.Add(MAGIC_FOLDER, Errors.Find(MAGIC_FOLDER)+1);
+						return NULL;
+					}
+
+					Create = true;
+				}
+				else return NULL;
+			}
+
+			f = c;
+		}
+
+		if (Create)
+			Created.Add(MAGIC_FOLDER, Created.Find(MAGIC_FOLDER)+1);
+		else
+			Skipped.Add(MAGIC_FOLDER, Skipped.Find(MAGIC_FOLDER)+1);
+
+		return f;
+	}
+
 	void OnComplete()
 	{
-		LgiMsg(	this,
-				"Mail export complete.\n"
-				"\n"
-				"    Email: %i created, %i already exist, %i errors\n"
-				"    Contacts: %i created, %i already exist, %i errors",
-				"Export",
-				MB_OK,
-				MailCreated,
-				MailSkipped,
-				MailErrors,
-				ContactCreated,
-				ContactSkipped,
-				ContactErrors);
+		Store3ItemTypes types[] = { MAGIC_FOLDER, MAGIC_MAIL, MAGIC_CONTACT, MAGIC_CALENDAR, MAGIC_GROUP, MAGIC_FILTER };
+		LStringPipe html;
+
+		html.Print("<style> td{background:ThreeDFace; padding:3px;}</style>\n"
+					"<body style='background:ThreeDFace;'><div>Mail export complete.</div>\n"
+					"<br>\n"
+					"<table style='border-spacing: 1px; background:#aaa;'>\n"
+					"<tr><th>Object <th>Created <th>Errors <th>Skipped </tr>\n");
+		for (int i=0; i<CountOf(types); i++)
+		{
+			auto type    = types[i];
+			auto name    = Store3ItemTypeName(type);
+			auto created = Created.Find(type);
+			auto errors  = Errors.Find(type);
+			auto skipped = Skipped.Find(type);
+			auto errStyle = errors ? " style='color:red'" : "";
+
+			html.Print("<tr><td>%s <td>%i <td%s>%i <td>%i </tr>\n",
+				name, created, errStyle, errors, skipped);
+		}
+
+		html.Print("</table></body>\n");
+
+		LHtmlMsg(NULL, this, html.NewGStr(), "Export", MB_OK);
 	}
 };
 
@@ -476,197 +489,6 @@ LString ScribeExportTask::ContactKey(Contact *c)
 	{ if (onStatus) onStatus(b); \
 	return; }
 
-/*
-void ScribeExportTask::ExportFolder(LString ToPath,
-									LString FromPath,
-									bool Children,
-									LProgressDlg *Prog,
-									std::function<void(bool)> onStatus)
-{
-	if (!ToPath || !FromPath)
-		ExportFolderStatus(false);
-
-	ScribeFolder *From = App->GetFolder(FromPath);
-	if (!From)
-		ExportFolderStatus(false);
-
-	if (!((!Spam  || From != Spam) &&
-		(!Trash || From != Trash)))
-		ExportFolderStatus(false);
-
-	ScribeFolder *To = GetFolder(ToPath, From);
-	if (!To)
-		ExportFolderStatus(false);
-
-	bool FromLoaded = From->IsLoaded();
-	bool ToLoaded = From->IsLoaded();
-
-	auto ProcessItem = [this, To, Prog, FromPath, From, FromLoaded, ToLoaded, Children, ToPath, onStatus]()
-	{
-		bool Status = true;
-
-
-		if (!FromLoaded)
-		{
-			From->UnloadThings();
-		}
-		if (!ToLoaded)
-		{
-			To->UnloadThings();
-		}
-
-		if (Children)
-		{
-			char t[256];
-			char f[256];
-			LString n;
-
-			for (ScribeFolder *c = From->GetChildFolder(); c && (!Prog || !Prog->IsCancelled()); c = c->GetNextFolder())
-			{
-				n = c->GetName(true);
-				if (n)
-				{
-					strcpy_s(t, sizeof(t), ToPath);
-					char *e = t + strlen(t) - 1;
-					if (*e++ != '/') *e++ = '/';
-					strcpy_s(e, sizeof(t)-(e-t), n);
-
-					strcpy_s(f, sizeof(f), FromPath);
-					e = f + strlen(f) - 1;
-					if (*e++ != '/') *e++ = '/';
-					strcpy_s(e, sizeof(f)-(e-f), n);
-									
-					ExportFolder(t, f, true, Prog, [](auto ok){});
-				}
-			}
-		}
-	};
-
-	To->LoadThings(NULL, [From, ProcessItem](auto status)
-	{
-		From->LoadThings(NULL, [ProcessItem](auto status)
-		{
-			ProcessItem();
-		});
-	});
-}
-
-bool ScribeExportTask::ExportThing()
-{
-	switch ((uint32_t)SrcFolder->GetItemType())
-	{
-		case MAGIC_MAIL:
-		{
-			int InitMailErrors = MailErrors;
-								
-			for (auto t: From->Items)
-			{
-				if (Prog && Prog->IsCancelled())
-					break;
-									
-				Mail *m = t->IsMail();
-				if (m)
-				{
-					auto Id = m->GetMessageId(true);
-					if (Id)
-					{
-						if (!ToMsgs.Find(Id))
-						{
-							// Create new mail...
-							Mail *n = new Mail(App);
-							if (n)
-							{
-								*n = (Thing&)*m;
-								n->SetParentFolder(To);
-								n->SetObject(To->GetObject()->GetStore()->Create(MAGIC_MAIL), false, _FL);
-								if (n->GetObject())
-								{
-									MailCreated++;
-
-									// Now create all the attachments
-									List<Attachment> Att;
-									if (m->GetAttachments(&Att))
-									{
-										for (auto OldAttachment: Att)
-										{
-											Attachment *NewAttachment = new Attachment(m->App, OldAttachment);
-											if (NewAttachment)
-											{
-												n->AttachFile(NewAttachment);
-												NewAttachment->SetObject(n->GetObject()->GetStore()->Create(MAGIC_ATTACHMENT), false, _FL);
-											}
-										}
-									}
-								}
-								else MailErrors++;
-
-							}
-							else MailErrors++;
-						}
-						else MailSkipped++;
-					}
-					else MailErrors++;
-				}
-
-				if (Prog)
-					Prog->Value(Prog->Value() + 1);
-			}
-
-			Status |= MailErrors == InitMailErrors;
-			break;
-		}
-		case MAGIC_CONTACT:
-		{
-			LHashTbl<StrKey<char>,Contact*> ToContacts;
-			for (auto t: To->Items)
-			{
-				Contact *c = t->IsContact();
-				if (c)
-				{
-					auto k = ContactKey(c);
-					if (k)
-						ToContacts.Add(k, c);
-				}
-			}
-
-			int InitContactErrors = ContactErrors;
-			uint64 Last = LCurrentTime();
-			for (auto t: From->Items)
-			{
-				if (Prog && Prog->IsCancelled())
-					break;
-										
-				Contact *c = t->IsContact();
-				if (c)
-				{
-					auto k = ContactKey(c);
-					if (k)
-					{
-						if (!ToContacts.Find(k))
-						{
-							Contact *n = new Contact(App);
-							if (n)
-							{
-								*n = (Thing&)*c;
-								n->SetParentFolder(To);
-							}
-							else ContactErrors++;
-						}
-						else ContactSkipped++;
-					}
-					else ContactErrors++;
-				}
-
-				if (Prog)
-					Prog->Value(Prog->Value() + 1);
-			}
-
-			Status |= ContactErrors == InitContactErrors;
-			break;
-		}
-}
-*/
-
 bool ScribeExportTask::TimeSlice()
 {
 	if (IsCancelled())
@@ -694,8 +516,14 @@ bool ScribeExportTask::TimeSlice()
 				return true;
 			}
 
+			auto Path = SrcFolder->GetPath();
+			if (Stristr(Path.Get(), "/Inbox"))
+			{
+				int asd=0;
+			}
+
 			DstStore = NULL;
-			DstFolder = Dst.GetFolder(dst, SrcFolder->GetItemType());
+			DstFolder = GetFolder(dst, SrcFolder->GetItemType());
 			if (!DstFolder)
 			{
 				return true;
@@ -721,7 +549,7 @@ bool ScribeExportTask::TimeSlice()
 						if (status == Store3Success)
 						{
 							State = ExpItems;
-							SetDescription(DstFolder->GetPath());
+							SetDescription(SrcFolder->GetPath());
 
 							if (DstFolder->GetObject())
 								DstObj = dynamic_cast<LDataFolderI*>(DstFolder->GetObject());
@@ -792,16 +620,10 @@ bool ScribeExportTask::TimeSlice()
 					{
 						auto Id = in->GetStr(FIELD_MESSAGE_ID);
 						if (!Id)
-						{
-							MailErrors++;
-							break;
-						}
+							OnError("%s:%i - Email has no MsgId\n", _FL)
 
 						if (DstMsgIds.Find(Id))
-						{
-							MailSkipped++;
-							break;
-						}
+							OnSkip()
 
 						// Create new mail...
 						auto outMail = DstStore->Create(MAGIC_MAIL);
@@ -814,7 +636,7 @@ bool ScribeExportTask::TimeSlice()
 						{
 							outSeg = DstStore->Create(MAGIC_ATTACHMENT);
 							if (!outSeg)
-								MailErrors++;
+								OnError("%s:%i - Failed to create attachment\n", _FL)
 							else
 							{
 								outSeg->CopyProps(*inSeg);
@@ -832,18 +654,19 @@ bool ScribeExportTask::TimeSlice()
 								}
 
 								if (outMail->SetObj(FIELD_MIME_SEG, outSeg) < Store3Delayed)
-									MailErrors++;
+									OnError("%s:%i - Failed to attach seg to mail.\n", _FL)
 								else
 								{
 									LString err;
 									if (!CopyAttachments(outMail, outSeg, inSeg, err))
-										MailErrors++;
+										OnError("%s:%i - CopyAttachments failed\n", _FL)
 									else
-										MailCreated++;
+										OnCreate()
 								}
 							}
 						}
-						else MailCreated++;
+						else
+							OnCreate()
 
 						outMail->Save(DstFolder->GetObject());
 						break;
@@ -853,26 +676,18 @@ bool ScribeExportTask::TimeSlice()
 						auto outObj = DstStore->Create(in->Type());
 						if (!outObj)
 						{
-							ObjectErrors++;
-							LgiTrace("%s:%i - %s failed to create %s\n", _FL,
+							OnError("%s:%i - %s failed to create %s\n", _FL,
 								DstStore->GetStr(FIELD_STORE_TYPE),
-								Store3ItemTypeName((Store3ItemTypes)in->Type()));
-							break;
+								Store3ItemTypeName((Store3ItemTypes)in->Type()))
 						}
 
 						if (!outObj->CopyProps(*in))
-						{
-							ObjectErrors++;
-							break;
-						}
+							OnError("%s:%i - CopyProps failed.\n", _FL)
 
 						if (outObj->Save(DstFolder->GetObject()) < Store3Delayed)
-						{
-							ObjectErrors++;
-							break;
-						}
+							OnError("%s:%i - Save failed\n", _FL)
 
-						ObjectCreated++;
+						OnCreate();
 						break;
 					}
 				}
@@ -889,11 +704,21 @@ bool ScribeExportTask::TimeSlice()
 				(*this)++; // move progress...
 			}
 
-			LgiTrace("Processed: %i\n", Processed);
+			// LgiTrace("Processed: %i\n", Processed);
 			break;
 		}
 		case ExpFinished:
 		{
+			OnComplete();
+			State = ExpCleanup;
+			return true;
+		}
+		case ExpCleanup:
+		{
+			if (Dst.IsDirty())
+				return true;
+
+			// We're done...
 			return false;
 		}
 	}

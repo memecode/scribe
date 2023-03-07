@@ -342,8 +342,6 @@ class ScribeClass ThingType :
 	bool Loaded    = false;
 
 protected:
-	bool GetDirty() { return Dirty; }
-
 	bool OnError(const char *File, int Line)
 	{
 		_lgi_assert(false, "Object Missing", File, Line);
@@ -405,7 +403,9 @@ public:
 
 	ThingType();
 	virtual ~ThingType();
+
 	virtual Store3ItemTypes Type() { return MAGIC_NONE; }
+	bool GetDirty() { return Dirty; }
 	virtual bool SetDirty(bool b = true);
 	void SetWillDirty(bool c) { WillDirty = c; }
 

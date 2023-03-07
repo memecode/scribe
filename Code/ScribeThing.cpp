@@ -12,6 +12,14 @@ ThingType::ThingType()
 
 ThingType::~ThingType()
 {
+	if (Dirty)
+	{
+		if (DirtyThings.HasItem(this))
+		{
+			LAssert(!"Should not be deleting something in the dirty list...?");
+			DirtyThings.Delete(this);
+		}
+	}
 }
 
 void ThingType::WhenLoaded(const char *file, int line, std::function<void()> Callback, int index)

@@ -1535,14 +1535,13 @@ bool ScribeDom::GetVariant(const char *Name, LVariant &Value, const char *Array)
 
 class HtmlMsg : public LDialog, public LDefaultDocumentEnv
 {
-	LTableLayout *Tbl;
-	Html1::LHtml *Html2;
+	LTableLayout *Tbl = NULL;
+	Html1::LHtml *Html2 = NULL;
 
 public:
 	HtmlMsg(LViewI *Parent, const char *Html, const char *Title, int Type)
 	{
-		LPoint Size(200, 200);
-		Tbl = NULL;
+		LPoint Size(300, 300);
 		SetParent(Parent);
 		Name(Title?Title:"Message");
 		
@@ -1556,9 +1555,11 @@ public:
 			Html2->SetCharset("utf-8");
 			Html2->Name(Html);
 
+			/*
 			Size = Html2->Layout();
 			LRect r(0, 0, Size.x, Size.y);
 			Html2->SetPos(r);
+			*/
 		}
 
 		LArray<LButton*> Btns;
@@ -1593,6 +1594,12 @@ public:
 				Size.y + 20 + LSysFont->GetHeight() + LAppInst->GetMetric(LGI_MET_DECOR_CAPTION) + LAppInst->GetMetric(LGI_MET_DECOR_Y));
 		SetPos(r);
 		MoveSameScreen(Parent);
+	}
+
+	void OnPosChange()
+	{
+		if (Tbl)
+			Tbl->SetPos(GetClient());
 	}
 	
 	int OnNotify(LViewI *Ctrl, LNotification n)
