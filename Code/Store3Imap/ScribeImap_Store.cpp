@@ -130,6 +130,8 @@ const char *ImapStore::GetStr(int id)
 	{
 		case FIELD_ERROR:
 			return ErrorMsg;
+		case FIELD_STORE_TYPE:
+			return "ImapStore";
 	}
 	
 	return NULL;

@@ -1225,6 +1225,12 @@ Store3Status LMail3Mail::SetStr(int id, const char *str)
 		{
 			LoadSegs();
 			
+			if (!ValidStr(str))
+				// There is no point continuing as it will just attach an empty
+				// attachment which eventually asserts in the save code.
+				//		e.g. LMail3Attachment::GetHeaders()
+				break;
+
 			if (!Seg)
 			{
 				// This happens when the user re-sends an email and it creates
@@ -1237,12 +1243,6 @@ Store3Status LMail3Mail::SetStr(int id, const char *str)
 				}
 				
 				a->AttachTo(this);
-			}
-
-			if (!Seg)
-			{
-				LAssert(0);
-				return Store3Error;
 			}
 			
 			Seg->SetStr(id, str);

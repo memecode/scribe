@@ -380,6 +380,8 @@ const char *LMail3Store::GetStr(int id)
 			return StatusMsg;
 		case FIELD_TEMP_PATH:
 			return TempPath;
+		case FIELD_STORE_TYPE:
+			return "LMail3Store";
 	}
 	
 	return NULL;

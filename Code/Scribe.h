@@ -907,7 +907,6 @@ public:
 
 extern int ListItemCompare(LListItem *a, LListItem *b, NativeInt Data);
 extern int ContainerIndexer(Thing *a, Thing *b, NativeInt Data);
-extern const char *Store3ItemTypeName(Store3ItemTypes t);
 extern int GetFolderVersion(const char *Path);
 extern bool CreateMailHeaders(ScribeWnd *App, LStream &Out, LDataI *Mail, MailProtocol *Protocol);
 

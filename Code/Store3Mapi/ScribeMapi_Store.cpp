@@ -394,6 +394,8 @@ const char *LMapiStore::GetStr(int id)
 		case FIELD_FOLDER_NAME:
 			RootName = Username + "@" + Profile;
 			return RootName;
+		case FIELD_STORE_TYPE:
+			return "LMapiStore";
 	}
 	
 	return NULL;

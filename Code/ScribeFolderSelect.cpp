@@ -152,7 +152,7 @@ class LFolderCtrlFactory : public LViewFactory
 ScribeFolderTree::ScribeFolderTree(int id, int x, int y, int cx, int cy) :
 	LTree(id, x, y, cx, cy, "")
 {
-	_ObjName = Res_Custom;
+	SetObjectName(Res_Custom);
 	Sunken(true);
 	AskImage(true);
 }

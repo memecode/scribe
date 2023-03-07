@@ -138,12 +138,17 @@ struct Mail3Folders
 struct ScribeExportTask : public FolderTask
 {
 	int FolderLoadErrors = 0;
+
 	int MailCreated = 0;
 	int MailSkipped = 0;
 	int MailErrors = 0;
+
 	int ContactCreated = 0;
 	int ContactSkipped = 0;
 	int ContactErrors = 0;
+
+	int ObjectCreated = 0;
+	int ObjectErrors = 0;
 
 	LMailStore *SrcStore = NULL; // Source data store
 	Mail3Folders Dst;
@@ -383,6 +388,8 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 
 				if (Lst)
 				{
+					Params.SrcPaths.Empty();
+					Params.SrcPaths.SetFixedLength(false);
 					for (auto i: *Lst)
 						Params.SrcPaths.Add(i->GetText());
 				}
@@ -820,11 +827,10 @@ bool ScribeExportTask::TimeSlice()
 									{
 										// This is going to cause an assert later
 										outSeg->SetStr(FIELD_MIME_TYPE, sAppOctetStream);
-										LgiTrace("%s:%i - Setting default mime on %p\n", _FL, outSeg);
+										// LgiTrace("%s:%i - Setting default mime on %p\n", _FL, outSeg);
 									}
 								}
 
-								LgiTrace("%s:%i - Setting root seg: %p\n", _FL, outSeg);
 								if (outMail->SetObj(FIELD_MIME_SEG, outSeg) < Store3Delayed)
 									MailErrors++;
 								else
@@ -844,13 +850,34 @@ bool ScribeExportTask::TimeSlice()
 					}
 					default:
 					{
-						LgiTrace("%s:%i - Unhandled object type.\n", _FL);
+						auto outObj = DstStore->Create(in->Type());
+						if (!outObj)
+						{
+							ObjectErrors++;
+							LgiTrace("%s:%i - %s failed to create %s\n", _FL,
+								DstStore->GetStr(FIELD_STORE_TYPE),
+								Store3ItemTypeName((Store3ItemTypes)in->Type()));
+							break;
+						}
+
+						if (!outObj->CopyProps(*in))
+						{
+							ObjectErrors++;
+							break;
+						}
+
+						if (outObj->Save(DstFolder->GetObject()) < Store3Delayed)
+						{
+							ObjectErrors++;
+							break;
+						}
+
+						ObjectCreated++;
 						break;
 					}
 				}
 
 				Processed++;
-
 			}
 
 			if (SrcItems.Length() == 0)

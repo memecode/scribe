@@ -226,7 +226,11 @@ char *LMail3Attachment::GetHeaders()
 	if (!Headers)
 	{
 		LStringPipe p;
-		LAssert(MimeType != NULL);
+		if (!MimeType)
+		{
+			LAssert(!"MimeType is required.");
+			return NULL;
+		}
 		p.Print("Content-Type: %s", MimeType?MimeType.Get():(char*)"text/plain");
 		if (Charset)
 			p.Print("; charset=%s", Charset.Get());

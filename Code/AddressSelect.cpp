@@ -14,7 +14,7 @@ AddressList::AddressList(ScribeWnd *app, int id, int x, int y, int cx, int cy, c
 	: LList(id, x, y, cx, cy, name)
 {
 	App = app;
-	_ObjName = Res_Custom;
+	SetObjectName(Res_Custom);
 	ColumnHeaders = false;
 }
 
