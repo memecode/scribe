@@ -54,7 +54,7 @@
 		3477C3B41CC227ED0028B84B /* CalendarView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3681CC227ED0028B84B /* CalendarView.cpp */; };
 		3477C3B51CC227ED0028B84B /* Components.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3691CC227ED0028B84B /* Components.cpp */; };
 		3477C3B91CC227ED0028B84B /* Exp_Scribe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C36D1CC227ED0028B84B /* Exp_Scribe.cpp */; };
-		3477C3BE1CC227ED0028B84B /* GNewMailDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */; };
+		3477C3BE1CC227ED0028B84B /* NewMailDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3721CC227ED0028B84B /* NewMailDlg.cpp */; };
 		3477C3BF1CC227ED0028B84B /* SearchView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3731CC227ED0028B84B /* SearchView.cpp */; };
 		3477C3C01CC227ED0028B84B /* HtmlToText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3741CC227ED0028B84B /* HtmlToText.cpp */; };
 		3477C3C21CC227ED0028B84B /* Imp_Eml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3761CC227ED0028B84B /* Imp_Eml.cpp */; };
@@ -479,7 +479,7 @@
 		345921061F2565D100098DFD /* Components.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Components.h; path = ../../Code/Components.h; sourceTree = "<group>"; };
 		345921071F2565D100098DFD /* DomType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DomType.h; path = ../../Code/DomType.h; sourceTree = "<group>"; };
 		345921081F2565D100098DFD /* DomTypeValues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DomTypeValues.h; path = ../../Code/DomTypeValues.h; sourceTree = "<group>"; };
-		345921091F2565D100098DFD /* GNewMailDlg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GNewMailDlg.h; path = ../../Code/GNewMailDlg.h; sourceTree = "<group>"; };
+		345921091F2565D100098DFD /* NewMailDlg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewMailDlg.h; path = ../../Code/NewMailDlg.h; sourceTree = "<group>"; };
 		3459210A1F2565D100098DFD /* SearchView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchView.h; path = ../../Code/SearchView.h; sourceTree = "<group>"; };
 		3459210B1F2565D100098DFD /* Imp_Outlook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Imp_Outlook.h; path = ../../Code/Imp_Outlook.h; sourceTree = "<group>"; };
 		3459210C1F2565D100098DFD /* ManageMailStores.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ManageMailStores.h; path = ../../Code/ManageMailStores.h; sourceTree = "<group>"; };
@@ -530,7 +530,7 @@
 		3477C3681CC227ED0028B84B /* CalendarView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CalendarView.cpp; path = ../../Code/CalendarView.cpp; sourceTree = "<group>"; };
 		3477C3691CC227ED0028B84B /* Components.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Components.cpp; path = ../../Code/Components.cpp; sourceTree = "<group>"; };
 		3477C36D1CC227ED0028B84B /* Exp_Scribe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Exp_Scribe.cpp; path = ../../Code/Exp_Scribe.cpp; sourceTree = "<group>"; };
-		3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GNewMailDlg.cpp; path = ../../Code/GNewMailDlg.cpp; sourceTree = "<group>"; };
+		3477C3721CC227ED0028B84B /* NewMailDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NewMailDlg.cpp; path = ../../Code/NewMailDlg.cpp; sourceTree = "<group>"; };
 		3477C3731CC227ED0028B84B /* SearchView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SearchView.cpp; path = ../../Code/SearchView.cpp; sourceTree = "<group>"; };
 		3477C3741CC227ED0028B84B /* HtmlToText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlToText.cpp; path = ../../Code/HtmlToText.cpp; sourceTree = "<group>"; };
 		3477C3761CC227ED0028B84B /* Imp_Eml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Imp_Eml.cpp; path = ../../Code/Imp_Eml.cpp; sourceTree = "<group>"; };
@@ -1060,7 +1060,7 @@
 			children = (
 				3477C3631CC227ED0028B84B /* AddressSelect.cpp */,
 				3477C3691CC227ED0028B84B /* Components.cpp */,
-				3477C3721CC227ED0028B84B /* GNewMailDlg.cpp */,
+				3477C3721CC227ED0028B84B /* NewMailDlg.cpp */,
 				3477C3741CC227ED0028B84B /* HtmlToText.cpp */,
 				3477C3811CC227ED0028B84B /* MContainer.cpp */,
 				3477C3891CC227ED0028B84B /* ScribeAccount.cpp */,
@@ -1072,7 +1072,7 @@
 				345921061F2565D100098DFD /* Components.h */,
 				345921071F2565D100098DFD /* DomType.h */,
 				345921081F2565D100098DFD /* DomTypeValues.h */,
-				345921091F2565D100098DFD /* GNewMailDlg.h */,
+				345921091F2565D100098DFD /* NewMailDlg.h */,
 				345921221F2565D100098DFD /* Store3Common.h */,
 				3450280327405C96007F5F2A /* BayesianFilter */,
 				34A666722379687D00ED0212 /* Calendar */,
@@ -1630,7 +1630,7 @@
 				3477C4E91CC27D870028B84B /* Browser.cpp in Sources */,
 				3477C4041CC22F680028B84B /* ExeCheck.cpp in Sources */,
 				34EE8BB52748A6EC00F12915 /* HomoglyphsTable.cpp in Sources */,
-				3477C3BE1CC227ED0028B84B /* GNewMailDlg.cpp in Sources */,
+				3477C3BE1CC227ED0028B84B /* NewMailDlg.cpp in Sources */,
 				3445E5841F1F428400D0A824 /* BlockCursor.cpp in Sources */,
 				3445E5861F1F428400D0A824 /* RichTextEditPriv.cpp in Sources */,
 				3477C3C21CC227ED0028B84B /* Imp_Eml.cpp in Sources */,

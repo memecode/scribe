@@ -161,12 +161,6 @@ bool LMail3Contact::Serialize(LMail3Store::LStatement &s, bool Write)
 	{
 		s.GetBinary(i++, &Image);
 	}
-
-	if (Id == 58)
-	{
-		int asd=0;
-	}
-
 	SERIALIZE_DATE(DateMod, i++);
 		
 	return true;

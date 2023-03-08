@@ -334,7 +334,7 @@ public:
 		}
 	}
 
-	LMessage::Result OnEvent(LMessage *Msg)
+	LMessage::Result OnEvent(LMessage *Msg) override
 	{
 		switch (Msg->Msg())
 		{
@@ -666,7 +666,7 @@ public:
 		LAssert(status);
 	}
 
-	int Main()
+	int Main() override
 	{
 		if (auto s = FindWordDb(HamWordsFile))
 			SetStore(Ham, new LWordStore(s));

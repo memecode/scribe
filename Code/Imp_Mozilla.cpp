@@ -596,7 +596,11 @@ void Import_MozillaMail(ScribeWnd *App)
 
 				Dest->Expanded(true);
 			}
-			else LgiMsg(App, LLoadString(IDS_ERROR_FOLDER_DOESNT_EXIST), AppName, MB_OK, Dlg->DestFolder);
+			else LgiMsg(App,
+						LLoadString(IDS_ERROR_FOLDER_DOESNT_EXIST),
+						AppName,
+						MB_OK,
+						Dlg->DestFolder.Get());
 		}
 
 		delete dlg;

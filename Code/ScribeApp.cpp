@@ -4868,7 +4868,7 @@ LDataStoreI *ScribeWnd::CreateDataStore(const char *_Full, bool CreateIfMissing)
 	{
 		if (!_stricmp(Ext, "mail2"))
 		{
-			LgiMsg(this, LLoadString(IDS_MAIL2_DEPRECATED), AppName, MB_OK, Full);
+			LgiMsg(this, LLoadString(IDS_MAIL2_DEPRECATED), AppName, MB_OK, Full.Get());
 		}
 		else if (!_stricmp(Ext, "mail3"))
 		{
@@ -4881,11 +4881,11 @@ LDataStoreI *ScribeWnd::CreateDataStore(const char *_Full, bool CreateIfMissing)
 		}
 		else
 		{
-			LgiTrace("%s:%i - Not a valid mail store extension: %s\n", _FL, Full);
+			LgiTrace("%s:%i - Not a valid mail store extension: %s\n", _FL, Full.Get());
 			LAssert(!"Not a valid mail store extension.");
 		}
 	}
-	else LgiTrace("%s:%i - No extension for CreateDataStore: %s\n", _FL, Full);
+	else LgiTrace("%s:%i - No extension for CreateDataStore: %s\n", _FL, Full.Get());
 
 	return NULL;
 }
@@ -11065,8 +11065,6 @@ Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, cons
 			break;
 		case PermRequireUser:
 		{
-			bool Status = false;
-
 			GPassword p;
 			if (!p.Serialize(GetOptions(), OPT_UserPermPassword, false))
 			{

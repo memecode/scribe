@@ -345,10 +345,6 @@ struct ScribeExportTask : public FolderTask
 			return true; // Can't tell... no dates stored.
 	
 		bool mod = *inMod > *outMod;
-		if (mod)
-		{
-			int asd=0;
-		}
 
 		return mod;
 	}
@@ -845,6 +841,11 @@ bool ScribeExportTask::TimeSlice()
 				return true;
 
 			// We're done...
+			return false;
+		}
+		default:
+		{
+			LAssert(!"Not impl.");
 			return false;
 		}
 	}

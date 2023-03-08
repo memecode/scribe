@@ -240,7 +240,11 @@ void Export_UnixMBox(ScribeWnd *Parent)
 				for (auto File: Dlg->SrcFiles)
 				{
 					if (!LFileExists(File) ||
-						LgiMsg(Parent, LLoadString(IDS_ERROR_FILE_EXISTS), AppName, MB_YESNO, File) == IDYES)
+						LgiMsg(	Parent,
+								LLoadString(IDS_ERROR_FILE_EXISTS),
+								AppName,
+								MB_YESNO,
+								File.Get()) == IDYES)
 					{
 						LAutoPtr<LFile> F(new LFile);
 						if (F->Open(File, O_WRITE))

@@ -431,7 +431,7 @@ void MailTree::OnCreateSubDirectory(ScribeFolder *Item)
 			if (Path)
 			{
 				LString s;
-				s.Printf("%s/%s", Path.Get(), Dlg->SubName);
+				s.Printf("%s/%s", Path.Get(), Dlg->SubName.Get());
 				if (App->GetFolder(s))
 				{
 					LgiMsg(this, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);

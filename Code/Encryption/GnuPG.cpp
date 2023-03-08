@@ -920,7 +920,7 @@ struct MailUiGpgPriv
 		}
 	
 		LString Msg;
-		Msg.Printf("Enter password for the user '%s':", Addr);
+		Msg.Printf("Enter password for the user '%s':", Addr.Get());
 		
 		auto Dlg = new LInput(Parent, "", Msg, "GnuPG Password", true);
 		Dlg->DoModal([this, Dlg, Addr, Callback](auto dlg, auto ctrlId)
@@ -1272,7 +1272,8 @@ void MailUiGpg::Decrypt(std::function<void(int)> callback)
 	LDataI *EncryptedObj = NULL;
 	LArray<LDataI*> Objs;
 	if (!m->GetAttachmentObjs(Objs))
-		DecryptStatus(1);	
+		DecryptStatus(1);
+		
 	for (unsigned i=0; i<Objs.Length(); i++)
 	{
 		Mt = Objs[i]->GetStr(FIELD_MIME_TYPE);

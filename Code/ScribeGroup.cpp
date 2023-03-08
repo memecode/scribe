@@ -219,17 +219,17 @@ Thing::IoProgress ContactGroup::Import(IoProgressImplArgs)
 	if (!r.IsTag(ContactGroupObj))
 		IoProgressError("No ContactGroup tag.");
 
-	if (t = r.GetChildTag(ContactGroupName))
+	if ((t = r.GetChildTag(ContactGroupName)))
 		GetObject()->SetStr(FIELD_GROUP_NAME, t->GetContent());
 	else
 		IoProgressError("No Name tag.");
 
-	if (t = r.GetChildTag(ContactGroupList))
+	if ((t = r.GetChildTag(ContactGroupList)))
 		GetObject()->SetStr(FIELD_GROUP_LIST, t->GetContent());
 	else
 		IoProgressError("No List tag.");
 
-	if (t = r.GetChildTag(ContactGroupDateModified))
+	if ((t = r.GetChildTag(ContactGroupDateModified)))
 	{
 		LDateTime dt;
 		if (dt.Set(t->GetContent()))

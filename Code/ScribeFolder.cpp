@@ -330,7 +330,7 @@ void ScribeFolder::GetMessageById(const char *Id, std::function<void(Mail*)> Cal
 
 	LoadThings(NULL, [&](auto s)
 	{
-		if (s <= Store3Loading)
+		if (s < Store3Delayed)
 		{
 			if (Callback) Callback(NULL);
 			return;

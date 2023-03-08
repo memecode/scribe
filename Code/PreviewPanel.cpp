@@ -93,12 +93,12 @@ public:
 		DeleteObj(Bar);
 	}
 
-	char *GetIncludeFile(char *FileName)
+	char *GetIncludeFile(char *FileName) override
 	{
 		return 0;
 	}
 
-	bool AppendItems(LSubMenu *Menu, const char *Param, int Base)
+	bool AppendItems(LSubMenu *Menu, const char *Param, int Base) override
 	{
 		if (!Menu)
 			return false;
@@ -114,7 +114,7 @@ public:
 		return true;
 	}
 
-	bool OnMenu(LDocView *View, int Id, void *Context)
+	bool OnMenu(LDocView *View, int Id, void *Context) override
 	{
 		if (Id == IDM_NEW_CONTACT)
 		{
@@ -143,7 +143,7 @@ public:
 		return true;
 	}
 
-	bool OnNavigate(LDocView *Parent, const char *Uri)
+	bool OnNavigate(LDocView *Parent, const char *Uri) override
 	{
 		Mailto m(App, Uri);
 		if (m.To[0])
@@ -159,7 +159,7 @@ public:
 		return false;
 	}
 
-	LDocumentEnv::LoadType GetContent(LoadJob *&j)
+	LDocumentEnv::LoadType GetContent(LoadJob *&j) override
 	{
 		LUri i;
 
@@ -267,7 +267,7 @@ public:
 	}
 
 	void SetEngine(LScriptEngine *Eng) {}
-	GHostFunc *GetCommands();
+	GHostFunc *GetCommands() override;
 
 	void SetGlobals(LCompiledCode *obj)
 	{
@@ -286,7 +286,7 @@ public:
 		}
 	}
 
-	bool OnCompileScript(LDocView *Parent, char *Script, const char *Language, const char *MimeType)
+	bool OnCompileScript(LDocView *Parent, char *Script, const char *Language, const char *MimeType) override
 	{
 		LScriptEngine *Engine = App->GetScriptEngine();
 		if (!Engine || !Script)
@@ -312,7 +312,7 @@ public:
 		return Engine->Compile(ScriptObj, this, Script, FileName);
 	}
 
-	bool OnExecuteScript(LDocView *Parent, char *Script)
+	bool OnExecuteScript(LDocView *Parent, char *Script) override
 	{
 		LScriptEngine *Engine = App->GetScriptEngine();
 		if (Engine && Script)
