@@ -32,6 +32,7 @@ GMail3Def TblCalendar[] =
 	{"LastCheck",		"TEXT"},	// FIELD_CAL_LAST_CHECK
 	{"AllDay",			"INTEGER"},	// FIELD_CAL_ALL_DAY
 	{"Status",			"STATUS"},	// FIELD_CAL_STATUS
+	{"DateModified",	"TEXT"},	// FIELD_DATE_MODIFIED
 
 	{0, 0}
 };
@@ -81,10 +82,10 @@ bool LMail3Calendar::Serialize(LMail3Store::LStatement &s, bool Write)
 	SERIALIZE_INT(Completed, i++); // FIELD_CAL_COMPLETED
 	SERIALIZE_DATE(Start, i++); // FIELD_CAL_START_UTC
 	SERIALIZE_DATE(End, i++); // FIELD_CAL_END_UTC
-	SERIALIZE_GSTR(TimeZone, i++); // FIELD_CAL_TIMEZONE
-	SERIALIZE_GSTR(Subject, i++); // FIELD_CAL_SUBJECT
-	SERIALIZE_GSTR(Location, i++); // FIELD_CAL_LOCATION
-	SERIALIZE_GSTR(Uid, i++); // FIELD_UID
+	SERIALIZE_LSTR(TimeZone, i++); // FIELD_CAL_TIMEZONE
+	SERIALIZE_LSTR(Subject, i++); // FIELD_CAL_SUBJECT
+	SERIALIZE_LSTR(Location, i++); // FIELD_CAL_LOCATION
+	SERIALIZE_LSTR(Uid, i++); // FIELD_UID
 	SERIALIZE_INT(ShowTimeAs, i++); // FIELD_CAL_SHOW_TIME_AS
 	SERIALIZE_INT(Recur, i++); // FIELD_CAL_RECUR
 	SERIALIZE_INT(RecurFreq, i++); // FIELD_CAL_RECUR_FREQ
@@ -92,17 +93,17 @@ bool LMail3Calendar::Serialize(LMail3Store::LStatement &s, bool Write)
 	SERIALIZE_DATE(RecurEnd, i++); // FIELD_CAL_RECUR_END_DATE
 	SERIALIZE_INT(RecurCount, i++); // FIELD_CAL_RECUR_END_COUNT
 	SERIALIZE_INT(RecurEndType, i++); // FIELD_CAL_RECUR_END_TYPE
-	SERIALIZE_GSTR(RecurPos, i++); // FIELD_CAL_RECUR_FILTER_POS
+	SERIALIZE_LSTR(RecurPos, i++); // FIELD_CAL_RECUR_FILTER_POS
 	SERIALIZE_INT(FilterDays, i++); // FIELD_CAL_RECUR_FILTER_DAYS
 	SERIALIZE_INT(FilterMonths, i++); // FIELD_CAL_RECUR_FILTER_MONTHS
-	SERIALIZE_GSTR(FilterYears, i++); // FIELD_CAL_RECUR_FILTER_YEARS
-	SERIALIZE_GSTR(Notes, i++); // FIELD_CAL_NOTES
+	SERIALIZE_LSTR(FilterYears, i++); // FIELD_CAL_RECUR_FILTER_YEARS
+	SERIALIZE_LSTR(Notes, i++); // FIELD_CAL_NOTES
 	SERIALIZE_COLOUR(Colour, i++); // FIELD_COLOUR
-	SERIALIZE_GSTR(To, i++); // FIELD_TO
-	SERIALIZE_GSTR(Reminders, i++); // FIELD_CAL_REMINDER_TIME
+	SERIALIZE_LSTR(To, i++); // FIELD_TO
+	SERIALIZE_LSTR(Reminders, i++); // FIELD_CAL_REMINDER_TIME
 	SERIALIZE_DATE(LastCheck, i++); // FIELD_CAL_LAST_CHECK
 	SERIALIZE_BOOL(AllDay, i++); // FIELD_CAL_ALL_DAY
-	SERIALIZE_GSTR(EventStatus, i++); // FIELD_CAL_STATUS
+	SERIALIZE_LSTR(EventStatus, i++); // FIELD_CAL_STATUS
 
 	if (Write)
 	{
@@ -148,6 +149,7 @@ Store3CopyImpl(LMail3Calendar)
 	SetStr(FIELD_CAL_RECUR_FILTER_YEARS, p.GetStr(FIELD_CAL_RECUR_FILTER_YEARS));
 	SetStr(FIELD_CAL_NOTES, p.GetStr(FIELD_CAL_NOTES));
 	SetDate(FIELD_CAL_LAST_CHECK, p.GetDate(FIELD_CAL_LAST_CHECK));
+	SetDate(FIELD_DATE_MODIFIED, p.GetDate(FIELD_DATE_MODIFIED));
 
 	return true;
 }
@@ -379,54 +381,52 @@ const LDateTime *LMail3Calendar::GetDate(int id)
 			return &RecurEnd;
 		case FIELD_CAL_LAST_CHECK:
 			return &LastCheck;
+		case FIELD_DATE_MODIFIED:
+			return &Modified;
 	}
 
-	LAssert(0);
-	return 0;
+	return NULL;
 }
 
 Store3Status LMail3Calendar::SetDate(int id, const LDateTime *t)
 {
+	if (t)
+		LAssert(t->GetTimeZone()==0);
+
 	switch (id)
 	{
 		case FIELD_CAL_START_UTC:
 			if (t)
-			{
-				LAssert(t->GetTimeZone()==0);
 				Start = *t;
-			}
 			else
 				Start.Year(0);
 			break;
 		case FIELD_CAL_END_UTC:
 			if (t)
-			{
-				LAssert(t->GetTimeZone()==0);
 				End = *t;
-			}
 			else
 				End.Year(0);
 			break;
 		case FIELD_CAL_RECUR_END_DATE:
 			if (t)
-			{
-				LAssert(t->GetTimeZone()==0);
 				RecurEnd = *t;
-			}
 			else
 				RecurEnd.Year(0);
 			break;
 		case FIELD_CAL_LAST_CHECK:
 			if (t)
-			{
-				LAssert(t->GetTimeZone()==0);
 				LastCheck = *t;
-			}
 			else
 				LastCheck.Empty();
 			break;
+		case FIELD_DATE_MODIFIED:
+			if (t)
+				Modified = *t;
+			else
+				Modified.Empty();
+			break;
 		default:
-			return Store3Error;
+			return Store3NotImpl;
 	}
 
 	return Store3Success;

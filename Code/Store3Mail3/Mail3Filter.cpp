@@ -18,6 +18,7 @@ GMail3Def TblFilter[] =
 	{"Actions",			"TEXT"},
 	{"Script",			"TEXT"},
 	{"Direction",		"INTEGER"},
+	{"DateModifed",		"TEXT"},
 
 	{0, 0}
 };
@@ -50,23 +51,16 @@ bool LMail3Filter::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	int i = 0;
 
-	#undef SERIALIZE_AUTOSTR
-	#define SERIALIZE_AUTOSTR(var, idx) \
-		{ \
-			if (Write) { if (!s.SetStr(idx, var)) return false; } \
-			else { var.Reset(NewStr(s.GetStr(idx))); } \
-			idx++; \
-		}
-
 	SERIALIZE_INT64(Id, i++);
 	SERIALIZE_INT64(ParentId, i++);
 	SERIALIZE_INT(Index, i++);
 	SERIALIZE_INT(StopFiltering, i++);
-	SERIALIZE_AUTOSTR(Name, i);
-	SERIALIZE_AUTOSTR(ConditionsXml, i);
-	SERIALIZE_AUTOSTR(ActionsXml, i);
-	SERIALIZE_AUTOSTR(Script, i);
+	SERIALIZE_LSTR(Name, i++);
+	SERIALIZE_LSTR(ConditionsXml, i++);
+	SERIALIZE_LSTR(ActionsXml, i++);
+	SERIALIZE_LSTR(Script, i++);
 	SERIALIZE_INT(Direction, i++);
+	SERIALIZE_DATE(Modified, i++);
 
 	return true;
 }
@@ -75,13 +69,14 @@ Store3CopyImpl(LMail3Filter)
 {
 	Index = (int) p.GetInt(FIELD_FILTER_INDEX);
 	StopFiltering = (int) p.GetInt(FIELD_STOP_FILTERING);
-	Direction = (int) ((p.GetInt(FIELD_FILTER_INCOMING) ? FilterIn : 0) |
-				(p.GetInt(FIELD_FILTER_OUTGOING) ? FilterOut : 0) |
-				(p.GetInt(FIELD_FILTER_INTERNAL) ? FilterInternal : 0));
+	Direction = (int) (	(p.GetInt(FIELD_FILTER_INCOMING) ? FilterIn : 0) |
+						(p.GetInt(FIELD_FILTER_OUTGOING) ? FilterOut : 0) |
+						(p.GetInt(FIELD_FILTER_INTERNAL) ? FilterInternal : 0));
 	SetStr(FIELD_FILTER_NAME, p.GetStr(FIELD_FILTER_NAME));
 	SetStr(FIELD_FILTER_CONDITIONS_XML, p.GetStr(FIELD_FILTER_CONDITIONS_XML));
 	SetStr(FIELD_FILTER_ACTIONS_XML, p.GetStr(FIELD_FILTER_ACTIONS_XML));
 	SetStr(FIELD_FILTER_SCRIPT, p.GetStr(FIELD_FILTER_SCRIPT));
+	SetDate(FIELD_DATE_MODIFIED, p.GetDate(FIELD_DATE_MODIFIED));
 
 	return true;
 }
@@ -109,16 +104,16 @@ Store3Status LMail3Filter::SetStr(int id, const char *str)
 	switch (id)
 	{
 		case FIELD_FILTER_NAME:
-			Name.Reset(NewStr(str));
+			Name = str;
 			return Store3Success;
 		case FIELD_FILTER_CONDITIONS_XML:
-			ConditionsXml.Reset(NewStr(str));
+			ConditionsXml = str;
 			return Store3Success;
 		case FIELD_FILTER_ACTIONS_XML:
-			ActionsXml.Reset(NewStr(str));
+			ActionsXml = str;
 			return Store3Success;
 		case FIELD_FILTER_SCRIPT:
-			Script.Reset(NewStr(str));
+			Script = str;
 			return Store3Success;
 	}
 
@@ -189,5 +184,32 @@ Store3Status LMail3Filter::SetInt(int id, int64 n)
 
 	LAssert(0);
 	return Store3Error;
+}
+
+const LDateTime *LMail3Filter::GetDate(int id)
+{
+	switch (id)
+	{
+		case FIELD_DATE_MODIFIED:
+			return &Modified;
+	}
+
+	return NULL;
+}
+
+Store3Status LMail3Filter::SetDate(int id, const LDateTime *i)
+{
+	switch (id)
+	{
+		case FIELD_DATE_MODIFIED:
+		{
+			if (!i)
+				return Store3Error;
+			Modified = *i;
+			return Store3Success;
+		}
+	}
+
+	return Store3NotImpl;
 }
 

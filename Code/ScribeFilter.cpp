@@ -3270,6 +3270,9 @@ bool Filter::Save(ScribeFolder *Into)
 		if (ChkInternal)
 			SetInternal(ChkInternal->Value()!=0);
 
+		LDateTime Now;
+		GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now.SetNow());
+
 		Store3Status s = Into->WriteThing(this);
 		Status = s != Store3Error;
 		if (Status)

@@ -330,6 +330,29 @@ struct ScribeExportTask : public FolderTask
 		return LString();
 	}
 
+	bool CheckModified(LDataI *in, LDataI *out)
+	{
+		if (!out)
+			// No existing object
+			return true;
+
+		auto inMod = in->GetDate(FIELD_DATE_MODIFIED);
+		auto outMod = in->GetDate(FIELD_DATE_MODIFIED);
+		if (!inMod ||
+			!outMod ||
+			!inMod->IsValid() ||
+			!outMod->IsValid())
+			return true; // Can't tell... no dates stored.
+	
+		bool mod = *inMod > *outMod;
+		if (mod)
+		{
+			int asd=0;
+		}
+
+		return mod;
+	}
+
 	void MakeDstObjMap()
 	{
 		DstObjMap.Empty();
@@ -772,7 +795,8 @@ bool ScribeExportTask::TimeSlice()
 					{
 						// Is the object already in the dst map?
 						auto Id = ObjToId(*in);
-						if (DstObjMap.Find(Id))
+						auto existing = DstObjMap.Find(Id);
+						if (!CheckModified(in, existing))
 							OnSkip();
 
 						auto outObj = DstStore->Create(in->Type());

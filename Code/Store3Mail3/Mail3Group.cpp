@@ -52,8 +52,8 @@ bool LMail3Group::Serialize(LMail3Store::LStatement &s, bool Write)
 
 	SERIALIZE_INT64(Id, i++);
 	SERIALIZE_INT64(ParentId, i++);
-	SERIALIZE_GSTR(Name, i++);
-	SERIALIZE_GSTR(Group, i++);
+	SERIALIZE_LSTR(Name, i++);
+	SERIALIZE_LSTR(Group, i++);
 	SERIALIZE_DATE(DateMod, i++);
 
 	return true;

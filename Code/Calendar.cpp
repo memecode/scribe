@@ -1720,6 +1720,9 @@ bool Calendar::Save(ScribeFolder *Folder)
 		Status = true;
 		if (Folder)
 		{
+			LDateTime Now;
+			GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now.SetNow());
+
 			Folder->WriteThing(this, [this, ChangeEvent](auto Status)
 			{
 				if (Status > Store3Error)

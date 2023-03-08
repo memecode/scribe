@@ -157,7 +157,7 @@ extern GMail3Def TblCalendar[];
 		} \
 	}
 
-#define SERIALIZE_GSTR(var, Col) \
+#define SERIALIZE_LSTR(var, Col) \
 	{ \
 		if (Write) \
 		{ \
@@ -689,10 +689,11 @@ class LMail3Filter : public LMail3Thing
 	int Index;
 	int StopFiltering;
 	int Direction;
-	LAutoString Name;
-	LAutoString ConditionsXml;
-	LAutoString ActionsXml;
-	LAutoString Script;
+	LString Name;
+	LString ConditionsXml;
+	LString ActionsXml;
+	LString Script;
+	LDateTime Modified;
 
 	const char *GetTable() override { return MAIL3_TBL_FILTER; }
 
@@ -708,9 +709,11 @@ public:
 	bool DbDelete() override;
 
 	const char *GetStr(int id) override;
-	Store3Status SetStr(int id, const char *str) override;
+	Store3Status SetStr(int id, const char *str) override;	
 	int64 GetInt(int id) override;
 	Store3Status SetInt(int Col, int64 n) override;
+	const LDateTime *GetDate(int id) override;
+	Store3Status SetDate(int id, const LDateTime *i) override;
 };
 
 class LMail3Calendar : public LMail3Thing
@@ -731,6 +734,7 @@ private:
 	bool AllDay; // FIELD_CAL_ALL_DAY
 	int64 StoreStatus; // FIELD_STATUS - ie the current Store3Status
 	LString EventStatus; // FIELD_CAL_STATUS
+	LDateTime Modified; // FIELD_DATE_MODIFIED
 
 	LString Reminders; // FIELD_CAL_REMINDERS
 	LDateTime LastCheck; // FIELD_CAL_LAST_CHECK

@@ -1580,6 +1580,9 @@ bool Contact::Save(ScribeFolder *Folder)
 
 	if (Folder)
 	{
+		LDateTime Now;
+		GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now.SetNow());
+
 		Status = Folder->WriteThing(this) != Store3Error;
 		if (Status)
 			SetDirty(false);

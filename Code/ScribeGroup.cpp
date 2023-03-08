@@ -646,6 +646,9 @@ bool ContactGroup::Save(ScribeFolder *Into)
 	if (!GetFolder())
 		return false;
 
+	LDateTime Now;
+	GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now.SetNow());
+
 	auto Status = GetFolder()->WriteThing(this) != Store3Error;
 	if (Status)
 		SetDirty(false);
@@ -762,12 +765,8 @@ void GroupUi::OnSave()
 	ResolveAll();
 	
 	// Save the group of contacts
-	LDateTime Now;
-	Now.SetNow();
-
 	Item->SetDirty();
 	SerializeUi(GroupFieldDefs, Item->GetObject(), this, false);
-	Item->GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now);
 	Item->Save();
 	Item->Update();
 }

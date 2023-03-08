@@ -8427,8 +8427,7 @@ bool Mail::Save(ScribeFolder *Into)
 	
 	// This frees the resizer thread... 
 	// so they aren't hanging around pointlessly
-	d->OnSave();
-	
+	d->OnSave();	
 	
 	return Status;
 }
