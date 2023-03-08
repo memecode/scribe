@@ -563,10 +563,14 @@ public:
 	bool SetField(int Field, double n);
 	bool SetField(int Field, char *n);
 	bool SetField(int Field, LDateTime &n);
+	bool SetDateField(int Field, LVariant &v);
+
 	bool GetField(int Field, int &n);
 	bool GetField(int Field, double &n);
 	bool GetField(int Field, const char *&n);
 	bool GetField(int Field, LDateTime &n);
+	bool GetDateField(int Field, LVariant &v);
+
 	bool DeleteField(int Field);
 };
 
@@ -796,6 +800,7 @@ public:
 
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
+	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
 
 	// Events

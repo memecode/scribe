@@ -1925,11 +1925,11 @@ bool Calendar::GetVariant(const char *Name, LVariant &Value, const char *Array)
 
 		// Date time fields
 		case SdStart: // Type: DateTime
-			Value = GetObject()->GetDate(FIELD_CAL_START_UTC);
-			break;
+			return GetDateField(FIELD_CAL_START_UTC, Value);
 		case SdEnd: // Type: DateTime
-			Value = GetObject()->GetDate(FIELD_CAL_END_UTC);
-			break;
+			return GetDateField(FIELD_CAL_END_UTC, Value);
+		case SdDateModified: // Type: DateTime
+			return GetDateField(FIELD_DATE_MODIFIED, Value);
 
 		default:
 			return false;
@@ -2009,25 +2009,11 @@ bool Calendar::SetVariant(const char *Name, LVariant &Value, const char *Array)
 
 		// Date time fields
 		case SdStart:
-			if (Value.Type == GV_DATETIME)
-				Value = GetObject()->SetDate(FIELD_CAL_START_UTC, Value.Value.Date);
-			else if (Value.Str())
-			{
-				LDateTime dt;
-				dt.Set(Value.Str());
-				GetObject()->SetDate(FIELD_CAL_START_UTC, &dt);
-			}
-			break;
+			return SetDateField(FIELD_CAL_START_UTC, Value);
 		case SdEnd:
-			if (Value.Type == GV_DATETIME)
-				Value = GetObject()->SetDate(FIELD_CAL_END_UTC, Value.Value.Date);
-			else if (Value.Str())
-			{
-				LDateTime dt;
-				dt.Set(Value.Str());
-				GetObject()->SetDate(FIELD_CAL_END_UTC, &dt);
-			}
-			break;
+			return SetDateField(FIELD_CAL_END_UTC, Value);
+		case SdDateModified:
+			return SetDateField(FIELD_DATE_MODIFIED, Value);
 
 		default:
 			return false;

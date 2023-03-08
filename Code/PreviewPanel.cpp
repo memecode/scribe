@@ -254,18 +254,16 @@ public:
 	}
 
 	// Convert dynamic fields into string values...
-	char *OnDynamicContent(LDocView *Parent, const char *Code)
+	LString OnDynamicContent(LDocView *Parent, const char *Code) override
 	{
-		if (HeaderDom)
-		{
-			LVariant v;
-			if (HeaderDom->GetValue(Code, v))
-			{
-				return NewStr(v.CastString());
-			}
-		}
+		if (!HeaderDom)
+			return NULL;
 
-		return 0;
+		LVariant v;
+		if (!HeaderDom->GetValue(Code, v))
+			return NULL;
+
+		return v.CastString();
 	}
 
 	void SetEngine(LScriptEngine *Eng) {}

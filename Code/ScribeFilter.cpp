@@ -2628,6 +2628,8 @@ bool Filter::SetVariant(const char *Name, LVariant &Value, const char *Array)
 		case SdActionsXml:
 			SetActionsXml(Value.Str());
 			break;
+		case SdDateModified:
+			return SetDateField(FIELD_DATE_MODIFIED, Value);
 		default:
 			return false;
 	}
@@ -2831,6 +2833,10 @@ bool Filter::GetVariant(const char *Var, LVariant &Value, const char *Array)
 		{
 			Value = GetIndex();
 			break;
+		}
+		case SdDateModified: // Type: DateTime
+		{
+			return GetDateField(FIELD_DATE_MODIFIED, Value);
 		}
 		default:
 		{

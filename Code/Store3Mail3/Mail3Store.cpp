@@ -2112,7 +2112,10 @@ bool LMail3Store::LStatement::SetInt64(int Col, int64 n)
 
 char *LMail3Store::LStatement::GetStr(int Col)
 {
-	return IsOk() ? (char*)sqlite3_column_text(s, Col) : 0;
+	if (!IsOk())
+		return NULL;
+	auto txt = (char*)sqlite3_column_text(s, Col);
+	return txt;
 }
 
 bool LMail3Store::LStatement::GetBinary(int Col, LVariant *v)

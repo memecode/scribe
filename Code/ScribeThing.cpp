@@ -710,6 +710,27 @@ bool Thing::SetField(int Field, LDateTime &n)
 	return GetObject() ? GetObject()->SetDate(Field, &n) != 0 : false;
 }
 
+bool Thing::SetDateField(int Feild, LVariant &v)
+{
+	auto obj = GetObject();
+	if (!obj)
+		return false;
+
+	if (v.Type == GV_DATETIME)
+	{
+		if (!v.Value.Date || !v.Value.Date->IsValid())
+			return false;
+
+		return obj->SetDate(FIELD_DATE_MODIFIED, v.Value.Date) >= Store3Delayed;
+	}
+
+	LDateTime dt(v.Str());
+	if (!dt.IsValid())
+		return false;
+
+	return obj->SetDate(FIELD_DATE_MODIFIED, &dt) >= Store3Delayed;
+}
+
 bool Thing::GetField(int Field, int &n)
 {
 	n = GetObject() ? (int)GetObject()->GetInt(Field) : 0;
@@ -738,6 +759,20 @@ bool Thing::GetField(int Field, LDateTime &n)
 	}
 
 	return false;
+}
+
+bool Thing::GetDateField(int Field, LVariant &v)
+{
+	auto obj = GetObject();
+	if (!obj)
+		return false;
+
+	auto dt = obj->GetDate(Field);
+	if (!dt || !dt->IsValid())
+		return false;
+	
+	v = dt;
+	return true;
 }
 
 bool Thing::DeleteField(int Field)

@@ -302,6 +302,49 @@ bool ContactGroup::GetAddresses(List<char> &a)
 	return Status;
 }
 
+static const char *ListDelimiters = ", \r\n";
+
+bool ContactGroup::SetVariant(const char *Name, LVariant &Value, const char *Array)
+{
+	ScribeDomType Fld = StrToDom(Name);
+	switch (Fld)
+	{
+		case SdName:
+		{
+			GetObject()->SetStr(FIELD_GROUP_NAME, Value.Str());
+			break;
+		}
+		case SdList: // Type: String[]
+		{
+			if (Array)
+			{
+				auto Idx = Atoi(Array);
+				auto t = LString(GetObject()->GetStr(FIELD_GROUP_LIST)).SplitDelimit(ListDelimiters);
+				if (t.IdxCheck(Idx))
+					t[Idx] = Value.Str();
+				else
+					t.New() = Value.Str();
+				GetObject()->SetStr(FIELD_GROUP_LIST, LString("\n").Join(t));
+			}
+			else
+			{
+				GetObject()->SetStr(FIELD_GROUP_LIST, Value.Str());
+			}
+			break;
+		}
+		case SdDateModified:
+		{
+			return SetDateField(FIELD_DATE_MODIFIED, Value);
+		}
+		default:
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool ContactGroup::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
 	ScribeDomType Fld = StrToDom(Name);
@@ -336,8 +379,7 @@ bool ContactGroup::GetVariant(const char *Name, LVariant &Value, const char *Arr
 		}
 		case SdDateModified:
 		{
-			Value = GetObject()->GetDate(FIELD_DATE_MODIFIED);
-			break;
+			return GetDateField(FIELD_DATE_MODIFIED, Value);
 		}
 		case SdUsedTs:
 		{

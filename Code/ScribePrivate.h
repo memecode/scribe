@@ -686,8 +686,8 @@ public:
 	DynamicHtml(ScribeWnd *app, const char *file);
 	~DynamicHtml();
 
-	char *OnDynamicContent(LDocView *Parent, const char *Code);
-	bool OnNavigate(LDocView *Parent, const char *Uri);
+	LString OnDynamicContent(LDocView *Parent, const char *Code) override;
+	bool OnNavigate(LDocView *Parent, const char *Uri) override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////

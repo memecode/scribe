@@ -970,6 +970,10 @@ bool Contact::SetVariant(const char *Name, LVariant &Value, const char *Array)
 		return false;
 
 	// Check normal fields..
+	ScribeDomType Fld = StrToDom(Name);
+	if (Fld == SdDateModified)
+		return SetDateField(FIELD_DATE_MODIFIED, Value);
+
 	int Id = PropMap.Find(Name);
 	if (Id)
 	{
@@ -1258,6 +1262,8 @@ bool Contact::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		case SdWorkWebpage: // Type: String
 			Value = Obj->GetStr(FIELD_WORK_WEBPAGE);
 			return true;
+		case SdDateModified: // Type: DateTime
+			return GetDateField(FIELD_DATE_MODIFIED, Value);
 		default:
 		{
 			// Check custom fields..

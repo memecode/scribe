@@ -154,12 +154,19 @@ bool LMail3Contact::Serialize(LMail3Store::LStatement &s, bool Write)
 	if (Write)
 	{
 		if (Image.Type == GV_BINARY)
-			s.SetBinary(i++, "Image", &Image);
+			s.SetBinary(i, "Image", &Image);
+		i++;
 	}
 	else
 	{
-		s.GetBinary(i, &Image);
+		s.GetBinary(i++, &Image);
 	}
+
+	if (Id == 58)
+	{
+		int asd=0;
+	}
+
 	SERIALIZE_DATE(DateMod, i++);
 		
 	return true;

@@ -40,33 +40,35 @@ DynamicHtml::~DynamicHtml()
 	DeleteObj(d);
 }
 
-char *DynamicHtml::OnDynamicContent(LDocView *Parent, const char *Code)
+LString DynamicHtml::OnDynamicContent(LDocView *Parent, const char *Code)
 {
 	LVariant Val;
-	if (d->App->GetValue(Code, Val))
+	
+	if (!d->App->GetValue(Code, Val))
+		return NULL;
+
+	switch (Val.Type)
 	{
-		switch (Val.Type)
+		default:
 		{
-			default:
-			{
-				LAssert(!"Not impl.");
-				break;
-			}
-			case GV_INT32:
-			{
-				char i[32];
-				sprintf_s(i, sizeof(i), "%i", Val.Value.Int);
-				return NewStr(i);
-			}
-			case GV_STRING:
-			{
-				return Val.ReleaseStr();
-			}
-			case GV_NULL:
-				break;
+			LAssert(!"Not impl.");
+			break;
 		}
+		case GV_INT32:
+		{
+			char i[32];
+			sprintf_s(i, sizeof(i), "%i", Val.Value.Int);
+			return LString(i);
+		}
+		case GV_STRING:
+		{
+			return Val.Str();
+		}
+		case GV_NULL:
+			break;
 	}
-	return 0;
+
+	return NULL;
 }
 
 bool DynamicHtml::OnNavigate(LDocView *Parent, const char *Uri)
