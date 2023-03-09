@@ -29,10 +29,13 @@ LString DetectCharset(LString s)
 		return NULL;
 
 	LString cs;
-	if (detect_r(s.Get(), s.Length(), &obj) == CHARDET_SUCCESS)
+	if (detect_r(s.Get(), s.Length(), &obj) == CHARDET_SUCCESS &&
+		obj->confidence >= 0.75)
 		cs = obj->encoding;
 
-	// obj->encoding, obj->confidence, obj->bom
+	LgiTrace("%s:%i - encoding=%s, obj->confidence=%f, obj->bom=%i, str='%s'\n",
+		_FL, obj->encoding, obj->confidence, obj->bom, s.Get());
+	
 	detect_obj_free (&obj);
 	return cs;
 }
