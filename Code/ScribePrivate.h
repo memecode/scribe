@@ -368,7 +368,9 @@ public:
 
 // this is the list pane that displays the
 // contents of a ScribeFolder
-class ThingList : public LList
+class ThingList :
+	public LList,
+	public LDragDropTarget
 {
 	friend class Mail;
 
@@ -400,9 +402,14 @@ public:
 	bool OnKey(LKey &k);
 	void OnColumnDrag(int Col, LMouse &m);
 	bool OnColumnReindex(LItemColumn *Col, int OldIndex, int NewIndex);
+	void OnCreate();
 
 	List<Thing> PlaceHolders;
 	void DeletePlaceHolders();
+
+	// Dnd
+	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState);
+	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState);
 };
 
 // this is the tree view on the left hand side

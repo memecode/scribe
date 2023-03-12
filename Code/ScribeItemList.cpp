@@ -13,6 +13,8 @@
 #include "lgi/common/ScrollBar.h"
 #include "lgi/common/LgiQuickSort.h"
 #include "lgi/common/LgiRes.h"
+#include "lgi/common/DropFiles.h"
+
 #include "resdefs.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -86,6 +88,33 @@ ThingList::ThingList(ScribeWnd *wnd) :
 ThingList::~ThingList()
 {
 	DeletePlaceHolders();
+}
+
+int ThingList::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
+{
+	Formats.SupportsFileDrops();
+	return Formats.Length() ? DROPEFFECT_COPY : DROPEFFECT_NONE;
+}
+
+int ThingList::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
+{
+	int Status = DROPEFFECT_NONE;
+
+	for (auto &dd: Data)
+	{
+		if (Container && dd.IsFileDrop())
+		{
+			LDropFiles Files(dd);
+			if (Files.Length())
+			{
+				Status = DROPEFFECT_COPY;
+				Container->OnReceiveFiles(Files);
+				break;
+			}
+		}
+	}
+	
+	return Status;
 }
 
 void ThingList::DeletePlaceHolders()
@@ -460,6 +489,11 @@ void ThingList::OnColumnDrag(int Col, LMouse &m)
 	{
 		DragColumn(Col);
 	}
+}
+
+void ThingList::OnCreate()
+{
+	SetWindow(this);
 }
 
 bool ThingList::OnColumnReindex(LItemColumn *Col, int OldIndex, int NewIndex)
