@@ -11524,6 +11524,7 @@ bool ScribeWnd::LaunchHelp(const char *File)
 		Browse = new LBrowser(this, "Help");
 		if (Browse)
 		{
+			Browse->AddPath(ScribeResourcePath());
 			Browse->SetEvents(d);
 			return Browse->SetUri(Path);
 		}
