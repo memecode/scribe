@@ -1396,7 +1396,7 @@ class FilterAction : public LListItem, public LDataPropI
 public:
 	// Data
 	FilterActionTypes Type;
-	LAutoString Arg1;
+	LString Arg1;
 
 	// Methods
 	FilterAction(LDataStoreI *Store);

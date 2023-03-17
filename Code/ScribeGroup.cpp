@@ -274,7 +274,7 @@ LString::Array ContactGroup::GetAddresses()
 	LVariant l;
 	if (GetVariant(ContactGroupList, l))
 	{
-		LToken t(l.Str());
+		auto t = l.LStr().SplitDelimit();
 		for (unsigned i=0; i<t.Length(); i++)
 		{
 			Addrs.Add(t[i]);
@@ -291,7 +291,7 @@ bool ContactGroup::GetAddresses(List<char> &a)
 	LVariant l;
 	if (GetVariant(ContactGroupList, l))
 	{
-		LToken t(l.Str());
+		auto t = l.LStr().SplitDelimit();
 		for (unsigned i=0; i<t.Length(); i++)
 		{
 			a.Insert(NewStr(t[i]));
@@ -359,7 +359,7 @@ bool ContactGroup::GetVariant(const char *Name, LVariant &Value, const char *Arr
 		{
 			if (Array)
 			{
-				LToken t(GetObject()->GetStr(FIELD_GROUP_LIST), ", \r\n");
+				auto t = LString(GetObject()->GetStr(FIELD_GROUP_LIST)).SplitDelimit(", \r\n");
 				int Idx = atoi(Array);
 				if (Idx >= 0 && Idx < (int)t.Length())
 				{

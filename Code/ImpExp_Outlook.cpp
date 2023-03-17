@@ -1085,7 +1085,7 @@ public:
 			LVariant s;
 			if (App->GetOptions()->GetValue(OPT_OutlookImportSrc, s) && s.Str())
 			{
-				LToken t(s.Str(), ",");
+				auto t = s.LStr().SplitDelimit(",");
 				for (unsigned i=0; i<t.Length(); i++)
 				{
 					AddPath(t[i]);
@@ -1246,7 +1246,7 @@ public:
 			LVariant v;
 			if (App->GetOptions()->GetValue(OPT_OutlookExportSrc, v) && v.Str())
 			{
-				LToken t(v.Str(), ",");
+				auto t = v.LStr().SplitDelimit(",");
 				for (unsigned i=0; i<t.Length(); i++)
 				{
 					AddPath(t[i]);
@@ -1396,21 +1396,17 @@ public:
 						e->OpenRoot(Io->GetSession(), Io->GetUiHnd(), Io->MsgStore, *MapiFolder);
 
 						// Drill down to the select sub-folder...
-						const char *DstFolder = GetCtrlName(IDC_FOLDER);
-						if (DstFolder)
+						auto t = LString(GetCtrlName(IDC_FOLDER)).SplitDelimit("/");
+						if (t.Length() > 0)
 						{
-							LToken t(DstFolder, "/");
-							if (t.Length() > 0)
+							LComPtr<IMAPIFolder> f = *MapiFolder;
+							for (unsigned i=0; i<t.Length(); i++)
 							{
-								LComPtr<IMAPIFolder> f = *MapiFolder;
-								for (unsigned i=0; i<t.Length(); i++)
-								{
-									f = GetSubFolderByName(f, t[i]);
-									if (!f)
-										break;
-								}
-								*MapiFolder = f;
+								f = GetSubFolderByName(f, t[i]);
+								if (!f)
+									break;
 							}
+							*MapiFolder = f;
 						}
 					}
 				}

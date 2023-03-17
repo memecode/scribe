@@ -7784,7 +7784,7 @@ void Mail::DeleteAsSpam(LView *View)
 
 	// Move it to the spam folder if it exists.
 	auto FolderPath = GetFolder()->GetPath();
-	LToken Parts(FolderPath, "/");
+	auto Parts = FolderPath.SplitDelimit("/");
 	
 	if (Parts.Length() == 0)
 		LgiMsg(View, "Error: No folder path?", AppName);

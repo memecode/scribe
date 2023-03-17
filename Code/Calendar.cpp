@@ -937,7 +937,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 
 				if (Show && ValidStr(FilterYear))
 				{
-					LToken t(FilterYear, " ,;:");
+					auto t = LString(FilterYear).SplitDelimit(" ,;:");
 					Show = false;
 					for (unsigned i=0; i<t.Length(); i++)
 					{
@@ -956,7 +956,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 					int Off = Sm.DayOfWeek();
 					int Idx = (CurLocal.Day() + Off) / 7;
 
-					LToken t(FilterPos, " ,;:");
+					auto t = LString(FilterPos).SplitDelimit(" ,;:");
 					Show = false;
 					for (unsigned i=0; i<t.Length(); i++)
 					{

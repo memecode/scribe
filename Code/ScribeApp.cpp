@@ -387,7 +387,7 @@ void IsSoftwareUpToDate(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bo
 			{
 				auto LocalVer = LString(ScribeVer).SplitDelimit(".");
 				LString BuildVer = ExtractVer(Info.Build);
-				LToken OnlineVer(BuildVer, ".");
+				auto OnlineVer = BuildVer.SplitDelimit(".");
 				if (OnlineVer.Length() != LocalVer.Length())
 				{
 					LgiTrace("%s:%i - Invalid online version number \"%s\"\n", _FL, Info.Version.Get());
@@ -416,7 +416,7 @@ void IsSoftwareUpToDate(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bo
 				}
 
 				LDateTime Compile;
-				LToken Date(__DATE__, " ");
+				auto Date = LString(__DATE__).SplitDelimit(" ");
 				Compile.Month(LDateTime::MonthFromName(Date[0]));
 				Compile.Day(atoi(Date[1]));
 				Compile.Year(atoi(Date[2]));
@@ -948,7 +948,7 @@ public:
 		if (!App->GetHelpFilesPath(Path, sizeof(Path)))
 			return false;
 
-		LToken Terms(txt, ", ");
+		auto Terms = LString(txt).SplitDelimit(", ");
 
 		LStringPipe p;
 		p.Print("<html>\n<body><h1>Search Results</h1>\n<ul>\n");
@@ -8923,7 +8923,7 @@ LMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 	if (!Path)
 		return NULL;
 
-	LToken t(Path, "/");
+	auto t = LString(Path).SplitDelimit("/");
 	if (t.Length() > 0)
 	{
 		const char *First = t[0];
@@ -10947,11 +10947,10 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 					char *FileName = 0;
 					if ((FileName = Tag->GetAttr("Filename")))
 					{
-						char *File = LReadTextFile(FileName);
-						if (File)
+						LFile f(FileName);
+						if (f)
 						{
-							LToken Lines(File, "\r\n");
-							DeleteArray(File);
+							auto Lines = f.Read().SplitDelimit("\r\n");
 							char *RandomLine = Lines[LRand((unsigned)Lines.Length())];
 							if (RandomLine)
 							{

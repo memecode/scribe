@@ -48,7 +48,7 @@ struct MissingCapsBarPriv
     LColour Back;
     int CountDown;
     
-    LToken Msg;
+    LString::Array Msg;
     LArray<LDisplayString*> Strs;
     
     MissingCapsBarPriv() : Back(0xd2, 0x40, 0x40)
@@ -64,7 +64,7 @@ struct MissingCapsBarPriv
     void SetMsg(const char *m)
     {
 		Msg.Empty();
-		Msg.Parse(m, "\n");
+		Msg = LString(m).SplitDelimit("\n");
 		Strs.DeleteObjects();
     }
 };

@@ -229,7 +229,7 @@ void ScribeAccount::SetDefaults()
 	const char *DefCharset = LLoadString(IDS_DEFAULT_CHARSET_SEND);
 	if (DefCharset)
 	{
-		LToken t(DefCharset, ",");
+		auto t = LString(DefCharset).SplitDelimit(",");
 		for (unsigned i=0; i<t.Length(); i++)
 		{
 			if (i == 0)
@@ -243,7 +243,7 @@ void ScribeAccount::SetDefaults()
 	DefCharset = LLoadString(IDS_DEFAULT_CHARSET_RECEIVE);
 	if (DefCharset)
 	{
-		LToken t(DefCharset, ",");
+		auto t = LString(DefCharset).SplitDelimit(",");
 		for (unsigned i=0; i<t.Length(); i++)
 		{
 			if (i == 0)

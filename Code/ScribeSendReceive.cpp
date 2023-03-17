@@ -1536,7 +1536,7 @@ int ReceiveAccountlet::GetCheckTimeout()
 	LVariant Timeout = CheckTimeout();
 	if (Timeout.Str())
 	{
-		LToken t(Timeout.Str(), ":");
+		auto t = Timeout.LStr().SplitDelimit(":");
 		if (t.Length() == 2)
 		{
 			Sec = (atoi(t[0]) * 60) + atoi(t[1]);

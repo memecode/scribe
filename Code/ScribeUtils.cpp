@@ -780,7 +780,7 @@ bool DecodeUuencodedAttachment(LDataStoreI *Store, LArray<LDataI*> &Files, LStre
 					Last = 0;
 				}
 
-				LToken Header(s, " ", true, e - s);
+				auto Header = LString(s, e - s).SplitDelimit(" ", -1, true);
 				if (Header.Length() >= 3)
 				{
 					LMemQueue File;
@@ -1247,7 +1247,7 @@ Mailto::Mailto(ScribeWnd *app, const char *s)
 			*Question++ = 0;
 
 			// Split all the headers up
-			LToken Headers(Question, "&");
+			auto Headers = LString(Question).SplitDelimit("&");
 			for (unsigned h=0; h<Headers.Length(); h++)
 			{
 				char *Header = Headers[h];

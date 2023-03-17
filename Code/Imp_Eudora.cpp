@@ -6,114 +6,117 @@ char EudoraPathKey[] = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\
 
 bool ImportEudoraAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 {
+	if (!App || !Folder || !File)
+		return false;
+
+	LFile f(File);
+	if (!f)
+		return false;
+
+	auto Text = f.Read();
+	if (!Text)
+		return false;
+
 	bool Status = false;
+	char *Alias = 0;
+	char *Address = 0;
 
-	if (App && Folder && File)
+	auto L = Text.SplitDelimit("\r\n");
+	for (unsigned i=0; i<L.Length(); i++)
 	{
-		char *Text = LReadTextFile(File);
-		if (Text)
+		auto S = L[i].SplitDelimit(" ");
+		if (S.Length() > 2)
 		{
-			char *Alias = 0;
-			char *Address = 0;
-
-			LToken L(Text, "\r\n");
-			for (unsigned i=0; i<L.Length(); i++)
+			if (_stricmp(S[0], "alias") == 0)
 			{
-				LToken S(L[i], " ");
-				if (S.Length() > 2)
+				DeleteArray(Alias);
+				Alias = NewStr(S[1]);
+				DeleteArray(Address);
+				Address = NewStr(S[2]);
+			}
+			else if (_stricmp(S[0], "note") == 0)
+			{
+				if (Alias && Address)
 				{
-					if (_stricmp(S[0], "alias") == 0)
+					Contact *c = new Contact(App);
+					if (c)
 					{
-						DeleteArray(Alias);
-						Alias = NewStr(S[1]);
-						DeleteArray(Address);
-						Address = NewStr(S[2]);
-					}
-					else if (_stricmp(S[0], "note") == 0)
-					{
-						if (Alias && Address)
+						c->App = App;
+
+						// set basic information
+						c->Set(OPT_Nick, Alias);
+						c->Set(OPT_Email, Address);
+
+						// parse through all the tags..
+						char *n = 0;
+						for (char *s = strchr(L[i], '<'); s && *s; s = n)
 						{
-							Contact *c = new Contact(App);
-							if (c)
+							char *Var = ++s;
+							n = strchr(Var, '>');
+							if (n)
 							{
-								c->App = App;
+								*n++ = 0;
 
-								// set basic information
-								c->Set(OPT_Nick, Alias);
-								c->Set(OPT_Email, Address);
-
-								// parse through all the tags..
-								char *n = 0;
-								for (char *s = strchr(L[i], '<'); s && *s; s = n)
+								char *Val = strchr(Var, ':');
+								if (Val)
 								{
-									char *Var = ++s;
-									n = strchr(Var, '>');
-									if (n)
+									*Val++ = 0;
+
+									#define Map(From, To) else if (_stricmp(Var, From) == 0) c->Set(To, Val)
+									if (_stricmp(Var, "first") == 0)
 									{
-										*n++ = 0;
-
-										char *Val = strchr(Var, ':');
-										if (Val)
+										c->Set(OPT_First, Val);
+									}
+									Map("last", OPT_Last);
+									Map("address", OPT_HomeStreet);
+									Map("city", OPT_HomeSuburb);
+									Map("state", OPT_HomeState);
+									Map("country", OPT_HomeCountry);
+									Map("zip", OPT_HomePostcode);
+									Map("phone", OPT_HomePhone);
+									Map("fax", OPT_HomeFax);
+									Map("mobile", OPT_HomeMobile);
+									Map("web", OPT_HomeWebPage);
+									// Map("title", );
+									Map("company", OPT_Company);
+									Map("address2", OPT_WorkStreet);
+									Map("city2", OPT_WorkSuburb);
+									Map("country2", OPT_WorkCountry);
+									Map("zip2", OPT_WorkPostcode);
+									Map("phone2", OPT_WorkPhone);
+									Map("fax2", OPT_WorkFax);
+									Map("web2", OPT_WorkWebPage);
+									else if (_stricmp(Var, "name") == 0)
+									{
+										char *Sp = strchr(Val, ' ');
+										if (Sp)
 										{
-											*Val++ = 0;
-
-											#define Map(From, To) else if (_stricmp(Var, From) == 0) c->Set(To, Val)
-											if (_stricmp(Var, "first") == 0)
-											{
-												c->Set(OPT_First, Val);
-											}
-											Map("last", OPT_Last);
-											Map("address", OPT_HomeStreet);
-											Map("city", OPT_HomeSuburb);
-											Map("state", OPT_HomeState);
-											Map("country", OPT_HomeCountry);
-											Map("zip", OPT_HomePostcode);
-											Map("phone", OPT_HomePhone);
-											Map("fax", OPT_HomeFax);
-											Map("mobile", OPT_HomeMobile);
-											Map("web", OPT_HomeWebPage);
-											// Map("title", );
-											Map("company", OPT_Company);
-											Map("address2", OPT_WorkStreet);
-											Map("city2", OPT_WorkSuburb);
-											Map("country2", OPT_WorkCountry);
-											Map("zip2", OPT_WorkPostcode);
-											Map("phone2", OPT_WorkPhone);
-											Map("fax2", OPT_WorkFax);
-											Map("web2", OPT_WorkWebPage);
-											else if (_stricmp(Var, "name") == 0)
-											{
-												char *Sp = strchr(Val, ' ');
-												if (Sp)
-												{
-													*Sp++ = 0;
-													c->Set(OPT_First, Val);
-													c->Set(OPT_Last, Sp);
-												}
-												else
-												{
-													c->Set(OPT_First, Val);
-												}
-											}
-											else if (_stricmp(Var, "otheremail") == 0)
-											{
-												
-											}
+											*Sp++ = 0;
+											c->Set(OPT_First, Val);
+											c->Set(OPT_Last, Sp);
+										}
+										else
+										{
+											c->Set(OPT_First, Val);
 										}
 									}
-
-									char *Next = strchr(n, '<');
-									if (!Next && strlen(n) > 0)
+									else if (_stricmp(Var, "otheremail") == 0)
 									{
-										c->Set(OPT_Note, n);
-										n = 0;
+												
 									}
-									else n = Next;
 								}
-
-								Status |= (Folder->WriteThing(c, NULL) != Store3Error);
 							}
+
+							char *Next = strchr(n, '<');
+							if (!Next && strlen(n) > 0)
+							{
+								c->Set(OPT_Note, n);
+								n = 0;
+							}
+							else n = Next;
 						}
+
+						Status |= (Folder->WriteThing(c, NULL) != Store3Error);
 					}
 				}
 			}

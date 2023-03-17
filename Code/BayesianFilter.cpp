@@ -1497,7 +1497,7 @@ Store3Status BayesianFilter::IsSpam(double &Result, Mail *m, bool Analyse)
 		LVariant Wl;
 		if (App->GetOptions()->GetValue(OPT_BayesUserWhiteList, Wl))
 		{
-			LToken w(Wl.Str(), "\r\n\t ");
+			auto w = Wl.LStr().SplitDelimit("\r\n\t ");
 			bool IsWhite = false;
 			for (unsigned i=0; i<w.Length(); i++)
 			{

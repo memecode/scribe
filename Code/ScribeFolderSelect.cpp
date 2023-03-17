@@ -181,7 +181,7 @@ void ScribeFolderTree::Setup(FolderDlgPriv *d, ScribeFolder *Root, const char *I
 
 		if (InitSel)
 		{
-			LToken Path(InitSel, "/");
+			auto Path = LString(InitSel).SplitDelimit("/");
 			LTreeNode *n = this;
 			for (unsigned i=0; i<Path.Length(); i++)
 			{

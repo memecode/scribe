@@ -245,7 +245,7 @@ class BrowseReply : public LDialog
 	LCombo *Temp;
 
 public:
-	char *Arg;
+	LString Arg;
 
 	BrowseReply(ScribeWnd *App, LView *Parent, const char *arg)
 	{
@@ -292,7 +292,7 @@ public:
 					int MarkReplied = (int)GetCtrlValue(IDC_MARK_REPLIED);
 					char s[256];
 					sprintf_s(s, sizeof(s), "\"%s\" %i %i", Template?Template:(char*)"", All, MarkReplied);
-					Arg = NewStr(s);
+					Arg = s;
 				}
 				
 				// Fall thru
@@ -316,7 +316,7 @@ class BrowseForward : public LDialog
 	bool UseTemplate;
 
 public:
-	char *Arg;
+	LString Arg;
 
 	BrowseForward(ScribeWnd *app, LView *parent, const char *arg, bool temp)
 	{
@@ -412,7 +412,7 @@ public:
 				{
 					sprintf_s(s, sizeof(s), "\"%s\" %i %i", Email?Email:(char*)"", Attachments, MarkForwarded);
 				}
-				Arg = NewStr(s);
+				Arg = s;
 				// Fall thru				
 			}
 			case IDCANCEL:
@@ -1028,7 +1028,7 @@ int FilterAction::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDC_ARG_EDIT:
 		{
-			Arg1.Reset(NewStr(c->Name()));
+			Arg1 = c->Name();
 			break;
 		}
 		case IDC_BROWSE_ARG:
@@ -1149,7 +1149,7 @@ bool FilterAction::Set(LXmlTag *t)
 
 	// XML -> Obj
 	Type = (FilterActionTypes) t->GetAsInt(OPT_Type);
-	Arg1.Reset(NewStr(t->GetAttr(OPT_Arg1)));
+	Arg1 = t->GetAttr(OPT_Arg1);
 	return true;
 }
 
@@ -1159,7 +1159,7 @@ LDataPropI &FilterAction::operator =(LDataPropI &p)
 	if (c)
 	{
 		Type = c->Type;
-		Arg1.Reset(NewStr(c->Arg1));
+		Arg1 = c->Arg1;
 	}
 
 	return *this;
@@ -1184,7 +1184,7 @@ const char *GetFileName(const char *Path)
 	return 0;
 }
 
-bool CollectAttachmentsByPattern(Mail *m, char *Pattern, List<Attachment> &Files)
+bool CollectAttachmentsByPattern(Mail *m, LString Pattern, List<Attachment> &Files)
 {
 	Files.Empty();
 	
@@ -1193,7 +1193,7 @@ bool CollectAttachmentsByPattern(Mail *m, char *Pattern, List<Attachment> &Files
 		List<Attachment> Attachments;
 		if (m->GetAttachments(&Attachments))
 		{
-			LToken p(Pattern, " ,;");
+			auto p = Pattern.SplitDelimit(" ,;");
 			for (auto a: Attachments)
 			{
 				bool Match = true;
@@ -1457,7 +1457,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 				if (IsDigit(*Arg1))
 				{
 					// boolean number
-					Read = atoi(Arg1) != 0;
+					Read = Arg1.Int() != 0;
 				}
 				else if (stristr(Arg1, "true"))
 				{
@@ -1583,7 +1583,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 		}
 		case ACTION_MARK:
 		{
-			if (_stricmp(Arg1, "false") == 0)
+			if (Stricmp(Arg1.Get(), "false") == 0)
 			{
 				// unmark the item...
 				m->SetMarkColour(0);
@@ -1591,7 +1591,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 			else
 			{
 				// parse out RGB
-				LToken T(Arg1, ",");
+				auto T = Arg1.SplitDelimit(",");
 				if (T.Length() == 3)
 				{
 					// we have an RGB, so set it baby
@@ -1926,7 +1926,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
-					Arg1.Reset(NewStr(Dlg->Get()));
+					Arg1 = Dlg->Get();
 				delete dlg;
 			});
 			break;
@@ -1934,11 +1934,11 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_EXPORT:
 		{
 			auto s = new LFileSelect(Parent);
-			s->OpenFolder([&](auto dlg, auto status)
+			s->OpenFolder([this](auto s, auto status)
 			{
 				if (status)
-					Arg1.Reset(NewStr(s->Name()));
-				delete dlg;
+					Arg1 = s->Name();
+				delete s;
 			});
 			break;
 		}
@@ -1958,17 +1958,17 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					{
 						case IDM_LOCAL:
 						{
-							Arg1.Reset(NewStr("local"));
+							Arg1 = "local";
 							break;
 						}
 						case IDM_SERVER:
 						{
-							Arg1.Reset(NewStr("server"));
+							Arg1 = "server";
 							break;
 						}
 						case IDM_LOCAL_AND_SERVER:
 						{
-							Arg1.Reset(NewStr("local,server"));
+							Arg1 = "local,server";
 							break;
 						}
 					}
@@ -1999,17 +1999,17 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					{
 						case IDM_TRUE:
 						{
-							Arg1.Reset(NewStr("true"));
+							Arg1 = "true";
 							break;
 						}
 						case IDM_FALSE:
 						{
-							Arg1.Reset(NewStr("false"));
+							Arg1 = "false";
 							break;
 						}
 						case IDM_NOTNEW:
 						{
-							Arg1.Reset(NewStr("false,notnew"));
+							Arg1 = "false,notnew";
 							break;
 						}
 					}
@@ -2031,7 +2031,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					int Result = RClick->Float(Parent, m.x, m.y);
 					if (Result == IDM_UNMARK)
 					{
-						Arg1.Reset(NewStr("False"));
+						Arg1 = "False";
 					}
 					else if (Result >= IDM_MARK_BASE)
 					{
@@ -2041,7 +2041,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 								R32(MarkColours32[Result-IDM_MARK_BASE]),
 								G32(MarkColours32[Result-IDM_MARK_BASE]),
 								B32(MarkColours32[Result-IDM_MARK_BASE]));
-						Arg1.Reset(NewStr(s));
+						Arg1 = s;
 					}
 				}
 			}
@@ -2079,11 +2079,11 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			}
 			Select->Name(Arg1);
 
-			Select->Open([this](auto dlg, auto id)
+			Select->Open([this](auto s, auto ok)
 			{
-				if (id)
-					Arg1.Reset(NewStr(dlg->Name()));
-				delete dlg;
+				if (ok)
+					Arg1 = s->Name();
+				delete s;
 			});
 			break;
 		}
@@ -2093,7 +2093,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
-					Arg1.Reset(NewStr(Dlg->Arg));
+					Arg1 = Dlg->Arg;
 				delete dlg;
 			});
 			break;
@@ -2104,7 +2104,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
-					Arg1.Reset(NewStr(Dlg->Arg));
+					Arg1 = Dlg->Arg;
 				delete dlg;
 			});
 			break;
@@ -2115,7 +2115,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
-					Arg1.Reset(NewStr(Dlg->Arg));
+					Arg1 = Dlg->Arg;
 				delete dlg;
 			});
 			break;
@@ -2126,7 +2126,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
-					Arg1.Reset(NewStr(Dlg->Arg));
+					Arg1 = Dlg->Arg;
 				delete dlg;
 			});
 			break;
@@ -2184,7 +2184,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Result--;
 					if (Result >= 0 && Result < (int)Cs.Length())
 					{
-						Arg1.Reset(NewStr(Cs[Result]->Charset));
+						Arg1 = Cs[Result]->Charset;
 					}
 				}
 
@@ -2738,7 +2738,7 @@ bool Filter::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LV
 				if (Action.Equals(an->Default))
 				{
 					a.Type = (FilterActionTypes) (an - ActionNames);
-					a.Arg1.Reset(NewStr(Args[1]->CastString()));
+					a.Arg1 = Args[1]->CastString();
 					AddAction(&a);
 					return true;
 				}

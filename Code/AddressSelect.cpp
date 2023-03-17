@@ -182,16 +182,16 @@ void AddressList::Copy()
 void AddressList::Paste()
 {
 	LClipBoard Clip(this);
-	char *Txt = Clip.Text();
+	LString Txt = Clip.Text();
 	if (Txt)
 	{
-		LToken t(Txt, "\r\n");
-		for (unsigned i=0; i<t.Length(); i++)
+		auto Lines = Txt.SplitDelimit("\r\n");
+		for (auto &ln: Lines)
 		{
 			ListAddr *La = new ListAddr(App);
 			if (La)
 			{
-				La->Paste(t[i]);
+				La->Paste(ln);
 				Insert(La);
 			}
 		}
@@ -325,7 +325,7 @@ public:
 		WordStart = WordEnd = 0;
 	}
 
-	void Test(LArray<char*> &Txt, const char *First, const char *Last, LString::Array &Email, const char *Nick)
+	void Test(LString::Array &Txt, const char *First, const char *Last, LString::Array &Email, const char *Nick)
 	{
 		if (Txt.Length() < 1)
 			return;
@@ -475,7 +475,7 @@ public:
 		if (!App)
 			return false;
 
-		LToken t(Txt, " ");
+		auto t = Txt.SplitDelimit(" ");
 		LHashTbl<StrKey<char,false>,Contact*> Contacts;
 		App->HashContacts(Contacts);
 
