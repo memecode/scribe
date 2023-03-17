@@ -786,7 +786,7 @@ bool DecodeUuencodedAttachment(LDataStoreI *Store, LArray<LDataI*> &Files, LStre
 					LMemQueue File;
 					for (int n=2; Header[n]; n++)
 					{
-						FileName.Print("%s%s", n==2?"":" ", Header[n]);
+						FileName.Print("%s%s", n==2?"":" ", Header[n].Get());
 					}
 				}
 
