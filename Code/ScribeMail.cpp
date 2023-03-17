@@ -7792,7 +7792,7 @@ void Mail::DeleteAsSpam(LView *View)
 	{
 		LString SpamPath;
 		LString SpamLeaf = "Spam";
-		SpamPath.Printf("/%s/%s", Parts[0], SpamLeaf.Get());
+		SpamPath.Printf("/%s/%s", Parts[0].Get(), SpamLeaf.Get());
 
 		ScribeFolder *Spam = App->GetFolder(SpamPath);
 		if (!Spam)
