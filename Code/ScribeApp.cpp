@@ -759,7 +759,7 @@ public:
 
 class ScribeWndPrivate :
 	public LBrowser::LBrowserEvents,
-	public LVmDebuggerCallback,
+	public LVmCallback,
 	public LHtmlStaticInst
 {
 	LOptionsFile::PortableType InstallMode = LOptionsFile::UnknownMode;
@@ -934,6 +934,25 @@ public:
 			return new LVmDebuggerWnd(App, this, Vm, Code, NULL);
 		
 		return NULL;
+	}
+
+	bool CallCallback(LString CallbackName, LScriptArguments &Args)
+	{
+		for (auto s: Scripts)
+		{
+			if (!s->Code)
+				continue;
+
+			auto Method = s->Code->GetMethod(CallbackName);
+			if (!Method)
+				continue;
+
+			LVirtualMachine Vm(this);
+			auto Status = Vm.ExecuteFunction(s->Code, Method, Args);
+			return Status > ScriptError;
+		}
+
+		return false;
 	}
 
 	bool CompileScript(LAutoPtr<LCompiledCode> &Output, const char *FileName, const char *Source)
@@ -2584,7 +2603,7 @@ LAutoString ScribeWnd::GetForwardXml(const char *MimeType)
 	return LAutoString(s.ReleaseStr());
 }
 
-LVmDebuggerCallback *ScribeWnd::GetDebuggerCallback()
+LVmCallback *ScribeWnd::GetDebuggerCallback()
 {
 	return d;
 }

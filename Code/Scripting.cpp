@@ -8,7 +8,7 @@
 #include "resdefs.h"
 #include "../src/common/Coding/ScriptingPriv.h"
 
-extern GHostFunc Methods[];
+extern LHostFunc Methods[];
 
 #ifdef _MSC_VER
 #define __func__ __FUNCTION__
@@ -278,7 +278,7 @@ LAutoString LScribeScript::GetDataFolder()
 	return App->GetDataFolder();
 }
 
-char *LScribeScript::GetIncludeFile(char *FileName)
+LString LScribeScript::GetIncludeFile(const char *FileName)
 {
 	LString Path;
 	const char *Search[] = {
@@ -302,15 +302,23 @@ char *LScribeScript::GetIncludeFile(char *FileName)
 	else
 		Path = LFindFile(FileName);
 	
-	if (Path)
-		return LReadTextFile(Path);
-	else
+	if (!Path)
+	{
 		LgiTrace("%s:%i - GetIncludeFile(%s) failed.\n", _FL, FileName);
+		return NULL;
+	}
 
-	return NULL;
+	LFile f(Path);
+	if (!f)
+	{
+		LgiTrace("%s:%i - GetIncludeFile(%s) couldn't open '%s' for reading.\n", _FL, FileName, Path.Get());
+		return NULL;
+	}
+
+	return f.Read();
 }
 
-GHostFunc *LScribeScript::GetCommands()
+LHostFunc *LScribeScript::GetCommands()
 {
 	return Methods;
 }
@@ -921,9 +929,9 @@ bool LScribeScript::FilterDoActions(LScriptArguments &Args)
 
 
 #define DefFn(Name) \
-	GHostFunc(#Name, 0, (ScriptCmd)&LScribeScript::Name)
+	LHostFunc(#Name, 0, (ScriptCmd)&LScribeScript::Name)
 
-GHostFunc Methods[] =
+LHostFunc Methods[] =
 {
 	DefFn(MsgBox),
 
@@ -952,7 +960,7 @@ GHostFunc Methods[] =
 	DefFn(MenuAddSubmenu),
 	DefFn(ToolbarAddItem),
 
-	GHostFunc(0, 0, 0),
+	LHostFunc(0, 0, 0),
 };
 
 LScriptConsole::LScriptConsole(ScribeWnd *app, ConsoleClosingCallback callback, void *callback_data)

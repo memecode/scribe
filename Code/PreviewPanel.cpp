@@ -93,9 +93,9 @@ public:
 		DeleteObj(Bar);
 	}
 
-	char *GetIncludeFile(char *FileName) override
+	LString GetIncludeFile(const char *FileName) override
 	{
-		return 0;
+		return NULL;
 	}
 
 	bool AppendItems(LSubMenu *Menu, const char *Param, int Base) override
@@ -267,7 +267,7 @@ public:
 	}
 
 	void SetEngine(LScriptEngine *Eng) {}
-	GHostFunc *GetCommands() override;
+	LHostFunc *GetCommands() override;
 
 	void SetGlobals(LCompiledCode *obj)
 	{
@@ -334,15 +334,15 @@ public:
 	}
 };
 
-GHostFunc Cmds[] =
+LHostFunc Cmds[] =
 {
-	GHostFunc("getElementById", "", (ScriptCmd)&LPreviewPanelPrivate::getElementById),
-	GHostFunc("encodeURI", "", (ScriptCmd)&LPreviewPanelPrivate::encodeURI),
-	GHostFunc("trace", "", (ScriptCmd)&LPreviewPanelPrivate::trace),
-	GHostFunc(0, 0, 0)
+	LHostFunc("getElementById", "", (ScriptCmd)&LPreviewPanelPrivate::getElementById),
+	LHostFunc("encodeURI", "", (ScriptCmd)&LPreviewPanelPrivate::encodeURI),
+	LHostFunc("trace", "", (ScriptCmd)&LPreviewPanelPrivate::trace),
+	LHostFunc(0, 0, 0)
 };
 
-GHostFunc *LPreviewPanelPrivate::GetCommands()
+LHostFunc *LPreviewPanelPrivate::GetCommands()
 {
 	return Cmds;
 }

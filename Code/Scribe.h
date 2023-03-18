@@ -229,8 +229,8 @@ public:
 	void ShowScriptingWindow(bool show);
 	LAutoString GetDataFolder();
 	LStream *GetLog();
-	GHostFunc *GetCommands();	
-	char *GetIncludeFile(char *FileName);
+	LHostFunc *GetCommands();	
+	LString GetIncludeFile(const char *FileName) override;
 
 	// System
 	void SetEngine(LScriptEngine *eng);
@@ -2463,7 +2463,7 @@ public:
 	LFont			*GetPreviewFont();
 	LFont			*GetBoldFont() { return LSysBold; }
 	LToolBar		*LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LImageList> &Img);
-	class LVmDebuggerCallback *GetDebuggerCallback();
+	class LVmCallback *GetDebuggerCallback();
 	class GpgConnector *GetGpgConnector();
 	void			GetUserInput(LView *Parent, LString Msg, bool Password, std::function<void(LString)> Callback);
 
