@@ -936,7 +936,7 @@ public:
 		return NULL;
 	}
 
-	bool CallCallback(LString CallbackName, LScriptArguments &Args)
+	bool CallCallback(LVirtualMachine &Vm, LString CallbackName, LScriptArguments &Args)
 	{
 		for (auto s: Scripts)
 		{
@@ -947,11 +947,12 @@ public:
 			if (!Method)
 				continue;
 
-			LVirtualMachine Vm(this);
 			auto Status = Vm.ExecuteFunction(s->Code, Method, Args);
 			return Status > ScriptError;
 		}
 
+		Vm.SetDebuggerEnabled(true); // Lets show the UI when we throw the callback not found error.
+		Args.Throw(_FL, "There is no function '%s' for callback.", CallbackName.Get());
 		return false;
 	}
 
