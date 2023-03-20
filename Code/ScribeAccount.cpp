@@ -381,7 +381,7 @@ void ScribeAccount::SerializeUi(LView *Wnd, bool Load)
 			Pop3Folder->Enabled(false);
 		}
 
-		GPassword s, r;
+		LPassword s, r;
 		char Buf[128];
 		if (Load)
 		{

@@ -661,25 +661,26 @@ int CalSorter(TimePeriod *a, TimePeriod *b)
 	return a->s.Compare(&b->s);
 }
 
-bool Calendar::SummaryOfToday(ScribeWnd *App, LVariant &v)
+void Calendar::SummaryOfToday(ScribeWnd *App, std::function<void(LString)> Callback)
 {
-	bool Status = false;
+	LDateTime Now;
+	Now.SetNow();
+	LDateTime Next = Now;
+	Next.AddMonths(1);
 
     LArray<CalendarSource*> Sources;
-	if (App && App->GetCalendarSources(Sources))
-	{
-		LDateTime Now;
-		Now.SetNow();
-		LDateTime Next = Now;
-		Next.AddMonths(1);
+	if (!App || !Callback || !App->GetCalendarSources(Sources))
+		return;
 
-		LArray<TimePeriod> e;
-		for (unsigned i=0; i<Sources.Length(); i++)
+	new CalendarSourceGetEvents(Now, Next, Sources, [Callback](auto e)
+	{
+		if (!e.Length())
 		{
-			Sources[i]->GetEvents(Now, Next, e);
+			char s[256];
+			sprintf_s(s, sizeof(s), "<font color='#808080'>%s</font>", LLoadString(IDS_NO_EVENTS));
+			Callback(s);
 		}
-		
-		if (e.Length())
+		else
 		{
 			e.Sort(CalSorter);
 
@@ -726,24 +727,9 @@ bool Calendar::SummaryOfToday(ScribeWnd *App, LVariant &v)
 			}
 			p.Print("</table>\n");
 
-			char *Str = p.NewStr();
-			if (Str)
-			{
-				v = Str;
-				DeleteArray(Str);
-				Status = true;
-			}
+			Callback(p.NewLStr());
 		}
-		else
-		{
-			char s[256];
-			sprintf_s(s, sizeof(s), "<font color='#808080'>%s</font>", LLoadString(IDS_NO_EVENTS));
-			v = s;
-			Status = true;
-		}
-	}
-
-	return Status;
+	});
 }
 
 void Calendar::OnSerialize(bool Write)
@@ -1426,7 +1412,8 @@ void Calendar::DoContextMenu(LMouse &m, LView *Parent)
 								{
 									LArray<Thing*> Items;
 									Items.Add(this);
-									DstFolder->MoveTo(Items);
+									DstFolder->MoveTo(Items, false);
+									// FIXME: Impl moveto callback properly.
 									if (Items[0] != (Thing*)this)
 										return;
 

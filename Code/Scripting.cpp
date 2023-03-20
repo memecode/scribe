@@ -554,7 +554,8 @@ bool LScribeScript::MoveThing(LScriptArguments &Args)
 
 	// Move the thing to the folder...
 	Items.Add(t);
-	*Args.GetReturn() = To->MoveTo(Items);
+	To->MoveTo(Items, false);
+	*Args.GetReturn() = true;
 	return true;
 
 MoveThingErr:

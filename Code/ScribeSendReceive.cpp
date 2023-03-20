@@ -679,7 +679,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
 					ValidStr(HostName))
 				{
 					char Password[256] = "";
-					GPassword p;
+					LPassword p;
 					if (GetPassword(&p))
 					{
 						p.Get(Password);
@@ -730,7 +730,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
 					ValidStr(Server().Str()))
 				{
 					char Password[256] = "";
-					GPassword p;
+					LPassword p;
 					if (GetPassword(&p))
 						p.Get(Password);
 
@@ -770,11 +770,10 @@ bool Accountlet::Connect(LView *p, bool quiet)
 					Lck.Reset();
 				}
 
-				auto StartThread = [&]()
+				auto StartThread = [this]()
 				{
 					if (Thread.Reset(new AccountletThread(this, 0)))
 					{
-						Status = true;
 						Thread->Run();
 						Account->Parent->OnBeforeConnect(Account, IsReceive());
 					}
@@ -782,7 +781,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
 
 				// Do we need the password?
 				LString Password;
-				GPassword Psw;
+				LPassword Psw;
 				GetPassword(&Psw);
 				Password = Psw.Get();
 				auto User = UserName();
@@ -796,7 +795,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
 					GetApp()->GetUserInput(	Parent ? Parent : GetApp(),
 											Msg,
 											true,
-											[&](auto Psw)
+											[this, StartThread](auto Psw)
 											{
 												this->TempPsw = Psw;
 												StartThread();
@@ -841,7 +840,7 @@ char *Accountlet::OptionName(const char *Opt, char *Dest, int DestLen)
 	return Dest;
 }
 
-bool Accountlet::GetPassword(GPassword *p)
+bool Accountlet::GetPassword(LPassword *p)
 {
 	bool Status = false;
 
@@ -858,7 +857,7 @@ bool Accountlet::GetPassword(GPassword *p)
 	return Status;
 }
 
-void Accountlet::SetPassword(GPassword *p)
+void Accountlet::SetPassword(LPassword *p)
 {
 	if (OptPassword &&
 		Lock())
@@ -1146,7 +1145,7 @@ if (DebugTrace) LgiTrace("Send(%i) got %i mail to send\n", Account->GetIndex(), 
 
 							if (RequireAuthentication())
 							{
-								GPassword p;
+								LPassword p;
 								if (GetPassword(&p))
 									_Password = p.Get();
 							}
@@ -1897,7 +1896,7 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 
 	LString Password;
 
-	GPassword Psw;
+	LPassword Psw;
 	GetPassword(&Psw);
 	Password = Psw.Get();
 

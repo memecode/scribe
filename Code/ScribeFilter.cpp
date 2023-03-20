@@ -464,11 +464,11 @@ public:
 			{
 				auto s = new LFileSelect(this);
 				s->Name(GetCtrlName(IDC_DIR));
-				s->OpenFolder([&](auto dlg, auto status)
+				s->OpenFolder([this](auto s, auto status)
 				{
 					if (status)
 						SetCtrlName(IDC_DIR, s->Name());
-					delete dlg;
+					delete s;
 				});
 				break;
 			}
@@ -1330,11 +1330,12 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 			{
 				LArray<Thing*> Items;
 				Items.Add(m);
-				Status = Folder->MoveTo(Items);
-				m = Items[0]->IsMail();
-
-		        if (Log)
-    		        Log->Print("\tACTION_MOVE_TO_FOLDER(%s) = %i.\n", Arg1.Get(), Status);
+				Folder->MoveTo(Items, false, [this, Log](auto result, auto status)
+				{
+			        if (Log)
+				        Log->Print("\tACTION_MOVE_TO_FOLDER(%s) = %i.\n", Arg1.Get(), result);
+				});
+				Status = true;
 			}
 			else if (Log)
 			{
@@ -1349,11 +1350,12 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 			{				
 				LArray<Thing*> Items;
 				Items.Add(m);
-				Status = Folder->MoveTo(Items, true);
-				m = Items[0]->IsMail();
-
-		        if (Log)
-    		        Log->Print("\tACTION_COPY(%s) = %i.\n", Arg1.Get(), Status);
+				Folder->MoveTo(Items, true, [this, Log](auto result, auto status)
+				{
+					if (Log)
+    					Log->Print("\tACTION_COPY(%s) = %i.\n", Arg1.Get(), result);
+				});
+				Status = true;
 			}
 			else if (Log)
 			{

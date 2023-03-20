@@ -242,24 +242,33 @@ void FolderCalendarSource::EditPath(LView *parent, CalendarView *cv)
 	});
 }
 
-bool FolderCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArray<TimePeriod> &Events)
+bool FolderCalendarSource::GetEvents(const LDateTime StartTs,
+									 const LDateTime EndTs,
+									 std::function<void(LArray<TimePeriod>&)> Callback)
 {
 	Read();
 
-	if (!Display)
-		return false;
-	
-	LDateTime Start = StartTs;
-	Start.ToUtc();
-	LDateTime End = EndTs;
-	End.ToUtc();
-
-	LArray<Calendar*> Search;
-	if (!Folder)
+	if (!Callback)
 		return false;
 
-	Folder->LoadThings(NULL, [&](auto Status)
+	if (!Display || !Folder)
 	{
+		LArray<TimePeriod> Empty;
+		Callback(Empty);
+		return false;
+	}
+	
+	Folder->LoadThings(NULL, [this, StartTs, EndTs, Callback](auto Status)
+	{
+		LArray<TimePeriod> Events;
+
+		LDateTime Start = StartTs;
+		Start.ToUtc();
+		LDateTime End = EndTs;
+		End.ToUtc();
+
+		LArray<Calendar*> Search;
+
 		for (auto t : Folder->Items)
 		{
 			Calendar *c = t->IsCalendar();
@@ -325,6 +334,8 @@ bool FolderCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArra
 				}
 			}
 		}
+
+		Callback(Events);
 	});
 
 	return true;

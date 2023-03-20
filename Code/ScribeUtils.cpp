@@ -2097,37 +2097,3 @@ void ScriptDownloadContentThread::OnComplete()
 		
 	App->ExecuteScriptCallback(Cb, Args);
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This converts an async call to sync, because the GetVariant / CallMethod API
-// can't be changed to include a callback. It's a hack until such time as there
-// is proper support for callbacks in the DOM api.
-void WaitForVariant(LVariant &var)
-{
-	auto StartTs = LCurrentTime();
-	while (var.Type == GV_NULL)
-	{
-		LSleep(10);
-		LYield();
-		if (LCurrentTime() - StartTs > 20000)
-		{
-			LgiTrace("%s:%i - WaitForVariant waiting for: %is", _FL, (int)(LCurrentTime()-StartTs));
-			StartTs = LCurrentTime();
-		}
-	}
-}
-
-void WaitForString(LString &var)
-{
-	auto StartTs = LCurrentTime();
-	while (var.Get() == NULL)
-	{
-		LSleep(10);
-		LYield();
-		if (LCurrentTime() - StartTs > 20000)
-		{
-			LgiTrace("%s:%i - WaitForString waiting for: %is", _FL, (int)(LCurrentTime()-StartTs));
-			StartTs = LCurrentTime();
-		}
-	}
-}

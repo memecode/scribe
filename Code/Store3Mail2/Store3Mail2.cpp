@@ -100,7 +100,7 @@ char *LMail2Store::GetStr(int id)
 			return ErrorMsg;
 		case FIELD_STORE_PASSWORD:
 		{
-			GPassword p;
+			LPassword p;
 			if (GetPassword(&p))
 			{
 				static char s[128];

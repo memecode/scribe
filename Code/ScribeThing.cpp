@@ -399,7 +399,10 @@ bool Thing::OnDelete()
 
 	LArray<Thing*> Items;
 	Items.Add(this);
-	return Trash->MoveTo(Items);
+
+	// FIXME: Impl callback
+	Trash->MoveTo(Items, false);
+	return true;
 }
 
 void Thing::OnMove()
@@ -483,12 +486,13 @@ void Thing::ExportAll(	LViewI *Parent,
 	else
 		Sel.Insert(this);
 	
-	auto Process = [&](LFileSelect *Select)
+	auto Process = [this, Callback, Parent, Sel, ExportMimeType=LString(ExportMimeType)](LFileSelect *Select)
 	{
 		int Exported = 0;
 		int Errors = 0;
-		for (auto m: Sel)
+		for (unsigned idx = 0; idx < Sel.Length(); idx++)
 		{
+			auto m = Sel[idx];
 			const char *Out;
 			char Buf[MAX_PATH_LEN];
 			if (Sel.Length() == 1)
@@ -559,7 +563,7 @@ void Thing::ExportAll(	LViewI *Parent,
 
 	if (Sel.Length() > 1)
 	{
-		Select->OpenFolder([&](auto dlg, auto status)
+		Select->OpenFolder([this, Process](auto dlg, auto status)
 		{
 			if (status)
 				Process(dlg);
@@ -568,7 +572,7 @@ void Thing::ExportAll(	LViewI *Parent,
 	}
 	else
 	{
-		Select->Save([&](auto dlg, auto status)
+		Select->Save([this, Process](auto dlg, auto status)
 		{
 			if (status)
 				Process(dlg);

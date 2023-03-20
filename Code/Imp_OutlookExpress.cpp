@@ -573,7 +573,7 @@ struct ImportOe : public LProgressDlg
 		LProgressDlg(app)
 	{
 		// Get the base directory
-		auto Dir = LGetSystemPath(LSP_LOCAL_APP_DATA);
+		Dir = LGetSystemPath(LSP_LOCAL_APP_DATA);
 		if (!Dir)
 			// Just in case
 			Dir = LGetSystemPath(LSP_OS);
@@ -594,15 +594,15 @@ struct ImportOe : public LProgressDlg
 						Dir.Get()) == IDYES)
 			{
 				auto Select = new LFileSelect(App);
-				Select->OpenFolder([&](auto dlg, auto status)
+				Select->OpenFolder([this](auto s, auto ok)
 				{
-					if (status)
+					if (ok)
 					{
-						strcpy_s(Dir, sizeof(Dir), Select->Name());
+						Dir = s->Name();
 						DoFileSearch();
 						ProcessFiles();
 					}
-					delete dlg;
+					delete s;
 				});
 			}
 		}

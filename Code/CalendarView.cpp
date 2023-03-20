@@ -912,6 +912,26 @@ void CalendarView::OnContentsChanged(CalendarSource *Source)
 
 	LDateTime End = Start;
 	End.AddDays(MonthX * MonthY);
+	
+	new CalendarSourceGetEvents(Start, End, CalendarSource::GetSources(), [this](auto Events)
+	{
+		Current += Events;
+
+		LHashTbl<PtrKey<Calendar*>, bool> InCur;
+		for (unsigned i=0; i<Current.Length(); i++)
+		{
+			InCur.Add(Current[i].c, true);
+		}
+		for (unsigned i=0; i<Selection.Length(); i++)
+		{
+			if (!InCur.Find(Selection[i]))
+				Selection.DeleteAt(i--);
+		}
+
+		OnCursorChange();
+	});
+	
+	/*
 	for (size_t i=0; i<CalendarSource::GetSources().Length(); i++)
 	{
 		auto cs = CalendarSource::GetSources().ItemAt(i);
@@ -930,6 +950,7 @@ void CalendarView::OnContentsChanged(CalendarSource *Source)
 	}
 
 	OnCursorChange();
+	*/
 }
 
 void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)
@@ -961,12 +982,14 @@ void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)
 		{
 			Current[i].c->Source = 0;
 		}
+
 		Current.Length(0);
-		for (unsigned i=0; i<CalendarSource::GetSources().Length(); i++)
+
+		new CalendarSourceGetEvents(s, e, CalendarSource::GetSources(), [this](auto Events)
 		{
-			auto cs = CalendarSource::GetSources().ItemAt(i);
-			cs->GetEvents(s, e, Current);
-		}
+			Current += Events;
+			Invalidate();
+		});
 		
 		LDateTime::GetDaylightSavingsInfo(Dst, s, &e);
 

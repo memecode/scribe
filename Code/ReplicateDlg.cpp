@@ -1335,7 +1335,7 @@ ReplicateDlg::ReplicateDlg(ScribeWnd *app)
 
 					as.Uri.Empty();
 
-					GPassword Pass;
+					LPassword Pass;
 					if (a->Receive.GetPassword(&Pass))
 					{
 						char Ps[256] = "";

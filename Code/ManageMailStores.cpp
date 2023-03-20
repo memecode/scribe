@@ -285,7 +285,7 @@ public:
 
 	void Edit()
 	{
-		EditWebdav(GetList(), &Tag, [&](auto status)
+		EditWebdav(GetList(), &Tag, [this](auto status)
 		{
 			if (status)
 				Update();
@@ -482,9 +482,9 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 				auto s = new LFileSelect(this);
 				s->InitialDir(Opts);
 				s->Name((char*)"Folders.mail3");
-				s->Save([&](auto dlg, auto status)
+				s->Save([this, Opts=LString(Opts)](auto s, auto ok)
 				{
-					if (status)
+					if (ok)
 					{
 						StoreItem *Si = new StoreItem(App);
 						if (Si)
@@ -497,7 +497,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 							Lst->ResizeColumnsToContent();
 						}
 					}
-					delete dlg;
+					delete s;
 				});
 			}
 			else if (Cmd == IDM_WEBDAV_FOLDER)
@@ -506,14 +506,14 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 				if (!Si)
 					break;
 				
-				EditWebdav(this, &Si->Tag, [&](auto status)
+				EditWebdav(this, &Si->Tag, [this, Si](auto status)
 				{
 					if (status)
 					{					
 						Lst->Insert(Si);
 						Lst->ResizeColumnsToContent();
 					}
-					else DeleteObj(Si);
+					else delete Si;
 				});
 			}
 			break;

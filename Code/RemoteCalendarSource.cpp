@@ -204,15 +204,27 @@ bool RemoteCalendarSource::Match(char *Email)
 	return false;
 }
 
-bool RemoteCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArray<TimePeriod> &Events)
+bool RemoteCalendarSource::GetEvents(const LDateTime StartTs,
+									 const LDateTime EndTs,
+									 std::function<void(LArray<TimePeriod>&)> Callback)
 {
-	if (!Display)
+	if (!Callback)
 		return false;
+
+	LArray<TimePeriod> Events;
+	if (!Display)
+	{
+		Callback(Events);
+		return false;
+	}
 
 	if (!d->Loaded)
 	{
 		d->Loaded = true;
 		d->PostEvent(M_LOAD_URI);
+		
+		// FIXME: Should call the callback when loaded...?
+		Callback(Events);
 		return true;
 	}
 	
@@ -280,7 +292,8 @@ bool RemoteCalendarSource::GetEvents(LDateTime &StartTs, LDateTime &EndTs, LArra
 		}
 	}
 
-	return false;
+	Callback(Events);
+	return true;
 }
 
 void RemoteCalendarSource::EditPath(LView *parent, CalendarView *cv)

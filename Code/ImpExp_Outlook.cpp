@@ -3700,7 +3700,7 @@ bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const c
 		if (Server.Str())
 		{
 			char PassStr[128] = "";
-			GPassword p;
+			LPassword p;
 			Account->Receive.GetPassword(&p);
 			p.Get(PassStr);
 

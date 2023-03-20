@@ -253,11 +253,11 @@ public:
 				auto s = new LFileSelect(this);
 				s->Type("XML", "*.xml");
 				s->Type("All Files", LGI_ALL_FILES);
-				s->Save([&](auto dlg, auto id)
+				s->Save([this](auto s, auto ok)
 				{
-					if (id)
+					if (ok)
 						SaveMapping(s->Name());
-					delete dlg;
+					delete s;
 				});
 				break;
 			}

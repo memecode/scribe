@@ -4976,7 +4976,7 @@ void Mail::PrepSend()
 		{
 			LArray<Thing*> Items;
 			Items.Add(this);
-			OutBox->MoveTo(Items);
+			OutBox->MoveTo(Items, false);
 		}
 	}
 }
@@ -6409,7 +6409,7 @@ void SetFolderCallback(LInput *Dlg, LViewI *EditCtrl, void *Param)
 	ScribeWnd *App = (ScribeWnd*) Param;
 	auto Str = EditCtrl->Name();
 	auto Select = new FolderDlg(Dlg, App, MAGIC_MAIL, 0, Str);
-	Select->DoModal([&](auto dlg, auto id)
+	Select->DoModal([Select, EditCtrl](auto dlg, auto id)
 	{
 		if (id)
 			EditCtrl->Name(Select->Get());
@@ -7098,7 +7098,7 @@ void Mail::OnAfterSend()
 		{
 			LArray<Thing*> Items;
 			Items.Add(this);
-			Sent->MoveTo(Items);
+			Sent->MoveTo(Items, false);
 		}
 	}
 }
@@ -7821,10 +7821,11 @@ void Mail::DeleteAsSpam(LView *View)
 		{
 			LArray<Thing*> Items;
 			Items.Add(this);
-			if (!Spam->MoveTo(Items))
+			Spam->MoveTo(Items, false, [View](auto result, auto status)
 			{
-				LgiMsg(View, "Error: Couldn't move email to spam folder.", AppName);
-			}
+				if (!result)
+					LgiMsg(View, "Error: Couldn't move email to spam folder.", AppName);
+			});
 		}
 	}
 }

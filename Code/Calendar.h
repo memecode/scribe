@@ -97,7 +97,7 @@ class ScribeClass Calendar :
 
 public:
 	static void CheckReminders();
-	static bool SummaryOfToday(ScribeWnd *App, LVariant &v);
+	static void SummaryOfToday(ScribeWnd *App, std::function<void(LString)> Callback);
 
 	// Week view
 	static int DayStart;
@@ -277,10 +277,56 @@ public:
 	virtual void SetColour(LColour c) = 0;
 	virtual const char *GetName() = 0;
 	virtual bool Read() = 0;
-	virtual bool GetEvents(LDateTime &Start, LDateTime &End, LArray<TimePeriod> &Events) = 0;
+	virtual bool GetEvents(const LDateTime Start, const LDateTime End, std::function<void(LArray<TimePeriod>&)> Callback) = 0;
 	virtual Calendar *NewEvent() = 0;
 	virtual void OnFolderDelete(ScribeFolder *f) = 0;
 	virtual void OnPulse() = 0;
+};
+
+/// Helper class to collect events from multiple CalendarSource objects
+class CalendarSourceGetEvents
+{
+	ScribeWnd *App = NULL;
+    LArray<CalendarSource*> Sources;
+	LArray<TimePeriod> Events;
+	LDateTime Start, End;
+	std::function<void(LArray<TimePeriod>&)> Callback;
+
+	void OnFinished()
+	{
+		if (Callback)
+			Callback(Events);
+		delete this;
+	}
+
+public:
+	CalendarSourceGetEvents(LDateTime start,
+							LDateTime end,
+							LArray<CalendarSource*> sources,
+							std::function<void(LArray<TimePeriod>&)> callback)
+	{
+		Sources = sources;
+		Start = start;
+		End = end;
+		Callback = callback;
+
+		for (auto src: Sources)
+		{
+			if (!App)
+				App = src->GetApp();
+
+			src->GetEvents(Start, End, [this, src](auto events)
+			{
+				LAssert(Sources.HasItem(src));
+				Sources.Delete(src);
+				
+				Events += events;
+
+				if (Sources.Length() == 0)
+					OnFinished();
+			});
+		}
+	}
 };
 
 class FolderCalendarSource :
@@ -302,7 +348,7 @@ public:
 	bool Delete();
 	Calendar *NewEvent();
 	bool Match(char *Email);
-	bool GetEvents(LDateTime &Start, LDateTime &End, LArray<TimePeriod> &Events);
+	bool GetEvents(const LDateTime Start, const LDateTime End, std::function<void(LArray<TimePeriod>&)> Callback);
 	void EditPath(LView *parent, CalendarView *cv);
 
 	// Props
@@ -339,7 +385,7 @@ public:
 	bool Delete();
 	Calendar *NewEvent();
 	bool Match(char *Email);
-	bool GetEvents(LDateTime &Start, LDateTime &End, LArray<TimePeriod> &Events);
+	bool GetEvents(const LDateTime Start, const LDateTime End, std::function<void(LArray<TimePeriod>&)> Callback);
 	void EditPath(LView *parent, CalendarView *cv);
 
 	// Props

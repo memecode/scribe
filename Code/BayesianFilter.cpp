@@ -1267,7 +1267,7 @@ void TokeniseText(const char *Source, bool *Lut, LString::Array &Blocks, TokenMa
 	auto oldWarn = LUtf8Ptr::Warn;
 	LUtf8Ptr::Warn = false;
 
-	auto emitBuf = [&]() {
+	auto emitBuf = [&Blocks, &used, &buf]() {
 		if (used > 0)
 			Blocks.New().Set(buf, used);
 		used = 0;

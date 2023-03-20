@@ -141,19 +141,19 @@ int ScribeFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 			Select->Type("v3 Mail Store", "*.sqlite");
 			Select->Type("All Files", LGI_ALL_FILES);
 
-			Select->Save([&](auto dlg, auto status)
+			Select->Save([this](auto s, auto ok)
 			{
-				if (status)
+				if (ok)
 				{
 					char Def[MAX_PATH_LEN];
-					strcpy_s(Def, sizeof(Def), Select->Name());
+					strcpy_s(Def, sizeof(Def), s->Name());
 					char *d = strrchr(Def, DIR_CHAR);
 					if (d)
 					{
 						char *e = strrchr(d, '.');
 						if (!e)
 						{
-							if (Select->SelectedType() == 0)
+							if (s->SelectedType() == 0)
 								strcat(d, ".mail3");
 						}
 
@@ -161,7 +161,7 @@ int ScribeFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 					}
 					else LgiMsg(this, "Error: Invalid path.", AppName);
 				}
-				delete dlg;
+				delete s;
 			});
 			break;
 		}

@@ -580,7 +580,7 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 
 						bool CopyOp = (KeyState & LGI_EF_CTRL) != 0;
 
-						auto FinishFolderOp = [&](int Res)
+						auto FinishFolderOp = [this, Folder, Leaf, CopyOp](int Res)
 						{
 							int SystemFolder = App->GetFolderType(Folder);
 							auto OldPath = Folder->GetPath();
@@ -704,7 +704,8 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 				if (Items.Length())
 				{
 					LArray<Store3Status> ItemStatus;
-					Leaf->MoveTo(Items, CopyOnly, &ItemStatus);
+					Leaf->MoveTo(Items, CopyOnly, NULL);
+					// Fixme: Impl MoveTo Callback
 					for (auto s: ItemStatus)
 						if (s == Store3Error)
 							Errors++;

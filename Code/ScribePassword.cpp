@@ -47,7 +47,7 @@ bool ScribePassword::Load(LView *dlg)
 	d->Dlg = dlg;
 	if (IsOk())
 	{
-		GPassword p;
+		LPassword p;
 		if (p.Serialize(d->Props, d->Opt, false))
 		{
 			d->Dlg->SetCtrlValue(d->CtrlEnable, true);
@@ -75,7 +75,7 @@ bool ScribePassword::Save()
 			{
 				if (strcmp(Psw, Confirm) == 0)
 				{
-					GPassword p;
+					LPassword p;
 					p.Set(Psw);
 					if (p.Serialize(d->Props, d->Opt, true))
 					{

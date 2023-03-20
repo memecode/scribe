@@ -780,7 +780,7 @@ public:
 	bool            ExitAfterSend = false;
 	LToolButton		*ShowConsoleBtn = NULL;
 	LString			MulPassword;
-	
+	LString			CalendarSummary;
 	LBox			*SubSplit = NULL, *SearchSplit = NULL;
 	LArray<ScribeFolder*> ThingSources;
 	int				LastLayout = 0;
@@ -1051,7 +1051,7 @@ public:
 							LLoadString(IDS_DESKTOP),
 							LLoadString(IDS_PORTABLE));
 		
-		Dlg->SetButtonCallback(1, [&](auto idx)
+		Dlg->SetButtonCallback(1, [this](auto idx)
 		{
 			App->LaunchHelp("install.html");
 		});
@@ -1707,7 +1707,7 @@ void ScribeWnd::Construct3()
 	SetupAccounts();
 
 	// Recursively load folder tree
-	LoadFolders([&](auto status)
+	LoadFolders([this](auto status)
 	{
 		// Redo it for the templates... now that load folders has completed.
 		BuildDynMenus();
@@ -2729,7 +2729,12 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		}
 		case SdCalendarToday: // Type: String
 		{
-			return Calendar::SummaryOfToday(this, Value);
+			Calendar::SummaryOfToday(this, [this](auto s)
+			{
+				d->CalendarSummary = s;
+			});
+
+			return d->CalendarSummary;
 		}
 		case SdInboxSummary:
 		{
@@ -3584,7 +3589,7 @@ bool ScribeWnd::LoadOptions()
 			// no encrypted password, look for unencrypted password
 			if (GetOptions()->GetValue(Pw, v))
 			{
-				GPassword p;
+				LPassword p;
 				p.Set(v.Str());
 				p.Serialize(GetOptions(), OPT_EncryptedSmtpPassword, true);
 			}
@@ -5196,7 +5201,7 @@ bool ScribeWnd::LoadMailStores()
 				{
 					if (id == IDOK)
 					{
-						GPassword User;
+						LPassword User;
 						User.Set(Dlg->GetStr());
 						if (Dlg->GetStr() == FolderPsw)
 							ProcessFolder(Store, StoreIdx, StoreName);
@@ -6723,12 +6728,11 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 					{
 						LUri u;
 						LString a = u.DecodeStr(d);
-						f->GetMessageById(a, [&](auto r)
+						f->GetMessageById(a, [this, NewFlag=(int)Msg->B()](auto r)
 						{
 							if (r)
 							{
 								int ExistingFlags = r->GetFlags();
-								int NewFlag = (int)Msg->B();
 								r->SetFlags(ExistingFlags | NewFlag);
 							}
 						});
@@ -6920,11 +6924,11 @@ void ScribeWnd::ThingPrint(std::function<void(bool)> Callback, ThingType *m, LPr
 		return;
 	}
 		
-	ScribePrintContext Events(this, t);
-	Printer->Print(	&Events,
-					[&](auto pages)
+	auto Events = new ScribePrintContext(this, t);
+	Printer->Print(	Events,
+					[this, Events, Parent, Printer, Callback](auto pages)
 					{
-						if (pages == Events.OnBeginPrintError)
+						if (pages == Events->OnBeginPrintError)
 						{
 							LgiMsg(Parent, "Printing failed: %s", AppName, MB_OK, Printer->GetErrorMsg().Get());
 							if (Callback)
@@ -6934,6 +6938,8 @@ void ScribeWnd::ThingPrint(std::function<void(bool)> Callback, ThingType *m, LPr
 						{
 							Callback(true);
 						}
+
+						delete Events;
 					},
 					AppName,
 					-1,
@@ -7110,7 +7116,7 @@ void ScribeWnd::OnBayesAnalyse(const char *Msg, const char *WhiteListEmail)
 		s += LString("<br>") + q;
 	}
 	s += "</body></html>";
-	LHtmlMsg([&](auto result)
+	LHtmlMsg([this, WhiteListEmail=LString(WhiteListEmail)](auto result)
 			{
 				if (result == IDYES)
 					RemoveFromWhitelist(WhiteListEmail);
@@ -7183,11 +7189,12 @@ bool ScribeWnd::OnBayesResult(Mail *m, double Rating)
 		{
 			LArray<Thing*> Items;
 			Items.Add(m);
-			f->MoveTo(Items);
-			
-			List<Mail> obj;
-			obj.Insert(m);
-			OnNewMail(&obj, false);
+			f->MoveTo(Items, false, [this, m](auto result, auto status)
+			{			
+				List<Mail> obj;
+				obj.Insert(m);
+				OnNewMail(&obj, false);
+			});
 		}
 	}
 	else
@@ -7487,16 +7494,16 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		{
 			// Check for user perm password...
 			// No point allow any old one to edit the security settings.
-			auto ShowDialog = [&]()
+			auto ShowDialog = [this]()
 			{
 				auto Dlg = new SecurityDlg(this);
 				Dlg->DoModal(NULL);
 			};
 
-			GPassword p;
+			LPassword p;
 			if (p.Serialize(GetOptions(), OPT_UserPermPassword, false))
 			{
-				GetAccessLevel(this, PermRequireUser, "Security Settings", [&](bool Allow)
+				GetAccessLevel(this, PermRequireUser, "Security Settings", [ShowDialog](bool Allow)
 				{
 					if (Allow)
 						ShowDialog();
@@ -11084,7 +11091,7 @@ Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, cons
 			break;
 		case PermRequireUser:
 		{
-			GPassword p;
+			LPassword p;
 			if (!p.Serialize(GetOptions(), OPT_UserPermPassword, false))
 			{
 				if (Callback) Callback(true);

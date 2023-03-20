@@ -328,7 +328,7 @@ void ScribeFolder::GetMessageById(const char *Id, std::function<void(Mail*)> Cal
 		return;
 	}
 
-	LoadThings(NULL, [&](auto s)
+	LoadThings(NULL, [this, Id=LString(Id), Callback](auto s)
 	{
 		if (s < Store3Delayed)
 		{
@@ -343,7 +343,7 @@ void ScribeFolder::GetMessageById(const char *Id, std::function<void(Mail*)> Cal
 				continue;
 		
 			auto rid = r->GetMessageId();
-			if (!Stricmp(rid, Id))
+			if (!Stricmp(rid, Id.Get()))
 			{
 				if (Callback)
 					Callback(r);
@@ -421,7 +421,7 @@ void ScribeFolder::SetFolderPerms(LView *Parent, ScribeAccessType Access, Scribe
 
 	if (GetObject() && Current != Perm)
 	{
-		App->GetAccessLevel(Parent, Current, GetPath(), [&](auto Allow)
+		App->GetAccessLevel(Parent, Current, GetPath(), [this, Field, Perm, Callback](auto Allow)
 		{
 			if (Allow)
 			{
@@ -1042,10 +1042,10 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 
 			auto s = new LFileSelect(mt);
 			s->Name(DropName);
-			s->Save([&](auto dlg, auto status)
+			s->Save([this, ExportMimeType](auto s, auto ok)
 			{
-				LAutoPtr<LFileSelect> mem(dlg);
-				if (status)
+				LAutoPtr<LFileSelect> mem(s);
+				if (ok)
 				{
 					if (LFileExists(s->Name()))
 					{
@@ -1082,7 +1082,7 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 				if (Del.Length())
 					GetObject()->GetStore()->Delete(Del, false);
 
-				DeleteAllThings([&](auto status)
+				DeleteAllThings([mt](auto status)
 				{
 					mt->Invalidate();
 				});
@@ -1472,10 +1472,10 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 	if (!Parent)
 		Parent = App;
 
-	auto ContinueLoading = [&]()
+	auto ContinueLoading = [this, OldUnRead, Callback, FldObj]()
 	{
 		WhenLoaded(_FL,
-			[this, OldUnRead, Callback]()
+			[this, OldUnRead, Callback, FldObj]()
 			{
 				// This is called when all the Store3 objects are loaded
 				int Unread = OldUnRead;
@@ -1581,7 +1581,7 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 	std::function<void(bool)> AccessCb;
 	if (Callback)
 	{
-		AccessCb = [&](bool Access)
+		AccessCb = [ContinueLoading, Callback](bool Access)
 		{
 			if (Access)
 				ContinueLoading();
@@ -2943,192 +2943,267 @@ bool ScribeFolder::Delete(LArray<Thing*> &Items, bool ToTrash)
 	return true;
 }
 
-#define MoveToStatus(idx, status)	if (Status) { (*Status)[idx] = (status); }
-
-bool ScribeFolder::MoveTo(LArray<Thing*> &Items, bool CopyOnly, LArray<Store3Status> *Status)
+class MoveToState
 {
-	if (Items.Length() == 0)
-		return false;
-	if (!GetObject() || !App)
-		return false;
+	ScribeWnd *App = NULL;
 
-	auto FolderItemType = GetItemType();
-	for (unsigned i=0; i<Items.Length(); i++)
+	// Input
+	ScribeFolder *Folder = NULL;
+	LArray<Thing*> Items;
+	bool CopyOnly;
+	std::function<void(bool, LArray<Store3Status>&)> Callback;
+
+	// Output
+	bool Result = false; // Overall success/failure
+	LArray<Store3Status> Status; // Per item status
+
+	// State
+	LArray<LDataI*> InStoreMove; // Object in the same store...
+	LDataI *FolderObj = NULL;
+	LDataStoreI *FolderStore = NULL;
+	ScribeMailType NewBayesType = BayesMailUnknown;
+	LHashTbl<PtrKey<Thing*>, int> Map;
+	int NewFolderType = -1;
+	bool BuildDynMenus = false;
+	bool BayesInc = false;
+	size_t Moves = 0;
+
+	// Returns true if the object is deleted.
+	bool SetStatus(int i, Store3Status s)
 	{
-		auto t = Items[i];
-		if (!t->GetObject())
+		LAssert(Status[i] == Store3NotImpl);
+		Status[i] = s;
+
+		LAssert(Moves > 0);
+		Moves--;
+
+		if (Moves > 0)
+			return false;
+		
+		OnMovesDone();
+		return true;
+	}
+
+public:
+	MoveToState(ScribeFolder *folder,
+				LArray<Thing*> &items,
+				bool copyOnly,
+				std::function<void(bool, LArray<Store3Status>&)> callback) :
+		Folder(folder),
+		Items(items),
+		CopyOnly(copyOnly),
+		Callback(callback)
+	{
+		// Validate parameters
+		if (Folder &&
+			(App = Folder->App))
 		{
-			MoveToStatus(i, Store3Error);
+			LVariant v;
+			if (App->GetOptions()->GetValue(OPT_BayesIncremental, v))
+				BayesInc = v.CastInt32() != 0;
 		}
 		else
 		{
-			auto ThingItemType = t->Type();
-			if (!(FolderItemType == ThingItemType || FolderItemType == MAGIC_ANY))
-				MoveToStatus(i, Store3Error);
+			delete this;
+			return;
 		}
+
+		if ((FolderObj = Folder->GetObject()))
+		{
+			FolderStore = Folder->GetObject()->GetStore();
+		}
+
+		Status.Length(Moves = Items.Length());
+		for (auto &s: Status)
+			s = Store3NotImpl;
+
+		auto FolderItemType = Folder->GetItemType();
+		auto ThisFolderPath = Folder->GetPath();
+		NewBayesType = App->BayesTypeFromPath(ThisFolderPath);
+		NewFolderType = App->GetFolderType(Folder);
+		ScribeFolder *TemplatesFolder = App->GetFolder(FOLDER_TEMPLATES);
+		BuildDynMenus = Folder == TemplatesFolder;
+
+		for (unsigned i=0; i<Items.Length(); i++)
+		{
+			auto t = Items[i];
+			if (!t || !t->GetObject())
+			{
+				if (SetStatus(i, Store3Error))
+					return;
+				continue;
+			}
+
+			auto ThingItemType = t->Type();
+			if (FolderItemType != ThingItemType && FolderItemType != MAGIC_ANY)
+			{
+				if (SetStatus(i, Store3Error))
+					return;
+				continue;
+			}
+			
+			ScribeFolder *Old = t->GetFolder();
+			LString Path;
+			if (Old)
+			{
+				Path = Old->GetPath();
+		
+				if (Old == TemplatesFolder)
+					// Moving to or from the templates folder... update the menu
+					BuildDynMenus = true;
+			}
+
+			if (Old && Path)
+			{
+				bool IsDeleted = false;
+				App->GetAccessLevel(App,
+									Old->GetFolderPerms(ScribeWriteAccess),
+									Path,
+									[this, i, t, &IsDeleted](bool Allow)
+									{
+										if (Allow)
+											IsDeleted = Move(i, t);
+										else
+											IsDeleted = SetStatus(i, Store3NoPermissions);
+									});
+				// If the callback has already been executed and the object is deleted, exit immediately.
+				if (IsDeleted)
+					return;
+			}
+			else
+			{
+				if (Move(i, t))
+					return;
+			}
+		}
+
 	}
 
-	LVariant BayesInc;
-	if (App)
-		App->GetOptions()->GetValue(OPT_BayesIncremental, BayesInc);
-
-	auto ThisFolderPath = GetPath();
-	auto NewBayesType = App->BayesTypeFromPath(ThisFolderPath);
-	int NewFolderType = App->GetFolderType(this);
-	ScribeFolder *TemplatesFolder = App->GetFolder(FOLDER_TEMPLATES);
-	bool BuildDynMenus = this == TemplatesFolder;
-	LArray<LDataI*> InStoreMove; // Object in the same store...
-	auto ThisStore = GetObject()->GetStore();
-	LHashTbl<IntKey<int>, bool> Map;
-
-	for (unsigned i=0; i<Items.Length(); i++)
+	// This must call SetStatus once and only once for each item it's called with.
+	// Returns true if the SetStatus call indicates deletion.
+	// 'this' will be invalid after SetStatus returns true.
+	bool Move(int i, Thing *t)
 	{
-		auto t = Items[i];
-		if (!t)
-		{
-			LAssert(!"Shouldn't have null ptr");
-			MoveToStatus(i, Store3Error);
-			continue;
-		}
-
-		ScribeFolder *Old = t->GetFolder();
-		LString Path;
-		if (Old)
-		{
-			Path = Old->GetPath();
-		
-			if (Old == TemplatesFolder)
-				// Moving to or from the templates folder... update the menu
-				BuildDynMenus = true;
-		}
-
 		ScribeMailType OldBayesType = BayesMailUnknown;
-		if (BayesInc.CastInt32() &&
+		if (BayesInc &&
 			t->IsMail() &&
 			TestFlag(t->IsMail()->GetFlags(), MAIL_READ))
 		{
 			OldBayesType = App->BayesTypeFromPath(t->IsMail());
 		}
 
-		auto DoMove = [&]()
+		ScribeFolder *Old = t->GetFolder();
+		Store3Status r = Store3NotImpl;
+
+		int OldFolderType = Old ? App->GetFolderType(Old) : -1;
+		if ( (OldFolderType == FOLDER_TRASH || OldFolderType == FOLDER_SENT) &&
+				NewFolderType == FOLDER_TRASH)
 		{
-			int OldFolderType = Old ? App->GetFolderType(Old) : -1;
-			if ( (OldFolderType == FOLDER_TRASH || OldFolderType == FOLDER_SENT) &&
-				  NewFolderType == FOLDER_TRASH)
+			// Delete for good
+			r = Old ? Old->DeleteThing(t, NULL) : Store3Error;
+		}
+		else
+		{
+			// If this folder is currently selected...
+			if (Folder->Select())
 			{
-				// Delete for good
-				auto Success = Old ? Old->DeleteThing(t, NULL) : Store3Error;
-				MoveToStatus(i, Success ? Store3Success : Store3Error);
-				if (Success)
-					t->OnMove();
+				// Insert item into list
+				t->SetFieldArray(Folder->FieldArray);
+			}
+
+			if (CopyOnly)
+			{
+				LDataI *NewT = FolderStore->Create(t->Type());
+				if (NewT)
+				{
+					NewT->CopyProps(*t->GetObject());
+					r = NewT->Save(Folder->GetObject());
+				}
+				else
+				{
+					r = Store3Error;
+				}
 			}
 			else
 			{
-				// If this folder is currently selected...
-				if (Select())
+				if (NewFolderType != FOLDER_TRASH &&
+					OldBayesType != NewBayesType)
 				{
-					// Insert item into list
-					t->SetFieldArray(FieldArray);
+					App->OnBayesianMailEvent(t->IsMail(), OldBayesType, NewBayesType);
 				}
 
-				if (CopyOnly)
+				// Move to this folder
+				auto o = t->GetObject();
+				if (o && o->GetStore() == FolderStore)
 				{
-					LDataI *NewT = ThisStore->Create(t->Type());
-					if (NewT)
-					{
-						NewT->CopyProps(*t->GetObject());
-						auto s = NewT->Save(GetObject());
-						MoveToStatus(i, s);
-					}
-					else
-					{
-						MoveToStatus(i, Store3Error);
-					}
+					InStoreMove.Add(o);
+					Map.Add(t, i);
+					r = Store3Delayed;
 				}
 				else
 				{
-					if (NewFolderType != FOLDER_TRASH &&
-						OldBayesType != NewBayesType)
+					// Out of store more... use the old single object method... for the moment..
+					r = t->SetFolder(Folder);
+					if (r == Store3Success)
 					{
-						App->OnBayesianMailEvent(t->IsMail(), OldBayesType, NewBayesType);
-					}
-
-					// Move to this folder
-					auto o = t->GetObject();
-					if (o && o->GetStore() == ThisStore)
-					{
-						InStoreMove.Add(o);
-						Map.Add(i, true);
-					}
-					else
-					{
-						// Out of store more... use the old single object method... for the moment..
-						Store3Status s = t->SetFolder(this);
-						MoveToStatus(i, s);
-						if (s == Store3Success)
-						{
-							// Remove from the list..
-							if (Old && Old->Select() && App->MailList)
-								App->MailList->Remove(t);
-	
-							t->OnMove();
-						}
-						else if (s == Store3Error)
-						{
-							LgiTrace("%s:%i - SetFolder failed.\n", _FL);
-						}
+						// Remove from the list..
+						if (Old && Old->Select() && App->GetMailList())
+							App->GetMailList()->Remove(t);
 					}
 				}
 			}
-		};
-
-		if (App)
-		{
-			App->GetAccessLevel(App, Old->GetFolderPerms(ScribeWriteAccess), Path, [&](bool Allow)
-			{
-				if (Allow)
-					DoMove();
-				else
-					MoveToStatus(i, Store3NoPermissions);
-			});
 		}
-		else DoMove();
+
+		if (r == Store3Success)
+			t->OnMove();
+
+		return SetStatus(i, r);
 	}
 
-	// FIXME: This code that runs at the end needs to wait for the DoMove events to complete somehow...
-	if (InStoreMove.Length())
+	void OnMovesDone()
 	{
-		auto Fld = dynamic_cast<LDataFolderI*>(GetObject());
-		if (!Fld)
-			return false;
-
-		auto s = ThisStore->Move(Fld, InStoreMove);
-
-		for (unsigned i=0; i<Items.Length(); i++)
+		if (InStoreMove.Length())
 		{
-			auto t = Items[i];
+			Store3Status s = Store3NotImpl;
+			auto Fld = dynamic_cast<LDataFolderI*>(Folder->GetObject());
+			if (!Fld)
+				s = Store3Error;
+			else
+				s = FolderStore->Move(Fld, InStoreMove);
 
-			if (Map.Find(i))
+			for (auto p: Map)
 			{
-				MoveToStatus(i, s);
+				Status[p.value] = s;
 
 				if (s == Store3Success)
 				{
-					LAssert(t->GetFolder() == this);
-					LAssert(Items.HasItem(t));
+					LAssert(p.key->GetFolder() == Folder);
+					LAssert(Items.HasItem(p.key));
+					
+					p.key->OnMove();
 				}
 			}
 		}
 
-		if (s <= Store3Error)
-			return false;
+		if (BuildDynMenus)
+			// Moving to or from the templates folder... update the menu
+			App->BuildDynMenus();
+
+		if (Callback)
+			Callback(Result, Status);
+
+		delete this;
 	}
+};
 
-	if (BuildDynMenus)
-		// Moving to or from the templates folder... update the menu
-		App->BuildDynMenus();
+void ScribeFolder::MoveTo(LArray<Thing*> &Items, bool CopyOnly, std::function<void(bool, LArray<Store3Status>&)> Callback)
+{
+	if (Items.Length() == 0)
+		return;
+	if (!GetObject() || !App)
+		return;
 
-	return true;
+	new MoveToState(this, Items, CopyOnly, Callback);
 }
 
 int ThingFilterCompare(Thing *a, Thing *b, NativeInt Data)
@@ -3429,7 +3504,7 @@ void ScribeFolder::CollectSubFolderMail(ScribeFolder *To)
 {
 	if (!To) To = this;
 
-	LoadThings(NULL, [&](auto Status)
+	LoadThings(NULL, [this, To](auto Status)
 	{
 		LArray<Thing*> Items;
 		for (auto Item: Items)
@@ -3437,7 +3512,7 @@ void ScribeFolder::CollectSubFolderMail(ScribeFolder *To)
 			if (To != this && Item->IsMail())
 				Items.Add(Item);
 		}
-		To->MoveTo(Items);
+		To->MoveTo(Items, false, NULL);
 
 		for (ScribeFolder *f = GetChildFolder(); f; f = f->GetNextFolder())
 		{
@@ -4170,14 +4245,22 @@ void ScribeFolder::ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, std::
 		return;
 	}
 
-	LoadThings(NULL, [&](auto Status)
-	{
-		FolderExportTask *Task = NULL;
-		if (Status == Store3Success)
-			Task = new FolderExportTask(f, this, MimeType);
-		if (Callback)
-			Callback(Task);
-	});
+	LoadThings(	NULL,
+				[
+					this,
+					Str = f.Release(),
+					MimeType = LString(MimeType),
+					Callback
+				]
+				(auto Status)
+				{
+					LAutoPtr<LStreamI> f(Str);
+					FolderExportTask *Task = NULL;
+					if (Status == Store3Success)
+						Task = new FolderExportTask(f, this, MimeType);
+					if (Callback)
+						Callback(Task);
+				});
 }
 
 ThingType::IoProgress ScribeFolder::Export(IoProgressImplArgs)
@@ -4417,13 +4500,8 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 	{
 		case SdLoad: // Type: ()
 		{
-			LoadThings(App, [&](auto Status)
-			{
-				*ReturnValue = Status == Store3Success;
-			});
-
-			// Convert the async LoadFolders call back to sync.
-			WaitForVariant(*ReturnValue);
+			LoadThings(App);
+			// FIXME: Callback for status?
 			return true;
 		}
 		case SdSelect: // Type: ()

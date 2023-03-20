@@ -1193,6 +1193,7 @@ class ScribeClass ScribeFolder :
 	friend class FolderPropertiesDlg;
 	friend class ThingList;
 	friend class ScribeWnd;
+	friend class MoveToState;
 
 protected:
 	class ScribeFolderPriv *d;
@@ -1281,7 +1282,7 @@ public:
 	bool ReindexField(int OldIndex, int NewIndex);
 	void CollectSubFolderMail(ScribeFolder *To = 0);
 	bool InsertThing(Thing *Item);
-	bool MoveTo(LArray<Thing*> &Items, bool CopyOnly = false, LArray<Store3Status> *Status = NULL);
+	void MoveTo(LArray<Thing*> &Items, bool CopyOnly, std::function<void(bool, LArray<Store3Status>&)> Callback = NULL);
 	bool Delete(LArray<Thing*> &Items, bool ToTrash);
 	void SetDefaultFields(bool Force = false);
 	bool Thread();
@@ -1784,8 +1785,8 @@ public:
 	AccIntOption(Disabled, OPT_AccountDisabled);
 	AccIntOption(Id, OPT_AccountUID);
 	AccIntOption(Expanded, OPT_AccountExpanded);
-	bool GetPassword(GPassword *p);
-	void SetPassword(GPassword *p);
+	bool GetPassword(LPassword *p);
+	void SetPassword(LPassword *p);
 	bool IsCheckDialup();
 	
 	// Events

@@ -109,11 +109,11 @@ public:
 	{
 		if (m.Double() && Account)
 		{
-			Dlg->App->GetAccountSettingsAccess(Dlg, ScribeReadAccess, [&](auto Allow)
+			Dlg->App->GetAccountSettingsAccess(Dlg, ScribeReadAccess, [this](auto Allow)
 			{
 				if (Allow)
 				{
-					Account->InitUI(Parent, 0, [&](auto status)
+					Account->InitUI(Parent, 0, [this](auto status)
 					{
 						if (status)
 							Update();
@@ -633,7 +633,7 @@ bool OptionsDlg::PasswordCtrlValue(int CtrlId, char *Option, bool ToWindow)
 			{
 				// user has modified the string
 				// encrypt and store
-				GPassword p;
+				LPassword p;
 				p.Set(s);
 				p.Serialize(App->GetOptions(), Option, true);
 				Status = true;
@@ -820,7 +820,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_ADD:
 		{
-			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [&](auto Allow)
+			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [this](auto Allow)
 			{
 				if (!Allow)
 					return;
@@ -829,20 +829,21 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 				if (AList && GetViewById(IDC_ACCOUNTS, ACtrl))
 				{
 					int Items = (int)AList->Length();
-					LAutoPtr<ScribeAccount> a(new ScribeAccount(App, Items));
+					ScribeAccount *a = new ScribeAccount(App, Items);
 					if (a)
 					{
 						a->Create();
 
 						// Open the UI
-						a->InitUI(this, 0, [&](auto status)
+						a->InitUI(this, 0, [this, ACtrl, AList, a](auto status)
 						{
 							if (status)
 							{
 								ACtrl->Insert(new AccountItem(this, a));
-								AList->Insert(a.Release());
+								AList->Insert(a);
 								UpdateDefaultSendAccounts();
 							}
+							else delete a;
 						});
 					}
 				}
@@ -851,7 +852,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_DELETE:
 		{
-			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [&](auto Allow)
+			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [this](auto Allow)
 			{
 				if (!Allow)
 					return;
@@ -899,7 +900,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		case IDC_UP:
 		case IDC_DOWN:
 		{
-			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [&](auto Allow)
+			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [this, Ctrl](auto Allow)
 			{
 				if (!Allow)
 					return;
@@ -945,7 +946,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_PROPERTIES:
 		{
-			App->GetAccountSettingsAccess(this, ScribeReadAccess, [&](auto Allow)
+			App->GetAccountSettingsAccess(this, ScribeReadAccess, [this](auto Allow)
 			{
 				if (!Allow)
 					return;
@@ -957,7 +958,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 					AccountItem *i = dynamic_cast<AccountItem*>(Sel[0]);
 					if (i)
 					{
-						i->GetAccount()->InitUI(this, 0, [&](auto status)
+						i->GetAccount()->InitUI(this, 0, [this, i](auto status)
 						{
 							if (status)
 							{
@@ -992,7 +993,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_SET_FONT:
 		{
-			EditorFont.DoUI(this, [&](auto fontType)
+			EditorFont.DoUI(this, [this](auto fontType)
 			{
 				UpdateFontDescription();
 			});
@@ -1000,7 +1001,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_SET_HTML_FONT:
 		{
-			HtmlFont.DoUI(this, [&](auto fontType)
+			HtmlFont.DoUI(this, [this](auto fontType)
 			{
 				UpdateFontDescription();
 			});

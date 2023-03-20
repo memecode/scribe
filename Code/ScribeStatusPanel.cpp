@@ -287,11 +287,13 @@ void AccountStatusItem::OnMouseClick(LMouse &m)
 			}
 			case IDM_CONFIG:
 			{
-				Account->GetApp()->GetAccountSettingsAccess(GetList(), ScribeReadAccess, [&](auto status)
-				{
-					if (status)
-						Account->InitUI(Parent, 0, NULL);
-				});
+				Account->GetApp()->GetAccountSettingsAccess(GetList(),
+															ScribeReadAccess,
+															[this](auto status)
+															{
+																if (status)
+																	Account->InitUI(Parent, 0, NULL);
+															});
 				break;
 			}
 		}

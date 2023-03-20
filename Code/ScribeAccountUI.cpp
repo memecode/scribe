@@ -320,7 +320,7 @@ int AccountDlg::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDOK:
 		{
-			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [&](auto Allow)
+			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [this, id=c->GetId()](auto Allow)
 			{
 				if (Allow)
 				{
@@ -328,7 +328,7 @@ int AccountDlg::OnNotify(LViewI *c, LNotification n)
 						SetCtrlName(IDC_ACCOUNT_NAME, "My ISP");
 					Account->SerializeUi(this, false);
 
-					EndModal(c->GetId());
+					EndModal(id);
 				}
 			});
 			break;

@@ -219,11 +219,11 @@ int PrintPreview::OnNotify(LViewI *Ctrl, LNotification n)
 				LMakePath(p, sizeof(p), p, "print-preview.jpg");
 				s->Name(p);
 				
-				s->Save([&](auto dlg, auto status)
+				s->Save([this](auto s, auto ok)
 				{
-					if (status)
+					if (ok)
 						GdcD->Save(s->Name(), d->Mem);
-					delete dlg;
+					delete s;
 				});
 			}
 			else LgiMsg(this, "No image to save.", LLoadString(IDS_ERROR));

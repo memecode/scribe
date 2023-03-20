@@ -199,7 +199,7 @@ int ScribePageSetup::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_BROWSE_FONT:
 		{
-			Font.DoUI(this, [&](auto fontType)
+			Font.DoUI(this, [this](auto fontType)
 			{
 				char s[256];				
 				Font.GetDescription(s, sizeof(s));

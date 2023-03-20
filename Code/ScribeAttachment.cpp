@@ -766,7 +766,7 @@ void Attachment::OnSaveAs(LView *Parent)
 
 		if (Files.Length() > 0)
 		{
-			auto DoSave = [&](LFileSelect *Select)
+			auto DoSave = [this, Files, Parent](LFileSelect *Select)
 			{
 				char Dir[MAX_PATH_LEN];
 				strcpy_s(Dir, sizeof(Dir), Select->Name());
@@ -774,8 +774,9 @@ void Attachment::OnSaveAs(LView *Parent)
 				if (Files.Length() > 1)
 				{
 					// Loop through all the files and write them to that directory
-					for (LListItem *i: Files)
+					for (unsigned idx=0; idx<Files.Length(); idx++)
 					{
+						LListItem *i = Files[idx];
 						Attachment *a = dynamic_cast<Attachment*>(i);
 						if (a)
 						{
@@ -804,7 +805,7 @@ void Attachment::OnSaveAs(LView *Parent)
 			if (Files.Length() > 1)
 			{
 				// multiple files, ask which directory to write to
-				Select->OpenFolder([&](auto dlg, auto status)
+				Select->OpenFolder([DoSave](auto dlg, auto status)
 				{
 					if (status)
 						DoSave(dlg);
@@ -814,7 +815,7 @@ void Attachment::OnSaveAs(LView *Parent)
 			else
 			{
 				// single file, ask for filename and path
-				Select->Save([&](auto dlg, auto status)
+				Select->Save([DoSave](auto dlg, auto status)
 				{
 					if (status)
 						DoSave(dlg);

@@ -139,18 +139,21 @@ public:
 		{
 			case IDOK:
 			{
-				auto Err = [&]()
+				auto Err = [this]()
 				{
 					LgiMsg(this, "Failed to set permissions.", AppName);
 					return false;
 				};
 
-				Folder->SetFolderPerms(this, ScribeReadAccess, (ScribePerm) GetCtrlValue(IDC_FOLDER_READ), [&](auto status)
+				Folder->SetFolderPerms(	this,
+										ScribeReadAccess,
+										(ScribePerm) GetCtrlValue(IDC_FOLDER_READ),
+										[this, Err](auto status)
 				{
 					if (!status)
 						return Err();
 
-					this->Folder->SetFolderPerms(this, ScribeWriteAccess, (ScribePerm) this->GetCtrlValue(IDC_FOLDER_WRITE), [&](auto status)
+					this->Folder->SetFolderPerms(this, ScribeWriteAccess, (ScribePerm) this->GetCtrlValue(IDC_FOLDER_WRITE), [this, Err](auto status)
 					{
 						if (!status)
 							return Err();

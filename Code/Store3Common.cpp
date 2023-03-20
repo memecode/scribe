@@ -253,7 +253,7 @@ bool Store3Addr::SetVariant(const char *n, LVariant &Value, const char *Array)
 		}
 		case SdText: // Type: String
 		{
-			DecodeAddrName(Value.Str(), [&](LString name, LString addr){
+			DecodeAddrName(Value.Str(), [this](LString name, LString addr){
 				Name = LString::UnEscape(name);
 				Addr = addr;
 			}, NULL);
