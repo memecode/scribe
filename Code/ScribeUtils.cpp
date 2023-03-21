@@ -1773,10 +1773,15 @@ void InitStrToDom()
 {
 	if (Scribe_StrToDom.Length() == 0)
 	{
+		// If this asserts it's likely you have a duplicate value in Code/DomTypeValues.h
 		#undef _
-		#define _(name) Scribe_StrToDom.Add(#name, Sd##name); \
+		#define _(name) LAssert(Scribe_StrToDom.Find(#name) == SdNone); \
+						Scribe_StrToDom.Add(#name, Sd##name); \
 						LAssert(Scribe_StrToDom.Find(#name) == Sd##name); \
-						Scribe_DomToStr.Add(Sd##name, #name);
+						\
+						LAssert(Scribe_DomToStr.Find(Sd##name) == NULL); \
+						Scribe_DomToStr.Add(Sd##name, #name); \
+						LAssert(Scribe_DomToStr.Find(Sd##name) != NULL);
 		#include "DomTypeValues.h"
 		#undef _
 	}

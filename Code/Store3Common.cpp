@@ -467,21 +467,24 @@ bool GMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly)
 LString HeadersFromStream(LStreamI *Msg)
 {
 	LString s;
+	int Block = 1024;
 	
-	for (int Sz = 1024; Msg && Sz < (64 << 10); Sz += 1024)
+	Msg->SetPos(0);
+	for (ssize_t Pos = 0; Pos < (512 << 10); )
 	{
-		Msg->SetPos(0);
-		if (!s.Length(Sz))
+		if (!s.Length(Pos + Block))
 			break;
 		
-		ssize_t Rd = Msg->Read(s.Get(), s.Length());
+		ssize_t Rd = Msg->Read(s.Get() + Pos, s.Length() - Pos);
 		if (Rd <= 0)
 		{
 			s.Empty();
 			break;
 		}
 		
-		s.Length(Rd);
+		Pos += Rd;
+		s.Length(Pos);
+
 		ptrdiff_t EndOfHeader = s.Find("\r\n\r\n");
 		if (EndOfHeader > 0)
 		{

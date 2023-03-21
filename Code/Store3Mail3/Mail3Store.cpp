@@ -2141,9 +2141,11 @@ bool LMail3Store::LStatement::SetInt(int Col, int n)
 		return Store->Check(sqlite3_bind_int(s, Col+1, n), 0);
 }
 
-bool LMail3Store::LStatement::SetStr(int Col, char *Str)
+bool LMail3Store::LStatement::SetStr(int Col, const char *Str)
 {
-	if (!IsOk()) return false;
+	if (!IsOk())
+		return false;
+	
 	if (Str)
 		return Store->Check(sqlite3_bind_text(s, Col+1, Str, -1, SQLITE_STATIC), 0);
 	else

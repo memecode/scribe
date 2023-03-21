@@ -276,7 +276,7 @@ public:
 		char *GetStr(int Col);
 		bool GetBinary(int Col, LVariant *v);
 
-		bool SetStr(int Col, char *s);
+		bool SetStr(int Col, const char *s);
 		bool SetDate(int Col, LDateTime &d);
 		bool SetStream(int Col, const char *ColName, LStreamI *s);
 		bool SetBinary(int Col, const char *ColName, LVariant *v);

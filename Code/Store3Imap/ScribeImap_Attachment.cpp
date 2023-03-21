@@ -128,7 +128,7 @@ uint64 ImapAttachment::Size()
 
 	if (Seg)
 	{
-		char *h = Seg->GetHeaders();
+		auto h = Seg->GetHeaders();
 		Size += h ? strlen(h) : 0;
 		LStreamI *s = Seg->GetData();
 		if (s)

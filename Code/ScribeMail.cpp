@@ -800,7 +800,7 @@ ItemFieldDef MailFieldDefs[] =
 	{"Send Date", SdSendDate,				GV_DATETIME,	FIELD_DATE_SENT},
 	{"Body", SdBody,						GV_STRING,		FIELD_TEXT},
 	{"Internet Header", SdInternetHeader,	GV_STRING,		FIELD_INTERNET_HEADER, IDC_INTERNET_HEADER},
-	{"Message ID", SdMessageID, 			GV_STRING,		FIELD_MESSAGE_ID},
+	{"Message ID", SdMessageId, 			GV_STRING,		FIELD_MESSAGE_ID},
 	{"Priority", SdPriority, 				GV_INT32,		FIELD_PRIORITY},
 	{"Flags", SdFlags, 						GV_INT32,		FIELD_FLAGS},
 	{"Html", SdHtml, 						GV_STRING,		FIELD_ALTERNATE_HTML},
@@ -5593,7 +5593,7 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 			Value.OwnStr(p.NewStr());
 			break;
 		}
-		case SdMessageID: // Type: String
+		case SdMessageId: // Type: String
 		{
 			Value = GetMessageId();
 			return true;
@@ -5790,7 +5790,7 @@ bool Mail::SetVariant(const char *Name, LVariant &Value, const char *Array)
 	switch (Fld)
 	{
 		DomSetStr(SdSubject, FIELD_SUBJECT)
-		DomSetStr(SdMessageID, FIELD_MESSAGE_ID)
+		DomSetStr(SdMessageId, FIELD_MESSAGE_ID)
 		DomSetStr(SdInternetHeaders, FIELD_INTERNET_HEADER)
 		DomSetInt(SdPriority, FIELD_PRIORITY)
 		DomSetDate(SdDateSent, FIELD_DATE_SENT)
@@ -7159,7 +7159,10 @@ void MungCharset(Mail *Msg, bool &HasRealCs, ScribeAccount *Acc)
 bool Mail::OnAfterReceive(LStreamI *Msg)
 {
 	if (!Msg)
+	{
+		LAssert(!"No input.");
 		return false;
+	}
 
 	// Clear the codepage setting here so that we can
 	// check later, down the bottom we must set it to
@@ -7167,15 +7170,21 @@ bool Mail::OnAfterReceive(LStreamI *Msg)
 	// way.
 	SetBodyCharset(0);
 
-	if (GetObject() &&
-		!GetObject()->SetRfc822(Msg))
+	auto obj = GetObject();
+	if (!obj)
+	{
+		LAssert(!"No storage object.");
+		return false;
+	}
+
+	if (!obj->SetRfc822(Msg))
 	{
 		LAssert(!"Failed to set mime content.");
 		return false;
 	}
 
 	// Now parse them into the meta fields...
-	GetObject()->ParseHeaders();
+	obj->ParseHeaders();
 	
 	ScribeAccount *Acc = GetAccountSentTo();
 	LAutoString ContentType;
@@ -7230,7 +7239,7 @@ bool Mail::OnAfterReceive(LStreamI *Msg)
 
 		LStringPipe NewBody;
 		LArray<LDataI*> Files;
-		if (DecodeUuencodedAttachment(GetObject()->GetStore(), Files, &NewBody, BodyText))
+		if (DecodeUuencodedAttachment(obj->GetStore(), Files, &NewBody, BodyText))
 		{
 			LDataI *AttachPoint = GetFileAttachPoint();
 			if (AttachPoint)
