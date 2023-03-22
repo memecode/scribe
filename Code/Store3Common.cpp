@@ -336,7 +336,7 @@ Store3Status Store3Field::SetInt(int id, int64 i)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mime conversion
-bool Store3ToGMime(LMime *Out, LDataPropI *InInterface)
+bool Store3ToLMime(LMime *Out, LDataPropI *InInterface)
 {
 	LDataI *In = dynamic_cast<LDataI*>(InInterface);
 	if (!Out || !In)
@@ -352,7 +352,7 @@ bool Store3ToGMime(LMime *Out, LDataPropI *InInterface)
 		LDataPropI *Child = Sub->First();
 		if (Child)
 		{
-			if (!Store3ToGMime(Out, Child))
+			if (!Store3ToLMime(Out, Child))
 				return false;
 		}
 		else LAssert(0);
@@ -372,8 +372,12 @@ bool Store3ToGMime(LMime *Out, LDataPropI *InInterface)
 		{
 			// No headers???
 		}
+
+		auto Charset = In->GetStr(FIELD_CHARSET);
+		if (Charset)
+			Out->SetCharset(Charset);
 		
-		LAutoStreamI Data = In->GetStream(_FL);
+		auto Data = In->GetStream(_FL);
 		if (Data)
 		{
 			if (!Out->SetData(true, Data.Release()))
@@ -389,7 +393,7 @@ bool Store3ToGMime(LMime *Out, LDataPropI *InInterface)
 			LMime *NewSeg = Out->NewChild();
 			if (NewSeg)
 			{
-				if (Store3ToGMime(NewSeg, Child))
+				if (Store3ToLMime(NewSeg, Child))
 					Out->Insert(NewSeg);
 				else
 					return false;

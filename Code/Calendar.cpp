@@ -533,6 +533,11 @@ const char *RelativeTime(LDateTime &Then)
 	Then.Get(t);
 	int64_t Diff = (int64)t - (int64)n;
 
+	if (Then.Year() == 2006)
+	{
+		int asd=0;
+	}
+
 	int Yrs = 0;
 	int Months = 0;
 	int Days = 0;
@@ -541,10 +546,13 @@ const char *RelativeTime(LDateTime &Then)
 	LDateTime i = Now;
 	int Inc = Then > Now ? 1 : -1;
 	char DirIndcator = Then > Now ? '+' : '-';
-	while (ABS(Diff) >= YEAR_1)
+	auto Year1 = YEAR_1;
+	while (ABS(Diff) > YEAR_1)
 	{
 		Yrs++;
 		i.Year(i.Year()+Inc);
+		if (!i.IsValid())
+			break;
 		i.Get(n);
 		Diff = (int64)t - (int64)n;
 	}

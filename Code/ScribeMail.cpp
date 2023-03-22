@@ -7050,7 +7050,7 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 	LMime Mime(ScribeTempPath());
 	LTempStream Buf(ScribeTempPath());
 	
-	Store3ToGMime(&Mime, Root);
+	Store3ToLMime(&Mime, Root);
 	
 	// Do the encode
 	if (!Mime.Text.Encode.Push(&Buf))

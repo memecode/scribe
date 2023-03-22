@@ -1461,7 +1461,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 			f.SetSize(0);
 			f.SetPos(0);
 			LMime Mime(ScribeTempPath());
-			Store3ToGMime(&Mime, LocalRoot);
+			Store3ToLMime(&Mime, LocalRoot);
 	
 			if (!Mime.GetBoundary())
 			{

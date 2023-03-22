@@ -278,7 +278,7 @@ public:
 	LDataStoreI *GetStore() { return Kit; }
 };
 
-extern bool Store3ToGMime(LMime *Out, LDataPropI *In);
+extern bool Store3ToLMime(LMime *Out, LDataPropI *In);
 extern bool GMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly = false);
 extern LString HeadersFromStream(LStreamI *Msg);
 extern LString CreateMboxHeader(LDataI *Object);

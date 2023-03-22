@@ -336,18 +336,6 @@ bool LMail3Mail::Serialize(LMail3Store::LStatement &s, bool Write)
 	SERIALIZE_INT(AccountId, i++);
 	SERIALIZE_INT(MarkColour, i++);
 
-	/*
-	auto sub = Subject.Str();
-	if (sub)
-	{
-		uint32_t w;
-		for (LUtf8Ptr utf(sub); w = utf; utf++)
-		{
-			LgiTrace("%i 0x%x\n", w, w);
-		}
-	}
-	*/
-
 	SERIALIZE_STR(Subject, i++);
 	SERIALIZE_STR(vTo, i++);
 	SERIALIZE_STR(vFrom, i++);
@@ -556,7 +544,7 @@ LAutoStreamI LMail3Mail::GetStream(const char *file, int line)
 		if (Seg)
 		{
 			LMime Mime(TmpPath);
-			if (Store3ToGMime(&Mime, Seg))
+			if (Store3ToLMime(&Mime, Seg))
 			{
 				if (!Mime.Text.Encode.Push(Ret))
 				{
