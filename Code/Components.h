@@ -9,22 +9,18 @@ class CapabilityInstaller;
 
 struct InstallProgress : public LMutex, public LRefCount
 {
-	int64 CurrentPos;
-	int64 TotalSize;
-	bool Finished;
-	bool HasError;
+	int64 CurrentPos = 0;
+	int64 TotalSize = 0;
+	bool Finished = false;
+	bool HasError = false;
 
 	// These are protected by the lock... 
 	// DO NOT access without locking. Crashes happen.
 	LViewI *Ui;
-	LAutoString Msg;
+	LString Msg;
 	
 	InstallProgress() : LMutex("InstallProgress")
 	{
-		CurrentPos = 0;
-		TotalSize = 0;
-		Finished = false;
-		HasError = false;
 	}
 	
 	~InstallProgress()
@@ -35,7 +31,7 @@ struct InstallProgress : public LMutex, public LRefCount
 	{
 		if (Lock(_FL))
 		{
-			IncRef();
+			LRefCount::IncRef();
 			Unlock();
 		}
 	}
@@ -61,13 +57,16 @@ class MissingCapsBar : public LLayout
 {
 	struct MissingCapsBarPriv *d;
 
-    LCapabilityTarget::CapsHash *Caps;
-    LProgressView *ProgCtrl;
+    CapabilityInstaller *Installer = NULL;
+    LCapabilityTarget::CapsHash *Caps = NULL;
+    LProgressView *ProgCtrl = NULL;
+    InstallProgress *Progress = NULL;
+    LCapabilityTarget *Owner = NULL;
+
     LArray<LButton*> Btns;
-    CapabilityInstaller *Installer;
-    InstallProgress *Progress;
-    LCapabilityTarget *Owner;
     LArray<LString> Actions;
+
+    bool IsFinished = false;
     
 public:
     MissingCapsBar
@@ -88,7 +87,7 @@ public:
     );
     ~MissingCapsBar();
 
-	void Empty() { Actions.Length(0);}
+	void Empty();
 	void SetMsg(const char *m);
     void OnCreate();
     void OnPosChange();

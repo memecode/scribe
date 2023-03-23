@@ -2672,7 +2672,7 @@ Prof.Add("Load things");
 	List<LListItem> Is;
 
 	// Do any threading/sorting
-	LString SortMsg;
+	static LString SortMsg;
 	if (!Thread() &&
 		GetSortField())
 	{

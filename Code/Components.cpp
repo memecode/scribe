@@ -34,13 +34,15 @@ ScribeWnd::OnCloseInstaller) is called to delete the MissingCapsBar.
 
 */
 #include "lgi/common/Lgi.h"
-#include "Scribe.h"
-#include "Components.h"
 #include "lgi/common/Button.h"
 #include "lgi/common/Http.h"
 #include "lgi/common/DisplayString.h"
 
-#define MISSING_CAPS_BAR_COUNTDOWN		4 // seconds
+#include "Scribe.h"
+#include "Components.h"
+#include "resdefs.h"
+
+#define MISSING_CAPS_BAR_COUNTDOWN		15 // seconds
 #define MISSING_ACTION_BASE				100
 
 struct MissingCapsBarPriv
@@ -79,9 +81,7 @@ MissingCapsBar::MissingCapsBar(	LCapabilityTarget *owner,
 	d = new MissingCapsBarPriv();
 	Owner = owner;
     Installer = inst;
-    Progress = NULL;
     Caps = a;
-    ProgCtrl = NULL;
     if (background)
 		d->Back = *background;
     
@@ -128,6 +128,12 @@ MissingCapsBar::~MissingCapsBar()
 	}
 
 	DeleteObj(d);
+}
+
+void MissingCapsBar::Empty()
+{
+    Actions.Length(0);
+	Btns.DeleteObjects();
 }
 
 void MissingCapsBar::SetMsg(const char *m)
@@ -213,7 +219,13 @@ bool MissingCapsBar::Pour(LRegion &r)
 
 int MissingCapsBar::OnNotify(LViewI *c, LNotification n)
 {
-    if (c->GetId() >= MISSING_ACTION_BASE)
+	if (c->GetId() == IDOK)
+	{
+		Detach();
+		Owner->OnCloseInstaller();
+		delete this;
+	}
+    else if (c->GetId() >= MISSING_ACTION_BASE)
     {
 		int Idx = c->GetId() - MISSING_ACTION_BASE;
 		#if DEBUG_CAPABILITIES
@@ -297,16 +309,28 @@ LMessage::Param MissingCapsBar::OnEvent(LMessage *m)
 		{
 			if (Progress && Progress->Lock(_FL))
 			{
-				bool Finished = Progress->Finished;
+				bool Finished = !IsFinished && Progress->Finished;
 				bool HasError = Progress->HasError;
 				if (Progress->Msg)
 					d->SetMsg(Progress->Msg);
-				Progress->Msg.Reset();
+				Progress->Msg.Empty();
 				Progress->Unlock();
 				
-				Invalidate();				
+				Invalidate();
+
 				if (Finished)
 				{
+					IsFinished = true;
+					if (HasError)
+					{
+						Btns.DeleteObjects();
+						
+						auto Ok = new LButton(IDOK, 0, 0, -1, -1, LLoadString(IDS_OK));
+						Btns.Add(Ok);
+						Ok->Attach(this);
+						OnPosChange();
+					}
+
 					// Is the case that the caller doesn't delete us then setup
 					// a count down to automatically remove the install bar.
 					d->CountDown = MISSING_CAPS_BAR_COUNTDOWN;
@@ -371,7 +395,7 @@ private:
     bool Loop;
     
 public:
-    LAutoString Uri, Proxy, App, Version;
+    LString Uri, Proxy, App, Version;
 
     CapabilityInstallerPriv(const char *TmpFolder) :
 		LMutex("ComponentInstaller.Mutex"),
@@ -401,7 +425,7 @@ public:
 		
 		if (Prog->Lock(_FL))
 		{
-			Prog->Msg.Reset(NewStr(buffer));
+			Prog->Msg = buffer;
 			if (Prog->Ui)
 				Prog->Ui->PostEvent(M_UPDATE);
 			
@@ -453,7 +477,7 @@ public:
                     Http.SetProxy(u.sHost, u.Port?u.Port:HTTP_PORT);
                 }
                 
-                char Url[256];
+                char Url[512];
                 const char *Os = LGetOsName();
 				#ifdef _MSC_VER
                 int ch =
@@ -530,9 +554,7 @@ public:
 
 									if (InFiles.Length() == 0)
 									{
-										LString s;
-										s.Printf("Error: No downloads available (%s)", Url);
-										Msg(j->Prog, s);
+										Msg(j->Prog, "Error: No downloads available (%s)", Url);
 									}
 									else
 									{
@@ -723,10 +745,10 @@ CapabilityInstaller::CapabilityInstaller(const char *App,
 										const char *Proxy)
 {
     d = new CapabilityInstallerPriv(TmpPath);
-    d->App.Reset(NewStr(App));
-    d->Version.Reset(NewStr(Version));
-    d->Proxy.Reset(NewStr(Proxy));
-    d->Uri.Reset(NewStr(Uri));
+    d->App = App;
+    d->Version = Version;
+    d->Proxy = Proxy;
+    d->Uri = Uri;
     d->Run();
 }
 

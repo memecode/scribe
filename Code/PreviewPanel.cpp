@@ -615,6 +615,9 @@ bool LPreviewPanel::CallMethod(const char *Name, LVariant *Dst, LArray<LVariant*
 
 void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 {
+	if (d->Item == item)
+		return;
+
     d->MissingCaps.Empty();
     DeleteObj(d->Bar);
     
