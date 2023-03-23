@@ -42,7 +42,7 @@ ScribeWnd::OnCloseInstaller) is called to delete the MissingCapsBar.
 #include "Components.h"
 #include "resdefs.h"
 
-#define MISSING_CAPS_BAR_COUNTDOWN		15 // seconds
+#define MISSING_CAPS_BAR_COUNTDOWN		5 // seconds
 #define MISSING_ACTION_BASE				100
 
 struct MissingCapsBarPriv
@@ -330,10 +330,12 @@ LMessage::Param MissingCapsBar::OnEvent(LMessage *m)
 						Ok->Attach(this);
 						OnPosChange();
 					}
-
-					// Is the case that the caller doesn't delete us then setup
-					// a count down to automatically remove the install bar.
-					d->CountDown = MISSING_CAPS_BAR_COUNTDOWN;
+					else
+					{
+						// Is the case that the caller doesn't delete us then setup
+						// a count down to automatically remove the install bar.
+						d->CountDown = MISSING_CAPS_BAR_COUNTDOWN;
+					}
 					
 					if (ProgCtrl)
 						ProgCtrl->Value(Progress->TotalSize);

@@ -398,6 +398,8 @@ void LPreviewPanel::OnInstall(CapsHash *Caps, bool Status)
 			(Obj = d->Item->GetObject()) &&
 			Obj->Type() == MAGIC_MAIL)
 		{
+			LFontSystem::Inst()->ResetLibCheck();
+
 			Mail *m = d->Item->IsMail();
 			if (m)
 			{
@@ -412,6 +414,7 @@ void LPreviewPanel::OnInstall(CapsHash *Caps, bool Status)
 			d->App->SetContext(_FL);
 		    d->App->OnChange(Change, FIELD_INTERNET_HEADER);
 		}
+
 		OnThing(d->Item, true);
 	}
 	else
@@ -615,7 +618,7 @@ bool LPreviewPanel::CallMethod(const char *Name, LVariant *Dst, LArray<LVariant*
 
 void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 {
-	if (d->Item == item)
+	if (d->Item == item && !ChangeEvent)
 		return;
 
     d->MissingCaps.Empty();
