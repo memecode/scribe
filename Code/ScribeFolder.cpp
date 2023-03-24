@@ -3171,6 +3171,8 @@ public:
 			else
 				s = FolderStore->Move(Fld, InStoreMove);
 
+			Result = s >= Store3Delayed;
+
 			for (auto p: Map)
 			{
 				Status[p.value] = s;
