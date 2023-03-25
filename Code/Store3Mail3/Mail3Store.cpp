@@ -233,7 +233,7 @@ bool LMail3Store::OpenDb()
 	else
 	{
 		// const char *Tbl;
-		// for (GMail3Def *Flds=Fields.First(&Tbl); Flds; Flds=Fields.Next(&Tbl))
+		// for (LMail3Def *Flds=Fields.First(&Tbl); Flds; Flds=Fields.Next(&Tbl))
 		for (auto it : Fields)
 		{
 			Store3Status s = CheckTable(it.key, it.value);
@@ -374,6 +374,8 @@ const char *LMail3Store::GetStr(int id)
 {
 	switch (id)
 	{
+		case FIELD_NAME:
+			return DbFile;
 		case FIELD_ERROR:
 			return ErrorMsg;
 		case FIELD_STATUS:
@@ -1654,7 +1656,7 @@ bool LMail3Store::ParseTableFormat(const char *Name, TableDefn &Defs)
 		{
 			*Sp++ = 0;
 
-			GMail3Def &d = Defs.New();
+			LMail3Def &d = Defs.New();
 			d.Name = Fld;
 			d.Type = Sp;
 		}
@@ -1664,7 +1666,7 @@ bool LMail3Store::ParseTableFormat(const char *Name, TableDefn &Defs)
 	return true;
 }
 
-Store3Status LMail3Store::CheckTable(const char *Name, GMail3Def *Flds)
+Store3Status LMail3Store::CheckTable(const char *Name, LMail3Def *Flds)
 {
 	Store3Status Status = Store3Success;
 
@@ -1690,7 +1692,7 @@ Store3Status LMail3Store::CheckTable(const char *Name, GMail3Def *Flds)
 				break;
 			}
 
-			GMail3Def &Def = Defs[i];
+			LMail3Def &Def = Defs[i];
 			if (i >= FieldCount) // Schema field count is less than existing table
 			{
 				LString Msg;
@@ -1735,7 +1737,7 @@ Store3Status LMail3Store::CheckTable(const char *Name, GMail3Def *Flds)
 	return Status;
 }
 
-bool LMail3Store::UpdateTable(const char *Name, GMail3Def *Flds, Store3Status Check)
+bool LMail3Store::UpdateTable(const char *Name, LMail3Def *Flds, Store3Status Check)
 {
 	LStatement st(this);
 	LAutoString TempTable;
@@ -1796,7 +1798,7 @@ bool LMail3Store::UpdateTable(const char *Name, GMail3Def *Flds, Store3Status Ch
 		int Count = 0;
 		for (unsigned i=0; i<Defs.Length(); i++) // For all common fields between the 2 tables
 		{
-			GMail3Def &Def = Defs[i];
+			LMail3Def &Def = Defs[i];
 			if (AllFlds.Find(Def.Name))
 			{
 				p.Print("%s%s", Count ? (char*)", " : "", Def.Name);
@@ -1808,7 +1810,7 @@ bool LMail3Store::UpdateTable(const char *Name, GMail3Def *Flds, Store3Status Ch
 		Count = 0;
 		for (unsigned i=0; i<Defs.Length(); i++)
 		{
-			GMail3Def &Def = Defs[i];
+			LMail3Def &Def = Defs[i];
 			if (AllFlds.Find(Def.Name))
 			{
 				p.Print("%s%s", Count ? (char*)", " : "", Def.Name);
@@ -1850,7 +1852,7 @@ LMail3Store::LInsert::LInsert(LMail3Store *store, const char *Tbl) : LStatement(
 	Store = store;
 	Table = Tbl;
 
-	GMail3Def *f = Store->GetFields(Tbl);
+	LMail3Def *f = Store->GetFields(Tbl);
 	if (f)
 	{
 		LVariant v;
@@ -1876,7 +1878,7 @@ LMail3Store::LUpdate::LUpdate(LMail3Store *store, const char *Tbl, int64 rowid, 
 
 	LAssert(Store != 0 && Tbl != 0 && RowId > 0);
 
-	GMail3Def *f = Store->GetFields(Tbl);
+	LMail3Def *f = Store->GetFields(Tbl);
 	if (f)
 	{
 		LVariant v;

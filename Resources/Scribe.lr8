@@ -269,7 +269,7 @@
 		<String Ref="458" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="459" Cid="451" Define="IDC_FORWARDED" en="Forwarded" fr="Transmi" cs="Poslaná dál" de="Weitergeleitet" nl="Doorgestuurd" es="Reenviados" pt_br="Encaminhado" ru="Переслано" pt="Encaminhado" pl="Przesłane dalej" it="Inoltrato" vi="Chuyển tiếp" zh_tw="已轉寄" ja="転送" sr="Prosleđeno" no="Videresendt" lt="Persiųstas" fa="ارسال شده به ديگران" da="Videresendt" sv="Vidarebefordrat" lg="Eziwerezeddwa" tr="Yönlendirilen" hu="Továbbított" ko="전달" uk="Переправлено" />
 		<String Ref="460" Cid="460" Define="IDD_NO_FOLDER" en="Open Folder" fr="Ouvrir dossier" cs="Otevřít složku" de="Mail-Ordner öffnen" nl="Open map" es="Abrir Carpeta" pt_br="Abrir pasta" ru="Открыть Папку" pt="Abrir pasta" pl="Otwórz folder" it="Apri cartella" vi="Mở danh mục" zh_tw="開啟資料夾" ja="フォルダを開く" sr="Otvori omotnicu" no="Åpne mappe" lt="Laiškų rinkmenos parinkimas" fa="پوشه را باز کن" da="Åben mappe" sv="Öppna mapp" lg="Gulawo Kabada" tr="Klasörü Aç" hu="Mappa megnyitása" ko="폴더 열기" uk="Відкрити теку" />
-		<String Ref="461" Cid="-1" Define="IDC_STATIC" en="Email address:" fr="Courriel:" it="Indirizzo email:" cs="Email:" es="Email:" de="E-Mail Adresse:" nl="epost-adres:" pt_br="Endereço eletrônico:" pt="e-mail:" pl="Adres e-mail:" vi="Địa chỉ email:" zh_tw="電郵住址:" ja="メールアドレス:" sr="E-mail adresa:" no="Epostadresse" lt="El. pašto adresas:" fa="Email:" da="Epost adresse:" sv="E-postadress:" lg="E-meilo Yo:" hu="Email cím:" tr="E-posta adresi:" ru="Адрес e-mail:" ko="이메일 주소:" uk="Поштова адреса:" />
+		<String Ref="461" Cid="-1" Define="IDC_STATIC" en="&Email address:" fr="Courriel:" it="Indirizzo email:" cs="Email:" es="Email:" de="E-Mail Adresse:" nl="epost-adres:" pt_br="Endereço eletrônico:" pt="e-mail:" pl="Adres e-mail:" vi="Địa chỉ email:" zh_tw="電郵住址:" ja="メールアドレス:" sr="E-mail adresa:" no="Epostadresse" lt="El. pašto adresas:" fa="Email:" da="Epost adresse:" sv="E-postadress:" lg="E-meilo Yo:" hu="Email cím:" tr="E-posta adresi:" ru="Адрес e-mail:" ko="이메일 주소:" uk="Поштова адреса:" />
 		<String Ref="462" Cid="-1" Define="IDC_STATIC" en="Action" cs="Akce" de="Vorgehen" nl="Actie" es="Acción" pt_br="Ação" ru="Действие" pt="Acção" pl="Zadanie" it="Azione" vi="Thao tác" zh_tw="動作" ja="動作" sr="Akcija" no="Handling" lt="Veiksmas" fa="عمليات" da="Aktion" sv="Åtgärd" lg="Eky&apos;Okukola" tr="Klasör Tercihi" hu="Művelet" ko="동작" uk="Дія" />
 		<String Ref="463" Cid="1022" Define="IDC_SMTP_SERVER" />
 		<String Ref="464" Cid="837" Define="IDC_SEND_CHARSET1" />
@@ -281,7 +281,7 @@
 		<String Ref="470" Cid="1113" Define="IDC_DELETE" en="Delete" fr="Supprimer" it="Cancella" cs="Smazat" es="Eliminar" de="Löschen" nl="Verwijderen" pt_br="Excluir" ru="Удалить" ja="削除" pt="Propriedades" pl="Usuń" vi="Xóa" zh_tw="刪除" sr="Briši" no="Slett" lt="Pašalinti" fa="پاک کن" da="Slet" sv="Ta bort" lg="Ebikwataku" tr="Sil" hu="Töröl" ko="삭제" uk="Видалити" />
 		<String Ref="471" Cid="503" Define="IDC_NEW_FOLDER" />
 		<String Ref="472" Cid="487" Define="IDC_FOLDER_HISTORY" />
-		<String Ref="473" Cid="-1" Define="IDC_STATIC" en="Name:" fr="Nom:" it="Nome:" cs="Jméno:" es="Nombre:" nl="Naam:" pt_br="Nome:" ru="Имя:" pt="Nome:" pl="Nazwa:" vi="Tên:" zh_tw="名稱:" ja="名前:" sr="Ime:" no="Navn:" lt="Vardas:" fa="نام" da="Navn:" sv="Namn:" lg="Erinnya:" tr="İsim:" hu="Név:" ko="이름:" uk="Ім`я" />
+		<String Ref="473" Cid="-1" Define="IDC_STATIC" en="&Name:" fr="Nom:" it="Nome:" cs="Jméno:" es="Nombre:" nl="Naam:" pt_br="Nome:" ru="Имя:" pt="Nome:" pl="Nazwa:" vi="Tên:" zh_tw="名稱:" ja="名前:" sr="Ime:" no="Navn:" lt="Vardas:" fa="نام" da="Navn:" sv="Namn:" lg="Erinnya:" tr="İsim:" hu="Név:" ko="이름:" uk="Ім`я" />
 		<String Ref="474" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="475" Cid="1119" Define="IDC_DEF_SEND_TXT" en="Default send account:" fr="Compte d&apos;envoi par defaut" cs="Výchozí účet odesílání:" nl="Standaard verzender" es="Cuenta de envío por defecto:" pt_br="Conta padrão para envio:" ru="Запись по умолчанию:" ja="ディフォルトは\n記述を送る:" pt="Conta de envio\npor defeito" pl="Domyślne dla wysyłki:" it="Account di default:" vi="Gửi thư mặc định bằng:" zh_tw="預設接收 帳號" sr="Podrazumevaninalog za slanje" no="Standard send konto:" lt="Numatytoji paskyra:" fa="حساب اصلي براي فرستادن" de="Standard Sende-\nE-Mail-Konto:" da="Standard send konto:" sv="Standard avsändar-\nkonto:" lg="Akawunta esindikirwako\ney&apos;enkalakalira" tr="Varsayılan gönderim hesabı:" hu="Alapértelmezett küldő fiók:" ko="기본 전송 계정:" uk="Встановити за замовчуванням :" />
 		<String Ref="476" Cid="477" Define="IDC_ACCOUNT_NAME" />
@@ -332,7 +332,7 @@
 		<String Ref="531" Cid="1093" Define="IDC_PRIVATE" en="Private" ko="개인" uk="Особистий" de="Privat" fr="Privé" />
 		<String Ref="532" Cid="1124" Define="IDC_SAVE" en="Save" ko="저장" uk="Зберегти" de="Speichern" fr="Enregistrer" />
 		<String Ref="533" Cid="2" Define="IDCANCEL" en="Cancel" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
-		<String Ref="534" Cid="-1" Define="IDC_STATIC" en="Signature XML:" fr="Fichier signature:" it="File firma XML:" cs="XML podpis:" es="Firma XML:" de="XML-Signatur:" nl="Handtekening:" pt_br="Assinatura XML:" ru="Подпись XML:" pt="Assinatura XML:" pl="Sygnatura XML:" vi="Chữ ký XML:" zh_tw="XML 簽名檔:" ja="XML署名:" sr="XML potpis:" no="Signatur XML" lt="XML parašas:" fa="XMLامضاي" da="Signatur XML:" sv="XML-signatur:" lg="Sayini ya XML:" tr="XML İmza:" hu="Aláírás XML:" ko="서명 XML:" uk="Підпис XML:" />
+		<String Ref="534" Cid="-1" Define="IDC_STATIC" en="Signature &XML:" fr="Fichier signature:" it="File firma XML:" cs="XML podpis:" es="Firma XML:" de="XML-Signatur:" nl="Handtekening:" pt_br="Assinatura XML:" ru="Подпись XML:" pt="Assinatura XML:" pl="Sygnatura XML:" vi="Chữ ký XML:" zh_tw="XML 簽名檔:" ja="XML署名:" sr="XML potpis:" no="Signatur XML" lt="XML parašas:" fa="XMLامضاي" da="Signatur XML:" sv="XML-signatur:" lg="Sayini ya XML:" tr="XML İmza:" hu="Aláírás XML:" ko="서명 XML:" uk="Підпис XML:" />
 		<String Ref="535" Cid="535" Define="IDC_ID_TABLE" />
 		<String Ref="536" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="537" Cid="448" Define="IDC_MAIL_DESCRIPTION" en="Description" cs="Popis" de="Beschreibung:" nl="Beschrijving" es="Descripción:" pt_br="Descrição" ru="Описание" pt="Descrição" pl="Opis" it="Descrizione" vi="Mô tả" zh_tw="目的" ja="記述" sr="Opis" no="Beskrivelse" lt="Aprašymas" fa="توصيف" da="Beskrivelse" sv="Beskrivning" lg="Ebikikwatako" tr="Açıklamalar" hu="Leírás" ko="상세설명" uk="Опис" />
@@ -372,8 +372,8 @@
 		<String Ref="591" Cid="-1" Define="IDC_STATIC" en="Name:" fr="Nom:" />
 		<String Ref="592" Cid="566" Define="IDC_USER_PASS_CONFIRM" />
 		<String Ref="593" Cid="-1" Define="IDC_STATIC" en="Account settings access:" pt="Acesso à conta:" pl="Dostęp do ustawień konta:" it="Impostazioni d&apos;accesso account:" vi="Thiết lập truy nhập tài khoản:" zh_tw="帳戶存取設定:" ja="アカウントのアクセス設定" nl="Toegang account-instellingen:" sr="Pristup podešavanjima naloga:" es="Permisos Configuración Cuentas:" cs="Přístup k nastavení účtu:" no="Konto innstillinger for tilgang:" lt="Paskyros teisės:" fa="دسترسي به تنظيمات حساب ها:" de="Zugriffsrechte E-Mail-Konto:" da="Konto indstillinger for tilgang:" sv="Inställningar för e-postkonto:" pt_br="Acesso às configurações da conta:" lg="Okuyingira mu ntereeza za Akawunta:" tr="Hesap ayarı erişim kısıtlamaları:" hu="Fiók beállítások elérése:" ru="Настройки доступа учетной записи:" ko="계정 설정 접속:" uk="Налаштування облікового запису для доступу:" fr="Accès config compte:" />
-		<String Ref="594" Cid="-1" Define="IDC_STATIC" en="Reply to:" fr="Répondre à:" it="Rispondi a:" cs="Odpovídat do:" es="Responder a:" de="Antworten gehen an:" nl="Antwoordadres:" pt_br="Responder para:" pt="Responder para:" pl="Odpowiedz:" vi="Địa chỉ nhận thư trả lời:" zh_tw="回覆到:" ja="返信先:" sr="Odgovori na:" no="Svar til:" lt="Atsakyti kam:" fa="آدرس مخصوص پاسخ دادن:" da="Svar til:" sv="Svara till:" lg="E-meilo Kwodirwamu:" hu="Válaszcím:" tr="Yanıt adresi:" ru="Отвечать сюда:" ko="다음 사람에게 회신:" uk="Відповідати сюди:" />
-		<String Ref="595" Cid="701" Define="IDC_ONLY_SEND_THIS" en="Only send through this account." nl="Alleen verzenden via deze account" pt="Enviar sempre por esta conta" pl="Wysyłka tylko z tego konta" cs="Odesílat pouze pomocí tohoto účtu." no="Send kun gjennom denne kontoen" lt="Siųsti tik su šia paskyra" fa="فقط از طريق اين حساب بفرست" de="Nur über dieses E-Mail-Konto versenden." sr="Šalji samo sa ovog naloga." da="Send kun gennem denne konto." vi="Chỉ gửi thư bằng tài khoản này" sv="Sänd enbart via detta konto" es="Enviar solo por esta cuenta" pt_br="Enviar apenas através desta conta." lg="Sindikira ku Akawunta eno kwoka." hu="Küldés csak ezen a fiókon keresztül" tr="Sadece bu hesaptan gönder." ru="Отправлять только через эту учетную  запись" ko="이 계정을 통해서만 보내기" uk="Відправляти тільки цим обліковим записом." fr="Envoyer seulement à partir de ce compte." />
+		<String Ref="594" Cid="-1" Define="IDC_STATIC" en="&Reply to:" fr="Répondre à:" it="Rispondi a:" cs="Odpovídat do:" es="Responder a:" de="Antworten gehen an:" nl="Antwoordadres:" pt_br="Responder para:" pt="Responder para:" pl="Odpowiedz:" vi="Địa chỉ nhận thư trả lời:" zh_tw="回覆到:" ja="返信先:" sr="Odgovori na:" no="Svar til:" lt="Atsakyti kam:" fa="آدرس مخصوص پاسخ دادن:" da="Svar til:" sv="Svara till:" lg="E-meilo Kwodirwamu:" hu="Válaszcím:" tr="Yanıt adresi:" ru="Отвечать сюда:" ko="다음 사람에게 회신:" uk="Відповідати сюди:" />
+		<String Ref="595" Cid="701" Define="IDC_ONLY_SEND_THIS" en="&Only send through this account." nl="Alleen verzenden via deze account" pt="Enviar sempre por esta conta" pl="Wysyłka tylko z tego konta" cs="Odesílat pouze pomocí tohoto účtu." no="Send kun gjennom denne kontoen" lt="Siųsti tik su šia paskyra" fa="فقط از طريق اين حساب بفرست" de="Nur über dieses E-Mail-Konto versenden." sr="Šalji samo sa ovog naloga." da="Send kun gennem denne konto." vi="Chỉ gửi thư bằng tài khoản này" sv="Sänd enbart via detta konto" es="Enviar solo por esta cuenta" pt_br="Enviar apenas através desta conta." lg="Sindikira ku Akawunta eno kwoka." hu="Küldés csak ezen a fiókon keresztül" tr="Sadece bu hesaptan gönder." ru="Отправлять только через эту учетную  запись" ko="이 계정을 통해서만 보내기" uk="Відправляти тільки цим обліковим записом." fr="Envoyer seulement à partir de ce compte." />
 		<String Ref="596" Cid="-1" Define="IDC_STATIC" en="Identity" fr="Identité" it="Informazioni utente" cs="Identita" es="Identidad" de="Identität" nl="Gegevens" pt_br="Identidade" ru="Личные данные" pt="Identidade" pl="Tożsamość" vi="Định danh" zh_tw="身分" ja="個人" sr="Identitet" no="Identitet" lt="Tapatybė" fa="هويت" da="Identitet" sv="Identitet" lg="Ebya E-meilo Yo" tr="Kimlik" hu="Identitás" ko="개인 설정" uk="Особові дані" />
 		<String Ref="597" Cid="1078" Define="IDC_USE_TEMPLATE" en="Use this template:" pt="Utilizar o Modelo:" lt="Naudoti šį šabloną:" cs="Použít tuto šablonu" fa=":از اين الگو استفاده کن" nl="Gebruik dit sjabloon:" pl="Użyj tego szablonu:" de="Diese Vorlage verwenden:" sr="Koristi ovaj šablon:" da="Brug forskrift:" vi="Sử dụng mẫu:" sv="Använd denna mall:" es="Utilizar plantilla:" pt_br="Utilizar o Modelo:" lg="Kozesa akatiba kano:" tr="Kullanılacak şablon:" hu="Ezt a sablont használd:" ru="Использовать этот шаблон:" ko="이 템플릿 사용:" uk="Використовувати цей шаблон:" fr="Utiliser ce modèle:" />
 		<String Ref="598" Cid="657" Define="IDC_TOOLBAR_TEXT" en="Show text on toolbar buttons" fr="Texte sur les boutons" cs="Ukázat text pod tlačítky" de="Text bei Toolbar-Symbolen anzeigen" nl="Tekst weergeven bij de knoppen" es="Mostrar texto en los botones de la barra de herramientas" pt_br="Mostrar texto nos botões da barra de ferramentas" ja="ツールバーボタン上のテキストを表示" pt="Mostrar texto na barra de ferramentas" pl="Pokazuj opisy przycisków" it="Mostra testo sui pulsanti" vi="Hiện chữ trên nút chức năng" zh_tw="顯示文字於工作列按鈕" sr="Prikazi tekst na dugmićima palete alata" no="Vis tekst i knapperad" lt="Rodyti tekstą po mygtukais" fa="بر روي دکمه هاي نوار ابزار از متن استفاده کن" da="Vis tekst i toolbar-knapperne" sv="Visa text på verktygsknappar" lg="Laga ebiwandiiko ku bulooka z&apos;ebikola" tr="Program butonlarının üzerinde yazıları göster" hu="Eszköztár gombokon szöveg mutatása" ru="Показывать подписи к кнопкам" ko="툴바 버튼의 문자 보이기" uk="Показувати підписи до кнопок" />
@@ -757,7 +757,7 @@
 		<String Ref="1228" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1230" Cid="1069" Define="IDC_MSG" en="Message" it="Messaggio" cs="Zpráva" es="Mensaje" de="E-Mail:" nl="Bericht" pt_br="Mensagem" ru="Сообщение" pt="Mensagem" pl="Wiadomo??" vi="Thông điệp" zh_tw="??" ja="?????" sr="Poruka" no="Melding" lt="Laiškas" fa="نامه" da="Melding" sv="Meddelande" lg="Ebaluwa" tr="Mesaj" hu="Üzenet" ko="메시지" uk="Повідомлення" />
 		<String Ref="1231" Cid="1488" Define="IDC_MSG_DEL_NEXT" en="Next" ko="다음" uk="Наступний" de="Nächste E-Mail" fr="Suivant" />
-		<String Ref="1232" Cid="476" Define="IDC_ACCOUNT" en="Account name:" fr="Nom de compte" cs="Název účtu:" nl="Account:" es="Cuenta:" pt_br="Nome da conta:" ru="Учетное запись:" pt="Nome da conta:" pl="Nazwa konta:" it="Nome account" vi="Tên tài khoản:" zh_tw="帳號名稱:" ja="アカウント名:" sr="Ime naloga" no="Kontonavn:" lt="Paskyros vardas:" fa="نام حساب" de="E-Mail-Kontoname:" da="Kontonavn:" sv="Kontonamn:" lg="Erinnya ly&apos;Akawunta:" tr="Hesap adı:" hu="Fiók név:" ko="계정 이름:" uk="Ім&apos;я облікового запису:" />
+		<String Ref="1232" Cid="476" Define="IDC_ACCOUNT" en="&Account name:" fr="Nom de compte" cs="Název účtu:" nl="Account:" es="Cuenta:" pt_br="Nome da conta:" ru="Учетное запись:" pt="Nome da conta:" pl="Nazwa konta:" it="Nome account" vi="Tên tài khoản:" zh_tw="帳號名稱:" ja="アカウント名:" sr="Ime naloga" no="Kontonavn:" lt="Paskyros vardas:" fa="نام حساب" de="E-Mail-Kontoname:" da="Kontonavn:" sv="Kontonamn:" lg="Erinnya ly&apos;Akawunta:" tr="Hesap adı:" hu="Fiók név:" ko="계정 이름:" uk="Ім&apos;я облікового запису:" />
 		<String Ref="1233" Cid="-1" Define="IDC_STATIC" en="Smtp Server" fr="Serveur SMTP" it="Server SMTP" cs="SMTP server" es="Servidor SMTP" de="SMTP Server" nl="SMTP-server" pt_br="Servidor SMTP" ru="SMTP сервер" pt="Servidor SMTP" pl="Serwer SMTP" vi="Máy chủ SMTP" zh_tw="Smtp 主機" ja="SMTPサーバ" no="SMTP tjener" lt="Laiškų išsiuntimo (SMTP) serveris" sv="SMTP-server" lg="Saava ya SMTP" tr="SMTP Sunucu" hu="Smtp kiszolgáló" ko="Smtp 서버" uk="SMTP сервер" />
 		<String Ref="1234" Cid="-1" Define="IDC_STATIC" en="Server:" fr="Serveur:" es="Servidor:" pt_br="Servidor:" ru="Сервер:" pt="Servidor:" pl="Serwer:" vi="Máy chủ:" zh_tw="伺服器:" ja="サーバ名:" no="Tjener:" lt="Serveris:" lg="Saava:" tr="Sunucu:" hu="Kiszolgáló:" ko="서버:" uk="Сервер:" />
 		<String Ref="1235" Cid="1235" Define="IDS_1235" en="Via direct SSL connection" sv="Via direkt SSL-anslutning" lt="Tiesioginis SSL prisijungimas" hu="Via közvetlen SSL kapcsolat" cs="Přímé SSL spojení" de="Direkte SSL Verbindung" tr="Direkt SSL bağlantısı ile" ru="Через прямое SSL соединение" pl="Bezpośrednie połączenie SSL" ko="직접 SSL 연결을 통함" uk="Через пряме SSL з`єднання" fr="Via une connexion SSL directe" />
@@ -4666,23 +4666,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4690,9 +4676,23 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>
@@ -5068,6 +5068,7 @@
 			<String Ref="1051" Cid="41118" Define="IDM_BUILD_BAYES_DB" en="&Rebuild Bayesian Word Lists" pl="Przebuduj listę słów Spamu" it="Ricostruisci la lista delle parole" vi="Xây dựng lại danh sách từ Bayes" pt="Reconstruir lista de palavras" zh_tw="重建 Bayesian Word 清單" ja="ベイズフィルタの単語リストを再構築" nl="Heropbouw Bayesiaanse &woordenlijst" sr="Ponovo izgradi Bayesian listu reči" es="&Rehacer el Listado Bayesiano" cs="Obnovit bayesovsou databázi" no="&Gjenoppbygg Bayesian ordliste" lt="Iš naujo &sudaryti Bayeso filtro žodžių sąrašą" fa="Bayesian Word Listsبازسازی" de="Bayes Wortlisten neu e&rstellen" da="&Genopbyg Bayesian ordliste" sv="&Bygg om bayesisk ordlista" pt_br="Reconstruir Lista Bayesiana de Palavras" tr="Bayesian Anahtar Kelimelerini Tekrar Oluştur" hu="Bayesian szólista újraépítése" ru="Перестроить список слов Баеса" ko="&베이지안 단어 목록 재건" uk="Перебудувати словник  Баеса" fr="&Reconstruire les listes de mots bayésiennes" />
 			<String Ref="1055" Cid="533" Define="IDM_BAYES_STATS" en="Bayes Stats" />
 			<String Ref="1302" Cid="1195" Define="IDM_MENU_1195" />
+			<String Ref="1369" Cid="539" Define="IDM_UNIT_TESTS" en="Run Unit Tests" />
 		</string-group>
 		<submenu Ref="1464">
 			<menuitem Ref="1463" />
@@ -5182,6 +5183,7 @@
 			</submenu>
 			<menuitem Sep="1" />
 			<submenu Ref="1389">
+				<menuitem Ref="1369" Shortcut="F11" />
 				<menuitem Ref="892" Shortcut="F7" />
 				<menuitem Ref="756" />
 				<menuitem Ref="1386" />

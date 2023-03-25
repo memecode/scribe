@@ -31,7 +31,7 @@ public:
 	bool SetFormat(LViewI *Parent, LDataPropI *Props);
 	void OnEvent(void *Param);
 	bool Check(int Code, const char *Sql);
-	// GMail3Def *GetFields(const char *t);
+	// LMail3Def *GetFields(const char *t);
 
 	StoreTrans StartTransaction();
 };

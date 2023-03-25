@@ -19,7 +19,7 @@
 	</div>
 
 	<div class=content>
-		<center><h2>Installation and Configuration</h2></center>
+		<h2>Installation and Configuration</h2>
 
 		<div class=helpheading><a name="mode">Install Mode</a></div>
 			There are two types of installation:
@@ -30,10 +30,14 @@
 					<th>Portable
 				<tr>
 					<td>The desktop mode is for installation that integrates with the operating system.
-						<div class="win_specific">
+						<div class="win specific">
 							You will automatically get the desktop mode if you install on windows with the
 							default install location:
-							<pre>c:\Program Files (x86)\Memecode\Scribe</pre>
+							<pre>c:\Program Files\Memecode\Scribe</pre>
+						</div>
+						<div class="mac specific">
+							To install in 'desktop' mode copying the .app bundle to the standard location:
+							<pre>/Applications</pre>
 						</div>
 					<td>&nbsp;
 					<td>You can also elect to install Scribe to a USB drive and use the mail client at
@@ -48,7 +52,7 @@
 			<br>
 			Now you should be able to see a folder tree on the left, a menu along the top and a toolbar
 			beneath. At this point you'll want to start configuring
-			your identity and accounts. To start this process click File &#9654; Options. Enter your
+			your identity and accounts. To start this process click File → Options. Enter your
 			identity on the first tab and then move on to the accounts tab to configure your
 			mail server settings.
 
@@ -90,11 +94,11 @@
 				<tr>
 					<td>-p&nbsp;<span class="param">max-pages</span>
 					<td>Prints max-pages of the .eml on the command line, or the whole file if
-						max-pages is 0. The printer used is configured in File &#9654; Print Setup. e.g.:
+						max-pages is 0. The printer used is configured in File → Print Setup. e.g.:
 						<pre>Scribe.exe -p1 d:\temp\message.eml</pre>
 				<tr>
-					<td>-noreg
-					<td>[Windows] Don't write anything to the registry. This disables the ability to use
+					<td class="win">-noreg
+					<td class="win">Windows: Don't write anything to the registry. This disables the ability to use
 						Scribe as the default mail client. But it's useful for users putting Scribe on
 						a portable disk for use on public computers.
 				<tr>
@@ -112,16 +116,24 @@
 			<p/>
 
 		<div class=helpheading><a name="config">Configuration</a></div>
-			Once Scribe is running you can at any time open a different set of folders using the File &#9654;
-			Open Folders menu. This closes the currently selected folder if any. You can create new folders
-			with the File &#9654; Create Folders menu.
+			Once Scribe is running you can at any time open a different set of folders using the File →
+			Manage Mail Stores. In the Manage Mail Stores dialog you can:
+			<ul>
+				<li> Open existing folders </li>
+				<li> Closing currently openned folders </li>
+				<li> Create new folder stores </li>
+				<li> Compact folder databases </li>
+				<li> Repair folders </li>
+				<li> Convert older folder formats to the current version </li>
+				<li> Set the system folder names </li>
+				<li> Change the default select folder on startup </li>
+			</ul>
 			<p/>
-			Every couple of weeks, depending on usage you should backup the folders (by copying them in
-			your file manager) and compact the folder using File &#9654; Compact Folders to remove unused space.
-			Otherwise your folders will just get bigger and bigger, even if you delete things.
+			Every couple of weeks, depending on usage you should backup the folders either by copying them in
+			your file manager, or using Tools → Export → Scribe.
 			<p/>
 			Then once you have the folders setup you need to configure the accounts and options.
-			Click File &#9654; Options
+			Click File → Options	
 			and begin filling out your identification details. The following is a 
 			description of the different options:<br>
 
@@ -133,45 +145,37 @@
 					<td class=fld>Name
 					<td>Enter your name. This is mainly used for the title bar. Your identity used in emailing
 						is enter in the Account settings window.
-						
-						<div class=inscribe>InScribe: Use the name that you registered the product with.</div>
 				
 				<tr>
 					<th colspan=2><a name="accounts">Accounts Tab</a>
 				<tr>
 					<td class="fld">Properties
-					<td>This tab has a list of accounts, which is limited to one item in i.Scribe. Click
-						properties to edit the details of the account.<br>
-						<br>
-						There is no provision in Scribe for dialing up to the internet. If you need to manually
-						connect to the internet then you should do so before sending or receiving email in Scribe.
+					<td>This tab has a list of accounts. Click properties or double click the list item
+						to edit the details of the account.
 
 				<tr>
-					<td class="fld-inscribe">Add (InScribe)
-					<td class="inscribe">
-								InScribe: Click this to add a new account.
+					<td class="fld">Add/Delete
+					<td>Click these to add or delete accounts.
 				<tr>
-					<td class="fld-inscribe">Delete (InScribe)
-					<td class="inscribe">
-								InScribe: Deletes an existing account.
+					<td class="fld">Default Send Account
+					<td>Sets the default send account for all email not associated with an account
+						that has "Only send through this account" set.<br>
+						<br>
+						The "Default Send Account" should be set to the account with your main SMTP server.
+						This option will not set the default identity used to create email with; to set that use
+						the main window's Identity menu.<br>
+						<br>
+						You can send using another accounts SMTP server by opening
+						the status panel on the main window, selecting the account, right click and "Send"
 				<tr>
-					<td class="fld-inscribe">Default Send Account (InScribe)
-					<td class="inscribe">
-								InScribe: Sets the default send account for all email not associated with an account
-								that has "Only send through this account" set.<br>
-								<br>
-								The "Default Send Account" should be set to the account with your main SMTP server.
-								This option will not set the default identity used to create email with; to set that use
-								the main window's Identity menu.<br>
-								<br>
-								You can send using another accounts SMTP server by opening
-								the status panel on the main window, selecting the account, right click and "Send"
+					<td class="fld">Sort Order ↑ ↓
+					<td>Change the order of the accounts. This is a cosmetic thing and doesn't affect function.
 
 				<!-------------------------------------------------------------------------->
 				<tr>
 					<th colspan=2><a name="general">General Tab</a>
 				<tr>
-					<td class="fld">Quote when replying with ???
+					<td class="fld">Quote when replying with:
 					<td>This option allows you to quote the contents of the incoming mail when 
 							replying. This adds the specified characters to the start of each line. 
 							Typically the string "> " if used for quoting.
@@ -210,12 +214,12 @@
 				<tr>
 					<td class="fld">Populate recipients from clipboard
 					<td>If this option if switched on Scribe checks the clipboard when a new email
-							is created. If a string with a '@' symbol less than 100 characters long is
-							present it assumes its an email address and puts it in the recipient's field
-							by default. This is really useful for emailing to an address without a hyperlink.
-							Copy the address to the clipboard, hit new mail... and off you go. Sometimes 
-							you'll have an email address in the clipboard that's not who you want to send
-							to, in which case you have to delete the recipient. Or turn off the option.
+						is created. If a string with a '@' symbol less than 100 characters long is
+						present it assumes its an email address and puts it in the recipient's field
+						by default. This is really useful for emailing to an address without a hyperlink.
+						Copy the address to the clipboard, hit new mail... and off you go. Sometimes 
+						you'll have an email address in the clipboard that's not who you want to send
+						to, in which case you have to delete the recipient. Or turn off the option.
 				
 				<tr>
 					<td class="fld">Minimize to tray icon
@@ -223,10 +227,16 @@
 							the start bar.
 				
 				<tr>
-					<td class="fld">Check default email client on startup
-					<td>Win32 supports a default email client for mailto: URL's. If this option is set
-							then Scribe will monitor that setting on startup and prompt you if it doesn't 
-							point to Scribe.
+					<td class="fld_win">Register as Windows Email Client
+					<td class="win">Windows: add appropriate register entries to be seen as an email client on windows.
+						This require the client to be run with admin privledges. This is normally done 
+						as the first time execution from the setup.exe installer.
+
+				<tr>
+					<td class="fld_win">Check default email client on startup
+					<td class="win">Windows: supports a default email client for mailto: URL's. If this option is set
+						then Scribe will monitor that setting on startup and prompt you if it doesn't 
+						point to Scribe.
 							
 				<tr>
 					<td class="fld">Confirm item delete
@@ -284,13 +294,12 @@
 				<tr>
 					<td class="fld">HTTP Proxy
 					<td>This is your HTTP proxy in the form:
-							<pre>&lt;server&gt;[:&lt;port&gt;]</pre>
-							(Or blank if you have direct internet access). The shared calendaring
-							and <a href='#popoverhttp'>PopOverHttp</a> protocols use this field.
+						<pre>&lt;server&gt;[:&lt;port&gt;]</pre>
+						(Or blank if you have direct internet access).
 				
 				<tr>
-					<td class="fld-inscribe">Default receive action
-					<td class="inscribe">InScribe: Specify what the "receive mail" button does.</div>
+					<td class="fld">Default receive action
+					<td>Specify what the "receive mail" button does.</div>
 			
 
 				<!-------------------------------------------------------------------------->
@@ -302,7 +311,7 @@
 					<td>Select the font to use in the preview pane and the mail compose/view window.
 				
 				<tr>
-					<td class="fld">Wrap lines at ??
+					<td class="fld">Wrap lines at
 					<td>Wraps the text in the mail window at a specific column or at the edge of the
 						window if no value is supplied. Replies are wrapped to the column value 
 						specified or the default of 76 if nothing is specified.
@@ -451,27 +460,23 @@
 					<td class="fld">Name
 					<td>Enter a descriptive name for the account.							
 				<tr>
-					<td class="fld-inscribe">Identity Name (InScribe)
-					<td class="inscribe">
-								InScribe: Enter a name to associated with this account.
+					<td class="fld">Identity Name
+					<td>Enter a name to associated with this account.
 				<tr>
-					<td class="fld-inscribe">Email Address (InScribe)
-					<td class="inscribe">
-								InScribe: Enter the email to associated with this account.
+					<td class="fld">Email Address
+					<td>Enter the email to associated with this account.
 				<tr>
-					<td class="fld-inscribe">Reply To (InScribe)
-					<td class="inscribe">
-								InScribe: Enter the account specific reply to addres -or- leave blank to use
-								the email address above.
+					<td class="fld">Reply To
+					<td>Enter the account specific reply to addres -or- leave blank to use
+						the email address above.
 				<tr>
-					<td class="fld-inscribe">Only Send Through This Account (InScribe)
-					<td class="inscribe">The "Only Send Through This Account" option forces replies to email received
-							on this account to go through the Send server settings for this account as well.
-							Otherwise they will be sent through the default outgoing server.
+					<td class="fld">Only Send Through This Account
+					<td>The "Only Send Through This Account" option forces replies to email received
+						on this account to go through the Send server settings for this account as well.
+						Otherwise they will be sent through the default outgoing server.
 				<tr>
-					<td class="fld-inscribe">Signature XML (InScribe)
-					<td class="inscribe">
-							Enter an account specific signature.
+					<td class="fld">Signature XML
+					<td>Enter an account specific signature.
 
 
 				<!-------------------------------------------------------------------------->
@@ -624,32 +629,35 @@
 			How you uninstalling Scribe is dependent on which method you used to install it. If you used
 			the zip file to install Scribe with then you can just delete the directory containing Scribe
 			and you're done.
-			<p>
-			If you used the self contained install exe then go into Scribe's entry in the Start Menu and
-			select "uninstall".
-			<p>
-			Only a few unavoidable settings are left in the registry and no dll's or other files 
-			are put into system directories. If you want to keep your folders and email then don't 
-			delete the folders.mail file in Scribe's directory.
-			<p>
-			The registry settings left behind are:
-			<ul>
-				<li> HKEY_CURRENT_USER\SOFTWARE\Memecode\Scribe
-				<li> HKEY_CURRENT_USER\SOFTWARE\Clients\Mail\Scribe (IE intergration)
-				<li> HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Mail\Scribe (IE intergration)
-				<li> HKEY_CLASSES_ROOT\mailto (If you have selected Scribe as the default client)
-			</ul>
-			These are unavoidable for system intergration and don't impact system performance 
-			after you remove Scribe. HKEY_CLASSES_ROOT\mailto can be set to something else by
-			changing Control Panel &#9654; Internet Options &#9654; Programs &#9654; Email.
+			<div class="win specific">
+				If you used the self contained install exe then go into Scribe's entry in the Start Menu and
+				select "uninstall".
+				<p>
+				Only a few unavoidable settings are left in the registry and no dll's or other files 
+				are put into system directories. If you want to keep your folders and email then don't 
+				delete the folders.mail file in Scribe's directory.
+				<p>
+				The registry settings left behind are:
+				<ul>
+					<li> HKEY_CURRENT_USER\SOFTWARE\Memecode\Scribe
+					<li> HKEY_CURRENT_USER\SOFTWARE\Clients\Mail\Scribe (IE intergration)
+					<li> HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Mail\Scribe (IE intergration)
+					<li> HKEY_CLASSES_ROOT\mailto (If you have selected Scribe as the default client)
+				</ul>
+				<br>
+				These are unavoidable for system intergration and don't impact system performance 
+				after you remove Scribe. HKEY_CLASSES_ROOT\mailto can be set to something else by
+				changing Control Panel → Internet Options → Programs → Email.
+			</div>
+			<div class="mac specific">
+				If you installed Scribe to /Applications you can just delete that.<br>
+				<br>
+				Also clear out ~/Library/Scribe.
+			</div>
 
-			<center>
-				&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a>
-			</center>
+			&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a>
 
 	</div>
 
-
-</font>
 </body>
 </html>

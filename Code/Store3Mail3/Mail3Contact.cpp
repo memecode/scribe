@@ -56,7 +56,7 @@ LVariantType FieldToType(int Fld)
 	return GV_STRING;
 }
 
-GMail3Def TblContact[] =
+LMail3Def TblContact[] =
 {
 	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
 	{"ParentId",		"INTEGER"},

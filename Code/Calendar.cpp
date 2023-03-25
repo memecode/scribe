@@ -83,6 +83,7 @@ ItemFieldDef CalendarFields[] = {
 	
 	{"Reminders", SdReminders,			GV_STRING,		FIELD_CAL_REMINDERS,		-1},
 	{"LastCheck", SdLastCheck,			GV_DATETIME,	FIELD_CAL_LAST_CHECK,		-1},
+	{"DateModified", SdDateModified,	GV_DATETIME,	FIELD_DATE_MODIFIED,		-1},
 
 	{0}
 };

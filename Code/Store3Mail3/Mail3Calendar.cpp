@@ -1,7 +1,7 @@
 #include "Mail3.h"
 #include "lgi/common/Json.h"
 
-GMail3Def TblCalendar[] =
+LMail3Def TblCalendar[] =
 {
 	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
 	{"ParentId",		"INTEGER"},
@@ -39,19 +39,6 @@ GMail3Def TblCalendar[] =
 
 LMail3Calendar::LMail3Calendar(LMail3Store *store) : LMail3Thing(store)
 {
-	CalType = 0;
-	CalPriv = CalDefaultPriv;
-	Completed = 0;
-	ShowTimeAs = 0;
-	Recur = 0;
-	RecurFreq = 0;
-	RecurInterval = 0;
-	RecurCount = 0;
-	RecurEndType = 0;
-	FilterDays = 0;
-	FilterMonths = 0;
-	AllDay = false;
-	StoreStatus = Store3Success;
 }
 
 LMail3Calendar::~LMail3Calendar()

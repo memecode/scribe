@@ -6,7 +6,7 @@
 #include "lgi/common/TextConvert.h"
 #include "ScribeUtils.h"
 
-GMail3Def TblMail[] =
+LMail3Def TblMail[] =
 {
 	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
 	{"ParentId",		"INTEGER"},
@@ -40,7 +40,7 @@ GMail3Def TblMail[] =
 	{0, 0}
 };
 
-GMail3Def TblMailSegs[] =
+LMail3Def TblMailSegs[] =
 {
 	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
 	{"MailId",			"INTEGER"},

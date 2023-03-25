@@ -338,6 +338,8 @@ enum ScribeMessages
 	M_SET_HTML,
 	M_UNIT_TEST,				// (LJson*)m->A()
 	M_CALENDAR_SOURCE_EVENT,	// (CalendarSource*)m->a, (LMessage*)m->b
+	M_LOAD_NEXT_MAIL_STORE,
+	M_UNIT_TEST_TICK,
 };
 
 enum ScribeControls

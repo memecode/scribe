@@ -495,7 +495,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ClCompile Include="..\Code\ScribeUtils.cpp" />
     <ClCompile Include="..\Code\Scripting.cpp" />
     <ClCompile Include="..\Code\SecurityDlg.cpp" />
-    <ClCompile Include="..\Code\Sqlite\v3.6.14\sqlite3.c" />
+    <ClCompile Include="..\Code\Sqlite\v3.41.2\sqlite3.c" />
     <ClCompile Include="..\Code\Store3Common.cpp" />
     <ClCompile Include="..\Code\Store3Imap\ScribeImap_Attachment.cpp" />
     <ClCompile Include="..\Code\Store3Imap\ScribeImap_Folder.cpp" />
@@ -614,8 +614,8 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ClInclude Include="..\Code\ScribePrivate.h" />
     <ClInclude Include="..\Code\ScribeStatusPanel.h" />
     <ClInclude Include="..\Code\ScribeUtils.h" />
-    <ClInclude Include="..\Code\Sqlite\v3.6.14\sqlite3.h" />
-    <ClInclude Include="..\Code\Sqlite\v3.6.14\sqlite3ext.h" />
+    <ClInclude Include="..\Code\Sqlite\v3.41.2\sqlite3.h" />
+    <ClInclude Include="..\Code\Sqlite\v3.41.2\sqlite3ext.h" />
     <ClInclude Include="..\Code\Store3Imap\include\Scribe.pb.h" />
     <ClInclude Include="..\Code\Store3Imap\ScribeImap.h" />
     <ClInclude Include="..\Code\Store3Mail3\Mail3.h" />

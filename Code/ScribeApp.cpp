@@ -785,7 +785,7 @@ public:
 	LArray<ScribeFolder*> ThingSources;
 	int				LastLayout = 0;
 	LMenuItem		*DisableUserFilters = NULL;
-	LOptionsFile	*Options = NULL;
+	LAutoPtr<LOptionsFile> Options;
 	HttpImageThread	*ImageLoader = NULL;
 	int				LastMinute = -1, LastHour = -1;
 	LArray<LDataEventsI*> Store3EventCallbacks;
@@ -883,7 +883,7 @@ public:
 	{
 		// Why do we need this? ~LView will take care of it?
 		// LEventSinkMap::Dispatch.RemoveSink(App);
-		DeleteObj(Options);
+		Options.Reset();
 		Scripts.DeleteObjects();
 		DeleteObj(ImageLoader);
 		Engine.Reset();
@@ -1288,7 +1288,7 @@ ScribeWnd::ScribeWnd() :
 			d->SetInstallMode(selectedMode);
 
 			if (!d->Options)
-				d->Options = new LOptionsFile(selectedMode, OptionsFileName);
+				d->Options.Reset(new LOptionsFile(selectedMode, OptionsFileName));
 
 			Construct1();
 		});
@@ -3043,37 +3043,37 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			*ReturnValue = dynamic_cast<LDom*>(Grp);
 			break;
 		}
-		case SdGetUserString: // Type: (LView ParentView, String PromptMessage[, Bool ObsurePassword[, String DefaultValue]])
+		case SdAskUserString: // Type: (LView ParentView, String Callback, String PromptMessage[, Bool ObsurePassword[, String DefaultValue]])
 		{
-			if (Args.Length() < 2)
-				return false;
+			LVirtualMachine::Context Ctx;
+			// Ctx = Args.GetVm()->SaveContext()
 
-			LView *View = Args[0]->CastView();
-			char *Prompt = Args[1]->CastString();
-			bool Pass = Args.Length() > 2 ? Args[2]->CastInt32() != 0 : false;
-			char *Default = Args.Length() > 3 ? Args[3]->CastString() : NULL;
-
-			LString Result;
-			bool Loop = true;
-			auto i = new LInput(View ? View : this, Default, Prompt, AppName, Pass);
-			i->DoModal([&Result, &Loop, i](auto dlg, auto id)
+			if (!Ctx || Args.Length() < 3)
 			{
-				if (id)
-					Result = i->GetStr();
-				delete dlg;
-				Loop = false;
-			});
-
-			// This is obviously not ideal, but I don't want to implement a scripting language callback for
-			// something that should be a simple modal dialog that waits for user input.
-			while (Loop)
-			{
-				LSleep(10);
-				LYield();
+				*ReturnValue = true;
+				return true;
 			}
 
-			if (ReturnValue)
-				*ReturnValue = Result;
+			LView *View       = Args[0]->CastView();
+			auto CallbackName = Args[1]->Str();
+			auto Prompt       = Args[2]->CastString();
+			bool IsPassword   = Args.Length() > 3 ? Args[3]->CastInt32() != 0 : false;
+			auto Default      = Args.Length() > 4 ? Args[4]->Str() : NULL;
+
+			auto i = new LInput(View ? View : this, Default, Prompt, AppName, IsPassword);
+			i->DoModal([Ctx, i, CallbackName=LString(CallbackName)](auto dlg, auto id)
+			{
+				if (id)
+				{
+					LScriptArguments Args(NULL);
+					Args.Add(new LVariant(i->GetStr()));
+					Ctx.Call(CallbackName, Args);
+					Args.DeleteObjects();
+				}
+				delete dlg;
+			});
+
+			*ReturnValue = true;
 			break;
 		}
 		case SdCreateAccount: // Type: ()
@@ -3221,27 +3221,35 @@ OptionsInfo &OptionsInfo::operator =(char *p)
 	return *this;
 }
 	
-LOptionsFile *OptionsInfo::Load()
+LAutoPtr<LOptionsFile> OptionsInfo::Load()
 {
 	// Read the file...
 	LAutoPtr<LOptionsFile> Of(new LOptionsFile(File));
 	if (!Of)
-		return NULL;
+		return Of;
 	if (!Of->SerializeFile(false))
-		return NULL;
+		goto OnError;
 		
 	// Sanity check the options...
 	LXmlTag *Acc = Of->LockTag(OPT_Accounts, _FL);
-	if (!Acc) return NULL;
+	if (!Acc)
+		goto OnError;
 	Of->Unlock();
 		
 	LXmlTag *Stores = Of->LockTag(OPT_MailStores, _FL);
-	if (!Stores) return NULL;
+	if (!Stores)
+		goto OnError;
+
 	auto Count = Stores->Children.Length();
 	Of->Unlock();
-	if (Count == 0) Of.Reset();
+	if (Count == 0)
+		goto OnError;
 		
-	return Of.Release();
+	return Of;
+
+OnError:
+	Of.Reset();
+	return Of;
 }
 
 #define DEBUG_OPTS_SCAN		0
@@ -3512,8 +3520,7 @@ bool ScribeWnd::LoadOptions()
 				// the previously run instance around. So we should run that
 				// by using the options file and password from MUL's instance
 				// record.
-				DeleteObj(d->Options);
-				d->Options = new LOptionsFile(Mul->OptionsPath);
+				d->Options.Reset(new LOptionsFile(Mul->OptionsPath));
 			}
 		}
 		
@@ -4925,12 +4932,14 @@ public:
 	int Status = -1;
 	LString Error;
 
-	MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds)
+	MailStoreUpgrade(ScribeWnd *app, LDataStoreI *ds) :
+		LProgressDlg(app, -1)
 	{
-		App = app;
+		SetParent(App = app);
 		Ds = ds;
 		SetCanCancel(false);
 		SetDescription("Upgrading mail store...");
+		SetPulse(1000);
 
 		Ds->Upgrade(this, this, [this](auto status)
 		{
@@ -5053,32 +5062,142 @@ bool ScribeWnd::ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName
 	return true;
 }
 
-bool ScribeWnd::LoadMailStores()
+struct LoadMailStoreState : public LView::ViewEventTarget
 {
-	bool Status = false;
+	typedef std::function<void(bool)> BoolCb;
+	typedef std::function<void(int)>  IntCb;
 
-	LXmlTag *MailStores = GetOptions()->LockTag(OPT_MailStores, _FL);
-	if (!MailStores)
-		return false;
-
-	bool OptionsDirty = false;
+	ScribeWnd *App;
+	BoolCb Callback; // Final cb for entire LoadMailStoreState execution
+	LOptionsFile *Options = NULL;
+	LXmlTag *MailStores = NULL;
+	LArray<LXmlTag*> Que;
 	int StoreIdx = 0;
-	for (auto MailStore: MailStores->Children)
+	bool OptionsDirty = false;
+	bool Status = false;
+	std::function<bool(bool)> ReturnWithEvent;
+	std::function<bool(bool)> ReturnOnDialog;
+	std::function<void(const char *folderPath,const char *details,IntCb callback)> AskStoreUpgrade;
+
+	LoadMailStoreState(ScribeWnd *app, std::function<void(bool)> callback) :
+		ViewEventTarget(app, M_LOAD_NEXT_MAIL_STORE),
+		App(app),
+		Callback(callback)
 	{
+		Options = App->GetOptions();
+
+		ReturnWithEvent = [this](bool s)
+		{
+			PostEvent(M_LOAD_NEXT_MAIL_STORE);
+			return s;
+		};
+
+		ReturnOnDialog = [this](bool s)
+		{
+			return s;
+		};
+
+		AskStoreUpgrade = [this](auto FolderPath, auto Details, auto cb)
+		{
+			auto result = LgiMsg(App,
+								LLoadString(IDS_MAILSTORE_UPGRADE_Q),
+								AppName,
+								MB_YESNO,
+								FolderPath,
+								ValidStr(Details) ? Details : "n/a");
+			cb(result);
+		};
+
+		MailStores = Options->LockTag(OPT_MailStores, _FL);
+
+		// Load up some work in the queue and start the iteration...
+		if (MailStores)
+			Que = MailStores->Children;
+	}
+
+	~LoadMailStoreState()
+	{
+		LgiTrace("%s:%i - ~this=%p\n", _FL, this);
+		int asd=0;
+	}
+
+	void Start()
+	{
+		PostEvent(M_LOAD_NEXT_MAIL_STORE);
+	}
+
+	bool OnStatus(bool b)
+	{
+		if (MailStores)
+			Options->Unlock();
+
+		if (OptionsDirty)
+			App->SaveOptions();
+
+		if (Callback)
+			Callback(b);
+		
+		delete this;
+		
+		return b;
+	}
+
+	LMessage::Result OnEvent(LMessage *Msg) override
+	{
+		if (Msg->Msg() == M_LOAD_NEXT_MAIL_STORE)
+		{
+			if (!MailStores)
+				OnStatus(false);
+			else
+				Iterate();
+		}
+
+		return 0;
+	}
+
+	// This will process one item off the Que,
+	// Or if no work is available call PostIterate to 
+	// finish the process.
+	//
+	// In most cases this function should complete with
+	// ReturnWithEvent to trigger the next iteration...
+	bool Iterate()
+	{
+		// No more work, so do the completion step:
+		if (Que.Length() == 0)
+			return PostIterate();
+
+		// There are 2 exits modes for this function:
+		//
+		// 1) Normal exit where we should post a M_LOAD_NEXT_MAIL_STORE to ourselves to
+		// start the next iteration by calling ReturnWithEvent.
+		//
+		// 2) A dialog was launched and we should NOT post a M_LOAD_NEXT_MAIL_STORE event
+		// by calling ReturnOnDialog. The dialog's callback will do that later.
+
+		// Get the next Xml tag off the queue:
+		auto MailStore = Que[0];
+		Que.DeleteAt(0, true);
+
 		if (!MailStore->IsTag(OPT_MailStore))
-			continue;
+			return ReturnWithEvent(false);
 
 		// Read the folders..
-		auto Path = MailStore->GetAttr(OPT_MailStoreLocation);
+		auto Path       = MailStore->GetAttr(OPT_MailStoreLocation);
 		auto ContactUrl = MailStore->GetAttr(OPT_MailStoreContactUrl);
-		auto CalUrl = MailStore->GetAttr(OPT_MailStoreCalendarUrl);
+		auto CalUrl     = MailStore->GetAttr(OPT_MailStoreCalendarUrl);
 		if (!Path && !ContactUrl && !CalUrl)
 		{
 			LgiTrace("%s:%i - No mail store path (%i).\n", _FL, StoreIdx);
-			continue;
+			return ReturnWithEvent(false);
 		}
 
-		char *StoreName = MailStore->GetAttr(OPT_MailStoreName);
+		// If disabled, skip:
+		if (MailStore->GetAsInt(OPT_MailStoreDisable) > 0)
+			return ReturnWithEvent(false);
+
+		// Check and validate the folder name:
+		auto StoreName = MailStore->GetAttr(OPT_MailStoreName);
 		if (!StoreName)
 		{
 			char Tmp[256];
@@ -5093,195 +5212,251 @@ bool ScribeWnd::LoadMailStores()
 			StoreName = MailStore->GetAttr(OPT_MailStoreName);
 			OptionsDirty = true;
 		}
-		Folders[StoreIdx].Name = StoreName;
 
-		if (MailStore->GetAsInt(OPT_MailStoreDisable) > 0)
-		{
-			// LgiTrace("%s:%i - Mail store '%i' is disabled.\n", _FL, StoreIdx);
-			continue;
-		}
+		// Build a LMailStore entry in App->Folders:
+		auto &Folder = App->Folders[StoreIdx];
+		Folder.Name = StoreName;
 
 		if (Path)
 		{
 			// Mail3 folders on disk...
-			char Full[MAX_PATH_LEN];
+			LFile::Path p;
 			if (LIsRelativePath(Path))
 			{
-				LMakePath(Full, sizeof(Full), GetOptions()->GetFile(), "..");
-				LMakePath(Full, sizeof(Full), Full, Path);
+				p = Options->GetFile();
+				p--;
+				p += Path;
 			}
-			else
-			{
-				strcpy_s(Full, sizeof(Full), Path);
-			}
+			else p = Path;
+			auto Full = p.GetFull();
 
 			LVariant CreateFoldersIfMissing;
-			GetOptions()->GetValue(OPT_CreateFoldersIfMissing, CreateFoldersIfMissing);
+			Options->GetValue(OPT_CreateFoldersIfMissing, CreateFoldersIfMissing);
 
 			// Sniff type...
-			char *Ext = LGetExtension(Full);
+			auto Ext = LGetExtension(Full);
 			if (!Ext)
-				continue;
+				return ReturnWithEvent(false);
 
-			if (!Folders[StoreIdx].Store)
-				Folders[StoreIdx].Store = CreateDataStore(Full, CreateFoldersIfMissing.CastInt32() != 0);
-			if (!Folders[StoreIdx].Store)
+			if (!Folder.Store)
+				Folder.Store = App->CreateDataStore(Full, CreateFoldersIfMissing.CastInt32() != 0);
+			if (!Folder.Store)
 			{
 				LgiTrace("%s:%i - Failed to create data store for '%s'\n", _FL, Full);
-				continue;
+				return ReturnWithEvent(false);
 			}
 
-			Folders[StoreIdx].Path = Full;
+			Folder.Path = Full;
 		}
 		else if (ContactUrl || CalUrl)
 		{
 			// Remove Webdav folders...
-			Folders[StoreIdx].Store = new WebdavStore(this, this, StoreName);
+			Folder.Store = new WebdavStore(App, App, StoreName);
 		}
-		else break;
+		else
+		{
+			return ReturnWithEvent(false);
+		}
 
-		LDataStoreI *&Store = Folders[StoreIdx].Store;
+		LDataStoreI *&Store = Folder.Store;
 		auto ex = MailStore->GetAsInt(OPT_MailStoreExpanded);
 		if (ex >= 0)
-			Folders[StoreIdx].Expanded = ex != 0;
-
+			Folder.Expanded = ex != 0;
 		
-		// check if the mail store requires upgrading...
-		Store3Status MsState = (Store3Status)Store->GetInt(FIELD_STATUS);
+		// Check if the mail store requires upgrading...
+		auto MsState = (Store3Status)Store->GetInt(FIELD_STATUS);
 		if (MsState == Store3UpgradeRequired)
 		{
-			const char *Details = Store->GetStr(FIELD_STATUS);
-			if (LgiMsg(this,
-						LLoadString(IDS_MAILSTORE_UPGRADE_Q),
-						AppName,
-						MB_YESNO,
-						Folders[StoreIdx].Path.Get(),
-						ValidStr(Details)?Details:"n/a") == IDYES)
-			{
-				auto Prog = new MailStoreUpgrade(this, Store);
-				Prog->DoModal(NULL);
-			}
-			else
-			{
-				continue;
-			}
+			LgiTrace("%s:%i - this=%p\n", _FL, this);
+			auto Details = Store->GetStr(FIELD_STATUS);
+			AskStoreUpgrade(Folder.Path.Get(),
+							ValidStr(Details) ? Details : "n/a",
+							[this, Store, MailStore](auto result)
+							{
+								if (result == IDYES)
+								{
+									auto Prog = new MailStoreUpgrade(App, Store);
+									Prog->DoModal([this, MailStore](auto dlg, auto code)
+									{
+										// Upgrade complete, finish the iteration..
+										Iterate2(MailStore);
+
+										delete dlg;
+									});
+									return;
+								}
+
+								// Upgrade not allowed, so do next iteration...			
+								ReturnWithEvent(false);
+							});
+
+			return ReturnOnDialog(true);
 		}
 		else if (MsState == Store3Error)
 		{
 			auto ErrMsg = Store->GetStr(FIELD_ERROR);
-			auto a = new LAlert(this,
+			auto a = new LAlert(App,
 								AppName, ErrMsg ? ErrMsg : LLoadString(IDS_ERROR_FOLDERS_STATUS),
 								LLoadString(IDS_EDIT_MAIL_STORES),
 								LLoadString(IDS_OK));			
-			a->DoModal([this](auto dlg, auto Btn)
+			a->DoModal([this](auto dlg, auto code)
 			{
-				if (Btn == 1)
-					PostEvent(M_COMMAND, IDM_MANAGE_MAIL_STORES);
 				delete dlg;
+
+				if (code == 1)
+				{
+					App->PostEvent(M_COMMAND, IDM_MANAGE_MAIL_STORES);
+					
+					// This fails the whole LoadMailStores process, because the user
+					// is going to edit the mail store list via the dialog;
+					OnStatus(false);
+				}
+				else
+				{
+					// We can't load this mail store, so do the next iteration...
+					ReturnWithEvent(true);
+				}
 			});
-			continue;
+
+			return ReturnOnDialog(false);
 		}
+
+		// No upgrade or error, just keep going.
+		return Iterate2(MailStore);
+	}
+
+	// This also should complete by calling ReturnWithEvent/ReturnOnDialog.
+	bool Iterate2(LXmlTag *MailStore)
+	{
+		auto &Folder = App->Folders[StoreIdx];
+		auto StoreName = MailStore->GetAttr(OPT_MailStoreName);
 
 		// check password
 		LString FolderPsw;
-		if ((FolderPsw = Store->GetStr(FIELD_STORE_PASSWORD)))
+		if ((FolderPsw = Folder.Store->GetStr(FIELD_STORE_PASSWORD)))
 		{
 			bool Verified = false;
 
-			if (ValidStr(d->MulPassword))
+			if (ValidStr(App->d->MulPassword))
 			{
-				Verified = d->MulPassword.Equals(FolderPsw, false);
-				d->MulPassword.Empty();
+				Verified = App->d->MulPassword.Equals(FolderPsw, false);
+				App->d->MulPassword.Empty();
 			}
 
 			if (!Verified)
 			{
-				auto Dlg = new LInput(this, "", LLoadString(IDS_ASK_FOLDER_PASS), AppName, true);
-				Dlg->DoModal([this, Dlg, FolderPsw, &Store, StoreIdx, StoreName](auto dlg, auto id)
+				auto Dlg = new LInput(App, "", LLoadString(IDS_ASK_FOLDER_PASS), AppName, true);
+				Dlg->DoModal([this, Dlg, FolderPsw, StoreName](auto dlg, auto id)
 				{
+					auto psw = Dlg->GetStr();
+					delete dlg;
+
 					if (id == IDOK)
 					{
-						LPassword User;
-						User.Set(Dlg->GetStr());
-						if (Dlg->GetStr() == FolderPsw)
-							ProcessFolder(Store, StoreIdx, StoreName);
+						auto &Folder = App->Folders[StoreIdx];
+						if (psw == FolderPsw)
+						{
+							Status |= App->ProcessFolder(Folder.Store, StoreIdx, StoreName);
+						}
 						else
-							DeleteObj(Store);
+						{
+							// Clear the folder and don't increment the StoreIdx...
+							Folder.Empty();
+							App->Folders.PopLast();
+							ReturnWithEvent(false);
+							return;
+						}
 					}
-					delete dlg;
+
+					Iterate3();
 				});
+
+				return ReturnOnDialog(true);
 			}
 		}
-		else ProcessFolder(Store, StoreIdx, StoreName);
-		
-		Status = true;
-		StoreIdx++;
+		else
+		{
+			Status |= App->ProcessFolder(Folder.Store, StoreIdx, StoreName);
+		}
+
+		return Iterate3();
 	}
 
-	if (Status)
+	bool Iterate3()
 	{
-		// Force load some folders...
-		ScribeFolder *Folder = GetFolder(FOLDER_CALENDAR);
-		if (Folder)
-			Folder->LoadThings();
-		Folder = GetFolder(FOLDER_FILTERS);
-		if (Folder)
-			Folder->LoadThings();
-		for (auto ms: Folders)
-		{
-			if (!ms.Root)
-				continue;
-			for (auto c = ms.Root->GetChildFolder(); c; c = c->GetNextFolder())
-			{
-				if (c->GetItemType() == MAGIC_CONTACT ||
-					c->GetItemType() == MAGIC_FILTER)
-					c->LoadThings();
-			}
-		}
-
-		List<Contact> c;
-		GetContacts(c);
-
-		// Set selected folder to Inbox by default
-		// if the user hasn't selected a folder already
-		if (ScribeState != ScribeExiting && Tree && !Tree->Selection())
-		{
-			LVariant StartInFolder;
-			GetOptions()->GetValue(OPT_StartInFolder, StartInFolder);
-
-			ScribeFolder *Start = NULL;
-			if (ValidStr(StartInFolder.Str()))
-			{
-				Start = GetFolder(StartInFolder.Str());
-			}
-			if (!Start)
-			{
-				Start = GetFolder(FOLDER_INBOX);
-			}
-			if (Start && Tree)
-			{
-				Tree->Select(Start);
-			}
-		}
+		StoreIdx++;
+		return ReturnWithEvent(true);
 	}
 
-	GetOptions()->DeleteValue(OPT_CreateFoldersIfMissing);
-	if (OptionsDirty)
-		SaveOptions();
+	bool PostIterate()
+	{
+		if (Status)
+		{
+			// Force load some folders...
+			ScribeFolder *Folder = App->GetFolder(FOLDER_CALENDAR);
+			if (Folder)
+				Folder->LoadThings();
+			Folder = App->GetFolder(FOLDER_FILTERS);
+			if (Folder)
+				Folder->LoadThings();
+			for (auto ms: App->Folders)
+			{
+				if (!ms.Root)
+					continue;
+				for (auto c = ms.Root->GetChildFolder(); c; c = c->GetNextFolder())
+				{
+					if (c->GetItemType() == MAGIC_CONTACT ||
+						c->GetItemType() == MAGIC_FILTER)
+						c->LoadThings();
+				}
+			}
 
-	GetOptions()->Unlock();
+			List<Contact> c;
+			App->GetContacts(c);
 
-	// Set system folders
-	ScribeFolder *f = GetFolder(FOLDER_INBOX);
-	if (f) f->SetSystemFolderType(Store3SystemInbox);
-	f = GetFolder(FOLDER_OUTBOX);
-	if (f) f->SetSystemFolderType(Store3SystemOutbox);
-	f = GetFolder(FOLDER_SENT);
-	if (f) f->SetSystemFolderType(Store3SystemSent);
-	f = GetFolder(FOLDER_SPAM);
-	if (f) f->SetSystemFolderType(Store3SystemSpam);
+			// Set selected folder to Inbox by default
+			// if the user hasn't selected a folder already
+			if (App->ScribeState != ScribeWnd::ScribeExiting && App->Tree && !App->Tree->Selection())
+			{
+				LVariant StartInFolder;
+				Options->GetValue(OPT_StartInFolder, StartInFolder);
 
-	return Status;
+				ScribeFolder *Start = NULL;
+				if (ValidStr(StartInFolder.Str()))
+				{
+					Start = App->GetFolder(StartInFolder.Str());
+				}
+				if (!Start)
+				{
+					Start = App->GetFolder(FOLDER_INBOX);
+				}
+				if (Start && App->Tree)
+				{
+					App->Tree->Select(Start);
+				}
+			}
+		}
+
+		Options->DeleteValue(OPT_CreateFoldersIfMissing);
+
+		// Set system folders
+		ScribeFolder *f = App->GetFolder(FOLDER_INBOX);
+		if (f) f->SetSystemFolderType(Store3SystemInbox);
+		f = App->GetFolder(FOLDER_OUTBOX);
+		if (f) f->SetSystemFolderType(Store3SystemOutbox);
+		f = App->GetFolder(FOLDER_SENT);
+		if (f) f->SetSystemFolderType(Store3SystemSent);
+		f = App->GetFolder(FOLDER_SPAM);
+		if (f) f->SetSystemFolderType(Store3SystemSpam);
+
+		return OnStatus(Status);
+	}
+};
+
+void ScribeWnd::LoadMailStores(std::function<void(bool)> Callback)
+{
+	if (auto s = new LoadMailStoreState(this, Callback))
+		s->Start();
 }
 
 void ScribeWnd::LoadFolders(std::function<void(bool)> Callback)
@@ -5339,99 +5514,100 @@ void ScribeWnd::LoadFolders(std::function<void(bool)> Callback)
 	CmdReceive.Enabled(false);
 	CmdPreview.Enabled(false);
 
-	bool Status = LoadMailStores();
-
-	if (Tree)
+	LoadMailStores([this, PrevState, Callback](auto Status)
 	{
-		for (auto a: Accounts)
+		if (Tree)
 		{
-			if (!a->Receive.Disabled() && a->Receive.IsPersistant())
-				a->Receive.Connect(0, false);
-		}
-	}
-
-	using BoolFn = std::function<void(bool)>;
-	auto FinishLoad = new BoolFn
-	(
-		[this, PrevState, Callback](bool Status)
-		{
-			if (ScribeState == ScribeExiting)
+			for (auto a: Accounts)
 			{
-				LCloseApp();
+				if (!a->Receive.Disabled() && a->Receive.IsPersistant())
+					a->Receive.Connect(0, false);
 			}
-			else
-			{
-				d->FoldersLoaded = true;
-				PostEvent(M_SCRIBE_LOADED);
-			}
-
-			if (ScribeState == ScribeExiting)
-				LCloseApp();
-			ScribeState = PrevState;
-
-			if (Callback)
-				Callback(Status);
 		}
-	);
 
-	if (Folders.Length() == 0)
-	{
-		auto Dlg = new ScribeFolderDlg(this);
-		Dlg->DoModal([this, Dlg, FinishLoad, Callback, &Status](auto dlg, auto id)
-		{
-			if (id == IDOK)
+		using BoolFn = std::function<void(bool)>;
+		auto FinishLoad = new BoolFn
+		(
+			[this, PrevState, Callback](bool Status)
 			{
-				bool CreateMailStore = false;
-
-				if (Dlg->Create)
+				if (ScribeState == ScribeExiting)
 				{
-					// create folders
-					if (LFileExists(Dlg->FolderFile))
-					{
-						if (LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_ALREADY_EXIST), AppName, MB_YESNO) == IDYES)
-							CreateMailStore = true;
-						else
-							LgiMsg(this, LLoadString(IDS_ERROR_WONT_OVERWRITE_FOLDERS), AppName);
-					}
-					else if ((Status = CreateFolders(Dlg->FolderFile)))
-						CreateMailStore = true;
+					LCloseApp();
 				}
 				else
-					CreateMailStore = true;
-
-				if (CreateMailStore)
 				{
-					LXmlTag *MailStores = GetOptions()->LockTag(OPT_MailStores, _FL);
-					if (MailStores)
-					{
-						LXmlTag *Store = MailStores->CreateTag(OPT_MailStore);
-						if (Store)
-						{
-							char p[MAX_PATH_LEN];
-							LMakePath(p, sizeof(p), GetOptions()->GetFile(), "..");
-							auto RelPath = LMakeRelativePath(p, Dlg->FolderFile);
-							Store->SetAttr(OPT_MailStoreLocation, RelPath ? RelPath.Get() : Dlg->FolderFile.Get());
-						}
-						GetOptions()->Unlock();
+					d->FoldersLoaded = true;
+					PostEvent(M_SCRIBE_LOADED);
+				}
 
-						LoadMailStores();
+				if (ScribeState == ScribeExiting)
+					LCloseApp();
+				ScribeState = PrevState;
+
+				if (Callback)
+					Callback(Status);
+			}
+		);
+
+		if (Folders.Length() == 0)
+		{
+			auto Dlg = new ScribeFolderDlg(this);
+			Dlg->DoModal([this, Dlg, FinishLoad, Callback, &Status](auto dlg, auto id)
+			{
+				if (id == IDOK)
+				{
+					bool CreateMailStore = false;
+
+					if (Dlg->Create)
+					{
+						// create folders
+						if (LFileExists(Dlg->FolderFile))
+						{
+							if (LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_ALREADY_EXIST), AppName, MB_YESNO) == IDYES)
+								CreateMailStore = true;
+							else
+								LgiMsg(this, LLoadString(IDS_ERROR_WONT_OVERWRITE_FOLDERS), AppName);
+						}
+						else if ((Status = CreateFolders(Dlg->FolderFile)))
+							CreateMailStore = true;
+					}
+					else
+						CreateMailStore = true;
+
+					if (CreateMailStore)
+					{
+						LXmlTag *MailStores = GetOptions()->LockTag(OPT_MailStores, _FL);
+						if (MailStores)
+						{
+							LXmlTag *Store = MailStores->CreateTag(OPT_MailStore);
+							if (Store)
+							{
+								char p[MAX_PATH_LEN];
+								LMakePath(p, sizeof(p), GetOptions()->GetFile(), "..");
+								auto RelPath = LMakeRelativePath(p, Dlg->FolderFile);
+								Store->SetAttr(OPT_MailStoreLocation, RelPath ? RelPath.Get() : Dlg->FolderFile.Get());
+							}
+							GetOptions()->Unlock();
+
+							LoadMailStores(NULL);
+						}
 					}
 				}
-			}
 
-			if (id)
-				(*FinishLoad)(Status);
-			else if (Callback)
-				Callback(false);
+				if (id)
+					(*FinishLoad)(Status);
+				else if (Callback)
+					Callback(false);
+				delete FinishLoad;
+				delete dlg;
+			});
+		}
+		else
+		{
+			(*FinishLoad)(Status);
 			delete FinishLoad;
-			delete dlg;
-		});
-	}
-	else
-	{
-		(*FinishLoad)(Status);
-		delete FinishLoad;
-	}
+		}
+	});
 }
 
 bool ScribeWnd::UnLoadFolders()
@@ -8410,6 +8586,14 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				break;
 			LVirtualMachine::BreakOnWarning = !mi->Checked();
 			mi->Checked(LVirtualMachine::BreakOnWarning);
+			break;
+		}
+		case IDM_UNIT_TESTS:
+		{
+			UnitTests([this](auto ok)
+			{
+				LgiMsg(this, "UnitTest status: %i", AppName, MB_OK, ok);
+			});
 			break;
 		}
 
@@ -12751,3 +12935,325 @@ void ScribeWnd::OnScriptCompileError(const char *Source, Filter *f)
 		OnPosChange();
 	}
 }
+
+#ifdef _DEBUG
+#include "Store3Mail3/Mail3.h"
+
+class NoSaveOptions : public LOptionsFile
+{
+	bool Serialize(bool Write) { return true; }
+public:
+	NoSaveOptions(LOptionsFile *opts) :
+		LOptionsFile(PortableMode, AppName)
+	{
+	}
+};
+
+struct ScribeUnitTest
+{
+	uint64_t StartTs = 0;
+	int Timeout = 5000;
+
+	virtual ~ScribeUnitTest() {}
+	virtual void OnTimeout() {}
+	virtual void Run(std::function<void(bool)> Callback) = 0;
+
+	virtual void OnPulse()
+	{
+		if (StartTs != 0 &&
+			LCurrentTime() - StartTs >= Timeout)
+		{
+			LgiTrace("%s:%i - UnitTest timed out.\n", _FL);
+			StartTs = 0;
+			OnTimeout();
+		}
+	}
+};
+
+struct UnitTestState :
+	public LView::ViewEventTarget,
+	public LThread,
+	public LCancel
+{
+	ScribeWnd *App = NULL;
+	NoSaveOptions *Opts = NULL;
+	std::function<void(bool)> Callback;
+	LArray<ScribeUnitTest*> Tests;
+	LAutoPtr<ScribeUnitTest> t;
+	bool Status = true;
+	bool IsFinished = false;
+
+	// Old app state..
+	LAutoPtr<LOptionsFile> OldOpts;
+	LArray<LMailStore> OldFolders;
+
+	UnitTestState(ScribeWnd *app, std::function<void(bool)> callback);
+	~UnitTestState();
+	LMessage::Result OnEvent(LMessage *Msg) override;
+	bool Iterate();
+	bool Done();
+	int Main();
+	LDataStoreI *CreateTestMail3();
+
+	// Wrappers for protected elements:
+	LArray<LMailStore> &GetFolders() { return App->Folders; }
+	void UnLoadFolders() { App->UnLoadFolders(); }
+};
+
+#define UnitTestFail()	{ if (Callback) Callback(false); return; }
+#define UnitTestPass()	{ if (Callback) Callback(true); return; }
+
+// Basic load mail3 folder...
+struct LoadMailStore1 : public ScribeUnitTest
+{
+	UnitTestState *s;
+	LString folderPath;
+	bool GotCallback = false;
+	std::function<void(bool)> Callback;
+
+	LoadMailStore1(UnitTestState *state) : s(state)
+	{
+	}
+
+	~LoadMailStore1()
+	{
+		if (folderPath)
+		{
+			s->UnLoadFolders();
+
+			LFile::Path p = folderPath;
+			p--;
+			FileDev->RemoveFolder(p, true);
+		}
+		LAssert(GotCallback);
+	}
+
+	// Do operations on mail store before we try and load it...
+	virtual void OnMailStore(LDataStoreI *store) {}
+	virtual void ConfigureLoadMailStoreState(LoadMailStoreState *state) {}
+
+	void OnTimeout()
+	{
+		GotCallback = true;
+		Callback(false); // This should delete 'this'
+	}
+
+	void Run(std::function<void(bool)> cb)
+	{
+		Callback = cb;
+
+		if (auto store = s->CreateTestMail3())
+		{
+			folderPath = store->GetStr(FIELD_NAME);
+			OnMailStore(store);
+			delete store;
+		}
+
+		// Setup the options saying what folders to load...
+		s->Opts->CreateTag(OPT_MailStores);
+		auto MailStores = s->Opts->LockTag(OPT_MailStores, _FL);
+		if (MailStores == NULL)
+			UnitTestFail();
+
+		auto ms = MailStores->CreateTag(OPT_MailStore);
+		ms->SetAttr(OPT_MailStoreLocation, folderPath);
+		ms->SetAttr(OPT_MailStoreDisable, "0");
+		ms->SetAttr(OPT_MailStoreName, "testing");
+
+		s->Opts->Unlock();
+		if (!ms)
+			UnitTestFail();
+
+		// Try the load...
+		if (auto state = new LoadMailStoreState(s->App, [this](auto status)
+			{
+				GotCallback = true;
+
+				auto &Folders = s->GetFolders();
+				if (Folders.Length() == 0)
+					UnitTestFail()
+
+				bool found = false;
+				for (auto &f: Folders)
+				{
+					if (f.Path == folderPath &&
+						f.Store != NULL)
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					UnitTestFail();
+
+				Callback(status);
+			})
+		)
+		{
+			ConfigureLoadMailStoreState(state);
+			state->Start();
+		}
+	}
+};
+
+// This tests the DB schema upgrade functionality of the mail3 store.
+struct LoadMailStore2 : public LoadMailStore1
+{
+	LoadMailStore2(UnitTestState *state) :
+		LoadMailStore1(state)
+	{
+	}
+
+	void OnMailStore(LDataStoreI *store)
+	{
+		auto ms3 = dynamic_cast<LMail3Store*>(store);
+		if (!ms3)
+			UnitTestFail();
+
+		// Delete a field from the database so that we force an "upgrade"
+		LMail3Store::LStatement s(ms3, "alter table Calendar rename column DateModified to DateMod");
+		if (!s.Exec())
+			UnitTestFail();
+	}
+
+	// This is a simple placeholder dialog to simulate asking the user to
+	// upgrade the mail store. It then returns a 'Yes' to the callback after
+	// a few seconds.
+	struct UpgradeYes : public LWindow
+	{
+		UnitTestState *s;
+		LoadMailStoreState::IntCb Cb;
+
+		UpgradeYes(UnitTestState *state, LoadMailStoreState::IntCb cb) :
+			s(state),
+			Cb(cb)
+		{
+			Name("Upgrade Dlg");
+			SetPulse(2000);
+
+			LRect r(0, 0, 100, 100);
+			SetPos(r);
+			MoveSameScreen(s->App);
+
+			if (Attach(NULL))
+				Visible(true);
+		}
+
+		void OnPulse()
+		{
+			Cb(IDYES);
+			Quit();
+		}
+	};
+
+	void ConfigureLoadMailStoreState(LoadMailStoreState *state) override
+	{
+		state->AskStoreUpgrade = [this](auto path, auto detail, auto cb)
+		{
+			new UpgradeYes(s, cb);
+		};
+	}
+};
+
+UnitTestState::UnitTestState(ScribeWnd *app, std::function<void(bool)> callback) :
+	LView::ViewEventTarget(app, M_UNIT_TEST_TICK),
+	LThread("UnitTestState"),
+	App(app),
+	Callback(callback)
+{
+	OldOpts = App->d->Options;
+	OldFolders.Swap(App->Folders);
+	App->d->Options.Reset(Opts = new NoSaveOptions(OldOpts));
+
+	// Tests.Add(new LoadMailStore1(this));
+	Tests.Add(new LoadMailStore2(this));
+	
+	LgiTrace("%s:%i - Starting with " LPrintfInt64 " unit tests.\n", _FL, Tests.Length());
+	Run();
+}
+
+UnitTestState::~UnitTestState()
+{
+	Cancel();
+
+	// Restore app state...
+	App->d->Options = OldOpts;
+	OldFolders.Swap(App->Folders);
+
+	WaitForExit();
+}
+
+LMessage::Result UnitTestState::OnEvent(LMessage *Msg)
+{
+	if (!IsFinished &&
+		Msg->Msg() == M_UNIT_TEST_TICK)
+	{
+		if (t)
+			t->OnPulse();
+		else
+			Iterate();
+	}
+	return 0;
+}
+
+bool UnitTestState::Iterate()
+{
+	if (Tests.Length() == 0)
+		return Done();
+		
+	t.Reset(Tests[0]);
+	Tests.DeleteAt(0, true);
+	t->StartTs = LCurrentTime();
+	LgiTrace("%s:%i - Running unit test..\n", _FL);
+	t->Run([this](auto ok)
+	{
+		LgiTrace("%s:%i - Unit test status: %i\n", _FL, ok);
+		Status &= ok;
+		t.Reset(); // Reset for the next unit test.
+	});
+
+	return true;
+}
+
+bool UnitTestState::Done()
+{
+	// Stop more tick events..
+	IsFinished = true;
+	Cancel();
+
+	if (Callback)
+		Callback(Status);
+
+	delete this;
+	return true;
+}
+
+int UnitTestState::Main()
+{
+	while (!IsCancelled())
+	{
+		PostEvent(M_UNIT_TEST_TICK);
+		LSleep(500);
+	}
+
+	return 0;
+}
+
+LDataStoreI *UnitTestState::CreateTestMail3()
+{
+	LFile::Path p(ScribeTempPath());
+	p += "UnitTesting";
+	if (!p.Exists())
+		FileDev->CreateFolder(p);
+	p += "Folders.mail3";
+
+	return App->CreateDataStore(p, true);
+}
+
+void ScribeWnd::UnitTests(std::function<void(bool)> Callback)
+{
+	UnLoadFolders();
+	new UnitTestState(this, Callback);
+}
+
+#endif

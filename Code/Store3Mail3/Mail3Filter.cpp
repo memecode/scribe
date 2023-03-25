@@ -7,7 +7,7 @@ enum Dir
 	FilterInternal = 0x4,
 };
 
-GMail3Def TblFilter[] =
+LMail3Def TblFilter[] =
 {
 	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
 	{"ParentId",		"INTEGER"},

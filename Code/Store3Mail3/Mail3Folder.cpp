@@ -1,7 +1,7 @@
 #include "Mail3.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-GMail3Def TblFolder[] =
+LMail3Def TblFolder[] =
 {
 	{"Id",			"INTEGER PRIMARY KEY AUTOINCREMENT"},
 	{"ParentId",	"INTEGER"},
@@ -16,7 +16,7 @@ GMail3Def TblFolder[] =
 	{0, 0}
 };
 
-GMail3Def TblFolderFlds[] =
+LMail3Def TblFolderFlds[] =
 {
 	{"Id",			"INTEGER PRIMARY KEY AUTOINCREMENT"},
 	{"ParentId",	"INTEGER"},

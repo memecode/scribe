@@ -2160,6 +2160,14 @@ public:
 		return Ver;
 	}
 
+	void Empty()
+	{
+		DeleteObj(Store);
+		Name.Empty();
+		Path.Empty();
+		Root = NULL;
+	}
+
 	LMailStore &operator =(LMailStore &a)
 	{
 		LAssert(0);
@@ -2178,7 +2186,7 @@ struct OptionsInfo
 	OptionsInfo();
 	
 	OptionsInfo &operator =(char *p);
-	LOptionsFile *Load();
+	LAutoPtr<LOptionsFile> Load();
 };
 
 class ScribeClass ScribeWnd :
@@ -2198,6 +2206,8 @@ class ScribeClass ScribeWnd :
 	friend class OptionsDlg;
 	friend class LoadWordStoreThread;
 	friend struct ScribeReplicator;
+	friend struct LoadMailStoreState;
+	friend struct UnitTestState;
 
 public:
 	enum LayoutMode
@@ -2320,7 +2330,7 @@ protected:
 	int				AdjustAllObjectSizes(LDataI *Item);
 	bool			CleanFolders(ScribeFolder *f);
 	void			LoadFolders(std::function<void(bool)> Callback);
-	bool			LoadMailStores();
+	void			LoadMailStores(std::function<void(bool)> Callback);
 	bool			ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName);
 	bool			UnLoadFolders();
 	void			AddFolderToMru(char *FileName);
@@ -2345,10 +2355,15 @@ public:
 
 	~ScribeWnd();
 
-	static bool IsUnitTest;
 	const char *GetClass() override { return "ScribeWnd"; }
 	void DoDebug(char *s);
 	void Validate(LMailStore *s);
+
+	// Unit testing.
+	static bool IsUnitTest;
+	#ifdef _DEBUG
+	void UnitTests(std::function<void(bool)> Callback);
+	#endif
 
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;

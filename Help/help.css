@@ -96,15 +96,6 @@ ul
 	margin-bottom: 0.3em;
 }
 
-.inscribe
-{
-	color: #009;
-	background: #eef;
-	margin: 0.5em 0px;
-	border-radius: 9px;
-	padding: 9px;
-}
-
 .action
 {
 	font-style: italic;
@@ -155,13 +146,28 @@ arg {
 	color: #b99;
 }
 
-.win_specific 
+div.specific 
 {
-	padding: 0.5em;
 	border: 1px solid #e0e0ff;
-	background-color: #f0f0ff;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+	padding: 0.5em;
+	margin: 0.5em 0px;
+}
+
+.win, table.options td.win
+{
+	background: #f0f0ff;
+}
+
+.mac, table.options td.mac
+{
+	background: #fff0f0;
+}
+
+table.options td.fld_win
+{
+	background: #aaaadd;
+	color: white;
+	font-weight: bold;
 }
 
 .bordered td, .bordered th {
@@ -193,19 +199,4 @@ table.options td.fld {
 	background: #aaa;
 	color: white;
 	font-weight: bold;
-}
-
-
-table.options td.fld-inscribe {
-	background: #aaf;
-	color: white;
-	font-weight: bold;
-}
-
-table.options td.inscribe
-{
-	color: #009;
-	background: #eef;
-	margin: 0.5em 0px;
-	border-radius: 0px;
 }

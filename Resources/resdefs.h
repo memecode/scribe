@@ -342,6 +342,7 @@
 #define IDC_CONTACT_FIELD						536
 #define IDC_ACTION								537
 #define IDS_REMOVE								538
+#define IDM_UNIT_TESTS							539
 #define IDC_LAYOUT								540
 #define IDC_TABS								541
 #define IDC_275									542

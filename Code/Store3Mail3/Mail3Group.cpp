@@ -1,7 +1,7 @@
 #include "lgi/common/Lgi.h"
 #include "Mail3.h"
 
-GMail3Def TblGroup[] =
+LMail3Def TblGroup[] =
 {
 	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
 	{"ParentId",		"INTEGER"},

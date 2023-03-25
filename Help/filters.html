@@ -19,7 +19,7 @@
 			runs first and checks incoming mail for spam. If it passes that stage then it's run through
 			the normal user specified filters. Which may sort, delete and mark or label email.
 			<p/>
-			To create a new user filter, use the Filters &#9654; New Filter menu. This opens a filter edit window
+			To create a new user filter, use the Filters → New Filter menu. This opens a filter edit window
 			to allow you to set the conditions and actions of the filter. The first tab of the filter
 			window has a name, to describe what the filter does, and a couple of buttons to change the
 			order that the filters run in. If you select the filters folder in the main window and set
@@ -27,14 +27,6 @@
 			Filters are executed in ascending order, from 1 through to the last number unless some filter
 			asks for furthur processing to stop. This means that multiple filters may match on the same
 			email and run their actions on it.
-			<p/>
-			<div class=inscribe>
-				i.Scribe: Only the first 5 filters run when you receive mail. This is just 
-				to demonstrate the feature that is in InScribe, enough so that you can 
-				see how it works. If you define more than that then they appear greyed out
-				in i.Scribe. However if you purchase InScribe and install it they will become
-				active.
-			</div>
 			<p/>
 			The user filtering system is based around the Scribe <a target="_top"
 			href='http://www.memecode.com/scribe/dom.php'>DOM</a>
@@ -77,14 +69,14 @@
 			them into a sub-directory of /Filters.
 			<p/>
 			If you have a folder of mail that you want to process using filters, you can do so by selecting
-			the folder in the tree view and then clicking the Filters &#9654; Filter the Current Folder menu.
+			the folder in the tree view and then clicking the Filters → Filter the Current Folder menu.
 			This runs the filters over all the email in the current folder as if you had just received it.
 			Usually known as "filtering after the fact" in some other mail apps. This is handy if something
 			you just received ended up in your inbox instead of being filtered, then you can go and adjust 
 			the filter, and re-run the filters over the inbox.
 			<p/>
 			If you need to debug a problem you're having with filters you can switch on logging using the 
-			Filters &#9654; Log Filter Activity menu option. The output is written to a file called 'FilterLog.txt'
+			Filters → Log Filter Activity menu option. The output is written to a file called 'FilterLog.txt'
 			in the same folder as the Scribe executable.
 			<p/>
 			On a related note, there is another feature that may prove useful when filtering folders. If
@@ -127,7 +119,7 @@
 					Deletes the email. Use the "..." button to configure where to delete from, either
 					local folders, the server or both.
 				<li> <div class=action>Print</div>
-					Prints the email using the current Printer setup (File &#9654; Print Setup).
+					Prints the email using the current Printer setup (File → Print Setup).
 				<li> <div class=action>Play Sound</div>
 					Plays the specified sound. Select a sound with "...".
 				<li> <div class=action>Open Email</div>
@@ -210,10 +202,10 @@ I received your email on &lt;? mail.datereceived ?&gt;, thanks.
 			off "Mailbox" called "Spam" if it doesn't already exist.
 			<p/>
 			Once you have a little bit of spam collected, switch the filtering into "Training mode" 
-			using the Filters &#9654; Bayesian Filtering Options dialog. I set the Probably directory to 
+			using the Filters → Bayesian Filtering Options dialog. I set the Probably directory to 
 			"/Spam/Probably" so I can check it easily for false positives.
 			<p/>
-			Then run the Filters &#9654; Build Word Lists command which will iterate through all your mail 
+			Then run the Filters → Build Word Lists command which will iterate through all your mail 
 			and build a database of words, both good and bad. As a side effect of this a whitelist 
 			is generated from the "from" address of all the email not in the Spam folder.
 			<p/>
@@ -226,7 +218,7 @@ I received your email on &lt;? mail.datereceived ?&gt;, thanks.
 			(minus any false positives of course).
 			<p/>
 			Also at this point the word database is not updated automatically, you have to re-run the 
-			Filters &#9654; Build Word Database every few days to keep it up to date. The problem with 
+			Filters → Build Word Database every few days to keep it up to date. The problem with 
 			keeping the word database up to date is not adding the Spam mail to the spam word database 
 			but deciding when to add the Ham to the ham database. For instance if you receive a 
 			mail that is a false negative (i.e. a Spam classified as Ham) then you would read the 

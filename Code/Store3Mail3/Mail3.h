@@ -27,7 +27,7 @@ enum Mail3SubFormat
 	Mail3v2, // All the mail and segs in per folders tables.
 };
 
-struct GMail3Def
+struct LMail3Def
 {
 	const char *Name;
 	const char *Type;
@@ -68,14 +68,14 @@ public:
 };
 
 
-extern GMail3Def TblFolder[];
-extern GMail3Def TblFolderFlds[];
-extern GMail3Def TblMail[];
-extern GMail3Def TblMailSegs[];
-extern GMail3Def TblContact[];
-extern GMail3Def TblFilter[];
-extern GMail3Def TblGroup[];
-extern GMail3Def TblCalendar[];
+extern LMail3Def TblFolder[];
+extern LMail3Def TblFolderFlds[];
+extern LMail3Def TblMail[];
+extern LMail3Def TblMailSegs[];
+extern LMail3Def TblContact[];
+extern LMail3Def TblFilter[];
+extern LMail3Def TblGroup[];
+extern LMail3Def TblCalendar[];
 
 #define SERIALIZE_STR(Var, Col) \
 	if (Write) \
@@ -200,7 +200,7 @@ class LMail3Store : public LDataStoreI
 	LString Folder;
 	LString DbFile;
 	class LMail3Folder *Root;
-	LHashTbl<ConstStrKey<char,false>, GMail3Def*> Fields;
+	LHashTbl<ConstStrKey<char,false>, LMail3Def*> Fields;
 	LHashTbl<StrKey<char,false>, GMail3Idx*> Indexes;
 	Store3Status OpenStatus;
 	LHashTbl<ConstStrKey<char,true>, Store3Status> TableStatus;
@@ -211,14 +211,14 @@ class LMail3Store : public LDataStoreI
 	std::function<void(bool)> CompactOnStatus;
 	std::function<void(bool)> RepairOnStatus;
 
-	struct TableDefn : LArray<GMail3Def>
+	struct TableDefn : LArray<LMail3Def>
 	{
 		LString::Array t;
 	};
 
 	bool ParseTableFormat(const char *Name, TableDefn &Defs);
-	Store3Status CheckTable(const char *Name, GMail3Def *Flds);
-	bool UpdateTable(const char *Name, GMail3Def *Flds, Store3Status Check);
+	Store3Status CheckTable(const char *Name, LMail3Def *Flds);
+	bool UpdateTable(const char *Name, LMail3Def *Flds, Store3Status Check);
 	bool DeleteMailById(int64 Id);
 	bool OpenDb();
 	bool CloseDb();
@@ -245,7 +245,7 @@ public:
 		LAutoString TempSql;
 		
 	public:
-		LStatement(LMail3Store *store, const char *sql = 0);
+		LStatement(LMail3Store *store, const char *sql = NULL);
 		virtual ~LStatement();
 
 		operator sqlite3_stmt *() { return s; }
@@ -371,7 +371,7 @@ public:
 	void PostStore(LMail3StoreMsg *m) { Callback->Post(this, m); }
 	void OnEvent(void *Param);
 	bool Check(int Code, const char *Sql);
-	GMail3Def *GetFields(const char *t) { return Fields.Find(t); }
+	LMail3Def *GetFields(const char *t) { return Fields.Find(t); }
 
 	StoreTrans StartTransaction();
 
@@ -721,35 +721,35 @@ class LMail3Calendar : public LMail3Thing
 	LString ToCache;
 
 private:
-	int CalType; // FIELD_CAL_TYPE
+	int CalType = 0; // FIELD_CAL_TYPE
 	LString To; // FIELD_TO
-	CalendarPrivacyType CalPriv; // FIELD_CAL_PRIVACY
-	int Completed; // FIELD_CAL_COMPLETED
+	CalendarPrivacyType CalPriv = CalDefaultPriv; // FIELD_CAL_PRIVACY
+	int Completed = 0; // FIELD_CAL_COMPLETED
 	LDateTime Start; // FIELD_CAL_START_UTC
 	LDateTime  End; // FIELD_CAL_END_UTC
 	LString TimeZone; // FIELD_CAL_TIMEZONE
 	LString Subject; // FIELD_CAL_SUBJECT
 	LString Location; // FIELD_CAL_LOCATION
 	LString Uid; // FIELD_UID
-	bool AllDay; // FIELD_CAL_ALL_DAY
-	int64 StoreStatus; // FIELD_STATUS - ie the current Store3Status
+	bool AllDay = false; // FIELD_CAL_ALL_DAY
+	int64 StoreStatus = Store3Success; // FIELD_STATUS - ie the current Store3Status
 	LString EventStatus; // FIELD_CAL_STATUS
 	LDateTime Modified; // FIELD_DATE_MODIFIED
 
 	LString Reminders; // FIELD_CAL_REMINDERS
 	LDateTime LastCheck; // FIELD_CAL_LAST_CHECK
-	int ShowTimeAs; // FIELD_CAL_SHOW_TIME_AS
+	int ShowTimeAs = 0; // FIELD_CAL_SHOW_TIME_AS
 
-	int Recur; // FIELD_CAL_RECUR
-	int RecurFreq; // FIELD_CAL_RECUR_FREQ
-	int RecurInterval; // FIELD_CAL_RECUR_INTERVAL
+	int Recur = 0; // FIELD_CAL_RECUR
+	int RecurFreq = 0; // FIELD_CAL_RECUR_FREQ
+	int RecurInterval = 0; // FIELD_CAL_RECUR_INTERVAL
 	LDateTime RecurEnd; // FIELD_CAL_RECUR_END_DATE
-	int RecurCount; // FIELD_CAL_RECUR_END_COUNT
-	int RecurEndType; // FIELD_CAL_RECUR_END_TYPE
+	int RecurCount = 0; // FIELD_CAL_RECUR_END_COUNT
+	int RecurEndType = 0; // FIELD_CAL_RECUR_END_TYPE
 	LString RecurPos; // FIELD_CAL_RECUR_FILTER_POS
 	
-	int FilterDays; // FIELD_CAL_RECUR_FILTER_DAYS
-	int FilterMonths; // FIELD_CAL_RECUR_FILTER_MONTHS
+	int FilterDays = 0; // FIELD_CAL_RECUR_FILTER_DAYS
+	int FilterMonths = 0; // FIELD_CAL_RECUR_FILTER_MONTHS
 	LString FilterYears; // FIELD_CAL_RECUR_FILTER_YEARS
 	LString Notes; // FIELD_CAL_NOTES
 	
