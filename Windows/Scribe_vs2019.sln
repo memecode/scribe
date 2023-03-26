@@ -10,7 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScribeMapi", "..\ScribeMapi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LgiStatic", "..\..\..\Lgi\trunk\LgiStatic_vs2019.vcxproj", "{DE6D97B9-A194-401B-A8A4-83110C56D572}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Updater", "..\..\..\Lgi\trunk\Updater\Updater_vs2019.vcxproj", "{11E9238B-921E-44E5-A3D2-61C5BFA7CC6C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Updater", "..\..\..\Lgi\trunk\utils\Updater\Updater_vs2019.vcxproj", "{11E9238B-921E-44E5-A3D2-61C5BFA7CC6C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aspell-dist-0.60", "..\..\libs\aspell-0.60.6.1\win32\dist\aspell-dist-0.60-vs2019.vcxproj", "{1509FE6D-0B3A-422A-99D1-E26A26CE8DA5}"
 EndProject

@@ -1101,6 +1101,7 @@
 #define IDS_ERROR_IMPORT_COUNT					1388
 #define IDS_GNUPG_ERR_NOT_INSTALLED				1458
 #define IDD_FOLDER_SELECT						1469
+#define IDS_REPARSE								1471
 #define IDD_FOLDER_FORMAT						1472
 #define IDC_V1									1481
 #define IDC_V2									1482

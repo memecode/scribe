@@ -809,6 +809,10 @@ const char *LMail3Mail::GetStr(int id)
 			LgiTrace("\n");
 			#endif
 
+			LAutoWString w(Utf8ToWide(Subject.Str()));
+			if (w)
+				LgiTrace("Subj='%S'\n", w.Get());
+
 			return Subject.Str();
 		}
 		case FIELD_CHARSET:

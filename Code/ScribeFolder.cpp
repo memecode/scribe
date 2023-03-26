@@ -12,7 +12,7 @@
 #include "Scribe.h"
 #include "lgi/common/DropFiles.h"
 #include "lgi/common/ProgressDlg.h"
-#include "lgi/common/LgiQuickSort.h"
+#include "lgi/common/QuickSort.h"
 #include "lgi/common/DisplayString.h"
 #include "lgi/common/TextFile.h"
 #include "lgi/common/LgiRes.h"
@@ -2332,7 +2332,7 @@ bool ScribeFolder::Thread()
 
 			Containers.Sort(ContainerCompare);
 
-			LgiQuickSort(Base, Containers2.Length(), ContainerSorter, &Params);
+			LQuickSort(Base, Containers2.Length(), ContainerSorter, &Params);
 			
 			for (int i=0; i<Containers.Length(); i++)
 			{
@@ -2344,7 +2344,7 @@ bool ScribeFolder::Thread()
 			#else
 			MContainer **Base = &Containers[0];
 	        if (Containers.Length() > 1)
-	    		LgiQuickSort(Base, Containers.Length(), ContainerSorter, &Params);
+	    		LQuickSort(Base, Containers.Length(), ContainerSorter, &Params);
 
             /*
 			for (int i=0; i<Containers.Length(); i++)

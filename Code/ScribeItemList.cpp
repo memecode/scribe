@@ -11,7 +11,7 @@
 // Includes
 #include "Scribe.h"
 #include "lgi/common/ScrollBar.h"
-#include "lgi/common/LgiQuickSort.h"
+#include "lgi/common/QuickSort.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/DropFiles.h"
 
@@ -323,7 +323,7 @@ void ThingList::ReSort()
 			Root.Sort(ContainerCompare);
 			#else
 			if (Root.Length() > 1)
-			    LgiQuickSort(&Root[0], Root.Length(), ContainerSorter, &Params);
+			    LQuickSort(&Root[0], Root.Length(), ContainerSorter, &Params);
 			#endif
 
 			for (int i=0; i<(int)Root.Length(); i++)

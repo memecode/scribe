@@ -13129,7 +13129,9 @@ struct LoadMailStore2 : public LoadMailStore1
 			Cb(cb)
 		{
 			Name("Upgrade Dlg");
-			SetPulse(2000);
+			
+			// Just needs to be open long enough to run the msg loop a bit.
+			SetPulse(500);
 
 			LRect r(0, 0, 100, 100);
 			SetPos(r);
@@ -13165,7 +13167,7 @@ UnitTestState::UnitTestState(ScribeWnd *app, std::function<void(bool)> callback)
 	OldFolders.Swap(App->Folders);
 	App->d->Options.Reset(Opts = new NoSaveOptions(OldOpts));
 
-	// Tests.Add(new LoadMailStore1(this));
+	Tests.Add(new LoadMailStore1(this));
 	Tests.Add(new LoadMailStore2(this));
 	
 	LgiTrace("%s:%i - Starting with " LPrintfInt64 " unit tests.\n", _FL, Tests.Length());

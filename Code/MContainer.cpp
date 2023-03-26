@@ -1,6 +1,6 @@
 #include "Scribe.h"
 #include "ScribePrivate.h"
-#include "lgi/common/LgiQuickSort.h"
+#include "lgi/common/QuickSort.h"
 #include "lgi/common/DisplayString.h"
 
 MContainer::MContainer(const char *Id, Mail *m)
@@ -207,7 +207,7 @@ void MContainer::Pour(int &index, int depth, int tree, bool next, ThingSortParam
 
 	// Children.Sort(ContainerCompare);
 	if (Children.Length() > 1)
-	    LgiQuickSort(&Children[0], Children.Length(), ContainerSorter, params);
+	    LQuickSort(&Children[0], Children.Length(), ContainerSorter, params);
 
 	int Flag = (Open && Next) ? 1 << Depth : 0;
 	ssize_t Last = Children.Length() - 1;

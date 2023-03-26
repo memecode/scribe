@@ -6546,9 +6546,9 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 			auto Thread = s.Sub->AppendSub(LLoadString(IDS_THREAD));
 			if (Thread)
 			{
-				Thread->AppendItem(LLoadString(IDS_THREAD_SELECT), IDM_SELECT_THREAD, true);
-				Thread->AppendItem(LLoadString(IDS_THREAD_DELETE), IDM_DELETE_THREAD, true);
-				Thread->AppendItem(LLoadString(IDS_THREAD_IGNORE), IDM_IGNORE_THREAD, true);
+				Thread->AppendItem(LLoadString(IDS_THREAD_SELECT), IDM_SELECT_THREAD);
+				Thread->AppendItem(LLoadString(IDS_THREAD_DELETE), IDM_DELETE_THREAD);
+				Thread->AppendItem(LLoadString(IDS_THREAD_IGNORE), IDM_IGNORE_THREAD);
 				s.Sub->AppendSeparator();
 			}
 		}
@@ -6570,8 +6570,9 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 		}
 
 		s.Sub->AppendSeparator();
-		s.Sub->AppendItem(AddAmp(LLoadString(IDS_INSPECT), 'i'), IDM_INSPECT, true);
-		s.Sub->AppendItem(LLoadString(IDS_PROPERTIES), IDM_PROPERTIES, true);
+		s.Sub->AppendItem(AddAmp(LLoadString(IDS_INSPECT), 'i'), IDM_INSPECT);
+		s.Sub->AppendItem(LLoadString(IDS_REPARSE), IDM_REPARSE);
+		s.Sub->AppendItem(LLoadString(IDS_PROPERTIES), IDM_PROPERTIES);
 
 		#ifdef _DEBUG
 		Prof->Add("ScriptCallbacks");
@@ -6742,6 +6743,19 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 					{
 						m->SetFlags(m->GetFlags() | MAIL_IGNORE | MAIL_READ);
 					}
+				}
+				break;
+			}
+			case IDM_REPARSE:
+			{
+				if (!_GetListItems(Sel, false))
+					break;
+
+				for (auto s: Sel)
+				{
+					Mail *m = dynamic_cast<Mail*>(s);
+					if (m)
+						m->Reparse();
 				}
 				break;
 			}
@@ -6974,6 +6988,17 @@ void Mail::OnCreate()
 	}
 
 	Update();
+}
+
+void Mail::Reparse()
+{
+	_debug = true;
+
+	// This temporarily removes the attachments that will be 
+	// deleted by the call to ParseHeaders after this...
+	ClearCachedItems();
+
+	Thing::Reparse();
 }
 
 void Mail::CreateMailHeaders()
@@ -8065,7 +8090,14 @@ const char *Mail::GetFieldText(int Field)
 			break;
 		}
 		case FIELD_SUBJECT:
-			return GetSubject();
+		{
+			auto s = GetSubject();
+
+			if (_debug)
+				LgiTrace("GetSubj=%s\n", s);
+
+			return s;
+		}
 		case FIELD_SIZE:
 		{
 			if (TotalSizeCache < 0)

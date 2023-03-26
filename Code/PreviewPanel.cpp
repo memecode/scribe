@@ -399,20 +399,7 @@ void LPreviewPanel::OnInstall(CapsHash *Caps, bool Status)
 			Obj->Type() == MAGIC_MAIL)
 		{
 			LFontSystem::Inst()->ResetLibCheck();
-
-			Mail *m = d->Item->IsMail();
-			if (m)
-			{
-				// This temporarily removes the attachments that will be 
-				// deleted by the call to ParseHeaders after this...
-				m->ClearCachedItems();
-			}
-		    Obj->ParseHeaders();
-		    
-		    LArray<LDataI*> Change;
-		    Change.Add(Obj);
-			d->App->SetContext(_FL);
-		    d->App->OnChange(Change, FIELD_INTERNET_HEADER);
+			d->Item->Reparse();
 		}
 
 		OnThing(d->Item, true);

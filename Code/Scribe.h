@@ -358,6 +358,10 @@ protected:
 	LArray<ThingEventInfo*> OnLoadCallbacks;
 
 public:
+	#ifdef _DEBUG
+	bool _debug = false;
+	#endif
+
 	struct IoProgress;
 	typedef std::function<void(IoProgress*,LStreamI*)> IoProgressCallback;
 	struct IoProgress
@@ -547,6 +551,7 @@ public:
 	virtual char *GetDropFileName() = 0;
 	virtual bool GetDropFiles(LString::Array &Files) { return false; }
 	virtual void OnSerialize(bool Write) {}
+	virtual void Reparse();
 
 	// Interfaces
 	virtual Mail *IsMail() { return 0; }
@@ -1121,6 +1126,7 @@ public:
 	void CreateMailHeaders();
 	bool AddCalendarEvent(LViewI *Parent, bool AddPopupReminder, LString *Msg);
 	LArray<Attachment*> GetCalendarAttachments();
+	void Reparse() override;
 
 	// UI
 	LDocView *CreateView(MailViewOwner *Owner, LString MimeType, bool Sunken, size_t MaxBytes, bool NoEdit = false);

@@ -1486,7 +1486,6 @@ int ImapThread::Main()
 		d->Store->ItemProgress->Empty();
 	if (d->Store->DataProgress)
 		d->Store->DataProgress->Empty();
-	
-	LgiTrace("Main finished... (IsCancelled=%i)\n", d->IsCancelled());
+
 	return 0;
 }

@@ -405,24 +405,24 @@ bool Thing::OnDelete()
 	return true;
 }
 
+void Thing::Reparse()
+{
+	auto Obj = GetObject();
+	if (Obj)
+	{
+		Obj->ParseHeaders();
+		    
+		LArray<LDataI*> Change;
+		Change.Add(Obj);
+		App->SetContext(_FL);
+		App->OnChange(Change, FIELD_INTERNET_HEADER);
+	}
+
+	Update();
+}
+
 void Thing::OnMove()
 {
-	/*
-	if (LListItem::Parent)
-	{
-		int MyIndex = LListItem::Parent->IndexOf(this);
-		LListItem::Parent->Remove(this);
-
-		if (Parent && Parent->Length() < 1)
-		{
-			Window->OnSelect();
-		}
-		else if (LListItem::Parent && MyIndex >= 0)
-		{
-			LListItem::Parent->Value(MyIndex);
-		}
-	}
-	*/
 }
 
 bool Thing::OnBeginDrag(LMouse &m)
