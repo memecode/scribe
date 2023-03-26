@@ -3224,6 +3224,9 @@ OptionsInfo &OptionsInfo::operator =(char *p)
 LAutoPtr<LOptionsFile> OptionsInfo::Load()
 {
 	// Read the file...
+	size_t Count = 0;
+	LXmlTag *Stores = NULL;
+	LXmlTag *Acc = NULL;
 	LAutoPtr<LOptionsFile> Of(new LOptionsFile(File));
 	if (!Of)
 		return Of;
@@ -3231,16 +3234,16 @@ LAutoPtr<LOptionsFile> OptionsInfo::Load()
 		goto OnError;
 		
 	// Sanity check the options...
-	LXmlTag *Acc = Of->LockTag(OPT_Accounts, _FL);
+	Acc = Of->LockTag(OPT_Accounts, _FL);
 	if (!Acc)
 		goto OnError;
 	Of->Unlock();
 		
-	LXmlTag *Stores = Of->LockTag(OPT_MailStores, _FL);
+	Stores = Of->LockTag(OPT_MailStores, _FL);
 	if (!Stores)
 		goto OnError;
 
-	auto Count = Stores->Children.Length();
+	Count = Stores->Children.Length();
 	Of->Unlock();
 	if (Count == 0)
 		goto OnError;
