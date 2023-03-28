@@ -12,12 +12,13 @@ Target = ./scribe
 ifndef Build
 	Build = Debug
 endif
+MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
 
 Flags = -fPIC -w -fno-inline -fpermissive
 
 ifeq ($(Build),Debug)
-	Flags += -g -std=c++14
+	Flags += -MMD -MP -g -std=c++14
 	Tag = d
 	Defs = -D_DEBUG -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
@@ -52,7 +53,7 @@ ifeq ($(Build),Debug)
 		-I../../../lgi/trunk/include \
 		-I../../../../codelib/openssl/include
 else
-	Flags += -s -Os -std=c++14
+	Flags += -MMD -MP -s -Os -std=c++14
 	Defs = -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
 		-L../../libs/build-x64/libchardet \
@@ -244,9 +245,23 @@ Source =	../Utils/Tables/MailFlags.c \
 			../../../lgi/trunk/src/common/Coding/ScriptCompiler.cpp \
 			../../../lgi/trunk/src/common/Coding/LexCpp.cpp
 
-SourceLst := $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(Source)))
-Objects := $(addprefix $(BuildDir)/,$(SourceLst))
-Deps := $(patsubst %.o,%.d,$(Objects))
+SourceC    := $(filter %.c,$(Source))
+ObjectsC   := $(SourceC:.c=.o)
+SourceCpp  := $(filter %.cpp,$(Source))
+ObjectsCpp := $(SourceCpp:.cpp=.o)
+Objects    := $(notdir $(ObjectsC) $(ObjectsCpp))
+Objects    := $(addprefix $(BuildDir)/,$(Objects))
+Deps       := $(patsubst %.o,%.d,$(Objects))
+
+$(BuildDir)/%.o: %.c
+	mkdir -p $(@D)
+	echo $(notdir $<) [$(Build)]
+	$(CC) $(Inc) $(Flags) $(Defs) -c $< -o $@
+
+$(BuildDir)/%.o: %.cpp
+	mkdir -p $(@D)
+	echo $(notdir $<) [$(Build)]
+	$(CPP) $(Inc) $(Flags) $(Defs) -c $< -o $@
 
 # Target
 # Executable target
@@ -509,6 +524,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/include/lgi/common/Point.h \
 	../../../lgi/trunk/include/lgi/common/Popup.h \
 	../../../lgi/trunk/include/lgi/common/PopupList.h \
+	../../../lgi/trunk/include/lgi/common/PopupNotification.h \
 	../../../lgi/trunk/include/lgi/common/Printer.h \
 	../../../lgi/trunk/include/lgi/common/Profile.h \
 	../../../lgi/trunk/include/lgi/common/Progress.h \
@@ -693,55 +709,40 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	export Build=$(Build); \
 	$(MAKE) -C ../../../lgi/trunk -f Makefile.linux
 
-.SECONDEXPANSION:
-$(Objects): $(BuildDir)/%.o: $$(wildcard %.c*)
-	mkdir -p $(@D)
-	@echo $(<F) [$(Build)]
-ifeq "$(suffix $<)" ".cpp"
-	$(CPP) -MMD -MP $(Inc) $(Flags) $(Defs) -c $< -o $@
-else
-	$(CC) -MMD -MP $(Inc) $(Flags) $(Defs) -c $< -o $@
-endif
-
 -include $(Objects:.o=.d)
 
 # Clean just this target
 clean :
-	rm $(Objects) $(Deps) $(Target)
-	@echo Cleaned $(BuildDir)
+	rm -rf $(BuildDir) $(Target)
+	@echo Cleaned $(BuildDir) $(Target)
 
 # Clean all targets
 cleanall :
-	rm $(Objects) $(Deps) $(Target)
-	@echo Cleaned $(BuildDir)
+	rm -rf $(BuildDir) $(Target)
+	@echo Cleaned $(BuildDir) $(Target)
 	+make -C "../../libs/aspell-0.60.6.1/linux" -f "Makefile.linux" clean
 	+make -C "../../libs/bzip2-1.0.6/linux" -f "Makefile.linux" clean
 	+make -C "../../../lgi/trunk" -f "Makefile.linux" clean
 
-VPATH=%.cpp \
-	../../../../codelib/openssl/include \
+VPATH=$(BuildDir) \
 	../Utils/Tables \
-	../Scripts \
-	../Resources \
-	../Help \
 	../Code/Store3Webdav \
 	../Code/Store3Mail3 \
 	../Code/Store3Imap \
 	../Code/Sqlite/v3.6.14 \
-	../Code/Sqlite \
 	../Code/Encryption \
 	../Code \
-	../../libs/libchardet/src \
-	../../libs/libchardet/include \
-	../../libs/aspell-0.60.6.1/interfaces/cc \
+	../../libs/Btree \
 	../../../lgi/trunk/src/common/Widgets/Editor \
+	../../../lgi/trunk/src/common/Widgets \
+	../../../lgi/trunk/src/common/Text/Homoglyphs \
+	../../../lgi/trunk/src/common/Text/Emoji \
 	../../../lgi/trunk/src/common/Text \
-	../../../lgi/trunk/src/common/Coding \
-	../../../lgi/trunk/private/common \
-	../../../lgi/trunk/include/lgi/linux/Gtk \
-	../../../lgi/trunk/include/lgi/linux \
-	../../../lgi/trunk/include/lgi/common \
-	../../../lgi/trunk/include \
-	../../../lgi/trunk/docs/scripting \
-	$(BuildDir)
-
+	../../../lgi/trunk/src/common/Net \
+	../../../lgi/trunk/src/common/Lgi \
+	../../../lgi/trunk/src/common/General \
+	../../../lgi/trunk/src/common/Gdc2/Font \
+	../../../lgi/trunk/src/common/Gdc2/Filters \
+	../../../lgi/trunk/src/common/Gdc2 \
+	../../../lgi/trunk/src/common/Db \
+	../../../lgi/trunk/src/common/Coding
