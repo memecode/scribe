@@ -377,7 +377,9 @@ const LDateTime *LMail3Calendar::GetDate(int id)
 
 Store3Status LMail3Calendar::SetDate(int id, const LDateTime *t)
 {
-	if (t)
+	if (!t)
+		return Store3Error;
+	if (t->GetTimeZone())
 	{
 		LStackTrace("LMail3Calendar::SetDate error: date has timezone.\n");
 		LAssert(t->GetTimeZone()==0);

@@ -711,7 +711,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <ProjectReference Include="..\..\..\lgi\trunk\src\common\Net\libntlm-0.4.2\build-win32\libntlm_vs2019.vcxproj">
       <Project>{f97aaaca-bf41-46b8-b534-a1639589a1a3}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Lgi\trunk\Updater\Updater_vs2015.vcxproj">
+    <ProjectReference Include="..\..\..\Lgi\trunk\utils\Updater\Updater_vs2015.vcxproj">
       <Project>{11e9238b-921e-44e5-a3d2-61c5bfa7cc6c}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\libs\aspell-0.60.6.1\win32\dist\aspell-dist-0.60-vs2019.vcxproj">

@@ -244,7 +244,7 @@ void FolderCalendarSource::EditPath(LView *parent, CalendarView *cv)
 
 bool FolderCalendarSource::GetEvents(const LDateTime StartTs,
 									 const LDateTime EndTs,
-									 std::function<void(LArray<TimePeriod>&)> Callback)
+									 GetEventCb Callback)
 {
 	Read();
 

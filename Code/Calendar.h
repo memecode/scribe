@@ -277,7 +277,10 @@ public:
 	virtual void SetColour(LColour c) = 0;
 	virtual const char *GetName() = 0;
 	virtual bool Read() = 0;
-	virtual bool GetEvents(const LDateTime Start, const LDateTime End, std::function<void(LArray<TimePeriod>&)> Callback) = 0;
+	typedef std::function<void(LArray<TimePeriod>&)> GetEventCb;
+	virtual bool GetEvents(	const LDateTime Start,
+							const LDateTime End,
+							GetEventCb Callback) = 0;
 	virtual Calendar *NewEvent() = 0;
 	virtual void OnFolderDelete(ScribeFolder *f) = 0;
 	virtual void OnPulse() = 0;
@@ -287,7 +290,7 @@ public:
 class CalendarSourceGetEvents
 {
 	ScribeWnd *App = NULL;
-    LArray<CalendarSource*> Sources;
+    LArray<CalendarSource*> Sources, Done;
 	LArray<TimePeriod> Events;
 	LDateTime Start, End;
 	std::function<void(LArray<TimePeriod>&)> Callback;
@@ -317,12 +320,10 @@ public:
 
 			src->GetEvents(Start, End, [this, src](auto events)
 			{
-				LAssert(Sources.HasItem(src));
-				Sources.Delete(src);
-				
+				Done.Add(src);				
 				Events += events;
 
-				if (Sources.Length() == 0)
+				if (Done.Length() >= Sources.Length())
 					OnFinished();
 			});
 		}
@@ -348,7 +349,9 @@ public:
 	bool Delete();
 	Calendar *NewEvent();
 	bool Match(char *Email);
-	bool GetEvents(const LDateTime Start, const LDateTime End, std::function<void(LArray<TimePeriod>&)> Callback);
+	bool GetEvents(	const LDateTime Start,
+					const LDateTime End,
+					GetEventCb Callback);
 	void EditPath(LView *parent, CalendarView *cv);
 
 	// Props
@@ -385,7 +388,7 @@ public:
 	bool Delete();
 	Calendar *NewEvent();
 	bool Match(char *Email);
-	bool GetEvents(const LDateTime Start, const LDateTime End, std::function<void(LArray<TimePeriod>&)> Callback);
+	bool GetEvents(const LDateTime Start, const LDateTime End, GetEventCb Callback);
 	void EditPath(LView *parent, CalendarView *cv);
 
 	// Props

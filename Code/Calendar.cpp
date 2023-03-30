@@ -30,7 +30,12 @@
 
 #define MAX_RECUR			1024
 #define DEBUG_REMINDER		0
-#define DEBUG_DATES			0
+#define DEBUG_DATES			1
+#if DEBUG_DATES
+#define LOG_DEBUG(...)		LgiTrace(__VA_ARGS__)
+#else
+#define LOG_DEBUG(...)
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 ItemFieldDef CalendarFields[] = {
@@ -1563,9 +1568,7 @@ const char *Calendar::GetText(int i)
 			{
 				LDateTime tmp = *dt;
 				
-				#if DEBUG_DATES
-				printf("GetText.UTC %i = %s\n", i, tmp.Get().Get());
-				#endif
+				LOG_DEBUG("%s:%i - GetText.UTC %i = %s\n", _FL, i, tmp.Get().Get());
 				
 				bool UseLocal = true;
 				tmp.SetTimeZone(0, false);
@@ -1603,9 +1606,7 @@ const char *Calendar::GetText(int i)
 				if (UseLocal)
 					tmp.ToLocal();
 
-				#if DEBUG_DATES
-				printf("GetText.Local %i = %s\n", i, tmp.Get().Get());
-				#endif
+				LOG_DEBUG("%s:%i - GetText.Local %i = %s\n", _FL, i, tmp.Get().Get());
 
 				tmp.Get(s, sizeof(s));
 				return s;
@@ -1717,7 +1718,7 @@ bool Calendar::Save(ScribeFolder *Folder)
 		if (Folder)
 		{
 			LDateTime Now;
-			GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now.SetNow());
+			GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now.SetNow().ToUtc());
 
 			Folder->WriteThing(this, [this, ChangeEvent](auto Status)
 			{
@@ -3020,15 +3021,13 @@ void CalendarUi::OnLoad()
 	auto dt = o->GetDate(FIELD_CAL_START_UTC);
 	if (dt)
 	{
-		#if DEBUG_DATES
-		printf("Load.Start.UTC=%s\n", dt->Get().Get());
-		#endif
+		LOG_DEBUG("%s:%i - Load.Start.UTC=%s\n", _FL, dt->Get().Get());
+
 		LDateTime tmp = *dt;
 		tmp.SetTimeZone(0, false);
 		tmp.ToLocal(true);
-		#if DEBUG_DATES
-		printf("Load.Start.Local=%s\n", tmp.Get().Get());
-		#endif
+
+		LOG_DEBUG("%s:%i - Load.Start.Local=%s\n", _FL, tmp.Get().Get());
 
 		tmp.GetDate(s, sizeof(s));
 		SetCtrlName(IDC_START_DATE, s);
@@ -3041,15 +3040,13 @@ void CalendarUi::OnLoad()
 	dt = o->GetDate(FIELD_CAL_END_UTC);
 	if (dt)
 	{
-		#if DEBUG_DATES
-		printf("Load.End.UTC=%s\n", dt->Get().Get());
-		#endif
+		LOG_DEBUG("%s:%i - Load.End.UTC=%s\n", _FL, dt->Get().Get());
+
 		LDateTime tmp = *dt;
 		tmp.SetTimeZone(0, false);
 		tmp.ToLocal(true);
-		#if DEBUG_DATES
-		printf("Load.End.Local=%s\n", tmp.Get().Get());
-		#endif
+
+		LOG_DEBUG("%s:%i - Load.End.Local=%s\n", _FL, tmp.Get().Get());
 
 		tmp.GetDate(s, sizeof(s));
 		SetCtrlName(IDC_END_DATE, s);
@@ -3187,25 +3184,25 @@ void CalendarUi::OnSave()
 	LDateTime dt;
 	dt.SetDate(GetCtrlName(IDC_START_DATE));
 	dt.SetTime(AllDay ? "0:0:0" : GetCtrlName(IDC_START_TIME));
-	#if DEBUG_DATES
-	printf("Start.Local=%s\n", dt.Get().Get());
-	#endif
+	
+		LOG_DEBUG("%s:%i - Start.Local=%s\n", _FL, dt.Get().Get());
+
 	dt.ToUtc(true);
-	#if DEBUG_DATES
-	printf("Start.UTC=%s\n", dt.Get().Get());
-	#endif
+	
+		LOG_DEBUG("%s:%i - Start.UTC=%s\n", _FL, dt.Get().Get());
+	
 	o->SetDate(FIELD_CAL_START_UTC, &dt);
 
 	dt.Empty();
 	dt.SetDate(GetCtrlName(IDC_END_DATE));
 	dt.SetTime(AllDay ? "11:59:59" : GetCtrlName(IDC_END_TIME));
-	#if DEBUG_DATES
-	printf("End.Local=%s\n", dt.Get().Get());
-	#endif
+	
+		LOG_DEBUG("%s:%i - End.Local=%s\n", _FL, dt.Get().Get());
+	
 	dt.ToUtc(true);
-	#if DEBUG_DATES
-	printf("End.UTC=%s\n", dt.Get().Get());
-	#endif
+	
+		LOG_DEBUG("%s:%i - End.UTC=%s\n", _FL, dt.Get().Get());
+	
 	o->SetDate(FIELD_CAL_END_UTC, &dt);
 
 	o->SetInt(FIELD_CAL_RECUR, GetCtrlValue(IDC_REPEAT));

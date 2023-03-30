@@ -206,7 +206,7 @@ bool RemoteCalendarSource::Match(char *Email)
 
 bool RemoteCalendarSource::GetEvents(const LDateTime StartTs,
 									 const LDateTime EndTs,
-									 std::function<void(LArray<TimePeriod>&)> Callback)
+									 GetEventCb Callback)
 {
 	if (!Callback)
 		return false;
