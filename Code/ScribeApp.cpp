@@ -5245,7 +5245,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 				Folder.Store = App->CreateDataStore(Full, CreateFoldersIfMissing.CastInt32() != 0);
 			if (!Folder.Store)
 			{
-				LgiTrace("%s:%i - Failed to create data store for '%s'\n", _FL, Full);
+				LgiTrace("%s:%i - Failed to create data store for '%s'\n", _FL, Full.Get());
 				return ReturnWithEvent(false);
 			}
 

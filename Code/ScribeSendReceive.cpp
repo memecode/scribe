@@ -1892,7 +1892,7 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 	Params.MaxSize = DownloadLimit() << 10;
 
 	auto MailSourceType = ProtocolStrToEnum(Protocol().Str());
-	auto Ms = GetApp()->GetDefaultMailStore();
+	// auto Ms = GetApp()->GetDefaultMailStore();
 
 	LString Password;
 

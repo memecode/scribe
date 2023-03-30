@@ -227,9 +227,9 @@ public:
 	~LScribeScript();
 
 	void ShowScriptingWindow(bool show);
-	LAutoString GetDataFolder();
-	LStream *GetLog();
-	LHostFunc *GetCommands();	
+	LAutoString GetDataFolder() override;
+	LStream *GetLog() override;
+	LHostFunc *GetCommands() override;	
 	LString GetIncludeFile(const char *FileName) override;
 
 	// System

@@ -105,8 +105,10 @@ static LString GpgBinPath;
 #define GPG_KEY_STALE_TIMEOUT			(10 MINUTES)
 
 #define DecryptStatus(val) \
-	if (callback) callback(val); \
-	return;
+	{ \
+		if (callback) callback(val); \
+		return; \
+	}
 
 typedef LArray<GpgConnector::KeyInfo>	KeyArr;
 typedef LAutoPtr<KeyArr>				KeyArrAuto;
