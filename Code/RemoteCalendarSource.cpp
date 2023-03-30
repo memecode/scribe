@@ -105,6 +105,13 @@ void RemoteCalendarSource::SetUri(const char *uri)
 	OnChange(false);
 }
 
+LString RemoteCalendarSource::ToString()
+{
+	LString s;
+	s.Printf("%p::RemoteCalendarSource(%s, %s)", this, d->Name.Get(), d->Uri.Get());
+	return s;
+}
+
 bool RemoteCalendarSource::Read()
 {
 	if (!Id)

@@ -918,9 +918,10 @@ void CalendarView::OnContentsChanged(CalendarSource *Source)
 		Current += Events;
 
 		LHashTbl<PtrKey<Calendar*>, bool> InCur;
-		for (unsigned i=0; i<Current.Length(); i++)
+		for (auto &c: Current)
 		{
-			InCur.Add(Current[i].c, true);
+			// LgiTrace("%s\n", c.ToString().Get());
+			InCur.Add(c.c, true);
 		}
 		for (unsigned i=0; i<Selection.Length(); i++)
 		{
@@ -930,27 +931,6 @@ void CalendarView::OnContentsChanged(CalendarSource *Source)
 
 		OnCursorChange();
 	});
-	
-	/*
-	for (size_t i=0; i<CalendarSource::GetSources().Length(); i++)
-	{
-		auto cs = CalendarSource::GetSources().ItemAt(i);
-	    cs->GetEvents(Start, End, Current);
-	}
-	
-	LHashTbl<PtrKey<Calendar*>, bool> InCur;
-	for (unsigned i=0; i<Current.Length(); i++)
-	{
-		InCur.Add(Current[i].c, true);
-	}
-	for (unsigned i=0; i<Selection.Length(); i++)
-	{
-		if (!InCur.Find(Selection[i]))
-			Selection.DeleteAt(i--);
-	}
-
-	OnCursorChange();
-	*/
 }
 
 void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)

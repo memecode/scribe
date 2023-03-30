@@ -1219,6 +1219,7 @@ protected:
 	void EmptyFieldList();
 	void SetLoadFolder(Thing *t) { if (t) t->SetParentFolder(this); }
 	bool HasFieldId(int Id);
+	void ContinueLoading(int OldUnread, std::function<void(Store3Status)> Callback);
 
 	// Tree item stuff
 	void _PourText(LPoint &Size) override;
@@ -1305,32 +1306,31 @@ public:
 	bool IsInTrash();
 	bool SortItems();
 	
-	// Virtuals:
-		/// 
-		/// These methods can be used in a synchronous or asynchronous manner:
-		///		sync:	Call with 'Callback=NULL' and use the return value.
-		///				If the function needs to show a dialog (like to get permissions from
-		///				the user) then it'll return Store3Delayed immediately.
-		///		async:	Call with a valid callback, and the method will possibly wait 
-		///				for the user and then either return Store3Error or Store3Success.
-		virtual Store3Status LoadThings(LViewI *Parent = NULL,	std::function<void(Store3Status)> Callback = NULL);
-		virtual Store3Status WriteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
-		virtual Store3Status DeleteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
-		virtual Store3Status DeleteAllThings(					std::function<void(Store3Status)> Callback = NULL);
-		virtual bool LoadFolders();
-		virtual bool UnloadThings();
-		virtual bool IsWriteable() { return true; }
-		virtual bool IsPublicFolders() { return false; }
+	/// 
+	/// These methods can be used in a synchronous or asynchronous manner:
+	///		sync:	Call with 'Callback=NULL' and use the return value.
+	///				If the function needs to show a dialog (like to get permissions from
+	///				the user) then it'll return Store3Delayed immediately.
+	///		async:	Call with a valid callback, and the method will possibly wait 
+	///				for the user and then either return Store3Error or Store3Success.
+	Store3Status LoadThings(LViewI *Parent = NULL,	std::function<void(Store3Status)> Callback = NULL);
+	Store3Status WriteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
+	Store3Status DeleteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
+	Store3Status DeleteAllThings(					std::function<void(Store3Status)> Callback = NULL);
+	bool LoadFolders();
+	bool UnloadThings();
+	bool IsWriteable() { return true; }
+	bool IsPublicFolders() { return false; }
 
-		virtual void OnProperties(int Tab = -1) override;
-		virtual ScribeFolder *CreateSubDirectory(const char *Name, int Type);
-		virtual void OnRename(char *NewName);
-		virtual void OnDelete();
-		virtual LString GetPath();
-		virtual ScribeFolder *GetSubFolder(const char *Path);
-		virtual void Populate(ThingList *List);
-		virtual bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL) { return GetItemType() != MAGIC_ANY; }
-		virtual void OnRethread();
+	void OnProperties(int Tab = -1) override;
+	ScribeFolder *CreateSubDirectory(const char *Name, int Type);
+	void OnRename(char *NewName);
+	void OnDelete();
+	LString GetPath();
+	ScribeFolder *GetSubFolder(const char *Path);
+	void Populate(ThingList *List);
+	bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL) { return GetItemType() != MAGIC_ANY; }
+	void OnRethread();
 
 	// Name
 	void SetName(const char *Name, bool Encode);

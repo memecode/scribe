@@ -767,6 +767,20 @@ void Calendar::OnSerialize(bool Write)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+LString TimePeriod::ToString()
+{
+	LString str;
+	auto subj = c->GetObject()->GetStr(FIELD_CAL_SUBJECT);
+	str.Printf("TimePeriod(%p, %s, %s, %s, %s)",
+		c,
+		subj,
+		src ? src->ToString().Get() : NULL,
+		s.Get().Get(),
+		e.Get().Get());
+	return str;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 Calendar::Calendar(ScribeWnd *app, LDataI *object) : Thing(app, object)
 {
 	DefaultObject(object);

@@ -68,6 +68,8 @@ struct TimePeriod
 
 		return true;
 	}
+
+	LString ToString();
 };
 
 #include "Attendee.h"
@@ -284,15 +286,17 @@ public:
 	virtual Calendar *NewEvent() = 0;
 	virtual void OnFolderDelete(ScribeFolder *f) = 0;
 	virtual void OnPulse() = 0;
+	virtual LString ToString() = 0;
 };
 
 /// Helper class to collect events from multiple CalendarSource objects
 class CalendarSourceGetEvents
 {
 	ScribeWnd *App = NULL;
-    LArray<CalendarSource*> Sources, Done;
+    LArray<CalendarSource*> Sources;
 	LArray<TimePeriod> Events;
 	LDateTime Start, End;
+	int Done = 0;
 	std::function<void(LArray<TimePeriod>&)> Callback;
 
 	void OnFinished()
@@ -318,12 +322,14 @@ public:
 			if (!App)
 				App = src->GetApp();
 
+			// LgiTrace("CalendarSourceGetEvents: %s\n", src->ToString().Get());
 			src->GetEvents(Start, End, [this, src](auto events)
 			{
-				Done.Add(src);				
-				Events += events;
+				// LgiTrace("Callback %s %i\n", src->ToString().Get(), (int)events.Length());
 
-				if (Done.Length() >= Sources.Length())
+				Done++;
+				Events += events;
+				if (Done >= Sources.Length())
 					OnFinished();
 			});
 		}
@@ -342,6 +348,12 @@ public:
 	~FolderCalendarSource();
 
 	const char *GetClass() { return "FolderCalendarSource"; }
+	LString ToString()
+	{
+		LString s;
+		s.Printf("%p::FolderCalendarSource(%s)", this, Path.Get());
+		return s;
+	}
 
 	// Actions
 	bool Read();
@@ -381,6 +393,7 @@ public:
 	~RemoteCalendarSource();
 
 	const char *GetClass() { return "RemoteCalendarSource"; }
+	LString ToString();
 
 	// Actions
 	bool Read();

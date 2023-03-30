@@ -1458,6 +1458,105 @@ bool ScribeFolder::UnloadThings()
 	#define PROFILE(str)
 #endif
 
+void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Status)> Callback)
+{
+	auto FldObj = GetFldObj();
+
+	WhenLoaded(_FL,
+		[this, OldUnread, Callback, FldObj]()
+		{
+			// This is called when all the Store3 objects are loaded
+			int Unread = OldUnread;
+			if (Unread < 0)
+				Unread = GetUnRead();
+
+			Loading.Reset();
+
+			auto &Children = GetFldObj()->Children();
+			if (Children.GetState() != Store3Loaded)
+			{
+				LAssert(!"Really should be loaded by now.");
+				return;
+			}
+
+			for (auto c = Children.First(); c; c = Children.Next())
+			{
+				auto t = CastThing(c);
+				if (t)
+				{
+					// LAssert(Items.HasItem(t));
+				}
+				else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
+				{
+					t->SetObject(c, false, _FL);
+					t->SetParentFolder(this);
+					t->OnSerialize(false);
+				}
+			}
+
+			int NewUnRead = 0;
+			for (auto t: Items)
+			{
+				if (t->GetFolder() != this)
+				{
+					#ifdef _DEBUG
+					char s[256];
+					sprintf_s(s, sizeof(s),
+						"%s:%i - Error, thing not parented correctly: this='%s', child='%x'\n",
+						_FL,
+						GetText(0),
+						t->GetObject() ? t->GetObject()->Type() : 0);
+					printf("%s", s);
+					LgiMsg(App, s, AppName);
+					#endif
+			
+					t->SetFolder(this);
+				}
+
+				Mail *m = t->IsMail();
+				if (m)
+					NewUnRead += (m->GetFlags() & MAIL_READ) ? 0 : 1;
+
+				t->SetFieldArray(FieldArray);
+			}
+
+			if (Unread != NewUnRead)
+				OnUpdateUnRead(NewUnRead - Unread, false);
+
+			Update();
+
+			if (d->IsInbox < 0 && App)
+			{
+				d->IsInbox = App->GetFolder(FOLDER_INBOX) == this;
+				if (d->IsInbox > 0)
+					UpdateOsUnread();
+			}
+
+			if (Callback)
+				Callback(Store3Success);
+		},
+		0);
+
+	if (!IsLoaded())
+	{
+		bool Ui = Tree ? Tree->InThread() : false;
+		if (Ui)
+			Tree->Capture(false);
+
+		auto &Children = FldObj->Children();
+		auto Status = Children.GetState();
+		if (Status != Store3Loaded)
+		{
+			if (View() && Loading.Reset(Ui ? new LoadingItem(&Children) : NULL))
+				View()->Insert(Loading);
+
+			return; // Ie deferred or error...
+		}
+
+		IsLoaded(true);
+	}
+}
+
 Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback)
 {
 	int OldUnRead = GetUnRead();
@@ -1472,105 +1571,6 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 	if (!Parent)
 		Parent = App;
 
-	auto ContinueLoading = [this, OldUnRead, Callback, FldObj]()
-	{
-		WhenLoaded(_FL,
-			[this, OldUnRead, Callback, FldObj]()
-			{
-				// This is called when all the Store3 objects are loaded
-				int Unread = OldUnRead;
-				if (Unread < 0)
-					Unread = GetUnRead();
-
-				Loading.Reset();
-
-				auto &Children = GetFldObj()->Children();
-				if (Children.GetState() != Store3Loaded)
-				{
-					LAssert(!"Really should be loaded by now.");
-					return;
-				}
-
-				for (auto c = Children.First(); c; c = Children.Next())
-				{
-					auto t = CastThing(c);
-					if (t)
-					{
-						// LAssert(Items.HasItem(t));
-					}
-					else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
-					{
-						t->SetObject(c, false, _FL);
-						t->SetParentFolder(this);
-						t->OnSerialize(false);
-					}
-				}
-
-				int NewUnRead = 0;
-				for (auto t: Items)
-				{
-					if (t->GetFolder() != this)
-					{
-						#ifdef _DEBUG
-						char s[256];
-						sprintf_s(s, sizeof(s),
-							"%s:%i - Error, thing not parented correctly: this='%s', child='%x'\n",
-							_FL,
-							GetText(0),
-							t->GetObject() ? t->GetObject()->Type() : 0);
-						printf("%s", s);
-						LgiMsg(App, s, AppName);
-						#endif
-			
-						t->SetFolder(this);
-					}
-
-					Mail *m = t->IsMail();
-					if (m)
-						NewUnRead += (m->GetFlags() & MAIL_READ) ? 0 : 1;
-
-					t->SetFieldArray(FieldArray);
-				}
-
-				if (Unread != NewUnRead)
-					OnUpdateUnRead(NewUnRead - Unread, false);
-
-				Update();
-
-				if (d->IsInbox < 0 && App)
-				{
-					d->IsInbox = App->GetFolder(FOLDER_INBOX) == this;
-					if (d->IsInbox > 0)
-						UpdateOsUnread();
-				}
-
-				if (Callback)
-					Callback(Store3Success);
-			},
-			0);
-
-		if (!IsLoaded())
-		{
-			bool Ui = Tree ? Tree->InThread() : false;
-			if (Ui)
-				Tree->Capture(false);
-
-			auto &Children = FldObj->Children();
-			auto Status = Children.GetState();
-			if (Status != Store3Loaded)
-			{
-				if (View() && Loading.Reset(Ui ? new LoadingItem(&Children) : NULL))
-					View()->Insert(Loading);
-
-				return Status; // Ie deferred or error...
-			}
-
-			IsLoaded(true);
-		}
-
-		return Store3Loaded;
-	};
-
 	auto Path = GetPath();
 	if (!App || !Path)
 	{
@@ -1578,22 +1578,18 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 		return Store3Error;
 	}
 
-	std::function<void(bool)> AccessCb;
-	if (Callback)
-	{
-		AccessCb = [ContinueLoading, Callback](bool Access)
+	auto Access = App->GetAccessLevel(
+		Parent,
+		GetReadAccess(),
+		Path,
+		[this, OldUnRead, Callback](auto access)
 		{
-			if (Access)
-				ContinueLoading();
+			if (access)
+				ContinueLoading(OldUnRead, Callback);
 			else
-				Callback(Store3Error);
-		};
-	}
+				Callback(Store3NoPermissions);
+		});
 
-	auto Access = App->GetAccessLevel(	Parent,
-										GetReadAccess(),
-										Path,
-										AccessCb);
 	if (Access == Store3Error)
 	{		
 		// No read access:
@@ -1607,10 +1603,6 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 		IsLoaded(false);
 		
 		Update();
-	}
-	else if (Access == Store3Success)
-	{
-		ContinueLoading();
 	}
 		
 	return Access;
