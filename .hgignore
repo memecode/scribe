@@ -1,0 +1,9 @@
+syntax: glob
+
+Linux/Aspell/data
+Linux/Aspell/dict
+Linux/Debug
+Linux/Release
+*.asm
+Linux/*.idx
+Linux/ScribeOptions_*.bak
