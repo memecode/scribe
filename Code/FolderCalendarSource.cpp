@@ -278,59 +278,19 @@ bool FolderCalendarSource::GetEvents(const LDateTime StartTs,
 
 		for (auto c: Search)
 		{
-			LDateTime s, e;
+			LDateTime s;
 			if (c->GetCalType() == CalEvent &&
 				c->GetField(FIELD_CAL_START_UTC, s))
 			{
-				int Recur = 0;
-				c->GetField(FIELD_CAL_RECUR, Recur);
+				LArray<TimePeriod> Times;
+				if (c->GetTimes(Start, End, Times))
+				{						    
+					SetCalendarsSource(c);
 
-				const char *Sub = NULL;
-				c->GetField(FIELD_CAL_SUBJECT, Sub);
-
-				if (Recur)
-				{
-					LArray<TimePeriod> Times;
-					if (c->GetTimes(Start, End, Times))
-					{						    
-						SetCalendarsSource(c);
-						for (auto &t: Times)
-						{
-							t.src = this;
-							Events.Add(t);
-						}
-					}
-				}
-				else
-				{
-					if (!c->GetField(FIELD_CAL_END_UTC, e))
-					{
-						e = s;
-						e.AddHours(1);
-					}
-
-					#if 0
-					printf("%s: %s > %s, %s < %s\n",
-						Sub,
-						s.Get().Get(),
-						End.Get().Get(),
-						e.Get().Get(),
-						Start.Get().Get());
-					#endif
-					if (s > End || e < Start)
-					{
-						// Is before/after the range
-					}
-					else
-					{
-						TimePeriod &tp = Events.New();
-						tp.src = this;
-						tp.c = c;
-						tp.s = s;
-						tp.e = e;
-						tp.ToLocal();
-						SetCalendarsSource(c);
-					}
+					for (auto &t: Times)
+						t.src = this;
+					
+					Events.Add(Times);
 				}
 			}
 		}

@@ -186,6 +186,7 @@ copy Code\Resource.res $(OutDir)
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <PreLinkEvent>
       <Command>
@@ -254,6 +255,7 @@ copy Code\Resource.res $(OutDir)
       <WarningLevel>Level1</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MinSpace</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <PreLinkEvent>
       <Command>cd ..\Code\Py
@@ -329,6 +331,7 @@ copy Code\Resource.res $(OutDir)
       <WarningLevel>Level1</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MinSpace</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <PreLinkEvent>
       <Command>cd ..\Code\Py

@@ -6992,7 +6992,9 @@ void Mail::OnCreate()
 
 void Mail::Reparse()
 {
+	#ifdef _DEBUG
 	_debug = true;
+	#endif
 
 	// This temporarily removes the attachments that will be 
 	// deleted by the call to ParseHeaders after this...
@@ -8093,8 +8095,10 @@ const char *Mail::GetFieldText(int Field)
 		{
 			auto s = GetSubject();
 
+			#ifdef _DEBUG
 			if (_debug)
 				LgiTrace("GetSubj=%s\n", s);
+			#endif
 
 			return s;
 		}

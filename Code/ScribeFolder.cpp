@@ -1586,7 +1586,7 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 		{
 			if (access)
 				ContinueLoading(OldUnRead, Callback);
-			else
+			else if (Callback)
 				Callback(Store3NoPermissions);
 		});
 

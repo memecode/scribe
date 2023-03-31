@@ -268,9 +268,6 @@
     <ClCompile Include="..\Code\Store3Mapi\ScribeMapi_Thing.cpp">
       <Filter>Store3\Mapi</Filter>
     </ClCompile>
-    <ClCompile Include="..\Code\Sqlite\v3.6.14\sqlite3.c">
-      <Filter>Store3\Mail3</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Jpeg.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -505,6 +502,7 @@
     <ClCompile Include="..\Code\PreviewPanel.cpp">
       <Filter>Controls/UI\PreviewPanel</Filter>
     </ClCompile>
+    <ClCompile Include="..\Code\Sqlite\v3.41.2\sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\Btree\btree.h">
@@ -657,12 +655,6 @@
     <ClInclude Include="..\Code\Store3Mapi\ScribeMapi.h">
       <Filter>Store3\Mapi</Filter>
     </ClInclude>
-    <ClInclude Include="..\Code\Sqlite\v3.6.14\sqlite3.h">
-      <Filter>Store3\Mail3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Code\Sqlite\v3.6.14\sqlite3ext.h">
-      <Filter>Store3\Mail3</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Lgi\trunk\include\common\LWebDav.h">
       <Filter>Store3\WebDav</Filter>
     </ClInclude>
@@ -801,6 +793,8 @@
     <ClInclude Include="..\Code\PreviewPanel.h">
       <Filter>Controls/UI\PreviewPanel</Filter>
     </ClInclude>
+    <ClInclude Include="..\Code\Sqlite\v3.41.2\sqlite3.h" />
+    <ClInclude Include="..\Code\Sqlite\v3.41.2\sqlite3ext.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Icons\app.ico">

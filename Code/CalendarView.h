@@ -101,6 +101,7 @@ protected:
 	void OnSelect(Calendar *c, bool Ctrl, bool Shift);
 	bool Overlap(LDateTime &Start, LDateTime &End, Calendar *a, Calendar *b);
 	void SetupScroll();
+	void CalDelete(Calendar *c);
 
 public:
 	static ScribeWnd *App;
@@ -108,6 +109,11 @@ public:
 	static int FirstDayOfWeek;
 	static LArray<CalendarView*> CalendarViews;
 	static void OnOptionsChange();
+	static void OnDelete(Calendar *c)
+	{
+		for (auto cv: CalendarViews)
+			cv->CalDelete(c);
+	}
 
 	CalendarView(ScribeFolder *folder, int Id = -1, LRect *r = 0, const char *Name = 0);
 	~CalendarView();
@@ -145,14 +151,15 @@ public:
 	void OnPaint(LSurface *pDC);
 	bool OnPrintPage(LPrintDC *pDC, int PageIndex);
 
-	void OnMouseClick(LMouse &m);
-	void OnMouseMove(LMouse &m);
-	void OnFocus(bool f);
-	bool OnKey(LKey &k);
-	void OnCreate();
-	void OnPulse();
-	int OnNotify(LViewI *v, LNotification n);
-	bool OnLayout(LViewLayoutInfo &Inf);
+	void OnMouseClick(LMouse &m) override;
+	void OnMouseMove(LMouse &m) override;
+	bool OnMouseWheel(double Lines) override;
+	void OnFocus(bool f) override;
+	bool OnKey(LKey &k) override;
+	void OnCreate() override;
+	void OnPulse() override;
+	int OnNotify(LViewI *v, LNotification n) override;
+	bool OnLayout(LViewLayoutInfo &Inf) override;
 };
 
 class CalendarViewWnd : public LWindow

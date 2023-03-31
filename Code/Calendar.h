@@ -70,6 +70,7 @@ struct TimePeriod
 	}
 
 	LString ToString();
+	void Set(CalendarSource *source, Calendar *cal, LDateTime start, LDateTime end);
 };
 
 #include "Attendee.h"
@@ -86,10 +87,10 @@ class ScribeClass Calendar :
 	static List<Calendar> Reminders;
 
 	// Data
-	CalendarUi *Ui;
+	CalendarUi *Ui = NULL;
 	LRegion ViewPos;
-	CalendarSource *Source;
-	class CalendarTodoItem *TodoView;
+	CalendarSource *Source = NULL;
+	class CalendarTodoItem *TodoView = NULL;
 	LDateTime RecurAfter;
 	LDateTime RemindTs;
 
@@ -123,6 +124,7 @@ public:
 	CalendarSource *GetSource() { return Source; }
 	bool GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePeriod> &Times);
 	LDateTime *GetRemindTs() { return &RemindTs; }
+	LString ToString();
 
 	// Thing
 	uint32_t GetFlags() override;
@@ -287,30 +289,30 @@ public:
 	virtual void OnFolderDelete(ScribeFolder *f) = 0;
 	virtual void OnPulse() = 0;
 	virtual LString ToString() = 0;
+	virtual bool IsWritable() = 0;
 };
 
 /// Helper class to collect events from multiple CalendarSource objects
-class CalendarSourceGetEvents
+class CalendarSourceGetEvents : public LView::ViewEventTarget
 {
 	ScribeWnd *App = NULL;
     LArray<CalendarSource*> Sources;
 	LArray<TimePeriod> Events;
 	LDateTime Start, End;
 	int Done = 0;
-	std::function<void(LArray<TimePeriod>&)> Callback;
+	CalendarSource::GetEventCb Callback;
 
-	void OnFinished()
-	{
-		if (Callback)
-			Callback(Events);
-		delete this;
-	}
+	#ifdef _DEBUG
+	LHashTbl<PtrKey<CalendarSource*>,bool> GotCb;
+	#endif
 
 public:
-	CalendarSourceGetEvents(LDateTime start,
+	CalendarSourceGetEvents(ScribeWnd *app,
+							LDateTime start,
 							LDateTime end,
 							LArray<CalendarSource*> sources,
-							std::function<void(LArray<TimePeriod>&)> callback)
+							CalendarSource::GetEventCb callback) :
+		LView::ViewEventTarget(app, M_CALENDAR_SOURCE_FINISH)
 	{
 		Sources = sources;
 		Start = start;
@@ -325,14 +327,31 @@ public:
 			// LgiTrace("CalendarSourceGetEvents: %s\n", src->ToString().Get());
 			src->GetEvents(Start, End, [this, src](auto events)
 			{
-				// LgiTrace("Callback %s %i\n", src->ToString().Get(), (int)events.Length());
+				#ifdef _DEBUG
+				LAssert(!GotCb.Find(src));
+				GotCb.Add(src, true);
+				#endif
 
+				// LgiTrace("Callback %s %i\n", src->ToString().Get(), (int)events.Length());
 				Done++;
 				Events += events;
 				if (Done >= Sources.Length())
-					OnFinished();
+					// By sending an event to ourselves the code avoids deleting itself in
+					// the constructor in the case that the callbacks are all synchronous.
+					PostEvent(M_CALENDAR_SOURCE_FINISH);
 			});
 		}
+	}
+
+	LMessage::Result OnEvent(LMessage *Msg)
+	{
+		if (Msg->Msg() == M_CALENDAR_SOURCE_FINISH)
+		{
+			if (Callback)
+				Callback(Events);
+			delete this;
+		}
+		return 0;
 	}
 };
 
@@ -381,8 +400,10 @@ public:
 	void OnChange(bool IsDelete);
 	void OnFolderDelete(ScribeFolder *f);
 	void OnPulse();
+	bool IsWritable() { return true; }
 };
 
+// Loads a read only iCal feed from a remote URI.
 class RemoteCalendarSource :
 	public CalendarSource
 {
@@ -394,6 +415,7 @@ public:
 
 	const char *GetClass() { return "RemoteCalendarSource"; }
 	LString ToString();
+	bool IsWritable() { return false; }
 
 	// Actions
 	bool Read();

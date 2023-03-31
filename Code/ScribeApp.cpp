@@ -3387,7 +3387,7 @@ bool ScribeWnd::LoadOptions()
 			{
 				d->SetInstallMode(LOptionsFile::DesktopMode);
 				LgiTrace("Selecting xgate mode based on options file path.\n");
-				d->Options = new LOptionsFile(File);
+				d->Options.Reset(new LOptionsFile(File));
 			}
 		}
 	}
@@ -5036,7 +5036,7 @@ bool ScribeWnd::ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName
 
 	// Recursively load the rest of the tree
 	{
-		LProfile p("Loadfolders");
+		// LProfile p("Loadfolders");
 		Mailbox->LoadFolders();
 	}
 				
@@ -5116,12 +5116,6 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 		// Load up some work in the queue and start the iteration...
 		if (MailStores)
 			Que = MailStores->Children;
-	}
-
-	~LoadMailStoreState()
-	{
-		LgiTrace("%s:%i - ~this=%p\n", _FL, this);
-		int asd=0;
 	}
 
 	void Start()
@@ -8593,10 +8587,12 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_UNIT_TESTS:
 		{
+			#ifdef _DEBUG
 			UnitTests([this](auto ok)
 			{
 				LgiMsg(this, "UnitTest status: %i", AppName, MB_OK, ok);
 			});
+			#endif
 			break;
 		}
 

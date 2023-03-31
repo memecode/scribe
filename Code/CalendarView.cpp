@@ -815,6 +815,17 @@ void CalendarView::SetupScroll()
 	}
 }
 
+void CalendarView::CalDelete(Calendar *c)
+{
+	Selection.Delete(c);
+
+	for (size_t i=0; i<Current.Length(); i++)
+	{
+		if (Current[i].c == c)
+			Current.DeleteAt(i--); // Could be multiple number of them
+	}
+}
+
 void CalendarView::SetViewMode(CalendarViewMode m)
 {
 	Mode = m;
@@ -913,7 +924,7 @@ void CalendarView::OnContentsChanged(CalendarSource *Source)
 	LDateTime End = Start;
 	End.AddDays(MonthX * MonthY);
 	
-	new CalendarSourceGetEvents(Start, End, CalendarSource::GetSources(), [this](auto Events)
+	new CalendarSourceGetEvents(App, Start, End, CalendarSource::GetSources(), [this](auto Events)
 	{
 		Current += Events;
 
@@ -963,11 +974,9 @@ void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)
 			Current[i].c->Source = 0;
 		}
 
-		Current.Length(0);
-
-		new CalendarSourceGetEvents(s, e, CalendarSource::GetSources(), [this](auto Events)
+		new CalendarSourceGetEvents(App, s, e, CalendarSource::GetSources(), [this](auto Events)
 		{
-			Current += Events;
+			Current = Events;
 			Invalidate();
 		});
 		
@@ -1396,9 +1405,14 @@ void CalendarView::OnPaint(LSurface *pDC)
 						for (uint32_t i=0; i<Group.Length(); i++)
 						{
 							TimePeriod &t = *Group[i];
+							auto obj = t.c->GetObject();
 
-							double StartH = (double) t.s.Hours() + ((double)t.s.Minutes() / 60);
-							double EndH = (double) (t.e.Hours()?t.e.Hours():24) + ((double)t.e.Minutes() / 60);
+							auto allDay = obj ? obj->GetInt(FIELD_CAL_ALL_DAY) : false;
+							double StartH = (double) t.s.Hours() + ((double)t.s.Minutes() / 60), EndH;
+							if (t.e.IsSameDay(t.s) && t.e.Hours())
+								EndH = ((double)t.e.Hours()) + ((double)t.e.Minutes() / 60);
+							else
+								EndH = 24;
 
 							int x1 = p.x1 + (int)SX(4);
 							int x2 = p.x2 - (int)SX(5);
@@ -1410,6 +1424,13 @@ void CalendarView::OnPaint(LSurface *pDC)
 										(int)HourToY(StartH) - 1,
 										EndX,
 										(int)HourToY(EndH) - 3);
+
+							if (Vp.y2 < Vp.y1)
+							{
+								int asd=0;
+							}
+
+							LgiTrace("paint: %s %s\n", Vp.GetStr(), t.c->ToString().Get());
 
 							t.c->OnPaintView(pDC, Font, &Vp, &t);
 						}
@@ -2494,6 +2515,18 @@ void CalendarView::OnMouseMove(LMouse &m)
 		
 		#endif
 	}
+}
+
+bool CalendarView::OnMouseWheel(double Lines)
+{
+	if (!VScroll)
+		return false;
+
+	auto v = VScroll->Value();
+	v += (int) ceil(Lines / 3.0);
+	VScroll->Value(v);
+
+	return true;
 }
 
 LCursor CalendarView::GetCursor(int x, int y)

@@ -686,7 +686,7 @@ void Calendar::SummaryOfToday(ScribeWnd *App, std::function<void(LString)> Callb
 	if (!App || !Callback || !App->GetCalendarSources(Sources))
 		return;
 
-	new CalendarSourceGetEvents(Now, Next, Sources, [Callback](auto e)
+	new CalendarSourceGetEvents(App, Now, Next, Sources, [Callback](auto e)
 	{
 		if (!e.Length())
 		{
@@ -767,6 +767,15 @@ void Calendar::OnSerialize(bool Write)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+void TimePeriod::Set(CalendarSource *source, Calendar *cal, LDateTime start, LDateTime end)
+{
+	src = source;
+	c = cal;
+	s = start;
+	e = end;
+	ToLocal();
+}
+
 LString TimePeriod::ToString()
 {
 	LString str;
@@ -784,14 +793,14 @@ LString TimePeriod::ToString()
 Calendar::Calendar(ScribeWnd *app, LDataI *object) : Thing(app, object)
 {
 	DefaultObject(object);
-	Ui = 0;
-	TodoView = 0;
 	Source = 0;
 	SetImage(ICON_CALENDAR);
 }
 
 Calendar::~Calendar()
 {
+	CalendarView::OnDelete(this);
+	
 	DeleteObj(TodoView);
 	Reminders.Delete(this);
 }
@@ -806,7 +815,6 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 	LDateTime EndUtc = EndLocal;
 	StartUtc.ToUtc();
 	EndUtc.ToUtc();
-	// int StartTz = StartLocal.GetTimeZone();
 
 	TimePeriod w;
 	w.s = StartUtc;
@@ -817,272 +825,271 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 
 	TimePeriod BaseUtc;
 	LArray<TimePeriod> Periods;
-	if (GetField(FIELD_CAL_START_UTC, BaseUtc.s))
+
+	if (!GetField(FIELD_CAL_START_UTC, BaseUtc.s))
+		return false;
+
+	if (!GetField(FIELD_CAL_END_UTC, BaseUtc.e))
 	{
-		if (!GetField(FIELD_CAL_END_UTC, BaseUtc.e))
-		{
-			BaseUtc.e = BaseUtc.s;
-			BaseUtc.e.AddHours(1);
-		}
+		BaseUtc.e = BaseUtc.s;
+		BaseUtc.e.AddHours(1);
+	}
 
-		LArray<LDateTime::GDstInfo> Dst;
-		LDateTime::GetDaylightSavingsInfo(Dst, BaseUtc.s, &EndUtc);
-		LAssert(Dst.Length() > 0);
+	LArray<LDateTime::GDstInfo> Dst;
+	LDateTime::GetDaylightSavingsInfo(Dst, BaseUtc.s, &EndUtc);
+	LAssert(Dst.Length() > 0);
 
-		Periods.Add(BaseUtc);
+	Periods.Add(BaseUtc);
 
-		LDateTime BaseS = BaseUtc.s;
-		LDateTime::DstToLocal(Dst, BaseS);
-		auto BaseTz = BaseS.GetTimeZone();
+	LDateTime BaseS = BaseUtc.s;
+	LDateTime::DstToLocal(Dst, BaseS);
+	auto BaseTz = BaseS.GetTimeZone();
 
-		// Process recur rules
-		int Recur = 0;
-		if (GetField(FIELD_CAL_RECUR, Recur) &&
-			Recur)
-		{
-			LDateTime Diff = BaseUtc.e - BaseUtc.s;
+	int AllDay = false;
+	GetField(FIELD_CAL_ALL_DAY, AllDay);
 
-			int FilterFreq = -1;
-			int FilterInterval = 0;
-			int FilterDay = 0;
-			int FilterMonth = 0;
-			const char *FilterYear = 0;
-			const char *FilterPos = 0;
-			int EndType = 0;
-			LDateTime EndDate;
-			int EndCount = 0;
+	// Process recur rules
+	int Recur = 0;
+	if (GetField(FIELD_CAL_RECUR, Recur) &&
+		Recur)
+	{
+		LDateTime Diff = BaseUtc.e - BaseUtc.s;
+
+		int FilterFreq = -1;
+		int FilterInterval = 0;
+		int FilterDay = 0;
+		int FilterMonth = 0;
+		const char *FilterYear = 0;
+		const char *FilterPos = 0;
+		int EndType = 0;
+		LDateTime EndDate;
+		int EndCount = 0;
 			
-			GetField(FIELD_CAL_RECUR_FREQ, FilterFreq);
-			GetField(FIELD_CAL_RECUR_INTERVAL, FilterInterval);
-			GetField(FIELD_CAL_RECUR_FILTER_DAYS, FilterDay);
-			GetField(FIELD_CAL_RECUR_FILTER_MONTHS, FilterMonth);
-			GetField(FIELD_CAL_RECUR_FILTER_YEARS, FilterYear);
-			GetField(FIELD_CAL_RECUR_FILTER_POS, FilterPos);
-			GetField(FIELD_CAL_RECUR_END_TYPE, EndType);
-			GetField(FIELD_CAL_RECUR_END_DATE, EndDate);
-			GetField(FIELD_CAL_RECUR_END_COUNT, EndCount);
+		GetField(FIELD_CAL_RECUR_FREQ, FilterFreq);
+		GetField(FIELD_CAL_RECUR_INTERVAL, FilterInterval);
+		GetField(FIELD_CAL_RECUR_FILTER_DAYS, FilterDay);
+		GetField(FIELD_CAL_RECUR_FILTER_MONTHS, FilterMonth);
+		GetField(FIELD_CAL_RECUR_FILTER_YEARS, FilterYear);
+		GetField(FIELD_CAL_RECUR_FILTER_POS, FilterPos);
+		GetField(FIELD_CAL_RECUR_END_TYPE, EndType);
+		GetField(FIELD_CAL_RECUR_END_DATE, EndDate);
+		GetField(FIELD_CAL_RECUR_END_COUNT, EndCount);
 
-			LDateTime CurUtc = BaseUtc.s;
-			const char *Error = 0;
-			int Count = 0;
-			while (!Error)
+		LDateTime CurUtc = BaseUtc.s;
+		const char *Error = 0;
+		int Count = 0;
+		while (!Error)
+		{
+			// Advance the current date by interval * freq
+			switch (FilterFreq)
 			{
-				// Advance the current date by interval * freq
-				switch (FilterFreq)
-				{
-					case CalFreqDays:
-						CurUtc.AddDays(FilterInterval);
-						break;
-					case CalFreqWeeks:
-						CurUtc.AddDays(FilterInterval * 7);
-						break;
-					case CalFreqMonths:
-						CurUtc.AddMonths(FilterInterval);
-						break;
-					case CalFreqYears:
-						CurUtc.Year(CurUtc.Year() + FilterInterval);
-						break;
-					default:
-						Error = "Invalid freq.";
-						break;
-				}
-				
-				if (Error || CurUtc > EndUtc) break;
-				
-				// Check against end conditions
-				bool IsEnded = CurUtc > EndUtc;
-
-				switch (EndType)
-				{
-					case CalEndNever:
-						break;
-					case CalEndOnCount: // count
-						IsEnded = Count >= EndCount - 1;
-						break;
-					case CalEndOnDate: // date
-						IsEnded = CurUtc > EndDate;
-						break;
-					default: // error
-						IsEnded = true;
-						break;
-				}
-
-				if (IsEnded) break;
-
-				// Check against filters
-				LDateTime CurLocal = CurUtc;
-				LDateTime::DstToLocal(Dst, CurLocal);
-				
-				// This fixes the current time when it's in a different daylight saves zone.
-				// Otherwise you get events one hour or whatever out of position after DST starts
-				// or ends during the recurring set.
-				int DiffMins = BaseTz - CurLocal.GetTimeZone();
-				CurLocal.AddMinutes(DiffMins);
-
-				bool Show = true;
-				if (FilterDay)
-				{
-					int Day = CurLocal.DayOfWeek();
-					for (int i=0; i<7; i++)
-					{
-						int Bit = 1 << i;
-						if (Day == i &&
-							(FilterDay & Bit) == 0)
-						{
-							Show = false;
-							break;
-						}
-					}
-				}
-
-				if (Show && FilterMonth)
-				{
-					for (int i=0; i<12; i++)
-					{
-						int Bit = 1 << i;
-						if ((CurLocal.Month() == i + 1) &&
-							(FilterMonth & Bit) == 0)
-						{
-							Show = false;
-							break;
-						}
-					}
-				}
-
-				if (Show && ValidStr(FilterYear))
-				{
-					auto t = LString(FilterYear).SplitDelimit(" ,;:");
-					Show = false;
-					for (unsigned i=0; i<t.Length(); i++)
-					{
-						if (atoi(t[i]) == CurLocal.Year())
-						{
-							Show = true;
-							break;
-						}
-					}
-				}
-
-				if (Show && ValidStr(FilterPos))
-				{
-					LDateTime Sm = CurLocal;
-					Sm.Day(1);
-					int Off = Sm.DayOfWeek();
-					int Idx = (CurLocal.Day() + Off) / 7;
-
-					auto t = LString(FilterPos).SplitDelimit(" ,;:");
-					Show = false;
-					for (unsigned i=0; i<t.Length(); i++)
-					{
-						if (atoi(t[i]) == Idx)
-						{
-							Show = true;
-							break;
-						}
-					}
-				}
-
-				// Add to the periods to output
-				if (Show)
-				{
-					if (Periods.Length() >= MAX_RECUR)
-						break;
-
-					TimePeriod &p = Periods.New();
-					p.s = CurLocal;
-					p.e = CurLocal;
-					p.e.AddHours(Diff.Hours());
-					p.e.AddMinutes(Diff.Minutes());
-				}
-
-				Count++;
+				case CalFreqDays:
+					CurUtc.AddDays(FilterInterval);
+					break;
+				case CalFreqWeeks:
+					CurUtc.AddDays(FilterInterval * 7);
+					break;
+				case CalFreqMonths:
+					CurUtc.AddMonths(FilterInterval);
+					break;
+				case CalFreqYears:
+					CurUtc.Year(CurUtc.Year() + FilterInterval);
+					break;
+				default:
+					Error = "Invalid freq.";
+					break;
 			}
-		}
+				
+			if (Error || CurUtc > EndUtc) break;
+				
+			// Check against end conditions
+			bool IsEnded = CurUtc > EndUtc;
 
-		// Now process periods into multiday segments if needed
-		for (unsigned k=0; k<Periods.Length(); k++)
-		{
-			TimePeriod &n = Periods[k];
-			
-			if (!n.s.IsSameDay(n.e))
+			switch (EndType)
 			{
-				for (LDateTime i = n.s; true; i.AddDays(1))
+				case CalEndNever:
+					break;
+				case CalEndOnCount: // count
+					IsEnded = Count >= EndCount - 1;
+					break;
+				case CalEndOnDate: // date
+					IsEnded = CurUtc > EndDate;
+					break;
+				default: // error
+					IsEnded = true;
+					break;
+			}
+
+			if (IsEnded) break;
+
+			// Check against filters
+			LDateTime CurLocal = CurUtc;
+			LDateTime::DstToLocal(Dst, CurLocal);
+				
+			// This fixes the current time when it's in a different daylight saves zone.
+			// Otherwise you get events one hour or whatever out of position after DST starts
+			// or ends during the recurring set.
+			int DiffMins = BaseTz - CurLocal.GetTimeZone();
+			CurLocal.AddMinutes(DiffMins);
+
+			bool Show = true;
+			if (FilterDay)
+			{
+				int Day = CurLocal.DayOfWeek();
+				for (int i=0; i<7; i++)
 				{
-					if (i.IsSameDay(n.s))
+					int Bit = 1 << i;
+					if (Day == i &&
+						(FilterDay & Bit) == 0)
 					{
-						// Start day
-						TimePeriod t;
-						t.s = n.s;
-						t.e = n.s;
-						int h = t.e.Hours();
-						if (h > Calendar::WorkDayEnd)
-						{
-							t.e.Hours(23);
-							t.e.Minutes(59);
-							t.e.Seconds(59);
-						}
-						else
-						{
-							t.e.Hours(Calendar::WorkDayEnd);
-						}
-
-						if (t.Overlap(w))
-						{
-							t.c = this;
-							Times.Add(t);
-						}
-					}
-					else if (i.IsSameDay(n.e))
-					{
-						// End day
-						TimePeriod t;
-						t.s = n.e;
-						t.e = n.e;
-						int h = t.s.Hours();
-						if (h < Calendar::WorkDayStart)
-						{
-							t.s.Hours(0);
-							t.s.Minutes(0);
-							t.s.Seconds(0);
-						}
-						else
-						{
-							t.s.Hours(Calendar::WorkDayStart);
-						}
-
-						if (t.Overlap(w))
-						{
-							t.c = this;
-							Times.Add(t);
-						}
+						Show = false;
 						break;
+					}
+				}
+			}
+
+			if (Show && FilterMonth)
+			{
+				for (int i=0; i<12; i++)
+				{
+					int Bit = 1 << i;
+					if ((CurLocal.Month() == i + 1) &&
+						(FilterMonth & Bit) == 0)
+					{
+						Show = false;
+						break;
+					}
+				}
+			}
+
+			if (Show && ValidStr(FilterYear))
+			{
+				auto t = LString(FilterYear).SplitDelimit(" ,;:");
+				Show = false;
+				for (unsigned i=0; i<t.Length(); i++)
+				{
+					if (atoi(t[i]) == CurLocal.Year())
+					{
+						Show = true;
+						break;
+					}
+				}
+			}
+
+			if (Show && ValidStr(FilterPos))
+			{
+				LDateTime Sm = CurLocal;
+				Sm.Day(1);
+				int Off = Sm.DayOfWeek();
+				int Idx = (CurLocal.Day() + Off) / 7;
+
+				auto t = LString(FilterPos).SplitDelimit(" ,;:");
+				Show = false;
+				for (unsigned i=0; i<t.Length(); i++)
+				{
+					if (atoi(t[i]) == Idx)
+					{
+						Show = true;
+						break;
+					}
+				}
+			}
+
+			// Add to the periods to output
+			if (Show)
+			{
+				if (Periods.Length() >= MAX_RECUR)
+					break;
+
+				TimePeriod &p = Periods.New();
+				p.s = CurLocal;
+				p.e = CurLocal;
+				p.e.AddHours(Diff.Hours());
+				p.e.AddMinutes(Diff.Minutes());
+			}
+
+			Count++;
+		}
+	}
+
+	// Now process periods into multiday segments if needed
+	for (unsigned k=0; k<Periods.Length(); k++)
+	{
+		TimePeriod &n = Periods[k];
+		
+		n.s.ToLocal();
+		n.e.ToLocal();
+
+		if (!n.s.IsSameDay(n.e))
+		{
+			for (LDateTime i = n.s; true; i.AddDays(1))
+			{
+				if (i.IsSameDay(n.s))
+				{
+					// Start day
+					TimePeriod t;
+					t.s = n.s;
+					t.e = n.s;
+					int h = t.e.Hours();
+					if (h > Calendar::WorkDayEnd)
+					{
+						t.e = t.e.EndOfDay();
 					}
 					else
 					{
-						// Middle day
-						TimePeriod t;
-						t.s = i;
-						t.s.Hours(Calendar::WorkDayStart);
-						t.s.Minutes(0);
-						t.s.Seconds(0);
-						t.e = i;
 						t.e.Hours(Calendar::WorkDayEnd);
 						t.e.Minutes(0);
 						t.e.Seconds(0);
+					}
 
-						if (t.Overlap(w))
-						{
-							t.c = this;
-							Times.Add(t);
-						}
+					if (t.Overlap(w))
+					{
+						t.c = this;
+						Times.Add(t);
+					}
+				}
+				else if (i.IsSameDay(n.e))
+				{
+					// End day
+					TimePeriod t;
+					t.s = n.e;
+					t.e = n.e;
+					int h = t.s.Hours();
+					if (h < Calendar::WorkDayStart)
+						t.s.Hours(0);
+					else
+						t.s.Hours(Calendar::WorkDayStart);
+					t.s.Minutes(0);
+					t.s.Seconds(0);
+
+					if (t.Overlap(w))
+					{
+						t.c = this;
+						Times.Add(t);
+					}
+					break;
+				}
+				else
+				{
+					// Middle day
+					TimePeriod t;
+					t.s = i.StartOfDay();
+					t.s.Hours(Calendar::WorkDayStart);
+					t.e = i.StartOfDay();
+					t.e.Hours(Calendar::WorkDayEnd);
+
+					if (t.Overlap(w))
+					{
+						t.c = this;
+						Times.Add(t);
 					}
 				}
 			}
-			else if (n.Overlap(w))
-			{
-				n.c = this;
-				Times.Add(n);
-			}
+		}
+		else if (n.Overlap(w))
+		{
+			n.c = this;
+			Times.Add(n);
 		}
 	}
 
@@ -1100,6 +1107,17 @@ void Calendar::SetCalType(CalendarType Type)
 {
 	SetField(FIELD_CAL_TYPE, (int)Type);
 	SetImage(Type == CalTodo ? ICON_TODO : ICON_CALENDAR);
+}
+
+LString Calendar::ToString()
+{
+	LString s;
+	auto obj = GetObject();
+	s.Printf("Calendar(%s,%s,%s)",
+		obj ? obj->GetStr(FIELD_CAL_SUBJECT) : "#NoObject",
+		obj ? obj->GetDate(FIELD_CAL_START_UTC)->Get().Get() : NULL,
+		obj ? obj->GetDate(FIELD_CAL_END_UTC)->Get().Get() : NULL);
+	return s;
 }
 
 LColour Calendar::GetColour()
@@ -1396,9 +1414,12 @@ void Calendar::DoContextMenu(LMouse &m, LView *Parent)
 			for (unsigned n = 0; n<CalendarSource::GetSources().Length(); n++)
 			{
 				char m[256];
-				CalendarSource *Cs = CalendarSource::GetSources().ItemAt(n);
-				sprintf_s(m, sizeof(m), "Move to '%s'\n", Cs->GetName());
-				s.Sub->AppendItem(m, IDM_MOVE_TO + n++, Source != Cs);
+				auto Cs = CalendarSource::GetSources().ItemAt(n);
+				if (Cs->GetName() && Cs->IsWritable())
+				{
+					sprintf_s(m, sizeof(m), "Move to '%s'\n", Cs->GetName());
+					s.Sub->AppendItem(m, IDM_MOVE_TO + n, Source != Cs);
+				}
 			}
 		}
 
@@ -2923,6 +2944,18 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDCANCEL:
 		{
+			if (Item)
+			{
+				// Is the user cancelling an object that hasn't been saved yet?
+				// If so delete the object.
+				auto obj = Item->GetObject();
+				if (obj && obj->IsOrphan())
+				{
+					Item->DecRef();
+					Item = NULL;
+				}
+			}
+
 			Quit();
 			break;
 		}

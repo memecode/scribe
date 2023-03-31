@@ -96,7 +96,7 @@ public:
 	// LDataI impl
 	uint32_t Type() { return MAGIC_NONE; }
 	bool IsOnDisk() { return false; }
-	bool IsOrphan() { return Store != NULL; }
+	bool IsOrphan() { return Store == NULL || Parent == NULL; }
 	LDataStoreI *GetStore() { return Store; }
 
 	// Stubs
