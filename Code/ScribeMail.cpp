@@ -9309,9 +9309,7 @@ void Mail::OnPaint(LItem::ItemPaintCtx &InCtx)
 				for (i=0; Txt[i]; i++)
 				{
 					if (Txt[i] < ' ')
-					{
 						Txt[i] = ' ';
-					}
 				}
 
 				auto TxtLen = StrlenW(Txt);

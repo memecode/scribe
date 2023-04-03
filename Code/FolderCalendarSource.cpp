@@ -267,17 +267,12 @@ bool FolderCalendarSource::GetEvents(const LDateTime StartTs,
 		LDateTime End = EndTs;
 		End.ToUtc();
 
-		LArray<Calendar*> Search;
-
 		for (auto t : Folder->Items)
 		{
 			Calendar *c = t->IsCalendar();
-			if (c)
-				Search.Add(c);
-		}
+			if (!c)
+				continue;
 
-		for (auto c: Search)
-		{
 			LDateTime s;
 			if (c->GetCalType() == CalEvent &&
 				c->GetField(FIELD_CAL_START_UTC, s))

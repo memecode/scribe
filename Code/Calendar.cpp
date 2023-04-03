@@ -1012,7 +1012,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 		}
 	}
 
-	// Now process periods into multiday segments if needed
+	// Now process periods into 1 per day segments if needed
 	for (unsigned k=0; k<Periods.Length(); k++)
 	{
 		TimePeriod &n = Periods[k];
