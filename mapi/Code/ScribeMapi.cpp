@@ -1,8 +1,10 @@
 #include "lgi/common/Lgi.h"
-#include "mapi.h"
-#include "..\..\Code\Scribe.h"
-#include "..\..\Code\ScribeListAddr.h"
 #include "lgi/common/OptionsFile.h"
+
+#include "mapi.h"
+
+#include "../../src/Scribe.h"
+#include "../../src/ScribeListAddr.h"
 
 #define LOG_FILE_NAME		"ScribeMapiLog.txt"
 

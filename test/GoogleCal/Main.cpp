@@ -1,5 +1,5 @@
-#include "Lgi.h"
-#include "LTextLog.h"
+#include "lgi/common/Lgi.h"
+#include "lgi/common/TextLog.h"
 
 const char *AppName = "Google Cal Test";
 

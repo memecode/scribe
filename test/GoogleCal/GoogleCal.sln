@@ -1,44 +1,35 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 14 for Windows Desktop
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33027.164
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GoogleCal", "GoogleCal.vcxproj", "{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lgi", "..\..\..\..\Lgi\trunk\Lgi_vs2015.vcxproj", "{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lgi", "..\..\..\..\Lgi\trunk\Lgi_vs2019.vcxproj", "{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
-		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
-		ReleaseNoOptimize|Win32 = ReleaseNoOptimize|Win32
 		ReleaseNoOptimize|x64 = ReleaseNoOptimize|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Debug|Win32.Build.0 = Debug|Win32
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Debug|x64.ActiveCfg = Debug|Win32
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Release|Win32.ActiveCfg = Release|Win32
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Release|Win32.Build.0 = Release|Win32
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Release|x64.ActiveCfg = Release|Win32
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.ReleaseNoOptimize|Win32.ActiveCfg = Release|Win32
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.ReleaseNoOptimize|Win32.Build.0 = Release|Win32
-		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.ReleaseNoOptimize|x64.ActiveCfg = Release|Win32
-		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.Debug|Win32.Build.0 = Debug|Win32
+		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Debug|x64.ActiveCfg = Debug|x64
+		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Debug|x64.Build.0 = Debug|x64
+		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Release|x64.ActiveCfg = Release|x64
+		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.Release|x64.Build.0 = Release|x64
+		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.ReleaseNoOptimize|x64.ActiveCfg = Release|x64
+		{C4B39C48-D1DF-4DBF-AAC7-A21D56DAF2EC}.ReleaseNoOptimize|x64.Build.0 = Release|x64
 		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.Debug|x64.ActiveCfg = Debug|x64
 		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.Debug|x64.Build.0 = Debug|x64
-		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.Release|Win32.ActiveCfg = Release|Win32
-		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.Release|Win32.Build.0 = Release|Win32
 		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.Release|x64.ActiveCfg = Release|x64
 		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.Release|x64.Build.0 = Release|x64
-		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.ReleaseNoOptimize|Win32.ActiveCfg = ReleaseNoOptimize|Win32
-		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.ReleaseNoOptimize|Win32.Build.0 = ReleaseNoOptimize|Win32
 		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.ReleaseNoOptimize|x64.ActiveCfg = ReleaseNoOptimize|x64
 		{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}.ReleaseNoOptimize|x64.Build.0 = ReleaseNoOptimize|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BFD16BC3-F612-485A-81BD-1AF6EB6971E3}
 	EndGlobalSection
 EndGlobal

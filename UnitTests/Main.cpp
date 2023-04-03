@@ -3,7 +3,7 @@
 #include "lgi/common/Net.h"
 #include "lgi/common/Store3.h"
 
-#include "../Code/ScribeDefs.h"
+#include "../src/ScribeDefs.h"
 #include "UnitTest.h"
 
 int Status = 0;

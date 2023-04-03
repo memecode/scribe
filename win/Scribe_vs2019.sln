@@ -6,7 +6,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scribe", "Scribe_vs2019.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lgi", "..\..\..\lgi\trunk\Lgi_vs2019.vcxproj", "{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScribeMapi", "..\ScribeMapi\ScribeMapi_vs2019.vcxproj", "{148574CE-4DA6-4B8A-9EC6-FF68ADC2A046}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mapi", "..\mapi\ScribeMapi_vs2019.vcxproj", "{148574CE-4DA6-4B8A-9EC6-FF68ADC2A046}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LgiStatic", "..\..\..\Lgi\trunk\LgiStatic_vs2019.vcxproj", "{DE6D97B9-A194-401B-A8A4-83110C56D572}"
 EndProject

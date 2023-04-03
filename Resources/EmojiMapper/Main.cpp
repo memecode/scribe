@@ -313,7 +313,8 @@ private:
 	
 	public:
 		HttpThread(HttpEvents *events) :
-			LThread("HttpThread")
+			LThread("HttpThread.Thread"),
+			LMutex("HttpThread.Mutex")
 		{
 			Events = events;
 			Busy = false;
@@ -1018,12 +1019,12 @@ public:
 		IconsDown = MAX(IconsDown, 1);
 		
 		Src = c;
-		Src.Size(10, 10);
+		Src.Inset(10, 10);
 		Src.x2 = Src.x1 + (ICONS_ACROSS * IconCell) - 1;
 		Src.y2 = Src.y1 + (IconsDown * IconCell) - 1;
 		
 		Dst = c;
-		Dst.Size(10, 10);
+		Dst.Inset(10, 10);
 		Dst.x1 = Src.x2 + 10;
 		Tbl->SetPos(Dst);
 		
@@ -1050,7 +1051,7 @@ public:
 					pDC->Colour(Red);
 					pDC->Box(&r);
 				}
-				r.Size(1, 1);
+				r.Inset(1, 1);
 				
 				if (SrcSelect == i)
 				{
