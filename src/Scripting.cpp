@@ -282,9 +282,9 @@ LString LScribeScript::GetIncludeFile(const char *FileName)
 {
 	LString Path;
 	const char *Search[] = {
-		"./Scripts",
-		"../Scripts",
-		"../../Scripts",
+		"./scripts",
+		"../scripts",
+		"../../scripts",
 		NULL
 	};
 	LFile::Path p(ScribeResourcePath());

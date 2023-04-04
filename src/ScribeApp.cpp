@@ -1552,13 +1552,13 @@ void ScribeWnd::Construct3()
 			// Run scripts in './Scripts' folder
 			char s[MAX_PATH_LEN];
 			LMakePath(s, sizeof(s), ScribeResourcePath(),
-				"Scripts");
+				"scripts");
 			if (!LDirExists(s))
 				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
 					#if defined(LINUX) || defined(WINDOWS)
 					"..\\"
 					#endif
-					"Scripts");
+					"scripts");
 			if (!LDirExists(s))
 				LgiTrace("%s:%i - Error: the scripts folder '%s' doesn't exist.\n", _FL, s);
 			else
@@ -2540,7 +2540,7 @@ char *ScribeWnd::GetUiTags()
 
 void ScribeWnd::OnCreate()
 {
-	LgiTrace("ScribeWnd::OnCreate. ScribeState=%i\n", ScribeState);
+	// LgiTrace("ScribeWnd::OnCreate. ScribeState=%i\n", ScribeState);
 	if (IsAttached() && ScribeState == ScribeConstructed)
 	{
 		ScribeState = ScribeInitializing;

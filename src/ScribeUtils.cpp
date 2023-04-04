@@ -65,9 +65,9 @@ const char *ScribeResourcePath()
 		
 		#if !defined(MAC)
 		const char *Paths[] = {
-			"./Resources",
-			"../Resources",
-			"../../Resources",
+			"./resources",
+			"../resources",
+			"../../resources",
 		};
 		bool Found = false;
 		for (unsigned i=0; i<CountOf(Paths); i++)
