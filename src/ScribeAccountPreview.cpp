@@ -16,7 +16,7 @@
 #include "Scribe.h"
 #include "ScribePrivate.h"
 #include "ScribeAccountPreview.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 #include "lgi/common/Button.h"
 #include "lgi/common/List.h"
 #include "lgi/common/LgiRes.h"

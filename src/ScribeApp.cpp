@@ -69,8 +69,8 @@
 #include "ScribeAccountPreview.h"
 #include "Encryption/GnuPG.h"
 #include "Store3Webdav/WebdavStore.h"
-#include "../Resources/resdefs.h"
-#include "../UnitTests/UnitTest.h"
+#include "resdefs.h"
+#include "../unittests/UnitTest.h"
 #include "../src/common/Coding/ScriptingPriv.h"
 
 #define DEBUG_STORE_EVENTS			0

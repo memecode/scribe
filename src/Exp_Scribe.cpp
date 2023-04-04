@@ -8,7 +8,7 @@
 #include "lgi/common/FileSelect.h"
 
 #include "ScribeFolderSelect.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 #include "FolderTask.h"
 
 #define OnError(...) \

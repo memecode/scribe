@@ -39,11 +39,11 @@ ifeq ($(Build),Debug)
 		-L../../../lgi/trunk/$(BuildDir)
 	Inc =  \
 		`pkg-config --cflags gtk+-3.0` \
-		-I../Utils/Tables \
-		-I../Resources \
-		-I../Code/Store3Webdav \
-		-I../Code/Sqlite \
-		-I../Code \
+		-I../utils/Tables \
+		-I../src/Store3Webdav \
+		-I../src/Sqlite \
+		-I../src \
+		-I../resources \
 		-I../../libs/libchardet/src \
 		-I../../libs/libchardet/include \
 		-I../../libs/aspell-0.60.6.1/interfaces/cc \
@@ -73,11 +73,11 @@ else
 		-L../../../lgi/trunk/$(BuildDir)
 	Inc =  \
 		`pkg-config --cflags gtk+-3.0` \
-		-I../Utils/Tables \
-		-I../Resources \
-		-I../Code/Store3Webdav \
-		-I../Code/Sqlite \
-		-I../Code \
+		-I../utils/Tables \
+		-I../src/Store3Webdav \
+		-I../src/Sqlite \
+		-I../src \
+		-I../resources \
 		-I../../libs/libchardet/src \
 		-I../../libs/libchardet/include \
 		-I../../libs/aspell-0.60.6.1/interfaces/cc \
@@ -89,88 +89,88 @@ else
 endif
 
 # Dependencies
-Source =	../Utils/Tables/MailFlags.c \
-			../Code/TitlePage.cpp \
-			../Code/Store3Webdav/WebdavThread.cpp \
-			../Code/Store3Webdav/WebdavStore.cpp \
-			../Code/Store3Webdav/WebdavFolder.cpp \
-			../Code/Store3Webdav/WebdavContact.cpp \
-			../Code/Store3Webdav/WebdavCalendar.cpp \
-			../Code/Store3Mail3/Mail3Store.cpp \
-			../Code/Store3Mail3/Mail3Mail.cpp \
-			../Code/Store3Mail3/Mail3Group.cpp \
-			../Code/Store3Mail3/Mail3Folder.cpp \
-			../Code/Store3Mail3/Mail3Filter.cpp \
-			../Code/Store3Mail3/Mail3Contact.cpp \
-			../Code/Store3Mail3/Mail3Calendar.cpp \
-			../Code/Store3Mail3/Mail3Attachment.cpp \
-			../Code/Store3Imap/ScribeImap_Thread.cpp \
-			../Code/Store3Imap/ScribeImap_Store.cpp \
-			../Code/Store3Imap/ScribeImap_Mail.cpp \
-			../Code/Store3Imap/ScribeImap_Folder.cpp \
-			../Code/Store3Imap/ScribeImap_Attachment.cpp \
-			../Code/Store3Common.cpp \
-			../Code/Sqlite/v3.6.14/sqlite3.c \
-			../Code/SecurityDlg.cpp \
-			../Code/SearchView.cpp \
-			../Code/Scripting.cpp \
-			../Code/ScribeUtils.cpp \
-			../Code/ScribeUi.cpp \
-			../Code/ScribeThing.cpp \
-			../Code/ScribeStatusPanel.cpp \
-			../Code/ScribeSockets.cpp \
-			../Code/ScribeSendReceive.cpp \
-			../Code/ScribeRepair.cpp \
-			../Code/ScribePassword.cpp \
-			../Code/ScribePageSetup.cpp \
-			../Code/ScribeMain.cpp \
-			../Code/ScribeMail.cpp \
-			../Code/ScribeListAddr.cpp \
-			../Code/ScribeLangDlg.cpp \
-			../Code/ScribeItemList.cpp \
-			../Code/ScribeGroup.cpp \
-			../Code/ScribeFolderTree.cpp \
-			../Code/ScribeFolderSelect.cpp \
-			../Code/ScribeFolderProp.cpp \
-			../Code/ScribeFolderDlg.cpp \
-			../Code/ScribeFolder.cpp \
-			../Code/ScribeFinder.cpp \
-			../Code/ScribeFilter.cpp \
-			../Code/ScribeContact.cpp \
-			../Code/ScribeAttachment.cpp \
-			../Code/ScribeApp.cpp \
-			../Code/ScribeAccountUI.cpp \
-			../Code/ScribeAccountPreview.cpp \
-			../Code/ScribeAccount.cpp \
-			../Code/ScribeAbout.cpp \
-			../Code/ReplicateDlg.cpp \
-			../Code/RemoteCalendarSource.cpp \
-			../Code/PrintPreview.cpp \
-			../Code/PrintContext.cpp \
-			../Code/PreviewPanel.cpp \
-			../Code/OptionsDlg.cpp \
-			../Code/ObjectInspector.cpp \
-			../Code/NewMailDlg.cpp \
-			../Code/MContainer.cpp \
-			../Code/ManageMailStores.cpp \
-			../Code/ImpExp_Mbox.cpp \
-			../Code/Imp_OutlookExpress.cpp \
-			../Code/Imp_NetscapeContacts.cpp \
-			../Code/Imp_Mozilla.cpp \
-			../Code/Imp_Eudora.cpp \
-			../Code/Imp_Eml.cpp \
-			../Code/Imp_CsvContacts.cpp \
-			../Code/HtmlToText.cpp \
-			../Code/GBTreeWordStore.cpp \
-			../Code/FolderCalendarSource.cpp \
-			../Code/Exp_Scribe.cpp \
-			../Code/Encryption/GnuPG.cpp \
-			../Code/Components.cpp \
-			../Code/CalendarView.cpp \
-			../Code/Calendar.cpp \
-			../Code/BayesianFilter.cpp \
-			../Code/BayesDlg.cpp \
-			../Code/AddressSelect.cpp \
+Source =	../utils/Tables/MailFlags.c \
+			../src/TitlePage.cpp \
+			../src/Store3Webdav/WebdavThread.cpp \
+			../src/Store3Webdav/WebdavStore.cpp \
+			../src/Store3Webdav/WebdavFolder.cpp \
+			../src/Store3Webdav/WebdavContact.cpp \
+			../src/Store3Webdav/WebdavCalendar.cpp \
+			../src/Store3Mail3/Mail3Store.cpp \
+			../src/Store3Mail3/Mail3Mail.cpp \
+			../src/Store3Mail3/Mail3Group.cpp \
+			../src/Store3Mail3/Mail3Folder.cpp \
+			../src/Store3Mail3/Mail3Filter.cpp \
+			../src/Store3Mail3/Mail3Contact.cpp \
+			../src/Store3Mail3/Mail3Calendar.cpp \
+			../src/Store3Mail3/Mail3Attachment.cpp \
+			../src/Store3Imap/ScribeImap_Thread.cpp \
+			../src/Store3Imap/ScribeImap_Store.cpp \
+			../src/Store3Imap/ScribeImap_Mail.cpp \
+			../src/Store3Imap/ScribeImap_Folder.cpp \
+			../src/Store3Imap/ScribeImap_Attachment.cpp \
+			../src/Store3Common.cpp \
+			../src/Sqlite/v3.6.14/sqlite3.c \
+			../src/SecurityDlg.cpp \
+			../src/SearchView.cpp \
+			../src/Scripting.cpp \
+			../src/ScribeUtils.cpp \
+			../src/ScribeUi.cpp \
+			../src/ScribeThing.cpp \
+			../src/ScribeStatusPanel.cpp \
+			../src/ScribeSockets.cpp \
+			../src/ScribeSendReceive.cpp \
+			../src/ScribeRepair.cpp \
+			../src/ScribePassword.cpp \
+			../src/ScribePageSetup.cpp \
+			../src/ScribeMain.cpp \
+			../src/ScribeMail.cpp \
+			../src/ScribeListAddr.cpp \
+			../src/ScribeLangDlg.cpp \
+			../src/ScribeItemList.cpp \
+			../src/ScribeGroup.cpp \
+			../src/ScribeFolderTree.cpp \
+			../src/ScribeFolderSelect.cpp \
+			../src/ScribeFolderProp.cpp \
+			../src/ScribeFolderDlg.cpp \
+			../src/ScribeFolder.cpp \
+			../src/ScribeFinder.cpp \
+			../src/ScribeFilter.cpp \
+			../src/ScribeContact.cpp \
+			../src/ScribeAttachment.cpp \
+			../src/ScribeApp.cpp \
+			../src/ScribeAccountUI.cpp \
+			../src/ScribeAccountPreview.cpp \
+			../src/ScribeAccount.cpp \
+			../src/ScribeAbout.cpp \
+			../src/ReplicateDlg.cpp \
+			../src/RemoteCalendarSource.cpp \
+			../src/PrintPreview.cpp \
+			../src/PrintContext.cpp \
+			../src/PreviewPanel.cpp \
+			../src/OptionsDlg.cpp \
+			../src/ObjectInspector.cpp \
+			../src/NewMailDlg.cpp \
+			../src/MContainer.cpp \
+			../src/ManageMailStores.cpp \
+			../src/ImpExp_Mbox.cpp \
+			../src/Imp_OutlookExpress.cpp \
+			../src/Imp_NetscapeContacts.cpp \
+			../src/Imp_Mozilla.cpp \
+			../src/Imp_Eudora.cpp \
+			../src/Imp_Eml.cpp \
+			../src/Imp_CsvContacts.cpp \
+			../src/HtmlToText.cpp \
+			../src/GBTreeWordStore.cpp \
+			../src/FolderCalendarSource.cpp \
+			../src/Exp_Scribe.cpp \
+			../src/Encryption/GnuPG.cpp \
+			../src/Components.cpp \
+			../src/CalendarView.cpp \
+			../src/Calendar.cpp \
+			../src/BayesianFilter.cpp \
+			../src/BayesDlg.cpp \
+			../src/AddressSelect.cpp \
 			../../libs/Btree/offsetlist.c \
 			../../libs/Btree/hashtable.c \
 			../../libs/Btree/gbtree.cpp \
@@ -468,6 +468,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/include/lgi/common/DragAndDrop.h \
 	../../../lgi/trunk/include/lgi/common/DropFiles.h \
 	../../../lgi/trunk/include/lgi/common/Edit.h \
+	../../../lgi/trunk/include/lgi/common/Emoji.h \
 	../../../lgi/trunk/include/lgi/common/Error.h \
 	../../../lgi/trunk/include/lgi/common/EventTargetThread.h \
 	../../../lgi/trunk/include/lgi/common/File.h \
@@ -725,13 +726,13 @@ cleanall :
 	+make -C "../../../lgi/trunk" -f "Makefile.linux" clean
 
 VPATH=$(BuildDir) \
-	../Utils/Tables \
-	../Code/Store3Webdav \
-	../Code/Store3Mail3 \
-	../Code/Store3Imap \
-	../Code/Sqlite/v3.6.14 \
-	../Code/Encryption \
-	../Code \
+	../utils/Tables \
+	../src/Store3Webdav \
+	../src/Store3Mail3 \
+	../src/Store3Imap \
+	../src/Sqlite/v3.6.14 \
+	../src/Encryption \
+	../src \
 	../../libs/Btree \
 	../../../lgi/trunk/src/common/Widgets/Editor \
 	../../../lgi/trunk/src/common/Widgets \

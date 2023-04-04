@@ -17,7 +17,7 @@
 #include "Scribe.h"
 #include "lgi/common/Edit.h"
 #include "ScribeAccountUI.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 #include "lgi/common/LgiRes.h"
 #include "ScribeFolderSelect.h"
 

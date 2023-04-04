@@ -1,6 +1,6 @@
 #include "lgi/common/Lgi.h"
 #include "Scribe.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 #include "Store3Imap/ScribeImap.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/FileSelect.h"

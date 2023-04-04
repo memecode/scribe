@@ -23,7 +23,7 @@
 
 #include "CalendarView.h"
 #include "PrintContext.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 #include "resource.h"
 #include "AddressSelect.h"
 #include "ObjectInspector.h"

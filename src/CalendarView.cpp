@@ -20,7 +20,7 @@
 #include "CalendarView.h"
 #include "ScribePageSetup.h"
 #include "Store3Webdav/WebdavStore.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 #include "resource.h"
 
 char ScribeCalendarObject[] =	"com.memecode.Calendar";

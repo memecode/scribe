@@ -1,5 +1,5 @@
 #include "Scribe.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 
 /////////////////////////////////////////////////////////////
 class LNewMailItem : public LListItem

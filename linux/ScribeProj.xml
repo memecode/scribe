@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Project>
 	<Node Name="Encryption" Type="1" Platforms="15" Open="0" Id="1">
-		<Node File="../Code/Encryption/GnuPG.cpp" Type="2" Platforms="15" />
-		<Node File="../Code/Encryption/GnuPG.h" Type="3" Platforms="15" />
+		<Node File="../src/Encryption/GnuPG.cpp" Type="2" Platforms="15" />
+		<Node File="../src/Encryption/GnuPG.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Gdc2" Type="1" Open="0" Platforms="7" Id="2">
 		<Node File="../../../lgi/trunk/src/common/Gdc2/Filters/Gif.cpp" Type="2" Platforms="15" />
@@ -34,30 +34,30 @@
 		</Node>
 		<Node Name="WordStore" Type="1" Platforms="15" Id="1">
 			<Node File="../../../lgi/trunk/include/lgi/common/WordStore.h" Type="3" Platforms="15" />
-			<Node File="../Code/GBTreeWordStore.cpp" Type="2" Platforms="15" />
+			<Node File="../src/GBTreeWordStore.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node File="../Code/HtmlToText.cpp" Type="2" Platforms="15" />
+		<Node File="../src/HtmlToText.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/SegmentTree.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/SharedMemory.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/TimeZone.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/Tnef.cpp" Type="2" Platforms="15" />
 	</Node>
 	<Node Name="Help Files" Type="1" Open="0" Platforms="7" Id="5">
-		<Node File="../Help/calendar.html" Type="3" Platforms="7" />
-		<Node File="../Help/contacts.html" Type="3" Platforms="7" />
-		<Node File="../Help/email.html" Type="3" Platforms="7" />
-		<Node File="../Help/features.html" Type="3" Platforms="7" />
-		<Node File="../Help/filters.html" Type="3" Platforms="7" />
-		<Node File="../Help/help.css" Type="3" Platforms="7" />
-		<Node File="../Help/import.html" Type="3" Platforms="7" />
+		<Node File="../help/calendar.html" Type="3" Platforms="7" />
+		<Node File="../help/contacts.html" Type="3" Platforms="7" />
+		<Node File="../help/email.html" Type="3" Platforms="7" />
+		<Node File="../help/features.html" Type="3" Platforms="7" />
+		<Node File="../help/filters.html" Type="3" Platforms="7" />
+		<Node File="../help/help.css" Type="3" Platforms="7" />
+		<Node File="../help/import.html" Type="3" Platforms="7" />
 		<Node File="../../../lgi/trunk/docs/scripting/index.html" Type="3" Platforms="7" />
-		<Node File="../Help/install.html" Type="3" Platforms="7" />
-		<Node File="../Help/intro.html" Type="3" Platforms="7" />
-		<Node File="../Help/menu.html" Type="3" Platforms="7" />
-		<Node File="../Help/plugins.html" Type="3" Platforms="7" />
-		<Node File="../Help/print.html" Type="3" Platforms="7" />
-		<Node File="../Help/scripting.html" Type="7" Platforms="15" />
-		<Node File="../Help/ui.html" Type="3" Platforms="7" />
+		<Node File="../help/install.html" Type="3" Platforms="7" />
+		<Node File="../help/intro.html" Type="3" Platforms="7" />
+		<Node File="../help/menu.html" Type="3" Platforms="7" />
+		<Node File="../help/plugins.html" Type="3" Platforms="7" />
+		<Node File="../help/print.html" Type="3" Platforms="7" />
+		<Node File="../help/scripting.html" Type="7" Platforms="15" />
+		<Node File="../help/ui.html" Type="3" Platforms="7" />
 	</Node>
 	<Node Name="INet" Type="1" Open="0" Platforms="7" Id="6">
 		<Node File="../../../lgi/trunk/src/common/Net/HttpTools.cpp" Type="2" Platforms="15" />
@@ -110,58 +110,58 @@
 		<Node File="../../../lgi/trunk/src/common/Text/XmlTreeUi.cpp" Type="2" Platforms="15" />
 	</Node>
 	<Node Name="Resource Files" Type="1" Open="0" Platforms="7" Id="12">
-		<Node File="../Stuff/Resources/app.ico" Type="6" Platforms="7" />
-		<Node File="../Stuff/Resources/Blank.ico" Type="6" Platforms="7" />
-		<Node File="../Stuff/Resources/calender.ico" Type="6" Platforms="7" />
-		<Node File="../Stuff/Resources/contact.ico" Type="6" Platforms="7" />
-		<Node File="../Stuff/Resources/filter.ico" Type="6" Platforms="7" />
-		<Node File="../Stuff/Resources/Mail.ico" Type="6" Platforms="7" />
-		<Node File="../Resources/resdefs.h" Type="3" Platforms="15" />
-		<Node File="../Code/Resource.rc" Type="3" Platforms="7" />
-		<Node File="../Resources/Scribe.lr8" Type="5" Platforms="7" />
-		<Node File="../Stuff/Resources/Small.ico" Type="6" Platforms="7" />
+		<Node File="../stuff/Resources/app.ico" Type="6" Platforms="7" />
+		<Node File="../stuff/Resources/Blank.ico" Type="6" Platforms="7" />
+		<Node File="../stuff/Resources/calender.ico" Type="6" Platforms="7" />
+		<Node File="../stuff/Resources/contact.ico" Type="6" Platforms="7" />
+		<Node File="../stuff/Resources/filter.ico" Type="6" Platforms="7" />
+		<Node File="../stuff/Resources/Mail.ico" Type="6" Platforms="7" />
+		<Node File="../resources/resdefs.h" Type="3" Platforms="15" />
+		<Node File="../src/Resource.rc" Type="3" Platforms="7" />
+		<Node File="../resources/Scribe.lr8" Type="5" Platforms="7" />
+		<Node File="../stuff/Resources/Small.ico" Type="6" Platforms="7" />
 	</Node>
 	<Node Name="Scribe" Type="1" Open="1" Platforms="7" Id="13">
 		<Node Name="Accounts" Type="1" Open="0" Platforms="7" Id="14">
-			<Node File="../Code/ScribeAccount.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeAccountPreview.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeAccountPreview.h" Type="3" Platforms="15" />
-			<Node File="../Code/ScribeAccountUI.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeSendReceive.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeStatusPanel.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeStatusPanel.h" Type="3" Platforms="15" />
+			<Node File="../src/ScribeAccount.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeAccountPreview.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeAccountPreview.h" Type="3" Platforms="15" />
+			<Node File="../src/ScribeAccountUI.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeSendReceive.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeStatusPanel.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeStatusPanel.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Application" Type="1" Open="0" Platforms="7" Id="15">
-			<Node File="../Resources/About.html" Type="3" Platforms="15" />
-			<Node File="../Code/DomType.h" Type="3" Platforms="15" />
-			<Node File="../Code/DomTypeValues.h" Type="3" Platforms="15" />
-			<Node File="../Resources/Title.html" Type="3" Platforms="15" />
-			<Node File="../Code/ScribeAbout.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeApp.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeMain.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeRepair.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeSharedMem.h" Type="3" Platforms="15" />
-			<Node File="../Code/ScribeSockets.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeThing.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeUtils.cpp" Type="2" Platforms="15" />
+			<Node File="../resources/About.html" Type="3" Platforms="15" />
+			<Node File="../src/DomType.h" Type="3" Platforms="15" />
+			<Node File="../src/DomTypeValues.h" Type="3" Platforms="15" />
+			<Node File="../resources/Title.html" Type="3" Platforms="15" />
+			<Node File="../src/ScribeAbout.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeApp.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeMain.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeRepair.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeSharedMem.h" Type="3" Platforms="15" />
+			<Node File="../src/ScribeSockets.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeThing.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeUtils.cpp" Type="2" Platforms="15" />
 		</Node>
 		<Node Name="Components" Type="1" Platforms="15" Open="0" Id="16">
-			<Node File="../Code/Components.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/Components.h" Type="3" Platforms="15" />
+			<Node File="../src/Components.cpp" Type="2" Platforms="15" />
+			<Node File="../src/Components.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Import / Export" Type="1" Open="0" Platforms="7" Id="17">
-			<Node File="../Code/Exp_Scribe.cpp" Type="2" Platforms="15" />
+			<Node File="../src/Exp_Scribe.cpp" Type="2" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/Db/Db-Csv.cpp" Type="2" Platforms="15" />
 			<Node File="../../../lgi/trunk/include/lgi/common/Db.h" Type="3" Platforms="15" />
-			<Node File="../Code/Imp_Beos.cpp" Type="2" Platforms="8" />
-			<Node File="../Code/Imp_CsvContacts.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/Imp_Eml.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/Imp_Eudora.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/Imp_Mozilla.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/Imp_NetscapeContacts.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/Imp_OutlookExpress.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ImpExp_Mbox.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ImpExp_Outlook.cpp" Type="2" Platforms="1" />
+			<Node File="../src/Imp_Beos.cpp" Type="2" Platforms="8" />
+			<Node File="../src/Imp_CsvContacts.cpp" Type="2" Platforms="15" />
+			<Node File="../src/Imp_Eml.cpp" Type="2" Platforms="15" />
+			<Node File="../src/Imp_Eudora.cpp" Type="2" Platforms="15" />
+			<Node File="../src/Imp_Mozilla.cpp" Type="2" Platforms="15" />
+			<Node File="../src/Imp_NetscapeContacts.cpp" Type="2" Platforms="15" />
+			<Node File="../src/Imp_OutlookExpress.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ImpExp_Mbox.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ImpExp_Outlook.cpp" Type="2" Platforms="1" />
 		</Node>
 		<Node Name="Objects" Type="1" Open="0" Platforms="7" Id="18">
 			<Node Name="Calendar" Type="1" Open="0" Platforms="7" Id="19">
@@ -172,45 +172,45 @@
 					<Node File="../../../lgi/trunk/include/lgi/common/MonthView.h" Type="3" Platforms="15" />
 					<Node File="../../../lgi/trunk/src/common/Widgets/YearView.cpp" Type="2" Platforms="15" />
 				</Node>
-				<Node File="../Code/Calendar.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Calendar.h" Type="3" Platforms="15" />
-				<Node File="../Code/CalendarView.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/CalendarView.h" Type="3" Platforms="15" />
-				<Node File="../Code/RemoteCalendarSource.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Calendar.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Calendar.h" Type="3" Platforms="15" />
+				<Node File="../src/CalendarView.cpp" Type="2" Platforms="15" />
+				<Node File="../src/CalendarView.h" Type="3" Platforms="15" />
+				<Node File="../src/RemoteCalendarSource.cpp" Type="2" Platforms="15" />
 			</Node>
 			<Node Name="Filters" Type="1" Open="0" Platforms="7" Id="21">
-				<Node File="../Code/BayesianFilter.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/BayesianFilter.h" Type="3" Platforms="15" />
+				<Node File="../src/BayesianFilter.cpp" Type="2" Platforms="15" />
+				<Node File="../src/BayesianFilter.h" Type="3" Platforms="15" />
 				<Node File="../../../lgi/trunk/src/common/Widgets/FilterUi.cpp" Type="2" Platforms="15" />
 				<Node File="../../../lgi/trunk/include/lgi/common/FilterUi.h" Type="3" Platforms="15" />
 			</Node>
 			<Node Name="Printing" Type="1" Platforms="15" Open="0" Id="22">
-				<Node File="../Code/PrintContext.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/PrintContext.h" Type="3" Platforms="15" />
+				<Node File="../src/PrintContext.cpp" Type="2" Platforms="15" />
+				<Node File="../src/PrintContext.h" Type="3" Platforms="15" />
 			</Node>
 			<Node Name="vCard-vCal" Type="1" Open="0" Platforms="7" Id="23">
 				<Node File="../../../lgi/trunk/src/common/Text/vCard-vCal.cpp" Type="2" Platforms="15" />
 				<Node File="../../../lgi/trunk/include/lgi/common/vCard-vCal.h" Type="3" Platforms="15" />
 			</Node>
-			<Node File="../Code/MContainer.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeAttachment.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeContact.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeFilter.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeFolder.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeFolderTree.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeGroup.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeItemList.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeMail.cpp" Type="2" Platforms="15" />
+			<Node File="../src/MContainer.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeAttachment.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeContact.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeFilter.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeFolder.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeFolderTree.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeGroup.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeItemList.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeMail.cpp" Type="2" Platforms="15" />
 		</Node>
 		<Node Name="Shared" Type="1" Open="0" Platforms="7" Id="25">
-			<Node File="../Code/ScribeFolderDlg.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeFolderDlg.h" Type="3" Platforms="15" />
-			<Node File="../Code/ScribeFolderSelect.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeFolderSelect.h" Type="3" Platforms="15" />
-			<Node File="../Code/ScribeListAddr.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeListAddr.h" Type="3" Platforms="15" />
-			<Node File="../Code/ScribePageSetup.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribePageSetup.h" Type="3" Platforms="15" />
+			<Node File="../src/ScribeFolderDlg.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeFolderDlg.h" Type="3" Platforms="15" />
+			<Node File="../src/ScribeFolderSelect.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeFolderSelect.h" Type="3" Platforms="15" />
+			<Node File="../src/ScribeListAddr.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeListAddr.h" Type="3" Platforms="15" />
+			<Node File="../src/ScribePageSetup.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribePageSetup.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Spelling" Type="1" Platforms="15" Open="0" Id="26">
 			<Node File="../../../lgi/trunk/include/lgi/common/SpellCheck.h" Type="3" Platforms="15" />
@@ -221,66 +221,66 @@
 			<Node File="../../../lgi/trunk/include/lgi/common/OpenSSLSocket.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Tables" Type="1" Platforms="15" Id="1">
-			<Node File="../Utils/Tables/MailFlags.c" Type="2" Platforms="15" />
-			<Node File="../Utils/Tables/MailFlags.txt" Type="8" Platforms="0" />
-			<Node File="../Utils/Tables/Tables.h" Type="3" Platforms="15" />
+			<Node File="../utils/Tables/MailFlags.c" Type="2" Platforms="15" />
+			<Node File="../utils/Tables/MailFlags.txt" Type="8" Platforms="0" />
+			<Node File="../utils/Tables/Tables.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Ui" Type="1" Open="0" Platforms="7" Id="28">
 			<Node Name="Colour" Type="1" Open="0" Platforms="7" Id="29">
 				<Node File="../../../lgi/trunk/src/common/Widgets/ColourSelect.cpp" Type="2" Platforms="15" />
 			</Node>
 			<Node Name="Find" Type="1" Open="0" Platforms="7" Id="30">
-				<Node File="../Code/SearchView.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/SearchView.h" Type="3" Platforms="15" />
-				<Node File="../Code/ScribeFinder.cpp" Type="2" Platforms="15" />
+				<Node File="../src/SearchView.cpp" Type="2" Platforms="15" />
+				<Node File="../src/SearchView.h" Type="3" Platforms="15" />
+				<Node File="../src/ScribeFinder.cpp" Type="2" Platforms="15" />
 			</Node>
 			<Node Name="Folder Properties" Type="1" Open="0" Platforms="7" Id="31">
-				<Node File="../Code/ScribeFolderProp.cpp" Type="2" Platforms="15" />
+				<Node File="../src/ScribeFolderProp.cpp" Type="2" Platforms="15" />
 			</Node>
 			<Node Name="Item Preview" Type="1" Open="0" Platforms="7" Id="32">
-				<Node File="../Code/PreviewPanel.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/PreviewPanel.h" Type="3" Platforms="15" />
-				<Node File="../Code/PrintPreview.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/PrintPreview.h" Type="3" Platforms="15" />
-				<Node File="../Resources/PreviewMail.html" Type="7" Platforms="15" />
-				<Node File="../Resources/PreviewGroup.html" Type="7" Platforms="15" />
-				<Node File="../Resources/PreviewContact.html" Type="7" Platforms="15" />
+				<Node File="../src/PreviewPanel.cpp" Type="2" Platforms="15" />
+				<Node File="../src/PreviewPanel.h" Type="3" Platforms="15" />
+				<Node File="../src/PrintPreview.cpp" Type="2" Platforms="15" />
+				<Node File="../src/PrintPreview.h" Type="3" Platforms="15" />
+				<Node File="../resources/PreviewMail.html" Type="7" Platforms="15" />
+				<Node File="../resources/PreviewGroup.html" Type="7" Platforms="15" />
+				<Node File="../resources/PreviewContact.html" Type="7" Platforms="15" />
 			</Node>
 			<Node Name="Object Inspector" Type="1" Platforms="15" Open="0" Id="33">
-				<Node File="../Code/ObjectInspector.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/ObjectInspector.h" Type="3" Platforms="15" />
+				<Node File="../src/ObjectInspector.cpp" Type="2" Platforms="15" />
+				<Node File="../src/ObjectInspector.h" Type="3" Platforms="15" />
 			</Node>
 			<Node Name="Options" Type="1" Platforms="15" Open="0" Id="34">
-				<Node File="../Code/OptionsDlg.cpp" Type="2" Platforms="15" />
+				<Node File="../src/OptionsDlg.cpp" Type="2" Platforms="15" />
 			</Node>
-			<Node File="../Code/AddressSelect.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/BayesDlg.cpp" Type="2" Platforms="15" />
+			<Node File="../src/AddressSelect.cpp" Type="2" Platforms="15" />
+			<Node File="../src/BayesDlg.cpp" Type="2" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/Widgets/ControlTree.cpp" Type="2" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/General/Growl.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/NewMailDlg.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/NewMailDlg.h" Type="3" Platforms="15" />
+			<Node File="../src/NewMailDlg.cpp" Type="2" Platforms="15" />
+			<Node File="../src/NewMailDlg.h" Type="3" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/Widgets/ZoomView.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ManageMailStores.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ManageMailStores.h" Type="3" Platforms="15" />
-			<Node File="../Code/ReplicateDlg.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ReplicateDlg.h" Type="3" Platforms="15" />
-			<Node File="../Code/ScribeLangDlg.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribePassword.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/ScribeUi.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/SecurityDlg.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/TitlePage.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ManageMailStores.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ManageMailStores.h" Type="3" Platforms="15" />
+			<Node File="../src/ReplicateDlg.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ReplicateDlg.h" Type="3" Platforms="15" />
+			<Node File="../src/ScribeLangDlg.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribePassword.cpp" Type="2" Platforms="15" />
+			<Node File="../src/ScribeUi.cpp" Type="2" Platforms="15" />
+			<Node File="../src/SecurityDlg.cpp" Type="2" Platforms="15" />
+			<Node File="../src/TitlePage.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node File="../Code/Scribe.h" Type="3" Platforms="15" />
-		<Node File="../Code/ScribeDefs.h" Type="3" Platforms="15" />
-		<Node File="../Code/ScribeInc.h" Type="3" Platforms="15" />
-		<Node File="../Code/ScribePrivate.h" Type="3" Platforms="15" />
+		<Node File="../src/Scribe.h" Type="3" Platforms="15" />
+		<Node File="../src/ScribeDefs.h" Type="3" Platforms="15" />
+		<Node File="../src/ScribeInc.h" Type="3" Platforms="15" />
+		<Node File="../src/ScribePrivate.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Scripting" Type="1" Platforms="7" Open="0" Id="35">
 		<Node Name="Scripts" Type="1" Platforms="15" Open="0" Id="36">
-			<Node File="../Scripts/Add Senders To Contacts.script" Type="3" Platforms="7" />
-			<Node File="../Scripts/Delete Attachments.script" Type="3" Platforms="7" />
-			<Node File="../Scripts/Delete Duplicate Messages.script" Type="3" Platforms="7" />
-			<Node File="../Scripts/Mail Filters Menu.script" Type="8" Platforms="15" />
+			<Node File="../scripts/Add Senders To Contacts.script" Type="3" Platforms="7" />
+			<Node File="../scripts/Delete Attachments.script" Type="3" Platforms="7" />
+			<Node File="../scripts/Delete Duplicate Messages.script" Type="3" Platforms="7" />
+			<Node File="../scripts/Mail Filters Menu.script" Type="8" Platforms="15" />
 		</Node>
 		<Node File="../../../lgi/trunk/src/common/Coding/LexCpp.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Coding/ScriptCompiler.cpp" Type="2" Platforms="15" />
@@ -288,7 +288,7 @@
 		<Node File="../../../lgi/trunk/src/common/Coding/ScriptingPriv.h" Type="3" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Coding/ScriptLibrary.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Coding/ScriptVM.cpp" Type="2" Platforms="15" />
-		<Node File="../Code/Scripting.cpp" Type="2" Platforms="15" />
+		<Node File="../src/Scripting.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Coding/Instructions.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Storage" Type="1" Platforms="7" Open="0" Id="38">
@@ -296,43 +296,43 @@
 			<Node Name="Imap" Type="1" Platforms="7" Open="0" Id="40">
 				<Node File="../../../lgi/trunk/src/common/Net/Mime.cpp" Type="2" Platforms="15" />
 				<Node File="../../../lgi/trunk/include/lgi/common/Mime.h" Type="3" Platforms="15" />
-				<Node File="../Code/Store3Imap/ScribeImap.h" Type="3" Platforms="15" />
-				<Node File="../Code/Store3Imap/ScribeImap_Attachment.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Imap/ScribeImap_Folder.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Imap/ScribeImap_Mail.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Imap/ScribeImap_Store.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Imap/ScribeImap_Thread.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Imap/ScribeImap.h" Type="3" Platforms="15" />
+				<Node File="../src/Store3Imap/ScribeImap_Attachment.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Imap/ScribeImap_Folder.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Imap/ScribeImap_Mail.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Imap/ScribeImap_Store.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Imap/ScribeImap_Thread.cpp" Type="2" Platforms="15" />
 			</Node>
 			<Node Name="Mail3" Type="1" Platforms="7" Open="0" Id="41">
 				<Node Name="Sqlite" Type="1" Platforms="7" Open="1" Id="42">
-					<Node File="../Code/Sqlite/v3.6.14/sqlite3.c" Type="2" Platforms="15" />
-					<Node File="../Code/Sqlite/v3.6.14/sqlite3.h" Type="3" Platforms="15" />
-					<Node File="../Code/Sqlite/v3.6.14/sqlite3ext.h" Type="3" Platforms="15" />
+					<Node File="../src/Sqlite/v3.6.14/sqlite3.c" Type="2" Platforms="15" />
+					<Node File="../src/Sqlite/v3.6.14/sqlite3.h" Type="3" Platforms="15" />
+					<Node File="../src/Sqlite/v3.6.14/sqlite3ext.h" Type="3" Platforms="15" />
 				</Node>
-				<Node File="../Code/Store3Mail3/Mail3.h" Type="3" Platforms="15" />
-				<Node File="../Code/Store3Mail3/Mail3Attachment.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Mail3/Mail3Calendar.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Mail3/Mail3Contact.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Mail3/Mail3Filter.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Mail3/Mail3Folder.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Mail3/Mail3Group.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Mail3/Mail3Mail.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Mail3/Mail3Store.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3.h" Type="3" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3Attachment.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3Calendar.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3Contact.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3Filter.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3Folder.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3Group.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3Mail.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Mail3/Mail3Store.cpp" Type="2" Platforms="15" />
 			</Node>
 			<Node Name="Webdav" Type="1" Platforms="15" Id="1">
-				<Node File="../Code/FolderCalendarSource.cpp" Type="2" Platforms="15" />
+				<Node File="../src/FolderCalendarSource.cpp" Type="2" Platforms="15" />
 				<Node File="../../../lgi/trunk/src/common/Net/WebDav.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Webdav/WebdavCalendar.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Webdav/WebdavContact.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Webdav/WebdavFolder.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Webdav/WebdavStore.cpp" Type="2" Platforms="15" />
-				<Node File="../Code/Store3Webdav/WebdavStore.h" Type="3" Platforms="15" />
-				<Node File="../Code/Store3Webdav/WebdavStorePriv.h" Type="3" Platforms="15" />
-				<Node File="../Code/Store3Webdav/WebdavThread.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Webdav/WebdavCalendar.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Webdav/WebdavContact.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Webdav/WebdavFolder.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Webdav/WebdavStore.cpp" Type="2" Platforms="15" />
+				<Node File="../src/Store3Webdav/WebdavStore.h" Type="3" Platforms="15" />
+				<Node File="../src/Store3Webdav/WebdavStorePriv.h" Type="3" Platforms="15" />
+				<Node File="../src/Store3Webdav/WebdavThread.cpp" Type="2" Platforms="15" />
 			</Node>
 			<Node File="../../../lgi/trunk/include/lgi/common/Store3.h" Type="3" Platforms="15" />
-			<Node File="../Code/Store3Common.cpp" Type="2" Platforms="15" />
-			<Node File="../Code/Store3Common.h" Type="3" Platforms="15" />
+			<Node File="../src/Store3Common.cpp" Type="2" Platforms="15" />
+			<Node File="../src/Store3Common.h" Type="3" Platforms="15" />
 			<Node File="../../../lgi/trunk/include/lgi/common/Store3MimeTree.h" Type="3" Platforms="15" />
 			<Node File="../../../lgi/trunk/include/lgi/common/Store3Defs.h" Type="3" Platforms="15" />
 		</Node>
@@ -341,8 +341,8 @@
 	<Node File="../../libs/bzip2-1.0.6/linux/bzip2.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Node File="../../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Node Name="Installer Scripts" Type="1" Platforms="15" Open="0" Id="43">
-		<Node File="../Code/Py/DomScan.py" Type="8" Platforms="15" />
-		<Node File="../Utils/getversion.py" Type="8" Platforms="15" />
+		<Node File="../src/Py/DomScan.py" Type="8" Platforms="15" />
+		<Node File="../utils/getversion.py" Type="8" Platforms="15" />
 	</Node>
 	<Node Name="Build" Type="1" Platforms="15" Id="1">
 		<Node File="../build.py" Type="8" Platforms="15" />
@@ -395,22 +395,22 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 		<Build>
 			<IncludePaths>
 				<All>
-					<Debug>../Code
-../Code/Store3Webdav
-../Code/Sqlite
-../Resources
-../Utils/Tables
+					<Debug>../src
+../src/Store3Webdav
+../src/Sqlite
+../resources
+../utils/Tables
 ../../libs/aspell-0.60.6.1/interfaces/cc
 ../../libs/libchardet/src
 ../../libs/libchardet/include
 ../../../lgi/trunk/include
 ../../../lgi/trunk/private/common
 </Debug>
-					<Release>../Code
-../Code/Store3Webdav
-../Code/Sqlite
-../Resources
-../Utils/Tables
+					<Release>../src
+../src/Store3Webdav
+../src/Sqlite
+../resources
+../utils/Tables
 ../../libs/aspell-0.60.6.1/interfaces/cc
 ../../libs/libchardet/src
 ../../libs/libchardet/include

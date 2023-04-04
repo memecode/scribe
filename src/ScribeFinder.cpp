@@ -18,7 +18,7 @@
 #include "lgi/common/Button.h"
 #include "lgi/common/CheckBox.h"
 #include "lgi/common/Combo.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 #include "lgi/common/DragAndDrop.h"
 #include "lgi/common/TableLayout.h"
 #include "lgi/common/LgiRes.h"

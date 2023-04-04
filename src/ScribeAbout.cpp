@@ -4,7 +4,7 @@
 #include "Scribe.h"
 #include "ScribePrivate.h"
 #include "lgi/common/Button.h"
-#include "../Resources/resdefs.h"
+#include "resdefs.h"
 #include "lgi/common/LgiRes.h"
 
 class ScribeAboutWnd : public LWindow, public LDefaultDocumentEnv
