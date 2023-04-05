@@ -12991,7 +12991,7 @@ struct UnitTestState :
 	LMessage::Result OnEvent(LMessage *Msg) override;
 	bool Iterate();
 	bool Done();
-	int Main();
+	int Main() override;
 	LDataStoreI *CreateTestMail3();
 
 	// Wrappers for protected elements:
@@ -13103,7 +13103,7 @@ struct LoadMailStore2 : public LoadMailStore1
 	{
 	}
 
-	void OnMailStore(LDataStoreI *store)
+	void OnMailStore(LDataStoreI *store) override
 	{
 		auto ms3 = dynamic_cast<LMail3Store*>(store);
 		if (!ms3)

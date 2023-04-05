@@ -3,7 +3,7 @@
 
 #include "lgi/common/Lgi.h"
 #include "Store3Common.h"
-#include "v3.6.14/sqlite3.h"
+#include "v3.41.2/sqlite3.h"
 
 // Debugging stuff
 #define MAIL3_TRACK_OBJS		0

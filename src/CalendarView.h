@@ -87,15 +87,15 @@ protected:
 	LAutoPtr<LFont> Font;
 
 	// Drag'n'drop Target
-	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState);
-	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState);
+	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState) override;
+	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState) override;
 	void OnDragExit();
 
 	// Drag'n'drop Source
-	void OnDragInit(bool Success);
+	void OnDragInit(bool Success) override;
 	char *TypeOf();
-	bool GetData(LArray<LDragData> &Data);
-	bool GetFormats(LDragFormats &Formats);
+	bool GetData(LArray<LDragData> &Data) override;
+	bool GetFormats(LDragFormats &Formats) override;
 
 	// Internal Methods
 	void OnSelect(Calendar *c, bool Ctrl, bool Shift);
@@ -118,7 +118,7 @@ public:
 	CalendarView(ScribeFolder *folder, int Id = -1, LRect *r = 0, const char *Name = 0);
 	~CalendarView();
 	
-	const char *GetClass() { return "CalendarView"; }
+	const char *GetClass() override { return "CalendarView"; }
 
 	// Methods
 	Calendar *CalendarAt(int x, int y);
@@ -129,7 +129,7 @@ public:
 	bool GetEventsBetween(LArray<TimePeriod> &list, LDateTime Start, LDateTime End);
 	void LoadUsers();
 	void DeleteSource(CalendarSource *cs);
-	LCursor GetCursor(int x, int y);
+	LCursor GetCursor(int x, int y) override;
 	bool HitTest(int x, int y, EventDragMode &mode, Calendar *&event);
 	Calendar *NewEvent(LDateTime &dtStart, LDateTime &dtEnd);
 
@@ -148,7 +148,7 @@ public:
 
 	// Events
 	void DrawSelectionBox(LSurface *pDC, LRect &r);
-	void OnPaint(LSurface *pDC);
+	void OnPaint(LSurface *pDC) override;
 	bool OnPrintPage(LPrintDC *pDC, int PageIndex);
 
 	void OnMouseClick(LMouse &m) override;
