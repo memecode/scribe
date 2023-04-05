@@ -165,7 +165,6 @@
 		349AB0BE217B395B00573982 /* Png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 349AB0BD217B395B00573982 /* Png.cpp */; };
 		349AB0C0217B3D9500573982 /* scribe-mac-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */; };
 		34A66681237968A200ED0212 /* FolderCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A66680237968A200ED0212 /* FolderCalendarSource.cpp */; };
-		34A84C9F29DDA53C00E9A5C2 /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 34A84C9D29DDA53B00E9A5C2 /* sqlite3.c */; };
 		34AB68F6275240BC0045380B /* ScribeScripts.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34AB68E8275240B40045380B /* ScribeScripts.h */; };
 		34C1BF90238CAEC500658B99 /* calendar.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF71238CA23500658B99 /* calendar.html */; };
 		34C1BF91238CAEC500658B99 /* contacts.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF75238CA23500658B99 /* contacts.html */; };
@@ -185,7 +184,6 @@
 		34C1BF9F238CB05A00658B99 /* About64px.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34DD329B23153B2300FA2B35 /* About64px.png */; };
 		34C1D42528403C2400FCC98D /* libchardet.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34C1D42628403CD300FCC98D /* libjpeg9a.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34C1D42728403CDC00FCC98D /* libpng15.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE6283AF0A100897A16 /* libpng15.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34C1D42828403CE800FCC98D /* libz_local.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEEE283AF0A100897A16 /* libz_local.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34C1D42928403CF000FCC98D /* libiconv.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE0283AF0A100897A16 /* libiconv.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34C9A80B23C9615300129861 /* NoFace160.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A7FC23C9615200129861 /* NoFace160.png */; };
@@ -195,6 +193,8 @@
 		34DD329923153AF000FA2B35 /* About.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329523153AF000FA2B35 /* About.html */; };
 		34DD329A23153AF000FA2B35 /* Title.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329623153AF000FA2B35 /* Title.png */; };
 		34DD329C23153B2300FA2B35 /* About64px.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329B23153B2300FA2B35 /* About64px.png */; };
+		34E7C47F29DE2CE100C4DEB1 /* libpng16.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34E7C47B29DE2CDB00C4DEB1 /* libpng16.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34E7C48029DE2D6C00C4DEB1 /* libsqlite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D0512629DE2AC100BF0C5A /* libsqlite.a */; };
 		34EE8BB52748A6EC00F12915 /* HomoglyphsTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */; };
 		34EE8BB62748A6EC00F12915 /* Homoglyphs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */; };
 		34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34F1BD082442B0050062DCF4 /* libssl.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -215,7 +215,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 63F1B6C35FC9475F8A6274EC;
+			remoteGlobalIDString = EB83EFB8550140F6BC4261D3;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -260,6 +260,13 @@
 			remoteGlobalIDString = 3477C4A71CC2792F0028B84B;
 			remoteInfo = Btree;
 		};
+		34D0512529DE2AC100BF0C5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3477C4FC1CC3021B0028B84B;
+			remoteInfo = sqlite;
+		};
 		34D6AEDB283AF0A100897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
@@ -295,20 +302,6 @@
 			remoteGlobalIDString = 1860D095485B4874BD28CD68;
 			remoteInfo = libjpeg9a_static;
 		};
-		34D6AEE5283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 82B90DD671F24451898C0426;
-			remoteInfo = libpng15;
-		};
-		34D6AEE7283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 31AFC44E6C6649BB91C96E18;
-			remoteInfo = libpng15_static;
-		};
 		34D6AEE9283AF0A100897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
@@ -341,43 +334,57 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = FAEB745E38014DB5912D04F5;
+			remoteGlobalIDString = 4AC91E65C6B84B15A538AC46;
 			remoteInfo = libjpeg9a;
-		};
-		34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = A47CE3DD6D7E44FF984E327F;
-			remoteInfo = libpng15;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 7D1CF078C60E4238813E5BB7;
+			remoteGlobalIDString = 53A329659F1D496694D5AA3C;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = C84F72522656464CBED4EA91;
+			remoteGlobalIDString = 6DE831693BDA490B9E3A04FD;
 			remoteInfo = libiconv;
 		};
-		34DED72523AC30C30049E01F /* PBXContainerItemProxy */ = {
+		34E7C47429DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 3477C4FC1CC3021B0028B84B;
-			remoteInfo = sqlite;
+			remoteGlobalIDString = B638AB99162445249E145476;
+			remoteInfo = aspell;
 		};
-		34DED72723AC31950049E01F /* PBXContainerItemProxy */ = {
+		34E7C47629DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 3477C4FB1CC3021B0028B84B;
-			remoteInfo = sqlite;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 75082250E5864A7EBF9D9841;
+			remoteInfo = btree;
+		};
+		34E7C47829DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F3D3D4A7D3EA44AD8C46712E;
+			remoteInfo = bzip2;
+		};
+		34E7C47A29DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E531CE736DDF466C8243AF28;
+			remoteInfo = libpng16;
+		};
+		34E7C47C29DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AD60EE03874244B0A38D3871;
+			remoteInfo = libpng16_static;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -388,9 +395,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				34E7C47F29DE2CE100C4DEB1 /* libpng16.dylib in Copy Files */,
 				34C1D42928403CF000FCC98D /* libiconv.dylib in Copy Files */,
 				34C1D42828403CE800FCC98D /* libz_local.dylib in Copy Files */,
-				34C1D42728403CDC00FCC98D /* libpng15.dylib in Copy Files */,
 				34C1D42628403CD300FCC98D /* libjpeg9a.dylib in Copy Files */,
 				34C1D42528403C2400FCC98D /* libchardet.dylib in Copy Files */,
 				340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */,
@@ -632,7 +639,7 @@
 		3477C4E81CC27D870028B84B /* Browser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Browser.cpp; path = ../../../../Lgi/trunk/src/common/Lgi/Browser.cpp; sourceTree = "<group>"; };
 		3477C4EA1CC27DC90028B84B /* Password.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Password.cpp; path = ../../../../Lgi/trunk/src/common/General/Password.cpp; sourceTree = "<group>"; };
 		3477C4EE1CC27F500028B84B /* ZoomView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ZoomView.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/ZoomView.cpp; sourceTree = "<group>"; };
-		3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = sqlite.xcodeproj; path = ../Code/Sqlite/v3.6.14/sqlite.xcodeproj; sourceTree = SOURCE_ROOT; };
+		3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = sqlite.xcodeproj; path = ../src/Sqlite/v3.41.2/sqlite.xcodeproj; sourceTree = SOURCE_ROOT; };
 		3477C51F1CC311A00028B84B /* Scribe.lr8 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = Scribe.lr8; path = ../../Resources/Scribe.lr8; sourceTree = "<group>"; };
 		3477C5221CC315FC0028B84B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /Users/matthew/Code/Lgi/trunk/src/mac/cocoa/../../../../../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		347CF82623F64FD00028F610 /* flags.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = flags.png; path = ../../Resources/flags.png; sourceTree = "<group>"; };
@@ -647,8 +654,6 @@
 		349AB0BD217B395B00573982 /* Png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Png.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Filters/Png.cpp; sourceTree = "<group>"; };
 		349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "scribe-mac-icon.icns"; path = "../../Resources/scribe-mac-icon.icns"; sourceTree = "<group>"; };
 		34A66680237968A200ED0212 /* FolderCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FolderCalendarSource.cpp; path = ../../src/FolderCalendarSource.cpp; sourceTree = "<group>"; };
-		34A84C9D29DDA53B00E9A5C2 /* sqlite3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sqlite3.c; path = ../../src/Sqlite/v3.41.2/sqlite3.c; sourceTree = "<group>"; };
-		34A84C9E29DDA53B00E9A5C2 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sqlite3.h; path = ../../src/Sqlite/v3.41.2/sqlite3.h; sourceTree = "<group>"; };
 		34AB68E8275240B40045380B /* ScribeScripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeScripts.h; path = ../../Scripts/ScribeScripts.h; sourceTree = "<group>"; };
 		34C1BF71238CA23500658B99 /* calendar.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = calendar.html; path = ../../Help/calendar.html; sourceTree = "<group>"; };
 		34C1BF72238CA23500658B99 /* features.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = features.html; path = ../../Help/features.html; sourceTree = "<group>"; };
@@ -690,6 +695,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34E7C48029DE2D6C00C4DEB1 /* libsqlite.a in Frameworks */,
 				3477C5231CC315FC0028B84B /* Cocoa.framework in Frameworks */,
 				34749B5F278B08B200C8197E /* LgiCocoa.framework in Frameworks */,
 				34167B38279FEBA8005422F6 /* libchardet.dylib in Frameworks */,
@@ -704,14 +710,17 @@
 		34167B2E279FEAAF005422F6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				34E7C47529DE2CDB00C4DEB1 /* libaspell-dist-0.60d.dylib */,
+				34E7C47729DE2CDB00C4DEB1 /* libbtree.dylib */,
+				34E7C47929DE2CDB00C4DEB1 /* libbzip2.dylib */,
 				34167B34279FEAAF005422F6 /* libchardet.dylib */,
 				34D6AEDC283AF0A100897A16 /* example */,
 				34D6AEDE283AF0A100897A16 /* iconv */,
 				34D6AEE0283AF0A100897A16 /* libiconv.dylib */,
 				34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */,
 				34D6AEE4283AF0A100897A16 /* libjpeg9a_static.a */,
-				34D6AEE6283AF0A100897A16 /* libpng15.dylib */,
-				34D6AEE8283AF0A100897A16 /* libpng15_static.a */,
+				34E7C47B29DE2CDB00C4DEB1 /* libpng16.dylib */,
+				34E7C47D29DE2CDB00C4DEB1 /* libpng16_static.a */,
 				34D6AEEA283AF0A100897A16 /* minigzip */,
 				34D6AEEC283AF0A100897A16 /* pngtest */,
 				34D6AEEE283AF0A100897A16 /* libz_local.dylib */,
@@ -867,8 +876,6 @@
 		3450280727405D00007F5F2A /* Mail3 */ = {
 			isa = PBXGroup;
 			children = (
-				34A84C9D29DDA53B00E9A5C2 /* sqlite3.c */,
-				34A84C9E29DDA53B00E9A5C2 /* sqlite3.h */,
 				3477C4201CC2319B0028B84B /* Mail3.h */,
 				3477C4211CC2319B0028B84B /* Mail3Attachment.cpp */,
 				3477C4221CC2319B0028B84B /* Mail3Contact.cpp */,
@@ -1202,10 +1209,10 @@
 			name = Help;
 			sourceTree = "<group>";
 		};
-		34DED71523AC30C30049E01F /* Products */ = {
+		34D0512229DE2AC100BF0C5A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				34DED72623AC30C30049E01F /* libsqlite.a */,
+				34D0512629DE2AC100BF0C5A /* libsqlite.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1258,11 +1265,9 @@
 			dependencies = (
 				34D6AEF8283AF0E400897A16 /* PBXTargetDependency */,
 				34D6AEF6283AF0BD00897A16 /* PBXTargetDependency */,
-				34D6AEF4283AF0B900897A16 /* PBXTargetDependency */,
 				34D6AEF2283AF0B300897A16 /* PBXTargetDependency */,
 				34749B5B278B06B900C8197E /* PBXTargetDependency */,
 				34167B36279FEAC2005422F6 /* PBXTargetDependency */,
-				34DED72823AC31950049E01F /* PBXTargetDependency */,
 				3474FC5A226DE08D0064E0AD /* PBXTargetDependency */,
 				3474FC5C226DE08D0064E0AD /* PBXTargetDependency */,
 			);
@@ -1324,7 +1329,7 @@
 					ProjectRef = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 				},
 				{
-					ProductGroup = 34DED71523AC30C30049E01F /* Products */;
+					ProductGroup = 34D0512229DE2AC100BF0C5A /* Products */;
 					ProjectRef = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
 				},
 			);
@@ -1364,6 +1369,13 @@
 			remoteRef = 3474FC4D226DCCDD0064E0AD /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		34D0512629DE2AC100BF0C5A /* libsqlite.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libsqlite.a;
+			remoteRef = 34D0512529DE2AC100BF0C5A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		34D6AEDC283AF0A100897A16 /* example */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -1399,21 +1411,6 @@
 			remoteRef = 34D6AEE3283AF0A100897A16 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34D6AEE6283AF0A100897A16 /* libpng15.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			name = libpng15.dylib;
-			path = libpng15.15.4.0.dylib;
-			remoteRef = 34D6AEE5283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEE8283AF0A100897A16 /* libpng15_static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libpng15_static.a;
-			remoteRef = 34D6AEE7283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		34D6AEEA283AF0A100897A16 /* minigzip */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -1443,11 +1440,40 @@
 			remoteRef = 34D6AEEF283AF0A100897A16 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34DED72623AC30C30049E01F /* libsqlite.a */ = {
+		34E7C47529DE2CDB00C4DEB1 /* libaspell-dist-0.60d.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = "libaspell-dist-0.60d.dylib";
+			remoteRef = 34E7C47429DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34E7C47729DE2CDB00C4DEB1 /* libbtree.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libbtree.dylib;
+			remoteRef = 34E7C47629DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34E7C47929DE2CDB00C4DEB1 /* libbzip2.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libbzip2.dylib;
+			remoteRef = 34E7C47829DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34E7C47B29DE2CDB00C4DEB1 /* libpng16.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			name = libpng16.dylib;
+			path = libpng16.15.29.0.dylib;
+			remoteRef = 34E7C47A29DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34E7C47D29DE2CDB00C4DEB1 /* libpng16_static.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libsqlite.a;
-			remoteRef = 34DED72523AC30C30049E01F /* PBXContainerItemProxy */;
+			path = libpng16_static.a;
+			remoteRef = 34E7C47C29DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1521,7 +1547,6 @@
 				3477C3F91CC227ED0028B84B /* TitlePage.cpp in Sources */,
 				3477C42E1CC2319B0028B84B /* Mail3Group.cpp in Sources */,
 				3477C4291CC2319B0028B84B /* Mail3Attachment.cpp in Sources */,
-				34A84C9F29DDA53C00E9A5C2 /* sqlite3.c in Sources */,
 				3477C3B51CC227ED0028B84B /* Components.cpp in Sources */,
 				34EE8BB62748A6EC00F12915 /* Homoglyphs.cpp in Sources */,
 				3477C45E1CC26AAB0028B84B /* Mime.cpp in Sources */,
@@ -1673,11 +1698,6 @@
 			name = libjpeg9a;
 			targetProxy = 34D6AEF1283AF0B300897A16 /* PBXContainerItemProxy */;
 		};
-		34D6AEF4283AF0B900897A16 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = libpng15;
-			targetProxy = 34D6AEF3283AF0B900897A16 /* PBXContainerItemProxy */;
-		};
 		34D6AEF6283AF0BD00897A16 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = zlib;
@@ -1687,11 +1707,6 @@
 			isa = PBXTargetDependency;
 			name = libiconv;
 			targetProxy = 34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */;
-		};
-		34DED72823AC31950049E01F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = sqlite;
-			targetProxy = 34DED72723AC31950049E01F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
