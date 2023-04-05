@@ -208,7 +208,7 @@
     <ClInclude Include="..\..\..\Lgi\trunk\src\common\Hash\md5\md5.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Lgi\trunk\LgiStatic_vs2019.vcxproj">
+    <ProjectReference Include="..\..\..\Lgi\trunk\win\LgiStatic_vs2019.vcxproj">
       <Project>{de6d97b9-a194-401b-a8a4-83110c56d572}</Project>
     </ProjectReference>
   </ItemGroup>

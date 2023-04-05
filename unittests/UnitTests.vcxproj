@@ -235,7 +235,7 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Lgi\trunk\Lgi_vs2019.vcxproj">
+    <ProjectReference Include="..\..\..\Lgi\trunk\win\Lgi_vs2019.vcxproj">
       <Project>{95df9ca4-6d37-4a85-a648-80c2712e0da1}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Lgi\trunk\src\common\Net\libntlm-0.4.2\build-win32\libntlm_vs2019.vcxproj">

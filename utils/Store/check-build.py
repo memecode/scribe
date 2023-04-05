@@ -18,10 +18,10 @@ is_cmake = os.path.exists(os.path.join(basepath, "CMakeCache.txt"))
 
 if is_cmake:
 	exe = os.path.join(basepath, "Release", "Scribe.exe")
-	hdr = os.path.join(basepath, "..", "trunk_os", "code", "scribeinc.h")
+	hdr = os.path.join(basepath, "..", "trunk_os", "src", "scribeinc.h")
 else:
 	exe = os.path.join(basepath, "Windows", build_folder, "Scribe.exe")
-	hdr = os.path.join(basepath, "code\\scribeinc.h")
+	hdr = os.path.join(basepath, "src\\scribeinc.h")
 print("exe:", exe)
 
 print("basepath:", basepath)

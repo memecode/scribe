@@ -261,9 +261,9 @@ copy Code\Resource.res $(OutDir)
       <Command>cd ..\src\Py
 "C:\Program Files\Python39\python.exe"  win32_pre_build_step.py
 cd ..
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"
+call "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 rc Resource.rc
-copy Resource.res ..\Windows\$(OutDir)</Command>
+copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -337,9 +337,9 @@ copy Code\Resource.res $(OutDir)
       <Command>cd ..\src\Py
 "C:\Program Files\Python39\python.exe"  win32_pre_build_step.py
 cd ..
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"
+call "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 rc Resource.rc
-copy Resource.res ..\Windows\$(OutDir)</Command>
+copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -708,7 +708,7 @@ copy Resource.res ..\Windows\$(OutDir)</Command>
     <Text Include="..\Utils\Tables\MailFlags.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Lgi\trunk\Lgi_vs2019.vcxproj">
+    <ProjectReference Include="..\..\..\Lgi\trunk\win\Lgi_vs2019.vcxproj">
       <Project>{95df9ca4-6d37-4a85-a648-80c2712e0da1}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\lgi\trunk\src\common\Net\libntlm-0.4.2\build-win32\libntlm_vs2019.vcxproj">

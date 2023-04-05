@@ -9,9 +9,9 @@ rootDir = os.path.abspath(os.path.join(scriptDir, "..", ".."))
 isCmake = os.path.exists(os.path.join(rootDir, "CMakeCache.txt"))
 
 if isCmake:
-	codeDir = os.path.abspath(os.path.join(rootDir, "..", "trunk_os", "code"))
+	codeDir = os.path.abspath(os.path.join(rootDir, "..", "trunk_os", "src"))
 else:
-	codeDir = os.path.abspath(os.path.join(rootDir, "code"))
+	codeDir = os.path.abspath(os.path.join(rootDir, "src"))
 
 if len(sys.argv) != 6:
 	print("Incorrect args:", len(sys.argv))
