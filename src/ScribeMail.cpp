@@ -8094,12 +8094,20 @@ const char *Mail::GetFieldText(int Field)
 		case FIELD_SUBJECT:
 		{
 			auto s = GetSubject();
-
-			#ifdef _DEBUG
-			if (_debug)
-				LgiTrace("GetSubj=%s\n", s);
-			#endif
-
+			
+			if (Strchr(s, '\n'))
+			{
+				char *e = Buf + sizeof(Buf) - 1;
+				char *o = Buf;
+				for (char *i = s; o<e && *i; i++)
+				{
+					if (*i != '\n')
+						*o++ = *i;
+				}
+				*o++ = 0;
+				return Buf;
+			}
+			
 			return s;
 		}
 		case FIELD_SIZE:
