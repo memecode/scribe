@@ -5481,9 +5481,11 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		}
 		case SdBodyAsText: // Type: String
 		{
-			size_t MaxSize = ValidStr(Array) ? atoi(Array) : -1;
-			
-			if (ValidStr(GetBody()) && ValidStr(GetHtml()))
+			size_t MaxSize = Atoi(Array);
+			auto Txt = GetBody();
+			auto Html = GetHtml();
+
+			if (ValidStr(Txt) && ValidStr(Html))
 			{
 				LVariant Def;
 				App->GetOptions()->GetValue(OPT_DefaultAlternative, Def);			
@@ -5493,11 +5495,10 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 				}
 				goto DoText;
 			}
-			else if (ValidStr(GetBody()))
+			else if (ValidStr(Txt))
 			{
 				DoText:
 				LAutoString CharSet = GetCharSet();
-				auto Txt = GetBody();
 				if (CharSet)
 				{
 					size_t TxtLen = strlen(Txt);
@@ -5506,10 +5507,11 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 				else
 					Value = Txt;
 			}
-			else if (ValidStr(GetHtml()))
+			else if (ValidStr(Html))
 			{
 				DoHtml:
-				auto v = HtmlToText(GetHtml(), GetHtmlCharset());
+				auto cs = GetHtmlCharset();
+				auto v = HtmlToText(Html, cs);
 				Value = v.Get();
 			}
 			else return false;
@@ -8099,7 +8101,7 @@ const char *Mail::GetFieldText(int Field)
 			{
 				char *e = Buf + sizeof(Buf) - 1;
 				char *o = Buf;
-				for (char *i = s; o<e && *i; i++)
+				for (auto i = s; o<e && *i; i++)
 				{
 					if (*i != '\n')
 						*o++ = *i;
@@ -9302,7 +9304,7 @@ void Mail::OnPaint(LItem::ItemPaintCtx &InCtx)
 		PreviewFont->Transparent(true);
 
 		// Setup
-		if (!PreviewCache[0] || abs(PreviewCacheX-Ctx.X()) > 20)
+		if (PreviewCache.Length() == 0 || abs(PreviewCacheX - Ctx.X()) > 20)
 		{
 			PreviewCache.DeleteObjects();
 			PreviewCacheX = Ctx.X();
