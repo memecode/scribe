@@ -2998,40 +2998,48 @@ void Import_OutlookContacts(ScribeWnd *Parent)
 	Import_Outlook(Parent, IMP_OUTLOOK_PAB);
 	#else
 	ScribeFolder *Contacts = Parent->GetFolder(FOLDER_CONTACTS);
-	LFileSelect Select;
+	if (!Contacts)
+		return;
 
-	Select.Parent(Parent);
-	Select.Type("Outlook Contacts", "*.csv");
+	auto Select = new LFileSelect;
 
-	if (Contacts && Select.Open())
+	Select->Parent(Parent);
+	Select->Type("Outlook Contacts", "*.csv");
+
+	Select.Open([](auto s, auto ok)
 	{
-		ImpRecordSet Rs;
-		if (ReadCsv(Select.Name(), Rs) > 0)
+		if (ok)
 		{
-			for (ImpRecord *r = Rs.First(); r; r = Rs.Next())
+			ImpRecordSet Rs;
+			if (ReadCsv(s->Name(), Rs) > 0)
 			{
-				Contact *c = new Contact;
-				if (c)
+				for (ImpRecord *r = Rs.First(); r; r = Rs.Next())
 				{
-					CopyField(c, OPT_First, r, "First Name");
-					CopyField(c, OPT_Last, r, "Last Name");
-					CopyField(c, OPT_Email, r, "E-mail Address");
-					CopyField(c, OPT_Street, r, "Home Street");
-					CopyField(c, OPT_Suburb, r, "Home City");
-					CopyField(c, OPT_State, r, "Home State");
-					CopyField(c, OPT_Postcode, r, "Home Postal Code");
-					CopyField(c, OPT_Country, r, "Home Country");
-					CopyField(c, OPT_Work, r, "Business Phone");
-					CopyField(c, OPT_Home, r, "Home Phone");
-					CopyField(c, OPT_Mobile, r, "Mobile Phone");
-					CopyField(c, OPT_Fax, r, "Business Fax");
-					CopyField(c, OPT_WebPage, r, "Web Page");
+					Contact *c = new Contact;
+					if (c)
+					{
+						CopyField(c, OPT_First, r, "First Name");
+						CopyField(c, OPT_Last, r, "Last Name");
+						CopyField(c, OPT_Email, r, "E-mail Address");
+						CopyField(c, OPT_Street, r, "Home Street");
+						CopyField(c, OPT_Suburb, r, "Home City");
+						CopyField(c, OPT_State, r, "Home State");
+						CopyField(c, OPT_Postcode, r, "Home Postal Code");
+						CopyField(c, OPT_Country, r, "Home Country");
+						CopyField(c, OPT_Work, r, "Business Phone");
+						CopyField(c, OPT_Home, r, "Home Phone");
+						CopyField(c, OPT_Mobile, r, "Mobile Phone");
+						CopyField(c, OPT_Fax, r, "Business Fax");
+						CopyField(c, OPT_WebPage, r, "Web Page");
 
-					c->Save(Contacts);
+						c->Save(Contacts);
+					}
 				}
 			}
 		}
-	}
+
+		delete s;
+	});
 	#endif
 }
 

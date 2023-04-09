@@ -2143,16 +2143,6 @@ int ScribeFolder::GetImage(int Flags)
 	}
 }
 
-int ScribeFolder::Sizeof()
-{
-	return 0;
-}
-
-bool ScribeFolder::Serialize(LFile &f, bool Write)
-{
-	return false;
-}
-
 class NullMail : public Mail
 {
 	Thing &operator =(Thing &c) override

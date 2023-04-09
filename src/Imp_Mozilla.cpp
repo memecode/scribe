@@ -421,7 +421,6 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 
 void Import_MozillaAddressBook(ScribeWnd *App)
 {
-	LFileSelect Select;
 	LArray<char*> FindFiles;
 	LArray<const char*> Ext;
 
@@ -460,13 +459,13 @@ void Import_MozillaAddressBook(ScribeWnd *App)
 	FindFiles.DeleteArrays();
 
 	// Ask user...
-	auto Dlg = new ChooseFolderDlg(App,
-						false,
-						AppName,
-						"Select input files and destination directory",
-						DefaultFolder,
-						MAGIC_CONTACT,
-						&Files);
+	auto Dlg = new ChooseFolderDlg(	App,
+									false,
+									AppName,
+									"Select input files and destination directory",
+									DefaultFolder,
+									MAGIC_CONTACT,
+									&Files);
 	Dlg->DoModal([App, Dlg](auto dlg, auto id)
 	{
 		if (id && Dlg->SrcFiles[0])

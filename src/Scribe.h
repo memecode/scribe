@@ -690,8 +690,6 @@ public:
 	void SetMsg(Mail *m);
 
 	LStreamI *GotoObject(const char *file, int line);
-	int Sizeof();
-	bool Serialize(LFile &f, bool Write);
 	IoProgress Import(IoProgressFnArgs) override { return Store3Error; }
 	IoProgress Export(IoProgressFnArgs) override { return Store3Error; }
 
@@ -759,9 +757,6 @@ public:
 	bool HasEmail(LString email);
 
 	// Serialization
-	size_t SizeofField(const char *Name);
-	size_t Sizeof();
-	bool Serialize(LFile &f, bool Write);
 	bool Save(ScribeFolder *Into = 0) override;
 
 	// ListItem
@@ -1335,10 +1330,6 @@ public:
 	// Name
 	void SetName(const char *Name, bool Encode);
 	LString GetName(bool Decode);
-
-	// Serialization
-	int Sizeof();
-	bool Serialize(LFile &f, bool Write);
 
 	// Tree Item
 	const char *GetText(int i=0) override;

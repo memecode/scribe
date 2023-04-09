@@ -1346,29 +1346,9 @@ int Contact::Compare(LListItem *Arg, ssize_t FieldId)
 ThingUi *Contact::DoUI(MailContainer *c)
 {
 	if (!Ui)
-	{
 		Ui = new ContactUi(this);
-	}
 
 	return Ui;
-}
-
-size_t Contact::SizeofField(const char *Name)
-{
-	LAssert(0);
-	return 0;
-}
-
-size_t Contact::Sizeof()
-{
-	LAssert(0);
-	return 0;
-}
-
-bool Contact::Serialize(LFile &f, bool Write)
-{
-	LAssert(0);
-	return false;
 }
 
 int Contact::DefaultContactFields[] = { FIELD_FIRST_NAME, FIELD_LAST_NAME, FIELD_EMAIL, 0 };
