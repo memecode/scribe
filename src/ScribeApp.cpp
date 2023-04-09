@@ -371,46 +371,44 @@ static LString ExtractVer(const char *s)
 	return LString(Buf);
 }
 
-void IsSoftwareUpToDate(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function<void(SoftwareStatus)> callback)
+void IsSoftwareUpToDate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function<void(SoftwareStatus, LSoftwareUpdate::UpdateInfo*)> callback)
 {
+	// LSoftwareUpdate::UpdateInfo Info
 	// Software update?
-	LAutoString Proxy = Parent->GetHttpProxy();
-	LSoftwareUpdate Update(AppName, SoftwareUpdateUri, Proxy);
+	auto Proxy  = Parent->GetHttpProxy();
+	auto Update = new LSoftwareUpdate(AppName, SoftwareUpdateUri, Proxy);
 
-	Update.CheckForUpdate(
-		Info,
-		WithUI?Parent:0,
-		IncBetas,
-		[Info, WithUI, Parent, callback](auto status, auto errorMsg)
+	Update->CheckForUpdate(
+		[WithUI, Parent, callback, Update](auto Info, auto errorMsg)
 		{
-			if (status)
+			if (Info)
 			{
 				auto LocalVer = LString(ScribeVer).SplitDelimit(".");
-				LString BuildVer = ExtractVer(Info.Build);
+				LString BuildVer = ExtractVer(Info->Build);
 				auto OnlineVer = BuildVer.SplitDelimit(".");
 				if (OnlineVer.Length() != LocalVer.Length())
 				{
-					LgiTrace("%s:%i - Invalid online version number \"%s\"\n", _FL, Info.Version.Get());
-					if (callback)
-						callback(SwError);
+					LgiTrace("%s:%i - Invalid online version number \"%s\"\n", _FL, Info->Version.Get());
+					if(callback)
+						callback(SwError, Info);
 					return;
 				}
 
 				unsigned i;
-				for (i=0; i<OnlineVer.Length(); i++)
+				for(i = 0; i < OnlineVer.Length(); i++)
 				{
-					int l = atoi(LocalVer[i]);
-					int o = atoi(OnlineVer[i]);
-					if (l < o)
+					auto l = Atoi(LocalVer[i].Get());
+					auto o = Atoi(OnlineVer[i].Get());
+					if(l < o)
 					{
-						if (callback)
-							callback(SwOutOfDate);
+						if(callback)
+							callback(SwOutOfDate, Info);
 						return;
 					}
-					if (l > o)
+					if(l > o)
 					{
-						if (callback)
-							callback(SwUpToDate);
+						if(callback)
+							callback(SwUpToDate, Info);
 						return;
 					}
 				}
@@ -422,43 +420,40 @@ void IsSoftwareUpToDate(LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bo
 				Compile.Year(atoi(Date[2]));
 				Compile.SetTime(__TIME__);
 
-				bool DateGreaterThenCompile = Info.Date > Compile;
+				bool DateGreaterThenCompile = Info->Date > Compile;
 				if (callback)
-					callback(DateGreaterThenCompile ? SwOutOfDate : SwUpToDate);
+					callback(DateGreaterThenCompile ? SwOutOfDate : SwUpToDate, Info);
 				return;
 			}
 			else if (WithUI)
 			{
-				if (Info.Cancel)
-				{
-					if (callback)
-						callback(SwCancel);
-					return;
-				}
-
+				if (callback)
+					callback(SwCancel, NULL);
 				LgiMsg(Parent, LLoadString(IDS_ERROR_SOFTWARE_UPDATE), AppName, MB_OK, errorMsg);
 			}
 
 			if (callback)
-				callback(SwError);
-		});
+				callback(SwError, NULL);
+		},
+		WithUI ? Parent : NULL,
+		IncBetas);
 }
 
-bool UpgradeSoftware(const LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent, bool WithUI)
+bool UpgradeSoftware(const LSoftwareUpdate::UpdateInfo *Info, ScribeWnd *Parent, bool WithUI)
 {
 	bool DownloadUpdate = true;
 
 	if (WithUI)
 	{
 		char Ds[64];
-		Info.Date.Get(Ds, sizeof(Ds));
+		Info->Date.Get(Ds, sizeof(Ds));
 
 		DownloadUpdate = LgiMsg(Parent,
 								LLoadString(IDS_SOFTWARE_UPDATE_DOWNLOAD),
 								AppName,
 								MB_YESNO,
-								(char*)Info.Build,
-								(char*)Info.Uri,
+								Info->Build.Get(),
+								Info->Uri.Get(),
 								Ds)
 							==
 								IDYES;
@@ -469,14 +464,14 @@ bool UpgradeSoftware(const LSoftwareUpdate::UpdateInfo &Info, ScribeWnd *Parent,
 
 	LAutoString Proxy = Parent->GetHttpProxy();
 	LSoftwareUpdate Update(AppName, SoftwareUpdateUri, Proxy, ScribeTempPath());
-	return Update.ApplyUpdate(Info, false, Parent);
+	// FIXME:
+	return false; // Update.ApplyUpdate(Info, false, Parent);
 }
 
 void SoftwareUpdate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function<void(bool goingToUpdate)> callback)
 {
 	// Software update?
-	LSoftwareUpdate::UpdateInfo Info;
-	IsSoftwareUpToDate(Info, Parent, WithUI, IncBetas, [WithUI, Parent, Info, callback](auto s)
+	IsSoftwareUpToDate(Parent, WithUI, IncBetas, [WithUI, Parent, callback](auto s, auto Info)
 	{
 		if (s == SwUpToDate)
 		{
@@ -4539,14 +4534,16 @@ void ScribeWnd::OnHour()
 					GetOptions()->SetValue(OPT_SoftwareUpdateLast, v = s);
 
 					// Check for update now...
-					LSoftwareUpdate::UpdateInfo Info;
 					GetOptions()->GetValue(OPT_SoftwareUpdateIncBeta, v);
-					IsSoftwareUpToDate(Info, this, false, v.CastInt32() != 0, [Info, this](auto s)
-					{
-						if (s == SwOutOfDate)
-							if (UpgradeSoftware(Info, this, true))
-								LCloseApp();
-					});
+					IsSoftwareUpToDate(	this,
+										false,
+										v.CastInt32() != 0,
+										[this](auto s, auto Info)
+										{
+											if (s == SwOutOfDate)
+												if (UpgradeSoftware(Info, this, true))
+													LCloseApp();
+										});
 				}
 			}
 		}

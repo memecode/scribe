@@ -74,8 +74,8 @@
     <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\Windows\$(Platform)$(Configuration)19\</OutDir>
-    <IntDir>..\Windows\$(Platform)$(Configuration)19\Mapi\</IntDir>
+    <OutDir>..\win\$(Platform)$(Configuration)19\</OutDir>
+    <IntDir>..\win\$(Platform)$(Configuration)19\Mapi\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -86,8 +86,8 @@
     <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\Windows\$(Platform)$(Configuration)19\</OutDir>
-    <IntDir>..\Windows\$(Platform)$(Configuration)19\Mapi\</IntDir>
+    <OutDir>..\win\$(Platform)$(Configuration)19\</OutDir>
+    <IntDir>..\win\$(Platform)$(Configuration)19\Mapi\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;$(IncludePath)</IncludePath>
   </PropertyGroup>

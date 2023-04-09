@@ -241,94 +241,270 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\SpellCheckAspell.cpp">
       <Filter>SpellCheck</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\AddressSelect.cpp" />
-    <ClCompile Include="..\src\BayesDlg.cpp" />
-    <ClCompile Include="..\src\BayesianFilter.cpp" />
-    <ClCompile Include="..\src\Calendar.cpp" />
-    <ClCompile Include="..\src\CalendarView.cpp" />
-    <ClCompile Include="..\src\Components.cpp" />
-    <ClCompile Include="..\src\Encryption\GnuPG.cpp" />
-    <ClCompile Include="..\src\Exp_Scribe.cpp" />
-    <ClCompile Include="..\src\FolderCalendarSource.cpp" />
-    <ClCompile Include="..\src\GBTreeWordStore.cpp" />
-    <ClCompile Include="..\src\NewMailDlg.cpp" />
-    <ClCompile Include="..\src\RemoteCalendarSource.cpp" />
-    <ClCompile Include="..\src\SearchView.cpp" />
-    <ClCompile Include="..\src\HtmlToText.cpp" />
-    <ClCompile Include="..\src\ImpExp_Mbox.cpp" />
-    <ClCompile Include="..\src\ImpExp_Outlook.cpp" />
-    <ClCompile Include="..\src\Imp_CsvContacts.cpp" />
-    <ClCompile Include="..\src\Imp_Eml.cpp" />
-    <ClCompile Include="..\src\Imp_Eudora.cpp" />
-    <ClCompile Include="..\src\Imp_Mozilla.cpp" />
-    <ClCompile Include="..\src\Imp_NetscapeContacts.cpp" />
-    <ClCompile Include="..\src\Imp_OutlookExpress.cpp" />
-    <ClCompile Include="..\src\ManageMailStores.cpp" />
-    <ClCompile Include="..\src\MContainer.cpp" />
-    <ClCompile Include="..\src\ObjectInspector.cpp" />
-    <ClCompile Include="..\src\OptionsDlg.cpp" />
-    <ClCompile Include="..\src\PreviewPanel.cpp" />
-    <ClCompile Include="..\src\PrintContext.cpp" />
-    <ClCompile Include="..\src\PrintPreview.cpp" />
-    <ClCompile Include="..\src\ReplicateDlg.cpp" />
-    <ClCompile Include="..\src\ScribeAbout.cpp" />
-    <ClCompile Include="..\src\ScribeAccount.cpp" />
-    <ClCompile Include="..\src\ScribeAccountPreview.cpp" />
-    <ClCompile Include="..\src\ScribeAccountUI.cpp" />
-    <ClCompile Include="..\src\ScribeApp.cpp" />
-    <ClCompile Include="..\src\ScribeAttachment.cpp" />
-    <ClCompile Include="..\src\ScribeContact.cpp" />
-    <ClCompile Include="..\src\ScribeFilter.cpp" />
-    <ClCompile Include="..\src\ScribeFinder.cpp" />
-    <ClCompile Include="..\src\ScribeFolder.cpp" />
-    <ClCompile Include="..\src\ScribeFolderDlg.cpp" />
-    <ClCompile Include="..\src\ScribeFolderProp.cpp" />
-    <ClCompile Include="..\src\ScribeFolderSelect.cpp" />
-    <ClCompile Include="..\src\ScribeFolderTree.cpp" />
-    <ClCompile Include="..\src\ScribeGroup.cpp" />
-    <ClCompile Include="..\src\ScribeItemList.cpp" />
-    <ClCompile Include="..\src\ScribeLangDlg.cpp" />
-    <ClCompile Include="..\src\ScribeListAddr.cpp" />
-    <ClCompile Include="..\src\ScribeMail.cpp" />
-    <ClCompile Include="..\src\ScribeMain.cpp" />
-    <ClCompile Include="..\src\ScribePageSetup.cpp" />
-    <ClCompile Include="..\src\ScribePassword.cpp" />
-    <ClCompile Include="..\src\ScribeSendReceive.cpp" />
-    <ClCompile Include="..\src\ScribeSockets.cpp" />
-    <ClCompile Include="..\src\ScribeStatusPanel.cpp" />
-    <ClCompile Include="..\src\ScribeThing.cpp" />
-    <ClCompile Include="..\src\ScribeUi.cpp" />
-    <ClCompile Include="..\src\ScribeUtils.cpp" />
-    <ClCompile Include="..\src\Scripting.cpp" />
-    <ClCompile Include="..\src\SecurityDlg.cpp" />
-    <ClCompile Include="..\src\Sqlite\v3.41.2\sqlite3.c" />
-    <ClCompile Include="..\src\Store3Common.cpp" />
-    <ClCompile Include="..\src\Store3Imap\ScribeImap_Attachment.cpp" />
-    <ClCompile Include="..\src\Store3Imap\ScribeImap_Folder.cpp" />
-    <ClCompile Include="..\src\Store3Imap\ScribeImap_Mail.cpp" />
-    <ClCompile Include="..\src\Store3Imap\ScribeImap_Store.cpp" />
-    <ClCompile Include="..\src\Store3Imap\ScribeImap_Thread.cpp" />
-    <ClCompile Include="..\src\Store3Mail3\Mail3Attachment.cpp" />
-    <ClCompile Include="..\src\Store3Mail3\Mail3Calendar.cpp" />
-    <ClCompile Include="..\src\Store3Mail3\Mail3Contact.cpp" />
-    <ClCompile Include="..\src\Store3Mail3\Mail3Filter.cpp" />
-    <ClCompile Include="..\src\Store3Mail3\Mail3Folder.cpp" />
-    <ClCompile Include="..\src\Store3Mail3\Mail3Group.cpp" />
-    <ClCompile Include="..\src\Store3Mail3\Mail3Mail.cpp" />
-    <ClCompile Include="..\src\Store3Mail3\Mail3Store.cpp" />
-    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Attachment.cpp" />
-    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Calendar.cpp" />
-    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Contact.cpp" />
-    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Folder.cpp" />
-    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Mail.cpp" />
-    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Store.cpp" />
-    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Thing.cpp" />
-    <ClCompile Include="..\src\Store3Webdav\WebdavCalendar.cpp" />
-    <ClCompile Include="..\src\Store3Webdav\WebdavContact.cpp" />
-    <ClCompile Include="..\src\Store3Webdav\WebdavFolder.cpp" />
-    <ClCompile Include="..\src\Store3Webdav\WebdavStore.cpp" />
-    <ClCompile Include="..\src\Store3Webdav\WebdavThread.cpp" />
-    <ClCompile Include="..\src\TitlePage.cpp" />
+    <ClCompile Include="..\src\AddressSelect.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BayesDlg.cpp">
+      <Filter>Filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BayesianFilter.cpp">
+      <Filter>Filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Calendar.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CalendarView.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Components.cpp">
+      <Filter>Install</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Exp_Scribe.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FolderCalendarSource.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GBTreeWordStore.cpp">
+      <Filter>Filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Encryption\GnuPG.cpp">
+      <Filter>Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_CsvContacts.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_Eml.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_Eudora.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_Mozilla.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_NetscapeContacts.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_OutlookExpress.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ImpExp_Mbox.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ImpExp_Outlook.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Attachment.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Calendar.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Contact.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Filter.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Folder.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Group.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Mail.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Store.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ManageMailStores.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MContainer.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NewMailDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ObjectInspector.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\OptionsDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PreviewPanel.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PrintContext.cpp">
+      <Filter>Printing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PrintPreview.cpp">
+      <Filter>Printing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ReplicateDlg.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAccount.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeApp.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RemoteCalendarSource.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAccountUI.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolderProp.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolderSelect.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolderTree.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Attachment.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Folder.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Mail.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Store.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Thread.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAbout.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAccountPreview.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeItemList.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeContact.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAttachment.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFilter.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFinder.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolder.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolderDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeGroup.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeLangDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Attachment.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Calendar.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Contact.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Folder.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Mail.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Store.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Thing.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeUi.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeThing.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeListAddr.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Sqlite\v3.41.2\sqlite3.c">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Common.cpp">
+      <Filter>Store3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeStatusPanel.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeMail.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavCalendar.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavContact.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavFolder.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavStore.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavThread.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SecurityDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TitlePage.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SearchView.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribePageSetup.cpp">
+      <Filter>Printing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeMain.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeSendReceive.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeSockets.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribePassword.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeUtils.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\HtmlToText.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\Btree\btree.h">
@@ -520,41 +696,111 @@
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Http.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\BayesianFilter.h" />
-    <ClInclude Include="..\src\Calendar.h" />
-    <ClInclude Include="..\src\CalendarView.h" />
-    <ClInclude Include="..\src\Components.h" />
-    <ClInclude Include="..\src\DomFields.h" />
-    <ClInclude Include="..\src\DomType.h" />
-    <ClInclude Include="..\src\DomTypeValues.h" />
-    <ClInclude Include="..\src\Encryption\GnuPG.h" />
-    <ClInclude Include="..\src\Imp_Outlook.h" />
-    <ClInclude Include="..\src\ManageMailStores.h" />
-    <ClInclude Include="..\src\ObjectInspector.h" />
-    <ClInclude Include="..\src\PreviewPanel.h" />
-    <ClInclude Include="..\src\PrintContext.h" />
-    <ClInclude Include="..\src\PrintPreview.h" />
-    <ClInclude Include="..\src\ReplicateDlg.h" />
-    <ClInclude Include="..\src\Scribe.h" />
-    <ClInclude Include="..\src\ScribeAccountPreview.h" />
-    <ClInclude Include="..\src\ScribeAccountUI.h" />
-    <ClInclude Include="..\src\ScribeDefs.h" />
-    <ClInclude Include="..\src\ScribeFolderDlg.h" />
-    <ClInclude Include="..\src\ScribeFolderSelect.h" />
-    <ClInclude Include="..\src\ScribeInc.h" />
-    <ClInclude Include="..\src\ScribeListAddr.h" />
-    <ClInclude Include="..\src\ScribePageSetup.h" />
-    <ClInclude Include="..\src\ScribePrivate.h" />
-    <ClInclude Include="..\src\ScribeStatusPanel.h" />
-    <ClInclude Include="..\src\ScribeUtils.h" />
-    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3.h" />
-    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3ext.h" />
-    <ClInclude Include="..\src\Store3Imap\include\Scribe.pb.h" />
-    <ClInclude Include="..\src\Store3Imap\ScribeImap.h" />
-    <ClInclude Include="..\src\Store3Mail3\Mail3.h" />
-    <ClInclude Include="..\src\Store3Mapi\ScribeMapi.h" />
-    <ClInclude Include="..\src\Store3Webdav\WebdavStore.h" />
-    <ClInclude Include="..\src\Store3Webdav\WebdavStorePriv.h" />
+    <ClInclude Include="..\src\BayesianFilter.h">
+      <Filter>Filtering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Calendar.h">
+      <Filter>Calendar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CalendarView.h">
+      <Filter>Calendar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Components.h">
+      <Filter>Install</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DomFields.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DomType.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DomTypeValues.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Encryption\GnuPG.h">
+      <Filter>Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Imp_Outlook.h">
+      <Filter>Import/Export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Mail3\Mail3.h">
+      <Filter>Store3\Mail3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ManageMailStores.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ObjectInspector.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PreviewPanel.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PrintContext.h">
+      <Filter>Printing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PrintPreview.h">
+      <Filter>Printing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ReplicateDlg.h">
+      <Filter>Import/Export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scribe.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Imap\include\Scribe.pb.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeAccountUI.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeFolderSelect.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Imap\ScribeImap.h">
+      <Filter>Store3\Imap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeAccountPreview.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeDefs.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeFolderDlg.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeInc.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Mapi\ScribeMapi.h">
+      <Filter>Store3\Mapi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeListAddr.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3.h">
+      <Filter>Store3\Mail3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3ext.h">
+      <Filter>Store3\Mail3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeStatusPanel.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Webdav\WebdavStore.h">
+      <Filter>Store3\WebDav</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Webdav\WebdavStorePriv.h">
+      <Filter>Store3\WebDav</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribePageSetup.h">
+      <Filter>Printing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribePrivate.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeUtils.h">
+      <Filter>Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Icons\app.ico">
@@ -691,17 +937,39 @@
     <None Include="..\Resources\PreviewGroup.html">
       <Filter>Controls/UI\PreviewPanel</Filter>
     </None>
-    <None Include="..\src\Encryption\Examples\encrypted+attach.eml" />
-    <None Include="..\src\Encryption\Examples\encrypted+html+attach+key.eml" />
-    <None Include="..\src\Encryption\Examples\encrypted.eml" />
-    <None Include="..\src\Encryption\Examples\signed+attach.eml" />
-    <None Include="..\src\Encryption\Examples\signed+encrypted.eml" />
-    <None Include="..\src\Encryption\Examples\signed+HTML+attach+key.eml" />
-    <None Include="..\src\Encryption\Examples\signed+html.eml" />
-    <None Include="..\src\Encryption\Examples\signed.eml" />
-    <None Include="..\src\Py\DomScan.py" />
-    <None Include="..\src\Py\win32_pre_build_step.py" />
-    <None Include="..\src\Store3Imap\Scribe.proto" />
+    <None Include="..\src\Py\DomScan.py">
+      <Filter>Install</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted.eml">
+      <Filter>TestCases</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted+html+attach+key.eml">
+      <Filter>TestCases</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted+attach.eml">
+      <Filter>TestCases</Filter>
+    </None>
+    <None Include="..\src\Store3Imap\Scribe.proto">
+      <Filter>Application</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed.eml">
+      <Filter>TestCases</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+attach.eml">
+      <Filter>TestCases</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+encrypted.eml">
+      <Filter>TestCases</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+html.eml">
+      <Filter>TestCases</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+HTML+attach+key.eml">
+      <Filter>TestCases</Filter>
+    </None>
+    <None Include="..\src\Py\win32_pre_build_step.py">
+      <Filter>Application</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Utils\Tables\MailFlags.txt">
@@ -790,6 +1058,12 @@
     <Filter Include="Controls/UI\PreviewPanel">
       <UniqueIdentifier>{22d7ec0d-a127-4b05-b6f0-937c3255224a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="User Interface">
+      <UniqueIdentifier>{8fc43a66-4c8f-4df4-a79b-195ac2b933f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Printing">
+      <UniqueIdentifier>{0bbd47dc-9bff-40f0-9d61-182a4dc33ff7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\Lgi\trunk\src\common\Coding\ExternCall.asm">
@@ -802,6 +1076,8 @@
     </Manifest>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\src\Resource.rc" />
+    <ResourceCompile Include="..\src\Resource.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
