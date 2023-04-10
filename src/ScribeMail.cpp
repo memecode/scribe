@@ -250,7 +250,6 @@ bool ExtractHtmlContent(LString &OutHtml,
 	LMemStream mem(InHtml, strlen(InHtml), false);
 	if (!t.Read(&r, &mem))
 		return false;
-
 	bool InHead = false;
 	LStringPipe Style;
 
@@ -1973,7 +1972,7 @@ bool MailUi::OnViewKey(LView *v, LKey &k)
 					if (HtmlView)
 						HtmlView->DoFind(NULL);
 				}
-				break;
+				return true;
 			}
 			case 'r':
 			case 'R':
@@ -1997,15 +1996,13 @@ bool MailUi::OnViewKey(LView *v, LKey &k)
 				}
 				return true;
 			}
-			case 't':
-			case 'T':
+			case '1':
 			{
 				Tab->Value(0);
 				if (TextView) TextView->Focus(true);
 				return true;
 			}
-			case 'h':
-			case 'H':
+			case '2':
 			{
 				Tab->Value(1);
 				if (HtmlView) HtmlView->Focus(true);
@@ -8936,8 +8933,8 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 		SetSubject(m->GetSubject());
 	}
 
-	const char *EditMimeType = App->EditCtrlMimeType();
-	LAutoString Xml = App->GetReplyXml(EditMimeType);
+	auto EditMimeType = App->EditCtrlMimeType();
+	auto Xml = App->GetReplyXml(EditMimeType);
 	if (ValidStr(Xml))
 	{
 		RemoveReturns(Xml);
