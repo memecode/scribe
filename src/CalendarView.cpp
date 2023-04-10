@@ -1425,7 +1425,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 										EndX,
 										(int)HourToY(EndH) - 3);
 
-								LgiTrace("paint: %s %s\n", Vp.GetStr(), t.c->ToString().Get());
+							// LgiTrace("paint: %s %s\n", Vp.GetStr(), t.c->ToString().Get());
 
 							t.c->OnPaintView(pDC, Font, &Vp, &t);
 						}

@@ -71,9 +71,9 @@ int BayesDlg::OnNotify(LViewI *c, LNotification n)
 		case IDC_SET_SUSPECT_FOLDER:
 		{
 			auto fd = new FolderDlg(this, d->App, MAGIC_MAIL);
-			fd->DoModal([this, fd](auto dlg, auto ctrlId)
+			fd->DoModal([this, fd](auto dlg, auto ok)
 			{
-				if (ctrlId)
+				if (ok)
 					SetCtrlName(IDC_SUSPECT_FOLDER, fd->Get());
 				delete dlg;
 			});
@@ -82,9 +82,9 @@ int BayesDlg::OnNotify(LViewI *c, LNotification n)
 		case IDC_SET_SPAM_FOLDER:
 		{
 			auto fd = new FolderDlg(this, d->App, MAGIC_MAIL);
-			fd->DoModal([this, fd](auto dlg, auto ctrlId)
+			fd->DoModal([this, fd](auto dlg, auto ok)
 			{
-				if (ctrlId)
+				if (ok)
 					SetCtrlName(IDC_SPAM_FOLDER, fd->Get());
 				delete dlg;
 			});

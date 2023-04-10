@@ -2250,17 +2250,14 @@ struct LEditDropDownFactory : public LViewFactory
 //////////////////////////////////////////////////////////////////////////////
 class LRecurDlg : public LDialog
 {
-	CalendarUi *Ui;
-	LEditDropDown *EndOnDate;
-	LCombo *Repeats;
-	bool AcceptNotify;
+	CalendarUi *Ui = NULL;
+	LEditDropDown *EndOnDate = NULL;
+	LCombo *Repeats = NULL;
+	bool AcceptNotify = true;
 	
 public:
 	LRecurDlg(CalendarUi *ui)
 	{
-		EndOnDate = NULL;
-		Repeats = NULL;
-		AcceptNotify = true;
 		Ui = ui;
 		SetParent(ui);		
 		if (LoadFromResource(IDD_CAL_RECUR))
@@ -2284,7 +2281,7 @@ public:
 				Repeats->Insert(LLoadString(IDS_YEAR));
 				Repeats->Value(1);
 			}
-			
+
 			Radio(IDC_NEVER);
 			SetCtrlValue(IDC_EVERY, 1);
 			Serialize(false);

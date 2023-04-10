@@ -19,6 +19,8 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 	LString Name;
 	bool Error = false;
 	bool Loaded = false;
+
+	// Lock before using
 	LArray<Calendar*> Events;
 
 	RemoteCalendarSourcePriv(RemoteCalendarSource *src) :
@@ -31,6 +33,8 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 	{
 		for (auto c: Events)
 			c->DecRef();
+
+		LStackTrace("%p::~RemoteCalendarSourcePriv()", this);
 	}
 
 	void Post(int m, LMessage::Param a = 0, LMessage::Param b = 0)
@@ -52,18 +56,18 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 				auto r = LgiGetUri(this, &out, &err, Uri);
 				if (r)
 				{
-					/*
-					auto s = out.NewLStr();
-					LgiTrace("s='%s'\n", s.Get());
-					*/
-
 					VCal imp;
 					while (true)
 					{
-						Calendar *c = new Calendar(Source->GetApp());
-						// LgiTrace("outsize=" LPrintfInt64 "\n", out.GetSize());
+						auto c = new Calendar(Source->GetApp());
 						if (imp.Import(c->GetObject(), &out))
-							Events.Add(c);
+						{
+							if (Lock(_FL))
+							{
+								Events.Add(c);
+								Unlock();
+							}
+						}
 						else
 						{
 							c->DecRef();
@@ -240,23 +244,28 @@ bool RemoteCalendarSource::GetEvents(const LDateTime StartTs,
 	LDateTime End = EndTs;
 	End.ToUtc();
 
-	for (auto c: d->Events)
+	if (d->Lock(_FL))
 	{
-		LDateTime s;
-		if (c->GetCalType() == CalEvent &&
-			c->GetField(FIELD_CAL_START_UTC, s))
+		for (auto c: d->Events)
 		{
-			LArray<TimePeriod> Times;
-			if (c->GetTimes(Start, End, Times))
-			{						    
-				SetCalendarsSource(c);
-				for (auto &t: Times)
-				{
-					t.src = this;
-					Events.Add(t);
+			LDateTime s;
+			if (c->GetCalType() == CalEvent &&
+				c->GetField(FIELD_CAL_START_UTC, s))
+			{
+				LArray<TimePeriod> Times;
+				if (c->GetTimes(Start, End, Times))
+				{						    
+					SetCalendarsSource(c);
+					for (auto &t: Times)
+					{
+						t.src = this;
+						Events.Add(t);
+					}
 				}
 			}
 		}
+
+		d->Unlock();
 	}
 
 	Callback(Events);
