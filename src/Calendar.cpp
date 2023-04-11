@@ -2875,8 +2875,8 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 			auto Dlg = new LRecurDlg(this);
 			Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 			{
-				if (ctrlId)
-					SetCtrlValue(IDC_REPEAT, 0);
+				if (!ctrlId)
+					SetCtrlValue(IDC_REPEAT, false);
 				delete dlg;
 			});
 			break;

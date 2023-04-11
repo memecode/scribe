@@ -918,12 +918,29 @@ void CalendarView::OnContentsChanged(CalendarSource *Source)
 {
 	Current.Length(0);
 
+	// Reset the start and end...
+	SetCursor(Cursor);
+
 	LDateTime End = Start;
-	End.AddDays(MonthX * MonthY);
+	switch (Mode)
+	{
+		case CAL_VIEW_WEEK:
+			End.AddDays(7);
+			break;
+		case CAL_VIEW_MONTH:
+			End.AddDays(MonthX * MonthY);
+			break;
+		case CAL_VIEW_YEAR:
+			End.AddDays(366);
+			break;
+		default:
+			LAssert(0);
+			break;
+	}
 	
 	new CalendarSourceGetEvents(App, Start, End, CalendarSource::GetSources(), [this](auto Events)
 	{
-		Current += Events;
+		Current = Events;
 
 		LHashTbl<PtrKey<Calendar*>, bool> InCur;
 		for (auto &c: Current)
