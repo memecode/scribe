@@ -438,7 +438,7 @@ public:
 
 	const char *GetClass() { return "LMail3Thing"; }
 	bool IsOnDisk() { return Id > 0; }
-	bool IsOrphan() { return false; }
+	bool IsOrphan() { return Store == NULL || Parent == NULL; }
 	uint64 Size() { return sizeof(*this); }
 	uint32_t Type() { LAssert(0); return 0; }
 	Store3Status Delete(bool ToTrash);

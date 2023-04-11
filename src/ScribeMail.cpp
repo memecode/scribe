@@ -786,7 +786,7 @@ uint32_t MarkColours32[IDM_MARK_MAX] =
 	Rgb32(0, 0xc0, 255),// cyan
 	Rgb32(0, 0, 255),	// blue
 	Rgb32(192, 0, 255),	// purple
-	Rgb32(0, 0, 0)		// black
+	Rgb32(128, 128, 128) // grey
 };
 
 ItemFieldDef MailFieldDefs[] =
@@ -6916,9 +6916,15 @@ void Mail::OnCreate()
 		SetBody(Sig);
 	}
 	else if (EditCtrl.CastInt32())
+	{
+		SetHtmlCharset("utf-8");
 		SetHtml(Sig);
+	}
 	else
+	{
+		SetBodyCharset("utf-8");
 		SetBody(Sig);
+	}
 
 	LVariant ClipRecip;
 	if (Options->GetValue(OPT_RecipientFromClipboard, ClipRecip) &&

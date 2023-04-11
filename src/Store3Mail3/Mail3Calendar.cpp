@@ -337,8 +337,8 @@ Store3Status LMail3Calendar::SetInt(int id, int64 val)
 			CalPriv = (CalendarPrivacyType)n;
 			break;
 		case FIELD_COLOUR:
-			if (n > 0)
-				Colour.Set(n, 32);
+			if (val > 0)
+				Colour.Set((uint32_t)val, 32);
 			else
 				Colour.Empty();
 			break;

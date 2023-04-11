@@ -3324,9 +3324,9 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 						case IDM_ADD_LOCAL_CAL:
 						{
 							auto Dlg = new FolderDlg(this, App, MAGIC_CALENDAR);
-							Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
+							Dlg->DoModal([this, Dlg](auto dlg, auto ok)
 							{
-								if (ctrlId)
+								if (ok)
 								{
 									auto Key = UnusedKey();
 									auto Parts = Key.SplitDelimit(".");
