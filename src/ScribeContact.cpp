@@ -358,6 +358,7 @@ public:
 			{
 				if (k.Ctrl())
 				{
+					// Paste shortcut handler:
 					if (k.Down())
 					{
 						CompressedImg.Empty();
@@ -394,7 +395,7 @@ public:
 	
 	void SetImage(LAutoPtr<LSurface> Raw)
 	{
-		if (Raw && (Raw->X() > 160 || Raw->Y() > 160))
+		if (Raw && (Raw->X() != 160 || Raw->Y() != 160))
 			ConvertImageToContactSize(Img, 160, Raw);
 		else
 			Img = Raw;

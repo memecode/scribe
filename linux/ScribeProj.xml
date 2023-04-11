@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Project>
+	<Node Name="Build" Type="1" Platforms="15" Id="1">
+		<Node File="../build.py" Type="8" Platforms="15" />
+		<Node File="./make-zip.linux" Type="8" Platforms="15" />
+		<Node File="./make-install.linux" Type="7" Platforms="0" />
+		<Node File="./Makefile.linux" Type="9" Platforms="15" />
+	</Node>
 	<Node Name="Encryption" Type="1" Platforms="15" Open="0" Id="1">
 		<Node File="../src/Encryption/GnuPG.cpp" Type="2" Platforms="15" />
 		<Node File="../src/Encryption/GnuPG.h" Type="3" Platforms="15" />
@@ -69,6 +75,10 @@
 		<Node File="../../../lgi/trunk/include/lgi/common/Mail.h" Type="3" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Net/MailHttp.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Net/MailImap.cpp" Type="2" Platforms="15" />
+	</Node>
+	<Node Name="Installer Scripts" Type="1" Platforms="15" Open="0" Id="43">
+		<Node File="../src/Py/DomScan.py" Type="8" Platforms="15" />
+		<Node File="../utils/getversion.py" Type="8" Platforms="15" />
 	</Node>
 	<Node Name="Lgi" Type="1" Open="0" Platforms="7" Id="7">
 		<Node Name="DrawListSurface" Type="1" Platforms="15" Open="0" Id="8">
@@ -340,16 +350,6 @@
 	<Node File="../../libs/aspell-0.60.6.1/linux/aspell-dist-0.60.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Node File="../../libs/bzip2-1.0.6/linux/bzip2.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Node File="../../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
-	<Node Name="Installer Scripts" Type="1" Platforms="15" Open="0" Id="43">
-		<Node File="../src/Py/DomScan.py" Type="8" Platforms="15" />
-		<Node File="../utils/getversion.py" Type="8" Platforms="15" />
-	</Node>
-	<Node Name="Build" Type="1" Platforms="15" Id="1">
-		<Node File="../build.py" Type="8" Platforms="15" />
-		<Node File="./make-zip.linux" Type="8" Platforms="15" />
-		<Node File="./make-install.linux" Type="7" Platforms="0" />
-		<Node File="./Makefile.linux" Type="9" Platforms="15" />
-	</Node>
 	<Settings>
 		<General>
 			<Makefile>

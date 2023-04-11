@@ -620,10 +620,7 @@ void CalendarView::OnOptionsChange()
 		FirstDayOfWeek = v.CastInt32();
 
 	for (auto c: CalendarViews)
-	{
-		if (c->IsAttached())
-			c->Invalidate();
-	}
+		c->OnContentsChanged();
 }
 
 CalendarView *Calendar::GetView()
@@ -3335,10 +3332,10 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 						}
 						case IDM_ADD_CAL_URL:
 						{
-							auto dlg = new LInput(this);
-							dlg->DoModal([this, dlg](auto dialog, auto ctrlId)
+							auto dlg = new LInput(this, "", LLoadString(IDC_CAL_URL, "Calendar URL:"), AppName);
+							dlg->DoModal([this, dlg](auto dialog, auto ok)
 							{
-								if (ctrlId)
+								if (ok)
 								{
 									auto Key = UnusedKey();
 									auto Parts = Key.SplitDelimit(".");

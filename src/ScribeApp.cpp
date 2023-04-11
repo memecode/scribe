@@ -11658,7 +11658,7 @@ bool ScribeWnd::GetHelpFilesPath(char *Path, int PathSize)
 	for (int i=0; i<5; i++)
 	{
 		char p[MAX_PATH_LEN];
-		LMakePath(p, sizeof(p), Install, "Help");
+		LMakePath(p, sizeof(p), Install, "help");
 		LMakePath(p, sizeof(p), p, Index);
 		LgiTrace("Trying '%s'\n", p);
 		if (LFileExists(p))
@@ -11684,6 +11684,7 @@ bool ScribeWnd::GetHelpFilesPath(char *Path, int PathSize)
 	LArray<const char*> Ext;
 	LArray<char*> Help;
 	Ext.Add("index.html");
+	LMakePath(Install, sizeof(Install), ScribeResourcePath(), "..");
 	LRecursiveFileSearch(Install, &Ext, &Help);
 	for (unsigned i=0; i<Help.Length(); i++)
 	{

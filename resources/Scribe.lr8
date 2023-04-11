@@ -451,7 +451,7 @@
 		<String Ref="725" Cid="725" Define="IDC_725" />
 		<String Ref="726" Cid="-1" Define="IDC_STATIC" en="Contacts URL:" />
 		<String Ref="727" Cid="727" Define="IDC_CONTACTS_URL" />
-		<String Ref="728" Cid="-1" Define="IDC_STATIC" en="Calendar URL:" fr="URL du calendrier:" />
+		<String Ref="728" Cid="1199" Define="IDC_CAL_URL" en="Calendar URL:" fr="URL du calendrier:" />
 		<String Ref="731" Cid="2015" Define="IDC_NEW_MAIL_NOTIFY" fr="Notifier l&apos;arrivé de nouveau courriel par pop-up" en="Popup &notification when new email arrives" cs="Zobrazit upozornění při doručení nové zprávy" nl="Venstertje bij nieuwe post" es="Mostrar mensaje cuando llegue correo nuevo" pt_br="Mostrar notificação quando chegarem  novas mensagens" ja="新着メールをポップアップで通知する" pt="Avisar quando chegarem mensagens" pl="Powiadamiaj o nowej poczcie okienkiem" it="Mostra notifica del nuovo messaggio" vi="Hiện thông báo khi có thư mới" zh_tw="新郵件抵達時以蹦跳視窗通知" sr="Obaveštenje iskačućim prozorom kada nova pošta stigne" no="Vis varsel når nye meldinger ankommer." lt="Apie naują laišką pranešti ekrane" fa="نمايش پنجره براي اعلام رسيدن نامه جديد" de="Popup-Benachrichtigung beim Eingang neuer E-Mail" da="Vis varsel når nye meldinger ankommer." sv="Visa dialogruta när ny e-post ankommer" lg="Laga akatonya nga ebaluwa empya zize" tr="Yeni e-posta geldiğinde uyarı görüntüle" hu="Felugró értesítés új levél érkezésekor" ru="Информировать при получении нового сообщения" ko="새로운 이메일 수신시 팝업 알림" uk="Спливаюче повідомлення, коли приходить нова пошта" />
 		<String Ref="732" Cid="694" Define="IDC_PREVIEW_READ" en="Mark email as read after" vi="Đánh dấu thư đã đọc sau khi duyệt" pt="Marcar como lido após" pl="Uznaj za przeczytaną po" zh_tw="預覽" ja="メールを表示して" nl="Markeer bericht als gelezen na" sr="Obeleži poruku da je pročitana posle" es="Marcar el mensaje como leído tras mostrarlo" cs="Označit zprávu jako přečtenou po" no="Merk epost som lest etter" lt="Po" fa="بعد از 5 ثانيه پيش نمايش نامه را به عنوان خوانده شده برچسب بزن" de="E-Mails nach" da="Marker epost som læst efter" sv="Markera e-post som läst efte" pt_br="Marcar mensagem como Lida após" lg="Lamba nga esomeddwa bw&apos;eggulibwa okumala edakiika" hu="Olvasott jelölés" ru="Прочитано через" tr="E-postaları açınca" ko="나중에 읽기로 표시" uk="Відмітити як прочитане через:" fr="Marquer le courriel comme lu après" />
 		<String Ref="733" Cid="733" Define="IDS_APPEARANCE" en="Appearance" fr="Apparence" it="Aspetto" cs="Vzhled" es="Apariencia" de="Aussehen" nl="Beeld" pt_br="Aparência" ru="Вид" ja="表示" pt="Aparência" pl="Wygląd" vi="Hình thức" zh_tw="外觀" sr="Izgled" no="Utseende" lt="Išvaizda" fa="ظاهر" da="Udseende" sv="Utseende" lg="Endabika" tr="Görünüm" hu="Megjelenés" ko="외양" uk="Зовнішній вигляд" />
@@ -1669,7 +1669,7 @@
 							<StaticText pos="21,56,69,69" ref="1234" />
 						</td>
 						<td addr="1,1">
-							<EditBox Pos="108,45,215,65" ref="463" />
+							<EditBox Pos="108,45,214,65" ref="463" />
 						</td>
 						<td addr="2,1">
 							<StaticText pos="231,56,279,69" ref="1518" />
@@ -1709,7 +1709,7 @@
 					</tr>
 					<tr>
 						<td addr="0,6" align="Max" valign="Center">
-							<StaticText pos="0,268,107,281" ref="465" />
+							<StaticText pos="0,268,106,281" ref="465" />
 						</td>
 						<td addr="1,6" colspan="3">
 							<ComboBox pos="125,269,411,289" ref="480" />
@@ -1954,7 +1954,7 @@
 										<EditBox Pos="42,60,293,73" ref="904" />
 									</td>
 									<td addr="1,3">
-										<Button pos="393,61,413,77" ref="932" toggle="0" />
+										<Button pos="390,61,410,77" ref="932" toggle="0" />
 									</td>
 								</tr>
 								<tr>
@@ -2071,7 +2071,7 @@
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<TableLayout pos="14,323,468,371" ref="92" Style="width: 100%;" cols="0.500,0.500" rows="1.000">
+					<TableLayout pos="11,323,465,371" ref="92" Style="width: 100%;" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0" style="width: 99%;">
 								<Button pos="7,8,69,28" ref="1564" toggle="0" />
@@ -2131,10 +2131,10 @@
 			</tr>
 			<tr>
 				<td addr="0,1" colspan="5">
-					<TableLayout pos="7,127,237,161" ref="869" cols="0.500,0.500" rows="1.000">
+					<TableLayout pos="6,126,236,160" ref="869" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0">
-								<CheckBox pos="0,0,104,20" ref="870" />
+								<CheckBox pos="0,0,104,18" ref="870" />
 							</td>
 							<td addr="1,0">
 								<CheckBox pos="119,0,202,13" ref="868" />
@@ -2157,7 +2157,7 @@
 			<tr>
 				<td addr="0,3" />
 				<td addr="1,3" colspan="3">
-					<ListView pos="102,205,360,225" ref="1217" Style="height: 4em;" />
+					<ListView pos="100,205,358,225" ref="1217" Style="height: 4em;" />
 				</td>
 				<td addr="4,3" />
 			</tr>
@@ -2166,7 +2166,7 @@
 					<StaticText pos="14,241,62,254" ref="871" />
 				</td>
 				<td addr="1,4" colspan="3">
-					<EditBox Pos="95,245,360,265" Style="height: 4em;" MultiLine="1" ref="771" />
+					<EditBox Pos="93,245,358,265" Style="height: 4em;" MultiLine="1" ref="771" />
 				</td>
 				<td addr="4,4">
 					<Button pos="373,245,435,265" ref="872" toggle="0" />
@@ -2204,13 +2204,13 @@
 					<TableLayout pos="102,386,451,427" ref="913" cols="0.167,0.167,0.167,0.167,0.167,0.167" rows="1.000">
 						<tr>
 							<td addr="0,0">
-								<ComboBox pos="0,0,54,20" ref="1153" />
+								<ComboBox pos="0,0,53,20" ref="1153" />
 							</td>
 							<td addr="1,0">
-								<EditBox Pos="69,0,110,20" Style="width: 4em;" ref="914" />
+								<EditBox Pos="67,0,108,20" Style="width: 4em;" ref="914" />
 							</td>
 							<td addr="2,0">
-								<ComboBox pos="118,0,166,20" ref="918" />
+								<ComboBox pos="115,0,163,20" ref="918" />
 							</td>
 							<td addr="3,0" valign="Center">
 								<StaticText pos="175,7,188,20" ref="526" />
@@ -2219,7 +2219,7 @@
 								<EditBox Pos="224,0,265,20" Style="width: 8em;" ref="527" />
 							</td>
 							<td addr="5,0">
-								<Button pos="280,0,334,20" ref="525" toggle="0" />
+								<Button pos="279,0,333,20" ref="525" toggle="0" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -2248,14 +2248,14 @@
 					<StaticText pos="14,508,62,521" ref="1048" />
 				</td>
 				<td addr="1,11" colspan="2">
-					<Group pos="91,508,272,535" ref="528">
+					<Group pos="90,508,271,535" ref="528">
 						<RadioBox pos="7,14,76,27" ref="529" />
 						<RadioBox pos="70,7,146,20" ref="530" />
 						<RadioBox pos="119,14,181,27" ref="531" />
 					</Group>
 				</td>
 				<td addr="3,11">
-					<Button pos="292,514,361,534" ref="532" toggle="0" />
+					<Button pos="289,514,358,534" ref="532" toggle="0" />
 				</td>
 				<td addr="4,11">
 					<Button pos="380,514,442,534" ref="533" toggle="0" />
@@ -2281,10 +2281,10 @@
 					<TableLayout pos="111,38,362,72" ref="948" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0">
-								<EditBox Pos="0,0,62,21" Style="width: 4em;" ref="955" />
+								<EditBox Pos="0,0,62,18" Style="width: 4em;" ref="955" />
 							</td>
 							<td addr="1,0" valign="Center">
-								<StaticText pos="137,0,192,20" ref="941" />
+								<StaticText pos="137,0,192,18" ref="941" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -2304,16 +2304,16 @@
 								<CheckBox pos="49,7,83,27" ref="1239" />
 							</td>
 							<td addr="2,0">
-								<CheckBox pos="98,7,132,27" ref="1242" />
+								<CheckBox pos="96,7,130,27" ref="1242" />
 							</td>
 							<td addr="3,0">
 								<CheckBox pos="140,7,174,27" ref="1244" />
 							</td>
 							<td addr="4,0">
-								<CheckBox pos="189,7,223,27" ref="1245" />
+								<CheckBox pos="184,7,218,27" ref="1245" />
 							</td>
 							<td addr="5,0">
-								<CheckBox pos="231,7,265,27" ref="1247" />
+								<CheckBox pos="228,7,262,27" ref="1247" />
 							</td>
 							<td addr="6,0">
 								<CheckBox pos="273,7,307,27" ref="1248" />
@@ -2351,13 +2351,13 @@
 			<tr>
 				<td addr="0,5" />
 				<td addr="1,5">
-					<TableLayout pos="111,204,411,243" ref="1254" cols="0.500,0.500" rows="1.000">
+					<TableLayout pos="109,202,409,241" ref="1254" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0">
 								<RadioBox pos="0,7,94,20" ref="1255" />
 							</td>
 							<td addr="1,0">
-								<Custom pos="161,6,237,26" ref="1256" Style="width: 6em;" Ctrl="LEditDropDown" />
+								<Custom pos="158,3,234,23" ref="1256" Style="width: 6em;" Ctrl="LEditDropDown" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -2365,7 +2365,7 @@
 			</tr>
 			<tr>
 				<td addr="0,6" align="Max" valign="Center">
-					<StaticText pos="21,264,76,284" ref="1257" />
+					<StaticText pos="19,262,74,282" ref="1257" />
 				</td>
 				<td addr="1,6">
 					<EditBox Pos="111,259,390,279" ref="1258" />
@@ -2384,34 +2384,34 @@
 		<TableLayout pos="7,7,398,195" ref="590" cols="0.500,0.500" rows="0.200,0.200,0.200,0.200,0.200">
 			<tr>
 				<td addr="0,0">
-					<StaticText pos="21,13,76,33" ref="591" />
+					<StaticText pos="20,12,75,32" ref="591" />
 				</td>
 				<td addr="1,0">
-					<EditBox Pos="217,13,293,33" ref="628" />
+					<EditBox Pos="216,12,292,32" ref="628" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<StaticText pos="28,55,90,68" ref="656" />
+					<StaticText pos="26,53,88,66" ref="656" />
 				</td>
 				<td addr="1,1">
-					<EditBox Pos="210,48,286,68" ref="660" />
+					<EditBox Pos="208,46,284,66" ref="660" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,2">
-					<StaticText pos="35,83,118,103" ref="685" />
+					<StaticText pos="32,80,115,100" ref="685" />
 				</td>
 				<td addr="1,2">
-					<EditBox Pos="217,83,307,103" ref="688" />
+					<EditBox Pos="214,80,304,100" ref="688" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,3">
-					<StaticText pos="21,118,90,138" ref="689" />
+					<StaticText pos="17,114,86,134" ref="689" />
 				</td>
 				<td addr="1,3">
-					<EditBox Pos="224,118,307,138" Pw="1" ref="690" />
+					<EditBox Pos="220,114,303,134" Pw="1" ref="690" />
 				</td>
 			</tr>
 			<tr>
@@ -2457,7 +2457,7 @@
 								<StaticText pos="0,75,62,88" ref="61" />
 							</td>
 							<td addr="1,3" colspan="3">
-								<ListView pos="74,74,294,96" ref="63" Style="height: 5em;" />
+								<ListView pos="73,74,291,96" ref="63" Style="height: 5em;" />
 							</td>
 						</tr>
 						<tr>
@@ -2465,21 +2465,21 @@
 								<StaticText pos="0,100,62,113" ref="71" />
 							</td>
 							<td addr="1,4">
-								<EditBox Pos="74,100,146,120" ref="73" />
+								<EditBox Pos="73,100,144,120" ref="73" />
 							</td>
 							<td addr="2,4">
 								<StaticText pos="148,100,210,113" ref="77" />
 							</td>
 							<td addr="3,4">
-								<EditBox Pos="222,100,294,120" ref="348" />
+								<EditBox Pos="219,100,291,120" ref="348" />
 							</td>
 						</tr>
 						<tr>
 							<td addr="0,5">
-								<StaticText pos="0,125,72,138" ref="550" />
+								<StaticText pos="0,125,71,138" ref="550" />
 							</td>
 							<td addr="1,5" colspan="3">
-								<EditBox Pos="74,131,294,144" ref="551" />
+								<EditBox Pos="73,131,291,144" ref="551" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -2524,7 +2524,7 @@
 								<StaticText pos="0,38,62,48" ref="51" />
 							</td>
 							<td addr="1,2" colspan="3">
-								<EditBox Pos="72,38,287,48" ref="53" />
+								<EditBox Pos="71,38,284,48" ref="53" />
 							</td>
 						</tr>
 						<tr>
@@ -2532,13 +2532,13 @@
 								<StaticText pos="0,57,62,67" ref="54" />
 							</td>
 							<td addr="1,3">
-								<EditBox Pos="72,57,142,67" ref="64" />
+								<EditBox Pos="71,57,140,67" ref="64" />
 							</td>
 							<td addr="2,3" valign="Max">
 								<StaticText pos="144,57,206,67" ref="66" />
 							</td>
 							<td addr="3,3">
-								<EditBox Pos="216,57,287,67" ref="68" />
+								<EditBox Pos="213,57,284,67" ref="68" />
 							</td>
 						</tr>
 						<tr>
@@ -2546,7 +2546,7 @@
 								<StaticText pos="0,76,62,86" ref="79" />
 							</td>
 							<td addr="1,4" colspan="3">
-								<EditBox Pos="72,76,287,86" ref="433" />
+								<EditBox Pos="71,76,284,86" ref="433" />
 							</td>
 						</tr>
 						<tr>
@@ -2559,38 +2559,38 @@
 								<StaticText pos="0,114,62,124" ref="627" />
 							</td>
 							<td addr="1,6">
-								<EditBox Pos="72,114,142,124" ref="629" />
+								<EditBox Pos="71,114,140,124" ref="629" />
 							</td>
 							<td addr="2,6" valign="Max">
 								<StaticText pos="144,114,192,124" ref="630" />
 							</td>
 							<td addr="3,6">
-								<EditBox Pos="216,114,287,124" ref="658" />
+								<EditBox Pos="213,114,284,124" ref="658" />
 							</td>
 						</tr>
 						<tr>
 							<td addr="0,7" valign="Max">
-								<StaticText pos="0,133,62,143" ref="674" />
+								<StaticText pos="-1,132,61,142" ref="674" />
 							</td>
 							<td addr="1,7">
-								<EditBox Pos="72,133,142,143" ref="676" />
+								<EditBox Pos="70,132,139,142" ref="676" />
 							</td>
 							<td addr="2,7" />
 							<td addr="3,7" />
 						</tr>
 						<tr>
 							<td addr="0,8" valign="Max">
-								<StaticText pos="0,152,62,162" ref="694" />
+								<StaticText pos="-2,150,60,160" ref="694" />
 							</td>
 							<td addr="1,8">
-								<EditBox Pos="72,152,142,162" ref="696" />
+								<EditBox Pos="69,150,138,160" ref="696" />
 							</td>
 							<td addr="2,8" />
 							<td addr="3,8" />
 						</tr>
 						<tr>
 							<td addr="0,9" valign="Max">
-								<StaticText pos="0,171,70,181" ref="697" />
+								<StaticText pos="0,171,69,181" ref="697" />
 							</td>
 							<td addr="1,9" colspan="3">
 								<EditBox Pos="74,171,178,181" ref="698" />
@@ -2610,7 +2610,7 @@
 								<StaticText pos="0,18,62,28" ref="69" />
 							</td>
 							<td addr="1,1" colspan="3">
-								<EditBox Pos="74,18,294,28" ref="72" />
+								<EditBox Pos="73,18,291,28" ref="72" />
 							</td>
 						</tr>
 						<tr>
@@ -2618,7 +2618,7 @@
 								<StaticText pos="0,36,62,46" ref="74" />
 							</td>
 							<td addr="1,2" colspan="3">
-								<EditBox Pos="74,36,294,46" ref="350" />
+								<EditBox Pos="73,36,291,46" ref="350" />
 							</td>
 						</tr>
 						<tr>
@@ -2626,13 +2626,13 @@
 								<StaticText pos="0,54,62,64" ref="625" />
 							</td>
 							<td addr="1,3">
-								<EditBox Pos="74,54,146,64" ref="631" />
+								<EditBox Pos="73,54,144,64" ref="631" />
 							</td>
 							<td addr="2,3" valign="Max">
 								<StaticText pos="148,54,210,64" ref="642" />
 							</td>
 							<td addr="3,3">
-								<EditBox Pos="222,54,294,64" ref="657" />
+								<EditBox Pos="219,54,291,64" ref="657" />
 							</td>
 						</tr>
 						<tr>
@@ -2640,7 +2640,7 @@
 								<StaticText pos="0,72,62,82" ref="659" />
 							</td>
 							<td addr="1,4" colspan="3">
-								<EditBox Pos="74,72,294,82" ref="672" />
+								<EditBox Pos="73,72,291,82" ref="672" />
 							</td>
 						</tr>
 						<tr>
@@ -2653,13 +2653,13 @@
 								<StaticText pos="0,105,48,118" ref="687" />
 							</td>
 							<td addr="1,6">
-								<EditBox Pos="74,108,146,118" ref="759" />
+								<EditBox Pos="73,108,144,118" ref="759" />
 							</td>
 							<td addr="2,6" valign="Max">
 								<StaticText pos="148,108,210,118" ref="762" />
 							</td>
 							<td addr="3,6">
-								<EditBox Pos="222,108,294,118" ref="764" />
+								<EditBox Pos="219,108,291,118" ref="764" />
 							</td>
 						</tr>
 						<tr>
@@ -2667,7 +2667,7 @@
 								<StaticText pos="0,126,48,139" ref="1498" />
 							</td>
 							<td addr="1,7">
-								<EditBox Pos="74,126,146,136" ref="1499" />
+								<EditBox Pos="73,126,144,136" ref="1499" />
 							</td>
 							<td addr="2,7" />
 							<td addr="3,7" />
@@ -2677,17 +2677,17 @@
 								<StaticText pos="0,144,62,154" ref="1554" />
 							</td>
 							<td addr="1,8">
-								<EditBox Pos="74,144,146,154" ref="1555" />
+								<EditBox Pos="73,144,144,154" ref="1555" />
 							</td>
 							<td addr="2,8" />
 							<td addr="3,8" />
 						</tr>
 						<tr>
 							<td addr="0,9" valign="Max">
-								<StaticText pos="0,162,72,172" ref="1557" />
+								<StaticText pos="0,162,71,172" ref="1557" />
 							</td>
 							<td addr="1,9" colspan="3">
-								<EditBox Pos="74,162,294,172" ref="1559" />
+								<EditBox Pos="73,162,291,172" ref="1559" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -2701,7 +2701,7 @@
 			</tr>
 			<tr>
 				<td addr="0,4" style="padding-right: 0.5em;&#10;display: none;">
-					<TableLayout pos="0,511,328,636" ref="432" cols="1.000" rows="0.500,0.500">
+					<TableLayout pos="0,511,326,636" ref="432" cols="1.000" rows="0.500,0.500">
 						<tr>
 							<td addr="0,0">
 								<StaticText pos="7,0,195,13" ref="466" />
@@ -2749,7 +2749,7 @@
 			<tr>
 				<td addr="0,5" colspan="2" align="Max">
 					<Button pos="497,687,573,700" ref="693" toggle="0" />
-					<Button pos="582,687,658,700" ref="50" toggle="0" />
+					<Button pos="579,687,655,700" ref="50" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -2776,10 +2776,10 @@
 			<tr>
 				<td addr="0,2" />
 				<td addr="1,2" align="Max">
-					<Button pos="123,69,178,89" ref="1310" toggle="0" />
+					<Button pos="122,68,177,88" ref="1310" toggle="0" />
 				</td>
 				<td addr="2,2">
-					<Button pos="212,69,274,89" ref="1311" toggle="0" />
+					<Button pos="211,69,273,89" ref="1311" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -2796,10 +2796,10 @@
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<StaticText pos="0,280,105,300" ref="777" />
+					<StaticText pos="0,280,104,300" ref="777" />
 				</td>
 				<td addr="1,1" colspan="2" align="Max">
-					<Button pos="260,287,322,307" ref="940" toggle="0" />
+					<Button pos="257,287,319,307" ref="940" toggle="0" />
 					<Button pos="182,287,244,307" ref="939" toggle="0" />
 				</td>
 			</tr>
@@ -2827,8 +2827,8 @@
 			<tr>
 				<td addr="0,5" />
 				<td addr="1,5" colspan="2" align="Max">
-					<Button pos="253,462,322,482" ref="1503" toggle="0" />
-					<Button pos="253,462,322,482" ref="778" toggle="0" />
+					<Button pos="248,460,317,480" ref="1503" toggle="0" />
+					<Button pos="248,462,317,482" ref="778" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -2875,7 +2875,7 @@
 		<TableLayout pos="7,7,531,419" ref="1145" cols="0.932,0.068" rows="0.143,0.143,0.143,0.143,0.143,0.143,0.143">
 			<tr>
 				<td addr="0,0" colspan="2">
-					<StaticText pos="0,0,483,55" ref="1230" />
+					<StaticText pos="0,0,483,54" ref="1230" />
 				</td>
 			</tr>
 			<tr>
@@ -2903,7 +2903,7 @@
 			</tr>
 			<tr>
 				<td addr="0,5">
-					<ListView pos="0,285,450,340" ref="1029">
+					<ListView pos="0,280,450,334" ref="1029">
 						<Column ref="1031" width="353" />
 						<Column ref="1032" width="147" />
 					</ListView>
@@ -3013,7 +3013,7 @@
 		<TableLayout pos="7,7,475,272" ref="2" cols="0.417,0.291,0.291" rows="0.140,0.647,0.213">
 			<tr>
 				<td addr="0,0">
-					<CheckBox pos="7,7,188,20" ref="370" />
+					<CheckBox pos="6,7,187,20" ref="370" />
 				</td>
 				<td addr="1,0" />
 				<td addr="2,0" align="Max">
@@ -3031,8 +3031,8 @@
 			</tr>
 			<tr>
 				<td addr="0,2">
-					<Button pos="168,210,188,230" ref="1483" toggle="0" />
-					<Button pos="147,210,188,230" ref="1484" toggle="0" />
+					<Button pos="167,210,187,230" ref="1483" toggle="0" />
+					<Button pos="146,210,187,230" ref="1484" toggle="0" />
 				</td>
 				<td addr="1,2" />
 				<td addr="2,2" align="Max">
@@ -3097,7 +3097,7 @@
 					<CheckBox pos="160,0,223,20" ref="382" />
 				</td>
 				<td addr="3,0">
-					<Custom pos="252,0,426,34" ref="508" Ctrl="LMarkColourSelect" />
+					<Custom pos="252,0,426,32" ref="508" Ctrl="LMarkColourSelect" />
 				</td>
 				<td addr="4,0" valign="Center" style="padding-left:1em;">
 					<StaticText pos="462,7,545,27" ref="509" />
@@ -3199,7 +3199,7 @@
 								<StaticText pos="0,36,41,49" ref="137" />
 							</td>
 							<td addr="1,1">
-								<EditBox Pos="145,36,288,56" Enabled="0" ref="140" />
+								<EditBox Pos="144,36,286,56" Enabled="0" ref="140" />
 							</td>
 							<td addr="2,1">
 								<Button pos="290,36,310,56" ref="159" toggle="0" />
@@ -3210,7 +3210,7 @@
 								<CheckBox pos="0,73,202,86" ref="162" />
 							</td>
 							<td addr="2,2">
-								<CheckBox pos="290,73,434,86" ref="170" />
+								<CheckBox pos="288,73,431,86" ref="170" />
 							</td>
 						</tr>
 						<tr>
@@ -3218,7 +3218,7 @@
 								<CheckBox pos="0,109,209,122" ref="171" />
 							</td>
 							<td addr="2,3">
-								<CheckBox pos="290,109,434,122" ref="172" />
+								<CheckBox pos="288,109,431,122" ref="172" />
 							</td>
 						</tr>
 						<tr>
@@ -3232,10 +3232,10 @@
 						</tr>
 						<tr>
 							<td addr="0,5" valign="Center">
-								<StaticText pos="7,189,104,209" ref="178" />
+								<StaticText pos="5,187,102,207" ref="178" />
 							</td>
 							<td addr="1,5" colspan="2">
-								<Custom pos="148,189,434,209" ref="191" Ctrl="LMarkColourSelect" />
+								<Custom pos="143,187,429,207" ref="191" Ctrl="LMarkColourSelect" />
 							</td>
 						</tr>
 						<tr>
@@ -3255,7 +3255,7 @@
 						</tr>
 						<tr>
 							<td addr="0,8" colspan="3">
-								<StaticText pos="0,298,434,311" ref="316" />
+								<StaticText pos="0,298,431,311" ref="316" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -3380,7 +3380,7 @@
 			</tr>
 			<tr>
 				<td addr="0,2">
-					<TableLayout pos="7,413,370,489" ref="1228" cols="0.200,0.281,0.119,0.200,0.200" rows="1.000">
+					<TableLayout pos="5,413,368,489" ref="1228" cols="0.200,0.281,0.119,0.200,0.200" rows="1.000">
 						<tr>
 							<td addr="0,0">
 								<Button pos="7,14,62,34" ref="1363" toggle="0" />
@@ -3494,7 +3494,7 @@
 			</tr>
 			<tr>
 				<td addr="0,2">
-					<StaticText pos="0,81,111,115" ref="668" />
+					<StaticText pos="-3,78,108,112" ref="668" />
 				</td>
 				<td addr="1,2">
 					<EditBox Pos="217,78,335,98" Enabled="0" ref="665" />
@@ -3635,10 +3635,10 @@
 			<tr>
 				<td addr="0,9" />
 				<td addr="1,9" align="Max">
-					<Button pos="277,281,325,301" ref="1323" toggle="0" />
+					<Button pos="274,278,322,298" ref="1323" toggle="0" />
 				</td>
 				<td addr="2,9">
-					<Button pos="470,281,525,301" ref="1322" toggle="0" />
+					<Button pos="467,281,522,301" ref="1322" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -3763,10 +3763,10 @@
 			<tr>
 				<td addr="0,1" align="Max" />
 				<td addr="1,1">
-					<Button pos="105,329,153,349" ref="1122" toggle="0" />
+					<Button pos="103,327,151,347" ref="1122" toggle="0" />
 				</td>
 				<td addr="2,1">
-					<Button pos="224,336,230,349" ref="1123" toggle="0" />
+					<Button pos="222,336,228,349" ref="1123" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -4118,7 +4118,7 @@
 					<StaticText pos="21,103,76,123" ref="1351" />
 				</td>
 				<td addr="1,2">
-					<ListView pos="228,88,455,129" ref="1352">
+					<ListView pos="227,88,452,129" ref="1352">
 						<Column ref="1354" width="50" />
 						<Column ref="1353" width="206" />
 					</ListView>
@@ -4134,7 +4134,7 @@
 			</tr>
 			<tr>
 				<td addr="0,5" align="Max">
-					<Button pos="150,240,226,260" ref="1349" toggle="0" />
+					<Button pos="149,240,225,260" ref="1349" toggle="0" />
 				</td>
 				<td addr="1,5">
 					<Button pos="266,233,356,253" ref="1350" toggle="0" />
@@ -4520,10 +4520,10 @@
 					</tr>
 					<tr>
 						<td addr="0,1" class="inset">
-							<StaticText pos="0,23,133,36" ref="202" />
+							<StaticText pos="0,23,132,36" ref="202" />
 						</td>
 						<td addr="1,1">
-							<EditBox Pos="135,23,268,43" Enabled="0" ref="831" />
+							<EditBox Pos="134,23,266,43" Enabled="0" ref="831" />
 						</td>
 						<td addr="2,1" align="Max">
 							<Button pos="280,24,300,44" ref="1112" toggle="0" />
@@ -4531,7 +4531,7 @@
 					</tr>
 					<tr>
 						<td addr="0,2" class="inset">
-							<CheckBox pos="0,46,133,59" ref="108" />
+							<CheckBox pos="0,46,132,59" ref="108" />
 						</td>
 						<td addr="1,2">
 							<EditBox Pos="136,46,191,66" ref="201" />
@@ -4555,10 +4555,10 @@
 					</tr>
 					<tr>
 						<td addr="0,5" class="inset">
-							<StaticText pos="0,115,133,128" ref="341" />
+							<StaticText pos="0,115,132,128" ref="341" />
 						</td>
 						<td addr="1,5">
-							<EditBox Pos="135,115,268,135" Enabled="0" ref="1272" />
+							<EditBox Pos="134,115,266,135" Enabled="0" ref="1272" />
 						</td>
 						<td addr="2,5" align="Max">
 							<Button pos="273,115,293,135" ref="1273" toggle="0" />
@@ -4566,7 +4566,7 @@
 					</tr>
 					<tr>
 						<td addr="0,6" class="inset">
-							<StaticText pos="0,138,133,151" ref="1036" />
+							<StaticText pos="0,138,132,151" ref="1036" />
 						</td>
 						<td addr="1,6" colspan="2">
 							<ComboBox pos="136,138,303,158" ref="1037" />
@@ -4587,7 +4587,7 @@
 					</tr>
 					<tr>
 						<td addr="0,9" class="inset">
-							<StaticText pos="0,207,133,220" ref="346" />
+							<StaticText pos="0,207,132,220" ref="346" />
 						</td>
 						<td addr="1,9" colspan="2">
 							<ComboBox pos="136,207,303,227" ref="347" />
@@ -4595,7 +4595,7 @@
 					</tr>
 					<tr>
 						<td addr="0,10" class="inset">
-							<StaticText pos="0,230,133,243" ref="352" />
+							<StaticText pos="0,230,132,243" ref="352" />
 						</td>
 						<td addr="1,10" colspan="2">
 							<ComboBox pos="136,230,303,250" ref="362" />
@@ -4667,23 +4667,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4691,9 +4677,23 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>
@@ -4755,7 +4755,7 @@
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<ListView pos="0,26,279,168" ref="402" />
+					<ListView pos="0,25,279,165" ref="402" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -4883,7 +4883,7 @@
 			<tr>
 				<td addr="0,10" colspan="3" align="Max">
 					<Button pos="294,315,370,335" ref="753" toggle="0" />
-					<Button pos="386,317,462,337" ref="336" toggle="0" />
+					<Button pos="383,317,459,337" ref="336" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -4920,40 +4920,40 @@
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<StaticText pos="14,38,97,51" ref="726" />
+					<StaticText pos="13,37,96,50" ref="726" />
 				</td>
 				<td addr="1,1">
-					<EditBox Pos="186,31,318,51" ref="727" />
+					<EditBox Pos="185,30,317,50" ref="727" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,2">
-					<StaticText pos="14,58,118,78" ref="728" />
+					<StaticText pos="12,56,116,76" ref="728" />
 				</td>
 				<td addr="1,2">
-					<EditBox Pos="189,58,321,78" ref="737" />
+					<EditBox Pos="187,56,319,76" ref="737" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,3">
-					<StaticText pos="14,85,90,105" ref="738" />
+					<StaticText pos="11,82,87,102" ref="738" />
 				</td>
 				<td addr="1,3">
-					<EditBox Pos="189,85,307,105" ref="740" />
+					<EditBox Pos="186,82,304,102" ref="740" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,4">
-					<StaticText pos="21,112,125,132" ref="741" />
+					<StaticText pos="17,108,121,128" ref="741" />
 				</td>
 				<td addr="1,4">
-					<EditBox Pos="189,112,286,132" Pw="1" ref="742" />
+					<EditBox Pos="185,108,282,128" Pw="1" ref="742" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,5" colspan="2" align="Max">
-					<Button pos="175,139,244,159" ref="743" image="" toggle="0" />
-					<Button pos="259,139,328,159" ref="744" image="" toggle="0" />
+					<Button pos="174,138,243,158" ref="743" image="" toggle="0" />
+					<Button pos="258,139,327,159" ref="744" image="" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>

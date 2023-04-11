@@ -1002,6 +1002,7 @@
 #define IDC_DEST								1196
 #define IDC_SET_DEST							1197
 #define IDC_HAS_GROUPS							1198
+#define IDC_CAL_URL								1199
 #define IDC_SPAM_FLD							1200
 #define IDC_SET_SPAM							1201
 #define IDC_SPAM_FOLDER							1202

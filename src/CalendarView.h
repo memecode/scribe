@@ -140,7 +140,7 @@ public:
 	void SetCursor(LDateTime &c);
 
 	// Overridable
-	virtual void OnContentsChanged(CalendarSource *s = 0);
+	virtual void OnContentsChanged(CalendarSource *s = NULL);
 	virtual void OnSourceDelete(CalendarSource *s);
 	virtual void OnCursorChange(bool Day = true,
 								bool Month = true,
