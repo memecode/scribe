@@ -545,7 +545,6 @@
 #define IDS_ERROR_EXE_FILE						739
 #define IDC_USERNAME							740
 #define IDS_FROM								741
-#define IDC_PASSWORD							742
 #define IDC_DATE_FORMAT							743
 #define IDS_1034								744
 #define IDS_SORT_SUBFOLDERS						745
@@ -1007,6 +1006,7 @@
 #define IDC_SET_SPAM							1201
 #define IDC_SPAM_FOLDER							1202
 #define IDC_SET_SPAM_FOLDER						1203
+#define IDC_PASSWORD							1204
 #define IDS_ERROR_PRINT_FAILED					1214
 #define IDS_ASK_ACCOUNT_PASSWORD				1215
 #define IDS_SELECT_IO							1216
@@ -1104,6 +1104,7 @@
 #define IDD_FOLDER_SELECT						1469
 #define IDS_REPARSE								1471
 #define IDD_FOLDER_FORMAT						1472
+#define IDS_GNUPG_PSW_PROMPT					1473
 #define IDC_V1									1481
 #define IDC_V2									1482
 #define IDC_UP									1483

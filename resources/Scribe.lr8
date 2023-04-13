@@ -276,7 +276,7 @@
 		<String Ref="465" Cid="-1" Define="IDC_STATIC" en="Authentication Type:" cs="Typ autentizace" lt="Autentifikavimo tipas:" pt="Tipo de autenticação:" nl="Type verificatie:" pl="Sposób uwierzytelniania:" de="Authentifizierungsmethode:" sr="Tip autentifikacije:" da="Autentificerings type:" vi="Kiểu xác nhận:" sv="Autentiseringstyp:" es="Tipo de Autentificación:" pt_br="Tipo de autenticação:" lg="Ekika ky&apos;Olukusa:" tr="Kimlik Doğrulama Tipi:" hu="Hitelesítés típusa:" ru="Тип идентификации:" ko="인증 유형:" uk="Тип ідентифікації:" fr="Type d&apos;authentification:" />
 		<String Ref="466" Cid="-1" Define="IDC_STATIC" en="Enter free form data here:" cs="Zde vložte libovolné údaje:" nl="Voer vrije gegevens vanaf hier in:" pt_br="Coloque dados à sua escolha:" ja="自由な形式でデータを入力して下さい:" pt="Insira aqui outros dados:" pl="Wpisz tu dowolne dane:" vi="Nhập dữ liệu dạng tự do ở đây:" zh_tw="任意輸入資料於此:" sr="Unesi slobodne podatke u formular ovde:" es="Otros Datos:" lt="Čia savo nuožiūra galite įvesti kokius tik norite duomenis:" fa="اطلاعات دلخواه را اينجا وارد کنيد:" de="Unformatierte Daten hier eingeben:" sv="Skriv in oformaterad data här:" lg="Juzaamu wano ebya foomu:" tr="Diğer bilgileri bu alanlara girebilirsiniz:" hu="Egyéni formátumú adatok felvitele:" ru="Введите здесь данные произвольного вида:" ko="자유형식의 데이터 입력:" uk="Введіть тут дані довільного виду:" fr="Entrez les données ici:" />
 		<String Ref="467" Cid="478" Define="IDC_SMTP_PASSWORD" />
-		<String Ref="468" Cid="-1" Define="IDC_STATIC" en="Password:" fr="Mot de passe:" es="Contraseña:" cs="Heslo:" de="Passwort:" nl="Wachtwoord:" pt_br="Senha:" ru="Пароль:" pt="Senha:" pl="Hasło:" vi="Mật khẩu:" zh_tw="密碼:" ja="パスワード:" sr="Šifra:" no="Passord:" lt="Slaptažodis:" fa="رمزعبور" da="Passord:" sv="Lösenord:" lg="Akasumuluzo:" tr="Parola:" hu="Jelszó:" ko="패스워드:" uk="Пароль:" />
+		<String Ref="468" Cid="1204" Define="IDC_PASSWORD" en="Password:" fr="Mot de passe:" es="Contraseña:" cs="Heslo:" de="Passwort:" nl="Wachtwoord:" pt_br="Senha:" ru="Пароль:" pt="Senha:" pl="Hasło:" vi="Mật khẩu:" zh_tw="密碼:" ja="パスワード:" sr="Šifra:" no="Passord:" lt="Slaptažodis:" fa="رمزعبور" da="Passord:" sv="Lösenord:" lg="Akasumuluzo:" tr="Parola:" hu="Jelszó:" ko="패스워드:" uk="Пароль:" />
 		<String Ref="469" Cid="-1" Define="IDC_STATIC" en="User name:" it="Nome Utente:" fr="Nom d&apos;usager:" cs="Jméno uživatele:" de="Benutzername:" nl="Gebruikersnaam:" es="Nombre Usuario:" pt_br="Nome de usuário:" ru="Пользователь:" pt="Utilizador:" pl="Nazwa użytkownika:" vi="Tên người dùng:" zh_tw="用戶名稱:" ja="ユーザ名:" sr="Korisničko ime:" no="Brukernavn:" lt="Naudotojo vardas:" fa="نام کاربري" da="Brugernavn:" sv="Användarnamn:" lg="Erinnya ly&apos;Omukozesa:" tr="Kullanıcı adı:" hu="Felhasználó név:" ko="사용자 이름:" uk="Користувач:" />
 		<String Ref="470" Cid="1113" Define="IDC_DELETE" en="Delete" fr="Supprimer" it="Cancella" cs="Smazat" es="Eliminar" de="Löschen" nl="Verwijderen" pt_br="Excluir" ru="Удалить" ja="削除" pt="Propriedades" pl="Usuń" vi="Xóa" zh_tw="刪除" sr="Briši" no="Slett" lt="Pašalinti" fa="پاک کن" da="Slet" sv="Ta bort" lg="Ebikwataku" tr="Sil" hu="Töröl" ko="삭제" uk="Видалити" />
 		<String Ref="471" Cid="503" Define="IDC_NEW_FOLDER" />
@@ -462,7 +462,7 @@
 		<String Ref="738" Cid="-1" Define="IDC_STATIC" en="User name:" fr="Nom d&apos;usager:" />
 		<String Ref="740" Cid="740" Define="IDC_USERNAME" />
 		<String Ref="741" Cid="-1" Define="IDC_STATIC" en="Password:" fr="Mot de passe:" />
-		<String Ref="742" Cid="742" Define="IDC_PASSWORD" />
+		<String Ref="742" Cid="1204" Define="IDC_PASSWORD" />
 		<String Ref="743" Cid="1" Define="IDOK" en="Ok" />
 		<String Ref="744" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" />
 		<String Ref="745" Cid="-1" Define="IDC_STATIC" en="Store name:" fr="Nom du dépôt:" />
@@ -1567,6 +1567,7 @@
 		<String Ref="974" Cid="1059" Define="IDS_COPY_PATH" en="Copy Path" />
 		<String Ref="1158" Cid="170" Define="FIELD_RECEIVED_DOMAIN" en="Received Domain" />
 		<String Ref="1471" Cid="1471" Define="IDS_REPARSE" en="Reparse" />
+		<String Ref="1473" Cid="1473" Define="IDS_GNUPG_PSW_PROMPT" en="Enter password for the user &apos;%s&apos;:" />
 	</string-group>
 	<string-group Name="Title.html">
 		<String Ref="1062" Cid="782" Define="IDS_SUMMARY" en="Summary" de="Zusammenfassung" lt="Bendrai" da="Oversigt" pt="Caminho" fa="گزارش" cs="Přehled" sv="Sammanfattning" pt_br="Resumo" es="Sumario" lg="Panya" tr="Özet" hu="Összegzés" pl="Podsumowanie" ko="요약" uk="Резюме" fr="Résumé" />
@@ -2248,7 +2249,7 @@
 					<StaticText pos="14,508,62,521" ref="1048" />
 				</td>
 				<td addr="1,11" colspan="2">
-					<Group pos="90,508,271,535" ref="528">
+					<Group pos="91,508,272,535" ref="528">
 						<RadioBox pos="7,14,76,27" ref="529" />
 						<RadioBox pos="70,7,146,20" ref="530" />
 						<RadioBox pos="119,14,181,27" ref="531" />
@@ -4667,9 +4668,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4677,23 +4692,9 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>

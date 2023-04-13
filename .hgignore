@@ -1,9 +1,29 @@
 syntax: glob
 
+.vs
+*.pdb
+*.obj
+*.user
+*.VC.db
+*.asm
+
 Linux/Aspell/data
 Linux/Aspell/dict
 Linux/Debug
 Linux/Release
-*.asm
 Linux/*.idx
 Linux/ScribeOptions_*.bak
+
+src\Resource.res
+
+x64ReleaseNoOptimize*
+x64Release*
+x64Debug*
+
+test\Html\*.html
+test\Html\*.jpg
+test\Html\*.png
+test\Html\*.gif
+
+Help\scripting\*.html
+Help\scripting\*.css

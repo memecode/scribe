@@ -922,12 +922,13 @@ struct MailUiGpgPriv
 		}
 	
 		LString Msg;
-		Msg.Printf("Enter password for the user '%s':", Addr.Get());
+		Msg.Printf(LLoadString(IDS_GNUPG_PSW_PROMPT), Addr.Get());
 		
-		auto Dlg = new LInput(Parent, "", Msg, "GnuPG Password", true);
-		Dlg->DoModal([this, Dlg, Addr, Callback](auto dlg, auto ctrlId)
+		auto p = Parent->GetGView();
+		auto Dlg = new LInput(Parent, "", Msg, LLoadString(IDC_PASSWORD), true);
+		Dlg->DoModal([this, Dlg, Addr, Callback](auto dlg, auto ok)
 		{
-			if (ctrlId)
+			if (ok)
 			{
 				UserPassword &p = Psw.New();
 				p.Email = Addr;
@@ -1708,7 +1709,13 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 		});
 }
 
-void MailUiGpg::DoCommand(int Cmd, std::function<void(int)> callback)
+void MailUiGpg::DoCommand(
+	int Cmd,
+	/// This callback will do the normal command processing...
+	/// In the case where we encrypt / sign we replace the normal 
+	/// processing and don't do it at all... thus NOT calling the
+	/// callback.
+	std::function<void(int)> callback)
 {
 	switch (Cmd)
 	{
@@ -1727,37 +1734,37 @@ void MailUiGpg::DoCommand(int Cmd, std::function<void(int)> callback)
 			
 			if (!d->Enc->Value() && !d->Sign->Value())
 			{
-				DecryptStatus(0); // No need to sign &| encrypt
+				DecryptStatus(0); // No need to sign &| encrypt, but do the normal processing
 			}
 
-			Mail *m = d->Ui->GetItem();
+			auto m = d->Ui->GetItem();
 			if (!m)
 			{
 				d->SetError(LLoadString(IDS_GNUPG_ERR_NOMSG));
-				DecryptStatus(1);
+				DecryptStatus(1); // Don't do normal processing of the cmd
 			}
 
 			SignEncrypt(d->Sign->Value() != 0,
 						d->Enc->Value() != 0,
 						d->Attach->Value() != 0,
-						[this, m, callback](auto status)
-			{
-				if (!status)
-				{
-					// Send the email..
-					m->Send(true);
+						[this, m](auto status)
+						{
+							if (!status)
+							{
+								// Send the email..
+								m->Send(true);
 			
-					// Close the window...
-					d->Ui->Quit();
-				}
-
-				// Bypass the normal code
-				DecryptStatus(1);
-			});			
+								// Close the window... but after we clean up.
+								d->Ui->PostEvent(M_CLOSE);
+							}
+						});	
+			
+			// Don't call the callback as we're not doing the normal processing of this command.
+			return;
 		}
 	}
 	
-	DecryptStatus(0);
+	DecryptStatus(0); // Do the default processing
 }
 
 LMessage::Result MailUiGpg::OnEvent(LMessage *Msg)
