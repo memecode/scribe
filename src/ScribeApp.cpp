@@ -10433,7 +10433,7 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 
 	if (Editor)
 	{
-		if (MimeType && !_stricmp(MimeType, sTextHtml))
+		if (!Stricmp(MimeType, sTextHtml))
 		{		
 			// Use the built in html editor
 			LRichTextEdit *Rte;
@@ -10470,14 +10470,16 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 	{
 		// Create a view only control for the mime type:
 		LDocView *HtmlCtrl = NULL;
-		if (!MimeType || _stricmp(MimeType, sTextPlain) == 0)
+		if (!MimeType ||
+			!Stricmp(MimeType, sTextPlain) ||
+			!Stricmp(MimeType, sMultipartEncrypted))
+		{
 			Ctrl = new MailTextView(this, Id, 0, 0, 200, 200, (UseFont) ? &FontType : 0);
-		#if 0 // defined(WINDOWS) && !defined(__GTK_H__)
-		else if (_stricmp(MimeType, sApplicationInternetExplorer) == 0)
-			HtmlCtrl = Ctrl = CreateIeControl(Id);
-		#endif
+		}
 		else
+		{
 			HtmlCtrl = Ctrl = new Html1::LHtml(Id, 0, 0, 200, 200);
+		}
 		
 		if (HtmlCtrl && UseFont)
 		{

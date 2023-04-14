@@ -4602,7 +4602,8 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 	bool Created = TestFlag(GetFlags(), MAIL_CREATED);
 	bool Edit = NoEdit ? false : Created;
 	bool ReadOnly = !Created;
-	LAutoString Mem;
+	bool DisabledLook = false;
+	LString TextMem;
 	LVariant DefAlt;
 	App->GetOptions()->GetValue(OPT_DefaultAlternative, DefAlt);
 
@@ -4626,7 +4627,18 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 		else if (HtmlValid)
 			MimeType = sTextHtml;
 		else
-			return NULL;
+		{
+			auto rootSeg = GetObject()->GetObj(FIELD_MIME_SEG);
+			if (rootSeg)
+				MimeType = rootSeg->GetStr(FIELD_MIME_TYPE);
+			if (!MimeType)
+				return NULL;
+
+			// This is the 'multipart/encrypted' case here...
+			TextMem.Printf("'%s' content.", MimeType.Get());
+			TextBody = TextMem;
+			DisabledLook = ReadOnly = true;
+		}
 	}
 	
 	#ifdef WINDOWS
@@ -4672,154 +4684,165 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 										this);
 	}
 
-	if (View)
+	if (!View)
+		return NULL;
+
+	// Control setup
+	View->Sunken(Sunken);
+	View->SetReadOnly(ReadOnly);
+	View->SetEnv(this);
+
+	if (DisabledLook)
 	{
-		// Control setup
-		View->Sunken(Sunken);
-		View->SetReadOnly(ReadOnly);
-		View->SetEnv(this);
+		View->GetCss(true)->BackgroundColor(L_MED);
+		View->GetCss()->Color(L_LOW);
+	}
+	else
+	{
+		View->GetCss(true)->BackgroundColor(LCss::ColorInherit);
+		View->GetCss()->Color(LCss::ColorInherit);
+	}
 		
-		LVariant UseCid = true;
-		View->SetValue(LDomPropToString(HtmlImagesLinkCid), UseCid);
+	LVariant UseCid = true;
+	View->SetValue(LDomPropToString(HtmlImagesLinkCid), UseCid);
 		
-		LVariant LoadImages;
-		App->GetOptions()->GetValue(OPT_HtmlLoadImages, LoadImages);
-		bool AppLoadImages = LoadImages.CastInt32() != 0;
-		bool MailLoadImages = TestFlag(GetFlags(), MAIL_SHOW_IMAGES);
-		const char *SenderAddr = GetFrom() ? GetFrom()->GetStr(FIELD_EMAIL) : NULL;
-		auto SenderStatus = App->RemoteContent_GetSenderStatus(SenderAddr);
+	LVariant LoadImages;
+	App->GetOptions()->GetValue(OPT_HtmlLoadImages, LoadImages);
+	bool AppLoadImages = LoadImages.CastInt32() != 0;
+	bool MailLoadImages = TestFlag(GetFlags(), MAIL_SHOW_IMAGES);
+	const char *SenderAddr = GetFrom() ? GetFrom()->GetStr(FIELD_EMAIL) : NULL;
+	auto SenderStatus = App->RemoteContent_GetSenderStatus(SenderAddr);
 		
-		View->SetLoadImages
+	View->SetLoadImages
+	(
+		SenderStatus != RemoteNeverLoad
+		&&
 		(
-			SenderStatus != RemoteNeverLoad
-			&&
-			(
-				AppLoadImages ||
-				MailLoadImages ||
-				SenderStatus == RemoteAlwaysLoad
-			)
-		);
+			AppLoadImages ||
+			MailLoadImages ||
+			SenderStatus == RemoteAlwaysLoad
+		)
+	);
 
-        // Attach control
-		Owner->SetDoc(View, MimeType);
-		LCharset *CsInfo = LGetCsInfo(Charset);
+    // Attach control
+	Owner->SetDoc(View, MimeType);
+	LCharset *CsInfo = LGetCsInfo(Charset);
 
-		// Check for render scripts
-		LArray<LScriptCallback*> Renderers;
-		LString RenderMsg = "Rendering...";
-		if (App->GetScriptCallbacks(LRenderMail, Renderers))
+	// Check for render scripts
+	LArray<LScriptCallback*> Renderers;
+	LString RenderMsg = "Rendering...";
+	if (App->GetScriptCallbacks(LRenderMail, Renderers))
+	{
+		for (auto r: Renderers)
 		{
-			for (auto r: Renderers)
-			{
-				LVirtualMachine Vm;
+			LVirtualMachine Vm;
 				
-				LScriptArguments Args(&Vm);
-				Args.New() = new LVariant(App);
-				Args.New() = new LVariant(this);
-				Args.New() = new LVariant((void*)NULL);
-				bool Status = App->ExecuteScriptCallback(*r, Args);
-				Args.DeleteObjects();
-				if (Status)
+			LScriptArguments Args(&Vm);
+			Args.New() = new LVariant(App);
+			Args.New() = new LVariant(this);
+			Args.New() = new LVariant((void*)NULL);
+			bool Status = App->ExecuteScriptCallback(*r, Args);
+			Args.DeleteObjects();
+			if (Status)
+			{
+				auto Ret = Args.GetReturn();
+				if (Ret->IsString() || Ret->CastInt32())
 				{
-					auto Ret = Args.GetReturn();
-					if (Ret->IsString() || Ret->CastInt32())
-					{
-						if (Ret->IsString())
-							RenderMsg = Ret->Str();
-						d->Renderer.Reset(new MailRendererScript(this, r));
-						break;
-					}
+					if (Ret->IsString())
+						RenderMsg = Ret->Str();
+					d->Renderer.Reset(new MailRendererScript(this, r));
+					break;
 				}
 			}
 		}
+	}
 
-		if (d->Renderer)
+	if (d->Renderer)
+	{
+		LString Nm;
+		if (MimeType.Equals(sTextHtml))
+			Nm.Printf("<html><body>%s</body></html>", RenderMsg.Get());
+		else
+			Nm = RenderMsg;
+		View->Name(Nm);
+	}
+	else
+	{
+		// Send the data to the control
+		size_t ContentLen = Content ? strlen(Content) : 0;
+		Html1::LHtml *Html = dynamic_cast<Html1::LHtml*>(View);
+		if (MimeType.Equals(sTextHtml))
 		{
-			LString Nm;
-			if (MimeType.Equals(sTextHtml))
-				Nm.Printf("<html><body>%s</body></html>", RenderMsg.Get());
+			if (CsInfo)
+			{
+				int OverideDocCharset = *Charset == '>' ? 1 : 0;
+				View->SetCharset(Charset + OverideDocCharset);
+				if (Html)
+					Html->SetOverideDocCharset(OverideDocCharset != 0);
+			}
 			else
-				Nm = RenderMsg;
-			View->Name(Nm);
+			{
+				View->SetCharset(0);
+				if (Html)
+					Html->SetOverideDocCharset(0);
+			}
+
+			View->Name(Content);
 		}
 		else
 		{
-			// Send the data to the control
-			size_t ContentLen = Content ? strlen(Content) : 0;
-			Html1::LHtml *Html = dynamic_cast<Html1::LHtml*>(View);
-			if (MimeType.Equals(sTextHtml))
+			LAutoPtr<uint32_t,true> Utf32((uint32_t*)LNewConvertCp("utf-32",
+            														Content,
+            														Charset ? Charset : (char*)"utf-8",
+            														MaxBytes > 0 ? MIN(ContentLen, MaxBytes) : ContentLen));
+			if (Utf32)
 			{
-				if (CsInfo)
+				int Len = 0;
+				while (Utf32[Len])
+					Len++;
+					
+				#if 0
+				LFile f;
+				if (f.Open("c:\\temp\\utf32.txt", O_WRITE))
 				{
-					int OverideDocCharset = *Charset == '>' ? 1 : 0;
-					View->SetCharset(Charset + OverideDocCharset);
-					if (Html)
-						Html->SetOverideDocCharset(OverideDocCharset != 0);
+					uchar bom[4] = { 0xff, 0xfe, 0, 0 };
+					f.Write(bom, 4);
+					f.Write(Utf32, Len * sizeof(uint32));
+					f.Close();
 				}
-				else
-				{
-					View->SetCharset(0);
-					if (Html)
-						Html->SetOverideDocCharset(0);
-				}
-
-				View->Name(Content);
+				#endif
+			}
+			
+			LAutoWString Wide;
+			Wide.Reset((char16*)LNewConvertCp(LGI_WideCharset,
+												Content,
+												Charset ? Charset : (char*)"utf-8",
+												MaxBytes > 0 ? MIN(ContentLen, MaxBytes) : ContentLen));
+			if (Wide)
+			{
+				View->NameW(Wide);
 			}
 			else
 			{
-				LAutoPtr<uint32_t,true> Utf32((uint32_t*)LNewConvertCp("utf-32",
-            															Content,
-            															Charset ? Charset : (char*)"utf-8",
-            															MaxBytes > 0 ? MIN(ContentLen, MaxBytes) : ContentLen));
-				if (Utf32)
+				// Fall back... try and show something at least
+				LAutoString t(NewStr(Content, MaxBytes > 0 ? MIN(ContentLen, MaxBytes) : ContentLen));
+				if (t)
 				{
-					int Len = 0;
-					while (Utf32[Len])
-						Len++;
-					
-					#if 0
-					LFile f;
-					if (f.Open("c:\\temp\\utf32.txt", O_WRITE))
+					uint8_t *i = (uint8_t*)t.Get();
+					while (*i)
 					{
-						uchar bom[4] = { 0xff, 0xfe, 0, 0 };
-						f.Write(bom, 4);
-						f.Write(Utf32, Len * sizeof(uint32));
-						f.Close();
+						if (*i & 0x80)
+							*i &= 0x7f;
+						i++;
 					}
-					#endif
-				}
-			
-				LAutoWString Wide;
-				Wide.Reset((char16*)LNewConvertCp(LGI_WideCharset,
-													Content,
-													Charset ? Charset : (char*)"utf-8",
-													MaxBytes > 0 ? MIN(ContentLen, MaxBytes) : ContentLen));
-				if (Wide)
-				{
-					View->NameW(Wide);
+					
+					View->Name(t);
 				}
 				else
-				{
-					// Fallback... try and show something at least
-					LAutoString t(NewStr(Content, MaxBytes > 0 ? MIN(ContentLen, MaxBytes) : ContentLen));
-					if (t)
-					{
-						uint8_t *i = (uint8_t*)t.Get();
-						while (*i)
-						{
-							if (*i & 0x80)
-								*i &= 0x7f;
-							i++;
-						}
-					
-						View->Name(t);
-					}
-					else
-						View->NameW(0);
-				}
-
-				View->SetFixedWidthFont(TestFlag(GetFlags(), MAIL_FIXED_WIDTH_FONT));
+					View->NameW(0);
 			}
+
+			View->SetFixedWidthFont(TestFlag(GetFlags(), MAIL_FIXED_WIDTH_FONT));
 		}
 	}
 

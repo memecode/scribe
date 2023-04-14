@@ -638,9 +638,8 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 			}
 		}
 	}
-	d->Item = item;
 
-	char *Mem = 0;
+	d->Item = item;
 
 	if (!d->Item || d->Item->Type() != MAGIC_MAIL)
 	{
@@ -648,7 +647,11 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 		DeleteObj(d->HeaderDom);
 	}
 	
-	if (d->Item)
+	if (!d->Item)
+	{
+		DeleteObj(d->TextCtrl);
+	}
+	else
 	{
 		d->ScriptObj.Reset();
 
@@ -662,213 +665,215 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 		{
 			case MAGIC_MAIL:
 			{
-				Mail *m = d->Item->IsMail();
-				if (m)
+				auto m = d->Item->IsMail();
+				if (!m)
+					break;
+
+				if (!d->Header)
 				{
-					if (!d->Header)
+					if (!d->HeaderMailTemplate)
 					{
-						if (!d->HeaderMailTemplate)
-						{
-							char Base[] = "PreviewMail.html";
+						char Base[] = "PreviewMail.html";
 							
-							d->HeaderMailFile = LFindFile("PreviewMailCustom.html");
+						d->HeaderMailFile = LFindFile("PreviewMailCustom.html");
 							
-							if (d->HeaderMailFile || (d->HeaderMailFile = LFindFile(Base)))
-								d->HeaderMailTemplate = LFile(d->HeaderMailFile).Read();
-							else
-								d->HeaderMailTemplate.Printf("Failed to find '%s'", Base);
-						}
-
-						if (d->HeaderMailTemplate)
-						{
-							d->Header = new Html1::LHtml(100, HEADER_POS, HEADER_POS, GetPos().X()-1, d->HeaderY);
-							if (d->Header)
-							{
-								d->HeaderDom = new ScribeDom(d->App);
-								d->Header->SetEnv(d);
-								d->Header->Attach(this);
-								Invalidate();
-							}
-						}
+						if (d->HeaderMailFile || (d->HeaderMailFile = LFindFile(Base)))
+							d->HeaderMailTemplate = LFile(d->HeaderMailFile).Read();
+						else
+							d->HeaderMailTemplate.Printf("Failed to find '%s'", Base);
 					}
 
-					if (!TestFlag(m->GetFlags(), MAIL_READ) && !ChangeEvent)
+					if (d->HeaderMailTemplate)
 					{
-						LVariant MarkReadAfterPreview;
-						d->App->GetOptions()->GetValue(OPT_MarkReadAfterPreview, MarkReadAfterPreview);
-						if (MarkReadAfterPreview.CastInt32())
+						d->Header = new Html1::LHtml(100, HEADER_POS, HEADER_POS, GetPos().X()-1, d->HeaderY);
+						if (d->Header)
 						{
-							d->Pulse = d->Item;
-							
-							LVariant Secs = 5;
-							d->App->GetOptions()->GetValue(OPT_MarkReadAfterSeconds, Secs);
-							if (Secs.CastInt32())
-							{
-								d->Time = Secs.CastInt32();
-							}
-							else
-							{
-								m->SetFlags(m->GetFlags() | MAIL_READ);
-							}
+							d->HeaderDom = new ScribeDom(d->App);
+							d->Header->SetEnv(d);
+							d->Header->Attach(this);
+							Invalidate();
 						}
 					}
+				}
 
-					if (!m->CreateView(this, (const char*)NULL, false, 512<<10, true))
+				if (!TestFlag(m->GetFlags(), MAIL_READ) && !ChangeEvent)
+				{
+					LVariant MarkReadAfterPreview;
+					d->App->GetOptions()->GetValue(OPT_MarkReadAfterPreview, MarkReadAfterPreview);
+					if (MarkReadAfterPreview.CastInt32())
 					{
-						DeleteObj(d->TextCtrl);
+						d->Pulse = d->Item;
+							
+						LVariant Secs = 5;
+						d->App->GetOptions()->GetValue(OPT_MarkReadAfterSeconds, Secs);
+						if (Secs.CastInt32())
+						{
+							d->Time = Secs.CastInt32();
+						}
+						else
+						{
+							m->SetFlags(m->GetFlags() | MAIL_READ);
+						}
 					}
+				}
 
-					if (d->Header && d->HeaderMailTemplate)
-					{
-						if (d->HeaderDom)
-							d->HeaderDom->Email = m;
+				if (!m->CreateView(this, LString()/*mimetype*/, false, 512<<10, true))
+				{
+					DeleteObj(d->TextCtrl);
+				}
+
+				if (d->Header && d->HeaderMailTemplate)
+				{
+					if (d->HeaderDom)
+						d->HeaderDom->Email = m;
 						
-						d->Header->Name(d->HeaderMailTemplate);
-					}
+					d->Header->Name(d->HeaderMailTemplate);
 				}
 				break;
 			}
 			case MAGIC_CONTACT:
 			{
-				Contact *c = d->Item->IsContact();
-				if (c)
-				{
-					if (!d->Header)
-					{
-						if (!d->HeaderContactTemplate)
-						{
-							char Base[] = "PreviewContact.html";
-							if ((d->HeaderContactFile = LFindFile(Base)))
-								d->HeaderContactTemplate = LFile(d->HeaderContactFile).Read();
-							else
-								d->HeaderContactTemplate.Printf("Failed to find '%s'", Base);
-						}
+				auto c = d->Item->IsContact();
+				if (!c)
+					break;
 
-						if (d->HeaderContactTemplate)
-						{
-							d->Header = new Html1::LHtml(100, HEADER_POS, HEADER_POS, GetPos().X()-1, d->HeaderY);
-							if (d->Header)
-							{
-								d->HeaderDom = new ScribeDom(d->App);
-								d->Header->SetEnv(d);
-								d->Header->Attach(this);
-								Invalidate();
-							}
-						}
+				if (!d->Header)
+				{
+					if (!d->HeaderContactTemplate)
+					{
+						char Base[] = "PreviewContact.html";
+						if ((d->HeaderContactFile = LFindFile(Base)))
+							d->HeaderContactTemplate = LFile(d->HeaderContactFile).Read();
+						else
+							d->HeaderContactTemplate.Printf("Failed to find '%s'", Base);
 					}
 
-					if (d->Header && d->HeaderContactTemplate)
+					if (d->HeaderContactTemplate)
 					{
-						if (d->HeaderDom)
+						d->Header = new Html1::LHtml(100, HEADER_POS, HEADER_POS, GetPos().X()-1, d->HeaderY);
+						if (d->Header)
 						{
-							d->HeaderDom->Con = c;
+							d->HeaderDom = new ScribeDom(d->App);
+							d->Header->SetEnv(d);
+							d->Header->Attach(this);
+							Invalidate();
 						}
-						d->Header->Name(d->HeaderContactTemplate);
-					}					
+					}
 				}
+
+				if (d->Header && d->HeaderContactTemplate)
+				{
+					if (d->HeaderDom)
+					{
+						d->HeaderDom->Con = c;
+					}
+					d->Header->Name(d->HeaderContactTemplate);
+				}					
 				break;
 			}
 			case MAGIC_GROUP:
 			{
-				ContactGroup *g = d->Item->IsGroup();
-				if (g)
-				{
-					if (!d->Header)
-					{
-						if (!d->HeaderGroupTemplate)
-						{
-							char Base[] = "PreviewGroup.html";
-							if ((d->HeaderGroupFile = LFindFile(Base)))
-								d->HeaderGroupTemplate = LFile(d->HeaderGroupFile).Read();
-							else
-								d->HeaderGroupTemplate.Printf("Failed to find '%s'", Base);
-						}
+				auto g = d->Item->IsGroup();
+				if (!g)
+					break;
 
-						if (d->HeaderGroupTemplate)
-						{
-							d->Header = new Html1::LHtml(100, HEADER_POS, HEADER_POS, GetPos().X()-1, d->HeaderY);
-							if (d->Header)
-							{
-								d->HeaderDom = new ScribeDom(d->App);
-								d->Header->SetEnv(d);
-								d->Header->Attach(this);
-								Invalidate();
-							}
-						}
+				if (!d->Header)
+				{
+					if (!d->HeaderGroupTemplate)
+					{
+						char Base[] = "PreviewGroup.html";
+						if ((d->HeaderGroupFile = LFindFile(Base)))
+							d->HeaderGroupTemplate = LFile(d->HeaderGroupFile).Read();
+						else
+							d->HeaderGroupTemplate.Printf("Failed to find '%s'", Base);
 					}
 
-					if (d->Header && d->HeaderGroupTemplate)
+					if (d->HeaderGroupTemplate)
 					{
-						if (d->HeaderDom)
+						d->Header = new Html1::LHtml(100, HEADER_POS, HEADER_POS, GetPos().X()-1, d->HeaderY);
+						if (d->Header)
 						{
-							d->HeaderDom->Grp = g;
+							d->HeaderDom = new ScribeDom(d->App);
+							d->Header->SetEnv(d);
+							d->Header->Attach(this);
+							Invalidate();
 						}
-						d->Header->Name(d->HeaderGroupTemplate);
-					}					
+					}
+				}
+
+				if (d->Header && d->HeaderGroupTemplate)
+				{
+					if (d->HeaderDom)
+					{
+						d->HeaderDom->Grp = g;
+					}
+					d->Header->Name(d->HeaderGroupTemplate);
 				}
 				break;
 			}
 			case MAGIC_CALENDAR:
 			{
-				Calendar *c = d->Item->IsCalendar();
-				if (c)
-				{
-					LStringPipe p;
-					LDateTime Start, End;
-					uint64 StartTs, EndTs;
-					char s[256];
-					if (c->GetField(FIELD_CAL_START_UTC, Start))
-					{
-					    Start.Get(s, sizeof(s));
-					    Start.Get(StartTs);
-					    p.Print("Start: %s\n", s);
+				auto c = d->Item->IsCalendar();
+				if (!c)
+					break;
 
-					    if (c->GetField(FIELD_CAL_END_UTC, End))
-					    {
-					        End.Get(s, sizeof(s));
-    					    End.Get(EndTs);
-    					    
-                            int Min = (int) ((EndTs - StartTs) / LDateTime::Second64Bit / 60);
-                            if (Min >= 24 * 60)
-                            {
-                                double Days = (double)Min / 24.0 / 60.0;
-    					        p.Print("End: %s (%.1f day%s)\n", s, Days, Days == 1.0 ? "" : "s");
-                            }
-                            else
-                            {
-                                int Hrs = Min / 60;
-                                int Mins = Min % 60;
-    					        p.Print("End: %s (%i:%02i)\n", s, Hrs, Mins);
-                            }
-					    }
-					}
-					    
-					const char *Str = 0;
-					if (c->GetField(FIELD_CAL_SUBJECT, Str))
-					    p.Print("Subject: %s\n", Str);
-					if (c->GetField(FIELD_CAL_LOCATION, Str))
-					    p.Print("Location: %s\n", Str);
-					if (c->GetField(FIELD_CAL_NOTES, Str))
-					    p.Print("Notes: %s\n", Str);
-					
-					LAutoString Txt(p.NewStr());
-					if (!dynamic_cast<LTextView3*>(d->TextCtrl))
-						DeleteObj(d->TextCtrl);
-					if (!d->TextCtrl)
+				LStringPipe p;
+				LDateTime Start, End;
+				uint64 StartTs, EndTs;
+				char s[256];
+				if (c->GetField(FIELD_CAL_START_UTC, Start))
+				{
+					Start.Get(s, sizeof(s));
+					Start.Get(StartTs);
+					p.Print("Start: %s\n", s);
+
+					if (c->GetField(FIELD_CAL_END_UTC, End))
 					{
-						d->TextCtrl = d->App->CreateTextControl(100, "text/plain", false);
-						if (d->TextCtrl)
-						{
-							d->TextCtrl->Visible(false);
-							d->TextCtrl->Sunken(false);
-							d->TextCtrl->Attach(this);
-						}
+					    End.Get(s, sizeof(s));
+    					End.Get(EndTs);
+    					    
+                        int Min = (int) ((EndTs - StartTs) / LDateTime::Second64Bit / 60);
+                        if (Min >= 24 * 60)
+                        {
+                            double Days = (double)Min / 24.0 / 60.0;
+    					    p.Print("End: %s (%.1f day%s)\n", s, Days, Days == 1.0 ? "" : "s");
+                        }
+                        else
+                        {
+                            int Hrs = Min / 60;
+                            int Mins = Min % 60;
+    					    p.Print("End: %s (%i:%02i)\n", s, Hrs, Mins);
+                        }
 					}
+				}
+					    
+				const char *Str = 0;
+				if (c->GetField(FIELD_CAL_SUBJECT, Str))
+					p.Print("Subject: %s\n", Str);
+				if (c->GetField(FIELD_CAL_LOCATION, Str))
+					p.Print("Location: %s\n", Str);
+				if (c->GetField(FIELD_CAL_NOTES, Str))
+					p.Print("Notes: %s\n", Str);
+					
+				LAutoString Txt(p.NewStr());
+				if (!dynamic_cast<LTextView3*>(d->TextCtrl))
+					DeleteObj(d->TextCtrl);
+				
+				if (!d->TextCtrl)
+				{
+					d->TextCtrl = d->App->CreateTextControl(100, "text/plain", false);
 					if (d->TextCtrl)
 					{
-						d->TextCtrl->SetReadOnly(true);
-						d->TextCtrl->Name(Txt);
-					}						
+						d->TextCtrl->Visible(false);
+						d->TextCtrl->Sunken(false);
+						d->TextCtrl->Attach(this);
+					}
+				}
+
+				if (d->TextCtrl)
+				{
+					d->TextCtrl->SetReadOnly(true);
+					d->TextCtrl->Name(Txt);
 				}
 				break;
 			}
@@ -876,6 +881,7 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 			{
 				if (!dynamic_cast<Html1::LHtml*>(d->TextCtrl))
 					DeleteObj(d->TextCtrl);
+				
 				if (!d->TextCtrl)
 				{
 					LRect c = GetClient();
@@ -887,6 +893,7 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 						d->TextCtrl->Attach(this);
 					}
 				}
+				
 				if (d->TextCtrl)
 				{
 					Filter *f = d->Item->IsFilter();
@@ -904,10 +911,6 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 			}
 		}
 	}
-	else
-	{
-		DeleteObj(d->TextCtrl);
-	}
 
 	if (d->TextCtrl)
 	{
@@ -916,7 +919,6 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 	}
 
 	OnPosChange();
-	DeleteArray(Mem);
 }
 
 void LPreviewPanel::OnPulse()
