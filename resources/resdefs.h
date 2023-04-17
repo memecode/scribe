@@ -515,8 +515,7 @@
 #define IDS_FOLDER_PROPERTIES_DLG				709
 #define IDS_TOMORROW							710
 #define IDS_NEXT_WEEK							711
-#define IDC_FILES								712
-#define IDC_PICK_FILES							713
+#define IDC_SRC									712
 #define IDC_USAGE								714
 #define IDC_START_TIME							715
 #define IDS_ABOUT								716
@@ -545,6 +544,7 @@
 #define IDS_ERROR_EXE_FILE						739
 #define IDC_USERNAME							740
 #define IDS_FROM								741
+#define IDC_ADD									742
 #define IDC_DATE_FORMAT							743
 #define IDS_1034								744
 #define IDS_SORT_SUBFOLDERS						745
@@ -831,7 +831,7 @@
 #define IDC_REC_PASSWORD						1026
 #define IDC_REC_CHECK							1027
 #define IDC_POP3_LEAVE							1028
-#define IDS_ERROR_SERVER_CONNECT				1029
+#define IDC_DST									1029
 #define IDC_LAST								1030
 #define IDC_QUOTE								1031
 #define IDC_HOME_FAX							1032
@@ -870,7 +870,7 @@
 #define IDC_PICK_FOLDER							1065
 #define IDC_WRAP								1066
 #define IDC_NO_SPAM_TRASH						1067
-#define IDC_ADD									1068
+#define IDC_PICK_FILES							1068
 #define IDC_MSG									1069
 #define IDC_KEY									1070
 #define IDC_DONT_WARN							1071
@@ -959,7 +959,7 @@
 #define IDS_ERROR_MAPI_INIT_FAILED				1154
 #define IDD_CAL_RECUR							1155
 #define IDS_WEEKS								1156
-#define IDC_REMOVE_FILES						1157
+#define IDC_DEL									1157
 #define IDC_SHOW_EXTRA							1158
 #define IDC_IMAGE								1159
 #define IDC_GUEST_ENTRY							1160
@@ -1007,6 +1007,7 @@
 #define IDC_SPAM_FOLDER							1202
 #define IDC_SET_SPAM_FOLDER						1203
 #define IDC_PASSWORD							1204
+#define IDS_ERROR_SERVER_CONNECT				1205
 #define IDS_ERROR_PRINT_FAILED					1214
 #define IDS_ASK_ACCOUNT_PASSWORD				1215
 #define IDS_SELECT_IO							1216
@@ -1080,8 +1081,6 @@
 #define IDS_1340								1340
 #define IDS_1341								1341
 #define IDD_REPLICATE							1342
-#define IDC_SRC									1346
-#define IDC_DST									1348
 #define IDM_CHECK_UPDATE						1350
 #define IDS_1353								1353
 #define IDS_1354								1354

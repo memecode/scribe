@@ -644,7 +644,7 @@ struct ImportOe : public LProgressDlg
 		if (Current)
 			CurrentPath = Current->GetPath();
 
-		auto Dlg = new ChooseFolderDlg(	App,
+		auto Dlg = new ImportExportDlg(	App,
 										false,
 										AppName,
 										LLoadString(IDS_OE_IMPORT),

@@ -284,21 +284,22 @@ public:
 };
 
 
-class ChooseFolderDlg : public LDialog
+class ImportExportDlg : public LDialog
 {
-    ScribeWnd *App;
-	LEdit *Folder;
-	int Type;
-	bool Export;
-	LList *Lst;
+    ScribeWnd *App = NULL;
+	int Type = 0;
+	bool Export = false;
+	LList *Src = NULL;
+	LEdit *Dst = NULL;
 
 	void InsertFile(const char *f);
 
 public:
 	LString DestFolder;
 	LString::Array SrcFiles;
+	bool IncSubFolders = false;
 
-	ChooseFolderDlg
+	ImportExportDlg
 	(
 		ScribeWnd *parent,
 		bool IsExport,

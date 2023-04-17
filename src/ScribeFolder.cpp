@@ -2001,7 +2001,7 @@ void ScribeFolder::SetDefaultFields(bool Force)
 	}
 	else
 	{
-		// already has fields, so don't interfer with them
+		// already has fields, so don't interfere with them
 	}
 }
 
@@ -2012,7 +2012,9 @@ LString ScribeFolder::GetPath()
 	ScribeFolder *f = this;
 	while (f)
 	{
-		p.Add(f->GetName(true));
+		auto name = f->GetName(true);
+		if (name)
+			p.Add(name);
 		f = dynamic_cast<ScribeFolder*>(f->GetParent());
 	}
 

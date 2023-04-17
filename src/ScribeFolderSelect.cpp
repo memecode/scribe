@@ -56,11 +56,13 @@ struct FolderLeaf : public LTreeItem
 {
 	FolderDlgPriv *d;
 	ScribeFolder *Folder;
+	bool isRoot = false;
 
-	FolderLeaf(FolderDlgPriv *priv, ScribeFolder *folder)
+	FolderLeaf(FolderDlgPriv *priv, ScribeFolder *folder, bool isroot = false)
 	{
 		d = priv;
 		Folder = folder;
+		isRoot = isroot;
 	}
 
 	bool IsSelectable()
@@ -73,7 +75,12 @@ struct FolderLeaf : public LTreeItem
 
 	const char *GetText(int i=0) override
 	{
-		return (Folder) ? Folder->GetText(i) : "<error>";
+		if (!Folder)
+			return "<error>";
+		if (isRoot)
+			return "Folders";
+
+		return Folder->GetText(i);
 	}
 
 	int GetImage(int Flags = 0) override
@@ -160,69 +167,82 @@ ScribeFolderTree::ScribeFolderTree(int id, int x, int y, int cx, int cy) :
 void ScribeFolderTree::Setup(FolderDlgPriv *d, ScribeFolder *Root, const char *InitSel)
 {
 	if (!Root)
-		return;
-		
-	FolderLeaf *Leaf = new FolderLeaf(d, Root);
-	if (Leaf)
 	{
-		Insert(Leaf);
-		AddFolder(d, Leaf, Root);
+		LAssert(!"No root");
+		return;
+	}
+		
+	auto Leaf = new FolderLeaf(d, Root, true);
+	if (!Leaf)
+	{
+		LAssert(!"Alloc failed.");
+		return;
+	}
 
-		ScribeFolder *f = Root;
-		while ((f = f->GetNextFolder()))
+	Insert(Leaf);
+	AddFolder(d, Leaf, Root);
+
+	ScribeFolder *f = Root;
+	while ((f = f->GetNextFolder()))
+	{
+		Leaf = new FolderLeaf(d, f);
+		if (Leaf)
 		{
-			Leaf = new FolderLeaf(d, f);
-			if (Leaf)
-			{
-				Insert(Leaf);
-				AddFolder(d, Leaf, f);
-			}
-		}
-
-		if (InitSel)
-		{
-			auto Path = LString(InitSel).SplitDelimit("/");
-			LTreeNode *n = this;
-			for (unsigned i=0; i<Path.Length(); i++)
-			{
-				FolderLeaf *Match = 0;
-				for (FolderLeaf *c = dynamic_cast<FolderLeaf*>(n->GetChild()); c;
-								 c = dynamic_cast<FolderLeaf*>(c->GetNext()))
-				{
-					auto s = c->GetFolder()->GetName(true);
-					if (s.Equals(Path[i]))
-					{
-						Match = c;
-						break;
-					}
-				}
-
-				if (Match)
-					n = Match;
-				else
-					break;
-			}
-
-			LTreeItem *it = dynamic_cast<LTreeItem*>(n);
-			if (it)
-				it->Select(true);
+			Insert(Leaf);
+			AddFolder(d, Leaf, f);
 		}
 	}
+
+	if (InitSel)
+	{
+		auto Path = LString(InitSel).SplitDelimit("/");
+		LTreeNode *n = this;
+		for (unsigned i=0; i<Path.Length(); i++)
+		{
+			FolderLeaf *Match = 0;
+			for (FolderLeaf *c = dynamic_cast<FolderLeaf*>(n->GetChild()); c;
+								c = dynamic_cast<FolderLeaf*>(c->GetNext()))
+			{
+				auto s = c->GetFolder()->GetName(true);
+				if (s.Equals(Path[i]))
+				{
+					Match = c;
+					break;
+				}
+			}
+
+			if (Match)
+				n = Match;
+			else
+				break;
+		}
+
+		LTreeItem *it = dynamic_cast<LTreeItem*>(n);
+		if (it)
+			it->Select(true);
+	}
+
+	UpdateAllItems();
 }
 
 void ScribeFolderTree::AddFolder(FolderDlgPriv *d, LTreeItem *i, ScribeFolder *f)
 {
-	if (i && f)
+	if (!i || !f)
 	{
-		for (ScribeFolder *Folder = f->GetChildFolder(); Folder; Folder = Folder->GetNextFolder())
+		LAssert(!"Missing param");
+		return;
+	}
+
+	f->LoadFolders();
+
+	for (ScribeFolder *Folder = f->GetChildFolder(); Folder; Folder = Folder->GetNextFolder())
+	{
+		FolderLeaf *Leaf = new FolderLeaf(d, Folder);
+		if (Leaf)
 		{
-			FolderLeaf *Leaf = new FolderLeaf(d, Folder);
-			if (Leaf)
-			{
-				i->Insert(Leaf);
-				AddFolder(d, Leaf, Folder);
-				i->Expanded(true);
-			}
+			i->Insert(Leaf);
+			AddFolder(d, Leaf, Folder);
+			i->Expanded(true);
 		}
 	}
 }

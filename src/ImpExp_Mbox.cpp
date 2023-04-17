@@ -13,7 +13,7 @@
 #include "lgi/common/FileSelect.h"
 
 ///////////////////////////////////////////////////////////////////////////
-ChooseFolderDlg::ChooseFolderDlg
+ImportExportDlg::ImportExportDlg
 (
 	ScribeWnd *parent,
 	bool IsExport,
@@ -26,46 +26,44 @@ ChooseFolderDlg::ChooseFolderDlg
 {
 	Type = FolderType;
 	SetParent(App = parent);
-	DestFolder = 0;
 	Export = IsExport;
-	Lst = 0;
 
 	if (LoadFromResource(Export ? IDD_FILES_EXPORT : IDD_FILES_IMPORT))
 	{
 		Name(Title);
 
-		if (GetViewById(IDC_FOLDER, Folder))
+		if (GetViewById(IDC_SRC, Src))
 		{
-			Folder->Name(DefFolder ? DefFolder : (char*)"/");
-			Folder->Enabled(false);
-		}
-
-		SetCtrlName(IDC_MSG, Msg);
-
-		if (GetViewById(IDC_FILES, Lst))
-		{
+			Src->ShowColumnHeader(false);
 			if (Files)
 			{
 				for (unsigned i=0; i<Files->Length(); i++)
 					InsertFile((*Files)[i]);
 			}
 		}
+
+		if (GetViewById(IDC_DEST, Dst))
+		{
+			Dst->Name(DefFolder ? DefFolder : (char*)"/");
+			Dst->Enabled(false);
+		}
+
+		SetCtrlName(IDC_MSG, Msg);
 	}
 
 	MoveToCenter();
 }
 
-void ChooseFolderDlg::InsertFile(const char *f)
+void ImportExportDlg::InsertFile(const char *f)
 {
-	if (!Lst)
+	if (!Src)
 		return;
 
 	bool Has = false;
-	for (auto n : *Lst)
+	for (auto n : *Src)
 	{
-		char Path[MAX_PATH_LEN];
-		LMakePath(Path, sizeof(Path), n->GetText(0), n->GetText(1));
-		if (_stricmp(Path, f) == 0)
+		auto path = n->GetText(0);
+		if (Stricmp(path, f) == 0)
 		{
 			Has = true;
 			break;
@@ -75,109 +73,117 @@ void ChooseFolderDlg::InsertFile(const char *f)
 	if (Has)
 		return;
 	
-	LListItem *n = new LListItem;
+	LListItem *n = new LListItem(f);
 	if (!n)
 		return;
-
-	auto parts = LString(f).RSplit(DIR_STR, 1);
-	if (parts.Length() == 2)
-	{
-		n->SetText(parts[0], 0);
-		n->SetText(parts[1], 1);
-		Lst->Insert(n);
-	}
-	else delete n;
+	Src->Insert(n);
 }
 
-int ChooseFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
+int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
 {
+	if (!Src || !DestFolder)
+		return 0;
+
 	switch (Ctrl->GetId())
 	{
-		case IDC_FILES:
+		case IDC_ADD:
 		{
-			if (Lst && n.Type == LNotifyDeleteKey)
+			if (Export)
 			{
-				List<LListItem> Sel;
-				if (Lst->GetSelection(Sel))
+				// Pick scribe folders to export:
+				auto Dlg = new FolderDlg(this, App, Type);
+				Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
+					{
+						if (ctrlId)
+						{
+							auto f = Dlg->Get();
+							if (f)
+								InsertFile(f);
+						}
+						delete dlg;
+					});
+			}
+			else
+			{
+				// Pick external MBOX files to import:
+				auto s = new LFileSelect(this);
+
+				s->MultiSelect(true);
+				s->Type("All Files", LGI_ALL_FILES);
+				s->Type("MBOX Files", "*.mbx;*.mbox");
+				s->Type("Outlook Express Folders", "*.mbx;*.dbx");
+				s->Type("Mozilla Address Book", "*.mab");
+				s->Type("Eudora Address Book", "NNdbase.txt");
+				s->Open([this](auto dlg, auto status)
 				{
-					Sel.DeleteObjects();
-				}
+					if (status)
+					{
+						for (int i=0; i<dlg->Length(); i++)
+							InsertFile((*dlg)[i]);
+					}
+					delete dlg;
+				});
 			}
 			break;
 		}
-		case IDC_REMOVE_FILES:
+		case IDC_SRC:
 		{
-			if (Lst)
+			if (n.Type == LNotifyDeleteKey)
 			{
 				List<LListItem> Sel;
-				if (Lst->GetSelection(Sel))
-				{
+				if (Src->GetSelection(Sel))
 					Sel.DeleteObjects();
-				}
-			}			
+			}
 			break;
 		}
-		case IDC_PICK_FILES:
+		case IDC_DEL:
 		{
-			if (!Lst)
-				break;
-
-			auto s = new LFileSelect(this);
-
-			s->MultiSelect(!Export);
-			s->Type("All Files", LGI_ALL_FILES);
-			s->Type("MBOX Files", "*.mbx;*.mbox");
-			s->Type("Outlook Express Folders", "*.mbx;*.dbx");
-			s->Type("Mozilla Address Book", "*.mab");
-			s->Type("Eudora Address Book", "NNdbase.txt");
-			s->Open([this](auto dlg, auto status)
-			{
-				if (status)
-				{
-					if (Export)
-						Lst->Empty();
-
-					for (int i=0; i<dlg->Length(); i++)
-						InsertFile((*dlg)[i]);
-				}
-				delete dlg;
-			});
+			List<LListItem> Sel;
+			if (Src->GetSelection(Sel))
+				Sel.DeleteObjects();
 			break;
 		}
-		case IDC_SET_FOLDER:
+		case IDC_SET_DEST:
 		{
-			if (!Folder)
-				break;
-
-			auto Dlg = new FolderDlg(this, App, Type);
-			Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
+			if (Export)
 			{
-				if (ctrlId)
+				// Pick external folder for writing to:
+				auto s = new LFileSelect(this);
+
+				s->MultiSelect(!Export);
+				s->OpenFolder(	[this](auto dlg, auto status)
+								{
+									if (status)
+									{
+										for (int i=0; i<dlg->Length(); i++)
+											InsertFile((*dlg)[i]);
+									}
+									delete dlg;
+								});
+			}
+			else
+			{
+				// Pick scribe folder for writing to:
+				auto Dlg = new FolderDlg(this, App, Type);
+				Dlg->DoModal([this, Dlg](auto dlg, auto ctrlId)
 				{
-					auto f = Dlg->Get();
-					if (f)
-						this->Folder->Name(f);
-				}
-				delete dlg;
-			});
+					if (ctrlId)
+					{
+						auto f = Dlg->Get();
+						if (f && Dst)
+							Dst->Name(f);
+					}
+					delete dlg;
+				});
+			}
 			break;
 		}
 		case IDOK:
 		{
-			if (Lst)
-			{
-				for (auto n : *Lst)
-				{
-					char Path[MAX_PATH_LEN];
-					LMakePath(Path, sizeof(Path), n->GetText(0), n->GetText(1));
-					SrcFiles.Add(Path);
-				}
-			}
-
-			if (Folder)
-			{
-				DestFolder = NewStr(Folder->Name());
-			}
+			for (auto n : *Src)
+				SrcFiles.Add(n->GetText());
+			DestFolder = Dst->Name();
+			IncSubFolders = GetCtrlValue(IDC_SUB_FOLDERS) > 0;
 
 			EndModal(1);
 			break;
@@ -199,12 +205,12 @@ void Import_UnixMBox(ScribeWnd *Parent)
 	if (Cur)
 	    Path = Cur->GetPath();
 	
-	auto Dlg = new ChooseFolderDlg(Parent, false, LLoadString(IDS_MBOX_IMPORT), LLoadString(IDS_MBOX_SELECT_FOLDER), Path);
-	Dlg->DoModal([Dlg, Parent](auto dlg, auto ctrlId)
+	auto Dlg = new ImportExportDlg(Parent, false, LLoadString(IDS_MBOX_IMPORT), LLoadString(IDS_MBOX_SELECT_FOLDER), Path);
+	Dlg->DoModal([Dlg, Parent](auto dlg, auto ok)
 	{
-		if (ctrlId && Dlg->DestFolder)
+		if (ok && Dlg->DestFolder)
 		{
-			ScribeFolder *Folder = Parent->GetFolder(Dlg->DestFolder);
+			auto Folder = Parent->GetFolder(Dlg->DestFolder);
 			if (Folder)
 			{
 				for (auto File: Dlg->SrcFiles)
@@ -225,7 +231,7 @@ void Export_UnixMBox(ScribeWnd *Parent)
 	LString Path;
 	if (Cur)
 	    Path = Cur->GetPath();
-	auto Dlg = new ChooseFolderDlg(Parent,
+	auto Dlg = new ImportExportDlg(Parent,
 						true,
 						LLoadString(IDS_MBOX_EXPORT),
 						LLoadString(IDS_MBOX_EXPORT_FOLDER),

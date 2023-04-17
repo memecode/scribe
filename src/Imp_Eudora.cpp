@@ -164,7 +164,7 @@ void Import_EudoraAddressBook(ScribeWnd *App)
 	}
 
 	// Ask user...
-	auto Dlg = new ChooseFolderDlg(App,
+	auto Dlg = new ImportExportDlg(App,
 						false,
 						"Eudora",
 						LLoadString(IDS_SELECT_IO),

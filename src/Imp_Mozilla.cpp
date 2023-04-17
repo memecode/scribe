@@ -459,7 +459,7 @@ void Import_MozillaAddressBook(ScribeWnd *App)
 	FindFiles.DeleteArrays();
 
 	// Ask user...
-	auto Dlg = new ChooseFolderDlg(	App,
+	auto Dlg = new ImportExportDlg(	App,
 									false,
 									AppName,
 									"Select input files and destination directory",
@@ -562,7 +562,7 @@ void Import_MozillaMail(ScribeWnd *App)
 	LString CurPath;
 	if (Cur)
 		CurPath = Cur->GetPath();
-	auto Dlg = new ChooseFolderDlg(App,
+	auto Dlg = new ImportExportDlg(App,
 						false,
 						"Mozilla/Thunderbird",
 						LLoadString(IDS_IMPORT),
