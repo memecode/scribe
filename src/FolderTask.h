@@ -1,5 +1,7 @@
 #pragma once
 
+#include "resdefs.h"
+
 class FolderTask : public LProgressDlg
 {
 protected:
@@ -76,5 +78,79 @@ public:
 	/// false.
 	virtual bool TimeSlice() = 0;
 };
+
+class ExportFolderTask : public FolderTask
+{
+	int Idx = 0;
+
+public:
+	ExportFolderTask(	ScribeFolder *folder,
+						LAutoPtr<LStreamI> out,
+						LString mimeType,
+						ThingType::IoProgressCallback cb) :
+		FolderTask(folder, out, mimeType, cb)
+	{
+		bool Mbox = _stricmp(MimeType, sMimeMbox) == 0;
+
+		// Clear the files contents
+		Stream->SetSize(0);
+
+		// Setup progress UI
+		SetDescription(Mbox ? LLoadString(IDS_MBOX_WRITING) : (char*)"Writing...");
+		SetRange(Folder->Items.Length());
+		
+		switch (Folder->GetItemType())
+		{
+			case MAGIC_MAIL:
+				SetType(LLoadString(IDS_EMAIL));
+				break;
+			case MAGIC_CALENDAR:
+				SetType(LLoadString(IDS_CALENDAR));
+				break;
+			case MAGIC_CONTACT:
+				SetType(LLoadString(IDS_CONTACT));
+				break;
+			case MAGIC_GROUP:
+				SetType("Groups");
+				break;
+			default:
+				SetType("Objects");
+				break;
+		}
+
+		SetPulse(PULSE_MS);
+		SetAlwaysOnTop(true);
+	}
+	
+	bool TimeSlice()
+	{
+		auto Start = LCurrentTime();
+		while (	LCurrentTime() - Start < WORK_SLICE_MS
+				&&
+		        !IsCancelled())
+		{
+			if (Idx >= (ssize_t)Folder->Items.Length())
+				return false;
+
+			// Process all the container's items
+			Thing *t = Folder->Items[Idx++];
+			if (!t)
+				return false;
+
+			LAutoPtr<LStreamI> wrapper(new LProxyStream(Stream));
+			if (!t->Export(wrapper, MimeType))
+			{
+				Status.status = Store3Error;
+				Status.errMsg = "Error exporting items.";
+				return false;
+			}
+			
+			Value(Idx);
+		}
+		
+		return true;
+	}
+};
+
 
 

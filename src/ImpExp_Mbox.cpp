@@ -8,9 +8,11 @@
 #include "lgi/common/Edit.h"
 #include "lgi/common/TextLabel.h"
 #include "lgi/common/TextFile.h"
-#include "resdefs.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/FileSelect.h"
+
+#include "FolderTask.h"
+#include "resdefs.h"
 
 ///////////////////////////////////////////////////////////////////////////
 ImportExportDlg::ImportExportDlg
@@ -48,8 +50,8 @@ ImportExportDlg::ImportExportDlg
 
 		if (Dst)
 		{
-			Dst->Name(dstFolder ? dstFolder : (char*)"/");
-			Dst->Enabled(false);
+			if (dstFolder)
+				Dst->Name(dstFolder);
 		}
 		else LAssert(0);
 
@@ -156,14 +158,11 @@ int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
 				auto s = new LFileSelect(this);
 
 				s->MultiSelect(!Export);
-				s->OpenFolder(	[this](auto dlg, auto status)
+				s->OpenFolder(	[this](auto s, auto status)
 								{
 									if (status)
-									{
-										for (int i=0; i<dlg->Length(); i++)
-											InsertFile((*dlg)[i]);
-									}
-									delete dlg;
+										SetCtrlName(IDC_DST, s->Name());
+									delete s;
 								});
 			}
 			else
@@ -235,6 +234,69 @@ void Import_UnixMBox(ScribeWnd *Parent)
 	});
 }
 
+struct MboxExportTask : public LView::ViewEventTarget
+{
+	ScribeWnd *App = NULL;
+	LString DestFolder;
+	LString::Array SrcFiles;
+	bool IncSubFolders = false;
+
+	// Chain together enough ExportFolderTask instances to
+	// get the SrcFiles written....
+	MboxExportTask(ScribeWnd *Parent) :
+		LView::ViewEventTarget(Parent, M_EXPORT_NEXT)
+	{
+		// Kick it off....
+		App = Parent;
+	}
+
+	void Next()
+	{
+		PostEvent(M_EXPORT_NEXT);
+	}
+
+	LMessage::Result OnEvent(LMessage *Msg)
+	{
+		if (Msg->Msg() == M_EXPORT_NEXT)
+		{
+			if (SrcFiles.Length() == 0)
+				return OnFinished();
+
+			// Pop next folder path
+			auto inPath = SrcFiles[0];
+			SrcFiles.DeleteAt(0, true);
+			auto folder = App->GetFolder(inPath);
+			if (folder)
+			{	
+				LFile::Path outPath = DestFolder;
+				outPath += LGetLeaf( folder->GetDropFileName() );
+				auto p = outPath.GetFull();
+				LAutoPtr<LStreamI> outFile;
+				outFile.Reset(new LFile(p, O_WRITE));
+
+				new ExportFolderTask(folder,
+									outFile,
+									sMimeMbox, 
+									[this](auto prog, auto stream)
+									{
+										Next();
+									});
+				return 1;
+			}
+
+			Next();
+		}
+
+		return 0;
+	}
+
+	int OnFinished()
+	{
+		delete this;
+		return 0;
+	}
+};
+
 void Export_UnixMBox(ScribeWnd *Parent)
 {
 	ScribeFolder *Cur = Parent->GetCurrentFolder();
@@ -247,29 +309,42 @@ void Export_UnixMBox(ScribeWnd *Parent)
 									LLoadString(IDS_MBOX_EXPORT),
 									LLoadString(IDS_MBOX_EXPORT_FOLDER),
 									&SrcPath);
-	Dlg->DoModal([Dlg, Parent](auto dlg, auto ctrlId)
+	Dlg->DoModal([Dlg, Parent](auto dlg, auto ok)
 	{
-		if (ctrlId && Dlg->DestFolder)
+		if (ok &&
+			Dlg->SrcFiles.Length() > 0 &&
+			Dlg->DestFolder)
 		{
-			ScribeFolder *Folder = Parent->GetFolder(Dlg->DestFolder);
-			if (Folder)
-			{
-				for (auto File: Dlg->SrcFiles)
-				{
-					if (!LFileExists(File) ||
-						LgiMsg(	Parent,
-								LLoadString(IDS_ERROR_FILE_EXISTS),
-								AppName,
-								MB_YESNO,
-								File.Get()) == IDYES)
-					{
-						LAutoPtr<LFile> F(new LFile);
-						if (F->Open(File, O_WRITE))
-							Folder->Export(Folder->AutoCast(F), sMimeMbox);
-					}
-				}
-			}
+			auto task = new MboxExportTask(Parent);
+			task->DestFolder = Dlg->DestFolder;
+			task->SrcFiles = Dlg->SrcFiles;
+			task->IncSubFolders = Dlg->IncSubFolders;
+			task->Next();
 		}
 		delete dlg;
 	});
 }
+
+
+/*
+
+	ScribeFolder *Folder = Parent->GetFolder(Dlg->DestFolder);
+	if (Folder)
+	{
+		for (auto File: Dlg->SrcFiles)
+		{
+			if (!LFileExists(File) ||
+				LgiMsg(	Parent,
+						LLoadString(IDS_ERROR_FILE_EXISTS),
+						AppName,
+						MB_YESNO,
+						File.Get()) == IDYES)
+			{
+				LAutoPtr<LFile> F(new LFile);
+				if (F->Open(File, O_WRITE))
+					Folder->Export(Folder->AutoCast(F), sMimeMbox);
+			}
+		}
+	}
+
+*/

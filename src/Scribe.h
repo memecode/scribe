@@ -1196,6 +1196,7 @@ class ScribeClass ScribeFolder :
 	friend class ThingList;
 	friend class ScribeWnd;
 	friend class MoveToState;
+	friend struct MboxExportTask;
 
 protected:
 	class ScribeFolderPriv *d;
