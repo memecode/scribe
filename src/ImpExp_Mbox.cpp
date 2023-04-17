@@ -19,9 +19,9 @@ ImportExportDlg::ImportExportDlg
 	bool IsExport,
 	const char *Title,
 	const char *Msg,
-	char *DefFolder,
-	int FolderType,
-	LString::Array *Files
+	LString::Array *srcFiles,
+	const char *dstFolder,
+	int FolderType
 )
 {
 	Type = FolderType;
@@ -32,21 +32,26 @@ ImportExportDlg::ImportExportDlg
 	{
 		Name(Title);
 
-		if (GetViewById(IDC_SRC, Src))
+		GetViewById(IDC_SRC, Src);
+		GetViewById(IDC_DST, Dst);
+
+		if (Src)
 		{
 			Src->ShowColumnHeader(false);
-			if (Files)
+			if (srcFiles)
 			{
-				for (unsigned i=0; i<Files->Length(); i++)
-					InsertFile((*Files)[i]);
+				for (auto f: *srcFiles)
+					InsertFile(f);
 			}
 		}
+		else LAssert(0);
 
-		if (GetViewById(IDC_DEST, Dst))
+		if (Dst)
 		{
-			Dst->Name(DefFolder ? DefFolder : (char*)"/");
+			Dst->Name(dstFolder ? dstFolder : (char*)"/");
 			Dst->Enabled(false);
 		}
+		else LAssert(0);
 
 		SetCtrlName(IDC_MSG, Msg);
 	}
@@ -81,7 +86,7 @@ void ImportExportDlg::InsertFile(const char *f)
 
 int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
 {
-	if (!Src || !DestFolder)
+	if (!Src || !Dst)
 		return 0;
 
 	switch (Ctrl->GetId())
@@ -200,12 +205,17 @@ int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
 ///////////////////////////////////////////////////////////////////////////
 void Import_UnixMBox(ScribeWnd *Parent)
 {
-	ScribeFolder *Cur = Parent->GetCurrentFolder();
-	LString Path;
+	auto Cur = Parent->GetCurrentFolder();
+	LString DstPath;
 	if (Cur)
-	    Path = Cur->GetPath();
+		DstPath = Cur->GetPath();
 	
-	auto Dlg = new ImportExportDlg(Parent, false, LLoadString(IDS_MBOX_IMPORT), LLoadString(IDS_MBOX_SELECT_FOLDER), Path);
+	auto Dlg = new ImportExportDlg(	Parent,
+									false,
+									LLoadString(IDS_MBOX_IMPORT),
+									LLoadString(IDS_MBOX_SELECT_FOLDER),
+									NULL, // Src
+									DstPath);
 	Dlg->DoModal([Dlg, Parent](auto dlg, auto ok)
 	{
 		if (ok && Dlg->DestFolder)
@@ -228,14 +238,15 @@ void Import_UnixMBox(ScribeWnd *Parent)
 void Export_UnixMBox(ScribeWnd *Parent)
 {
 	ScribeFolder *Cur = Parent->GetCurrentFolder();
-	LString Path;
+	LString::Array SrcPath;
 	if (Cur)
-	    Path = Cur->GetPath();
-	auto Dlg = new ImportExportDlg(Parent,
-						true,
-						LLoadString(IDS_MBOX_EXPORT),
-						LLoadString(IDS_MBOX_EXPORT_FOLDER),
-						Path);
+		SrcPath.Add(Cur->GetPath());
+	
+	auto Dlg = new ImportExportDlg(	Parent,
+									true,
+									LLoadString(IDS_MBOX_EXPORT),
+									LLoadString(IDS_MBOX_EXPORT_FOLDER),
+									&SrcPath);
 	Dlg->DoModal([Dlg, Parent](auto dlg, auto ctrlId)
 	{
 		if (ctrlId && Dlg->DestFolder)

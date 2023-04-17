@@ -516,6 +516,7 @@
 #define IDS_TOMORROW							710
 #define IDS_NEXT_WEEK							711
 #define IDC_SRC									712
+#define IDC_SET_DEST							713
 #define IDC_USAGE								714
 #define IDC_START_TIME							715
 #define IDS_ABOUT								716
@@ -531,7 +532,6 @@
 #define IDM_IMPORT_EML							726
 #define IDC_CONTACTS_URL						727
 #define IDS_DELETE_FOLDER_DLG					728
-#define IDS_1035								729
 #define IDS_SET_DEFAULT							730
 #define IDC_HTML_FONT							731
 #define IDC_SET_HTML_FONT						732
@@ -546,7 +546,6 @@
 #define IDS_FROM								741
 #define IDC_ADD									742
 #define IDC_DATE_FORMAT							743
-#define IDS_1034								744
 #define IDS_SORT_SUBFOLDERS						745
 #define IDC_DESC								746
 #define IDC_948									747
@@ -753,7 +752,6 @@
 #define IDC_TIME_TYPE							948
 #define IDS_FOLDER_TRASH						949
 #define IDD_FILES_EXPORT						950
-#define IDS_1022								951
 #define IDC_END_DATE							952
 #define IDC_HAM									953
 #define IDC_SPAM								954
@@ -831,7 +829,6 @@
 #define IDC_REC_PASSWORD						1026
 #define IDC_REC_CHECK							1027
 #define IDC_POP3_LEAVE							1028
-#define IDC_DST									1029
 #define IDC_LAST								1030
 #define IDC_QUOTE								1031
 #define IDC_HOME_FAX							1032
@@ -870,7 +867,6 @@
 #define IDC_PICK_FOLDER							1065
 #define IDC_WRAP								1066
 #define IDC_NO_SPAM_TRASH						1067
-#define IDC_PICK_FILES							1068
 #define IDC_MSG									1069
 #define IDC_KEY									1070
 #define IDC_DONT_WARN							1071
@@ -999,7 +995,6 @@
 #define IDC_INCOMING							1194
 #define IDM_MENU_1195							1195
 #define IDC_DEST								1196
-#define IDC_SET_DEST							1197
 #define IDC_HAS_GROUPS							1198
 #define IDC_CAL_URL								1199
 #define IDC_SPAM_FLD							1200
@@ -1008,6 +1003,7 @@
 #define IDC_SET_SPAM_FOLDER						1203
 #define IDC_PASSWORD							1204
 #define IDS_ERROR_SERVER_CONNECT				1205
+#define IDC_DST									1206
 #define IDS_ERROR_PRINT_FAILED					1214
 #define IDS_ASK_ACCOUNT_PASSWORD				1215
 #define IDS_SELECT_IO							1216

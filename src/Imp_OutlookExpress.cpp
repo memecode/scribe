@@ -648,9 +648,9 @@ struct ImportOe : public LProgressDlg
 										false,
 										AppName,
 										LLoadString(IDS_OE_IMPORT),
+										&FileArr,
 										CurrentPath,
-										MAGIC_MAIL,
-										&FileArr);
+										MAGIC_MAIL);
 		Dlg->DoModal([this, Dlg](auto dlg, auto id)
 		{
 			LAutoPtr<LDialog> mem(dlg);

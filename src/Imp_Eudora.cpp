@@ -140,12 +140,10 @@ void Import_EudoraAddressBook(ScribeWnd *App)
 		}
 	#endif
 
-	LString::Array Files;
+	LString::Array SrcFiles;
 	LMakePath(Str, sizeof(Str), Str, "NNdbase.txt");
 	if (LFileExists(Str))
-	{
-		Files.Add(Str);
-	}
+		SrcFiles.Add(Str);
 
 	// Get default path..
 	char DefaultFolder[256] = "/Contacts";
@@ -164,13 +162,13 @@ void Import_EudoraAddressBook(ScribeWnd *App)
 	}
 
 	// Ask user...
-	auto Dlg = new ImportExportDlg(App,
-						false,
-						"Eudora",
-						LLoadString(IDS_SELECT_IO),
-						DefaultFolder,
-						MAGIC_CONTACT,
-						&Files);
+	auto Dlg = new ImportExportDlg(	App,
+									false,
+									"Eudora",
+									LLoadString(IDS_SELECT_IO),
+									&SrcFiles,
+									DefaultFolder,
+									MAGIC_CONTACT);
 	Dlg->DoModal([App, Dlg](auto dlg, auto id)
 	{
 		if (id && Dlg->SrcFiles[0])

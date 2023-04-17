@@ -305,9 +305,9 @@ public:
 		bool IsExport,
 		const char *Title,
 		const char *Msg,
-		char *DefFolder = NULL,
-		int FolderType = MAGIC_MAIL,
-		LString::Array *Files = NULL
+		LString::Array *SrcFiles = NULL,
+		const char *DefFolder = NULL,
+		int FolderType = MAGIC_MAIL
 	);
 
 	int OnNotify(LViewI *Ctrl, LNotification n);

@@ -178,7 +178,7 @@
 		<String Ref="280" Cid="675" Define="IDD_FILES_IMPORT" pt="Importar Ficheiros" en="Import Files" lt="Rinkmenų importavimas" cs="Soubory importu" fa="عنوان" pl="Importuj pliki" de="Dateien importieren" sr="Uvezi fajlove" da="Importer filer" vi="Nhập tập tin" sv="Importera filer" es="Importar Archivos" pt_br="Importar arquivos" lg="Lagiriza failo" tr="İçe Al" hu="Fájl import" ru="Импорт файлов" ko="파일 불러오기" uk="Імпорт файлів" fr="Importation de fichiers" />
 		<String Ref="281" Cid="1157" Define="IDC_DEL" en="-" />
 		<String Ref="282" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
-		<String Ref="283" Cid="1079" Define="IDC_SET_FOLDER" en="..." />
+		<String Ref="283" Cid="713" Define="IDC_SET_DEST" en="..." />
 		<String Ref="284" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="285" Cid="-1" Define="IDC_STATIC" en="Detail:" it="Dettagli" es="Detalle" pt_br="Detalhe" ru="Детали" pt="Detalhes" pl="Szczegóły" vi="Chi tiết" zh_tw="細節" ja="詳細" sr="Detalj" no="Detaljer" lt="Išsamiai" fa="جزئيات" de="Details" da="Detaljer" sv="Detaljerat" lg="Ebisingawo" tr="Detaylar" hu="Részlet" ko="세부 사항:" uk="Деталі:" fr="Détails:" />
 		<String Ref="286" Cid="-1" Define="IDC_STATIC" en="Source Files:" pl="Pliki źródłowe:" cs="Zdrojové soubory:" no="Kildefiler" pt="Importar de:" lt="Importuoti iš:" fa="فايل هاي مبدأ:" nl="Bronbestanden:" de="Quell-Dateien:" sr="Izvorna omotnica:" da="Kildefiler" vi="Tập tin nguồn:" sv="Källfiler:" es="Carpeta de Origen:" pt_br="Arquivos de Origem:" lg="Failo omunasowolwa" tr="Kaynak Dosyalar:" hu="Forrás fájl:" ru="Исходные файлы:" ko="소스 파일:" uk="Вихідні файли:" fr="Fichiers source:" />
@@ -649,11 +649,8 @@
 		<String Ref="1028" Cid="742" Define="IDC_ADD" en="+" />
 		<String Ref="1029" Cid="1206" Define="IDC_DST" />
 		<String Ref="1030" Cid="-1" Define="IDC_STATIC" en="Destination Folder:" fr="Dossier destination" it="Cartella:" cs="Cílová složka:" es="Carpeta de destino:" de="Ziel-Ordner:" nl="Map:" pt_br="Pasta de Destino:" pt="Para:" vi="Danh mục đích" zh_tw="???:" ja="????:" sr="Odredišna omotnica:" pl="Folder docelowy" no="Motaksmappe" lt="Importuojamųjų aplankas:" fa="پوشه مقصد" da="Modtagelsesmappe:" sv="Mapp för mottaget:" lg="Kabada mwebinaterekera:" tr="Hedef Klasör:" hu="Cél mappa:" ru="Папка назначегия:" ko="대상 폴더:" uk="Тека призначення:" />
-		<String Ref="1031" Cid="951" Define="IDS_1022" en="Path" pl="Ścieżka" cs="Cesta" no="Sti" lt="Kelias" nl="Pad" pt="Caminho" fa="مسير" de="Verzeichnis" sr="Putanja" da="Sti" vi="Đường dẫn" sv="Sökväg" pt_br="Diretório" es="Ruta" lg="Panya" tr="Adres" hu="Útvonal" ru="Путь" ko="경로" uk="Шлях" fr="Chemin" />
-		<String Ref="1032" Cid="729" Define="IDS_1035" en="Leaf" pl="Plik" lt="Rinkmena" pt="Folha" cs="Jméno" nl="Bestand" de="Zweig" sr="List" da="Blad" vi="Dữ liệu" sv="Filnamn" pt_br="Arquivo" es="Página" lg="Akakulungamya" tr="Sayfa" hu="Hajtás" ru="Лист" uk="Лист" fr="Feuille??" />
 		<String Ref="1033" Cid="-1" Define="IDC_STATIC" en="Destination Folder:" pl="Plik docelowy:" cs="Cílový soubor" no="Mottaksfil:" nl="Bestemming van bestand:" pt="Para:" lt="Kur eksportuoti:" fa="فايل مقصد" de="Ziel-Datei:" sr="Odredišna omotnica:" da="Modtagelsesfil:" vi="Tập tin đích:" sv="Mottagsfil:" es="Archivo de Destino:" pt_br="Arquivo de Destino:" lg="Failo mwebinaterekerwa:" tr="Hedef Dosya:" hu="Cél fájl:" ru="Конечный файл:" ko="대상 파일:" uk="Кінцевий файл:" fr="Dossier destination" />
-		<String Ref="1034" Cid="951" Define="IDS_1022" en="Path" pl="Ścieżka" cs="Cesta" no="Sti" lt="Kelias" nl="Pad" fa="مسير" de="Verzeichnis" sr="Putanja" da="Sti" vi="Đường dẫn" sv="Sökväg" pt_br="Diretório" es="Ruta" lg="Panya" tr="Adres" hu="Útvonal" ru="Путь" ko="경로" uk="Шлях" fr="Chemin" />
-		<String Ref="1035" Cid="1068" Define="IDC_PICK_FILES" en="..." />
+		<String Ref="1035" Cid="713" Define="IDC_SET_DEST" en="..." />
 		<String Ref="1036" Cid="-1" Define="IDC_STATIC" en="Default alternative:" cs="Výchozí alternativa:" nl="Standaard voorkeur" pt_br="Alternativa padrão:" ru="Выбор по умолчанию:" ja="デフォルト表示" pt="Utilizar por defeito:" pl="Domyślna alternatywa:" it="Alternativa al default:" vi="Kiểu thay thế:" zh_tw="預設傳送帳號:" sr="Podrazumevana alternativa:" es="Utilizar por defecto:" no="Standard alternativ:" lt="Numatytasis laiško formatas:" fa="گزينه پيشفرض" de="Standard-Alternative:" da="Standard alternativ:" sv="Standardalternativ:" lg="Ekyawukana ekyenkalakalira" tr="Varsayılan alternatif:" hu="Alapértelmezett választás:" ko="기본 대체:" uk="За замовчуванням альтернатива:" fr="Alternative par défaut:" />
 		<String Ref="1037" Cid="522" Define="IDC_DEFAULT_ALT" />
 		<String Ref="1038" Cid="1088" Define="IDC_BUSY" en="Busy" ko="바쁨" uk="Зайнятий" de="Beschäftigt" fr="Occupé" />
@@ -735,7 +732,7 @@
 		<String Ref="1194" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1195" Cid="-1" Define="IDC_STATIC" en="Destination mail store:" sv="Mottagarklient:" lt="Kur eksportuoti:" de="Export in Datei:" cs="Cílová složka zpráv:" tr="Hedef e-posta klasörü:" hu="Cél üzenet tároló:" ru="Конечное хранилище:" pl="Docelowy magazyn poczty:" ko="대상 메일 사서함:" uk="Місце  розташування поштової бази:" fr="Messagerie de destination:" />
 		<String Ref="1196" Cid="1196" Define="IDC_DEST" />
-		<String Ref="1197" Cid="1197" Define="IDC_SET_DEST" en="..." />
+		<String Ref="1197" Cid="713" Define="IDC_SET_DEST" en="..." />
 		<String Ref="1200" Cid="-1" Define="IDC_STATIC" en="Source Folders:" pl="Foldery źródłowe:" cs="Zdrojová složka:" no="Kildemappe" lt="Ką eksportuoti:" nl="Bronmap:" pt="Exportar" fa="پوشه مبدأ" de="Quell-Ordner:" sr="Izvorna omotnica:" da="Kildemappe" vi="Danh mục nguồn:" sv="Källmappar:" es="Carpeta de Origen:" pt_br="Pastas de origem:" tr="Kaynak Klasörler:" hu="Forrás mappák:" ru="Исходные папки:" ko="소스 폴더:" uk="Теки з файлами:" fr="Dossiers source:" />
 		<String Ref="1201" Cid="992" Define="IDC_ALL" en="All folders" no="Alle mapper" lt="Visi aplankai" pt="Tudo" cs="Všechny složky" fa="همه پوشه ها" nl="Alle mappen" pl="Wszystkie foldery" de="Alle Ordner" sr="Sve omotnice" da="Alle mapper" vi="Tất cả danh mục" sv="Alla mappar" es="Todas las carpetas" pt_br="Todas as Pastas" tr="Tüm klasörler" hu="Minden mappa" ru="Все папки" ko="모든 폴더" uk="Усі теки" fr="Tous les dossiers" />
 		<String Ref="1202" Cid="1067" Define="IDC_NO_SPAM_TRASH" en="Excluding Spam and Trash Folders" pt="Excepto Spam e Apagado" nl="Behalve Afval en Prullenbak" de="Ohne SPAM-Ordner und Papierkorb" sr="Izuzimajući Spam i Trash omotnice" lt="Išskyrus aplankus „Šiukšlės“ ir „Šlamštas“" fa="Spam و Trash به جز پوشه هاي" cs="Vynechat složky Spam a Koš" pl="Wyłączając Kosz i Folder ze Spamem" no="Ekskluder søppelpost og søppelkasse mapper" da="Undtag spam-post og papirkurv mapper" vi="Ngoại trừ danh mục Thư rác và Thùng rác" sv="Undanta skräppost- och papperskorgsmappar" es="Excluir carpetas de Spam y Papelera" pt_br="Excluíndo SPAM e Pastas de Lixo" tr="Spam ve Çöp Klasörleri Hariç Tutulsun" hu="Kivéve a Spam és Kuka mappákat" ru="Исключая папки Спам и Мусор" ko="스팸 및 휴지통 폴더 제외" uk="Виключаючи теку спаму і кошику" fr="Exclure les dossiers Spam et Corbeille" />
@@ -845,7 +842,7 @@
 		<String Ref="1345" Cid="-1" Define="IDC_STATIC" en="Source folders:" pl="Foldery źródłowe:" ko="원본 폴더" uk="Теки з файлами:" de="Quellordner:" fr="Dossiers source:" />
 		<String Ref="1346" Cid="712" Define="IDC_SRC" />
 		<String Ref="1347" Cid="-1" Define="IDC_STATIC" en="Destination folders:" pl="Foldery docelowe:" ko="대상 폴더:" uk="Тека призначення:" de="Zielordner:" fr="Dossiers destination" />
-		<String Ref="1348" Cid="1029" Define="IDC_DST" />
+		<String Ref="1348" Cid="1206" Define="IDC_DST" />
 		<String Ref="1349" Cid="1" Define="IDOK" en="Ok" ko="확인" uk="Так" />
 		<String Ref="1350" Cid="2" Define="IDCANCEL" en="Cancel" pl="Anuluj" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
 		<String Ref="1351" Cid="-1" Define="IDC_STATIC" en="Types:" pl="Rodzaje:" ko="유형:" uk="Типи:" de="Typen:" />
@@ -904,7 +901,6 @@
 		<String Ref="1510" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="1511" Cid="1490" Define="IDC_MSG_DEL_PREV" en="Prev" ko="미리보기" uk="Попередній" de="Vorige E-Mail" fr="Préc" />
 		<String Ref="1512" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="?????" pt="Cancelar" pl="Anuluj" vi="Hu?y" zh_tw="??" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
-		<String Ref="1513" Cid="744" Define="IDS_1034" en="Leaf" pl="Plik" lt="Rinkmena" pt="Folha" cs="Jméno" nl="Bestand" de="Zweig" sr="List" da="Blad" vi="Dữ liệu" sv="Filnamn" pt_br="Arquivo" es="Página" lg="Akakulungamya" tr="Sayfa" hu="Hajtás" ru="Лист" uk="Лист" fr="Feuille??" />
 		<String Ref="1514" Cid="1514" Define="IDC_RECEIVE_LOG" />
 		<String Ref="1515" Cid="3002" Define="IDC_FPR_ADMIN" en="Admin" pt="Administrador" zh_tw="管理員" ja="管理者" nl="Beheerder" sr="Administrator" es="Administrador" cs="Správce" lt="Admin." fa="مدير" de="Administrator" vi="Người quản lý" sv="Administratör" pt_br="Administrador" lg="Alabirira" tr="Yönetici" ru="Администратор" ko="관리자" uk="Адміністратор" />
 		<String Ref="1518" Cid="-1" Define="IDC_STATIC" en="Port:" vi="Cổng:" lt="Prievadas:" es="Puerto:" ru="порт:" nl="Poort:" pt_br="Porta:" ja="ポート:" pt="Porta:" ko="포트:" uk="Порт:" />
@@ -2913,7 +2909,7 @@
 					<EditBox Pos="7,308,433,328" ref="1029" />
 				</td>
 				<td addr="1,6">
-					<Button pos="478,299,498,319" ref="1035" toggle="0" />
+					<Button pos="483,308,503,328" ref="1035" image="" toggle="0" />
 				</td>
 			</tr>
 			<tr>
@@ -2959,7 +2955,7 @@
 					<EditBox Pos="7,301,454,321" ref="1157" />
 				</td>
 				<td addr="1,5">
-					<Button pos="488,295,508,315" ref="283" toggle="0" />
+					<Button pos="488,295,508,315" ref="283" image="" toggle="0" />
 				</td>
 			</tr>
 			<tr>
@@ -4668,9 +4664,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4678,23 +4688,9 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>
