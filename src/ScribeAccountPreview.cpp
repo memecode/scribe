@@ -25,22 +25,9 @@
 AccountMessage::AccountMessage(ScribeAccount *to)
 {
 	To = to;
-	Attachments = false;
-	New = true;
-	Size = 0;
-	From = 0;
-	Subject = 0;
-	ServerUid = 0;
 
 	Download = new LListItemCheckBox(this, 5);
 	Delete = new LListItemCheckBox(this, 6);
-}
-
-AccountMessage::~AccountMessage()
-{
-	DeleteArray(From);
-	DeleteArray(Subject);
-	DeleteArray(ServerUid);
 }
 
 const char *AccountMessage::GetText(int i)

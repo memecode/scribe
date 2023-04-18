@@ -2208,9 +2208,12 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) headers=%p, time=%i\n", Account->
 									}
 
 									t->Msg->Index = t->Index;
-									t->Msg->From = DecodeRfc2047(InetGetHeaderField(Headers, "From"));
-									t->Msg->Subject = DecodeRfc2047(InetGetHeaderField(Headers, "Subject"));
-									t->Msg->ServerUid = NewStr(t->Uid);
+
+									LAutoString From(DecodeRfc2047(InetGetHeaderField(Headers, "From")));
+									LAutoString Subject(DecodeRfc2047(InetGetHeaderField(Headers, "Subject")));
+									t->Msg->From = From.Get();
+									t->Msg->Subject = LString(Subject).Replace("\n");
+									t->Msg->ServerUid = t->Uid;
 									
 									LAutoString d(InetGetHeaderField(Headers, "Date"));
 									if (d)

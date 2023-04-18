@@ -7,22 +7,21 @@ class AccountMessage : public LListItem
 {
 public:
 	// Data
-	ScribeAccount *To;
-	int Index;
-	bool New;
-	int64 Size;
-	char *From;
-	char *Subject;
-	char *ServerUid;
+	ScribeAccount *To = NULL;
+	int Index = -1;
+	bool New = true;
+	int64 Size = 0;
+	LString From;
+	LString Subject;
+	LString ServerUid;
 	LDateTime Date;
-	bool Attachments;
+	bool Attachments = false;
 
-	LListItemCheckBox *Download;
-	LListItemCheckBox *Delete;
+	LListItemCheckBox *Download = NULL;
+	LListItemCheckBox *Delete = NULL;
 
 	// Constructor
 	AccountMessage(ScribeAccount *to);
-	~AccountMessage();
 
 	// Item
 	const char *GetText(int i);
