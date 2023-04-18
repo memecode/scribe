@@ -1,5 +1,4 @@
 #include "Mail3.h"
-#include "lgi/common/NetTools.h"
 #include "lgi/common/Mail.h"
 #include "lgi/common/Store3MimeTree.h"
 #include "lgi/common/StreamConcat.h"

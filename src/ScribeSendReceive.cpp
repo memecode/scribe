@@ -17,7 +17,6 @@
 #include "Scribe.h"
 #include "lgi/common/OpenSSLSocket.h"
 #include "ScribePrivate.h"
-#include "lgi/common/NetTools.h"
 #include "resdefs.h"
 #include "lgi/common/LgiRes.h"
 #include "ScribeAccountPreview.h"

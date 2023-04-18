@@ -29,7 +29,6 @@
 #include "Scribe.h"
 
 #include "lgi/common/StoreConvert1To2.h"
-#include "lgi/common/NetTools.h"
 #include "lgi/common/ProgressDlg.h"
 #include "lgi/common/TextLabel.h"
 #include "lgi/common/Button.h"

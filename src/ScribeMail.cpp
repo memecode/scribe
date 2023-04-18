@@ -17,7 +17,6 @@
 
 #include "Scribe.h"
 #include "ScribePageSetup.h"
-#include "lgi/common/NetTools.h"
 #include "lgi/common/Popup.h"
 #include "lgi/common/ColourSelect.h"
 #include "lgi/common/TextView3.h"

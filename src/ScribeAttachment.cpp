@@ -15,7 +15,6 @@
 
 #include "Scribe.h"
 #include "resdefs.h"
-#include "lgi/common/NetTools.h"
 #include "lgi/common/ProgressDlg.h"
 #include "lgi/common/Tnef.h"
 #include "lgi/common/LgiRes.h"

@@ -16,7 +16,6 @@
 #include <ctype.h>
 
 #include "Scribe.h"
-#include "lgi/common/NetTools.h"
 #include "lgi/common/Combo.h"
 #include "lgi/common/Edit.h"
 #include "lgi/common/Button.h"

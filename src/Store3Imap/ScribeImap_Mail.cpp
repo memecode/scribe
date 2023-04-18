@@ -1,10 +1,10 @@
 #include "lgi/common/Lgi.h"
-#include "lgi/common/NetTools.h"
+#include "lgi/common/LgiRes.h"
+#include "lgi/common/TextConvert.h"
+
 #include "ScribeImap.h"
 #include "ScribeUtils.h"
 #include "resdefs.h"
-#include "lgi/common/LgiRes.h"
-#include "lgi/common/TextConvert.h"
 
 #if IMAP_PROTOBUF
 #include "include/Scribe.pb.cc"

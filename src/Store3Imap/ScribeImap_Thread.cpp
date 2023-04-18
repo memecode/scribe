@@ -1,9 +1,10 @@
 #include <stdarg.h>
+
 #include "lgi/common/Lgi.h"
-#include "lgi/common/NetTools.h"
 #include "lgi/common/Mail.h"
-#include "ScribeImap.h"
 #include "lgi/common/OpenSSLSocket.h"
+
+#include "ScribeImap.h"
 #include "ScribeUtils.h"
 
 #define DEBUG_OUTPUT_FETCHES			0

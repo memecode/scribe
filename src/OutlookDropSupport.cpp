@@ -5,7 +5,6 @@
 #include <mapitags.h>
 #include <mapiutil.h>
 #include "lgi/common/Com.h"
-#include "lgi/common/NetTools.h"
 #include "lgi/common/RtfHtml.h"
 #include "lgi/common/Variant.h"
 

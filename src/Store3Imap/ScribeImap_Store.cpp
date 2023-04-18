@@ -1,5 +1,5 @@
 #include "lgi/common/Lgi.h"
-#include "lgi/common/NetTools.h"
+
 #include "ScribeImap.h"
 #include "ScribeUtils.h"
 

@@ -4,7 +4,6 @@
 #include <sys/timeb.h>
 
 #include "Scribe.h"
-#include "lgi/common/NetTools.h"
 #include "lgi/common/Edit.h"
 #include "lgi/common/TextLabel.h"
 #include "lgi/common/TextFile.h"
