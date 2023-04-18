@@ -94,6 +94,7 @@
 			<Node File="../../../lgi/trunk/src/common/Text/Html.cpp" Type="2" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/Text/HtmlCommon.cpp" Type="2" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/Text/HtmlParser.cpp" Type="2" Platforms="15" />
+			<Node File="../../../lgi/trunk/include/lgi/common/HtmlParser.h" Type="3" Platforms="15" />
 			<Node File="../../../lgi/trunk/src/common/Text/HtmlPriv.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="RichTextEdit" Type="1" Platforms="15" Open="0" Id="10">
@@ -115,6 +116,7 @@
 		<Node File="../../../lgi/trunk/include/lgi/common/Map.h" Type="3" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/General/SoftwareUpdate.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Text/TextConvert.cpp" Type="2" Platforms="15" />
+		<Node File="../../../lgi/trunk/include/lgi/common/TextConvert.h" Type="3" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Text/TextView4.cpp" Type="2" Platforms="15" />
 		<Node File="../../../lgi/trunk/include/lgi/common/TextView4.h" Type="3" Platforms="15" />
 		<Node File="../../../lgi/trunk/src/common/Text/XmlTreeUi.cpp" Type="2" Platforms="15" />
@@ -389,8 +391,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>./scribe</Release>
 				</Linux>
 			</Executable>
-			<CCrossCompiler />
-			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -495,12 +495,8 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>../../libs/build-x64/libchardet</Debug>
 					<Release>../../libs/build-x64/libchardet</Release>
 				</All>
-				<Linux />
 			</LibraryPaths>
-			<TargetName>
-				<Linux />
-			</TargetName>
-			<ApplicationIcon />
+			<TargetName />
 		</Build>
 		<Editor>
 			<TabSize>
@@ -515,26 +511,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
-			<CommentFile />
-			<CommentFunction />
 		</Editor>
 		<Advanced>
-			<PostBuildCommands>
-				<Linux />
-			</PostBuildCommands>
-			<OtherMakefileRules />
+			<PostBuildCommands />
 		</Advanced>
 		<Debug>
-			<Arguments>
-				<All />
-			</Arguments>
-			<Environment />
-			<DebugAdmin />
-			<InitialDir />
+			<Arguments />
 		</Debug>
-		<Remote>
-			<RemoteUri />
-			<RemotePass />
-		</Remote>
+		<Remote />
 	</Settings>
 </Project>

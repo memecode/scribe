@@ -15,7 +15,7 @@ endif
 MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
 
-Flags = -fPIC -w -fno-inline -fpermissive
+Flags = -fPIC -fno-inline -fpermissive -Wdeprecated-declarations
 
 ifeq ($(Build),Debug)
 	Flags += -MMD -MP -g -std=c++14
