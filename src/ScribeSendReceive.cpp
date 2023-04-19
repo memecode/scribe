@@ -1080,13 +1080,13 @@ void SendAccountlet::Main(AccountletThread *Thread)
 				s = PrefCharset1();
 				if (s.Str())
 				{
-					Sink->CharsetPrefs.Insert(NewStr(s.Str()));
+					Sink->CharsetPrefs.Add(s.Str());
 				}
 				
 				s = PrefCharset2();
 				if (s.Str())
 				{
-					Sink->CharsetPrefs.Insert(NewStr(s.Str()));
+					Sink->CharsetPrefs.Add(s.Str());
 				}
 			}
 
