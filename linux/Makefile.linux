@@ -15,7 +15,7 @@ endif
 MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
 
-Flags = -fPIC -fno-inline -fpermissive -Wdeprecated-declarations
+Flags = -fPIC -fno-inline -fpermissive -Wno-format-truncation
 
 ifeq ($(Build),Debug)
 	Flags += -MMD -MP -g -std=c++14
@@ -422,7 +422,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../libs/aspell-0.60.6.1/win32/api-glue.cpp \
 	../../libs/aspell-0.60.6.1/win32/settings.h
 	export Build=$(Build); \
-	$(MAKE) -C ../../libs/aspell-0.60.6.1/linux -f Makefile.linux
+	$(MAKE) -C ../../libs/aspell-0.60.6.1/linux -f ./Makefile.linux
 
 ../../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a : ../../libs/bzip2-1.0.6/blocksort.c \
 	../../libs/bzip2-1.0.6/bzlib.c \
@@ -434,7 +434,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../libs/bzip2-1.0.6/huffman.c \
 	../../libs/bzip2-1.0.6/randtable.c
 	export Build=$(Build); \
-	$(MAKE) -C ../../libs/bzip2-1.0.6/linux -f Makefile.linux
+	$(MAKE) -C ../../libs/bzip2-1.0.6/linux -f ./Makefile.linux
 
 ../../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so : ../../../lgi/trunk/include/lgi/common/App.h \
 	../../../lgi/trunk/include/lgi/common/Array.h \
@@ -494,7 +494,6 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/include/lgi/common/LgiInc.h \
 	../../../lgi/trunk/include/lgi/common/LgiInterfaces.h \
 	../../../lgi/trunk/include/lgi/common/LgiMsgs.h \
-	../../../lgi/trunk/include/lgi/common/LgiNetInc.h \
 	../../../lgi/trunk/include/lgi/common/LgiRes.h \
 	../../../lgi/trunk/include/lgi/common/LgiString.h \
 	../../../lgi/trunk/include/lgi/common/LgiUiBase.h \
@@ -513,7 +512,6 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/include/lgi/common/Mru.h \
 	../../../lgi/trunk/include/lgi/common/Mutex.h \
 	../../../lgi/trunk/include/lgi/common/Net.h \
-	../../../lgi/trunk/include/lgi/common/NetTools.h \
 	../../../lgi/trunk/include/lgi/common/Notifications.h \
 	../../../lgi/trunk/include/lgi/common/OAuth2.h \
 	../../../lgi/trunk/include/lgi/common/OptionsFile.h \
@@ -569,6 +567,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/include/lgi/common/Unicode.h \
 	../../../lgi/trunk/include/lgi/common/UnicodeString.h \
 	../../../lgi/trunk/include/lgi/common/UnrolledList.h \
+	../../../lgi/trunk/include/lgi/common/Uri.h \
 	../../../lgi/trunk/include/lgi/common/Variant.h \
 	../../../lgi/trunk/include/lgi/common/View.h \
 	../../../lgi/trunk/include/lgi/common/Widgets.h \
@@ -654,7 +653,6 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/src/common/Net/Base64.cpp \
 	../../../lgi/trunk/src/common/Net/MDStringToDigest.cpp \
 	../../../lgi/trunk/src/common/Net/Net.cpp \
-	../../../lgi/trunk/src/common/Net/NetTools.cpp \
 	../../../lgi/trunk/src/common/Net/Uri.cpp \
 	../../../lgi/trunk/src/common/Resource/LgiRes.cpp \
 	../../../lgi/trunk/src/common/Resource/Res.cpp \
@@ -708,7 +706,7 @@ $(Target) : ../../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag
 	../../../lgi/trunk/src/linux/Lgi/Widgets.cpp \
 	../../../lgi/trunk/src/linux/Lgi/Window.cpp
 	export Build=$(Build); \
-	$(MAKE) -C ../../../lgi/trunk -f Makefile.linux
+	$(MAKE) -C ../../../lgi/trunk -f ./linux/Makefile.linux
 
 -include $(Objects:.o=.d)
 
