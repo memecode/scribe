@@ -10079,19 +10079,17 @@ bool CreateMailAddress(LStream &Out, LDataPropI *Addr, MailProtocol *Protocol)
     if (!Addr)
         return false;
 
-    auto Name = Addr->GetStr(FIELD_NAME);
     auto Email = Addr->GetStr(FIELD_EMAIL);
     if (!Email)
         return false;
     
-	Name = EncodeRfc2047(NewStr(Name), 0, &Protocol->CharsetPrefs);
+	auto Name = LEncodeRfc2047(Addr->GetStr(FIELD_NAME), NULL/*charset*/, &Protocol->CharsetPrefs);
 	if (Name)
 	{
-		if (strchr(Name, '\"'))
-			Out.Print("'%s' ", Name);
+		if (Name.Find("\"") >= 0)
+			Out.Print("'%s' ", Name.Get());
 		else
-			Out.Print("\"%s\" ", Name);
-		DeleteArray(Name);
+			Out.Print("\"%s\" ", Name.Get());
 	}
 
 	Out.Print("<%s>", Email);
