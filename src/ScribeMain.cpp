@@ -77,7 +77,6 @@ int LgiMain(OsAppArguments &AppArgs)
 
 	LAppArguments Opts;
 
-
 	ScribeApp App(AppArgs, &Opts);
 	if (!App.IsOk())
 	{

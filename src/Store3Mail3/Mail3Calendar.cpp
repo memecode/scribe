@@ -152,7 +152,7 @@ const char *LMail3Calendar::GetStr(int id)
 				LJson j(To);
 				LString::Array Out;
 				Out.SetFixedLength(false);
-				for (auto i: j.GetArray(NULL))
+				for (auto i: j.GetArray(LString()))
 				{
 					auto Nm = i.Get("name");
 					auto Em = i.Get("email");

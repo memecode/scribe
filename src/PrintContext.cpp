@@ -119,7 +119,7 @@ void ScribePrintContext::OnBeginPrint(LPrintDC *pdc, std::function<void(int)> ca
 	}
 	else
 	{
-		PageRanges.Reset(new LPrintPageRanges(NULL));
+		PageRanges.Reset(new LPrintPageRanges(LString()));
 		Object->OnPrintHeaders(*this);
 		Object->OnPrintText(*this, *PageRanges);
 	}

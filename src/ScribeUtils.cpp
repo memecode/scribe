@@ -26,7 +26,7 @@ LString DetectCharset(LString s)
 {
 	DetectObj *obj = detect_obj_init ();
 	if (!obj)
-		return NULL;
+		return LString();
 
 	LString cs;
 	if (detect_r(s.Get(), s.Length(), &obj) == CHARDET_SUCCESS &&

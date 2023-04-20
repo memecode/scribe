@@ -305,14 +305,14 @@ LString LScribeScript::GetIncludeFile(const char *FileName)
 	if (!Path)
 	{
 		LgiTrace("%s:%i - GetIncludeFile(%s) failed.\n", _FL, FileName);
-		return NULL;
+		return LString();
 	}
 
 	LFile f(Path);
 	if (!f)
 	{
 		LgiTrace("%s:%i - GetIncludeFile(%s) couldn't open '%s' for reading.\n", _FL, FileName, Path.Get());
-		return NULL;
+		return LString();
 	}
 
 	return f.Read();

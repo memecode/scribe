@@ -61,7 +61,7 @@ class LUnitTestServer : public LThread, public LCancel
 
 public:
 	constexpr static int ServerPort = 3154;
-	constexpr static int MsgMagic = 'unit';
+	constexpr static int MsgMagic = Lgi4CC("unit");
 	constexpr static int HdrSize = 8; // 4 bytes = MsgMagic, 4 bytes = payload size
 
 	LUnitTestServer(LWindow *app) : LThread("UnitTestServer")

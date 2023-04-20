@@ -15,10 +15,12 @@ endif
 MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
 
-Flags = -fPIC -fno-inline -fpermissive -Wno-format-truncation
+CFlags = -MMD -MP -g -fPIC -fno-inline
+CppFlags = $CFlags -fpermissive -std=c++14
 
 ifeq ($(Build),Debug)
-	Flags += -MMD -MP -g -std=c++14
+	CFlags += -g
+	CppFlags += -g
 	Tag = d
 	Defs = -D_DEBUG -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
@@ -53,7 +55,8 @@ ifeq ($(Build),Debug)
 		-I../../../lgi/trunk/include \
 		-I../../../../codelib/openssl/include
 else
-	Flags += -MMD -MP -s -Os -std=c++14
+	CFlags += -s -Os
+	CppFlags += -s -Os
 	Defs = -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
 		-L../../libs/build-x64/libchardet \
@@ -256,12 +259,12 @@ Deps       := $(patsubst %.o,%.d,$(Objects))
 $(BuildDir)/%.o: %.c
 	mkdir -p $(@D)
 	echo $(notdir $<) [$(Build)]
-	$(CC) $(Inc) $(Flags) $(Defs) -c $< -o $@
+	$(CC) $(Inc) $(CFlags) $(Defs) -c $< -o $@
 
 $(BuildDir)/%.o: %.cpp
 	mkdir -p $(@D)
 	echo $(notdir $<) [$(Build)]
-	$(CPP) $(Inc) $(Flags) $(Defs) -c $< -o $@
+	$(CPP) $(Inc) $(CppFlags) $(Defs) -c $< -o $@
 
 # Target
 # Executable target

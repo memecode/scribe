@@ -1428,17 +1428,7 @@ char *NewPropStr(LOptionsFile *Options, char *Name)
 #endif
 
 MailUi::MailUi(Mail *item, MailContainer *container) :
-	ThingUi(item, LLoadString(IDS_MAIL_MESSAGE)), WorkingDlg(NULL),
-	Sx(0), Sy(0),
-	CmdAfterResize(NULL), MissingCaps(NULL),
-	BtnPrev(NULL), BtnNext(NULL), BtnSend(NULL), BtnSave(NULL), BtnSaveClose(NULL),
-	BtnAttach(NULL), BtnReply(NULL), BtnReplyAll(NULL), BtnForward(NULL), BtnBounce(NULL),
-	GpgUi(NULL), ToPanel(NULL), Entry(NULL), Browse(NULL), SetTo(NULL),
-	To(NULL), Remove(NULL), FromPanel(NULL), FromList(NULL), FromCbo(NULL),
-	ReplyToPanel(NULL), ReplyToChk(NULL), ReplyToCbo(NULL),
-	SubjectPanel(NULL), Subject(NULL), CalendarPanel(NULL), CalPanelStatus(NULL),
-	Tab(NULL), TabText(NULL), TextView(NULL), TabHtml(NULL), HtmlView(NULL),
-	TabAttachments(NULL), Attachments(NULL), TabHeader(NULL), Header(NULL)
+	ThingUi(item, LLoadString(IDS_MAIL_MESSAGE))
 {
 	// Init everything to 0
 	Container = container;
@@ -1447,10 +1437,6 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 		LAssert(!"Invalid ptrs");
 		return;
 	}
-
-	AddMode = MAIL_ADDR_TO;
-	CurrentEditCtrl = -1;
-	MetaFieldsDirty = IgnoreShowImgNotify = HtmlCtrlDirty = TextCtrlDirty = TextLoaded = HtmlLoaded = false;
 
     // This allows us to hook iconv conversion events
     LFontSystem::Inst()->Register(this);

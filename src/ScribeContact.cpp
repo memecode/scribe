@@ -961,7 +961,7 @@ LString Contact::GetAddrAt(int i)
 			return t[i-1];
 	}
 	
-	return NULL;
+	return LString();
 }
 
 bool Contact::SetVariant(const char *Name, LVariant &Value, const char *Array)

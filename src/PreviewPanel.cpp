@@ -95,7 +95,7 @@ public:
 
 	LString GetIncludeFile(const char *FileName) override
 	{
-		return NULL;
+		return LString();
 	}
 
 	bool AppendItems(LSubMenu *Menu, const char *Param, int Base) override
@@ -257,11 +257,11 @@ public:
 	LString OnDynamicContent(LDocView *Parent, const char *Code) override
 	{
 		if (!HeaderDom)
-			return NULL;
+			return LString();
 
 		LVariant v;
 		if (!HeaderDom->GetValue(Code, v))
-			return NULL;
+			return LString();
 
 		return v.CastString();
 	}

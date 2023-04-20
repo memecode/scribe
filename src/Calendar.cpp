@@ -2973,7 +2973,7 @@ void CalendarUi::OnLoad()
 	if (d->Guests)
 	{
 		LJson j(o->GetStr(FIELD_ATTENDEE_JSON));
-		for (auto g: j.GetArray(NULL))
+		for (auto g: j.GetArray(LString()))
 		{
 			LAutoPtr<ListAddr> la(new ListAddr(App));
 			if (la)
@@ -2994,7 +2994,7 @@ void CalendarUi::OnLoad()
 		LString::Array a = Rem.SplitDelimit("\n");
 		for (unsigned i=0; i<a.Length(); i++)
 		{
-			ReminderItem *ri = new ReminderItem(CalPopup, 0, CalMinutes, NULL);
+			ReminderItem *ri = new ReminderItem(CalPopup, 0, CalMinutes, LString());
 			if (ri)
 			{
 				if (ri->SetString(a[i]))

@@ -630,7 +630,7 @@ LString GetFullAppName(bool Platform)
 		Ret += s;
 	
 		#ifdef LINUX
-		char *Wm = 0;
+		const char *Wm = NULL;
 		switch (LGetWindowManager())
 		{
 			case WM_Gnome:
@@ -6793,7 +6793,7 @@ void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::fun
 		Inp->DoModal([this, Inp, Callback](auto dlg, auto id)
 		{
 			if (Callback)
-				Callback(id ? Inp->GetStr() : NULL);
+				Callback(id ? Inp->GetStr() : LString());
 			delete dlg;
 		});
 	}
@@ -6807,7 +6807,7 @@ void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::fun
 	{
 		LAssert(!"PostEvent failed.");
 		if (Callback)
-			Callback(NULL);
+			Callback(LString());
 	}
 }
 

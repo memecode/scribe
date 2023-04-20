@@ -45,7 +45,7 @@ LString DynamicHtml::OnDynamicContent(LDocView *Parent, const char *Code)
 	LVariant Val;
 	
 	if (!d->App->GetValue(Code, Val))
-		return NULL;
+		return LString();
 
 	switch (Val.Type)
 	{
@@ -68,7 +68,7 @@ LString DynamicHtml::OnDynamicContent(LDocView *Parent, const char *Code)
 			break;
 	}
 
-	return NULL;
+	return LString();
 }
 
 bool DynamicHtml::OnNavigate(LDocView *Parent, const char *Uri)
