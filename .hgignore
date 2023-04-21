@@ -7,12 +7,12 @@ syntax: glob
 *.VC.db
 *.asm
 
-Linux/Aspell/data
-Linux/Aspell/dict
-Linux/Debug
-Linux/Release
-Linux/*.idx
-Linux/ScribeOptions_*.bak
+linux/Aspell/data
+linux/Aspell/dict
+linux/Debug
+linux/Release
+linux/*.idx
+linux/ScribeOptions_*.bak
 
 src\Resource.res
 
