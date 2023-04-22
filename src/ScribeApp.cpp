@@ -1314,8 +1314,7 @@ void ScribeWnd::Construct1()
 
 	{
 		// Limit the size of the 'Scribe.txt' log file
-		char p[MAX_PATH_LEN];
-		if (LgiTraceGetFilePath(p, sizeof(p)))
+		if (auto p = LgiTraceGetFilePath())
 		{
 			int64 Sz = LFileSize(p);
 			#define MiB * 1024 * 1024

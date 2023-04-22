@@ -66,6 +66,10 @@ void Test()
 
 int LgiMain(OsAppArguments &AppArgs)
 {
+	// Collect all the trace messages into a temp store until such time
+	// as LScribeScriptPriv::LScribeScriptPriv is called to take over.
+	LgiTraceSetStream(&ScribeInitTraceStore);
+
 	#if 0 && defined(__GTK_H__) && defined(_DEBUG)
 	LArray<char*> a;
 	for (int i=0; i<AppArgs.Args; i++)

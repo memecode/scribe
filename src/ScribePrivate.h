@@ -55,6 +55,7 @@ extern int SizeOfFile(char *FileName);
 extern char *OsName();
 extern LString GetFullAppName(bool Platform = true);
 extern void LogMsg(char *str, ...);
+extern LStringPipe ScribeInitTraceStore;
 
 // Dnd and clipboard format for an array of "Thing*"
 extern char ScribeThingList[];

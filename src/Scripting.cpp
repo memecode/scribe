@@ -9,6 +9,7 @@
 #include "../src/common/Coding/ScriptingPriv.h"
 
 extern LHostFunc Methods[];
+LStringPipe ScribeInitTraceStore;
 
 #ifdef _MSC_VER
 #define __func__ __FUNCTION__
@@ -48,7 +49,7 @@ void LScribeScriptPriv_ConsoleClosingCallback(LScriptConsole *Console, void *Use
 struct LScribeScriptPriv : public LStream, public LThread
 {
 	ScribeWnd *App;	
-	bool Loop;
+	bool Loop = true;
 	LThreadEvent Event;
 	
 	// Incoming buffer
@@ -58,10 +59,10 @@ struct LScribeScriptPriv : public LStream, public LThread
 	
 	// Outputs
 	LMutex OutputLock; // Covers LogFile, LogMem and Console
-	LAutoString LogFile;
+	LString LogFile;
 	LArray<char> LogMem;
-	ssize_t LogMemUsed;
-	LScriptConsole *Console;
+	ssize_t LogMemUsed = 0;
+	LScriptConsole *Console = NULL;
 	
 	LScribeScriptPriv(ScribeWnd *app) :
 		LThread("LScribeScriptPriv.Thread"),
@@ -69,18 +70,10 @@ struct LScribeScriptPriv : public LStream, public LThread
 		InputLock("LScribeScriptPriv.Input"),
 		OutputLock("LScribeScriptPriv.Output")
 	{
-		Loop = true;
-		Console = NULL;
 		LogMem.Length(64 << 10);
-		LogMemUsed = 0;
 
 		// Get the log path
-		char p[MAX_PATH_LEN];
-		if (!LgiTraceGetFilePath(p, sizeof(p)))
-		{
-			LAssert(0);
-		}
-		else if (!LogFile.Reset(NewStr(p)))
+		if (!(LogFile = LgiTraceGetFilePath()))
 		{
 			LAssert(0);
 		}
@@ -90,7 +83,11 @@ struct LScribeScriptPriv : public LStream, public LThread
 		Buffer.Length(64 << 10);
 
 		// Now register to get trace messages...
+		// ScribeInitTraceStore has all the trace logs before this point
 		LgiTraceSetStream(this);
+
+		auto TraceContent = ScribeInitTraceStore.NewLStr();
+		Write(TraceContent.Get(), TraceContent.Length());
 		
 		// Start thread
 		Run();
