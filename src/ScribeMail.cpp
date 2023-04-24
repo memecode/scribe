@@ -9948,30 +9948,30 @@ int Mail::OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSur
 	double MemScale = (double) Context.pDC->X() / (double) RenderedHtml->X();
 	
 	// Now paint the bitmap onto the existing page
-	int PageIdx = 0, Printed = 0;
+	int PageIdx = 1, Printed = 0;
 	for (int y = 0; y < RenderedHtml->Y(); PageIdx++)
 	{
+		// Work out how much bitmap we can paint onto the current page...
+		int PageRemaining = Context.MarginPx.Y() - Context.CurrentY;
+		int MemPaint = (int) (PageRemaining / MemScale);
+
+		// This is how much of the memory context we can fit on the page
+		LRect MemRect(0, y, RenderedHtml->X()-1, y + MemPaint - 1);
+		LRect Bnds = RenderedHtml->Bounds();
+		MemRect.Bound(&Bnds);
+		
+		// Work out how much page that is take up
+		int PageHeight = (int) (MemRect.Y() * MemScale);
+		
+		// This is the position on the page we are blting to
+		LRect PageRect(Context.MarginPx.x1, Context.CurrentY, Context.MarginPx.x2, Context.CurrentY + PageHeight - 1);
+		
 		if (Pages.InRanges(PageIdx))
 		{
-			// Work out how much bitmap we can paint onto the current page...
-			int PageRemaining = Context.MarginPx.Y() - Context.CurrentY;
-			int MemPaint = (int) (PageRemaining / MemScale);
-
-			// This is how much of the memory context we can fit on the page
-			LRect MemRect(0, y, RenderedHtml->X()-1, y + MemPaint - 1);
-			LRect Bnds = RenderedHtml->Bounds();
-			MemRect.Bound(&Bnds);
-		
-			// Work out how much page that is take up
-			int PageHeight = (int) (MemRect.Y() * MemScale);
-		
-			// This is the position on the page we are blting to
-			LRect PageRect(Context.MarginPx.x1, Context.CurrentY, Context.MarginPx.x2, Context.CurrentY + PageHeight - 1);
-		
 			// Do the blt
 			Page->StretchBlt(&PageRect, RenderedHtml, &MemRect);
 			Printed++;
-		
+
 			// Now move our position down the page..
 			Context.CurrentY += PageHeight;
 			if ((Context.MarginPx.Y() - Context.CurrentY) * 100 / Context.MarginPx.Y() < 5)
@@ -9980,9 +9980,9 @@ int Mail::OnPrintHtml(ScribePrintContext &Context, LPrintPageRanges &Pages, LSur
 				Context.CurrentY = Context.MarginPx.y1;
 				Page = Context.NewPage();
 			}
-
-			y += MemRect.Y();
 		}
+
+		y += MemRect.Y();
 	}
 
 	return Printed;

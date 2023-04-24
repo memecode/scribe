@@ -27,15 +27,15 @@ public:
 			SetCtrlName(IDC_OUT_FOLDER, Out->GetPath());
 	}
 	
-	int Scan(LTreeNode *Parent, char *Folder)
+	int Scan(LTreeNode *Parent, const char *Folder)
 	{
 		LDirectory d;
 
 		int Email = 0;
 		int ChildEmail = 0;
-		LTreeItem *i = new LTreeItem;
+		LAutoPtr<LTreeItem> i(new LTreeItem);
 
-		for (int b=d.First(Folder); b; b=d.Next())
+		for (auto b=d.First(Folder); b; b=d.Next())
 		{
 			if (d.IsDir())
 			{
@@ -55,16 +55,12 @@ public:
 
 		if (Email || ChildEmail)
 		{
-			char *Leaf = strrchr(Folder, DIR_CHAR);
+			auto Leaf = strrchr(Folder, DIR_CHAR);
 			char Msg[MAX_PATH_LEN];
 			sprintf_s(Msg, sizeof(Msg), "%s (%i)", Leaf + 1, Email);
 			i->SetText(Msg);
-			Parent->Insert(i);
+			Parent->Insert(i.Release());
 			Parent->Expanded(true);
-		}
-		else
-		{
-			DeleteObj(i);
 		}
 
 		return Email + ChildEmail;
@@ -79,25 +75,20 @@ public:
 				auto s = new LFileSelect(this);
 				s->Type("Email Files", "*.eml");
 				s->Type("All Files", LGI_ALL_FILES);
-				s->Open([this](auto dlg, auto status)
+				s->OpenFolder([this](auto s, auto status)
 				{
 					if (status)
 					{
-						char p[MAX_PATH_LEN];
-						strcpy_s(p, sizeof(p), dlg->Name());
-						LTrimDir(p);
-						SetCtrlName(IDC_IN_FOLDER, p);
+						SetCtrlName(IDC_IN_FOLDER, s->Name());
 					
-						if (LDirExists(p))
+						if (LDirExists(s->Name()))
 						{
 							LTree *t;
 							if (GetViewById(IDC_TREE, t))
-							{
-								TotalEmail = Scan(t, p);
-							}
+								TotalEmail = Scan(t, s->Name());
 						}
 					}
-					delete dlg;
+					delete s;
 				});
 				break;
 			}

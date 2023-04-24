@@ -100,9 +100,9 @@ void ScribePrintContext::OnBeginPrint(LPrintDC *pdc, std::function<void(int)> ca
 		auto Dlg = new PrintPreview(App, mail, pdc);
 		Dlg->DoModal([this, Dlg, callback, mail](auto dlg, auto id)
 		{
+			LAutoPtr<LDialog> mem(dlg);
 			if (!id)
 			{
-				delete dlg;
 				PrintStatus(OnBeginPrintCancel);
 			}
 
@@ -111,7 +111,6 @@ void ScribePrintContext::OnBeginPrint(LPrintDC *pdc, std::function<void(int)> ca
 			mail->OnPrintHeaders(*this);
 			auto Pages = mail->OnPrintHtml(*this, *PageRanges, HtmlImg);
 			
-			delete dlg;
 			PrintStatus(Pages);
 		});
 
