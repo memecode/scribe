@@ -2806,7 +2806,7 @@ bool OutlookIO::Import(	ImportParams *P,
 						ScribeFolder *ChildOut = App->GetFolder(Str);
 						if (!ChildOut)
 						{
-							ChildOut = Out->CreateSubDirectory(OutlookName, FolderType(ChildIn));
+							ChildOut = Out->CreateSubFolder(OutlookName, FolderType(ChildIn));
 						}
 
 						if (ChildOut)

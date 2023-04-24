@@ -7219,7 +7219,7 @@ bool Mail::OnAfterReceive(LStreamI *Msg)
 
 	if (!obj->SetRfc822(Msg))
 	{
-		LAssert(!"Failed to set mime content.");
+		LgiTrace("%s:%i - SetRfc822 failed with '%s'\n", _FL, obj->GetStr(FIELD_ERROR));
 		return false;
 	}
 
@@ -7856,14 +7856,14 @@ void Mail::DeleteAsSpam(LView *View)
 					{
 						Spam = Ms->Root->GetSubFolder(SpamLeaf);
 						if (!Spam)
-							Spam = Ms->Root->CreateSubDirectory(SpamLeaf, MAGIC_MAIL);
+							Spam = Ms->Root->CreateSubFolder(SpamLeaf, MAGIC_MAIL);
 					}
 				}
 				else
 					LgiMsg(View, "Error: Couldn't get mail store for '%s'.", AppName, MB_OK, FolderPath.Get());
 			}
 			else
-				Spam = Ms->Root->CreateSubDirectory("Spam", MAGIC_MAIL);
+				Spam = Ms->Root->CreateSubFolder("Spam", MAGIC_MAIL);
 		}
 
 		if (Spam && Spam != GetFolder())

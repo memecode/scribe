@@ -1906,6 +1906,11 @@ bool LMail3Obj::Check(int r, char *sql)
 }
 
 #define DEBUG_MAIL3_WRITE				0
+#if DEBUG_MAIL3_WRITE
+#define PROFILE(msg)					Prof.Add(msg)
+#else
+#define PROFILE(msg)
+#endif
 
 bool LMail3Obj::Write(const char *Table, bool Insert)
 {
@@ -1914,27 +1919,22 @@ LProfile Prof("LMail3Obj::Write");
 #endif
 	LAutoPtr<LMail3Store::LStatement> s;
 
-#if DEBUG_MAIL3_WRITE
-Prof.Add(_FL);
-#endif
+	PROFILE("0");
 	if (Insert)
 		s.Reset(new LMail3Store::LInsert(Store, Table));
 	else
 		s.Reset(new LMail3Store::LUpdate(Store, Table, Id));
-#if DEBUG_MAIL3_WRITE
-Prof.Add(_FL);
-#endif
+
+	PROFILE("1");
 	if (s)
 	{
 		Serialize(*s, true);
-#if DEBUG_MAIL3_WRITE
-Prof.Add(_FL);
-#endif
+
+		PROFILE("2");
+
 		if (s->Exec())
 		{
-#if DEBUG_MAIL3_WRITE
-Prof.Add(_FL);
-#endif
+			PROFILE("3");
 			if (Insert)
 			{
 				Id = s->LastInsertId();

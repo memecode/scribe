@@ -120,6 +120,11 @@ public:
 		LAssert(Parent == NULL && Mail == NULL);
 	}
 
+	bool GetDirty()
+	{
+		return Dirty;
+	}
+
 	void Detach()
 	{
 		if (Parent)

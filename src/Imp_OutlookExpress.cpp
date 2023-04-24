@@ -51,7 +51,7 @@ bool ImportMBX(ScribeWnd *Parent, ScribeFolder *ParentFolder, char *FileName)
 				*Dot = 0;
 			}
 
-			ScribeFolder *Folder = ParentFolder->CreateSubDirectory(Ls, MAGIC_MAIL);
+			ScribeFolder *Folder = ParentFolder->CreateSubFolder(Ls, MAGIC_MAIL);
 			if (Folder)
 			{
 				// Skip unknown feilds
@@ -438,7 +438,7 @@ public:
 				}
 
 				// Create output folder
-				ScribeFolder *Folder = ParentFolder->CreateSubDirectory(Ls, MAGIC_MAIL);
+				ScribeFolder *Folder = ParentFolder->CreateSubFolder(Ls, MAGIC_MAIL);
 				if (Folder)
 				{
 					// Read header

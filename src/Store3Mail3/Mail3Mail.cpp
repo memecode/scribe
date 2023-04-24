@@ -723,6 +723,15 @@ void LMail3Mail::LoadSegs()
 						{
 							p.Seg->AttachTo(this);
 						}
+
+						#ifdef _DEBUG
+						// This was a hack to fix a dumb bug in a dev build... so so dumb.
+						if (p.Seg->GetDirty())
+						{
+							LArray<LDataI*> items{this};
+							Store->OnChange(_FL, items, FIELD_MIME_SEG);
+						}
+						#endif
 					}
 					else
 					{
@@ -958,6 +967,8 @@ const char *LMail3Mail::GetStr(int id)
 			IdCache.Printf(LPrintfInt64, Id);
 			return IdCache;
 		}
+		case FIELD_ERROR:
+			return ErrMsg;
 	}
 
 	LAssert(0);
@@ -1540,82 +1551,95 @@ Store3Status LMail3Mail::SetRfc822(LStreamI *m)
 {
 	Store3Status Status = Store3Error;
 
-	if (m)
+	if (!m)
 	{
-		// Save all the segments out
-		LDataStoreI::StoreTrans Trans = Store->StartTransaction();
+		ErrMsg = "No input stream.";
+		return Status;
+	}
 
-		if (Id < 0)
+	// Save all the segments out
+	LDataStoreI::StoreTrans Trans = Store->StartTransaction();
+
+	if (Id < 0)
+	{
+		// Must commit ourselves now and get an Id
+		if (!Write(MAIL3_TBL_MAIL, true))
 		{
-			// Must commit ourselves now and get an Id
-			if (!Write(MAIL3_TBL_MAIL, true))
-				return Store3Error;
+			ErrMsg = "Write to MAIL3_TBL_MAIL failed.";
+			return Store3Error;
 		}
-		else
+	}
+	else
+	{
+		char s[256];
+		sprintf_s(s, sizeof(s), "delete from %s where MailId=" LPrintfInt64, MAIL3_TBL_MAILSEGS, Id);
+		LMail3Store::LStatement Del(Store, s);
+		if (!Del.Exec())
 		{
-			char s[256];
-			sprintf_s(s, sizeof(s), "delete from %s where MailId=" LPrintfInt64, MAIL3_TBL_MAILSEGS, Id);
-			LMail3Store::LStatement Del(Store, s);
-			if (!Del.Exec())
-				return Store3Error;
+			ErrMsg = "Delete query failed.";
+			return Store3Error;
 		}
+	}
 
-		DeleteObj(Seg);
+	DeleteObj(Seg);
 
-		/*
-		Normally the message is parsed into MIME segments and stored parsed and decoded into 
-		the MailSegs table. If the message is encrypted or signed that could the client can't
-		verify the message later because the specifics of MIME encoding varies between clients.
+	/*
+	Normally the message is parsed into MIME segments and stored parsed and decoded into 
+	the MailSegs table. If the message is encrypted or signed that could the client can't
+	verify the message later because the specifics of MIME encoding varies between clients.
 		
-		So if the message is:
+	So if the message is:
 		
-			Signed and/or Encrypted:	There is only one MAILSEG record with all the headers of the 
-										root MIME segment, and the body stream has all the data of
-										the RFC822 image.
+		Signed and/or Encrypted:	There is only one MAILSEG record with all the headers of the 
+									root MIME segment, and the body stream has all the data of
+									the RFC822 image.
 			
-			Otherwise:					Normal MIME parsing is done, storing the message in different
-										MAILSEG records. Which was the previous behaviour.
+		Otherwise:					Normal MIME parsing is done, storing the message in different
+									MAILSEG records. Which was the previous behaviour.
 
-		First the headers of the root MIME node are read to see what the Content-Type is.
-		Then a decision about how to store the node is made.
-		*/
-		LString Hdrs = HeadersFromStream(m);
-		LAutoString Type(InetGetHeaderField(Hdrs, "Content-Type"));
+	First the headers of the root MIME node are read to see what the Content-Type is.
+	Then a decision about how to store the node is made.
+	*/
+	LString Hdrs = HeadersFromStream(m);
+	LAutoString Type(InetGetHeaderField(Hdrs, "Content-Type"));
 
-		Flags &= ~MAIL_STORED_FLAT;
-		if (Type)
+	Flags &= ~MAIL_STORED_FLAT;
+	if (Type)
+	{
+		LString s = Type.Get();
+		ptrdiff_t Colon = s.Find(";");
+		if (Colon > 0)
+			s.Length((uint32_t)Colon);
+		s = s.Strip().Lower();
+		if (s == sMultipartEncrypted ||
+			s == sMultipartSigned)
 		{
-			LString s = Type.Get();
-			ptrdiff_t Colon = s.Find(";");
-			if (Colon > 0)
-				s.Length((uint32_t)Colon);
-			s = s.Strip().Lower();
-			if (s == sMultipartEncrypted ||
-				s == sMultipartSigned)
-			{
-				Flags |= MAIL_STORED_FLAT;
-			}
+			Flags |= MAIL_STORED_FLAT;
 		}
+	}
 
-		LMail3Store::LInsert Ins(Store, MAIL3_TBL_MAILSEGS);
-		MailSize = 0;
+	LMail3Store::LInsert Ins(Store, MAIL3_TBL_MAILSEGS);
+	MailSize = 0;
 
-		LMime Mime;
-		if (Flags & MAIL_STORED_FLAT)
-		{
-			// Don't parse MIME into a tree.
-			Mime.SetHeaders(Hdrs);
-			Mime.SetData(true, new LSubStream(m, Hdrs.Length()+4));
-			if (Mail3_InsertSeg(Ins, &Mime, Id, -1, MailSize))
-				Status = Store3Success;
-		}
+	LMime Mime;
+	if (Flags & MAIL_STORED_FLAT)
+	{
+		// Don't parse MIME into a tree.
+		Mime.SetHeaders(Hdrs);
+		Mime.SetData(true, new LSubStream(m, Hdrs.Length()+4));
+		if (Mail3_InsertSeg(Ins, &Mime, Id, -1, MailSize))
+			Status = Store3Success;
 		else
-		{
-			// Do normal parsing in to MIME tree.
-			if (Mime.Text.Decode.Pull(m) &&
-				Mail3_InsertSeg(Ins, &Mime, Id, -1, MailSize))
-				Status = Store3Success;
-		}
+			ErrMsg = "Flat insert query failed.";
+	}
+	else
+	{
+		// Do normal parsing in to MIME tree.
+		if (Mime.Text.Decode.Pull(m) &&
+			Mail3_InsertSeg(Ins, &Mime, Id, -1, MailSize))
+			Status = Store3Success;
+		else
+			ErrMsg = "Regular insert query failed.";
 	}
 
 	return Status;

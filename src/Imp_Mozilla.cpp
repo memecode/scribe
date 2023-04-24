@@ -582,7 +582,7 @@ void Import_MozillaMail(ScribeWnd *App)
 					if (!Name) Name = Src;
 					else Name++;
 
-					ScribeFolder *Child = Dest->CreateSubDirectory(Name, MAGIC_MAIL);
+					ScribeFolder *Child = Dest->CreateSubFolder(Name, MAGIC_MAIL);
 					if (Child)
 					{
 						LAutoPtr<LTextFile> f(new LTextFile);

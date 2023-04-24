@@ -338,18 +338,18 @@ Store3Status Store3Field::SetInt(int id, int64 i)
 // Mime conversion
 bool Store3ToLMime(LMime *Out, LDataPropI *InInterface)
 {
-	LDataI *In = dynamic_cast<LDataI*>(InInterface);
+	auto In = dynamic_cast<LDataI*>(InInterface);
 	if (!Out || !In)
 	{
 		LAssert(0);
 		return false;
 	}
 	
-	int Type = In->Type();
+	auto Type = In->Type();
 	if (Type == MAGIC_MAIL)
 	{
-		LDataIt Sub = In->GetList(FIELD_MIME_SEG);
-		LDataPropI *Child = Sub->First();
+		auto Sub = In->GetList(FIELD_MIME_SEG);
+		auto Child = Sub->First();
 		if (Child)
 		{
 			if (!Store3ToLMime(Out, Child))

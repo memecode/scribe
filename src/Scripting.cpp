@@ -481,7 +481,7 @@ bool LScribeScript::CreateSubFolder(LScriptArguments &Args)
 
 	if (Type >= MAGIC_BASE)
 	{
-		ScribeFolder *Child = Parent->CreateSubDirectory(ChildName, Type);
+		ScribeFolder *Child = Parent->CreateSubFolder(ChildName, Type);
 		if (Child)
 		{
 			*Args.GetReturn() = Child;

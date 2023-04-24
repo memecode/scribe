@@ -369,7 +369,7 @@ public:
 	{
 		// This is the main result to look at:
 		//		Store3NotImpl - typically means the mime type is wrong.
-		//		Store3Error - an error occured.
+		//		Store3Error - an error occurred.
 		//		Store3Delayed - means the operation will take a long time.
 		//			However progress is report via 'prog' if not NULL.
 		//			And the 'onComplete' handler will be called at the end.
@@ -394,6 +394,11 @@ public:
 		operator bool()
 		{
 			return status > Store3Error;
+		}
+
+		bool IsCancelled()
+		{
+			return prog ? prog->IsCancelled() : false;
 		}
 	};
 	
@@ -1320,11 +1325,11 @@ public:
 	bool IsPublicFolders() { return false; }
 
 	void OnProperties(int Tab = -1) override;
-	ScribeFolder *CreateSubDirectory(const char *Name, int Type);
+	ScribeFolder *GetSubFolder(const char *Path);
+	ScribeFolder *CreateSubFolder(const char *Name, int Type);
 	void OnRename(char *NewName);
 	void OnDelete();
 	LString GetPath();
-	ScribeFolder *GetSubFolder(const char *Path);
 	void Populate(ThingList *List);
 	bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL) { return GetItemType() != MAGIC_ANY; }
 	void OnRethread();

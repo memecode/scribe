@@ -563,6 +563,7 @@ class LMail3Mail : public LMail3Thing
 	LString IdCache;
 	LAutoPtr<uint64> SizeCache;
 	LString InferredCharset;
+	LString ErrMsg;
 
 	void LoadSegs();
 	void OnSave() override;

@@ -33,8 +33,10 @@ LString DetectCharset(LString s)
 		obj->confidence >= 0.75)
 		cs = obj->encoding;
 
+	#if 0
 	LgiTrace("%s:%i - encoding=%s, obj->confidence=%f, obj->bom=%i, str='%s'\n",
 		_FL, obj->encoding, obj->confidence, obj->bom, s.Get());
+	#endif
 	
 	detect_obj_free (&obj);
 	return cs;

@@ -8353,7 +8353,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 										{
 											ScribeFolder *c = Spam->GetSubFolder(a[i]);
 											if (!c)
-												c = Spam->CreateSubDirectory(a[i], MAGIC_MAIL);
+												c = Spam->CreateSubFolder(a[i], MAGIC_MAIL);
 											Spam = c;
 										}
 									}
@@ -9489,7 +9489,7 @@ bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 		if (_strnicmp(p, "/IMAP ", 6) != 0)
 		{
 			LAssert(DefaultFolderTypes[Id] != MAGIC_NONE);
-			Folder = s->Root->CreateSubDirectory(*p=='/'?p+1:p, DefaultFolderTypes[Id]);
+			Folder = s->Root->CreateSubFolder(*p=='/'?p+1:p, DefaultFolderTypes[Id]);
 		}
 	}
 	
@@ -12297,6 +12297,14 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 					cv->OnContentsChanged();
 			}
 
+			#ifdef _DEBUG
+			if (FieldHint == FIELD_MIME_SEG)
+			{
+				// This was a hack to fix a dumb bug in a dev build... so so dumb.
+				t->SetDirty();
+			}
+			else 
+			#endif
 			if (FieldHint != FIELD_FLAGS)
 			{
 				// Call the on load handler...

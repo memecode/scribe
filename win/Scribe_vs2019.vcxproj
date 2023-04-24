@@ -598,6 +598,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\src\DomType.h" />
     <ClInclude Include="..\src\DomTypeValues.h" />
     <ClInclude Include="..\src\Encryption\GnuPG.h" />
+    <ClInclude Include="..\src\FolderTask.h" />
     <ClInclude Include="..\src\Imp_Outlook.h" />
     <ClInclude Include="..\src\ManageMailStores.h" />
     <ClInclude Include="..\src\ObjectInspector.h" />

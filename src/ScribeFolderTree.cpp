@@ -442,7 +442,7 @@ void MailTree::OnCreateSubDirectory(ScribeFolder *Item)
 			if (Dlg->SubName)
 			{
 				// insert the folder...
-				Item->CreateSubDirectory(Dlg->SubName, Type[Dlg->SubType]);
+				Item->CreateSubFolder(Dlg->SubName, Type[Dlg->SubType]);
 			}
 		}
 

@@ -801,6 +801,9 @@
     <ClInclude Include="..\src\ScribeUtils.h">
       <Filter>Application</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\FolderTask.h">
+      <Filter>Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Icons\app.ico">

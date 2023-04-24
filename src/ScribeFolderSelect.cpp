@@ -350,7 +350,7 @@ int FolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 
 			ScribeFolder *Sub = f->GetSubFolder(Dlg.SubName);
 			if (!Sub)
-				Sub = f->CreateSubDirectory(Dlg.SubName, Type[Dlg.SubType]);
+				Sub = f->CreateSubFolder(Dlg.SubName, Type[Dlg.SubType]);
 			if (!Sub)
 				break;
 

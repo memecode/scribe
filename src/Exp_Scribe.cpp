@@ -175,7 +175,7 @@ struct ScribeExportTask : public FolderTask
 			{
 				if (CreateItemType != MAGIC_NONE)
 				{
-					c = f->CreateSubDirectory(p, CreateItemType);
+					c = f->CreateSubFolder(p, CreateItemType);
 					if (!c)
 					{
 						Errors.Add(MAGIC_FOLDER, Errors.Find(MAGIC_FOLDER)+1);

@@ -180,7 +180,7 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 			ScribeFolder *Child = Out->GetSubFolder(d.GetName());
 			if (!Child)
 			{
-				Child = Out->CreateSubDirectory(d.GetName(), MAGIC_MAIL);
+				Child = Out->CreateSubFolder(d.GetName(), MAGIC_MAIL);
 			}
 			if (Child)
 			{			

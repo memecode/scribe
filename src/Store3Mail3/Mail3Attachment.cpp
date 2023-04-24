@@ -283,6 +283,19 @@ bool LMail3Attachment::Load(LMail3Store::LStatement &s, int64 &ParentId)
 	BlobSize = s.GetSize(4);
 	Dirty = false;
 
+	#ifdef _DEBUG
+	// This was a hack to fix a dumb bug in a dev build... so so dumb.
+	if (Headers)
+	{
+		auto cdcd = Strstr(Headers.Get(), "\xcd\xcd");
+		if (cdcd)
+		{
+			*cdcd = 0;
+			Dirty = true;
+		}
+	}	
+	#endif
+
 	LAssert(!Mail || Kit == Mail->Store);
 
 	return true;
