@@ -395,7 +395,7 @@ bool ContactGroup::GetVariant(const char *Name, LVariant &Value, const char *Arr
 	return true;
 }
 
-bool ContactGroup::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool ContactGroup::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
 	if (GetObject() && !Stricmp((char*)MethodName, (char*)"AddAddress"))
 	{
@@ -436,18 +436,17 @@ bool ContactGroup::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 			SetDirty();
 			
 			UsedTs.SetNow();
-			if (ReturnValue)
-				*ReturnValue = true;
+			*Args.GetReturn() = true;
 		}
-		else if (ReturnValue)
+		else
 		{
-			*ReturnValue = false;
+			*Args.GetReturn() = false;
 		}
 			
 		return true;
 	}
 
-	return Thing::CallMethod(MethodName, ReturnValue, Args);
+	return Thing::CallMethod(MethodName, Args);
 }
 
 bool ConvertList(ContactGroup *g, LArray<ListAddr*> &a)

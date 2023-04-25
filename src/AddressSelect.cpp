@@ -281,7 +281,7 @@ public:
 		Dirty = false;
 	}
 	
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+	bool CallMethod(const char *MethodName, LScriptArguments &Args)
 	{
 		for (unsigned i=0; i<Args.Length(); i++)
 		{

@@ -2048,11 +2048,9 @@ bool Calendar::SetVariant(const char *Name, LVariant &Value, const char *Array)
 	return true;
 }
 
-bool Calendar::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool Calendar::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
-	// ScribeDomType Fld = StrToDom(MethodName);
-	
-	return Thing::CallMethod(MethodName, ReturnValue, Args);
+	return Thing::CallMethod(MethodName, Args);
 }
 
 //////////////////////////////////////////////////////////////////////////////

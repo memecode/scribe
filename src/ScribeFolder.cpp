@@ -4037,7 +4037,7 @@ bool ScribeFolder::SetVariant(const char *Name, LVariant &Value, const char *Arr
 	return true;
 }
 
-bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool ScribeFolder::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
 	ScribeDomType m = StrToDom(MethodName);
 	switch (m)
@@ -4055,7 +4055,7 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 		}
 		case SdImport: // Type: (String FileName, String MimeType)
 		{
-			*ReturnValue = false;
+			*Args.GetReturn() = false;
 			if (Args.Length() != 2)
 				LgiTrace("%s:%i - Error: expecting 2 arguments to 'Import'.\n", _FL);
 			else
@@ -4065,7 +4065,7 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 				if (f->Open(FileName, O_READ))
 				{
 					auto p = Import(AutoCast(f), Args[1]->Str());
-					*ReturnValue = p.status;
+					*Args.GetReturn() = p.status;
 				}
 				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for reading.\n", _FL, FileName);
@@ -4074,7 +4074,7 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 		}
 		case SdExport: // Type: (String FileName, String MimeType)
 		{
-			*ReturnValue = false;
+			*Args.GetReturn() = false;
 			if (Args.Length() != 2)
 				LgiTrace("%s:%i - Error: expecting 2 arguments to 'Export'.\n", _FL);
 			else
@@ -4084,7 +4084,7 @@ bool ScribeFolder::CallMethod(const char *MethodName, LVariant *ReturnValue, LAr
 				if (f->Open(FileName, O_WRITE))
 				{
 					auto p = Export(AutoCast(f), Args[1]->Str());
-					*ReturnValue = p.status;
+					*Args.GetReturn() = p.status;
 				}
 				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for writing.\n", _FL, FileName);

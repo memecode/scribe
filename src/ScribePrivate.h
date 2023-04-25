@@ -353,7 +353,7 @@ public:
 	void OnChange();
 	bool IsWorking(int Set = -1);
 	bool OnRequestClose(bool OsClose);
-	bool CallMethod(const char *Name, LVariant *Dst, LArray<LVariant*> &Arg);
+	bool CallMethod(const char *Name, LScriptArguments &Arg);
 };
 
 class AttachmentList : public LList

@@ -2144,6 +2144,7 @@ bool ScribeWnd::ExecuteScriptCallback(LScriptCallback &c, LScriptArguments &Args
 
 	// Setup
 	LVirtualMachine Vm(d);
+	Vm.SetDebuggerEnabled(true);
 	d->CurrentScripts.Add(c.Script);
 	
 	// Call the method
@@ -2469,10 +2470,9 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 			!Stricmp((*c).key, "RemoteContent") &&
 			w)
 		{
-			LVariant Ret, Always(!Stricmp(Action.Str(), LLoadString(IDS_ALWAYS_SHOW_REMOTE_CONTENT)));
-			LArray<LVariant*> Args;
-			Args[0] = &Always;
-			w->CallMethod(DomToStr(SdShowRemoteContent), &Ret, Args);
+			LScriptArguments Args(NULL);
+			Args[0] = new LVariant(!Stricmp(Action.Str(), LLoadString(IDS_ALWAYS_SHOW_REMOTE_CONTENT)));
+			w->CallMethod(DomToStr(SdShowRemoteContent), Args);
 		}
 	}
 	else if (!_stricmp(Action.Str(), LLoadString(IDS_DOWNLOAD)))
@@ -2971,7 +2971,7 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 	return true;
 }
 
-bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
 	ScribeDomType m = StrToDom(MethodName);
 	switch (m)
@@ -3004,7 +3004,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 		case SdGetClipboardText: // Type: ()
 		{
 			LClipBoard c(this);
-			*ReturnValue = c.Text();
+			*Args.GetReturn() = c.Text();
 			break;
 		}
 		case SdSetClipboardText: // Type: (String Text)
@@ -3019,9 +3019,9 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			LClipBoard c(this);
 
 			if (ValidStr(Str))
-				*ReturnValue = c.Text(Str);
+				*Args.GetReturn() = c.Text(Str);
 			else
-				*ReturnValue = c.Empty();
+				*Args.GetReturn() = c.Empty();
 			break;
 		}
 		case SdLookupContactGroup: // Type: (String GroupName)
@@ -3033,17 +3033,19 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			}
 			
 			ContactGroup *Grp = LookupContactGroup(this, Args[0]->Str());
-			*ReturnValue = dynamic_cast<LDom*>(Grp);
+			*Args.GetReturn() = dynamic_cast<LDom*>(Grp);
 			break;
 		}
 		case SdAskUserString: // Type: (LView ParentView, String Callback, String PromptMessage[, Bool ObsurePassword[, String DefaultValue]])
 		{
-			LVirtualMachine::Context Ctx;
-			// Ctx = Args.GetVm()->SaveContext()
+			auto Vm = dynamic_cast<LVirtualMachine*>(Args.GetVm());
+			if (!Vm)
+				return false;
 
+			LVirtualMachine::Context Ctx = Vm->SaveContext();
 			if (!Ctx || Args.Length() < 3)
 			{
-				*ReturnValue = true;
+				*Args.GetReturn() = false;
 				return true;
 			}
 
@@ -3066,7 +3068,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 				delete dlg;
 			});
 
-			*ReturnValue = true;
+			*Args.GetReturn() = true;
 			break;
 		}
 		case SdCreateAccount: // Type: ()
@@ -3074,8 +3076,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			ScribeAccount *a = new ScribeAccount(this, (int)Accounts.Length());
 			if (a)
 			{
-				if (ReturnValue)
-					*ReturnValue = (LDom*)a;
+				*Args.GetReturn() = (LDom*)a;
 				Accounts.Insert(a);
 				a->Create();
 			}
@@ -3090,16 +3091,14 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			ScribeAccount *a = dynamic_cast<ScribeAccount*>(Args[0]->CastDom());
 			if (!a)
 			{
-				if (ReturnValue)
-					*ReturnValue = false;
+				*Args.GetReturn() = false;
 			}
 			else
 			{
 				int Idx = (int)Accounts.IndexOf(a);
 				if (Idx < 0 || a->IsOnline())
 				{
-					if (ReturnValue)
-						*ReturnValue = false;
+					*Args.GetReturn() = false;
 				}
 				else
 				{
@@ -3121,7 +3120,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 		case SdShowRemoteContent:
 		{
 			if (PreviewPanel)
-				return PreviewPanel->CallMethod(MethodName, ReturnValue, Args);
+				return PreviewPanel->CallMethod(MethodName, Args);
 			else
 				return false;
 			break;
@@ -3131,7 +3130,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			if (Args.Length() != 3)
 			{
 				LgiTrace("%s:%i - SearchHtml requires 3 arguments.\n", _FL);
-				*ReturnValue = false;
+				*Args.GetReturn() = false;
 				return true;
 			}
 
@@ -3141,11 +3140,11 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			if (!Html || !SearchExp || !ResultExp)
 			{
 				LgiTrace("%s:%i - SearchHtml got non-string argument.\n", _FL);
-				*ReturnValue = false;
+				*Args.GetReturn() = false;
 				return true;
 			}
 
-			SearchHtml(ReturnValue, Html, SearchExp, ResultExp);
+			SearchHtml(Args.GetReturn(), Html, SearchExp, ResultExp);
 			return true;
 		}
 		case SdGetUri: // Type(UriToDownload, CallbackName)
@@ -3153,7 +3152,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			if (Args.Length() < 2)
 			{
 				LgiTrace("%s:%i - GetUri requires at least 2 arguments.\n", _FL);
-				*ReturnValue = false;
+				*Args.GetReturn() = false;
 				return true;
 			}
 
@@ -3161,7 +3160,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray
 			auto Callback = Args[1]->Str();
 			LVariant *UserData = Args.Length() > 2 ? Args[2] : NULL;
 			new ScriptDownloadContentThread(this, Uri, Callback, UserData);
-			*ReturnValue = true;
+			*Args.GetReturn() = true;
 			return true;
 		}
 		default:
@@ -6853,11 +6852,9 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 			LAutoPtr<LString> Html((LString*)Msg->A());
 			if (PreviewPanel && Html)
 			{
-				LVariant Ret;
-				LArray<LVariant*> Arg;
+				LScriptArguments Arg(NULL);
 				Arg.Add(new LVariant(Html->Get()));
-				PreviewPanel->CallMethod(DomToStr(SdSetHtml), &Ret, Arg);
-				Arg.DeleteObjects();
+				PreviewPanel->CallMethod(DomToStr(SdSetHtml), Arg);
 			}
 			break;
 		}

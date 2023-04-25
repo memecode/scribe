@@ -581,14 +581,14 @@ void Thing::ExportAll(	LViewI *Parent,
 	}
 }
 
-bool Thing::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool Thing::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
 	ScribeDomType Fld = StrToDom(MethodName);
 	switch (Fld)
 	{
 		case SdImport: // Type: (String FileName, String MimeType)
 		{
-			*ReturnValue = false;
+			*Args.GetReturn() = false;
 			if (Args.Length() != 2)
 				LgiTrace("%s:%i - Error: expecting 2 arguments to 'Import'.\n", _FL);
 			else
@@ -598,7 +598,7 @@ bool Thing::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVa
 				if (f->Open(FileName, O_READ))
 				{
 					auto status = Import(AutoCast(f), Args[1]->Str());
-					*ReturnValue = status.status;
+					*Args.GetReturn() = status.status;
 				}
 				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for reading.\n", _FL, FileName);
@@ -607,7 +607,7 @@ bool Thing::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVa
 		}
 		case SdExport: // Type: (String FileName, String MimeType)
 		{
-			*ReturnValue = false;
+			*Args.GetReturn() = false;
 			if (Args.Length() != 2)
 				LgiTrace("%s:%i - Error: expecting 2 arguments to 'Export'.\n", _FL);
 			else
@@ -617,7 +617,7 @@ bool Thing::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVa
 				if (f->Open(FileName, O_WRITE))
 				{
 					auto status = Export(AutoCast(f), Args[1]->Str());
-					*ReturnValue = status.status;
+					*Args.GetReturn() = status.status;
 				}
 				else
 					LgiTrace("%s:%i - Error: Can't open '%s' for writing.\n", _FL, FileName);

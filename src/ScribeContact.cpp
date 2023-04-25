@@ -1284,11 +1284,9 @@ bool Contact::GetVariant(const char *Name, LVariant &Value, const char *Array)
 	return false;
 }
 
-bool Contact::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool Contact::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
-	// ScribeDomType Fld = StrToDom(MethodName);
-	
-	return Thing::CallMethod(MethodName, ReturnValue, Args);
+	return Thing::CallMethod(MethodName, Args);
 }
 
 Thing &Contact::operator =(Thing &c)

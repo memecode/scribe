@@ -168,7 +168,7 @@ public:
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 };
 
 class CalendarUi :

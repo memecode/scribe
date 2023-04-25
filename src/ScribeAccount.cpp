@@ -119,7 +119,7 @@ bool ScribeAccount::SetVariant(const char *Name, LVariant &Value, const char *Ar
 	return true;
 }
 
-bool ScribeAccount::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool ScribeAccount::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
 	ScribeDomType m = StrToDom(MethodName);
 	switch (m)

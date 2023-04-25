@@ -165,25 +165,25 @@ void Attachment::SetOwner(Mail *msg)
 	Owner = msg;
 }
 
-bool Attachment::CallMethod(const char *MethodName, LVariant *Ret, LArray<LVariant*> &Args)
+bool Attachment::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
 	ScribeDomType Fld = StrToDom(MethodName);
 
-	*Ret = false;
+	*Args.GetReturn() = false;
 	switch (Fld)
 	{
 		case SdSave: // Type: (String FileName)
 		{
 			auto Fn = Args.Length() > 0 ? Args[0]->Str() : NULL;
 			if (Fn)
-				*Ret = SaveTo(Fn, true);
+				*Args.GetReturn() = SaveTo(Fn, true);
 			return true;
 		}
 		default:
 			break;
 	}
 
-	return Thing::CallMethod(MethodName, Ret, Args);
+	return Thing::CallMethod(MethodName, Args);
 }
 
 bool Attachment::GetVariant(const char *Name, LVariant &Value, const char *Array)

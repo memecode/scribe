@@ -2638,7 +2638,7 @@ bool Filter::SetVariant(const char *Name, LVariant &Value, const char *Array)
 	return true;
 }
 
-bool Filter::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool Filter::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
 	ScribeDomType Method = StrToDom(MethodName);
 	switch (Method)
@@ -2778,7 +2778,7 @@ bool Filter::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LV
 			break;
 	}
 
-	return Thing::CallMethod(MethodName, ReturnValue, Args);
+	return Thing::CallMethod(MethodName, Args);
 }
 
 bool Filter::GetVariant(const char *Var, LVariant &Value, const char *Array)

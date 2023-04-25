@@ -26,7 +26,7 @@ public:
     void OnCloseInstaller();
     LMessage::Param OnEvent(LMessage *Msg);
 
-	bool CallMethod(const char *Name, LVariant *Dst, LArray<LVariant*> &Arg);
+	bool CallMethod(const char *Name, LScriptArguments &Arg);
 };
 
 #endif

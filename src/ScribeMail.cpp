@@ -488,21 +488,21 @@ public:
 		return 0;
 	}
 
-	bool CallMethod(const char *MethodName, LVariant *Ret, LArray<LVariant*> &Args)
+	bool CallMethod(const char *MethodName, LScriptArguments &Args)
 	{
 		ScribeDomType Method = StrToDom(MethodName);
 
-		*Ret = false;
+		*Args.GetReturn() = false;
 		switch (Method)
 		{		
 			case SdGetTemp:
 			{
-				*Ret = ScribeTempPath();
+				*Args.GetReturn() = ScribeTempPath();
 				break;
 			}
 			case SdExecute:
 			{
-				*Ret = false;
+				*Args.GetReturn() = false;
 				if (Args.Length() >= 3)
 				{
 					auto Dir = Args[0]->Str();
@@ -537,7 +537,7 @@ public:
 							if (p.IsRunning())
 								p.Kill();
 							else
-								*Ret = true;
+								*Args.GetReturn() = true;
 						}
 					}
 				}
@@ -3890,17 +3890,17 @@ void MailUi::OnDirty(bool Dirty)
 	}
 }
 
-bool MailUi::CallMethod(const char *Name, LVariant *Dst, LArray<LVariant*> &Arg)
+bool MailUi::CallMethod(const char *Name, LScriptArguments &Args)
 {
 	ScribeDomType Method = StrToDom(Name);
 
-	*Dst = false;
+	*Args.GetReturn() = false;
 	switch (Method)
 	{
 		case SdShowRemoteContent: // Type: ()
 			if (HtmlView)
 			{
-				bool Always = Arg.Length() > 0 ? Arg[0]->CastBool() : false;
+				bool Always = Args.Length() > 0 ? Args[0]->CastBool() : false;
 				if (Always && GetItem())
 				{
 					auto From = GetItem()->GetFrom();
@@ -3914,16 +3914,16 @@ bool MailUi::CallMethod(const char *Name, LVariant *Dst, LArray<LVariant*> &Arg)
 				HtmlView->SetLoadImages(true);
 				IgnoreShowImgNotify = false;
 				PostEvent(M_UPDATE);
-				*Dst = true;
+				*Args.GetReturn() = true;
 			}
 			break;
 		case SdSetHtml: // Type: (String Html)
 			if (HtmlView)
 			{
-				if (Arg.Length() > 0)
+				if (Args.Length() > 0)
 				{
-					HtmlView->Name(Arg[0]->Str());
-					*Dst = true;
+					HtmlView->Name(Args[0]->Str());
+					*Args.GetReturn() = true;
 				}
 			}
 			break;
@@ -5876,7 +5876,7 @@ bool Mail::SetVariant(const char *Name, LVariant &Value, const char *Array)
 	return true;
 }
 
-bool Mail::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args)
+bool Mail::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
 	ScribeDomType Fld = StrToDom(MethodName);
 	switch (Fld)
@@ -5887,21 +5887,19 @@ bool Mail::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVar
 		{
 			bool Now = Args.Length() > 0 ? Args[0]->CastInt32() != 0 : true;
 			bool Result = Send(Now);
-			if (ReturnValue)
-				*ReturnValue = Result;
+			*Args.GetReturn() = Result;
 			return true;
 		}
 		case SdAddCalendarEvent: // Type: ([Bool AddPopupReminder])
 		{
 			bool AddPopupReminder = Args.Length() > 0 ? Args[0]->CastInt32() != 0 : true;
 			bool Result = AddCalendarEvent(NULL, AddPopupReminder, NULL);
-			if (ReturnValue)
-				*ReturnValue = Result;
+			*Args.GetReturn() = Result;
 			return true;
 		}
 		case SdGetRead: // Type: ()
 		{
-			*ReturnValue = (GetFlags() & MAIL_READ) != 0;
+			*Args.GetReturn() = (GetFlags() & MAIL_READ) != 0;
 			return true;
 		}
 		case SdSetRead: // Type: (Bool IsRead = true)
@@ -5910,7 +5908,7 @@ bool Mail::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVar
 			auto Flags = GetFlags();
 			if (Rd) SetFlags(Flags | MAIL_READ);
 			else SetFlags(Flags & ~MAIL_READ);
-			*ReturnValue = true;
+			*Args.GetReturn() = true;
 			return true;
 		}
 		case SdBayesianChange: // Type: (int SpamWordOffset, int HamWordOffset)
@@ -5918,7 +5916,7 @@ bool Mail::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVar
 			if (Args.Length() != 2)
 			{
 				LgiTrace("%s:%i - Invalid arg count, expecting (int SpamWordOffset, int HamWordOffset)\n", _FL);
-				*ReturnValue = false;
+				*Args.GetReturn() = false;
 				return true;
 			}
 
@@ -5941,7 +5939,7 @@ bool Mail::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVar
 			double Result;
 			if (App->IsSpam(Result, this))
 			{
-				*ReturnValue = Result;
+				*Args.GetReturn() = Result;
 				return true;
 			}
 			break;
@@ -5951,7 +5949,7 @@ bool Mail::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVar
 			if (Args.Length() != 2)
 			{
 				LgiTrace("%s:%i - Method needs 1 argument.\n", _FL);
-				*ReturnValue = false;
+				*Args.GetReturn() = false;
 				return true;
 			}
 
@@ -5959,12 +5957,12 @@ bool Mail::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVar
 			if (!Html)
 			{
 				LgiTrace("%s:%i - No HTML to parse.\n", _FL);
-				*ReturnValue = false;
+				*Args.GetReturn() = false;
 				return true;
 			}
 				
 			// auto Cs = GetHtmlCharset();
-			SearchHtml(ReturnValue, Html, Args[0]->Str(), Args[1]->Str());
+			SearchHtml(Args.GetReturn(), Html, Args[0]->Str(), Args[1]->Str());
 			return true;
 		}
 		case SdDeleteAsSpam: // Type: ()
@@ -5974,7 +5972,7 @@ bool Mail::CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVar
 		}
 	}
 	
-	return Thing::CallMethod(MethodName, ReturnValue, Args);
+	return Thing::CallMethod(MethodName, Args);
 }
 
 char *Mail::GetDropFileName()

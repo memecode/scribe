@@ -557,17 +557,17 @@ Thing *LPreviewPanel::GetCurrent()
 	return d->Item;
 }
 
-bool LPreviewPanel::CallMethod(const char *Name, LVariant *Dst, LArray<LVariant*> &Arg)
+bool LPreviewPanel::CallMethod(const char *Name, LScriptArguments &Args)
 {
 	ScribeDomType Method = StrToDom(Name);
 
-	*Dst = false;
+	*Args.GetReturn() = false;
 	switch (Method)
 	{
 		case SdShowRemoteContent:
 			if (d->TextCtrl)
 			{
-				bool Always = Arg.Length() > 0 ? Arg[0]->CastBool() : false;
+				bool Always = Args.Length() > 0 ? Args[0]->CastBool() : false;
 				if (Always)
 				{
 					auto m = d->Item->IsMail();
@@ -586,14 +586,14 @@ bool LPreviewPanel::CallMethod(const char *Name, LVariant *Dst, LArray<LVariant*
 				d->TextCtrl->SetLoadImages(true);
 				d->IgnoreShowImgNotify = false;
 				PostEvent(M_UPDATE);
-				*Dst = true;
+				*Args.GetReturn() = true;
 			}
 			break;
 		case SdSetHtml:
-			if (d->TextCtrl && Arg.Length() > 0)
+			if (d->TextCtrl && Args.Length() > 0)
 			{
-				d->TextCtrl->Name(Arg[0]->Str());
-				*Dst = true;
+				d->TextCtrl->Name(Args[0]->Str());
+				*Args.GetReturn() = true;
 			}
 			break;
 		default:

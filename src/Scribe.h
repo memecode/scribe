@@ -201,10 +201,10 @@ public:
 		return true;
 	}
 
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override
 	{
 		if (Sub)
-			return Sub->CallMethod(MethodName, ReturnValue, Args);
+			return Sub->CallMethod(MethodName, Args);
 
 		return false;
 	}
@@ -513,7 +513,7 @@ public:
 	~Thing();
 
 	// Dom
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// D'n'd
 	bool GetData(LArray<LDragData> &Data) override;
@@ -667,7 +667,7 @@ public:
 
 	// LDom support
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
-	bool CallMethod(const char *MethodName, LVariant *Ret, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	void OnOpen(LView *Parent, char *Dest = 0);
 	void OnDeleteAttachment(LView *Parent, bool Ask);
@@ -740,7 +740,7 @@ public:
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = 0) override;
 	bool SetVariant(const char *Name, LVariant &Value, const char *Array = 0) override;
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// Events
 	void OnMouseClick(LMouse &m) override;
@@ -807,7 +807,7 @@ public:
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// Events
 	void OnMouseClick(LMouse &m) override;
@@ -1083,7 +1083,7 @@ public:
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// Events
 	void OnCreate() override;
@@ -1362,7 +1362,7 @@ public:
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant *> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 };
 
 //////////////////////////////////////////////////////////////
@@ -1490,7 +1490,7 @@ public:
 	bool Evaluate(char *s, LVariant &v);
 	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// Filter
 	bool Test(Mail *m, bool &Stop, LStream *Log = 0);
@@ -2112,7 +2112,7 @@ public:
 	// LDom interface
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -2371,7 +2371,7 @@ public:
 
 	// Dom
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
-	bool CallMethod(const char *MethodName, LVariant *ReturnValue, LArray<LVariant*> &Args) override;
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// ---------------------------------------------------------------------
 	// Methods

@@ -785,8 +785,9 @@ bool LScribeScript::MenuAddItem(LScriptArguments &Args)
 	ARG_CHECK(!=, 6);
 
 	*Args.GetReturn() = false;
-	LDom *Dom = Args[0]->CastDom();
-	LScriptUi *Menu = dynamic_cast<LScriptUi*>(Dom);
+	
+	auto Dom = Args[0]->CastDom();
+	auto Menu = dynamic_cast<LScriptUi*>(Dom);
 	char *IconFile = 0;
 	int IconIdx = -1;
 	
@@ -795,10 +796,10 @@ bool LScribeScript::MenuAddItem(LScriptArguments &Args)
 	else if (Args[1]->Type == GV_STRING)
 		IconFile = Args[1]->Str();
 	
-	char *LabelTxt = Args[2]->Str();
-	int Position = Args[3]->CastInt32();
-	char *CallbackMethodName = Args[4]->Str();
-	int CallbackId = Args[5]->CastInt32();
+	auto LabelTxt = Args.StringAt(2);
+	auto Position = Args.Int32At(3);
+	auto CallbackMethod = Args.StringAt(4);
+	auto CallbackId = Args.Int32At(5);
 	
 	if (!Menu || !Menu->Sub)
 		return Args.Throw(NULL, -1, "No menu to append to.");
@@ -812,10 +813,10 @@ bool LScribeScript::MenuAddItem(LScriptArguments &Args)
 
 	if (!LabelTxt)
 		return Args.Throw(NULL, -1, "No label text.");
-	if (!CallbackMethodName)
+	if (!CallbackMethod)
 		return Args.Throw(NULL, -1, "No label callback method name.");
 
-	LScriptCallback Cb = App->GetCallback(CallbackMethodName);
+	LScriptCallback Cb = App->GetCallback(CallbackMethod);
 	if (!Cb.Func)
 	{
 		Args.Throw(NULL, -1, "Callback not defined.");
