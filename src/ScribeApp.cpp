@@ -919,15 +919,20 @@ public:
 		return Growl;
 	}
 
-	LVmDebugger *AttachVm(LVirtualMachine *Vm, LCompiledCode *Code, const char *Assembly)
+	LVmDebugger *AttachVm(LVirtualMachine *OriginalVm, LCompiledCode *Code, const char *Assembly)
 	{
+		if (!OriginalVm || !Code)
+			return NULL;
+
 		LVariant v;
 		if (Options)
 			Options->GetValue(OPT_ScriptDebugger, v);
-		if (v.CastInt32())
-			return new LVmDebuggerWnd(App, this, Vm, Code, NULL);
-		
-		return NULL;
+		if (!v.CastInt32())
+			return NULL;
+
+		LAutoPtr<LVirtualMachine> CopiedVm(new LVirtualMachine(OriginalVm));
+		LAutoPtr<LCompiledCode> CopiedCode(new LCompiledCode(*Code));
+		return new LVmDebuggerWnd(App, this, CopiedVm, CopiedCode, Assembly);
 	}
 
 	bool CallCallback(LVirtualMachine &Vm, LString CallbackName, LScriptArguments &Args)
@@ -8564,8 +8569,6 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			LVmDebugger *dbg = vm->OpenDebugger();
 			if (!dbg)
 				break;
-
-			dbg->OwnVm(true);
 			break;
 		}
 		case IDM_SCRIPT_BREAK_ON_WARN:

@@ -478,13 +478,11 @@ public:
 
 	int Main()
 	{
-		LVirtualMachine Vm;				
-		LScriptArguments Args(&Vm);
+		LScriptArguments Args(NULL);
 		Args.New() = new LVariant(m->App);
 		Args.New() = new LVariant(m);
 		Args.New() = new LVariant((LDom*)this);
 		m->App->ExecuteScriptCallback(*cb, Args);
-		Args.DeleteObjects();
 		return 0;
 	}
 
@@ -4720,14 +4718,11 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 	{
 		for (auto r: Renderers)
 		{
-			LVirtualMachine Vm;
-				
-			LScriptArguments Args(&Vm);
+			LScriptArguments Args(NULL);
 			Args.New() = new LVariant(App);
 			Args.New() = new LVariant(this);
 			Args.New() = new LVariant((void*)NULL);
 			bool Status = App->ExecuteScriptCallback(*r, Args);
-			Args.DeleteObjects();
 			if (Status)
 			{
 				auto Ret = Args.GetReturn();
@@ -6593,8 +6588,6 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 			
 			for (auto c: Callbacks)
 				App->ExecuteScriptCallback(*c, Args);
-			
-			Args.DeleteObjects();
 		}
 
 		m.ToScreen();
