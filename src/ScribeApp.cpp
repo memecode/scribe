@@ -4163,19 +4163,19 @@ void ScribeWnd::SetupAccounts()
 //////////////////////////////////////////////////////////////////////////////
 class LShutdown : public LDialog
 {
-	LTextLabel *Msg;
-	LButton *KillBtn;
-	LButton *CancelBtn;
-	bool Disconnected;
+	LTableLayout *Tbl = NULL;
+	LTextLabel *Msg = NULL;
+	LButton *ActionBtn = NULL;
+	LButton *CancelBtn = NULL;
+	bool Disconnected = false;
+	uint64_t WaitTs = 0;
 	
 public:
-	ScribeAccount *Wait;
-	List<ScribeAccount> *Accounts;
+	ScribeAccount *Waiting = NULL;
+	LArray<ScribeAccount*> Accounts;
 
-	LShutdown(List<ScribeAccount> *accounts)
+	LShutdown(LArray<ScribeAccount*> accounts)
 	{
-		Wait = 0;
-		Disconnected = false;
 		Accounts = accounts;
 		LRect r(	0,
 					0,
@@ -4184,18 +4184,28 @@ public:
 		SetPos(r);
 		MoveToCenter();
 
-		char Str[256];
-		sprintf_s(Str, sizeof(Str), "%s exiting...", AppName);
+		LString Str;
+		Str.Printf("%s %s", AppName, LLoadString(IDS_EXITING));
 		LView::Name(Str);
 
-		AddView(Msg = new LTextLabel(-1, 10, 10, 300, -1, "None"));
-		AddView(KillBtn = new LButton(IDC_KILL, 70, 35, 60, 20, "Kill"));
-		AddView(CancelBtn = new LButton(IDCANCEL, 140, 35, 60, 20, "Cancel"));
+		AddView(Tbl = new LTableLayout(IDC_TABLE));
+		
+		auto c = Tbl->GetCell(0, 0);
+		c->Add(Msg = new LTextLabel(-1, 10, 10, 300, -1, LLoadString(IDS_NONE)));
 
-		if (KillBtn)
-		{
-			KillBtn->Enabled(false);
-		}
+		c = Tbl->GetCell(0, 1);
+		c->TextAlign(LCss::AlignCenter);
+		c->Width("100%");
+		c->Add(ActionBtn = new LButton(IDC_KILL, 0, 0, -1, -1, LLoadString(IDS_DISCONNECT)));
+		c->Add(CancelBtn = new LButton(IDCANCEL, 0, 0, -1, -1, LLoadString(IDS_CANCEL)));
+
+		if (ActionBtn)
+			ActionBtn->Enabled(false);
+	}
+
+	~LShutdown()
+	{
+		int asd=0;
 	}
 
 	void OnCreate()
@@ -4205,38 +4215,36 @@ public:
 
 	void OnPulse()
 	{
-		if (Accounts)
+		if (Accounts.Length())
 		{
-			if (!Wait)
+			LArray<ScribeAccount*> Remove;
+			for (auto a: Accounts)
 			{
-				Wait = (*Accounts)[0];
-				if (Wait)
+				if (!a->IsOnline())
 				{
-					Disconnected = false;
+					Remove.Add(a);
+					if (a == Waiting)
+						Waiting = NULL;
+				}
+				else if (!Waiting)
+				{
+					Waiting = a;
 					
-					char s[256];
-					LVariant v = Wait->Receive.Name();
-					sprintf_s(s, sizeof(s), "Waiting for '%s'", v.Str() ? v.Str() : (char*)"Untitled...");
+					LString s;
+					LVariant v = a->Receive.Name();
+					s.Printf(LLoadString(IDS_WAITING_FOR), v.Str() ? v.Str() : LLoadString(IDS_NONE));
 					Msg->Name(s);
 
-					Accounts->Delete(Wait);					
-					Wait->Stop();
-
-					KillBtn->Enabled(true);
-				}
-				else
-				{
-					SetPulse();
-					EndModal(true);
+					WaitTs = LCurrentTime();
+					
+					Disconnected = false;
+					ActionBtn->Name(LLoadString(IDS_DISCONNECT));
+					ActionBtn->Enabled(true);
 				}
 			}
 
-			if (Wait && !Wait->IsOnline())
-			{
-				Wait = 0;
-				Msg->Name("None");
-				KillBtn->Enabled(false);
-			}
+			for (auto r: Remove)
+				Accounts.Delete(r);
 		}
 		else
 		{
@@ -4251,17 +4259,24 @@ public:
 		{
 			case IDC_KILL:
 			{
-				if (Wait)
+				if (Waiting)
 				{
+					WaitTs = LCurrentTime();
 					if (!Disconnected)
 					{
 						Disconnected = true;
-						Wait->Disconnect();
+						ActionBtn->Name(LLoadString(IDS_KILL));
+						Waiting->Disconnect();
 					}
 					else
 					{
-						Wait->Kill();
+						Waiting->Kill();
+						ActionBtn->Enabled(false);
 					}
+				}
+				else
+				{
+					ActionBtn->Enabled(false);
 				}
 				break;
 			}
@@ -4308,19 +4323,18 @@ bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 			 GetActiveThreads() > 0)
 	{
 		// whack up a shutdown window
-		List<ScribeAccount> Online;
-
+		LArray<ScribeAccount*> Online;
 		for (auto i: Accounts)
 		{
 			i->OnEndSession();
 			if (i->IsOnline())
-			{
-				Online.Insert(i);
-			}
+				Online.Add(i);
 		}
 
-		auto Dlg = new LShutdown(&Online);
-		Dlg->DoModal([this, Dlg](auto dlg, auto id)
+		LAssert(Online.Length() > 0);
+
+		auto Dlg = new LShutdown(Online);
+		Dlg->DoModal([this](auto dlg, auto id)
 		{
 			if (id)
 			{
@@ -4332,6 +4346,7 @@ bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 				ScribeState = ScribeRunning;
 				Visible(true);
 			}
+			delete dlg;
 		});
 		return false; // At the very minimum the app has to wait for the user to respond.
 	}

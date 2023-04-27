@@ -532,6 +532,7 @@
 #define IDM_IMPORT_EML							726
 #define IDC_CONTACTS_URL						727
 #define IDS_DELETE_FOLDER_DLG					728
+#define IDS_DISCONNECT							729
 #define IDS_SET_DEFAULT							730
 #define IDC_HTML_FONT							731
 #define IDC_SET_HTML_FONT						732
@@ -546,6 +547,7 @@
 #define IDS_FROM								741
 #define IDC_ADD									742
 #define IDC_DATE_FORMAT							743
+#define IDS_EXITING								744
 #define IDS_SORT_SUBFOLDERS						745
 #define IDC_DESC								746
 #define IDC_948									747
@@ -752,6 +754,7 @@
 #define IDC_TIME_TYPE							948
 #define IDS_FOLDER_TRASH						949
 #define IDD_FILES_EXPORT						950
+#define IDS_WAITING_FOR							951
 #define IDC_END_DATE							952
 #define IDC_HAM									953
 #define IDC_SPAM								954
@@ -1109,6 +1112,7 @@
 #define IDC_MSG_DEL_NEXT						1488
 #define IDC_MSG_DEL_CLOSE						1489
 #define IDC_MSG_DEL_PREV						1490
+#define IDS_KILL								1497
 #define IDC_RECEIVE_LOG							1514
 #define IDS_EMAIL_PROGRESS						1516
 #define IDS_COPY_LOG_TO_CLIP					1517
@@ -1275,6 +1279,6 @@
 #define IDM_TOOLS_MENU							41163
 #define IDM_REPLICATE							41164
 #define IDM_EXPORT								41165
-#define IDM_COPY								Lgi4CC("copy")
-#define IDM_CUT									Lgi4CC("cut ")
-#define IDM_PASTE								Lgi4CC("past")
+#define IDM_COPY								'copy'
+#define IDM_CUT									'cut '
+#define IDM_PASTE								'past'
