@@ -2199,27 +2199,16 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) headers=%p, time=%i\n", Account->
 									t->Msg = new AccountMessage(Account);
 								if (t->Msg)
 								{
-									bool Attachments = false;
-									LAutoString ContentType(InetGetHeaderField(Headers, "Content-Type"));
-									if (ContentType)
-									{
-										Attachments = stristr(ContentType, "multipart/mixed") != NULL;
-									}
-
 									t->Msg->Index = t->Index;
-
-									LAutoString From(DecodeRfc2047(InetGetHeaderField(Headers, "From")));
-									LAutoString Subject(DecodeRfc2047(InetGetHeaderField(Headers, "Subject")));
-									t->Msg->From = From.Get();
-									t->Msg->Subject = LString(Subject).Replace("\n");
 									t->Msg->ServerUid = t->Uid;
+									t->Msg->From = LDecodeRfc2047(LGetHeaderField(Headers, "From"));
+									t->Msg->Subject = LDecodeRfc2047(LGetHeaderField(Headers, "Subject")).Replace("\n");
 									
-									LAutoString d(InetGetHeaderField(Headers, "Date"));
-									if (d)
-										t->Msg->Date.Decode(d);
+									auto date = LGetHeaderField(Headers, "Date");
+									if (date)
+										t->Msg->Date.Decode(date);
 									
-									t->Msg->Attachments = Attachments;
-									
+									t->Msg->Attachments = LGetHeaderField(Headers, "Content-Type").Find("multipart/mixed") >= 0;
 									if (IsSpamId(t->Uid))
 									{
 										t->Msg->Download->Value(false);

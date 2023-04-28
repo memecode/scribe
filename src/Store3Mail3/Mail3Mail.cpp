@@ -335,7 +335,7 @@ bool LMail3Mail::Serialize(LMail3Store::LStatement &s, bool Write)
 	SERIALIZE_INT(AccountId, i++);
 	SERIALIZE_INT(MarkColour, i++);
 
-	SERIALIZE_STR(Subject, i++);
+	SERIALIZE_LSTR(Subject, i++);
 	SERIALIZE_STR(vTo, i++);
 	SERIALIZE_STR(vFrom, i++);
 	SERIALIZE_STR(vReply, i++);
@@ -451,6 +451,11 @@ size_t Sizeof(LVariant &v)
 			return StrlenW(v.WStr()) * sizeof(char16);
 	}
 	return s + sizeof(v);
+}
+
+size_t Sizeof(LString &s)
+{
+	return sizeof(s) + s.Length();
 }
 
 size_t Sizeof(DIterator<LDataPropI, Store3Addr, LMail3Store> &i)
@@ -801,23 +806,8 @@ const char *LMail3Mail::GetStr(int id)
 		}
 		case FIELD_SUBJECT:
 		{
-			if (!LIsUtf8(Subject.Str()))
-			{
-				auto cs = DetectCharset(Subject.Str());
-				LAutoString conv;
-				if (conv.Reset((char*)LNewConvertCp("utf-8", Subject.Str(), cs ? cs.Get() : DefaultCharset)))
-					Subject = conv;
-			}
-
-			#if 0
-			int32 ch;
-			LgiTrace("Subj:");
-			for (LUtf8Ptr p(Subject.Str()); ch = p; p++)
-				LgiTrace(" u+%x", ch);
-			LgiTrace("\n");
-			#endif
-
-			return Subject.Str();
+			Utf8Check(Subject);
+			return Subject;
 		}
 		case FIELD_CHARSET:
 		{
@@ -1014,7 +1004,7 @@ void LMail3Mail::ResetCaches()
 	SizeCache.Reset();
 }
 
-const char *LMail3Mail::InferCharset()
+const char *LMail3Mail::InferCharset(const char *ExampleTxt)
 {
 	if (!InferredCharset)
 	{
@@ -1039,6 +1029,15 @@ const char *LMail3Mail::InferCharset()
 			}
 		}
 	}
+
+	if (!InferredCharset && ExampleTxt)
+	{
+		// Fall back to detecting the charset based on the text itself:
+		static LString Cs;
+		Cs = DetectCharset(ExampleTxt);
+		if (Cs)
+			InferredCharset = Cs;
+	}
 		
 	return InferredCharset;
 }
@@ -1047,7 +1046,7 @@ bool LMail3Mail::Utf8Check(LAutoString &v)
 {
 	if (!LIsUtf8(v.Get()))
 	{
-		const char *Cs = InferCharset();
+		const char *Cs = InferCharset(v.Get());
 		if (Cs)
 		{
 			LAutoString Value((char*) LNewConvertCp("utf-8", v, Cs, -1));
@@ -1062,11 +1061,29 @@ bool LMail3Mail::Utf8Check(LAutoString &v)
 	return false;
 }
 
+bool LMail3Mail::Utf8Check(LString &v)
+{
+	if (LIsUtf8(v))
+		return true;
+
+	// auto cs = DetectCharset(Subject);
+	auto Cs = InferCharset(v);
+	if (!Cs)
+		return false;
+
+	LAutoString Value((char*) LNewConvertCp("utf-8", v, Cs, v.Length()));
+	if (!Value)
+		return false;
+
+	v = Value.Get();
+	return true;
+}
+
 bool LMail3Mail::Utf8Check(LVariant &v)
 {
 	if (!LIsUtf8(v.Str()))
 	{
-		const char *Cs = InferCharset();
+		const char *Cs = InferCharset(v.Str());
 		if (Cs)
 		{
 			LAutoString Value((char*) LNewConvertCp("utf-8", v.Str(), Cs, -1));
@@ -1084,36 +1101,36 @@ bool LMail3Mail::Utf8Check(LVariant &v)
 bool LMail3Mail::ParseHeaders()
 {
 	// Reload from headers...
-	auto InetHdrs = GetStr(FIELD_INTERNET_HEADER);
-	Subject.OwnStr(DecodeRfc2047(InetGetHeaderField(InetHdrs, "subject")));
+	LString InetHdrs = GetStr(FIELD_INTERNET_HEADER);
+	Subject = LDecodeRfc2047(LGetHeaderField(InetHdrs, "subject"));
 	Utf8Check(Subject);
 
 	// From
-	LAutoString s(DecodeRfc2047(InetGetHeaderField(InetHdrs, "from")));
+	auto s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "from"));
 	Utf8Check(s);
 	From.Empty();
 	DecodeAddrName(s, From.Name, From.Addr, NULL);
 
-	s.Reset(DecodeRfc2047(InetGetHeaderField(InetHdrs, "reply-to")));
+	s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "reply-to"));
 	Utf8Check(s);
 	Reply.Empty();
 	DecodeAddrName(s, Reply.Name, Reply.Addr, NULL);
 
 	// Parse To and CC headers.
 	To.DeleteObjects();
-	if (s.Reset(DecodeRfc2047(InetGetHeaderField(InetHdrs, "to"))))
+	if (s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "to")))
 	{
 		Utf8Check(s);
 		ParseAddresses(s, MAIL_ADDR_TO);
 	}
-	if (s.Reset(DecodeRfc2047(InetGetHeaderField(InetHdrs, "cc"))))
+	if (s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "cc")))
 	{
 		Utf8Check(s);
 		ParseAddresses(s, MAIL_ADDR_CC);
 	}
 
 	// Data
-	if (s.Reset(InetGetHeaderField(InetHdrs, "date")))
+	if (s = LGetHeaderField(InetHdrs, "date"))
 	{
 	    DateSent.Decode(s);
 		DateSent.ToUtc();

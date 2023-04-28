@@ -510,7 +510,7 @@ class LMail3Attachment : public Store3Attachment<LMail3Store, LMail3Mail, LMail3
 	int64 SegId;
 	int64 BlobSize;
 
-	LAutoString Headers;
+	LString Headers;
 
 	LString Name;
 	LString MimeType;
@@ -570,7 +570,8 @@ class LMail3Mail : public LMail3Thing
 
 	const char *GetTable() override { return MAIL3_TBL_MAIL; }
 	void ParseAddresses(char *Str, int CC);
-	const char *InferCharset();
+	const char *InferCharset(const char *ExampleTxt);
+	bool Utf8Check(LString &v);
 	bool Utf8Check(LVariant &v);
 	bool Utf8Check(LAutoString &v);
 
@@ -581,7 +582,7 @@ public:
 	int64 MailSize = 0;
 	uint32_t MarkColour = Rgba32(0, 0, 0, 0); // FIELD_MARK_COLOUR, 32bit rgba colour
 
-	LVariant Subject;
+	LString Subject;
 	DIterator<LDataPropI, Store3Addr, LMail3Store> To;
 	LMail3Attachment *Seg = NULL;
 	Store3Addr From;

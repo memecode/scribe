@@ -150,7 +150,7 @@ void LMail3Attachment::SetInMemoryOnly(bool b)
 
 uint64 LMail3Attachment::Size()
 {
-	int64 HeaderSz = Headers ? strlen(Headers) : 0;
+	int64 HeaderSz = Headers.Length();
 	int64 NameSz = Name.Length();
 	int64 MimeSz = MimeType.Length();
 	int64 ContentIdSz = ContentId.Length();
@@ -197,7 +197,7 @@ LMail3Attachment *LMail3Attachment::Find(int64 Id)
 
 Store3CopyImpl(LMail3Attachment)
 {
-	Headers.Reset(NewStr(p.GetStr(FIELD_INTERNET_HEADER)));
+	Headers = p.GetStr(FIELD_INTERNET_HEADER);
 	if (Headers)
 	{
 		// Source supports headers...
@@ -243,7 +243,7 @@ char *LMail3Attachment::GetHeaders()
 			if (Name)
 				p.Print("Content-Disposition: inline; filename=\"%s\"\r\n", Name.Get());
 		}
-		Headers.Reset(p.NewStr());		
+		Headers = p.NewLStr();		
 	}
 
 	return Headers;
@@ -251,7 +251,7 @@ char *LMail3Attachment::GetHeaders()
 
 bool LMail3Attachment::ParseHeaders()
 {
-	LAutoString Ct(InetGetHeaderField(Headers, "Content-Type"));
+	auto Ct = LGetHeaderField(Headers, "Content-Type");
 	char *Colon = Ct ? strchr(Ct, ';') : 0;
 	if (Colon)
 	{
@@ -274,10 +274,9 @@ bool LMail3Attachment::ParseHeaders()
 
 bool LMail3Attachment::Load(LMail3Store::LStatement &s, int64 &ParentId)
 {
-	SegId = s.GetInt64(0);
-	ParentId = s.GetInt64(2);
-	
-	Headers.Reset(NewStr(s.GetStr(3)));
+	SegId    = s.GetInt64(0);
+	ParentId = s.GetInt64(2);	
+	Headers  = s.GetStr(3);
 	ParseHeaders();
 	
 	BlobSize = s.GetSize(4);
@@ -422,17 +421,16 @@ const char *LMail3Attachment::GetStr(int id)
 		{
 			if (!Name)
 			{
-				LAutoString t(InetGetHeaderField(Headers, "Content-Disposition"));
-				
-				LAutoString n(DecodeRfc2047(InetGetSubField(t, "filename")));
+				auto t = LGetHeaderField(Headers, "Content-Disposition");				
+				auto n = LDecodeRfc2047(LGetSubField(t, "filename"));
 				if (n)
 					Name = n.Get();
 				else
 				{
-					LAutoString ct(InetGetHeaderField(Headers, "Content-Type"));
+					auto ct = LGetHeaderField(Headers, "Content-Type");
 					if (ct)
 					{
-						if (n.Reset(DecodeRfc2047(InetGetSubField(ct, "name"))))
+						if (n = LDecodeRfc2047(LGetSubField(ct, "name")))
 							Name = n.Get();
 					}
 				}
@@ -445,14 +443,17 @@ const char *LMail3Attachment::GetStr(int id)
 		{
 			if (!MimeType)
 			{
-				LAutoString t(InetGetHeaderField(Headers, "Content-Type"));
+				auto t = LGetHeaderField(Headers, "Content-Type");
 				if (t)
 				{
-					char *c = strchr(t, ';');
+					// Trim off any sub-feilds.
+					auto c = strchr(t, ';');
 					if (c)
 					{
-						while (strchr(" \t\r\n", c[-1])) c--;
-						MimeType.Set(t, c ? c - t : -1);
+						while (strchr(" \t\r\n", c[-1]))
+							c--;
+						*c = 0;
+						MimeType.Set(t, c - t.Get());
 					}
 				}
 			}
@@ -484,12 +485,12 @@ Store3Status LMail3Attachment::SetStr(int id, const char *str)
 	switch (id)
 	{
 		case FIELD_INTERNET_HEADER:
-        	Headers.Reset(NewStr(str));
+        	Headers = str;
 			ParseHeaders();
 			break;
 		case FIELD_NAME:
 			Name = str;
-			Headers.Reset();
+			Headers.Empty();
 			break;
 		case FIELD_MIME_TYPE:
 			MimeType = str;
@@ -497,18 +498,18 @@ Store3Status LMail3Attachment::SetStr(int id, const char *str)
 			// FIXME: If we have headers from an incoming mail, this is an error to delete them here.
 			LAssert(Headers.Get() == NULL);
 
-			Headers.Reset();
+			Headers.Empty();
 			break;
 		case FIELD_CONTENT_ID:
 			ContentId = LString(str).Strip("<>");
-			Headers.Reset();
+			Headers.Empty();
 			break;
 		case FIELD_CHARSET:
 			Charset = str;
 			if (Charset.Find(">") >= 0)
 				LAssert(!"Invalid char");
 			
-			Headers.Reset();
+			Headers.Empty();
 			break;
 		default:
 			LAssert(!"Unknown id.");
