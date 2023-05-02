@@ -528,16 +528,6 @@ LAutoStreamI LMail3Mail::GetStream(const char *file, int line)
 				Sc->Add(new LMemStream(Hdr, HdrLen));
 				Sc->Add(new LMemStream("\r\n\r\n", 4));
 				Sc->Add(new Mail3BlobStream(Store, (int)SegId, BlobSize, file, line));
-				
-				LFile f;
-				if (f.Open("c:\\temp\\email.eml", O_WRITE))
-				{
-					LCopyStreamer Cp(64<<10);
-					Cp.Copy(Sc, &f);
-					f.Close();
-					
-					Sc->SetPos(0);
-				}
 			}
 		}
 	}
