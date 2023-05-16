@@ -39,7 +39,7 @@ public:
 	{
 		Prev = NULL;
 		SetPourLargest(true);
-		SetWrapType(TEXTED_WRAP_NONE);
+		SetWrapType(L_WRAP_NONE);
 		sEmpty.Printf("(%s)", LLoadString(IDS_EMPTY));
 
 		LFont *f = new LFont;

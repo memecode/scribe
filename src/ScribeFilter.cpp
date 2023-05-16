@@ -3492,7 +3492,7 @@ enum ConditionOptions
 
 int FilterCallback(	LFilterView *View,
 					LFilterItem *Item,
-					GFilterMenu Menu,
+					LFilterMenu Menu,
 					LRect &r,
 					LArray<char*> *GetList,
 					void *Data)
@@ -3687,7 +3687,7 @@ FilterUi::FilterUi(Filter *item) :
 			{
 				if (GetViewById(IDC_SCRIPT, Script))
 				{
-					Script->SetWrapType(TEXTED_WRAP_NONE);
+					Script->SetWrapType(L_WRAP_NONE);
 					Script->Sunken(true);
 					Script->SetPourLargest(true);
 				}

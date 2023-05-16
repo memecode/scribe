@@ -2018,7 +2018,7 @@ ContactUi::ContactUi(Contact *item) :
 				c->Sort(true);
 				c->Sub(GV_DOUBLE);
 
-				GTimeZone *Tz = GTimeZones;
+				LTimeZone *Tz = GTimeZones;
 				while (Tz->Text)
 				{
 					char s[256];

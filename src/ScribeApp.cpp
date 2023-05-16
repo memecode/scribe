@@ -6815,17 +6815,19 @@ void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::fun
 			delete dlg;
 		});
 	}
-
-	auto i = new UserInput;
-	i->Parent = Parent;
-	i->Msg = Msg;
-	i->Password = Password;
-	i->Callback = Callback;
-	if (!PostEvent(M_GET_USER_INPUT, (LMessage::Param)i))
+	else
 	{
-		LAssert(!"PostEvent failed.");
-		if (Callback)
-			Callback(LString());
+		auto i = new UserInput;
+		i->Parent = Parent;
+		i->Msg = Msg;
+		i->Password = Password;
+		i->Callback = Callback;
+		if (!PostEvent(M_GET_USER_INPUT, (LMessage::Param)i))
+		{
+			LAssert(!"PostEvent failed.");
+			if (Callback)
+				Callback(LString());
+		}
 	}
 }
 
