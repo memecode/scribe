@@ -10426,15 +10426,16 @@ public:
 					{
 						// Web link?
 						LExecute(s);
+						return true;
 					}
 				}
 				break;
 			}
 			default:
-				return false;
+				break;
 		}
 
-		return true;
+		return false;
 	}
 };
 
