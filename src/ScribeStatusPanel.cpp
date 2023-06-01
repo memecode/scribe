@@ -727,7 +727,7 @@ int AccountStatusPanel::CalcWidth()
 	LRect *Bounds = ImgLst ? ImgLst->GetBounds() : 0;
 	if (Bounds)
 	{
-		ScribeAccount *Send = App->GetSendAccount();
+		auto Send = App->GetSendAccount();
 
 		int UpArrow = STATUS_BASE + UP_ARROW;
 		int SendIcon = STATUS_BASE + (Send ? AccountStatus(&Send->Send) : 0);
@@ -765,7 +765,7 @@ void AccountStatusPanel::OnPaint(LSurface *pDC)
 		int x = LPanel::CalcWidth() - 8, y = 3;
 
 		auto Accs = Accounts->Length();
-		ScribeAccount *Send = App->GetSendAccount();
+		auto Send = App->GetSendAccount();
 		LColour Background(L_MED);
 
 		LRect *Bounds = ImgLst->GetBounds();

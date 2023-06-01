@@ -7401,8 +7401,7 @@ class ScribePasteState : public LProgressDlg
 {
 	ScribeWnd *App = NULL;
 	ScribeFolder *Folder = NULL;
-	LAutoPtr<uint8_t, true> Data;
-	ssize_t Size = 0;
+	LString Data;
 	LDataStoreI::StoreTrans Trans;
 	LProgressPane *LoadPane = NULL, *SavePane = NULL;
 	ScribeClipboardFmt *tl = NULL;
@@ -7416,12 +7415,11 @@ class ScribePasteState : public LProgressDlg
 	}	State = LoadingThings;
 
 public:
-	ScribePasteState(ScribeWnd *app, ScribeFolder *folder, LAutoPtr<uint8_t, true> data, ssize_t size) :
+	ScribePasteState(ScribeWnd *app, ScribeFolder *folder, LString data) :
 		LProgressDlg(app),
 		App(app),
 		Folder(folder),
-		Data(data),
-		Size(size)
+		Data(data)
 	{
 		// Paste 'ScribeThingList'
 		tl = (ScribeClipboardFmt*)Data.Get();
@@ -7971,18 +7969,20 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				break;
 			}
 
-			LAutoPtr<uint8_t, true> Data;
-			ssize_t Size = 0;
-			if (!Clip.Binary(d->ClipboardFormat, Data, &Size))
+			Clip.Binary(d->ClipboardFormat, [this, Folder](auto Data, auto Err)
 			{
-				LgiMsg(this, "Couldn't get the clipboard data.", AppName, MB_OK);
-				break;
-			}
-
-			if (ScribeClipboardFmt::IsThing(Data.Get(), Size))
-			{
-				new ScribePasteState(this, Folder, Data, Size);
-			}
+				if (Data)
+				{
+					if (ScribeClipboardFmt::IsThing(Data.Get(), Data.Length()))
+					{
+						new ScribePasteState(this, Folder, Data);
+					}
+				}
+				else
+				{
+					LgiMsg(this, "Couldn't get the clipboard data: %s", AppName, MB_OK, Err.Get());
+				}
+			});
 			break;
 		}
 		case IDM_DELETE:
