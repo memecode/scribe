@@ -534,9 +534,7 @@ const char *ImapMail::GetStr(int id)
 				if (!MsgId)
 				{
 					auto Headers = GetStr(FIELD_INTERNET_HEADER);
-					LAutoString h(DecodeRfc2047(InetGetHeaderField(Headers, "Message-ID")));
-					MsgId = h;
-
+					MsgId = LDecodeRfc2047(LGetHeaderField(Headers, "Message-ID"));
 					if (MsgId)
 					{
 					    LAssert(!strchr(MsgId, '\n'));
@@ -564,8 +562,7 @@ const char *ImapMail::GetStr(int id)
 				if (!Headers)
 					return LLoadString(IDS_LOADING);
 
-				LAutoString s(DecodeRfc2047(InetGetHeaderField(Headers, "Subject")));
-				Subject = s;
+				Subject = LDecodeRfc2047(LGetHeaderField(Headers, "Subject"));
 
 				auto Meta = GetMeta();
 				if (Meta)
@@ -1152,7 +1149,7 @@ Store3Addr *ImapMail::ProcessAddress(Store3Addr &Addr, const char *FieldId, cons
 
 		// Otherwise try and load from the headers...
 		auto Headers = GetStr(FIELD_INTERNET_HEADER);
-		LAutoString f(DecodeRfc2047(InetGetHeaderField(Headers, RfcField)));
+		auto f = LDecodeRfc2047(LGetHeaderField(Headers, RfcField));
 		if (f)
 		{
 			LAutoString Name, Email;
@@ -1206,7 +1203,7 @@ LDataIt ImapMail::GetList(int id)
 			{
 				auto Headers = GetStr(FIELD_INTERNET_HEADER);
 
-				LAutoString h(DecodeRfc2047(InetGetHeaderField(Headers, "To")));
+				auto h = LDecodeRfc2047(LGetHeaderField(Headers, "To"));
 				if (h)
 				{
 					List<char> Addr;
@@ -1224,7 +1221,7 @@ LDataIt ImapMail::GetList(int id)
 				}
 				To.State = Store3Loaded;
 
-				if (h.Reset(DecodeRfc2047(InetGetHeaderField(Headers, "Cc"))))
+				if (h = LDecodeRfc2047(LGetHeaderField(Headers, "Cc")))
 				{
 					List<char> Addr;
 					TokeniseStrList(h, Addr, ",");
