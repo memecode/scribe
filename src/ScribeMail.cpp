@@ -7782,7 +7782,8 @@ void Mail::DeleteAsSpam(LView *View)
 			if (ServerUid.Str())
 			{
 				a->Receive.DeleteAsSpam(ServerUid.Str());
-				SetServerUid(ServerUid = NULL);
+				ServerUid.Empty();
+				SetServerUid(ServerUid);
 			}
 			else
 			{
@@ -10268,22 +10269,17 @@ bool CreateMailHeaders(ScribeWnd *App, LStream &Out, LDataI *Mail, MailProtocol 
 	}
 
 	// Subject:
-	char *Subj = EncodeRfc2047(NewStr(Mail->GetStr(FIELD_SUBJECT)), 0, &Protocol->CharsetPrefs, 9);
-	sprintf_s(Buffer, sizeof(Buffer), "Subject: %s\r\n", (Subj) ? Subj : "");
+	auto Subj = LEncodeRfc2047(Mail->GetStr(FIELD_SUBJECT), 0, &Protocol->CharsetPrefs, 9);
+	sprintf_s(Buffer, sizeof(Buffer), "Subject: %s\r\n", Subj ? Subj.Get() : "");
 	Status &= Out.Write(Buffer, strlen(Buffer)) > 0;
-	DeleteArray(Subj);
 
 	// DispositionNotificationTo
 	uint8_t DispositionNotificationTo = TestFlag(Mail->GetInt(FIELD_FLAGS), MAIL_READ_RECEIPT);
 	if (DispositionNotificationTo && From)
 	{
 		int ch = sprintf_s(Buffer, sizeof(Buffer), "Disposition-Notification-To:");
-		char *Nme = EncodeRfc2047(NewStr(From->GetStr(FIELD_NAME)), 0, &Protocol->CharsetPrefs);
-		if (Nme)
-		{
-			ch += sprintf_s(Buffer+ch, sizeof(Buffer)-ch, " \"%s\"", Nme);
-			DeleteArray(Nme);
-		}
+		if (auto Nme = LEncodeRfc2047(From->GetStr(FIELD_NAME), 0, &Protocol->CharsetPrefs))
+			ch += sprintf_s(Buffer+ch, sizeof(Buffer)-ch, " \"%s\"", Nme.Get());
 		ch += sprintf_s(Buffer+ch, sizeof(Buffer)-ch, " <%s>\r\n", From->GetStr(FIELD_EMAIL));
 		Status &= Out.Write(Buffer, ch) > 0;
 	}

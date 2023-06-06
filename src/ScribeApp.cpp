@@ -6108,10 +6108,6 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 	}
 	
 	PourAll();
-	#ifdef LINUX
-	LYield();
-	#endif
-
 	d->LastLayout = Mode;
 }
 

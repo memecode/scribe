@@ -1408,7 +1408,8 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 					    Log->Print("\tACTION_DELETE - Setting '%s' to be deleted on the server (Uid=%s)\n", m->GetSubject(), Uid.Str());
 					    
 					a->Receive.DeleteAsSpam(Uid.Str());
-					m->SetServerUid(Uid = NULL);
+					Uid.Empty();
+					m->SetServerUid(Uid);
 				}
 				else
 				{

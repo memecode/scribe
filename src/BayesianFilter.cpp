@@ -1840,7 +1840,7 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 					a.Length(Size+1);
 					t->Log.Read(&a[0], Size);
 					a[Size] = 0;
-					OnBayesAnalyse(&a[0], t->WhiteListed ? t->FromAddr : NULL);
+					OnBayesAnalyse(&a[0], t->WhiteListed ? t->FromAddr : LString());
 				}
 				else if (t->MsgRef)
 				{

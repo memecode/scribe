@@ -584,7 +584,7 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 };
 
 ScribeExportTask::ScribeExportTask(ScribeExportDlg *dlg) :
-	FolderTask(dlg->Dst.Root, LAutoPtr<LStreamI>(NULL), NULL, NULL),
+	FolderTask(dlg->Dst.Root, LAutoPtr<LStreamI>(NULL), LString(), NULL),
 	Dst(dlg->Dst),
 	SrcStore(dlg->SrcStore)
 {

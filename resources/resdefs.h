@@ -1279,6 +1279,6 @@
 #define IDM_TOOLS_MENU							41163
 #define IDM_REPLICATE							41164
 #define IDM_EXPORT								41165
-#define IDM_COPY								'copy'
-#define IDM_CUT									'cut '
-#define IDM_PASTE								'past'
+#define IDM_COPY								Lgi4CC("copy")
+#define IDM_CUT									Lgi4CC("cut ")
+#define IDM_PASTE								Lgi4CC("past")

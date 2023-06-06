@@ -668,7 +668,7 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 	}
 
 	auto ParentFolder = GetFolder();
-	auto Path = ParentFolder ? ParentFolder->GetPath() : NULL;
+	auto Path = ParentFolder ? ParentFolder->GetPath() : LString();
 
 	auto OnAllow = [this, t, Callback]()
 	{
@@ -1989,11 +1989,11 @@ void ScribeFolder::SetName(const char *Name, bool Encode)
 LString ScribeFolder::GetName(bool Decode)
 {
 	if (!GetObject())
-		return NULL;
+		return LString();
 
 	auto In = GetObject()->GetStr(FIELD_FOLDER_NAME);
 	if (!In)
-		return NULL;
+		return LString();
 
 	if (Decode)
 		return LUrlDecode(In);
