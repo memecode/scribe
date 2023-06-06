@@ -1,11 +1,12 @@
 #include "Scribe.h"
-#include "ReplicateDlg.h"
 #include "lgi/common/Combo.h"
 #include "lgi/common/List.h"
-#include "resdefs.h"
 #include "lgi/common/ListItemCheckBox.h"
 #include "lgi/common/ProgressDlg.h"
 #include "lgi/common/LgiRes.h"
+
+#include "ReplicateDlg.h"
+#include "resdefs.h"
 
 #define SECONDS					* 1000
 #define REPLICATE_TIMEOUT		(30 SECONDS)
@@ -183,20 +184,20 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	};
 
 	ScribeWnd *App;
-	int Folders, Items;
-	bool Types[MAGIC_MAX-MAGIC_BASE];
-	int Copied[MAGIC_MAX-MAGIC_BASE];
-	bool Recurse;
-	bool DeleteSourceOnSuccess;
+	int Folders = 0, Items = 0;
+	bool Types[MAGIC_MAX-MAGIC_BASE] = {};
+	int Copied[MAGIC_MAX-MAGIC_BASE] = {};
+	bool Recurse = true;
+	bool DeleteSourceOnSuccess = false;
 	LArray<WorkUnit> Work;
 	LAutoPtr<LDataStoreI> SrcStore, DstStore;
 	ReplicateDlg::AccountSpec SrcSpec, DstSpec;
 	LDataStoreI::StoreTrans Trans;
-	int TransLen;
-	bool RestartOnPulse;
-	bool PulseStarted;
-	uint64 LastEvent;
-	int UnitsTimedOut;
+	int TransLen = 0;
+	bool RestartOnPulse = false;
+	bool PulseStarted = false;
+	uint64 LastEvent = 0;
+	int UnitsTimedOut = 0;
 	LString OverviewMsg;
 	LString StatusMsg;
 
@@ -208,15 +209,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	{
 		App = app;
 		Recurse = true;
-		DeleteSourceOnSuccess = false;
-		LastEvent = 0;
-		Folders = 0;
-		Items = 0;
-		UnitsTimedOut = 0;
-		PulseStarted = false;
-		RestartOnPulse = false;
-		FailedWork = 0;
-		ZeroObj(Copied);
 		SetDescription("Loading...");
 
 		App->OnFolderTask(this, true);
@@ -555,7 +547,12 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 				// Setup an end transaction to commit outstanding data..
 				Work.New().Type = REndTransaction;
 
-				if (Type && Types[Type-MAGIC_BASE])
+				auto TypeIndex = (unsigned)Type - (unsigned)MAGIC_BASE;
+				if (TypeIndex <= 0 || TypeIndex >= CountOf(Types))
+				{
+					LAssert(!"Index out of range.");
+				}
+				else if (Types[TypeIndex])
 				{
 					int ExistsInDestination = 0;
 					

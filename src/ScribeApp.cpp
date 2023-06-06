@@ -7665,9 +7665,9 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				{
 					UnLoadFolders();
 					Dlg->StartProcess();
-					// Don't delete dialog... let it run
 				}
-				else delete dlg;
+				
+				delete dlg;
 			});
 			break;
 		}
