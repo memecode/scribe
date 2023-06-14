@@ -37,6 +37,9 @@
 			<Node File="../../libs/Btree/gbtree.cpp" Type="2" Platforms="15" />
 			<Node File="../../libs/Btree/hashtable.c" Type="2" Platforms="15" />
 			<Node File="../../libs/Btree/offsetlist.c" Type="2" Platforms="15" />
+			<Node File="../../libs/Btree/offsetlist.h" Type="3" Platforms="15" />
+			<Node File="../../libs/Btree/db_internal.h" Type="3" Platforms="15" />
+			<Node File="../../libs/Btree/config.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="WordStore" Type="1" Platforms="15" Id="1">
 			<Node File="../../../lgi/trunk/include/lgi/common/WordStore.h" Type="3" Platforms="15" />
@@ -392,8 +395,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>./scribe</Release>
 				</Linux>
 			</Executable>
-			<CCrossCompiler />
-			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -498,12 +499,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>../../libs/build-x64/libchardet</Debug>
 					<Release>../../libs/build-x64/libchardet</Release>
 				</All>
-				<Linux />
 			</LibraryPaths>
-			<TargetName>
-				<Linux />
-			</TargetName>
-			<ApplicationIcon />
 		</Build>
 		<Editor>
 			<TabSize>
@@ -518,26 +514,8 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
-			<CommentFile />
-			<CommentFunction />
 		</Editor>
-		<Advanced>
-			<PostBuildCommands>
-				<Linux />
-			</PostBuildCommands>
-			<OtherMakefileRules />
-		</Advanced>
-		<Debug>
-			<Arguments>
-				<All />
-			</Arguments>
-			<Environment />
-			<DebugAdmin />
-			<InitialDir />
-		</Debug>
-		<Remote>
-			<RemoteUri />
-			<RemotePass />
-		</Remote>
+		<Advanced />
+		<Debug />
 	</Settings>
 </Project>

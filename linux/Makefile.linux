@@ -722,9 +722,9 @@ clean :
 cleanall :
 	rm -rf $(BuildDir) $(Target)
 	@echo Cleaned $(BuildDir) $(Target)
-	+make -C "../../libs/aspell-0.60.6.1/linux" -f "Makefile.linux" clean
-	+make -C "../../libs/bzip2-1.0.6/linux" -f "Makefile.linux" clean
-	+make -C "../../../lgi/trunk" -f "Makefile.linux" clean
+	+make -C "../../libs/aspell-0.60.6.1/linux" -f ./Makefile.linux clean
+	+make -C "../../libs/bzip2-1.0.6/linux" -f ./Makefile.linux clean
+	+make -C "../../../lgi/trunk" -f ./linux/Makefile.linux clean
 
 VPATH=$(BuildDir) \
 	../utils/Tables \

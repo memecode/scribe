@@ -762,7 +762,7 @@ public:
 	ScribeWnd		*App;
 	
 	uint64          LastTs = 0;
-	int				ClipboardFormat = 0;
+	LClipBoard::FormatType ClipboardFormat = 0;
 	LFont			*PreviewFont = NULL;
 	int				PrintMaxPages = -1;
 	int				NewMailTimeout = -1;
