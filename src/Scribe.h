@@ -112,9 +112,12 @@ enum LScriptCallbackType
 struct LScript;
 struct LScriptCallback
 {
+	static constexpr int INVALID_CALLBACK = 0;
+
 	LScriptCallbackType Type = LCallbackNull;
 	LScript *Script = NULL;
 	LFunctionInfo *Func = NULL;
+	int Uid = INVALID_CALLBACK;
 	int Param = 0;
 	double fParam = 0.0;
 	LVariant Data;
@@ -260,7 +263,8 @@ public:
 
 	// Callbacks
 	bool AddToolsMenuItem(LScriptArguments &Args);
-	bool AddCallback(LScriptArguments &Args);
+	bool AddCallback(LScriptArguments& Args);
+	bool RemoveCallback(LScriptArguments& Args);
 
 	// UI
 	bool MenuAddItem(LScriptArguments &Args);
@@ -2526,7 +2530,8 @@ public:
 	// Scripting support
 	bool GetScriptCallbacks(LScriptCallbackType Type, LArray<LScriptCallback*> &Callbacks);
 	LScriptCallback GetCallback(const char *CallbackMethodName);
-	bool RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args);
+	int RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args);
+	bool RemoveCallback(int Uid);
 	LStream *ShowScriptingConsole();
 	bool ExecuteScriptCallback(LScriptCallback &c, LScriptArguments &Args, bool ReturnArgs = false);
 	LScriptEngine *GetScriptEngine();

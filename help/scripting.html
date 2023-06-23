@@ -199,6 +199,7 @@ function Main(App)
 				<div class=desc>
 					Adds a callback to a specific handler. Multiple callbacks can be installed for the same
 					handler. Handlers call the callbacks in the order they were installed.<br>
+					The return value is a postive integer callback ID or zero on failure.<br>
 					<br>
 					Available callback handlers:
 					<ul>
@@ -299,7 +300,11 @@ function Main(App)
 						<li> <i style='color: grey'>(if you want something added here, ask the <a href="mailto:fret@memecode.com">author</a>)</i></li>
 					</ul>
 				</div>
-			<li> <method>MenuAddItem</method>(<arg>Menu</arg>,
+				<li> <method>RemoveCallback</method>(<arg>id</arg>)
+					<div class=desc>
+						Removes a callback using it's identifier returned from AddCallback.<br>
+					</div>
+				<li> <method>MenuAddItem</method>(<arg>Menu</arg>,
 												<arg>Icon</arg>,
 												<arg>LabelTxt</arg>,
 												<arg>Position</arg>,

@@ -779,6 +779,16 @@ bool LScribeScript::AddCallback(LScriptArguments &Args)
 	return true;
 }
 
+bool LScribeScript::RemoveCallback(LScriptArguments& Args)
+{
+	ARG_CHECK(!= , 1);
+
+	auto Uid = Args.Int32At(0);
+	*Args.GetReturn() = App->RemoveCallback(Uid);
+
+	return true;
+}
+
 // MenuAddItem(SubMenu, IconIndex/File, LabelText, Position, CallbackMethod, CallbackId)
 bool LScribeScript::MenuAddItem(LScriptArguments &Args)
 {
@@ -954,6 +964,7 @@ LHostFunc Methods[] =
 
 	DefFn(AddToolsMenuItem),
 	DefFn(AddCallback),
+	DefFn(RemoveCallback),
 
 	DefFn(MenuAddItem),
 	DefFn(MenuAddSubmenu),

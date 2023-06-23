@@ -331,7 +331,6 @@ enum ScribeMessages
 	M_GNUPG_DECRYPT,			// LAutoPtr<GpgDecryptResponse> Resp( (GpgDecryptResponse*)Msg->A() );
 	M_RESIZE_IMAGE,				// LAutoPtr<ImageResizeThread::Job> Job((ImageResizeThread::Job*)Msg->A());
 	M_SCRIBE_IDLE,
-	M_REPLICATE_NEXT,
 	M_EXPORT_NEXT,
 	M_DELETE_STYLE,
 	M_GET_USER_INPUT,			// (UserInput*)MsgA(m)

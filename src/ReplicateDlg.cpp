@@ -183,7 +183,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		}
 	};
 
-	ScribeWnd *App;
+	ScribeWnd *App = NULL;
 	int Folders = 0, Items = 0;
 	bool Types[MAGIC_MAX-MAGIC_BASE] = {};
 	int Copied[MAGIC_MAX-MAGIC_BASE] = {};
@@ -194,21 +194,18 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	ReplicateDlg::AccountSpec SrcSpec, DstSpec;
 	LDataStoreI::StoreTrans Trans;
 	int TransLen = 0;
-	bool RestartOnPulse = false;
-	bool PulseStarted = false;
 	uint64 LastEvent = 0;
 	int UnitsTimedOut = 0;
 	LString OverviewMsg;
 	LString StatusMsg;
 
 	// Error handling..
-	int FailedWork;
+	int FailedWork = 0;
 	LStringPipe ErrorLog;
 
 	ScribeReplicator(ScribeWnd *app) : LProgressDlg(app)
 	{
 		App = app;
-		Recurse = true;
 		SetDescription("Loading...");
 
 		App->OnFolderTask(this, true);
@@ -228,8 +225,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	{
 		switch (Msg->Msg())
 		{
-			case M_REPLICATE_NEXT:
-				return DoNext();
 			case M_STORAGE_EVENT:
 			{
 				LDataStoreI *Store = (LDataStoreI*)Msg->A();
@@ -335,11 +330,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	{
 		if (Work.Length() == 0)
 			return OnFinish();
-		if (!PulseStarted)
-		{
-			SetPulse(60);
-			PulseStarted = true;
-		}
 	
 		uint64 Start = LCurrentTime();
 		LastEvent = Start;
@@ -363,7 +353,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		if (DelayedCopies + DelayedSaves >= MAX_DELAYED_UNITS ||
 			DelayedCreate > 0)
 		{
-			RestartOnPulse = true;
 			return true;
 		}
 		
@@ -387,7 +376,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		
 		if (!w)
 		{
-			RestartOnPulse = true;
 			#if DEBUG_LOGGING
 			LgiTrace("%s:%i - DoNext all remaining delayed (%i/%i)\n", _FL, DelayedCopies, DelayedSaves);
 			#endif
@@ -405,7 +393,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 			{
 				// Just wait for it to be created...
 				LAssert(w->Delayed);
-				RestartOnPulse = true;			
 				return true;
 			}
 			case RDeleteFolder:
@@ -431,7 +418,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 				if (Cs->Ok + Cs->Errors < Cs->Total)
 				{
 					// Go into wait mode...
-					RestartOnPulse = true;
 					return true;
 				}
 				
@@ -475,7 +461,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 					
 					StatusMsg.Printf("Waiting folder %s", f->GetStr(FIELD_FOLDER_NAME));
 					UpdateMsg();
-					RestartOnPulse = true;
 					return true;
 				}
 				
@@ -773,7 +758,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 						// We should get an OnChange event when it loads...
 						w->Delayed = true;
 						w->Ts = LCurrentTime();
-						RestartOnPulse = true;
 						return true;
 					}
 					else if (State != Store3Loaded)
@@ -809,7 +793,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 					
 					StatusMsg.Printf("Waiting for IMAP connection");
 					UpdateMsg();
-					RestartOnPulse = true;
 					return true;
 				}
 				
@@ -866,11 +849,10 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		if (Length >= 50)
 		{
 			// This leaves a air gap for messages to be processed normally.
-			RestartOnPulse = true;			
 			return true;
 		}
 		
-		return PostEvent(M_REPLICATE_NEXT);
+		return true;
 	}
 	
 	void UpdateMsg()
@@ -956,12 +938,8 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		
 		if (UnitsTimedOut != Prev)
 			UpdateMsg();
-		
-		if (RestartOnPulse)
-		{
-			RestartOnPulse = false;
-			PostEvent(M_REPLICATE_NEXT);
-		}
+
+		LProgressDlg::OnPulse();
 	}
 
 	bool StartProcess(LDataFolderI *Dst, LDataFolderI *Src, bool recurse, bool deleteSourceOnSuccess, LArray<uint32_t> *types)
@@ -1003,9 +981,8 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		w = &Work.New();
 		w->Type = RCountSource;
 		w->Folder1.Folder = Src;
-		
-		// Start the event cycle
-		return PostEvent(M_REPLICATE_NEXT);
+
+		return true;
 	}
 
 	bool StartProcess(ReplicateDlg::ReplicateSettings *Settings)
@@ -1043,8 +1020,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		w->Open.Store = &DstStore;
 		w->Open.Spec = &DstSpec;
 
-		// Start the event cycle
-		return PostEvent(M_REPLICATE_NEXT);
+		return true;
 	}
 
 	Store3Status Open(LAutoPtr<LDataStoreI> *Out, ReplicateDlg::AccountSpec &Acc)

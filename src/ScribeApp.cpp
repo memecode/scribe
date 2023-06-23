@@ -823,6 +823,7 @@ public:
 	LArray<LScript*> CurrentScripts;
 	LScript *CurrentScript() { return CurrentScripts.Length() ? CurrentScripts.Last() : NULL; }
 	int NextToolMenuId = IDM_TOOL_SCRIPT_BASE;
+	int NextScriptUid = 1000;
 	LAutoPtr<LScriptUi> ScriptToolbar;
 	LArray<LScriptCallback*> OnSecondTimerCallbacks;
 
@@ -2049,20 +2050,20 @@ LScriptCallback ScribeWnd::GetCallback(const char *CallbackMethodName)
 	return Cb;
 }
 
-bool ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args)
+int ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args)
 {
 	if (!d->CurrentScript())
 	{
 		LgiTrace("%s:%i - No current script.\n", _FL);
-		return false;
+		return LScriptCallback::INVALID_CALLBACK;
 	}
 
-	char *Fn = Args[1]->Str();
-	LScriptCallback Cb = GetCallback(Fn);
+	auto Fn = Args[1]->Str();
+	auto Cb = GetCallback(Fn);
 	if (!Cb.Func)
 	{
 		LgiTrace("%s:%i - No callback '%s'.\n", _FL, Fn);
-		return false;
+		return LScriptCallback::INVALID_CALLBACK;
 	}
 
 	switch (Type)
@@ -2074,11 +2075,12 @@ bool ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Arg
 			if (!Menu || !Fn || !Cur)
 			{
 				LgiTrace("%s:%i - menu=%s, fn=%s.\n", _FL, Menu, Fn);
-				return false;
+				return LScriptCallback::INVALID_CALLBACK;
 			}
 
 			LScriptCallback &c = Cur->Callbacks.New();
 			c = Cb;
+			c.Uid = d->NextScriptUid++;
 			c.Type = Type;
 			c.Param = d->NextToolMenuId;
 
@@ -2094,7 +2096,7 @@ bool ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Arg
 				ToolSub->AppendItem(Menu, c.Param, true);			
 				d->NextToolMenuId++;
 			}
-			break;
+			return c.Uid;
 		}
 		case LThingContextMenu:
 		case LFolderContextMenu:
@@ -2114,18 +2116,53 @@ bool ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Arg
 			LScriptCallback &c = Cur->Callbacks.New();
 			c = Cb;
 			c.Type = Type;
+			c.Uid = d->NextScriptUid++;
 			if (Args.Length() > 2)
 				c.Data = *Args[2];
-			break;
+			return c.Uid;
 		}
 		default:
 		{
 			LAssert(!"Not a known callback type");
-			return false;
+			break;
 		}
 	}
 
-	return true;
+	return LScriptCallback::INVALID_CALLBACK;
+}
+
+bool ScribeWnd::RemoveCallback(int Uid)
+{
+	for (auto script: d->Scripts)
+	{
+		for (unsigned i=0; i<script->Callbacks.Length(); i++)
+		{
+			auto &cb = script->Callbacks[i];
+			if (cb.Uid == Uid)
+			{
+				if (cb.Type == LOnTimer)
+				{
+					for (auto timer: d->OnSecondTimerCallbacks)
+					{
+						if (timer->Uid == Uid)
+						{
+							bool removed = d->OnSecondTimerCallbacks.Delete(timer);
+							if (!removed)
+							{
+								LAssert(!"Remove failed.");
+								return false;
+							}
+						}
+					}
+				}
+
+				script->Callbacks.DeleteAt(i);
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 bool ScribeWnd::GetScriptCallbacks(LScriptCallbackType Type, LArray<LScriptCallback*> &Callbacks)
@@ -3167,6 +3204,46 @@ bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 			new ScriptDownloadContentThread(this, Uri, Callback, UserData);
 			*Args.GetReturn() = true;
 			return true;
+		}
+		case SdReplicate: // Type(SourceFolders, DestFolders)
+		{
+			auto Src = Args.StringAt(0);
+			auto Dst = Args.StringAt(1);
+			if (!Src || !Dst)
+			{
+				*Args.GetReturn() = "Param error";
+				break;
+			}
+
+			auto CastDataFolder = [this](const char *name) -> LDataFolderI*
+			{
+				auto Ms = GetMailStoreForPath(name);
+				if (!Ms)
+					return NULL;
+				if (!Ms->Root)
+					return NULL;
+				auto obj = Ms->Root->GetObject();
+				return dynamic_cast<LDataFolderI*>(obj);
+			};
+
+			auto SrcFolder = CastDataFolder(Src);
+			auto DstFolder = CastDataFolder(Dst);
+			if (!SrcFolder || !DstFolder)
+			{
+				*Args.GetReturn() = "Couldn't find both root folders";
+				break;
+			}
+			
+			LArray<uint32_t> Types;
+			Types.Add(MAGIC_MAIL);
+			auto status = Store3ReplicateFolders(this,
+												DstFolder,
+												SrcFolder,
+												true,
+												false,
+												&Types);
+			*Args.GetReturn() = status >= Store3Delayed;
+			break;
 		}
 		default:
 		{
@@ -4402,8 +4479,7 @@ void ScribeWnd::DoOnTimer(LScriptCallback *c)
 
 			LVirtualMachine Vm;
 			LScriptArguments Args(&Vm);
-			LVariant This((LDom*)this);
-			Args.Add(&This);
+			Args.Add(new LVariant((LDom*)this));
 			ExecuteScriptCallback(*c, Args);
 		}
 	}
