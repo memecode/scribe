@@ -153,7 +153,7 @@ else:
 
 print("\nBuilding Scribe:")
 if isMac:
-	args = ["xcodebuild", "-project", "MacCocoa/Scribe.xcodeproj"]
+	args = ["xcodebuild", "-project", "mac/Scribe.xcodeproj"]
 elif isWin:
 	vs2019 = "c:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\devenv.com"
 	args = [vs2019, os.path.join(trunk, "Windows\Scribe_vs2019.sln"), "/Build", "Debug"]

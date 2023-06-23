@@ -215,7 +215,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = EB83EFB8550140F6BC4261D3;
+			remoteGlobalIDString = 5E1C8B9622EA4278B15F2018;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -334,21 +334,21 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 4AC91E65C6B84B15A538AC46;
+			remoteGlobalIDString = B0CAA624B81B4C4DBAB27A1A;
 			remoteInfo = libjpeg9a;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 53A329659F1D496694D5AA3C;
+			remoteGlobalIDString = 378CD3C1F4CC48539EB29497;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 6DE831693BDA490B9E3A04FD;
+			remoteGlobalIDString = BE7E8891BBF243839FEC8DE3;
 			remoteInfo = libiconv;
 		};
 		34E7C47429DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
@@ -1880,9 +1880,8 @@
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
 					"../../../../codelib/libjpeg-9a",
+					../../../../codelib/openssl/include,
 					../../../../codelib/libpng,
-					"/usr/local/Cellar/openssl@1.1/1.1.1q/include",
-					/opt/local/libexec/openssl11/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1930,9 +1929,8 @@
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
 					"../../../../codelib/libjpeg-9a",
+					../../../../codelib/openssl/include,
 					../../../../codelib/libpng,
-					"/usr/local/Cellar/openssl@1.1/1.1.1q/include",
-					/opt/local/libexec/openssl11/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";

@@ -1866,9 +1866,10 @@ void ScribeWnd::LoadImageResources()
 	}
 
 	ToolbarImgs.Reset(LLoadImageList(GetResourceFile(ResToolbarFile)));
-	ImageList.Reset(LLoadImageList(GetResourceFile(ResIconsFile)));
+    auto IconsFile = GetResourceFile(ResIconsFile);
+	ImageList.Reset(LLoadImageList(IconsFile));
 	if (!ImageList)
-		LgiTrace("%s:%i - Failed to load toolbar image ('xgate-icons-32.png' or 'Toolbar-24.png')\n", _FL);
+		LgiTrace("%s:%i - Failed to load toolbar image ('%s')\n", _FL, IconsFile.Get());
 }
 
 int ScribeWnd::GetEventHandle()
