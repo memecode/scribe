@@ -26,7 +26,13 @@
 const char *AccountStatusTxt[] = { "Idle", "Connected", "Waiting", "Error" };
 
 ////////////////////////////////////////////////////////////////////////////
+
+#if 1
+typedef LThreadSafeTextView<LTextView3> LAccountLogParent;
+#else
 typedef LThreadSafeTextView<LTextView4> LAccountLogParent;
+#endif
+
 class LAccountLog : public LAccountLogParent
 {
 	LArray<uint32_t> Rgb;
