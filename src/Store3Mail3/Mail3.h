@@ -347,6 +347,8 @@ public:
 
 	LMail3Store(const char *Mail3Folder, LDataEventsI *Callback, bool Create);
 	~LMail3Store();
+		
+	const char *GetClass() override { return "LMail3Store"; }
 
 	int64 GetFolderId(char *Path);
 	LDataEventsI *GetEvents() { return Callback; }
@@ -529,6 +531,8 @@ class LMail3Attachment : public Store3Attachment<LMail3Store, LMail3Mail, LMail3
 public:
 	LMail3Attachment(LMail3Store *store);
 	~LMail3Attachment();
+	
+	const char *GetClass() override { return "LMail3Attachment"; }
 
 	void SetInMemoryOnly(bool b);
 	int64 GetId() { return SegId; }

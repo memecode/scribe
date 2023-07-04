@@ -475,6 +475,8 @@ public:
 		while (!IsExited())
 			LSleep(1);
 	}
+	
+	const char *GetClass() override { return "MailRendererScript"; }
 
 	int Main()
 	{

@@ -41,6 +41,7 @@ public:
 	Store3Addr(LDataStoreI *store, LDataPropI *i = NULL);	
 	~Store3Addr();
 
+	const char *GetClass() override { return "Store3Addr"; }
 	Store3CopyDecl;
 
 	void SetStore(LDataStoreI *s);
@@ -61,7 +62,8 @@ public:
 	int32 Id, Width;
 
 	Store3Field(LDataStoreI *Store, int id = 0, int width = 100);
-
+	
+	const char *GetClass() override { return "Store3Field"; }
 	LDataPropI &operator =(LDataPropI &p) { LAssert(0); return *this; }
 
 	const char *GetStr(int id);

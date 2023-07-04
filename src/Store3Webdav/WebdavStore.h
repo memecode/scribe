@@ -36,6 +36,8 @@ protected:
 public:
 	WebdavStore(ScribeWnd *a, LDataEventsI *cb, LString optsPath);
 	~WebdavStore();
+	
+	const char *GetClass() override { return "WebdavStore"; }
 
 	// Actions
 	/*
@@ -89,6 +91,7 @@ protected:
 public:
 	WebdavObj(WebdavStore *store) { Store = store; Parent = NULL; }
 
+	const char *GetClass() override { return "WebdavObj"; }
 	const char *GetHref() { return Href; }
 	virtual void FireOnChange(int Fld) {}
 	virtual bool ConvertToText() { return false; }
@@ -120,6 +123,8 @@ class WebdavFld : public LDataPropI
 
 public:
 	WebdavFld(LDataStoreI *s, WebdavFolder *p = 0, int id = 0, int width = 100);
+	
+	const char *GetClass() override { return "WebdavFld"; }
 	const char *GetStr(int id);
 	int64 GetInt(int id);
 	Store3Status SetInt(int id, int64 i);
@@ -147,6 +152,7 @@ public:
 
 	WebdavFolder(WebdavStore *store, WebdavFolder *parent = NULL);
 
+	const char *GetClass() override { return "WebdavFolder"; }
 	LString AllocateAddress();
 
 	// LDataPropI impl
@@ -225,6 +231,8 @@ class WebdavCalendar : public WebdavObj
 
 public:
 	WebdavCalendar(WebdavStore *store, WebdavEvent *e);
+
+	const char *GetClass() override { return "WebdavCalendar"; }
 
 	void FireOnChange(int Fld);
 	bool ConvertToText();
@@ -313,6 +321,8 @@ class WebdavContact : public WebdavObj
 
 public:
 	WebdavContact(WebdavStore *store, WebdavEvent *e);
+
+	const char *GetClass() override { return "WebdavContact"; }
 
 	void FireOnChange(int Fld);
 	bool ConvertToText();

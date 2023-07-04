@@ -711,6 +711,8 @@ public:
 	NoContactType(ScribeWnd *wnd) : Contact(wnd)
 	{
 	}
+	
+	const char *GetClass() override { return "NoContactType"; }
 
 	Thing &operator =(Thing &c) override
 	{
@@ -884,6 +886,8 @@ public:
 		Engine.Reset();
 		DeleteObj(LScribeScript::Inst);
 	}
+	
+	const char *GetClass() override { return "ScribeWndPrivate"; }
 
 	LGrowl *GetGrowl()
 	{

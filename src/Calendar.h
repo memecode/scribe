@@ -113,6 +113,8 @@ public:
 	// Object
 	Calendar(ScribeWnd *app, LDataI *object = 0);
 	~Calendar();
+	
+	const char *GetClass() override { return "Calendar"; }
 
 	// Properties
 	Store3ItemTypes Type() override { return MAGIC_CALENDAR; }

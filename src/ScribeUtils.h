@@ -232,6 +232,8 @@ public:
 		AccountTag = accountTag;
 	}
 	
+	const char *GetClass() override { return "ProtocolSettingStore"; }
+	
 	LOptionsFile *GetOptions()
 	{
 		return Opts;

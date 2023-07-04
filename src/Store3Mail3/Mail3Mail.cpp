@@ -1491,6 +1491,7 @@ public:
 		Len = len < 0 && s ? MaxLen : MIN(MaxLen, len); 
 	}
 
+	const char *GetClass() override { return "LSubStream"; }
 	bool IsOpen() { return true; }
 	int Close()
 	{

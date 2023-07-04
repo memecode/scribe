@@ -228,6 +228,7 @@ public:
 				LAutoPtr<ProtocolSettingStore> store);
 	~ImapStore();
 
+	const char *GetClass() override { return "ImapStore"; }
 	void PostStore(ImapMsg *m) { Callback->Post(this, m); }
 	bool PostThread(ImapMsg *m, bool UiPriority);
 
@@ -293,6 +294,7 @@ public:
 	ImapAttachment(ImapStore *store, ImapMail *mail, LDataPropI *att);
 	~ImapAttachment();
 
+	const char *GetClass() override { return "ImapAttachment"; }
 	void SetInMemoryOnly(bool b);
 
 	Store3CopyDecl;
@@ -375,6 +377,8 @@ public:
 	ImapMail(ImapStore *store, const char *file = NULL, int line = 0, uint32_t uid = 0);
 	~ImapMail();
 
+	const char *GetClass() override { return "ImapMail"; }
+	
 	void SetState(ImapMailState s);
 	void SetRemoteFlags(ImapMailFlags f);
 	bool IsOrphan() override { return Parent == 0; }
@@ -521,6 +525,7 @@ public:
 	ImapFolder(ImapStore *store, const char *path = 0);
 	~ImapFolder();
 
+	const char *GetClass() override { return "ImapFolder"; }
 	Store3CopyDecl;
 
 	bool IsOrphan() override { return _Parent == NULL; }

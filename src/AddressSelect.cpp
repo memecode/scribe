@@ -281,6 +281,8 @@ public:
 		Dirty = false;
 	}
 	
+	const char *GetClass() override { return "AddressBrowsePluginResults"; }
+	
 	bool CallMethod(const char *MethodName, LScriptArguments &Args)
 	{
 		for (unsigned i=0; i<Args.Length(); i++)

@@ -16,6 +16,8 @@ public:
 	RecipientItem(Contact *contact);
 	RecipientItem(ContactGroup *group);
 
+	const char *GetClass() override { return "RecipientItem"; }
+
 	// Name
 	const char *GetName();
 	const char *GetFirst();
@@ -56,6 +58,8 @@ public:
 
 	~ListAddr();
 	void _Delete();
+	
+	const char *GetClass() override { return "ListAddr"; }
 
 	void CopyFrom(AddressDescriptor &a);
 	ListAddr &operator =(AddressDescriptor &a) { CopyFrom(a); return *this; }

@@ -187,6 +187,8 @@ public:
 	{
 		Subs.DeleteObjects();
 	}
+	
+	const char *GetClass() override { return "LScriptUi"; }
 
 	bool GetVariant(const char *Name, LVariant &Value, const char *Arr = NULL) override
 	{
@@ -657,6 +659,8 @@ public:
 	Attachment(ScribeWnd *App, LDataI *object, const char *import = 0);
 	~Attachment();
 
+	const char *GetClass() override { return "Attachment"; }
+
 	bool ImportFile(const char *FileName);
 	bool ImportStream(const char *FileName, const char *MimeType, LAutoStreamI Stream);
 
@@ -727,6 +731,8 @@ public:
 
 	Contact(ScribeWnd *app, LDataI *object = 0);
 	~Contact();
+	
+	const char *GetClass() override { return "Contact"; }
 
 	LDATA_STR_PROP(First, FIELD_FIRST_NAME);
 	LDATA_STR_PROP(Last, FIELD_LAST_NAME);
@@ -803,6 +809,8 @@ public:
 
 	ContactGroup(ScribeWnd *app, LDataI *object = 0);
 	~ContactGroup();
+
+	const char *GetClass() override { return "ContactGroup"; }
 
 	// operators
 	Thing &operator =(Thing &c) override;
@@ -1014,6 +1022,8 @@ public:
 	Mail(ScribeWnd *app, LDataI *object = 0);
 	~Mail();
 
+	const char *GetClass() override { return "Mail"; }
+	
 	bool SetObject(LDataI *o, bool InDataDestuctor, const char *File, int Line) override;
 
 	LDATA_STR_PROP(Label, FIELD_LABEL);
@@ -1249,6 +1259,7 @@ public:
 	~ScribeFolder();
 
 	// Object
+	const char *GetClass() override { return "ScribeFolder"; }
 	LArray<int> &GetFieldArray() { return FieldArray; }
 	LDataFolderI *GetFldObj() { return dynamic_cast<LDataFolderI*>(GetObject()); }
 	bool SetObject(LDataI *o, bool InDataDestuctor, const char *File, int Line) override;
@@ -1410,6 +1421,8 @@ public:
 	// Methods
 	FilterAction(LDataStoreI *Store);
 	~FilterAction();
+	
+	const char *GetClass() override { return "FilterAction"; }
 
 	bool Set(LXmlTag *t);
 	bool Get(LXmlTag *t);
@@ -1461,6 +1474,8 @@ protected:
 public:
 	Filter(ScribeWnd *app, LDataI *object = 0);
 	~Filter();
+	
+	const char *GetClass() override { return "Filter"; }
 
 	LDATA_STR_PROP(Name, FIELD_FILTER_NAME);
 	LDATA_STR_PROP(ConditionsXml, FIELD_FILTER_CONDITIONS_XML);
@@ -2078,6 +2093,8 @@ public:
 	ScribeAccount(ScribeWnd *parent, int index);
 	~ScribeAccount();
 
+	const char *GetClass() override { return "ScribeAccount"; }
+
 	// Lifespan
 	bool IsValid();
 	bool Create();
@@ -2132,6 +2149,8 @@ public:
 	Filter *Fil;
 
 	ScribeDom(ScribeWnd *a);
+	
+	const char *GetClass() override { return "ScribeDom"; }
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = 0);
 };
 

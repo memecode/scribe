@@ -1242,6 +1242,8 @@ public:
 	FilterScribeDom(ScribeWnd *a) : ScribeDom(a)
 	{
 	}
+	
+	const char *GetClass() override { return "FilterScribeDom"; }
 
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = 0)
 	{
