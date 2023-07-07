@@ -299,6 +299,7 @@ public:
 
 	Store3CopyDecl;
 
+	const char *GetClass() override { return "LMapiAddr"; }
 	const char *GetStr(int id);
 	Store3Status SetStr(int id, const char *str);
 	int64 GetInt(int id);
@@ -321,6 +322,8 @@ public:
 
 	LMapiThing(LMapiStore *store);	
 	~LMapiThing();
+
+	const char* GetClass() override { return "LMapiThing"; }
 
 	virtual void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst) {}
 	virtual LPMESSAGE Handle() { return MapiMsg; }
@@ -357,6 +360,8 @@ class LMapiAttachment :
 public:
 	LMapiAttachment(LMapiStore *store);
 	~LMapiAttachment();
+
+	const char* GetClass() override { return "LMapiAttachment"; }
 
 	LPATTACH Handle();
 	bool Set(LMapiMail *mail, ScribeMapiList *Lst);
@@ -524,6 +529,8 @@ public:
 	LMapiFolderField(LMapiStore *store);
 	~LMapiFolderField();
 
+	const char* GetClass() override { return "LMapiFolderField"; }
+
 	// LDataPropI API
 	LDataPropI &operator =(LDataPropI &p);
 	const char *GetStr(int id);
@@ -561,6 +568,8 @@ class LMapiFolder : public LDataFolderI, public LMapiBase
 public:
 	LMapiFolder(LMapiStore *store);
 	~LMapiFolder();
+
+	const char* GetClass() override { return "LMapiFolder"; }
 
 	bool Set(LPMAPIFOLDER f);
 	bool Set(LMapiFolder *parent, ScribeMapiList *Lst);
@@ -787,6 +796,8 @@ public:
 				uint64 accountId,
 				LDataEventsI *callback);
 	~LMapiStore();
+
+	const char* GetClass() override { return "LMapiStore"; }
 
 	// Util
 	IMsgStore *Handle() { return MsgStore; }
