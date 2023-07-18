@@ -220,9 +220,6 @@ public:
 					AddMimeSeg(t->GetObj(FIELD_MIME_SEG), c, Size);
 				}
 			}
-
-            if (i % 30 == 0)
-			    LYield();
 		}
 
 		c.Add(1, Size);
@@ -238,7 +235,6 @@ public:
 		{
 			LDataFolderI *s = f->SubFolders()[n];
 			Count(s, c, depth + 1);
-			LYield();
 		}
 	}
 
@@ -246,8 +242,6 @@ public:
 	{
 		Counter c;
 
-		LYield();
-		
 		// Do count
 		LDataFolderI *f = Folder->GetFldObj();
 		c.Inc(f->Type());
@@ -259,7 +253,6 @@ public:
 			LDataI *t = Children[i];
 			c.Inc(t->Type());
 			c.Add(1, t->Size());
-			LYield();
 		}
 		
 		for (ScribeFolder *Child = Folder->GetChildFolder();
@@ -287,8 +280,6 @@ public:
 					Usage->Insert(i);
 				}
 			}
-
-			LYield();
 		}
 
 	    int64 Used = c.GetTypeCount(1); // 64 bytes in the header
@@ -305,7 +296,6 @@ public:
 			    char Str[32];
 			    sprintf_s(Str, sizeof(Str), "%.1f", (double)(int64)i->Size * 100 / Used );
 			    i->SetText(Str, 2);
-			    LYield();
 		    }
 
 		    // sort the items
