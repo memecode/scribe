@@ -289,9 +289,7 @@ public:
 	~AccountletThread();
 
 	// Methods
-	void Delete(int Index);
 	void Complete();		// Called by the app when the all the files have been processed
-	// void Cancel();			// Called by the app to signal the user is canceling the transfer
 	
 	// Thread
 	int Main();
@@ -316,15 +314,6 @@ void AccountletThread::SetState(AccountThreadState s)
 AccountThreadState AccountletThread::GetState()
 {
 	return Acc->GetState();
-}
-
-void AccountletThread::Delete(int Index)
-{
-	MailTransferEvent *e = Files[Index];
-	if (e)
-	{
-		e->Action = MailDelete;
-	}
 }
 
 void AccountletThread::Complete()
@@ -1891,7 +1880,6 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 	Params.MaxSize = DownloadLimit() << 10;
 
 	auto MailSourceType = ProtocolStrToEnum(Protocol().Str());
-	// auto Ms = GetApp()->GetDefaultMailStore();
 
 	LString Password;
 
@@ -1899,7 +1887,7 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 	GetPassword(&Psw);
 	Password = Psw.Get();
 
-	MailSource *Source = 0;
+	MailSource *Source = NULL;
 	LVariant RecHotFolder = HotFolder();
 	if (RecHotFolder.Str() && LDirExists(RecHotFolder.Str()))
 	{
