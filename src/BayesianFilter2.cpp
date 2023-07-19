@@ -470,7 +470,6 @@ LString BayesianFilter::MakeMailWordList(Mail *m)
 			while ( (Loaded = (Store3State)m->GetObject()->GetInt(FIELD_LOADED))  < Store3Loaded )
 			{
 				LSleep(1);
-				LYield();
 				Total = LCurrentTime() - Start; 
 				if (Total > TIMEOUT_BAYES_LOAD)
 					break;
@@ -583,7 +582,8 @@ bool BayesianFilter::BuildSpamDb()
 
 			prog.Value(prog.Value()+1);
 			Saved->Value(d->Saved);
-			if (prog.IsCancelled()) break; else LYield();
+			if (prog.IsCancelled())
+				break;
 		}
 
 		while (d->Training.Length())
@@ -592,7 +592,8 @@ bool BayesianFilter::BuildSpamDb()
 			s.Printf("hh: %i hs: %i sh: %i ss: %i", d->HamHam, d->HamSpam, d->SpamHam, d->SpamSpam);
 			Saved->SetDescription(s);
 			Saved->Value(d->Saved);			
-			if (prog.IsCancelled()) break; else LYield();
+			if (prog.IsCancelled())
+				break;
 			LSleep(1);
 		}
 
@@ -787,7 +788,6 @@ void BayesianFilter::BuildStats()
 			}
 
 			prog++;
-			LYield();
 			
 			// if (spamPred.Length() > 100) break;
 		}
@@ -801,7 +801,6 @@ void BayesianFilter::BuildStats()
 					inboxPred.Add(r);
 			}
 			(*inboxProg)++;
-			LYield();
 			
 			// if (inboxPred.Length() > 100) break;
 		}

@@ -1303,7 +1303,6 @@ bool ScribeFolder::LoadFolders()
 			int64 Now = LCurrentTime();
 			if (Now - Last > 500)
 			{
-				LYield();
 				Last = Now;
 			}
 			#endif
