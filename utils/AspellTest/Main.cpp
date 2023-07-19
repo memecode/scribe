@@ -78,7 +78,6 @@ int main(int args, char **arg)
 			printf("Put(%S)\n", Txt[i]);
 			Thread.Put(Wnd,0,1,LAutoWString(NewStrW(Txt[i])));
 			LSleep(LRand(500));
-			LYield();
 		}
 	}
 	return 0;

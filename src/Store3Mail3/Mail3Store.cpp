@@ -1444,8 +1444,6 @@ bool LMail3Store::DeleteMailById(int64 Id)
 			}
 			Thread.Unlock();
 		}
-				
-		LYield();
 	}
 			
 	Status = Thread.Return > 0;
