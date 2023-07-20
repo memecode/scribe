@@ -2460,7 +2460,7 @@ public:
 	void			HashContacts(LHashTbl<StrKey<char,false>,Contact*> &Contacts, ScribeFolder *Folder = 0, bool Deep = true);
 	
     // CapabilityInstaller impl
-    LAutoString     GetHttpProxy() override;
+    LString		     GetHttpProxy() override;
     InstallProgress *StartAction(MissingCapsBar *Bar, LCapabilityTarget::CapsHash *Components, const char *Action) override;
     
 	class HttpImageThread *GetImageLoader();

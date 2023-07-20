@@ -438,7 +438,7 @@ void IsSoftwareUpToDate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::func
 		IncBetas);
 }
 
-bool UpgradeSoftware(const LSoftwareUpdate::UpdateInfo *Info, ScribeWnd *Parent, bool WithUI)
+void UpgradeSoftware(const LSoftwareUpdate::UpdateInfo *Info, ScribeWnd *Parent, bool WithUI, std::function<void(bool)> Callback)
 {
 	bool DownloadUpdate = true;
 
@@ -458,13 +458,17 @@ bool UpgradeSoftware(const LSoftwareUpdate::UpdateInfo *Info, ScribeWnd *Parent,
 								IDYES;
 	}
 
-	if (!DownloadUpdate)
-		return false;
-
-	LAutoString Proxy = Parent->GetHttpProxy();
-	LSoftwareUpdate Update(AppName, SoftwareUpdateUri, Proxy, ScribeTempPath());
-	// FIXME:
-	return false; // Update.ApplyUpdate(Info, false, Parent);
+	if (DownloadUpdate)
+	{
+		auto Proxy = Parent->GetHttpProxy();
+		auto Update = new LSoftwareUpdate(AppName, SoftwareUpdateUri, Proxy, ScribeTempPath());
+		Update->ApplyUpdate(Info, false, Parent, [Update, Callback](auto Status)
+		{
+			if (Callback)
+				Callback(Status);
+			delete Update;
+		});
+	}
 }
 
 void SoftwareUpdate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function<void(bool goingToUpdate)> callback)
@@ -481,9 +485,7 @@ void SoftwareUpdate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function
 		}
 		else if (s == SwOutOfDate)
 		{
-			auto status = UpgradeSoftware(Info, Parent, WithUI);
-			if (callback)
-				callback(status); // update is going to happen
+			UpgradeSoftware(Info, Parent, WithUI, callback);
 		}
 	});
 }
@@ -2380,20 +2382,20 @@ LSpellCheck *ScribeWnd::GetSpellThread(bool OverrideOpt)
 	return d->SpellerThread;
 }
 
-LAutoString ScribeWnd::GetHttpProxy()
+LString ScribeWnd::GetHttpProxy()
 {
-	LAutoString Proxy;
+	LString Proxy;
 	
 	LVariant v;
 	if (GetOptions()->GetValue(OPT_HttpProxy, v) && ValidStr(v.Str()))
 	{
-		Proxy.Reset(v.ReleaseStr());
+		Proxy = v.Str();
 	}
 	else
 	{
 		LProxyUri p;
 		if (p.sHost)
-			Proxy.Reset(NewStr(p.ToString()));
+			Proxy = p.ToString();
 	}
 	
 	return Proxy;
@@ -2539,7 +2541,7 @@ HttpImageThread *ScribeWnd::GetImageLoader()
 {
 	if (!d->ImageLoader)
 	{
-		LAutoString Proxy = GetHttpProxy();
+		auto Proxy = GetHttpProxy();
 		d->ImageLoader = new HttpImageThread(this, Proxy, 0);
 	}
 
@@ -4639,8 +4641,11 @@ void ScribeWnd::OnHour()
 										[this](auto s, auto Info)
 										{
 											if (s == SwOutOfDate)
-												if (UpgradeSoftware(Info, this, true))
-													LCloseApp();
+												UpgradeSoftware(Info, this, true, [](auto status)
+												{
+													if (status)
+														LCloseApp();
+												});
 										});
 				}
 			}

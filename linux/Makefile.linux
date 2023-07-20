@@ -357,6 +357,7 @@ $(Target) : ../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).s
 	../libs/aspell-0.60.6.1/common/vararray.hpp \
 	../libs/aspell-0.60.6.1/common/vector.hpp \
 	../libs/aspell-0.60.6.1/common/word_list.hpp \
+	../libs/aspell-0.60.6.1/gen/settings.h \
 	../libs/aspell-0.60.6.1/gen/static_filters.src.cpp \
 	../libs/aspell-0.60.6.1/interfaces/cc/aspell.h \
 	../libs/aspell-0.60.6.1/interfaces/cc/pspell.h \
@@ -578,7 +579,6 @@ $(Target) : ../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).s
 	../../lgi/trunk/include/lgi/linux/Gtk/LgiOsDefs.h \
 	../../lgi/trunk/include/lgi/linux/Gtk/LgiWidget.h \
 	../../lgi/trunk/include/lgi/linux/Gtk/LgiWinManGlue.h \
-	../../lgi/trunk/include/lgi/linux/SymLookup.h \
 	../../lgi/trunk/include/lgi/mac/cocoa/LCocoaView.h \
 	../../lgi/trunk/include/lgi/mac/cocoa/LgiMac.h \
 	../../lgi/trunk/include/lgi/mac/cocoa/LgiOs.h \

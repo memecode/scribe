@@ -122,7 +122,7 @@ public:
 
     /// Gets the HTTP proxy to use.
     /// (As an alternative to passing it into the constructor)
-    virtual LAutoString GetHttpProxy() { return LAutoString(); }
+    virtual LString GetHttpProxy() { return LString(); }
     
     /// Start the install for a set of components
     virtual InstallProgress *StartAction(MissingCapsBar *Bar, LCapabilityTarget::CapsHash *Components, const char *Action);
