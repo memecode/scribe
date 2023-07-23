@@ -19,6 +19,8 @@ src\Resource.res
 x64ReleaseNoOptimize*
 x64Release*
 x64Debug*
+Debug*
+Release*
 
 test\Html\*.html
 test\Html\*.jpg

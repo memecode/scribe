@@ -159,7 +159,7 @@ elif isWin:
 	args = [vs2019, os.path.join(trunk, "Windows\Scribe_vs2019.sln"), "/Build", "Debug"]
 elif isLinux:
 	jobs = multiprocessing.cpu_count()
-	args = ["make", "-j", str(jobs), "-C", "linux", "-f", "Makefile.linux"]
+	args = ["make", "-j", str(jobs), "-f", "linux/Makefile.linux"]
 else:
 	print("Error: unsupported system.")
 	sys.exit(1)
