@@ -193,7 +193,7 @@ copy Code\Resource.res $(OutDir)
       </Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Debug\chardet19x64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
