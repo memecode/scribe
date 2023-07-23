@@ -89,7 +89,7 @@ protected:
 	// Drag'n'drop Target
 	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState) override;
 	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState) override;
-	void OnDragExit();
+	void OnDragExit() override;
 
 	// Drag'n'drop Source
 	void OnDragInit(bool Success) override;

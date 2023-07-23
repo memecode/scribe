@@ -1108,19 +1108,19 @@ bool LMail3Mail::ParseHeaders()
 
 	// Parse To and CC headers.
 	To.DeleteObjects();
-	if (s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "to")))
+	if ((s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "to"))))
 	{
 		Utf8Check(s);
 		ParseAddresses(s, MAIL_ADDR_TO);
 	}
-	if (s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "cc")))
+	if ((s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "cc"))))
 	{
 		Utf8Check(s);
 		ParseAddresses(s, MAIL_ADDR_CC);
 	}
 
 	// Data
-	if (s = LGetHeaderField(InetHdrs, "date"))
+	if ((s = LGetHeaderField(InetHdrs, "date")))
 	{
 	    DateSent.Decode(s);
 		DateSent.ToUtc();
@@ -1492,38 +1492,38 @@ public:
 	}
 
 	const char *GetClass() override { return "LSubStream"; }
-	bool IsOpen() { return true; }
-	int Close()
+	bool IsOpen() override { return true; }
+	int Close() override
 	{
 		s = NULL;
 		Start = Len = Pos = 0;
 		return true;
 	}
 	
-	int64 GetSize()
+	int64 GetSize() override
 	{
 		return s ? Len : -1;
 	}
 	
-	int64 SetSize(int64 Size)
+	int64 SetSize(int64 Size) override
 	{
 		// Can't set size
 		return GetSize();
 	}
 
-	int64 GetPos()
+	int64 GetPos() override
 	{
 		return s ? Pos : -1;
 	}
 	
-	int64 SetPos(int64 p)
+	int64 SetPos(int64 p) override
 	{
 		if (p < 0) p = 0;
 		if (p >= Len) p = Len;
 		return Pos = p;
 	}
 	
-	ssize_t Read(void *Buffer, ssize_t Size, int Flags = 0)
+	ssize_t Read(void *Buffer, ssize_t Size, int Flags = 0) override
 	{
 		ssize_t r = 0;
 		if (s && Buffer)
@@ -1546,13 +1546,13 @@ public:
 		return r;
 	}
 	
-	ssize_t Write(const void *Buffer, ssize_t Size, int Flags = 0)
+	ssize_t Write(const void *Buffer, ssize_t Size, int Flags = 0) override
 	{
 		LAssert(!"Not implemented.");
 		return 0;
 	}
 	
-	LStreamI *Clone() { return new LSubStream(s, Start, Len); }
+	LStreamI *Clone() override { return new LSubStream(s, Start, Len); }
 };
 
 Store3Status LMail3Mail::SetRfc822(LStreamI *m)

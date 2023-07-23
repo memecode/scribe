@@ -351,31 +351,31 @@ public:
 	const char *GetClass() override { return "LMail3Store"; }
 
 	int64 GetFolderId(char *Path);
-	LDataEventsI *GetEvents() { return Callback; }
-	bool OnIdle() { return false; }
+	LDataEventsI *GetEvents() override { return Callback; }
+	bool OnIdle() override { return false; }
 	sqlite3 *GetDb() { return Db; }
 	bool IsOk();
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *s);
-	LDataPropI *GetObj(int id);
-	uint64 Size();
-	LDataI *Create(int Type);
-	LDataFolderI *GetRoot(bool create = false);
-	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items);
-	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash);
-	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator);
-	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
-	void Upgrade(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
-	void Repair(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
-	bool SetFormat(LViewI *Parent, LDataPropI *Props);
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *s) override;
+	LDataPropI *GetObj(int id) override;
+	uint64 Size() override;
+	LDataI *Create(int Type) override;
+	LDataFolderI *GetRoot(bool create = false) override;
+	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items) override;
+	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash) override;
+	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator) override;
+	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus) override;
+	void Upgrade(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus) override;
+	void Repair(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus) override;
+	bool SetFormat(LViewI *Parent, LDataPropI *Props) override;
 	void PostStore(LMail3StoreMsg *m) { Callback->Post(this, m); }
-	void OnEvent(void *Param);
+	void OnEvent(void *Param) override;
 	bool Check(int Code, const char *Sql);
 	LMail3Def *GetFields(const char *t) { return Fields.Find(t); }
 
-	StoreTrans StartTransaction();
+	StoreTrans StartTransaction() override;
 
 	// LDataEventsI wrappers
 	void OnNew(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new);

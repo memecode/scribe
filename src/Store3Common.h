@@ -66,9 +66,9 @@ public:
 	const char *GetClass() override { return "Store3Field"; }
 	LDataPropI &operator =(LDataPropI &p) { LAssert(0); return *this; }
 
-	const char *GetStr(int id);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
+	const char *GetStr(int id) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
 };
 
 template<class TStore, class TMail, class TAttach>

@@ -430,7 +430,7 @@ const char *LMail3Attachment::GetStr(int id)
 					auto ct = LGetHeaderField(Headers, "Content-Type");
 					if (ct)
 					{
-						if (n = LDecodeRfc2047(LGetSubField(ct, "name")))
+						if ((n = LDecodeRfc2047(LGetSubField(ct, "name"))))
 							Name = n.Get();
 					}
 				}

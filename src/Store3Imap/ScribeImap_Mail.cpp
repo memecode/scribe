@@ -1221,7 +1221,7 @@ LDataIt ImapMail::GetList(int id)
 				}
 				To.State = Store3Loaded;
 
-				if (h = LDecodeRfc2047(LGetHeaderField(Headers, "Cc")))
+				if ((h = LDecodeRfc2047(LGetHeaderField(Headers, "Cc"))))
 				{
 					List<char> Addr;
 					TokeniseStrList(h, Addr, ",");

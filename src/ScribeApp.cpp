@@ -926,7 +926,7 @@ public:
 		return Growl;
 	}
 
-	LVmDebugger *AttachVm(LVirtualMachine *OriginalVm, LCompiledCode *Code, const char *Assembly)
+	LVmDebugger *AttachVm(LVirtualMachine *OriginalVm, LCompiledCode *Code, const char *Assembly) override
 	{
 		if (!OriginalVm || !Code)
 			return NULL;
@@ -942,7 +942,7 @@ public:
 		return new LVmDebuggerWnd(App, this, CopiedVm, CopiedCode, Assembly);
 	}
 
-	bool CallCallback(LVirtualMachine &Vm, LString CallbackName, LScriptArguments &Args)
+	bool CallCallback(LVirtualMachine &Vm, LString CallbackName, LScriptArguments &Args) override
 	{
 		for (auto s: Scripts)
 		{
@@ -962,13 +962,13 @@ public:
 		return false;
 	}
 
-	bool CompileScript(LAutoPtr<LCompiledCode> &Output, const char *FileName, const char *Source)
+	bool CompileScript(LAutoPtr<LCompiledCode> &Output, const char *FileName, const char *Source) override
 	{
 		LCompiler c;
 		return c.Compile(Output, Engine->GetSystemContext(), LScribeScript::Inst, FileName, Source, NULL);
 	}
 
-	bool OnSearch(LBrowser *br, const char *txt)
+	bool OnSearch(LBrowser *br, const char *txt) override
 	{
 		char Path[256];
 		if (!App->GetHelpFilesPath(Path, sizeof(Path)))
@@ -4289,7 +4289,6 @@ public:
 
 	~LShutdown()
 	{
-		int asd=0;
 	}
 
 	void OnCreate()

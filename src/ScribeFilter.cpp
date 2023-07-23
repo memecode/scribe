@@ -1245,7 +1245,7 @@ public:
 	
 	const char *GetClass() override { return "FilterScribeDom"; }
 
-	bool GetVariant(const char *Name, LVariant &Value, const char *Array = 0)
+	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override
 	{
 		if (!Name)
 			return false;

@@ -283,7 +283,7 @@ public:
 	
 	const char *GetClass() override { return "AddressBrowsePluginResults"; }
 	
-	bool CallMethod(const char *MethodName, LScriptArguments &Args)
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override
 	{
 		for (unsigned i=0; i<Args.Length(); i++)
 		{

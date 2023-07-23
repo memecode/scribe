@@ -53,21 +53,21 @@ public:
 	void OnChanged();
 
 	// LDataPropI
-	int64 GetInt(int id);
-	const char *GetStr(int id);
-	LDataPropI *GetObj(int id);
+	int64 GetInt(int id) override;
+	const char *GetStr(int id) override;
+	LDataPropI *GetObj(int id) override;
 
 	// LDataStoreI impl
-	uint64 Size() { return 0; }
-	LDataI *Create(int Type);
-	LDataFolderI *GetRoot(bool create = false);
-	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items) { return Store3Error; }
-	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash);
-	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator) { return Store3Error; }	
-	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus) { if (OnStatus) OnStatus(true); }	
-	void OnEvent(void *Param);
-	bool OnIdle() { return true; }
-	LDataEventsI *GetEvents() { return NULL; }
+	uint64 Size() override { return 0; }
+	LDataI *Create(int Type) override;
+	LDataFolderI *GetRoot(bool create = false) override;
+	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items) override { return Store3Error; }
+	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash) override;
+	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator) override { return Store3Error; }
+	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus) override { if (OnStatus) OnStatus(true); }
+	void OnEvent(void *Param) override;
+	bool OnIdle() override { return true; }
+	LDataEventsI *GetEvents() override { return NULL; }
 
 	// LDataEventsI impl
 	void Post(LDataStoreI *store, void *Param);
@@ -97,22 +97,22 @@ public:
 	virtual bool ConvertToText() { return false; }
 
 	// LDataI impl
-	uint32_t Type() { return MAGIC_NONE; }
-	bool IsOnDisk() { return false; }
-	bool IsOrphan() { return Store == NULL || Parent == NULL; }
-	LDataStoreI *GetStore() { return Store; }
+	uint32_t Type() override { return MAGIC_NONE; }
+	bool IsOnDisk() override { return false; }
+	bool IsOrphan() override { return Store == NULL || Parent == NULL; }
+	LDataStoreI *GetStore() override { return Store; }
 
 	// Stubs
-	uint64 Size() { return 0; }
-	Store3Status Save(LDataI *Parent = NULL) { return Store3NotImpl; }
-	Store3Status Delete(bool ToTrash = true) { return Store3NotImpl; }
-	LAutoStreamI GetStream(const char *file, int line) { return LAutoStreamI(NULL); }
-	bool SetStream(LAutoStreamI stream) { return false; }
-	bool ParseHeaders() { return false; }
-	LDataPropI *GetObj(int id) { EmptyVirtual(NULL); }	
-	Store3Status SetObj(int id, LDataPropI *i) { EmptyVirtual(Store3Error); }	
-	LDataIt GetList(int id) { EmptyVirtual(NULL); }		
-	Store3Status SetRfc822(LStreamI *Rfc822Msg) { return Store3Error; }
+	uint64 Size() override { return 0; }
+	Store3Status Save(LDataI *Parent = NULL) override { return Store3NotImpl; }
+	Store3Status Delete(bool ToTrash = true) override { return Store3NotImpl; }
+	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(NULL); }
+	bool SetStream(LAutoStreamI stream) override { return false; }
+	bool ParseHeaders() override { return false; }
+	LDataPropI *GetObj(int id) override { EmptyVirtual(NULL); }
+	Store3Status SetObj(int id, LDataPropI *i) override { EmptyVirtual(Store3Error); }
+	LDataIt GetList(int id) override { EmptyVirtual(NULL); }
+	Store3Status SetRfc822(LStreamI *Rfc822Msg) override { return Store3Error; }
 };
 
 class WebdavFld : public LDataPropI
@@ -125,9 +125,9 @@ public:
 	WebdavFld(LDataStoreI *s, WebdavFolder *p = 0, int id = 0, int width = 100);
 	
 	const char *GetClass() override { return "WebdavFld"; }
-	const char *GetStr(int id);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
+	const char *GetStr(int id) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
 };
 
 class WebdavFolder : public LDataFolderI
@@ -156,28 +156,28 @@ public:
 	LString AllocateAddress();
 
 	// LDataPropI impl
-	bool CopyProps(LDataPropI &p);
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
+	bool CopyProps(LDataPropI &p) override;
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
 
 	// LDataI impl
-	uint32_t Type() { return MAGIC_FOLDER; }
-	bool IsOnDisk() { return false; }
-	bool IsOrphan() { return false; }
-	uint64 Size() { return 0; }
-	Store3Status Save(LDataI *Parent = NULL);
-	Store3Status Delete(bool ToTrash = true);
-	LDataStoreI *GetStore() { return Store; }
-	LAutoStreamI GetStream(const char *file, int line);
-	bool SetStream(LAutoStreamI stream) { return false; }
-	bool ParseHeaders() { return false; }
+	uint32_t Type() override { return MAGIC_FOLDER; }
+	bool IsOnDisk() override { return false; }
+	bool IsOrphan() override { return false; }
+	uint64 Size() override { return 0; }
+	Store3Status Save(LDataI *Parent = NULL) override;
+	Store3Status Delete(bool ToTrash = true) override;
+	LDataStoreI *GetStore() override { return Store; }
+	LAutoStreamI GetStream(const char *file, int line) override;
+	bool SetStream(LAutoStreamI stream) override { return false; }
+	bool ParseHeaders() override { return false; }
 
 	// LDataFolderI impl
-	LDataIterator<LDataFolderI*> &SubFolders();
-	LDataIterator<LDataI*> &Children();
-	LDataIterator<LDataPropI*> &Fields();
+	LDataIterator<LDataFolderI*> &SubFolders() override;
+	LDataIterator<LDataI*> &Children() override;
+	LDataIterator<LDataPropI*> &Fields() override;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -234,24 +234,24 @@ public:
 
 	const char *GetClass() override { return "WebdavCalendar"; }
 
-	void FireOnChange(int Fld);
-	bool ConvertToText();
+	void FireOnChange(int Fld) override;
+	bool ConvertToText() override;
 
 	// Stubs
-	uint32_t Type() { return MAGIC_CALENDAR; }
-	uint64 Size() { return vCal.Length(); }
+	uint32_t Type() override { return MAGIC_CALENDAR; }
+	uint64 Size() override { return vCal.Length(); }
 	
 	// LDataI Impl
-	Store3Status Save(LDataI *Parent = 0);
-	Store3Status Delete(bool ToTrash = true);
-	LAutoStreamI GetStream(const char *file, int line);
-	bool CopyProps(LDataPropI &p);
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
-	const LDateTime *GetDate(int id);
-	Store3Status SetDate(int id, const LDateTime *i);
+	Store3Status Save(LDataI *Parent = 0) override;
+	Store3Status Delete(bool ToTrash = true) override;
+	LAutoStreamI GetStream(const char *file, int line) override;
+	bool CopyProps(LDataPropI &p) override;
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
+	const LDateTime *GetDate(int id) override;
+	Store3Status SetDate(int id, const LDateTime *i) override;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -324,26 +324,26 @@ public:
 
 	const char *GetClass() override { return "WebdavContact"; }
 
-	void FireOnChange(int Fld);
-	bool ConvertToText();
+	void FireOnChange(int Fld) override;
+	bool ConvertToText() override;
 
 	// Stubs
-	uint32_t Type() { return MAGIC_CONTACT; }
-	uint64 Size() { return vCard.Length(); }
+	uint32_t Type() override { return MAGIC_CONTACT; }
+	uint64 Size() override { return vCard.Length(); }
 	
 	// LDataI Impl
-	Store3Status Save(LDataI *Parent = 0);
-	Store3Status Delete(bool ToTrash = true);
-	LAutoStreamI GetStream(const char *file, int line);
-	bool CopyProps(LDataPropI &p);
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
-	const LDateTime *GetDate(int id);
-	Store3Status SetDate(int id, const LDateTime *i);
-	const LVariant *GetVar(int id);
-	Store3Status SetVar(int id, LVariant *i);
+	Store3Status Save(LDataI *Parent = NULL) override;
+	Store3Status Delete(bool ToTrash = true) override;
+	LAutoStreamI GetStream(const char *file, int line) override;
+	bool CopyProps(LDataPropI &p) override;
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
+	const LDateTime *GetDate(int id) override;
+	Store3Status SetDate(int id, const LDateTime *i) override;
+	const LVariant *GetVar(int id) override;
+	Store3Status SetVar(int id, LVariant *i) override;
 };
 
 #endif

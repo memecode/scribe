@@ -478,7 +478,7 @@ public:
 	
 	const char *GetClass() override { return "MailRendererScript"; }
 
-	int Main()
+	int Main() override
 	{
 		LScriptArguments Args(NULL);
 		Args.New() = new LVariant(m->App);
@@ -488,7 +488,7 @@ public:
 		return 0;
 	}
 
-	bool CallMethod(const char *MethodName, LScriptArguments &Args)
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override
 	{
 		ScribeDomType Method = StrToDom(MethodName);
 

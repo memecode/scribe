@@ -235,24 +235,24 @@ public:
 	void OnNew(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new);
 	bool OnDelete(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &del);
 	bool OnChange(const char *File, int Line, LArray<LDataI*> &items, int FieldHint);
-	bool OnIdle();
+	bool OnIdle() override;
 	LStreamI *GetLogger() { return Log; }
 
-	LDataEventsI *GetEvents() { return Callback; }
+	LDataEventsI *GetEvents() override { return Callback; }
 	char *GetCache();
 	LStream *GetLog() { return Log; }
-	uint64 Size();
-	LDataI *Create(int Type);
-	LDataFolderI *GetRoot(bool create);
-	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items);
-	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash);
-	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator);
-	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus);
-	void OnEvent(void *Param);
-	const char *GetStr(int id);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 val);
-	LDataPropI *GetObj(int id);
+	uint64 Size() override;
+	LDataI *Create(int Type) override;
+	LDataFolderI *GetRoot(bool create) override;
+	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items) override;
+	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash) override;
+	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator) override;
+	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus) override;
+	void OnEvent(void *Param) override;
+	const char *GetStr(int id) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 val) override;
+	LDataPropI *GetObj(int id) override;
 };
 
 class ImapThread : public LThread, public LMutex

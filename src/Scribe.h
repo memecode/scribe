@@ -1433,12 +1433,12 @@ public:
 	LDataPropI &operator =(LDataPropI &p);
 
 	// List item
-	const char *GetText(int Col = 0);
-	void OnMeasure(LPoint *Info);
-	bool Select();
-	void Select(bool b);
-	void OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c);
-	int OnNotify(LViewI *c, LNotification n);
+	const char *GetText(int Col = 0) override;
+	void OnMeasure(LPoint *Info) override;
+	bool Select() override;
+	void Select(bool b) override;
+	void OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c) override;
+	int OnNotify(LViewI *c, LNotification n) override;
 
 	// Object
 	ThingUi *DoUI(MailContainer *c = 0);
@@ -2151,7 +2151,7 @@ public:
 	ScribeDom(ScribeWnd *a);
 	
 	const char *GetClass() override { return "ScribeDom"; }
-	bool GetVariant(const char *Name, LVariant &Value, const char *Array = 0);
+	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 };
 
 //////////////////////////////////////////////////////////////////////
