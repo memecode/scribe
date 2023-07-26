@@ -5324,7 +5324,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 				p += Path;
 			}
 			else p = Path;
-			auto Full = p.GetFull();
+			auto Full = p.Absolute().GetFull();
 
 			LVariant CreateFoldersIfMissing;
 			Options->GetValue(OPT_CreateFoldersIfMissing, CreateFoldersIfMissing);
