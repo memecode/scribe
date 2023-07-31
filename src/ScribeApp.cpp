@@ -3241,7 +3241,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 				break;
 			}
 			
-			LArray<uint32_t> Types;
+			LArray<Store3ItemTypes> Types;
 			Types.Add(MAGIC_MAIL);
 			auto status = Store3ReplicateFolders(this,
 												DstFolder,
@@ -3715,8 +3715,10 @@ bool ScribeWnd::LoadOptions()
 		}
 		
 		// SSL debug logging
+		/*
 		if (GetOptions()->GetValue(OPT_DebugSSL, v))
 			SslSocket::DebugLogging = v.CastInt32() != 0;
+		*/
 
 		// Growl
 		if (GetOptions()->GetValue(OPT_GrowlEnabled, v) &&
@@ -7841,9 +7843,11 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 					if (GetOptions()->GetValue(OPT_AdjustDateTz, i))
 						Mail::AdjustDateTz = i.CastInt32() == 0;
 
+					/*
 					// SSL debug logging
 					if (GetOptions()->GetValue(OPT_DebugSSL, i))
 						SslSocket::DebugLogging = i.CastInt32() != 0;
+					*/
 
 					// Html edit menu
 					if (GetOptions()->GetValue(OPT_EditControl, i))

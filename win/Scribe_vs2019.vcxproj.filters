@@ -910,9 +910,6 @@
     <None Include="..\Scripts\Add Senders To Contacts.script">
       <Filter>Scripting\Scripts</Filter>
     </None>
-    <None Include="..\Scripts\CovieRender.script">
-      <Filter>Scripting\Scripts</Filter>
-    </None>
     <None Include="..\Scripts\Delete Attachments.script">
       <Filter>Scripting\Scripts</Filter>
     </None>

@@ -677,7 +677,6 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <None Include="..\Resources\Themes\Dark\styles.css" />
     <None Include="..\Resources\Title.html" />
     <None Include="..\Scripts\Add Senders To Contacts.script" />
-    <None Include="..\Scripts\CovieRender.script" />
     <None Include="..\Scripts\DecrementAll.script" />
     <None Include="..\Scripts\Delete Attachments.script" />
     <None Include="..\Scripts\Delete Duplicate Messages.script" />

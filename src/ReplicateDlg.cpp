@@ -11,8 +11,10 @@
 #define SECONDS					* 1000
 #define REPLICATE_TIMEOUT		(30 SECONDS)
 #define REPLICATE_TRANS_LENGTH	10
+#define REPLICATE_TIMESLICE		200 // ms
 #define MAX_DELAYED_UNITS		10
 #define DEBUG_LOGGING			1
+
 
 enum WorkType
 {
@@ -206,7 +208,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	ScribeReplicator(ScribeWnd *app) : LProgressDlg(app)
 	{
 		App = app;
-		SetDescription("Loading...");
+		SetDescription(LLoadString(IDS_LOADING));
 
 		App->OnFolderTask(this, true);
 		App->AddStore3EventHandler(this);
@@ -241,9 +243,9 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	{
 		LString sep("\n");
 		LString::Array s;
-		for (unsigned i=0; i<Work.Length(); i++)
+		for (auto &w: Work)
 		{
-			s.New() = Work[i].ToString();
+			s.New() = w.ToString();
 		}
 		return sep.Join(s);
 	}
@@ -257,7 +259,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		
 		if (ErrorLog.GetSize())
 		{
-			LAutoString a(ErrorLog.NewStr());
+			auto a = ErrorLog.NewLStr();
 			LgiMsg(this, "Replication failed:\n%s", AppName, MB_OK, a.Get());
 		}
 		
@@ -275,16 +277,16 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	// It may end up with a deferred save.
 	int SaveObject(WorkUnit *w)
 	{
-		LDataFolderI *df = w->Data.DstFld;
-		LDataFolderI *sf = w->Data.SrcFld;
-		LDataI *s = w->Data.Src;
+		auto df = w->Data.DstFld;
+		auto sf = w->Data.SrcFld;
+		auto s = w->Data.Src;
 
-		LDataI *d = df->GetStore()->Create(s->Type());
+		auto d = df->GetStore()->Create(s->Type());
 		if (d)
 		{
 			d->CopyProps(*s);
 			
-			Store3Status Result = d->Save(df);
+			auto Result = d->Save(df);
 			if (Result == Store3Error)
 			{
 				ErrorLog.Print("%s:%i - Failed to save item.\n", _FL);
@@ -298,7 +300,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 				return true;
 			}
 			
-			CopyStatus *Cs = Status.Find(sf);
+			auto Cs = Status.Find(sf);
 			if (Cs)
 				Cs->Ok++;
 			
@@ -324,6 +326,428 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 			Work.DeleteAt((int)Idx, true);
 		}
 		else LAssert(0);
+	}
+
+	bool DoDeleteFolder(WorkUnit *w)
+	{
+		LDataFolderI *f = w->Folder1.Folder;
+		if (!f)
+		{
+			ErrorLog.Print("%s:%i - Invalid folder.\n", _FL);
+			Pop(w);
+			return false;
+		}
+
+		// Get the copy status
+		CopyStatus *Cs = Status.Find(f);
+		if (!Cs)
+		{
+			ErrorLog.Print("%s:%i - No copy status for '%s'.\n", _FL, f->GetStr(FIELD_FOLDER_NAME));
+			Pop(w);
+			return false;
+		}
+
+		// Check that all the items have been copied across.
+		if (Cs->Ok + Cs->Errors < Cs->Total)
+		{
+			// Go into wait mode...
+			return true;
+		}
+
+		if (Cs->Total != Cs->Ok)
+		{
+			// Error out if not
+			ErrorLog.Print("%s:%i - Delete '%s' skipped: %i of %i ok (%i errors).\n",
+				_FL,
+				f->GetStr(FIELD_FOLDER_NAME),
+				Cs->Ok,
+				Cs->Total,
+				Cs->Errors);				
+			Pop(w);
+			return false;
+		}
+
+		Store3Status s = f->Delete();
+		if (s == Store3Error)
+		{
+			ErrorLog.Print("%s:%i - Failed to delete folder.\n", _FL);
+		}
+		else if (s == Store3Delayed)
+		{
+			w->Delayed = true;
+			// Leave the work unit on the stack...
+			return false;
+		}
+
+		Pop(w);
+		return false;
+	}
+
+	bool DoCountSource(WorkUnit *w)
+	{
+		LDataFolderI *f = w->Folder1.Folder;
+		LAssert(f != NULL);
+
+		if (!f->GetInt(FIELD_IS_ONLINE))
+		{
+			w->Delayed = true;
+			w->Ts = LCurrentTime();
+
+			StatusMsg.Printf("Waiting folder %s", f->GetStr(FIELD_FOLDER_NAME));
+			UpdateMsg();
+			return true;
+		}
+
+		Folders++;
+		Pop(w);
+
+		for (LDataI *i = f->Children().First(); i && !IsCancelled(); i = f->Children().Next())
+		{
+			int Type = i->Type();
+			if (Type && Types[Type-MAGIC_BASE])
+				Items++;
+		}
+
+		for (LDataFolderI *c = f->SubFolders().First(); c && !IsCancelled(); c = f->SubFolders().Next())
+		{
+			WorkUnit &wu = Work.New();
+			wu.Type = RCountSource;
+			wu.Folder1.Folder = c;
+		}
+
+		return false;
+	}
+
+	void DoCopyFolder(WorkUnit *w)
+	{
+		// Iterate over all the items and push work units onto the stack...
+		LDataFolderI *d = w->Folder2.Dst;
+		LDataFolderI *s = w->Folder2.Src;
+		LAssert(d != NULL && d != NULL);
+		Pop(w);
+
+		auto Name = s->GetStr(FIELD_FOLDER_NAME);
+		int64 Type = s->GetInt(FIELD_FOLDER_TYPE);
+
+		StatusMsg.Printf("Copying folder '%s'", Name);
+		UpdateMsg();
+
+		CopyStatus *Cs = NULL;
+		if (DeleteSourceOnSuccess)
+		{
+			// Setup a copy status structure..
+			Cs = new CopyStatus;
+			if (Cs)
+				Status.Add(s, Cs);
+			else
+				LAssert(0);
+
+			// Create a delete if needed
+			WorkUnit &del = Work.New();
+			del.Type = RDeleteFolder;
+			del.Folder1.Folder = s;
+		}
+
+		// Setup an end transaction to commit outstanding data..
+		Work.New().Type = REndTransaction;
+
+		auto TypeIndex = Type ? (unsigned)Type - (unsigned)MAGIC_BASE : 0;
+		if (TypeIndex < 0 || TypeIndex >= CountOf(Types))
+		{
+			LAssert(!"Index out of range.");
+		}
+		else if (Types[TypeIndex])
+		{
+			int ExistsInDestination = 0;
+
+			switch (Type)
+			{
+				case MAGIC_MAIL:
+				{
+					// Scan existing items for UID's
+					LHashTbl<ConstStrKey<char>,LDataI*> MsgMap;
+					for (LDataI *e=d->Children().First(); e && !IsCancelled(); e=d->Children().Next())
+					{
+						auto MsgId = e->GetStr(FIELD_MESSAGE_ID);
+						if (MsgId)
+							MsgMap.Add(MsgId, e);
+					}
+
+					// Start replicate process
+					for (LDataI *in=s->Children().First(); in && !IsCancelled(); in=s->Children().Next())
+					{
+						// Check if we have an existing item...
+						auto SrcMsgId = in->GetStr(FIELD_MESSAGE_ID);
+						if (!MsgMap.Find(SrcMsgId))
+						{
+							// Create a work unit to copy the data...
+							WorkUnit &wu = Work.New();
+							wu.Type = RCopyData;
+							wu.Data.DstFld = d;
+							wu.Data.SrcFld = s;
+							wu.Data.Src = in;
+
+							if (Cs) Cs->Total++;
+						}
+						else
+						{
+							ExistsInDestination++;
+						}
+					}
+					break;
+				}
+				case MAGIC_CONTACT:
+				{
+					// Scan for UID's
+					LHashTbl<ConstStrKey<char>,LDataI*> Uid, Email;
+					const char *c;
+					for (LDataI *e=d->Children().First(); e && !IsCancelled(); e=d->Children().Next())
+					{
+						if ((c = e->GetStr(FIELD_UID)))
+							Uid.Add(c, e);
+						if ((c = e->GetStr(FIELD_EMAIL)))
+							Email.Add(c, e);
+					}
+
+					// Start replicate process
+					for (LDataI *in=s->Children().First(); in && !IsCancelled(); in=s->Children().Next())
+					{
+						// Check if we have an existing item...
+						if (!Uid.Find(in->GetStr(FIELD_UID)) &&
+							!Email.Find(in->GetStr(FIELD_EMAIL)))
+						{
+							// Create a work unit to copy the data...
+							WorkUnit &wu = Work.New();
+							wu.Type = RCopyData;
+							wu.Data.DstFld = d;
+							wu.Data.SrcFld = s;
+							wu.Data.Src = in;
+
+							if (Cs) Cs->Total++;
+						}
+						else
+						{
+							ExistsInDestination++;
+						}
+					}
+					break;
+				}
+				case MAGIC_FILTER:
+				{
+					// Scan for names
+					LHashTbl<ConstStrKey<char,false>,LDataI*> Name;
+					const char *c;
+					for (LDataI *e=d->Children().First(); e && !IsCancelled(); e=d->Children().Next())
+					{
+						if ((c = e->GetStr(FIELD_FILTER_NAME)))
+							Name.Add(c, e);
+					}
+
+					// Start replicate process
+					for (LDataI *in=s->Children().First(); in && !IsCancelled(); in=s->Children().Next())
+					{
+						// Check if we have an existing item...
+						if (!Name.Find(in->GetStr(FIELD_FILTER_NAME)))
+						{
+							// Create a work unit to copy the data...
+							WorkUnit &wu = Work.New();
+							wu.Type = RCopyData;
+							wu.Data.DstFld = d;
+							wu.Data.SrcFld = s;
+							wu.Data.Src = in;
+
+							if (Cs) Cs->Total++;
+						}
+						else
+						{
+							ExistsInDestination++;
+						}
+					}
+					break;
+				}
+			}
+
+			if (ExistsInDestination)
+			{
+				Value(Value() + ExistsInDestination);
+			}
+		}
+
+		if (Recurse)
+		{
+			// Create a work unit to copy the child folders...
+			//
+			// By doing this at the end things like deletes get done
+			// on child folders first. E.g. for a "move" operation, 
+			// which is broken down to copy + delete.
+			WorkUnit &wu = Work.New();
+			wu.Type = RCopySubFolder;
+			wu.Folder2.Dst = d;
+			wu.Folder2.Src = s;
+		}
+	}
+
+	void DoCopySubFolder(WorkUnit *w)
+	{
+		// Iterate over all the items and push work units onto the stack...
+		LDataFolderI *d = w->Folder2.Dst;
+		LDataFolderI *s = w->Folder2.Src;
+		LAssert(d != NULL && d != NULL);
+		Pop(w);
+
+		LHashTbl<ConstStrKey<char,false>,LDataFolderI*> DestMap;
+		for (LDataFolderI *dc = d->SubFolders().First(); dc; dc=d->SubFolders().Next())
+		{
+			auto DstName = dc->GetStr(FIELD_FOLDER_NAME);
+			if (DstName)
+				DestMap.Add(DstName, dc);
+		}
+
+		// Replicate sub-folders
+		for (LDataFolderI *sc=s->SubFolders().First(); sc && !IsCancelled(); sc=s->SubFolders().Next())
+		{
+			auto SrcName = sc->GetStr(FIELD_FOLDER_NAME);
+			if (SrcName)
+			{
+				Store3Status Status = Store3Success;
+				LArray<WorkUnit> *Tasks = &Work;
+
+				// Find matching dest folder...
+				LDataFolderI *dc = DestMap.Find(SrcName);
+				if (!dc)
+				{
+					// Not found, so create new destination sub-folder
+					if ((dc = dynamic_cast<LDataFolderI*>(d->GetStore()->Create(MAGIC_FOLDER))))
+					{
+						dc->CopyProps(*sc);
+
+						Status = dc->Save(d);
+						if (Status == Store3Error)
+						{
+							ErrorLog.Print("%s:%i - Failed to create folder '%s'\n", _FL, SrcName);
+						}
+						else if (Status == Store3Delayed)
+						{
+							WorkUnit &wu = Work.New();
+							wu.Type = RCreateFolder;
+							wu.Folder2.Dst = d;
+							wu.Folder2.Src = dc;
+							wu.Delayed = true;
+							Tasks = &wu.Deferred;
+						}
+					}
+				}
+
+				if (dc)
+				{
+					WorkUnit &wu = Tasks->New();
+					wu.Type = RCopyFolder;
+					wu.Folder2.Dst = dc;
+					wu.Folder2.Src = sc;
+				}
+			}
+		}
+	}
+
+	bool DoCopyData(WorkUnit *w)
+	{
+		LDataFolderI *d = w->Data.DstFld;
+		LDataI *s = w->Data.Src;
+		LAssert(d != NULL && d != NULL);
+
+		if (IsCancelled())
+		{
+			Pop(w);
+			return false;
+		}
+
+		if (!Trans)
+			StartTransaction(d);
+
+		Store3State State = (Store3State)s->GetInt(FIELD_LOADED);
+		if (State != Store3Loaded)
+		{
+			// Ask for the object to load itself..
+			s->GetStr(FIELD_TEXT);
+
+			// Now check again to see what it's doing...
+			State = (Store3State)s->GetInt(FIELD_LOADED);
+			if (State == Store3Loading)
+			{
+				// We should get an OnChange event when it loads...
+				w->Delayed = true;
+				w->Ts = LCurrentTime();
+				return true;
+			}
+			else if (State != Store3Loaded)
+			{
+				// The error case... kill the task
+				FailedWork++;
+				Pop(w);
+				return false;
+			}
+		}
+
+		SaveObject(w);
+
+		return false;
+	}
+
+	bool DoOpenMailStore(WorkUnit *w)
+	{
+		Store3Status s = Open(w->Open.Store, *w->Open.Spec);
+		if (s == Store3Error)
+		{
+			LString a = w->Open.Spec->Uri.ToString();
+			ErrorLog.Print("%s:%i - Failed to open data store '%s'\n", _FL, a.Get());
+		}
+		else if (s == Store3Delayed)
+		{
+			w->Delayed = true;
+			w->Ts = LCurrentTime();
+
+			StatusMsg.Printf("Waiting for IMAP connection");
+			UpdateMsg();
+			return true;
+		}
+
+		Pop(w);
+
+		return false;
+	}
+
+	void DoCopyStore(WorkUnit *w)
+	{
+		Pop(w);
+		if (SrcStore && DstStore)
+		{
+			LDataFolderI *SrcRoot = SrcStore->GetRoot();
+			LDataFolderI *DstRoot = DstStore->GetRoot();
+			if (SrcRoot && DstRoot)
+			{
+				// Setup a job to copy the root sub-folders
+				w = &Work.New();
+				w->Type = RCopySubFolder;
+				w->Folder2.Dst = DstRoot;
+				w->Folder2.Src = SrcRoot;
+
+				// Update the UI with the count results...
+				Work.New().Type = RCountFinish;
+
+				// Setup a copy store task
+				w = &Work.New();
+				w->Type = RCountSource;
+				w->Folder1.Folder = SrcRoot;
+			}
+			else
+			{
+				ErrorLog.Print("%s:%i - Get roots failed %p/%p\n", _FL, SrcRoot, DstRoot);
+			}
+		}
+		else
+		{
+			ErrorLog.Print("%s:%i - Copy store failed %p/%p\n", _FL, SrcStore.Get(), DstStore.Get());
+		}
 	}
 	
 	int DoNext()
@@ -397,89 +821,14 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 			}
 			case RDeleteFolder:
 			{
-				LDataFolderI *f = w->Folder1.Folder;
-				if (!f)
-				{
-					ErrorLog.Print("%s:%i - Invalid folder.\n", _FL);
-					Pop(w);
-					break;
-				}
-				
-				// Get the copy status
-				CopyStatus *Cs = Status.Find(f);
-				if (!Cs)
-				{
-					ErrorLog.Print("%s:%i - No copy status for '%s'.\n", _FL, f->GetStr(FIELD_FOLDER_NAME));
-					Pop(w);
-					break;
-				}
-				
-				// Check that all the items have been copied across.
-				if (Cs->Ok + Cs->Errors < Cs->Total)
-				{
-					// Go into wait mode...
+				if (DoDeleteFolder(w))
 					return true;
-				}
-				
-				if (Cs->Total != Cs->Ok)
-				{
-					// Error out if not
-					ErrorLog.Print("%s:%i - Delete '%s' skipped: %i of %i ok (%i errors).\n",
-						_FL,
-						f->GetStr(FIELD_FOLDER_NAME),
-						Cs->Ok,
-						Cs->Total,
-						Cs->Errors);				
-					Pop(w);
-					break;
-				}
-				
-				Store3Status s = f->Delete();
-				if (s == Store3Error)
-				{
-					ErrorLog.Print("%s:%i - Failed to delete folder.\n", _FL);
-				}
-				else if (s == Store3Delayed)
-				{
-					w->Delayed = true;
-					// Leave the work unit on the stack...
-					break;
-				}
-
-				Pop(w);				
 				break;
 			}
 			case RCountSource:
 			{
-				LDataFolderI *f = w->Folder1.Folder;
-				LAssert(f != NULL);
-				
-				if (!f->GetInt(FIELD_IS_ONLINE))
-				{
-					w->Delayed = true;
-					w->Ts = LCurrentTime();
-					
-					StatusMsg.Printf("Waiting folder %s", f->GetStr(FIELD_FOLDER_NAME));
-					UpdateMsg();
+				if (DoCountSource(w))
 					return true;
-				}
-				
-				Folders++;
-				Pop(w);
-
-				for (LDataI *i = f->Children().First(); i && !IsCancelled(); i = f->Children().Next())
-				{
-					int Type = i->Type();
-					if (Type && Types[Type-MAGIC_BASE])
-						Items++;
-				}
-
-				for (LDataFolderI *c = f->SubFolders().First(); c && !IsCancelled(); c = f->SubFolders().Next())
-				{
-					WorkUnit &wu = Work.New();
-					wu.Type = RCountSource;
-					wu.Folder1.Folder = c;
-				}
 				break;
 			}
 			case RCountFinish:
@@ -501,275 +850,18 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 			}
 			case RCopyFolder:
 			{
-				// Iterate over all the items and push work units onto the stack...
-				LDataFolderI *d = w->Folder2.Dst;
-				LDataFolderI *s = w->Folder2.Src;
-				LAssert(d != NULL && d != NULL);
-				Pop(w);
-
-				auto Name = s->GetStr(FIELD_FOLDER_NAME);
-				int64 Type = s->GetInt(FIELD_FOLDER_TYPE);
-
-				StatusMsg.Printf("Copying folder '%s'", Name);
-				UpdateMsg();
-				
-				CopyStatus *Cs = NULL;
-				if (DeleteSourceOnSuccess)
-				{
-					// Setup a copy status structure..
-					Cs = new CopyStatus;
-					if (Cs)
-						Status.Add(s, Cs);
-					else
-						LAssert(0);
-					
-					// Create a delete if needed
-					WorkUnit &del = Work.New();
-					del.Type = RDeleteFolder;
-					del.Folder1.Folder = s;
-				}
-				
-				// Setup an end transaction to commit outstanding data..
-				Work.New().Type = REndTransaction;
-
-				auto TypeIndex = (unsigned)Type - (unsigned)MAGIC_BASE;
-				if (TypeIndex <= 0 || TypeIndex >= CountOf(Types))
-				{
-					LAssert(!"Index out of range.");
-				}
-				else if (Types[TypeIndex])
-				{
-					int ExistsInDestination = 0;
-					
-					switch (Type)
-					{
-						case MAGIC_MAIL:
-						{
-							// Scan existing items for UID's
-							LHashTbl<ConstStrKey<char>,LDataI*> MsgMap;
-							for (LDataI *e=d->Children().First(); e && !IsCancelled(); e=d->Children().Next())
-							{
-								auto MsgId = e->GetStr(FIELD_MESSAGE_ID);
-								if (MsgId)
-									MsgMap.Add(MsgId, e);
-							}
-
-							// Start replicate process
-							for (LDataI *in=s->Children().First(); in && !IsCancelled(); in=s->Children().Next())
-							{
-								// Check if we have an existing item...
-								auto SrcMsgId = in->GetStr(FIELD_MESSAGE_ID);
-								if (!MsgMap.Find(SrcMsgId))
-								{
-									// Create a work unit to copy the data...
-									WorkUnit &wu = Work.New();
-									wu.Type = RCopyData;
-									wu.Data.DstFld = d;
-									wu.Data.SrcFld = s;
-									wu.Data.Src = in;
-									
-									if (Cs) Cs->Total++;
-								}
-								else
-								{
-									ExistsInDestination++;
-								}
-							}
-							break;
-						}
-						case MAGIC_CONTACT:
-						{
-							// Scan for UID's
-							LHashTbl<ConstStrKey<char>,LDataI*> Uid, Email;
-							const char *c;
-							for (LDataI *e=d->Children().First(); e && !IsCancelled(); e=d->Children().Next())
-							{
-								if ((c = e->GetStr(FIELD_UID)))
-									Uid.Add(c, e);
-								if ((c = e->GetStr(FIELD_EMAIL)))
-									Email.Add(c, e);
-							}
-
-							// Start replicate process
-							for (LDataI *in=s->Children().First(); in && !IsCancelled(); in=s->Children().Next())
-							{
-								// Check if we have an existing item...
-								if (!Uid.Find(in->GetStr(FIELD_UID)) &&
-									!Email.Find(in->GetStr(FIELD_EMAIL)))
-								{
-									// Create a work unit to copy the data...
-									WorkUnit &wu = Work.New();
-									wu.Type = RCopyData;
-									wu.Data.DstFld = d;
-									wu.Data.SrcFld = s;
-									wu.Data.Src = in;
-
-									if (Cs) Cs->Total++;
-								}
-								else
-								{
-									ExistsInDestination++;
-								}
-							}
-							break;
-						}
-						case MAGIC_FILTER:
-						{
-							// Scan for names
-							LHashTbl<ConstStrKey<char,false>,LDataI*> Name;
-							const char *c;
-							for (LDataI *e=d->Children().First(); e && !IsCancelled(); e=d->Children().Next())
-							{
-								if ((c = e->GetStr(FIELD_FILTER_NAME)))
-									Name.Add(c, e);
-							}
-
-							// Start replicate process
-							for (LDataI *in=s->Children().First(); in && !IsCancelled(); in=s->Children().Next())
-							{
-								// Check if we have an existing item...
-								if (!Name.Find(in->GetStr(FIELD_FILTER_NAME)))
-								{
-									// Create a work unit to copy the data...
-									WorkUnit &wu = Work.New();
-									wu.Type = RCopyData;
-									wu.Data.DstFld = d;
-									wu.Data.SrcFld = s;
-									wu.Data.Src = in;
-
-									if (Cs) Cs->Total++;
-								}
-								else
-								{
-									ExistsInDestination++;
-								}
-							}
-							break;
-						}
-					}
-
-					if (ExistsInDestination)
-					{
-						Value(Value() + ExistsInDestination);
-					}
-				}
-
-				if (Recurse)
-				{
-					// Create a work unit to copy the child folders...
-					//
-					// By doing this at the end things like deletes get done
-					// on child folders first. E.g. for a "move" operation, 
-					// which is broken down to copy + delete.
-					WorkUnit &wu = Work.New();
-					wu.Type = RCopySubFolder;
-					wu.Folder2.Dst = d;
-					wu.Folder2.Src = s;
-				}
+				DoCopyFolder(w);
 				break;
 			}
 			case RCopySubFolder:
 			{
-				// Iterate over all the items and push work units onto the stack...
-				LDataFolderI *d = w->Folder2.Dst;
-				LDataFolderI *s = w->Folder2.Src;
-				LAssert(d != NULL && d != NULL);
-				Pop(w);
-
-				LHashTbl<ConstStrKey<char,false>,LDataFolderI*> DestMap;
-				for (LDataFolderI *dc = d->SubFolders().First(); dc; dc=d->SubFolders().Next())
-				{
-					auto DstName = dc->GetStr(FIELD_FOLDER_NAME);
-					if (DstName)
-						DestMap.Add(DstName, dc);
-				}
-
-				// Replicate sub-folders
-				for (LDataFolderI *sc=s->SubFolders().First(); sc && !IsCancelled(); sc=s->SubFolders().Next())
-				{
-					auto SrcName = sc->GetStr(FIELD_FOLDER_NAME);
-					if (SrcName)
-					{
-						Store3Status Status = Store3Success;
-						LArray<WorkUnit> *Tasks = &Work;
-						
-						// Find matching dest folder...
-						LDataFolderI *dc = DestMap.Find(SrcName);
-						if (!dc)
-						{
-							// Not found, so create new destination sub-folder
-							if ((dc = dynamic_cast<LDataFolderI*>(d->GetStore()->Create(MAGIC_FOLDER))))
-							{
-								dc->CopyProps(*sc);
-								
-								Status = dc->Save(d);
-								if (Status == Store3Error)
-								{
-									ErrorLog.Print("%s:%i - Failed to create folder '%s'\n", _FL, SrcName);
-								}
-								else if (Status == Store3Delayed)
-								{
-									WorkUnit &wu = Work.New();
-									wu.Type = RCreateFolder;
-									wu.Folder2.Dst = d;
-									wu.Folder2.Src = dc;
-									wu.Delayed = true;
-									Tasks = &wu.Deferred;
-								}
-							}
-						}
-
-						if (dc)
-						{
-							WorkUnit &wu = Tasks->New();
-							wu.Type = RCopyFolder;
-							wu.Folder2.Dst = dc;
-							wu.Folder2.Src = sc;
-						}
-					}
-				}
+				DoCopySubFolder(w);
 				break;
 			}
 			case RCopyData:
 			{
-				LDataFolderI *d = w->Data.DstFld;
-				LDataI *s = w->Data.Src;
-				LAssert(d != NULL && d != NULL);
-				
-				if (IsCancelled())
-				{
-					Pop(w);
-					break;
-				}
-				
-				if (!Trans)
-					StartTransaction(d);
-				
-				Store3State State = (Store3State)s->GetInt(FIELD_LOADED);
-				if (State != Store3Loaded)
-				{
-					// Ask for the object to load itself..
-					s->GetStr(FIELD_TEXT);
-
-					// Now check again to see what it's doing...
-					State = (Store3State)s->GetInt(FIELD_LOADED);
-					if (State == Store3Loading)
-					{
-						// We should get an OnChange event when it loads...
-						w->Delayed = true;
-						w->Ts = LCurrentTime();
-						return true;
-					}
-					else if (State != Store3Loaded)
-					{
-						// The error case... kill the task
-						FailedWork++;
-						Pop(w);
-						break;
-					}
-				}
-
-				SaveObject(w);
+				if (DoCopyData(w))
+					return true;
 				break;
 			}
 			case RReloadFolders:
@@ -780,57 +872,13 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 			}
 			case ROpenMailStore:
 			{
-				Store3Status s = Open(w->Open.Store, *w->Open.Spec);
-				if (s == Store3Error)
-				{
-					LString a = w->Open.Spec->Uri.ToString();
-					ErrorLog.Print("%s:%i - Failed to open data store '%s'\n", _FL, a.Get());
-				}
-				else if (s == Store3Delayed)
-				{
-					w->Delayed = true;
-					w->Ts = LCurrentTime();
-					
-					StatusMsg.Printf("Waiting for IMAP connection");
-					UpdateMsg();
+				if (DoOpenMailStore(w))
 					return true;
-				}
-				
-				Pop(w);
 				break;
 			}
 			case RCopyStore:
 			{
-				Pop(w);
-				if (SrcStore && DstStore)
-				{
-					LDataFolderI *SrcRoot = SrcStore->GetRoot();
-					LDataFolderI *DstRoot = DstStore->GetRoot();
-					if (SrcRoot && DstRoot)
-					{
-						// Setup a job to copy the root sub-folders
-						w = &Work.New();
-						w->Type = RCopySubFolder;
-						w->Folder2.Dst = DstRoot;
-						w->Folder2.Src = SrcRoot;
-						
-						// Update the UI with the count results...
-						Work.New().Type = RCountFinish;
-
-						// Setup a copy store task
-						w = &Work.New();
-						w->Type = RCountSource;
-						w->Folder1.Folder = SrcRoot;
-					}
-					else
-					{
-						ErrorLog.Print("%s:%i - Get roots failed %p/%p\n", _FL, SrcRoot, DstRoot);
-					}
-				}
-				else
-				{
-					ErrorLog.Print("%s:%i - Copy store failed %p/%p\n", _FL, SrcStore.Get(), DstStore.Get());
-				}
+				DoCopyStore(w);
 				break;
 			}
 			default:
@@ -845,12 +893,6 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		if (Length > 20)
 			LgiTrace("Work %i took " LPrintfInt64 "\n", w->Type, Length);
 		#endif
-		
-		if (Length >= 50)
-		{
-			// This leaves a air gap for messages to be processed normally.
-			return true;
-		}
 		
 		return true;
 	}
@@ -876,10 +918,16 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 	
 	void OnPulse()
 	{
+		if (Work.Length() == 0)
+		{
+			OnFinish();
+			return;
+		}
+
 		// Check for timeouts...
 		int Prev = UnitsTimedOut;
 		UnitsTimedOut = 0;
-		
+
 		uint64 Now = LCurrentTime();
 		for (unsigned i=0; i<Work.Length(); i++)
 		{
@@ -934,6 +982,10 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 					default: break;
 				}
 			}
+			else
+			{
+				int r = DoNext();
+			}
 		}
 		
 		if (UnitsTimedOut != Prev)
@@ -942,7 +994,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		LProgressDlg::OnPulse();
 	}
 
-	bool StartProcess(LDataFolderI *Dst, LDataFolderI *Src, bool recurse, bool deleteSourceOnSuccess, LArray<uint32_t> *types)
+	bool StartProcess(LDataFolderI *Dst, LDataFolderI *Src, bool recurse, bool deleteSourceOnSuccess, LArray<Store3ItemTypes> *types)
 	{
 		if (!Dst)
 		{
@@ -961,7 +1013,13 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		{
 			ZeroObj(Types);
 			for (unsigned i=0; i<types->Length(); i++)
-				Types[(*types)[i]-MAGIC_BASE] = true;
+			{
+				auto type = (*types)[i];
+				if (type > MAGIC_BASE && type < MAGIC_MAX)
+				{
+					Types[(int)type-MAGIC_BASE] = true;
+				}
+			}
 		}
 		else
 		{
@@ -1219,19 +1277,12 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 
 struct ReplicateDlgPriv
 {
-	ScribeWnd *App;
-	LCombo *Src, *Dst;
-	LList *Lst;
+	ScribeWnd *App = NULL;
+	LCombo *Src = NULL, *Dst = NULL;
+	LList *Lst = NULL;
 	LArray<ReplicateDlg::AccountSpec> Paths;
 	LAutoPtr<ReplicateDlg::ReplicateSettings> Settings;
 	LAutoString Msg;
-
-	ReplicateDlgPriv()
-	{
-		App = 0;
-		Src = Dst = 0;
-		Lst = 0;
-	}
 };
 
 class LType : public LListItem
@@ -1404,7 +1455,7 @@ Store3Status Store3ReplicateFolders(	ScribeWnd *App,
 										LDataFolderI *Src,
 										bool Recurse,
 										bool DeleteSourceOnSuccess,
-										LArray<uint32_t> *Types)
+										LArray<Store3ItemTypes> *Types)
 {
 	if (!Dst || !Src)
 		return Store3Error;

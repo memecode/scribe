@@ -48,6 +48,6 @@ Store3Status Store3ReplicateFolders(ScribeWnd *App,
 									LDataFolderI *Src,
 									bool Recurse,
 									bool DeleteSourceOnSuccess, // For 'move' operation
-									LArray<uint32_t> *Types);
+									LArray<Store3ItemTypes> *Types);
 
 #endif
