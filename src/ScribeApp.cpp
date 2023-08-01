@@ -3714,6 +3714,7 @@ bool ScribeWnd::LoadOptions()
 				LDateTime::SetDefaultFormat(DateTimeFormats[Idx]);
 		}
 		
+		/*
 		// SSL debug logging
 		/*
 		if (GetOptions()->GetValue(OPT_DebugSSL, v))
