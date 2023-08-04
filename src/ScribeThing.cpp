@@ -476,6 +476,77 @@ bool Thing::GetFormats(LDragFormats &Formats)
 	return Formats.Length() > 0;
 }
 
+void Thing::ExportAllProcess(LFileSelect *Select, LViewI *Parent, List<Thing> Sel, LString ExportMimeType, std::function<void(bool)> Callback)
+{
+	int Exported = 0;
+	int Errors = 0;
+
+	for (auto m: Sel)
+	{
+		const char *Out;
+		char Buf[MAX_PATH_LEN];
+		if (Sel.Length() == 1)
+		{
+			Out = Select->Name();
+		}
+		else
+		{
+			char *Leaf = LGetLeaf(m->GetDropFileName());
+			if (!Leaf)
+			{
+				Errors++;
+				continue;
+			}
+			
+			// Make a unique name...
+			for (int Index = 1; Index < 1000; Index++)
+			{
+				LString Nm = Leaf;
+				if (Index > 1)
+				{
+					LString::Array a = Nm.RSplit(".", 1);
+					if (a.Length() == 2)
+						Nm.Printf("%s %i.%s", a[0].Get(), Index, a[1].Get());
+					else
+						Nm.Printf("%s %i", a[0].Get(), Index);
+				}
+				if (!LMakePath(Buf, sizeof(Buf), Select->Name(), Nm))
+				{
+					Errors++;
+					break;
+				}
+				
+				if (!LFileExists(Buf))
+					break;
+			}
+			
+			Out = Buf;
+		}
+	
+		LAutoPtr<LFile> f(new LFile);
+		if (!f->Open(Out, O_WRITE))
+		{
+			LgiTrace("%s:%i - Couldn't open '%s' for writing.", _FL, Select->Name());
+			Errors++;
+		}
+		else
+		{
+			f->SetSize(0);
+			if (m->Export(m->AutoCast(f), ExportMimeType))
+				Exported++;
+			else
+				Errors++;
+		}
+	}
+
+	if (Errors > 0)
+		LgiMsg(Parent, "Export failed: %i exported, %i errors.", AppName, MB_OK, Exported, Errors);
+		
+	if (Callback)
+		Callback(Errors == 0);
+};
+
+
 void Thing::ExportAll(	LViewI *Parent,
 						const char *ExportMimeType,
 						std::function<void(bool)> Callback)
@@ -484,77 +555,7 @@ void Thing::ExportAll(	LViewI *Parent,
 	if (GetList())
 		GetList()->GetSelection(Sel);
 	else
-		Sel.Insert(this);
-	
-	auto Process = [this, Callback, Parent, Sel, ExportMimeType=LString(ExportMimeType)](LFileSelect *Select)
-	{
-		int Exported = 0;
-		int Errors = 0;
-		for (unsigned idx = 0; idx < Sel.Length(); idx++)
-		{
-			auto m = Sel[idx];
-			const char *Out;
-			char Buf[MAX_PATH_LEN];
-			if (Sel.Length() == 1)
-			{
-				Out = Select->Name();
-			}
-			else
-			{
-				char *Leaf = LGetLeaf(m->GetDropFileName());
-				if (!Leaf)
-				{
-					Errors++;
-					continue;
-				}
-				
-				// Make a unique name...
-				for (int Index = 1; Index < 1000; Index++)
-				{
-					LString Nm = Leaf;
-					if (Index > 1)
-					{
-						LString::Array a = Nm.RSplit(".", 1);
-						if (a.Length() == 2)
-							Nm.Printf("%s %i.%s", a[0].Get(), Index, a[1].Get());
-						else
-							Nm.Printf("%s %i", a[0].Get(), Index);
-					}				
-					if (!LMakePath(Buf, sizeof(Buf), Select->Name(), Nm))
-					{
-						Errors++;
-						break;
-					}
-					
-					if (!LFileExists(Buf))
-						break;
-				}
-				
-				Out = Buf;
-			}					
-		
-			LAutoPtr<LFile> f(new LFile);
-			if (!f->Open(Out, O_WRITE))
-			{
-				LgiTrace("%s:%i - Couldn't open '%s' for writing.", _FL, Select->Name());
-				Errors++;
-			}
-			else
-			{
-				f->SetSize(0);
-				if (m->Export(m->AutoCast(f), ExportMimeType))
-					Exported++;
-				else
-					Errors++;
-			}
-		}
-
-		if (Errors > 0)
-			LgiMsg(Parent, "Export failed: %i exported, %i errors.", AppName, MB_OK, Exported, Errors);
-			
-		if (Callback)
-			Callback(Errors == 0);
-	};
+		Sel.Insert(this);	
 	
 	auto Select = new LFileSelect(Parent);
 	if (Sel.Length() == 1)
@@ -563,19 +564,19 @@ void Thing::ExportAll(	LViewI *Parent,
 
 	if (Sel.Length() > 1)
 	{
-		Select->OpenFolder([this, Process](auto dlg, auto status)
+		Select->OpenFolder([this, Parent, ExportMimeType=LString(ExportMimeType), Callback, Sel](auto dlg, auto status)
 		{
 			if (status)
-				Process(dlg);
+				ExportAllProcess(dlg, Parent, Sel, ExportMimeType, Callback);
 			delete dlg;
 		});
 	}
 	else
 	{
-		Select->Save([this, Process](auto dlg, auto status)
+		Select->Save([this, Parent, ExportMimeType=LString(ExportMimeType), Callback, Sel](auto dlg, auto status)
 		{
 			if (status)
-				Process(dlg);
+				ExportAllProcess(dlg, Parent, Sel, ExportMimeType, Callback);
 			delete dlg;
 		});
 	}
