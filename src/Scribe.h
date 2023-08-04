@@ -539,7 +539,7 @@ public:
 	
 	/// This exports all the selected items
 	void ExportAll(LViewI *Parent, const char *ExportMimeType, std::function<void(bool)> Callback);
-	void ExportAllProcess(LFileSelect *Select, LViewI *Parent, List<Thing> Sel, LString ExportMimeType, std::function<void(bool)> Callback);
+	void ExportAllProcess(LFileSelect *Select, LViewI *Parent, LArray<Thing*> Sel, LString ExportMimeType, std::function<void(bool)> Callback);
 
 	// UI
 	bool OnKey(LKey &k) override;

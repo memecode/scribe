@@ -476,7 +476,7 @@ bool Thing::GetFormats(LDragFormats &Formats)
 	return Formats.Length() > 0;
 }
 
-void Thing::ExportAllProcess(LFileSelect *Select, LViewI *Parent, List<Thing> Sel, LString ExportMimeType, std::function<void(bool)> Callback)
+void Thing::ExportAllProcess(LFileSelect *Select, LViewI *Parent, LArray<Thing*> Sel, LString ExportMimeType, std::function<void(bool)> Callback)
 {
 	int Exported = 0;
 	int Errors = 0;
@@ -551,11 +551,11 @@ void Thing::ExportAll(	LViewI *Parent,
 						const char *ExportMimeType,
 						std::function<void(bool)> Callback)
 {
-	List<Thing> Sel;
+	LArray<Thing*> Sel;
 	if (GetList())
 		GetList()->GetSelection(Sel);
 	else
-		Sel.Insert(this);	
+		Sel.Add(this);
 	
 	auto Select = new LFileSelect(Parent);
 	if (Sel.Length() == 1)
