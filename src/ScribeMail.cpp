@@ -2991,6 +2991,20 @@ bool MailUi::SeekMsg(int delta)
 	return Status;
 }
 
+void MailUi::AttachFile(const char *File)
+{
+	auto m = GetItem();
+	if (!m)
+		return;
+
+	Attachment *a = m->AttachFile(this, File);
+	if (a && Attachments)
+	{
+		Attachments->Insert(a);
+		Attachments->ResizeColumnsToContent();
+	}
+}
+
 int MailUi::HandleCmd(int Cmd)
 {
 	switch (Cmd)
@@ -3212,12 +3226,7 @@ int MailUi::HandleCmd(int Cmd)
 								strcpy_s(File, sizeof(File), (*dlg)[i]);
 							}
 
-							Attachment *a = m->AttachFile(this, File);
-							if (a && Attachments)
-							{
-								Attachments->Insert(a);
-								Attachments->ResizeColumnsToContent();
-							}
+							AttachFile(File);
 						}
 					}
 				}
@@ -7037,13 +7046,13 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 	// First check the email from address...
 	if (!ValidStr(GetFrom()->GetStr(FIELD_EMAIL)))
 	{
-		LOptionsFile *Options = App->GetOptions();
+		auto Options = App->GetOptions();
 		if (Options)
 		{
-			ScribeAccount *Ident = App->GetAccounts()->ItemAt(App->GetCurrentIdentity());
+			auto Ident = App->GetAccounts()->ItemAt(App->GetCurrentIdentity());
 			if (Ident)
 			{
-				LVariant v = Ident->Identity.Email();
+				auto v = Ident->Identity.Email();
 				GetFrom()->SetStr(FIELD_EMAIL, v.Str());
 				v = Ident->Identity.Name();
 				GetFrom()->SetStr(FIELD_NAME, v.Str());
@@ -7052,9 +7061,9 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 	}
 
 	Out->From = GetFromStr(FIELD_EMAIL);
-	LDataIt To = GetTo();
+	auto To = GetTo();
 	ContactGroup *Group = NULL;
-	for (LDataPropI *t = To->First(); t; t = To->Next())
+	for (auto t = To->First(); t; t = To->Next())
 	{
 		LString Addr = t->GetStr(FIELD_EMAIL);
 		if (LIsValidEmail(Addr))
@@ -7066,7 +7075,7 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 		}
 	}
 
-	LDataPropI *Root = GetObject()->GetObj(FIELD_MIME_SEG);
+	auto Root = GetObject()->GetObj(FIELD_MIME_SEG);
 	if (!Root)
 	{
 		LAssert(!"No root element.");
@@ -7097,7 +7106,7 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 	Out->BounceMsgId = GetBounceMsgId();
 	
 	// Read the resulting string into the output envelope
-	int Sz = (int)Buf.GetSize();
+	auto Sz = Buf.GetSize();
 	Out->Rfc822.Length(Sz);
 	Buf.SetPos(0);
 	Buf.Read(Out->Rfc822.Get(), Sz);

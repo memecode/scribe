@@ -311,7 +311,6 @@ protected:
 	bool SeekMsg(int Delta);
 
 	bool NeedsCapability(const char *Name, const char *Param = NULL);
-	LDocView *GetDoc(const char *MimeType);
 	bool SetDoc(LDocView *v, const char *MimeType);
 	void OnInstall(LCapabilityTarget::CapsHash *Caps, bool Status);
 	void OnCloseInstaller();
@@ -325,6 +324,7 @@ public:
 	const char *GetClass() { return "MailUi"; }
 	Mail *GetItem();
 	void SetItem(Mail *m);
+	LDocView *GetDoc(const char *MimeType);
 
 	bool SetDirty(bool d, bool ui = true);
 	void OnLoad();
@@ -346,6 +346,7 @@ public:
 	LMessage::Result OnEvent(LMessage *Msg);
 	void OnPosChange();
 	int OnCommand(int Cmd, int Event, OsView Window);
+	void AttachFile(const char *File);
 	int HandleCmd(int Cmd);
 	void OnReceiveFiles(LArray<const char*> &Files);
 	bool OnViewKey(LView *v, LKey &k);

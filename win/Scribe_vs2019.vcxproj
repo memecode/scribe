@@ -525,6 +525,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\src\Store3Webdav\WebdavFolder.cpp" />
     <ClCompile Include="..\src\Store3Webdav\WebdavStore.cpp" />
     <ClCompile Include="..\src\Store3Webdav\WebdavThread.cpp" />
+    <ClCompile Include="..\src\Test\UnitTests.cpp" />
     <ClCompile Include="..\src\TitlePage.cpp" />
     <ClCompile Include="..\Utils\Tables\MailFlags.c" />
   </ItemGroup>
@@ -618,6 +619,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\src\ScribePrivate.h" />
     <ClInclude Include="..\src\ScribeStatusPanel.h" />
     <ClInclude Include="..\src\ScribeUtils.h" />
+    <ClInclude Include="..\src\ScribeWndPrivate.h" />
     <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3.h" />
     <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3ext.h" />
     <ClInclude Include="..\src\Store3Imap\include\Scribe.pb.h" />

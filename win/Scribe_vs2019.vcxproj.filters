@@ -505,6 +505,9 @@
     <ClCompile Include="..\src\HtmlToText.cpp">
       <Filter>Application</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Test\UnitTests.cpp">
+      <Filter>Testing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\Btree\btree.h">
@@ -804,6 +807,9 @@
     <ClInclude Include="..\src\FolderTask.h">
       <Filter>Application</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ScribeWndPrivate.h">
+      <Filter>Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Icons\app.ico">
@@ -940,35 +946,35 @@
     <None Include="..\src\Py\DomScan.py">
       <Filter>Install</Filter>
     </None>
-    <None Include="..\src\Encryption\Examples\encrypted.eml">
-      <Filter>TestCases</Filter>
-    </None>
-    <None Include="..\src\Encryption\Examples\encrypted+html+attach+key.eml">
-      <Filter>TestCases</Filter>
-    </None>
-    <None Include="..\src\Encryption\Examples\encrypted+attach.eml">
-      <Filter>TestCases</Filter>
-    </None>
     <None Include="..\src\Store3Imap\Scribe.proto">
       <Filter>Application</Filter>
     </None>
-    <None Include="..\src\Encryption\Examples\signed.eml">
-      <Filter>TestCases</Filter>
-    </None>
-    <None Include="..\src\Encryption\Examples\signed+attach.eml">
-      <Filter>TestCases</Filter>
-    </None>
-    <None Include="..\src\Encryption\Examples\signed+encrypted.eml">
-      <Filter>TestCases</Filter>
-    </None>
-    <None Include="..\src\Encryption\Examples\signed+html.eml">
-      <Filter>TestCases</Filter>
-    </None>
-    <None Include="..\src\Encryption\Examples\signed+HTML+attach+key.eml">
-      <Filter>TestCases</Filter>
-    </None>
     <None Include="..\src\Py\win32_pre_build_step.py">
       <Filter>Application</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+HTML+attach+key.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted+attach.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted+html+attach+key.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+attach.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+encrypted.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+html.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted.eml">
+      <Filter>Testing\Email</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -991,9 +997,6 @@
     </Filter>
     <Filter Include="Calendar">
       <UniqueIdentifier>{15bf5500-86f7-4217-ad50-dfc441b2fb89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="TestCases">
-      <UniqueIdentifier>{c8868eeb-fe8d-42a2-a647-9df3bff160c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Emoji">
       <UniqueIdentifier>{111097d8-3c3a-4fb4-a418-548f08670ade}</UniqueIdentifier>
@@ -1063,6 +1066,12 @@
     </Filter>
     <Filter Include="Printing">
       <UniqueIdentifier>{0bbd47dc-9bff-40f0-9d61-182a4dc33ff7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Testing">
+      <UniqueIdentifier>{c8868eeb-fe8d-42a2-a647-9df3bff160c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Testing\Email">
+      <UniqueIdentifier>{a1a4d9a6-dba2-4699-8d31-fc77816706cd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
