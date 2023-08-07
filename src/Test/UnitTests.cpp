@@ -242,7 +242,7 @@ struct MimeTreeTest : public ScribeUnitTest
 	Mail *m = NULL;
 	ThingUi *ui = NULL;
 	std::function<void(bool)> callback;
-	bool done = false;
+	int step = 0;
 
 	MimeTreeTest(UnitTestState *state) : s(state)
 	{
@@ -276,36 +276,54 @@ struct MimeTreeTest : public ScribeUnitTest
 
 	void OnPulse()
 	{
-		if (!done && ui)
+		switch (step)
 		{
-			done = true;
-
-			LEdit *e;
-			if (ui->GetViewById(IDC_ENTRY, e))
+			case 0:
 			{
-				e->Name("fret@memecode.com");
-				e->SendNotify(LNotifyReturnKey);
-			}
-			ui->SetCtrlName(IDC_SUBJECT, "MimeTreeTest");
-			
-			MailUi *mailui = dynamic_cast<MailUi*>(ui);
-			if (!mailui)
-				LAssert(!"Not a MailUi?");
-			else
-			{
-				mailui->AttachFile(CreateTmp("content1"));
-				mailui->AttachFile(CreateTmp("content2"));
+				if (!ui)
+					break;
+				step++;
 
-				auto html = mailui->GetDoc(sTextHtml);
-				if (html)
+				LEdit *e;
+				if (ui->GetViewById(IDC_ENTRY, e))
 				{
-					auto edit = dynamic_cast<LRichTextEdit*>(html);
-					if (edit)
+					e->Name("fret@memecode.com");
+					e->SendNotify(LNotifyReturnKey);
+				}
+				ui->SetCtrlName(IDC_SUBJECT, "MimeTreeTest");
+			
+				MailUi *mailui = dynamic_cast<MailUi*>(ui);
+				if (!mailui)
+					LAssert(!"Not a MailUi?");
+				else
+				{
+					mailui->AttachFile(CreateTmp("content1"));
+					mailui->AttachFile(CreateTmp("content2"));
+
+					auto html = mailui->GetDoc(sTextHtml);
+					if (html)
 					{
-						const char16 *content = L"This is the content";
-						edit->Insert(0, content, StrlenW(content)); 
+						auto edit = dynamic_cast<LRichTextEdit*>(html);
+						if (edit)
+						{
+							const char16 *content = L"This is the content";
+							edit->Insert(0, content, StrlenW(content)); 
+						}
 					}
 				}
+				break;
+			}
+			case 1:
+			{
+				ui->OnSave();
+				ui->Quit();
+				step++;
+				break;
+			}
+			case 2:
+			{
+				int asd=0;
+				break;
 			}
 		}
 
