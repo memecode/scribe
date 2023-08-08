@@ -8292,6 +8292,23 @@ const char *Mail::GetText(int i)
 	return NULL;
 }
 
+void DumpMimeTree(LDataPropI *seg, int depth = 0)
+{
+	if (!seg) return;
+	auto indent = LString(" ") * (depth << 2);
+
+	auto mimetype = seg->GetStr(FIELD_MIME_TYPE);
+	auto filename = seg->GetStr(FIELD_NAME);
+	LgiTrace("%sseg:%s fn=%s\n", indent.Get(), mimetype, filename);
+
+	auto It = seg->GetList(FIELD_MIME_SEG);
+	if (It)
+	{
+		for (auto i = It->First(); i; i=It->Next())
+			DumpMimeTree(i, depth + 1);
+	}
+}
+
 LDataI *Mail::GetFileAttachPoint()
 {
 	if (!GetObject())
@@ -8439,6 +8456,7 @@ Attachment *Mail::AttachFile(LView *Parent, const char *FileName)
 		}
 	}
 
+	DumpMimeTree(GetObject()->GetObj(FIELD_MIME_SEG));
 	return File;
 }
 

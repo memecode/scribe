@@ -284,28 +284,46 @@ struct MimeTreeTest : public ScribeUnitTest
 			callback(status);
 	}
 
+	void Dump(LMime &m, int depth = 0)
+	{
+		auto indent = LString(" ") * (depth<<2);
+		auto mimetype = m.LGetMimeType();
+		auto filename = m.LGetFileName();
+		LgiTrace("%sseg:%s fn=%s\n", indent.Get(), mimetype.Get(), filename.Get());
+		for (int i=0; i<m.Length(); i++)
+			Dump(*m[i], depth+1);
+	}
+
 	void OnMime(LMime &m)
 	{
-		LAutoString type(m.GetMimeType());
+		Dump(m);
+
+		auto type = m.LGetMimeType();
 		if (Stricmp(type.Get(), sMultipartMixed))
 			return OnComplete(false, "wrong root node type");
 		if (m.Length() == 0)
 			return OnComplete(false, "no child segs");
 
-		LMime *alt = NULL;
+		LMime *html = NULL;
+		LArray<LMime*> others;
 		LArray<LMime*> attachments;
 		for (int i=0; i<m.Length(); i++)
 		{
 			auto c = m[i];
-			type.Reset(c->GetMimeType());
-			if (!Stricmp(type.Get(), sMultipartAlternative))
-				alt = c;
-			else
+			type = c->LGetMimeType();
+			auto fn = c->LGetFileName();
+			if (!Stricmp(type.Get(), sTextHtml))
+				html = c;
+			else if (fn)
 				attachments.Add(c);
+			else
+				others.Add(c);
 		}
 
-		if (!alt)
-			return OnComplete(false, "no alt seg.");
+		if (!html)
+			return OnComplete(false, "missing html.");
+		if (others.Length())
+			return OnComplete(false, "should be no other segs.");
 		if (attachments.Length() != 2)
 			return OnComplete(false, "wrong attachment count.");
 

@@ -333,7 +333,7 @@ private:
 		LArray<LRange> Segs;
 		LMime Tmp;
 		LString Hdrs;
-		char *Boundary = NULL;
+		LString Boundary;
 		LAutoPtr<GpgSigCheckResponse> Resp(new GpgSigCheckResponse);
 		
 		if (!Resp)
@@ -373,7 +373,7 @@ private:
 		HdrSize = Msg.Find("\r\n\r\n");
 		Hdrs = Msg(0, HdrSize);
 		Tmp.SetHeaders(Hdrs);
-		Boundary = Tmp.GetBoundary();
+		Boundary = Tmp.LGetBoundary();
 		if (!Boundary)
 		{
 			Resp->Error = LLoadString(IDS_GNUPG_ERR_NO_BOUNDARY);
@@ -381,7 +381,7 @@ private:
 		}
 		
 		// Now look through the message and find all the segments...
-		Start.Printf("\r\n--%s", Boundary);
+		Start.Printf("\r\n--%s", Boundary.Get());
 		for (ptrdiff_t i = 0; i < (ptrdiff_t)Msg.Length(); )
 		{
 			ptrdiff_t Next = Msg.Find(Start, i);
@@ -1466,7 +1466,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 			LMime Mime(ScribeTempPath());
 			Store3ToLMime(&Mime, LocalRoot);
 	
-			if (!Mime.GetBoundary())
+			if (!Mime.LGetBoundary())
 			{
 				// No boundary... so set it and propagate the change back
 				char b[64];
