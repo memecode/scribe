@@ -9,6 +9,9 @@
 #include "resdefs.h"
 #include "LoadMailStoreState.h"
 
+#define UnitTestFail()	{ if (Callback) Callback(false); return; }
+#define UnitTestPass()	{ if (Callback) Callback(true); return; }
+
 class NoSaveOptions : public LOptionsFile
 {
 	bool Serialize(bool Write) { return true; }
@@ -77,9 +80,6 @@ struct UnitTestState :
 		App->UnLoadFolders();
 	}
 };
-
-#define UnitTestFail()	{ if (Callback) Callback(false); return; }
-#define UnitTestPass()	{ if (Callback) Callback(true); return; }
 
 // Basic load mail3 folder...
 struct LoadMailStore1 : public ScribeUnitTest
@@ -244,6 +244,8 @@ struct MimeTreeTest : public ScribeUnitTest
 	std::function<void(bool)> callback;
 	int step = 0;
 
+	const char *GetClass() { return "MimeTreeTest"; }
+	
 	MimeTreeTest(UnitTestState *state) : s(state)
 	{
 	}
@@ -274,6 +276,42 @@ struct MimeTreeTest : public ScribeUnitTest
 		return p.GetFull();
 	}
 
+	void OnComplete(bool status, const char *errMsg)
+	{
+		if (!status)
+			LgiTrace("%s:%i - %s failed: %s\n", _FL, GetClass(), errMsg);
+		if (callback)
+			callback(status);
+	}
+
+	void OnMime(LMime &m)
+	{
+		LAutoString type(m.GetMimeType());
+		if (Stricmp(type.Get(), sMultipartMixed))
+			return OnComplete(false, "wrong root node type");
+		if (m.Length() == 0)
+			return OnComplete(false, "no child segs");
+
+		LMime *alt = NULL;
+		LArray<LMime*> attachments;
+		for (int i=0; i<m.Length(); i++)
+		{
+			auto c = m[i];
+			type.Reset(c->GetMimeType());
+			if (!Stricmp(type.Get(), sMultipartAlternative))
+				alt = c;
+			else
+				attachments.Add(c);
+		}
+
+		if (!alt)
+			return OnComplete(false, "no alt seg.");
+		if (attachments.Length() != 2)
+			return OnComplete(false, "wrong attachment count.");
+
+		OnComplete(true, "success");
+	}
+
 	void OnPulse()
 	{
 		switch (step)
@@ -290,7 +328,7 @@ struct MimeTreeTest : public ScribeUnitTest
 					e->Name("fret@memecode.com");
 					e->SendNotify(LNotifyReturnKey);
 				}
-				ui->SetCtrlName(IDC_SUBJECT, "MimeTreeTest");
+				ui->SetCtrlName(IDC_SUBJECT, GetClass());
 			
 				MailUi *mailui = dynamic_cast<MailUi*>(ui);
 				if (!mailui)
@@ -315,14 +353,27 @@ struct MimeTreeTest : public ScribeUnitTest
 			}
 			case 1:
 			{
+				step++;
 				ui->OnSave();
 				ui->Quit();
-				step++;
 				break;
 			}
 			case 2:
 			{
-				int asd=0;
+				step++;
+				LAutoPtr<LStreamI> stream(new LStringPipe);
+				auto result = m->Export(stream, sMimeMessage, [this](auto prog, auto mime)
+				{
+					LMime parser;
+					auto sz = mime->GetSize();
+					mime->SetPos(0);
+					if (!parser.Text.Decode.Pull(mime))
+						OnComplete(false, "mime decode failed");
+					else
+						OnMime(parser);
+				});
+				if (result.status == Store3Error)
+					OnComplete(false, "mail export failed");
 				break;
 			}
 		}
