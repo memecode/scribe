@@ -243,6 +243,9 @@ struct MimeTreeTest : public ScribeUnitTest
 	ThingUi *ui = NULL;
 	std::function<void(bool)> callback;
 	int step = 0;
+	const char16 *htmlContent = L"This is the content";
+	const char *content1 = "content1";
+	const char *content2 = "content2";
 
 	const char *GetClass() { return "MimeTreeTest"; }
 	
@@ -294,6 +297,17 @@ struct MimeTreeTest : public ScribeUnitTest
 			Dump(*m[i], depth+1);
 	}
 
+	bool Check(LMime &m, LString content)
+	{
+		auto s = m.GetData();
+		if (!s)
+			return false;
+		LArray<char> data;
+		data.Length(s->GetSize());
+		auto rd = s->Read(data.AddressOf(), s->GetSize());
+		return Strnstr(data.AddressOf(), content.Get(), rd) != NULL;
+	}
+
 	void OnMime(LMime &m)
 	{
 		Dump(m);
@@ -305,16 +319,15 @@ struct MimeTreeTest : public ScribeUnitTest
 			return OnComplete(false, "no child segs");
 
 		LMime *html = NULL;
-		LArray<LMime*> others;
-		LArray<LMime*> attachments;
+		LArray<LMime*> others, attachments;
 		for (int i=0; i<m.Length(); i++)
 		{
 			auto c = m[i];
 			type = c->LGetMimeType();
 			auto fn = c->LGetFileName();
-			if (!Stricmp(type.Get(), sTextHtml))
+			if (type.Equals(sTextHtml))
 				html = c;
-			else if (fn)
+			else if (fn && type.Equals(sTextPlain))
 				attachments.Add(c);
 			else
 				others.Add(c);
@@ -326,6 +339,15 @@ struct MimeTreeTest : public ScribeUnitTest
 			return OnComplete(false, "should be no other segs.");
 		if (attachments.Length() != 2)
 			return OnComplete(false, "wrong attachment count.");
+
+		if (!Check(*html, htmlContent))
+			return OnComplete(false, "html missing the right content");
+		for (auto a: attachments)
+		{
+			if (!Check(*a, content1) &&
+				!Check(*a, content2))
+				return OnComplete(false, "attachment missing content.");
+		}
 
 		OnComplete(true, "success");
 	}
@@ -353,18 +375,15 @@ struct MimeTreeTest : public ScribeUnitTest
 					LAssert(!"Not a MailUi?");
 				else
 				{
-					mailui->AttachFile(CreateTmp("content1"));
-					mailui->AttachFile(CreateTmp("content2"));
+					mailui->AttachFile(CreateTmp(content1));
+					mailui->AttachFile(CreateTmp(content2));
 
 					auto html = mailui->GetDoc(sTextHtml);
 					if (html)
 					{
 						auto edit = dynamic_cast<LRichTextEdit*>(html);
 						if (edit)
-						{
-							const char16 *content = L"This is the content";
-							edit->Insert(0, content, StrlenW(content)); 
-						}
+							edit->Insert(0, htmlContent, StrlenW(htmlContent)); 
 					}
 				}
 				break;
