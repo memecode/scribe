@@ -407,7 +407,7 @@
 		<String Ref="649" Cid="649" Define="IDD_BAYES_SETTINGS" en="Bayesian Filtering" pt="Ordenar" cs="Bayesovské třídění" pl="Filtr Bayesa" it="Filtro Bayes" vi="Bộ lọc Bayes" zh_tw="Bayesian 過濾中" ja="ベイズフィルタリング" nl="Bayesiaans filteren" sr="Bayesian filter" es="Filtro Bayesiano" no="Bayesian filtrering" lt="Bayeso nepageidaujamų laiškų filtras" de="Bayes SPAM-Filter" da="Bayesian filtrering" fa="Bayesian فيلترينگ به روش" sv="Bayesisk filtrering" pt_br="Filtragem Bayesiana" tr="Bayesian Filtreleme" hu="Bayesian szűrő" ru="Фильтр Баеса" ko="베이지안 필터링" uk="Фільтрація Байеса" fr="Filtrage bayésien" />
 		<String Ref="650" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="651" Cid="684" Define="IDC_ACCOUNTS_WRITE" en="Write/Delete" pt="Escrita" cs="Zápis/Výmaz" pl="Pisanie/Usuwanie" it="Scrittura/Cancellazione" vi="Ghi/Xóa" zh_tw="寫入 / 刪除" ja="書き込み/削除" nl="Schrijven/Verwijderen" sr="Piši/Briši" es="Escritura/Borrado" no="Skrive/slette" lt="Įrašymas, šalinimas" fa="نوشتن/پاک کردن" de="Schreiben/Löschen" da="Skrive/slette" sv="Skriv/Ta bort" pt_br="Escrita" lg="Wandiika/Sangula" tr="Yazma/Silme" hu="Ír/Töröl" ru="Запись/Удаление" ko="작성/삭제" uk="Запис / Видалення" fr="Écrire/Éffacer" />
-		<String Ref="652" Cid="-1" Define="IDC_STATIC" en="Borders" fr="Marges" cs="Okraje" de="Ränder" nl="Marges" es="Bordes" pt_br="Bordas" pt="Margens" pl="Marginesy" it="Margini" vi="Khung" zh_tw="邊" ja="余白" sr="Margine" no="Marger" lt="Paraštės" fa="حاشيه ها" da="Marger" sv="Marginaler" lg="Oluggo" tr="Marjlar" hu="Keret" ru="Отступ" ko="여백" uk="Межі" />
+		<String Ref="652" Cid="-1" Define="IDC_STATIC" en="Borders (in centimeters)" fr="Marges" cs="Okraje" de="Ränder" nl="Marges" es="Bordes" pt_br="Bordas" pt="Margens" pl="Marginesy" it="Margini" vi="Khung" zh_tw="邊" ja="余白" sr="Margine" no="Marger" lt="Paraštės" fa="حاشيه ها" da="Marger" sv="Marginaler" lg="Oluggo" tr="Marjlar" hu="Keret" ru="Отступ" ko="여백" uk="Межі" />
 		<String Ref="654" Cid="690" Define="IDC_APW_NONE" en="None" pt="Nenhum" cs="Bez omezení" pl="Brak" it="Nessuno" vi="Không ai cả" zh_tw="無" ja="無し" nl="Geen" sr="Niko" es="Ninguno" no="Ingen" lt="Visiems" fa="هيچ يک" de="Niemand" da="Ingen" sv="Ingen" pt_br="Nenhum" lg="Temuli" tr="Yok" hu="Nincs" ru="Нет" ko="없음" uk="Ні" fr="Aucun" />
 		<String Ref="655" Cid="641" Define="IDC_ACCOUNTS_READ" en="Read" pt="Leitura" cs="Čtení" pl="Czytanie" it="Lettura" vi="Đọc" zh_tw="讀取" ja="読み取り" nl="Gelezen" sr="Čitaj" es="Lectura" no="Lese" lt="Skaitymas" fa="خواندن" de="Lesen" da="Læs" sv="Läs" pt_br="Leitura" lg="Ezisomeddwa" tr="Okuma" hu="Olvas" ru="Чтение" ko="읽기" uk="Читання" fr="Lire" />
 		<String Ref="656" Cid="-1" Define="IDC_STATIC" en="URL:" />
@@ -2250,7 +2250,7 @@
 					<StaticText pos="14,508,62,521" ref="1048" />
 				</td>
 				<td addr="1,11" colspan="2">
-					<Group pos="90,508,271,535" ref="528">
+					<Group pos="91,508,272,535" ref="528">
 						<RadioBox pos="7,14,76,27" ref="529" />
 						<RadioBox pos="70,7,146,20" ref="530" />
 						<RadioBox pos="119,14,181,27" ref="531" />
@@ -3904,7 +3904,7 @@
 		<TableLayout pos="7,7,573,454" ref="650" cols="0.250,0.250,0.250,0.250" rows="0.071,0.071,0.067,0.067,0.063,0.661">
 			<tr>
 				<td addr="0,0" colspan="2">
-					<StaticText pos="0,6,55,26" ref="652" />
+					<StaticText pos="0,7,146,27" ref="652" />
 				</td>
 				<td addr="2,0">
 					<StaticText pos="287,7,398,27" ref="562" />
@@ -4668,9 +4668,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4678,23 +4692,9 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>

@@ -7,8 +7,8 @@
 #define OPT_MarginY2	"Print.MarginY2"
 #define OPT_PrintFont	"Print.Font"
 
-#define PageDefaultX	21.0
-#define PageDefaultY	29.7
+#define PageDefaultX	21.0 // cm
+#define PageDefaultY	29.7 // cm
 
 class ScribePageSetup : public LDialog
 {

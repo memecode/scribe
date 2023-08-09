@@ -10,18 +10,17 @@ class BorderEdit : public LLayout, public ResObject
 {
 	friend class ScribePageSetup;
 
+	// These are all in centimeters
 	double x1, y1, x2, y2;
-	double PageX, PageY;
-	double Scale;
+	double PageX = PageDefaultX; // A4 is the default
+	double PageY = PageDefaultY;
+
+	double Scale = 1.0;
 
 public:
 	BorderEdit() : ResObject(Res_Custom)
 	{
 		x1 = y1 = x2 = y2 = 1.0;
-		PageX = PageDefaultX; // A4 is the default
-		PageY = PageDefaultY;
-		Scale = 1.0; // scaling..
-
 		Sunken(true);
 	}
 
@@ -37,8 +36,9 @@ public:
 	void OnPaint(LSurface *pDC)
 	{
 		// calculate scaling
-		// double Aspect = PageY / PageX;
-		Scale = ((double)Y()) * 0.8 / PageY;
+		auto client = GetClient();
+		auto TargetY = (double)client.Y() * 0.8;
+		Scale = PageY > 0 ? TargetY / PageY : 1.0;
 
 		// paint background
 		pDC->Colour(L_LOW);
@@ -86,12 +86,12 @@ public:
 	{
 	    if (!Inf.Width.Max)
 	    {
-	        Inf.Width.Max = 10000;
+	        Inf.Width.Max = -1;
 	        Inf.Width.Min = 100;
 	    }
 	    else if (!Inf.Height.Max)
 	    {
-	        Inf.Height.Max = 10000;
+	        Inf.Height.Max = -1;
 	        Inf.Height.Min = 100;
 	    }
 	    else return false;
