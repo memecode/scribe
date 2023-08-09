@@ -2,12 +2,12 @@
 #include "ScribeScripts.h"
 
 //
-// Delete duplicate messages
+// Delete duplicate messages recursively through folders.
 //
 
-function DeleteDuplicateMessages(App)
+function DeleteDuplicateMessages(App, folder)
 {
-	Folder = App.CurrentFolder;
+	Folder = folder;
 	if (Folder && Folder.ItemType == ScribeItemMail)
 	{
 		Msgs = New("HashTable");
@@ -25,6 +25,7 @@ function DeleteDuplicateMessages(App)
 					Existing = Msgs[Id];
 					if (Existing)
 					{
+						Print("Duplicate: " + folder.path + ":" + t.Subject + "\n");
 						// Decide which email is older
 						if (t.DateReceived < Existing.DateReceived)
 						{
@@ -58,14 +59,28 @@ function DeleteDuplicateMessages(App)
 				}
 			}
 		}
-		else Print("Error: No dupes.\n");
 	}
-	else Print("Error: No folder.\n");
+}
+
+function DeleteDuplicatesFromFolder(App, Folder)
+{
+    DeleteDuplicateMessages(App, Folder);
+    for (c = Folder.Child; c; c = c.Next)
+    {
+        DeleteDuplicatesFromFolder(App, c);
+    }
+}
+
+function RecurseDeleteDuplicatesFromFolder(App, MenuId)
+{
+    Print("Recursively delete duplicate messages from: " + App.CurrentFolder.Path + " (see console)\n");
+    DeleteDuplicatesFromFolder(App, App.CurrentFolder);
+    Print("done.\n");
 }
 
 function Main(App)
 {
-	if (!AddToolsMenuItem(LoadString(IDS_REMOVE_DUPES), "DeleteDuplicateMessages"))
-		MessageDlg(App, "Couldn't add hook for DeleteDuplicateMessages");
+	if (!AddToolsMenuItem(LoadString(IDS_REMOVE_DUPES), "RecurseDeleteDuplicatesFromFolder"))
+		MessageDlg(App, "Couldn't add hook for Delete Duplicate Messages");
 	return 1;
 }
