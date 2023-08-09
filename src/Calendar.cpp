@@ -669,6 +669,8 @@ int CalSorter(TimePeriod *a, TimePeriod *b)
 	return a->s.Compare(&b->s);
 }
 
+CalendarSourceGetEvents *Calendar::GetEvents = NULL;
+
 void Calendar::SummaryOfToday(ScribeWnd *App, std::function<void(LString)> Callback)
 {
 	LDateTime Now;
@@ -680,64 +682,73 @@ void Calendar::SummaryOfToday(ScribeWnd *App, std::function<void(LString)> Callb
 	if (!App || !Callback || !App->GetCalendarSources(Sources))
 		return;
 
-	new CalendarSourceGetEvents(App, Now, Next, Sources, [Callback](auto e)
-	{
-		if (!e.Length())
-		{
-			char s[256];
-			sprintf_s(s, sizeof(s), "<font color='#808080'>%s</font>", LLoadString(IDS_NO_EVENTS));
-			Callback(s);
-		}
-		else
-		{
-			e.Sort(CalSorter);
+	if (GetEvents)
+		return;
 
-			LStringPipe p;
-
-			p.Print("<table cellspacing=3 style='background:white;'>\n");
-			for (unsigned n=0; n<e.Length() && n < 3; n++)
+	new CalendarSourceGetEvents(
+		App,
+		&GetEvents,
+		Now,
+		Next,
+		Sources,
+		[Callback](auto e)
+		{
+			if (!e.Length())
 			{
-				TimePeriod &tp = e[n];
-				Calendar *c = tp.c;
-
-				char Fore[32] = "black";
-				char Back[32] = "#c0c0c0";
-				const char *Subject = "...";
-
-				c->GetField(FIELD_CAL_SUBJECT, Subject);
-
-				LColour Base32 = c->GetColour();
-				auto Edge = Base32.Mix(LColour(L_WORKSPACE), 0.85f);
-				sprintf_s(Back, sizeof(Back), "#%2.2x%2.2x%2.2x", Edge.r(), Edge.g(), Edge.b());
-				sprintf_s(Fore, sizeof(Fore), "#%2.2x%2.2x%2.2x", Base32.r(), Base32.g(), Base32.b());
-
-				p.Print("\t<tr><td style='padding:2px;color:%s;background:%s;border:1px solid %s;'>\n"
-						"\t\t<a style='color:%s;font-size:13px;' href='thing://%p'>%s</a>\n",
-						Fore,
-						Back,
-						Fore,
-						Fore,
-						(Thing*)c,
-						Subject);
-
-				char Str[256];
-				const char *Rel = RelativeTime(tp.s);
-				if (Rel)
-				{
-					p.Print("\t\t<br/>%s\n", Rel);
-				}
-
-				tp.s.Get(Str, sizeof(Str));
-				p.Print("\t\t<br/>%s\n", Str);
-
-				tp.e.Get(Str, sizeof(Str));
-				p.Print("\t\t-<br/>%s\n", Str);
+				char s[256];
+				sprintf_s(s, sizeof(s), "<font color='#808080'>%s</font>", LLoadString(IDS_NO_EVENTS));
+				Callback(s);
 			}
-			p.Print("</table>\n");
+			else
+			{
+				e.Sort(CalSorter);
 
-			Callback(p.NewLStr());
-		}
-	});
+				LStringPipe p;
+
+				p.Print("<table cellspacing=3 style='background:white;'>\n");
+				for (unsigned n=0; n<e.Length() && n < 3; n++)
+				{
+					TimePeriod &tp = e[n];
+					Calendar *c = tp.c;
+
+					char Fore[32] = "black";
+					char Back[32] = "#c0c0c0";
+					const char *Subject = "...";
+
+					c->GetField(FIELD_CAL_SUBJECT, Subject);
+
+					LColour Base32 = c->GetColour();
+					auto Edge = Base32.Mix(LColour(L_WORKSPACE), 0.85f);
+					sprintf_s(Back, sizeof(Back), "#%2.2x%2.2x%2.2x", Edge.r(), Edge.g(), Edge.b());
+					sprintf_s(Fore, sizeof(Fore), "#%2.2x%2.2x%2.2x", Base32.r(), Base32.g(), Base32.b());
+
+					p.Print("\t<tr><td style='padding:2px;color:%s;background:%s;border:1px solid %s;'>\n"
+							"\t\t<a style='color:%s;font-size:13px;' href='thing://%p'>%s</a>\n",
+							Fore,
+							Back,
+							Fore,
+							Fore,
+							(Thing*)c,
+							Subject);
+
+					char Str[256];
+					const char *Rel = RelativeTime(tp.s);
+					if (Rel)
+					{
+						p.Print("\t\t<br/>%s\n", Rel);
+					}
+
+					tp.s.Get(Str, sizeof(Str));
+					p.Print("\t\t<br/>%s\n", Str);
+
+					tp.e.Get(Str, sizeof(Str));
+					p.Print("\t\t-<br/>%s\n", Str);
+				}
+				p.Print("</table>\n");
+
+				Callback(p.NewLStr());
+			}
+		});
 }
 
 void Calendar::OnSerialize(bool Write)

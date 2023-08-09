@@ -55,6 +55,8 @@ protected:
 	LArray<TimePeriod> Current;
 	LArray<Calendar*> Selection;
 	CalendarViewMode Mode;
+	CalendarSourceGetEvents *GetEvents = NULL;
+	bool SourceEventsDirty = false;
 
 	// Date/Times
 	LDateTime Cursor;
@@ -160,6 +162,7 @@ public:
 	void OnPulse() override;
 	int OnNotify(LViewI *v, LNotification n) override;
 	bool OnLayout(LViewLayoutInfo &Inf) override;
+	LMessage::Result OnEvent(LMessage *Msg) override;
 };
 
 class CalendarViewWnd : public LWindow

@@ -16,6 +16,7 @@ class CalendarView;
 class Attendee;
 class CalendarSource;
 class LTimeLine;
+class CalendarSourceGetEvents;
 
 extern void InitCalendarView();
 extern const char *RelativeTime(LDateTime &Then);
@@ -85,6 +86,7 @@ class ScribeClass Calendar :
 
 	// Static
 	static List<Calendar> Reminders;
+	static CalendarSourceGetEvents *GetEvents;
 
 	// Data
 	CalendarUi *Ui = NULL;
@@ -303,6 +305,7 @@ class CalendarSourceGetEvents : public LView::ViewEventTarget
 	LDateTime Start, End;
 	int Done = 0;
 	CalendarSource::GetEventCb Callback;
+	CalendarSourceGetEvents **Owner = NULL;
 
 	#ifdef _DEBUG
 	LHashTbl<PtrKey<CalendarSource*>,bool> GotCb;
@@ -310,12 +313,15 @@ class CalendarSourceGetEvents : public LView::ViewEventTarget
 
 public:
 	CalendarSourceGetEvents(ScribeWnd *app,
+							CalendarSourceGetEvents **owner,
 							LDateTime start,
 							LDateTime end,
 							LArray<CalendarSource*> sources,
 							CalendarSource::GetEventCb callback) :
-		LView::ViewEventTarget(app, M_CALENDAR_SOURCE_FINISH)
+		LView::ViewEventTarget(app, M_CALENDAR_SOURCE_FINISH),
+		Owner(owner)
 	{
+		*Owner = this;
 		Sources = sources;
 		Start = start;
 		End = end;
@@ -345,6 +351,11 @@ public:
 		}
 	}
 
+	~CalendarSourceGetEvents()
+	{
+		*Owner = NULL;
+	}
+
 	LMessage::Result OnEvent(LMessage *Msg)
 	{
 		if (Msg->Msg() == M_CALENDAR_SOURCE_FINISH)
@@ -363,6 +374,7 @@ class FolderCalendarSource :
 protected:
 	LString Path;
 	ScribeFolder *Folder;
+	bool IsReading = false;
 
 public:
 	FolderCalendarSource(ScribeWnd *a, const char *id = NULL);

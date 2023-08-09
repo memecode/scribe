@@ -706,6 +706,24 @@ void CalendarView::OnPulse()
 	}	
 }
 
+LMessage::Result CalendarView::OnEvent(LMessage *Msg)
+{
+	switch (Msg->Msg())
+	{
+		case M_GET_EVENTS_DONE:
+		{
+			if (SourceEventsDirty)
+			{
+				SourceEventsDirty = false;
+				OnContentsChanged();
+			}
+			break;
+		}
+	}
+
+	return LLayout::OnEvent(Msg);
+}
+
 bool CalendarView::OnLayout(LViewLayoutInfo &Inf)
 {
 	if (Inf.Width.Max == 0)
@@ -938,24 +956,38 @@ void CalendarView::OnContentsChanged(CalendarSource *Source)
 			break;
 	}
 	
-	new CalendarSourceGetEvents(App, Start, End, CalendarSource::GetSources(), [this](auto Events)
+	if (!GetEvents)
 	{
-		Current = Events;
+		new CalendarSourceGetEvents(
+			App,
+			&GetEvents,
+			Start,
+			End,
+			CalendarSource::GetSources(),
+			[this](auto Events)
+			{
+				Current = Events;
 
-		LHashTbl<PtrKey<Calendar*>, bool> InCur;
-		for (auto &c: Current)
-		{
-			// LgiTrace("%s\n", c.ToString().Get());
-			InCur.Add(c.c, true);
-		}
-		for (unsigned i=0; i<Selection.Length(); i++)
-		{
-			if (!InCur.Find(Selection[i]))
-				Selection.DeleteAt(i--);
-		}
+				LHashTbl<PtrKey<Calendar*>, bool> InCur;
+				for (auto &c: Current)
+				{
+					// LgiTrace("%s\n", c.ToString().Get());
+					InCur.Add(c.c, true);
+				}
+				for (unsigned i=0; i<Selection.Length(); i++)
+				{
+					if (!InCur.Find(Selection[i]))
+						Selection.DeleteAt(i--);
+				}
 
-		OnCursorChange();
-	});
+				OnCursorChange();
+				PostEvent(M_GET_EVENTS_DONE);
+			});
+	}
+	else
+	{
+		SourceEventsDirty = true;
+	}
 }
 
 void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)
@@ -988,12 +1020,26 @@ void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)
 			Current[i].c->Source = 0;
 		}
 
-		new CalendarSourceGetEvents(App, s, e, CalendarSource::GetSources(), [this](auto Events)
+		if (!GetEvents)
 		{
-			Current = Events;
-			Invalidate();
-		});
-		
+			new CalendarSourceGetEvents(
+				App,
+				&GetEvents,
+				s,
+				e,
+				CalendarSource::GetSources(),
+				[this](auto Events)
+				{
+					Current = Events;
+					Invalidate();
+					PostEvent(M_GET_EVENTS_DONE);
+				});
+		}
+		else
+		{
+			SourceEventsDirty = true;
+		}
+
 		LDateTime::GetDaylightSavingsInfo(Dst, s, &e);
 
 		LWindow *Wnd = GetWindow();

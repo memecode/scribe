@@ -104,8 +104,11 @@ void FolderCalendarSource::OnChange(bool IsDelete)
 
 bool FolderCalendarSource::Read()
 {
-	if (!Folder)
+	if (!Folder && !IsReading)
 	{
+		// Block recusive reads...
+		IsReading = true;
+
 		if (Id)
 		{
 			LString k = GetKey();
@@ -124,11 +127,12 @@ bool FolderCalendarSource::Read()
 
 				App->GetOptions()->Unlock();
 				OnChange(false);
-
-				return true;
 			}
 		}
 		else LAssert(0);
+
+		IsReading = false;
+		return !Id.IsEmpty();
 	}
 
 	return Folder != NULL;

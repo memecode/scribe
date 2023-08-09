@@ -6846,11 +6846,15 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			LPassword p;
 			if (p.Serialize(GetOptions(), OPT_UserPermPassword, false))
 			{
-				GetAccessLevel(this, PermRequireUser, "Security Settings", [ShowDialog](bool Allow)
-				{
-					if (Allow)
-						ShowDialog();
-				});
+				GetAccessLevel(
+					this,
+					PermRequireUser,
+					"Security Settings",
+					[ShowDialog](bool Allow)
+					{
+						if (Allow)
+							ShowDialog();
+					});
 			}
 			else
 			{
@@ -10434,7 +10438,7 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 // in this mode the same return values as sync mode are used.
 Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback)
 {
-	if (Required >= CurrentAuthLevel)
+	if (CurrentAuthLevel >= Required)
 	{
 		if (Callback) Callback(true);
 		return Store3Success;

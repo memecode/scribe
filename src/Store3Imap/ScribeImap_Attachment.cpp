@@ -150,34 +150,30 @@ const char *ImapAttachment::GetStr(int id)
 		{
 			if (!Name)
 			{
-				Name.Reset(DecodeRfc2047(Seg->GetSub("Content-Type", "name")));
+				Name = LDecodeRfc2047(Seg->LGetSub("Content-Type", "name"));
 				if (!Name)
-					Name.Reset(DecodeRfc2047(Seg->GetSub("Content-Disposition", "filename")));
+					Name = LDecodeRfc2047(Seg->LGetSub("Content-Disposition", "filename"));
 			}
 			return Name;
-			break;
 		}
 		case FIELD_MIME_TYPE:
 		{
 			if (!MimeType)
-				MimeType.Reset(Seg->GetMimeType());
+				MimeType = Seg->LGetMimeType();
 			return MimeType;
-			break;
 		}
 		case FIELD_CONTENT_ID:
 		{
 			if (!ContentId)
-				ContentId.Reset(Seg->Get("Content-Id"));
+				ContentId = Seg->LGet("Content-Id");
 			return ContentId;
-			break;
 		}
 		case FIELD_CHARSET:
 		{
 			if (!Charset)
 			{
 			    // Check the headers...
-				Charset.Reset(Seg->GetSub("Content-Type", "charset"));
-				
+				Charset = Seg->LGetSub("Content-Type", "charset");				
 		        if (!Charset)
 		        {
 			        // Maybe a parent segment has a charset?
@@ -190,7 +186,6 @@ const char *ImapAttachment::GetStr(int id)
                 }
 			}
 			return Charset;
-			break;
 		}
 		case FIELD_INTERNET_HEADER:
 		{

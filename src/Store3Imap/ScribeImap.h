@@ -275,7 +275,7 @@ public:
 
 class ImapAttachment : public Store3Attachment<ImapStore, ImapMail, ImapAttachment>
 {
-	LAutoString Name, MimeType, ContentId, Charset;
+	LString Name, MimeType, ContentId, Charset;
 	LMime *Seg;
 
 	void _ClearChildSegs();

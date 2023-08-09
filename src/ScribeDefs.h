@@ -340,6 +340,7 @@ enum ScribeMessages
 	M_CALENDAR_SOURCE_FINISH,
 	M_LOAD_NEXT_MAIL_STORE,
 	M_UNIT_TEST_TICK,
+	M_GET_EVENTS_DONE,
 };
 
 enum ScribeControls

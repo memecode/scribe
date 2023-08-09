@@ -424,11 +424,9 @@ bool ImapMail::FindSegs(const char *Type, LArray<ImapAttachment*> &Segs)
 		for (unsigned i=0; i<Segs.Length(); i++)
 		{
 		    ImapAttachment *a = Segs[i];
-		    LAutoString Fn(a->GetSeg()->GetFileName());
+		    auto Fn = a->GetSeg()->LGetFileName();
 		    if (Fn)
-		    {
 		        Segs.DeleteAt(i--, true);
-		    }
 		}
 	}
 
