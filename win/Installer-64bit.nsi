@@ -1,4 +1,6 @@
 ; Scribe install/uninstall support
+; Requires: https://nsis.sourceforge.io/Inetc_plug-in
+
 !include LogicLib.nsh
 ; !include WinVer.nsh
 
@@ -13,13 +15,13 @@
 !system "copy ..\..\libs\aspell-0.60.6.1\win32\dist\x64Release19\aspell-dist-0.60.dll scribe-setup" = 0
 
 !system "copy ..\..\libs\build-x64\libjpeg-9a\Release\libjpeg9a_19x64.dll scribe-setup" = 0
-!system "copy ..\..\libs\build-x64\libpng\Release\libpng15_19x64.dll scribe-setup" = 0
+!system "copy ..\..\libs\build-x64\libpng\Release\libpng16_19x64.dll scribe-setup" = 0
 !system "copy ..\..\libs\build-x64\libpng\zlib_dir\Release\zlib_19x64.dll scribe-setup" = 0
 !system "copy ..\..\libs\build-x64\libchardet\Release\chardet19x64.dll scribe-setup" = 0
 
 !system "copy ..\..\..\Lgi\trunk\lib\Lgi19x64nop.dll scribe-setup" = 0
 !system "copy ..\..\..\Lgi\trunk\lib\libntlm19x64nop.dll scribe-setup" = 0
-!system "copy ..\..\..\Lgi\trunk\Updater\x64Release19\Updater.exe scribe-setup" = 0
+!system "copy ..\..\..\Lgi\trunk\utils\Updater\x64Release19\Updater.exe scribe-setup" = 0
 
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.exe'
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.dll'
@@ -74,7 +76,7 @@ Section ""
 	File .\scribe-setup\Lgi19x64nop.dll
 	File .\scribe-setup\libntlm19x64nop.dll
 	File .\scribe-setup\libjpeg9a_19x64.dll
-	File .\scribe-setup\libpng15_19x64.dll
+	File .\scribe-setup\libpng16_19x64.dll
 	File .\scribe-setup\zlib_19x64.dll
 	File .\scribe-setup\chardet19x64.dll
 
