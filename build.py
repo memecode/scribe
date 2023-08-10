@@ -11,6 +11,7 @@ print("platform.system():", platform.system())
 isMac = platform.system() == "Darwin"
 isWin = platform.system() == "Windows"
 isLinux = platform.system() == "Linux"
+buildDebug = False # ie build the Release build by default
 
 print("Build paths:")
 trunk = os.path.abspath(os.path.join(__file__, ".."))
@@ -152,16 +153,22 @@ else:
 		cwd=scribeLibs)
 
 print("\nBuilding Scribe:")
+buildEnv = os.environ.copy()
 if isMac:
-	args = ["xcodebuild", "-project", "mac/Scribe.xcodeproj"]
+	config = "Debug" if buildDebug else "Release"
+	args = ["xcodebuild", "-project", "mac/Scribe.xcodeproj", "-configuration", config]
 elif isWin:
+	config = "Debug" if buildDebug else "ReleaseNoOptimize"
 	vs2019 = "c:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\devenv.com"
-	args = [vs2019, os.path.join(trunk, "win", "Scribe_vs2019.sln"), "/Build", "Debug"]
+	args = [vs2019, os.path.join(trunk, "win", "Scribe_vs2019.sln"), "/Build", config]
 elif isLinux:
 	jobs = multiprocessing.cpu_count()
+	if jobs > 1:
+		jobs = jobs - 1 # leave a core free
+	buildEnv["BUILD"] = "Debug" if buildDebug else "Release"
 	args = ["make", "-j", str(jobs), "-f", "linux/Makefile.linux"]
 else:
-	print("Error: unsupported system.")
+	print("Error: unsupported system (haiku? Is that you? haha).")
 	sys.exit(1)
 
-p = subprocess.run(args, cwd=trunk)
+p = subprocess.run(args, cwd=trunk, env=buildEnv)
