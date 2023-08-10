@@ -151,7 +151,7 @@
     <PreLinkEvent>
       <Message>Update version</Message>
       <Command>cd Code\Py
-"C:\Program Files\Python36\python.exe"  win32_pre_build_step.py
+"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
 cd ..
 call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
 rc Resource.rc
@@ -219,7 +219,7 @@ copy Code\Resource.res $(OutDir)
     </ClCompile>
     <PreLinkEvent>
       <Command>cd Code\Py
-"C:\Python37\python.exe"  win32_pre_build_step.py
+"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
 cd ..
 call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
 rc Resource.rc
@@ -259,7 +259,7 @@ copy Code\Resource.res $(OutDir)
     </ClCompile>
     <PreLinkEvent>
       <Command>cd ..\src\Py
-"C:\Program Files\Python39\python.exe"  win32_pre_build_step.py
+"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
 cd ..
 call "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 rc Resource.rc
@@ -295,7 +295,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <PreLinkEvent>
       <Message>Update Version</Message>
       <Command>cd Code\Py
-"C:\Python37\python.exe"  win32_pre_build_step.py
+"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
 cd ..
 call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
 rc Resource.rc
@@ -335,7 +335,7 @@ copy Code\Resource.res $(OutDir)
     </ClCompile>
     <PreLinkEvent>
       <Command>cd ..\src\Py
-"C:\Program Files\Python39\python.exe"  win32_pre_build_step.py
+"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
 cd ..
 call "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 rc Resource.rc
