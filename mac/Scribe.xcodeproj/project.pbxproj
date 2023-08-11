@@ -156,6 +156,7 @@
 		3477C5201CC311A00028B84B /* Scribe.lr8 in Resources */ = {isa = PBXBuildFile; fileRef = 3477C51F1CC311A00028B84B /* Scribe.lr8 */; };
 		3477C5231CC315FC0028B84B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3477C5221CC315FC0028B84B /* Cocoa.framework */; };
 		347CF82723F64FD00028F610 /* flags.png in Resources */ = {isa = PBXBuildFile; fileRef = 347CF82623F64FD00028F610 /* flags.png */; };
+		3486E9E22A86E8CA009BDA7E /* UnitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */; };
 		34918095222F1C6F00944FC4 /* OAuth2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34918094222F1C6F00944FC4 /* OAuth2.cpp */; };
 		3497D54F2399D288009FCC14 /* Add Senders To Contacts.script in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3497D5482399D260009FCC14 /* Add Senders To Contacts.script */; };
 		3497D5502399D288009FCC14 /* Delete Attachments.script in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3497D5472399D260009FCC14 /* Delete Attachments.script */; };
@@ -644,6 +645,7 @@
 		3477C5221CC315FC0028B84B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /Users/matthew/Code/Lgi/trunk/src/mac/cocoa/../../../../../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		347CF82623F64FD00028F610 /* flags.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = flags.png; path = ../../Resources/flags.png; sourceTree = "<group>"; };
 		3481AAAA25DC8C820032ACB7 /* FileTransferProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileTransferProgress.h; path = ../../../../Lgi/trunk/include/lgi/common/FileTransferProgress.h; sourceTree = "<group>"; };
+		3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UnitTests.cpp; path = ../../src/Test/UnitTests.cpp; sourceTree = "<group>"; };
 		34918093222F1C5F00944FC4 /* OAuth2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OAuth2.h; path = ../../../../Lgi/trunk/include/lgi/common/OAuth2.h; sourceTree = "<group>"; };
 		34918094222F1C6F00944FC4 /* OAuth2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OAuth2.cpp; path = ../../../../Lgi/trunk/src/common/Net/OAuth2.cpp; sourceTree = "<group>"; };
 		3497D5462399D260009FCC14 /* Mail Filters Menu.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Mail Filters Menu.script"; path = "../../Scripts/Mail Filters Menu.script"; sourceTree = "<group>"; };
@@ -1020,6 +1022,7 @@
 				3477C2241CBEFD940028B84B /* Lgi */,
 				3477C51E1CC3118E0028B84B /* Resources */,
 				346FACFB1D3C81E600FFEBCE /* Spelling */,
+				3486E9D12A86E8AB009BDA7E /* Tests */,
 				34417D83205FB69400D2E80C /* Utils */,
 			);
 			path = Scribe;
@@ -1135,6 +1138,14 @@
 				3477C5221CC315FC0028B84B /* Cocoa.framework */,
 			);
 			name = Link;
+			sourceTree = "<group>";
+		};
+		3486E9D12A86E8AB009BDA7E /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */,
+			);
+			name = Tests;
 			sourceTree = "<group>";
 		};
 		3497D5382399D246009FCC14 /* Scripts */ = {
@@ -1649,6 +1660,7 @@
 				3477C3F21CC227ED0028B84B /* ScribeUtils.cpp in Sources */,
 				3477C4021CC22F340028B84B /* TimeZone.cpp in Sources */,
 				3477C41D1CC231890028B84B /* ScribeImap_Mail.cpp in Sources */,
+				3486E9E22A86E8CA009BDA7E /* UnitTests.cpp in Sources */,
 				3477C4001CC22EF60028B84B /* YearView.cpp in Sources */,
 				3477C3EC1CC227ED0028B84B /* ScribeRepair.cpp in Sources */,
 				3416149C238484F800A65477 /* WebdavThread.cpp in Sources */,
