@@ -86,7 +86,7 @@
 		<String Ref="108" Cid="1066" Define="IDC_WRAP" en="Wrap Lines at" fr="Couper lignes à" it="Vai a capo ogni" cs="Zalamovat řádky na" es="Autoajustar las líneas a" de="Zeilenumbruch nach" nl="Regels afbreken na" pt_br="Quebrar as linhas em" ru="Перенос строк больше" ja="ラインで囲む" pt="Ajustar as linhas a" pl="Łam wiersze co" vi="Xuống dòng tại" zh_tw="自動換行" sr="Završavaj redove u" no="Bryt linjer ved" lt="Laužti eilutę, ilgesnę kaip" fa="گروه بندي سطر ها به تعداد:" da="Bryd linier ved" sv="Radbryt vid" lg="Wumbawumbira layini ku" tr="Satırı böl" hu="Sortörés ennél" ko="자동 줄바꿈 위치" uk="Перенесення рядків більше" />
 		<String Ref="109" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="110" Cid="1051" Define="IDC_TRAY" en="&Minimize to tray icon" fr="&Minimiser dans zone de notification" it="Minimizza nella barra" cs="Minimalizovat do lišty" es="Minimizar en la barra de tareas" de="Zu Trayicon minimieren" nl="Verkleinen tot taakbalkpictogram" pt_br="Minimizar na bandeja" ru="Сворачивать в трей" ja="最小化時にタスクトレイに格納する" pt="Minimizar na bandeja" pl="Minimalizuj do zasobnika systemowego" vi="Thu gọn về khay hệ thống" zh_tw="縮小為圖示檔" sr="Minimiziraj u ikonu u treju" no="Minimer til tray ikon" lt="Mažinti iki piktogramos pranešimų srityje" fa="پنجره را به کنار ساعت کوچک کن" da="Minimer til tray ikon" sv="Minimera till meddelandefältet" lg="Ssa kafuuke akakooni" tr="Sistem bildirim alanına küçült (tray)" hu="Kicsinyítés tálcára" ko="트레이 아이콘으로 최소화" uk="Згорнути до трею в іконку" />
-		<String Ref="111" Cid="1074" Define="IDC_REGISTER_CLIENT" Tag="win32" en="&Register as Windows Email Client" fr="Verifier le client mail par defaut au démarrage" it="Controlla che Scribe sia il programma predefinito" cs="Kontrolovat výchozí poštovní klient při spuštění" es="Verificar si es el cliente de correo por defecto al iniciar" de="Als Standard-E-Mail-Client in Windows registrieren" nl="Controle op standaard epostprogramma" pt_br="Verificar se é o programa de correio padrão ao iniciar" ru="Проверять почтового клиента по умолчанию при запуске" ja="起動時にデフォルトのメールクライアントをチェックする" pt="Verificar o programa de e-mail predefinido ao iniciar" pl="Sprawdzanie domyślności programu przy starcie." vi="Kiểm tra chương trình thư điện tử mặc định khi khởi động" zh_tw="檢查是否為預設的郵件客端" sr="Proveri da li je podrazumevani e-mail klijent na startu" no="Sjekk standard epost-klient ved oppstart" lt="Paleidžiant programą, klausti, ar ją laikyti numatytąja" fa="وقت شروع برنامه اصلي پست الکترونيک را وارسي کن" da="Tjek standard epost-klient ved opstart" sv="Kontrollera standard för e-postklient vid uppstart" lg="Kebera Pulogulaamu ya e-meilo ku ntadikwa" tr="Başlarken varsayılan istemci ayarlarını kontrol et" hu="Induláskor alapértelemezett levelező ellenőrzése" ko="윈도우 이메일 클라이언트로 등록" uk="Реєстрація в якості поштового клієнта Windows" />
+		<String Ref="111" Cid="1074" Define="IDC_REGISTER_CLIENT" Tag="win" en="&Register as Windows Email Client" fr="Verifier le client mail par defaut au démarrage" it="Controlla che Scribe sia il programma predefinito" cs="Kontrolovat výchozí poštovní klient při spuštění" es="Verificar si es el cliente de correo por defecto al iniciar" de="Als Standard-E-Mail-Client in Windows registrieren" nl="Controle op standaard epostprogramma" pt_br="Verificar se é o programa de correio padrão ao iniciar" ru="Проверять почтового клиента по умолчанию при запуске" ja="起動時にデフォルトのメールクライアントをチェックする" pt="Verificar o programa de e-mail predefinido ao iniciar" pl="Sprawdzanie domyślności programu przy starcie." vi="Kiểm tra chương trình thư điện tử mặc định khi khởi động" zh_tw="檢查是否為預設的郵件客端" sr="Proveri da li je podrazumevani e-mail klijent na startu" no="Sjekk standard epost-klient ved oppstart" lt="Paleidžiant programą, klausti, ar ją laikyti numatytąja" fa="وقت شروع برنامه اصلي پست الکترونيک را وارسي کن" da="Tjek standard epost-klient ved opstart" sv="Kontrollera standard för e-postklient vid uppstart" lg="Kebera Pulogulaamu ya e-meilo ku ntadikwa" tr="Başlarken varsayılan istemci ayarlarını kontrol et" hu="Induláskor alapértelemezett levelező ellenőrzése" ko="윈도우 이메일 클라이언트로 등록" uk="Реєстрація в якості поштового клієнта Windows" />
 		<String Ref="112" Cid="674" Define="IDD_NEWFOLDER_F" en="Create Sub Folder" fr="Création de sous-dossier" it="Crea una Sottocartella" cs="Vytvořit podsložku" es="Crear una SubCarpeta" de="Unterordner erzeugen" nl="Een submap maken" pt_br="Criar sub-pasta" ru="Создать подпапку" pt="Criar sub-pasta" pl="Utwórz podfolder" vi="Tạo danh mục con" zh_tw="建立子目錄" ja="サブフォルダの作成" sr="Kreiraj podfolder" no="Lag undermappe" lt="Sukurti aplanką aplanke" fa="يک زيرفهرست بساز" da="Indret undermappe" sv="Skapa undermapp" lg="Tondawo ka Kabada" tr="Yeni Alt Klasör Oluştur" hu="Almappa létrehozás" ko="하위 폴더 생성" uk="Створити підтеку" />
 		<String Ref="113" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="114" Cid="1165" Define="IDC_TABLE" />
@@ -748,7 +748,7 @@
 		<String Ref="1212" Cid="2" Define="IDCANCEL" en="Cancel" no="Avbryt" lt="Atšaukti" pt="Cancelar" cs="Storno" fa="لغو" nl="Annuleren" pl="Anuluj" de="Abbrechen" sr="U redu" da="Afbryd" vi="Hủy bỏ" sv="Avbryt" es="Cancelar" pt_br="Cancelar" lg="Yee" tr="İptal" hu="Mégse" ru="Отмена" ko="취소" uk="Скасувати" fr="Annuler" />
 		<String Ref="1217" Cid="1217" Define="IDC_GUESTS" />
 		<String Ref="1220" Cid="1220" Define="IDC_1220" />
-		<String Ref="1221" Cid="940" Define="IDC_CHECK_DEFAULT" Tag="win32" en="&Check default email client on startup" fr="&Verifier le client mail par defaut au démarrage" it="Controlla che Scribe sia il programma predefinito" cs="Kontrolovat výchozí poštovní klient při spuštění" es="Verificar si es el cliente de correo por defecto al iniciar" de="Bei Start auf Standard-E-Mail-Client prüfen" nl="Controle op standaard epostprogramma" pt_br="Verificar se é o programa de correio padrão ao iniciar" ru="Проверять почтового клиента по умолчанию при запуске" ja="起動時にデフォルトのメールクライアントをチェックする" pt="Verificar o programa de e-mail predefinido ao iniciar" pl="Sprawdzanie domyślności programu przy starcie." vi="Kiểm tra chương trình thư điện tử mặc định khi khởi động" zh_tw="檢查是否為預設的郵件客端" sr="Proveri da li je podrazumevani e-mail klijent na startu" no="Sjekk standard epost-klient ved oppstart" lt="Paleidžiant programą, klausti, ar ją laikyti numatytąja" fa="وقت شروع برنامه اصلي پست الکترونيک را وارسي کن" da="Tjek standard epost-klient ved opstart" sv="Kontrollera standard för e-postklient vid uppstart" lg="Kebera Pulogulaamu ya e-meilo ku ntadikwa" tr="Başlarken varsayılan istemci ayarlarını kontrol et" hu="Induláskor alapértelemezett levelező ellenőrzése" ko="시작시 기본 이메일 클라이언트 확인" uk="Перевірка клієнта електронної пошти за замовчуванням при запуску" />
+		<String Ref="1221" Cid="940" Define="IDC_CHECK_DEFAULT" Tag="win" en="&Check default email client on startup" fr="&Verifier le client mail par defaut au démarrage" it="Controlla che Scribe sia il programma predefinito" cs="Kontrolovat výchozí poštovní klient při spuštění" es="Verificar si es el cliente de correo por defecto al iniciar" de="Bei Start auf Standard-E-Mail-Client prüfen" nl="Controle op standaard epostprogramma" pt_br="Verificar se é o programa de correio padrão ao iniciar" ru="Проверять почтового клиента по умолчанию при запуске" ja="起動時にデフォルトのメールクライアントをチェックする" pt="Verificar o programa de e-mail predefinido ao iniciar" pl="Sprawdzanie domyślności programu przy starcie." vi="Kiểm tra chương trình thư điện tử mặc định khi khởi động" zh_tw="檢查是否為預設的郵件客端" sr="Proveri da li je podrazumevani e-mail klijent na startu" no="Sjekk standard epost-klient ved oppstart" lt="Paleidžiant programą, klausti, ar ją laikyti numatytąja" fa="وقت شروع برنامه اصلي پست الکترونيک را وارسي کن" da="Tjek standard epost-klient ved opstart" sv="Kontrollera standard för e-postklient vid uppstart" lg="Kebera Pulogulaamu ya e-meilo ku ntadikwa" tr="Başlarken varsayılan istemci ayarlarını kontrol et" hu="Induláskor alapértelemezett levelező ellenőrzése" ko="시작시 기본 이메일 클라이언트 확인" uk="Перевірка клієнта електронної пошти за замовчуванням при запуску" />
 		<String Ref="1222" Cid="-1" Define="IDC_STATIC" en="Name:" pt="Grupo:" nl="Naam:" cs="Jméno:" pl="Nazwa:" it="Nome" vi="Tên:" zh_tw="名稱:" ja="名前:" sr="Ime:" es="Nombre:" no="Navn:" lt="Vardas:" fa="نام" de="Bezeichnung:" da="Navn:" sv="Namn:" pt_br="Nome:" lg="Erinnya:" tr="İsim:" hu="Név:" ru="Имя:" ko="이름:" uk="Ім`я" fr="Nom:" />
 		<String Ref="1223" Cid="-1" Define="IDC_STATIC" en="Page range:" />
 		<String Ref="1228" Cid="1165" Define="IDC_TABLE" />
@@ -4668,23 +4668,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4692,9 +4678,23 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>
@@ -4971,7 +4971,6 @@
 			<String Ref="1462" Cid="41164" Define="IDM_REPLICATE" en="&Replicate Mail Stores" pl="&Powiel magazyny poczty" ko="&메일 저장 복제" uk="Копіювання поштових скриньок" de="Mail-Datenbank replizieren" fr="&Répliquer Storage courrier" />
 			<String Ref="1461" Cid="40002" Define="IDM_UPGRADE_MAIL_STORES" en="&Upgrade Mail Stores" ko="&메일 저장 업그레이드" uk="Оновлення поштових скриньок" de="Mail-Datenbank akt&ualisieren" fr="Mise à nivea&u Storage courrier" />
 			<String Ref="1460" Cid="40004" Define="IDM_OPTIONS" en="&Options" it="&Opzioni" cs="Nastav&ení..." es="&Opciones" de="&Einstellungen" nl="Op&ties" pt_br="&Opções" ru="Настройки" ja="オプション(&O)" pt="&Opções" pl="&Opcje" vi="Tù&y chọn" zh_tw="選項(&O)" sr="&Opcije" no="&Innstillinger" lt="Programos nuos&tatos" fa="انتخاب ها" id="&Pilihan" da="&Indstillinger" sv="&Inställningar..." tr="&Ayarlar" hu="&Beállítások" ko="&옵션" uk="Налаштування" />
-			<String Ref="1459" Cid="40001" Define="IDM_SOFTWARE_KEY" Tag="inscribe" en="Software Key" fr="Clé logicielle" it="Cod. seriale" cs="Registrační klíč" es="Cod. Registro" de="Lizenzschlüssel" nl="Registratiecode" pt_br="Código de registro" ru="Ключ регистрации" ja="ソフトウェアキー" pl="Kod dostępu" zh_tw="軟體序號" sr="Ključ programa" no="Registreringsnøkkel" lt="Programos raktas" fa="کلید برنامه" da="Registreringsnøgle" vi="Số đăng ký" sv="Registreringsnyckel" tr="Lisans anahtarı" hu="Szoftver kulcs" ko="소프트웨어 키" uk="Ключ регістрації" />
 			<String Ref="1457" Cid="41075" Define="IDM_WORK_OFFLINE" Tag="!xgate" en="&Work Offline" fr="Travail en différé" es="Trabajar sin conexión" de="Offline &Arbeiten" ja="オフラインで作業(&W)" pt="&Trabalhar offline" pl="&Pracuj bez podłączenia" it="&Lavora offline" vi="&Làm việc ngoại tuyến" zh_tw="離線工作" nl="Niet met het &web verbonden" sr="Radi &bez mreže" cs="Pracovat o&ffline" no="Arbeid &frakoblet" lt="Darbas atsi&jungus" da="Arbejd &frakoblet" fa="Offline کر در حالت" sv="Arbeta o&ffline" pt_br="&Trabalhar desconectado (offline)" tr="Çevrim&dışı Çalış" hu="Ka&pcsolat nélkül" ru="Работать автономно" ko="&오프라인으로 작업" uk="&Автономна робота" />
 			<String Ref="1456" Cid="41105" Define="IDM_SECURITY" en="Security Settings" pl="Ustawienia &bezpieczeństwa" it="Impostazioni sicurezza" vi="Thiết lập &bảo mật" pt="Segurança" zh_tw="隱私設定" ja="セキュリティ設定" nl="Veilig&heidsinstellingen" sr="Sigurnosna podešavanja" es="Se&guridad" cs="Nastavení zabezpečení" no="&Sikkerhetsinnstillinger" lt="Sau&gumo nuostatos" fa="تنظیمات امنیتی" de="Sicherheitseinstellungen" id="Keamanan Pilihan" da="&Sikkerhedsindstillinger" sv="S&äkerhetsinställningar..." pt_br="Configurações de Segurança" tr="&Güvenlik Ayarları" hu="Biztonsági beállítások" ru="Настройки безопасности" ko="보안 설정" uk="Налаштування безпеки" fr="Paramètres de sécurité" />
 			<String Ref="1455" Cid="41129" Define="IDM_LOGOUT" en="Logout" pl="Wyloguj" vi="Đăng xuất" zh_tw="登出" ja="ログアウト" pt="Desligar" es="&Desconectar" cs="Odhlásit" no="&Logg av" lt="&Vėl reikalauti slaptažodžio" nl="Afmelden" fa="پايان نشست" de="Ausloggen" sr="Odjava" da="&Log ud" sv="&Logga ut" pt_br="Desconectar" tr="Bağlantıyı &Kopart" hu="Kijelentkezés" ru="Выйти из сессии" ko="로그아웃" uk="Закінчити сесію" fr="Déconexion" />
@@ -5015,7 +5014,7 @@
 			<String Ref="1417" en="Text" fr="Texte" it="Testo" es="Texto" pt_br="Texto" pt="Texto" pl="Tekst" vi="Văn bản" zh_tw="文字" ja="テキスト" nl="Tekst" sr="Tekst" no="Tekst" lt="Tekstą" fa="متن" da="Tekst" tr="Yazı (text)" sv="&Text" hu="Szöveg" ru="Текст" uk="Текст" />
 			<String Ref="1416" Cid="40047" Define="IDM_IMPORT_TEXT_MBOX" en="Unix MBOX" nl="Unix Mbox" pt="MBOX (Unix)" sv="&Unix MBOX..." pt_br="MBOX (Unix)" es="MBOX (Unix)" fr="MBOX Unix" />
 			<String Ref="1415" Cid="41065" Define="IDM_IMPORT_CSV" en="CSV Contacts" cs="Kontakty (CSV)" pt="Contactos (CSV)" pl="Kontakty (CSV)" it="Contatti CSV" vi="Tập tin CSV" zh_tw="CSV 聯絡簿" nl="CSV adresboek" sr="CSV kontakti" lt="CSV adresus" de="Kontakte (CSV)" da="CSV kontakter" sv="&CSV-kontakter..." pt_br="Contatos (CSV)" es="Contactos (CSV)" tr="CSV İrtibatlar" hu="CSV kapcsolatok" ru="Контакты CSV" uk="Контакти CSV" fr="Contacts CSV" />
-			<String Ref="1414" Tag="win32" en="Outlook (MAPI)" ja="Outlook(MAPI)" sv="&Outlook (MAPI)" />
+			<String Ref="1414" Tag="win" en="Outlook (MAPI)" ja="Outlook(MAPI)" sv="&Outlook (MAPI)" />
 			<String Ref="1413" Cid="40025" Define="IDM_IMPORT_OUTLOOK_PAB" en="Personal Address Book" fr="Carnet d&apos;adresses personnel" it="Rubrica Personale" cs="Osobní adresář" es="Libreta Personal" de="Persönliches Adressbuch" nl="Persoonlijk adresboek" pt_br="Contatos pessoais" pt="Contactos pessoais" pl="Osobista książka adresowa" vi="Sổ địa chỉ cá nhân" zh_tw="個人地址簿" ja="個人アドレス帳" sr="Lični adresar" lt="Asmeninį adresyną (PAB)" fa="دفترچه آدرس شخصی" da="Personlig adressebog" sv="&Personlig adressbok" tr="Adres Defteri" hu="Személyes címjegyzék" ru="Персональная адресная книга" ko="개인 주소록" uk="Особиста адресна книга" />
 			<String Ref="1412" Cid="40027" Define="IDM_IMPORT_OUTLOOK_ITEMS" en="Email, Folder and Contacts" fr="Courriels, Dossiers et Contacts" it="Messaggi, Cartelle e Contatti" cs="Zprávy, složky a kontakty" es="Correo, Carpeta y Contactos" de="E-Mails, Ordner und Kontakte" nl="Berichten, mappen en adresboek" pt_br="Mensagens, pastas e contatos" pt="Mensagens, pastas e contactos" pl="Poczta, foldery, kontakty" vi="Thư, danh mục và liên hệ" zh_tw="郵件，資料夾與聯絡人" ja="メールフォルダと連絡先" sr="E-mail, omotnice i kontakte" lt="El. paštą, aplankus ir adresus" fa="نامه٬پوشه هاودوستان" da="Epost, mapper og kontakter" sv="&E-post, mapp och kontakter..." tr="E-posta, Klasör ve İrtibatlar" hu="Levél, mappa és kapcsolatok" ru="Email, папка и контакты" ko="이메일, 폴더, 연락처" uk="Email, тека та контакти" />
 			<String Ref="1411" en="Outlook Express" sv="Outlook E&xpress" />
@@ -5033,8 +5032,8 @@
 			<String Ref="1399" en="Text" fr="Texte" it="Testo" es="Texto" pt_br="Texto" nl="Tekst" pt="Texto" pl="Tekst" vi="Văn bản" zh_tw="文字" sr="Tekst" no="Tekst" lt="Tekstą" fa="متن" da="Tekst" ja="テキスト" tr="Yazı (text)" sv="&Text" hu="Szöveg" ru="Текст" uk="Текст" />
 			<String Ref="1398" Cid="40048" Define="IDM_EXPORT_TEXT_MBOX" en="Unix MBOX" pt="MBOX (Unix)" nl="Unix Mbox" sv="&Unix MBOX..." pt_br="MBOX (Unix)" es="MBOX (Unix)" fr="MBOX Unix" />
 			<String Ref="1397" Cid="41085" Define="IDM_EXPORT_CSV" en="CSV Contacts" cs="Kontakty (CSV)" pl="Kontakty (CSV)" it="Contatti CSV" vi="Tập tin CSV" zh_tw="CSV 聯絡簿" nl="CSV adresboek" pt="Contactos (CSV)" sr="CSV Kontakti" lt="CSV adresus" de="Kontakte (CSV)" da="CSV kontakter" sv="&CSV-kontakter..." pt_br="Contatos (CSV)" es="Contactos (CSV)" tr="CSV İrtibatlar" hu="CSV kapcsolatok" ru="Контакты CSV" uk="Контакти CSV" fr="Contacts CSV" />
-			<String Ref="1396" Tag="inscribe win32" en="Outlook (MAPI)" sv="&Outlook (MAPI)" />
-			<String Ref="1395" Cid="41147" Define="IDM_EXPORT_OUTLOOK_ITEMS" Tag="inscribe" en="Email" lt="El. Paštas" cs="Zprávy" nl="Post" de="E-Mails" sr="E-mail" da="Epost" fa="نامه‌ها" ja="電子メール" sv="&E-post..." pt_br="Correio" es="Correo" tr="E-postalar" hu="Levél" ru="E-mail" pl="E-mail" ko="이메일" fr="Courriel" />
+			<String Ref="1396" Tag="win" en="Outlook (MAPI)" sv="&Outlook (MAPI)" />
+			<String Ref="1395" Cid="41147" Define="IDM_EXPORT_OUTLOOK_ITEMS" en="Email" lt="El. Paštas" cs="Zprávy" nl="Post" de="E-Mails" sr="E-mail" da="Epost" fa="نامه‌ها" ja="電子メール" sv="&E-post..." pt_br="Correio" es="Correo" tr="E-postalar" hu="Levél" ru="E-mail" pl="E-mail" ko="이메일" fr="Courriel" />
 			<String Ref="1394" Cid="1350" Define="IDM_CHECK_UPDATE" Tag="!xgate" en="Check for Software Update" pl="Sprawdź aktualizację oprogramowania" ko="소프트웨어 업데이트 확인" uk="Перевірка наявності оновлень програмного забезпечення" de="Auf Software Updates prüfen" fr="Vérifier la mise à jour de Scribe" />
 			<String Ref="1393" en="Layout" lt="Ekrano elementų išsidėstymas" pt="Aspecto" cs="Vzhled" fa="صفحه آرايي" nl="&Weergave" pl="Układ" de="Aussehen" sr="Izgled" zh_tw="佈局" ja="レイアウト" vi="Trình bày" es="Aspecto" pt_br="Aparência" tr="&Görünüm" sv="&Layout" hu="Elrendezés" ru="Расположение" ko="레이아웃" uk="Розкладка" fr="Disposition" />
 			<String Ref="1392" Cid="41144" Define="IDM_LAYOUT1" en="Folders On Left" no="Mapper til høyre" lt="Aplankai kairėje" pt="Mensagem à direita" cs="Náhled vpravo" fa="پوشه ها در سمت چپ" nl="Mappen aan de linkerkant" pl="Foldery po lewej" de="Baumansicht links" sr="Omotnice levo" da="Mapper til venstre" ja="左のホールダー" vi="Danh mục nằm bên trái" sv="&Mappar till höger" es="Carpetas y Vista previa" pt_br="Pastas à Esquerda" tr="&Klasörler Solda" hu="Mappák a bal oldalon" ru="Папки слева" ko="폴더를 왼쪽에" uk="Теки зліва" fr="Dossiers à gauche" />
@@ -5071,6 +5070,7 @@
 			<String Ref="1055" Cid="533" Define="IDM_BAYES_STATS" en="Bayes Stats" />
 			<String Ref="1302" Cid="1195" Define="IDM_MENU_1195" />
 			<String Ref="1369" Cid="539" Define="IDM_UNIT_TESTS" en="Run Unit Tests" />
+			<String Ref="1501" Cid="1029" Define="IDM_CLEAR_REGISTRY" Tag="win" en="Clear Registry Settings" />
 		</string-group>
 		<submenu Ref="1464">
 			<menuitem Ref="1463" />
@@ -5078,7 +5078,6 @@
 			<menuitem Ref="1461" />
 			<menuitem Sep="1" />
 			<menuitem Ref="1460" Shortcut="CtrlCmd+O" />
-			<menuitem Ref="1459" />
 			<menuitem Ref="1457" />
 			<menuitem Sep="1" />
 			<menuitem Ref="1456" />
@@ -5176,6 +5175,7 @@
 			</submenu>
 			<menuitem Ref="1394" />
 			<menuitem Ref="1530" />
+			<menuitem Ref="1501" />
 			<menuitem Sep="1" />
 			<submenu Ref="1393">
 				<menuitem Ref="1392" />

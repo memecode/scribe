@@ -2073,13 +2073,14 @@ char *ScribeWnd::GetUiTags()
 	if (!d->UiTags)
 	{
 		char UiTags[256] =
-			"inscribe"
-			#if defined WIN32
-			" win32"
+			#if defined WINDOWS
+			"win"
 			#elif defined LINUX
-			" linux"
+			"linux"
 			#elif defined MAC
-			" mac"
+			"mac"
+			#elif defined HAIKU
+			"haiku"
 			#endif
 			;
 	
@@ -7835,6 +7836,42 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			ScribeAbout(this);
 			break;
 		}
+
+#ifdef WINDOWS
+		case IDM_CLEAR_REGISTRY:
+		{
+			const char *keys[] = {
+				"HKCU\\SOFTWARE\\Memecode\\Scribe",
+				"HKCU\\SOFTWARE\\Clients\\Mail\\Scribe",
+				"HKLM\\SOFTWARE\\Clients\\Mail\\Scribe"
+			};
+
+			int deleted = 0;
+			LString failures;
+			for (int i=0; i<CountOf(keys); i++)
+			{
+				LRegKey k(true, keys[i]);
+				if (k.DeleteKey())
+					deleted++;
+				else
+					failures += LString(keys[i]) + " (" + k.GetErrorName().Strip() + ")\n";
+			}
+
+			LgiMsg(	this,
+					"Registry keys deleted: %i of %i\n"
+					"\n"
+					"%s\n"
+					"\n"
+					"Note: for 'access denied' try running as administrator.",
+					AppName,
+					MB_OK,
+					deleted,
+					CountOf(keys),
+					failures.Get());
+			break;
+		} 
+#endif
+
 		default:
 		{			
 			if (d->ScriptToolbar)

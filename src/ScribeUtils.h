@@ -67,7 +67,7 @@ extern void ClearTempPath();
 extern char *RemoveAmp(const char *s);
 extern LString AddAmp(const char *menu, int shortcut);
 
-class HttpImageThread : public LThreadWorker, public LCancel
+class HttpImageThread : public LThreadWorker
 {
 	class ScribeWnd *App;
 	LString Proxy, Cache;

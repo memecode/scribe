@@ -832,6 +832,7 @@
 #define IDC_REC_PASSWORD						1026
 #define IDC_REC_CHECK							1027
 #define IDC_POP3_LEAVE							1028
+#define IDM_CLEAR_REGISTRY						1029
 #define IDC_LAST								1030
 #define IDC_QUOTE								1031
 #define IDC_HOME_FAX							1032
@@ -1222,7 +1223,6 @@
 #define IDC_FPW_USER							3004
 #define IDC_FPW_ADMIN							3005
 #define IDM_BOUNCE								40000
-#define IDM_SOFTWARE_KEY						40001
 #define IDM_UPGRADE_MAIL_STORES					40002
 #define IDM_OPTIONS								40004
 #define IDM_PRINT								40005

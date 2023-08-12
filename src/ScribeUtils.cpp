@@ -431,7 +431,8 @@ char *ScribeInsertFields(const char *Template, LDom *Source)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-HttpImageThread::HttpImageThread(ScribeWnd *app, const char *proxy, LThreadTarget *First) : LThreadWorker(First, "HtmlImageLoader")
+HttpImageThread::HttpImageThread(ScribeWnd *app, const char *proxy, LThreadTarget *First) :
+	LThreadWorker(First, "HtmlImageLoader")
 {
 	App = app;
 	Proxy = proxy;
