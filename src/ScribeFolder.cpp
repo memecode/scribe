@@ -107,7 +107,7 @@ public:
 
 		#else
 
-			#error "Impl me."
+			#warning "Impl LDndFilePromise for this platform"
 
 		#endif
 	}

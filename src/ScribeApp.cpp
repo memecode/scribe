@@ -760,8 +760,10 @@ ScribeWnd::ScribeWnd() :
 						ScribeTempPath()),
 	TrayIcon(this)
 {
+	#ifndef HAIKU
 	if (_Lock)
 		_Lock->SetName("ScribeWnd");
+	#endif
 
 	// init some variables
 	LApp::ObjInstance()->AppWnd = this;
@@ -2409,6 +2411,8 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 				auto Api = "Carbon";
 			#elif defined WIN32
 				auto Api = "WinApi";
+			#elif defined HAIKU
+				auto Api = "Haiku";
 			#else
 				#error "Impl me."
 				auto Api = "#err";
@@ -10634,7 +10638,12 @@ void ScribeWnd::GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType Access
 
 LMutex *ScribeWnd::GetLock()
 {
+	#ifndef HAIKU
 	return _Lock;
+	#else
+	#warning "Fixme: scribe wnd locking."
+	return NULL;
+	#endif
 }
 
 void ScribeWnd::OnBeforeConnect(ScribeAccount *Account, bool Receive)

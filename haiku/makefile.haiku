@@ -8,7 +8,7 @@
 
 CC = gcc
 CPP = g++
-Target = scribeproj
+Target = scribe
 ifndef Build
 	Build = Debug
 endif
@@ -22,11 +22,12 @@ ifeq ($(Build),Debug)
 	CFlags += -g
 	CppFlags += -g
 	Tag = d
-	Defs = -D_DEBUG -DHAIKU -D_REENTRANT -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\"
+	Defs = -D_DEBUG -DHAIKU -D_REENTRANT -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -D_GNU_SOURCE
 	Libs =  \
 		-L../libs/build-x64/libchardet \
 		-lchardet \
 		-lbe \
+		-lgnu \
 		-laspell-dist-060$(Tag) \
 		-L../libs/aspell-0.60.6.1/linux/$(BuildDir) \
 		-lbzip2$(Tag) \
@@ -48,11 +49,12 @@ ifeq ($(Build),Debug)
 else
 	CFlags += -s -Os
 	CppFlags += -s -Os
-	Defs = -DHAIKU -D_REENTRANT -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\"
+	Defs = -DHAIKU -D_REENTRANT -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -D_GNU_SOURCE
 	Libs =  \
 		-L../libs/build-x64/libchardet \
 		-lchardet \
 		-lbe \
+		-lgnu \
 		-laspell-dist-060$(Tag) \
 		-L../libs/aspell-0.60.6.1/linux/$(BuildDir) \
 		-lbzip2$(Tag) \
@@ -76,6 +78,7 @@ endif
 # Dependencies
 Source =	utils/Tables/MailFlags.c \
 			src/TitlePage.cpp \
+			src/Test/UnitTests.cpp \
 			src/Store3Webdav/WebdavThread.cpp \
 			src/Store3Webdav/WebdavStore.cpp \
 			src/Store3Webdav/WebdavFolder.cpp \
@@ -251,7 +254,7 @@ $(BuildDir)/%.o: %.cpp
 
 # Target
 # Executable target
-$(Target) : ../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).so ../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a ../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so $(Objects)
+$(Target) : ../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).so ../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a $(Objects)
 	mkdir -p $(BuildDir)
 	@echo Linking $(Target) [$(Build)]...
 	$(CPP) -Wl,-export-dynamic,-R. -o \
@@ -423,278 +426,6 @@ $(Target) : ../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).s
 	export Build=$(Build); \
 	$(MAKE) -C ../libs/bzip2-1.0.6/linux -f ./Makefile.haiku
 
-../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so : ../../lgi/trunk/include/lgi/common/App.h \
-	../../lgi/trunk/include/lgi/common/Array.h \
-	../../lgi/trunk/include/lgi/common/AutoPtr.h \
-	../../lgi/trunk/include/lgi/common/Base64.h \
-	../../lgi/trunk/include/lgi/common/Bitmap.h \
-	../../lgi/trunk/include/lgi/common/Box.h \
-	../../lgi/trunk/include/lgi/common/Button.h \
-	../../lgi/trunk/include/lgi/common/CairoSurface.h \
-	../../lgi/trunk/include/lgi/common/Cancel.h \
-	../../lgi/trunk/include/lgi/common/Capabilities.h \
-	../../lgi/trunk/include/lgi/common/Charset.h \
-	../../lgi/trunk/include/lgi/common/CheckBox.h \
-	../../lgi/trunk/include/lgi/common/ClipBoard.h \
-	../../lgi/trunk/include/lgi/common/Colour.h \
-	../../lgi/trunk/include/lgi/common/ColourSpace.h \
-	../../lgi/trunk/include/lgi/common/Com.h \
-	../../lgi/trunk/include/lgi/common/Combo.h \
-	../../lgi/trunk/include/lgi/common/Containers.h \
-	../../lgi/trunk/include/lgi/common/Core.h \
-	../../lgi/trunk/include/lgi/common/Css.h \
-	../../lgi/trunk/include/lgi/common/CssTools.h \
-	../../lgi/trunk/include/lgi/common/CurrentTime.h \
-	../../lgi/trunk/include/lgi/common/DataDlg.h \
-	../../lgi/trunk/include/lgi/common/DateTime.h \
-	../../lgi/trunk/include/lgi/common/Dialog.h \
-	../../lgi/trunk/include/lgi/common/DisplayString.h \
-	../../lgi/trunk/include/lgi/common/DocView.h \
-	../../lgi/trunk/include/lgi/common/Dom.h \
-	../../lgi/trunk/include/lgi/common/DomFields.h \
-	../../lgi/trunk/include/lgi/common/DragAndDrop.h \
-	../../lgi/trunk/include/lgi/common/DropFiles.h \
-	../../lgi/trunk/include/lgi/common/Edit.h \
-	../../lgi/trunk/include/lgi/common/Emoji.h \
-	../../lgi/trunk/include/lgi/common/Error.h \
-	../../lgi/trunk/include/lgi/common/EventTargetThread.h \
-	../../lgi/trunk/include/lgi/common/File.h \
-	../../lgi/trunk/include/lgi/common/FileSelect.h \
-	../../lgi/trunk/include/lgi/common/Filter.h \
-	../../lgi/trunk/include/lgi/common/FindReplaceDlg.h \
-	../../lgi/trunk/include/lgi/common/Font.h \
-	../../lgi/trunk/include/lgi/common/FontCache.h \
-	../../lgi/trunk/include/lgi/common/FontSelect.h \
-	../../lgi/trunk/include/lgi/common/Gdc2.h \
-	../../lgi/trunk/include/lgi/common/GdcTools.h \
-	../../lgi/trunk/include/lgi/common/GdiLeak.h \
-	../../lgi/trunk/include/lgi/common/HashTable.h \
-	../../lgi/trunk/include/lgi/common/ImageList.h \
-	../../lgi/trunk/include/lgi/common/Input.h \
-	../../lgi/trunk/include/lgi/common/ItemContainer.h \
-	../../lgi/trunk/include/lgi/common/Json.h \
-	../../lgi/trunk/include/lgi/common/Layout.h \
-	../../lgi/trunk/include/lgi/common/Lgi.h \
-	../../lgi/trunk/include/lgi/common/LgiClasses.h \
-	../../lgi/trunk/include/lgi/common/LgiCommon.h \
-	../../lgi/trunk/include/lgi/common/LgiDefs.h \
-	../../lgi/trunk/include/lgi/common/LgiInc.h \
-	../../lgi/trunk/include/lgi/common/LgiInterfaces.h \
-	../../lgi/trunk/include/lgi/common/LgiMsgs.h \
-	../../lgi/trunk/include/lgi/common/LgiRes.h \
-	../../lgi/trunk/include/lgi/common/LgiString.h \
-	../../lgi/trunk/include/lgi/common/LgiUiBase.h \
-	../../lgi/trunk/include/lgi/common/Library.h \
-	../../lgi/trunk/include/lgi/common/LibraryUtils.h \
-	../../lgi/trunk/include/lgi/common/List.h \
-	../../lgi/trunk/include/lgi/common/ListItemCheckBox.h \
-	../../lgi/trunk/include/lgi/common/ListItemRadioBtn.h \
-	../../lgi/trunk/include/lgi/common/LMallocArray.h \
-	../../lgi/trunk/include/lgi/common/Mail.h \
-	../../lgi/trunk/include/lgi/common/Matrix.h \
-	../../lgi/trunk/include/lgi/common/Mem.h \
-	../../lgi/trunk/include/lgi/common/Menu.h \
-	../../lgi/trunk/include/lgi/common/Message.h \
-	../../lgi/trunk/include/lgi/common/Mime.h \
-	../../lgi/trunk/include/lgi/common/Mru.h \
-	../../lgi/trunk/include/lgi/common/Mutex.h \
-	../../lgi/trunk/include/lgi/common/Net.h \
-	../../lgi/trunk/include/lgi/common/Notifications.h \
-	../../lgi/trunk/include/lgi/common/OAuth2.h \
-	../../lgi/trunk/include/lgi/common/OptionsFile.h \
-	../../lgi/trunk/include/lgi/common/Palette.h \
-	../../lgi/trunk/include/lgi/common/Panel.h \
-	../../lgi/trunk/include/lgi/common/Password.h \
-	../../lgi/trunk/include/lgi/common/Path.h \
-	../../lgi/trunk/include/lgi/common/PixelRops.h \
-	../../lgi/trunk/include/lgi/common/Point.h \
-	../../lgi/trunk/include/lgi/common/Popup.h \
-	../../lgi/trunk/include/lgi/common/PopupList.h \
-	../../lgi/trunk/include/lgi/common/PopupNotification.h \
-	../../lgi/trunk/include/lgi/common/Printer.h \
-	../../lgi/trunk/include/lgi/common/Profile.h \
-	../../lgi/trunk/include/lgi/common/Progress.h \
-	../../lgi/trunk/include/lgi/common/ProgressDlg.h \
-	../../lgi/trunk/include/lgi/common/ProgressView.h \
-	../../lgi/trunk/include/lgi/common/Properties.h \
-	../../lgi/trunk/include/lgi/common/RadioGroup.h \
-	../../lgi/trunk/include/lgi/common/Range.h \
-	../../lgi/trunk/include/lgi/common/Rect.h \
-	../../lgi/trunk/include/lgi/common/RectF.h \
-	../../lgi/trunk/include/lgi/common/RefCount.h \
-	../../lgi/trunk/include/lgi/common/RegKey.h \
-	../../lgi/trunk/include/lgi/common/Res.h \
-	../../lgi/trunk/include/lgi/common/Rops.h \
-	../../lgi/trunk/include/lgi/common/ScrollBar.h \
-	../../lgi/trunk/include/lgi/common/SkinEngine.h \
-	../../lgi/trunk/include/lgi/common/Slider.h \
-	../../lgi/trunk/include/lgi/common/Splitter.h \
-	../../lgi/trunk/include/lgi/common/StatusBar.h \
-	../../lgi/trunk/include/lgi/common/Store3Defs.h \
-	../../lgi/trunk/include/lgi/common/Stream.h \
-	../../lgi/trunk/include/lgi/common/StringClass.h \
-	../../lgi/trunk/include/lgi/common/StringLayout.h \
-	../../lgi/trunk/include/lgi/common/StructuredIo.h \
-	../../lgi/trunk/include/lgi/common/StructuredLog.h \
-	../../lgi/trunk/include/lgi/common/SubProcess.h \
-	../../lgi/trunk/include/lgi/common/TableLayout.h \
-	../../lgi/trunk/include/lgi/common/TabView.h \
-	../../lgi/trunk/include/lgi/common/TextFile.h \
-	../../lgi/trunk/include/lgi/common/TextLabel.h \
-	../../lgi/trunk/include/lgi/common/TextLog.h \
-	../../lgi/trunk/include/lgi/common/TextView3.h \
-	../../lgi/trunk/include/lgi/common/Thread.h \
-	../../lgi/trunk/include/lgi/common/ThreadEvent.h \
-	../../lgi/trunk/include/lgi/common/Token.h \
-	../../lgi/trunk/include/lgi/common/ToolBar.h \
-	../../lgi/trunk/include/lgi/common/ToolTip.h \
-	../../lgi/trunk/include/lgi/common/TrayIcon.h \
-	../../lgi/trunk/include/lgi/common/Tree.h \
-	../../lgi/trunk/include/lgi/common/Undo.h \
-	../../lgi/trunk/include/lgi/common/Unicode.h \
-	../../lgi/trunk/include/lgi/common/UnicodeString.h \
-	../../lgi/trunk/include/lgi/common/UnrolledList.h \
-	../../lgi/trunk/include/lgi/common/Uri.h \
-	../../lgi/trunk/include/lgi/common/Variant.h \
-	../../lgi/trunk/include/lgi/common/View.h \
-	../../lgi/trunk/include/lgi/common/Widgets.h \
-	../../lgi/trunk/include/lgi/common/Window.h \
-	../../lgi/trunk/include/lgi/common/XmlTree.h \
-	../../lgi/trunk/include/lgi/haiku/LgiOsClasses.h \
-	../../lgi/trunk/include/lgi/haiku/LgiOsDefs.h \
-	../../lgi/trunk/include/lgi/linux/Gtk/LgiWidget.h \
-	../../lgi/trunk/include/lgi/linux/Gtk/LgiWinManGlue.h \
-	../../lgi/trunk/include/lgi/mac/cocoa/LCocoaView.h \
-	../../lgi/trunk/include/lgi/mac/cocoa/LgiMac.h \
-	../../lgi/trunk/include/lgi/mac/cocoa/LgiOs.h \
-	../../lgi/trunk/include/lgi/mac/cocoa/LgiOsClasses.h \
-	../../lgi/trunk/include/lgi/mac/cocoa/LgiOsDefs.h \
-	../../lgi/trunk/include/lgi/mac/cocoa/ObjCWrapper.h \
-	../../lgi/trunk/include/lgi/mac/cocoa/SymLookup.h \
-	../../lgi/trunk/private/common/FontPriv.h \
-	../../lgi/trunk/private/common/ViewPriv.h \
-	../../lgi/trunk/private/haiku/AppPriv.h \
-	../../lgi/trunk/private/linux/AppPriv.h \
-	../../lgi/trunk/src/common/Gdc2/15Bit.cpp \
-	../../lgi/trunk/src/common/Gdc2/16Bit.cpp \
-	../../lgi/trunk/src/common/Gdc2/24Bit.cpp \
-	../../lgi/trunk/src/common/Gdc2/32Bit.cpp \
-	../../lgi/trunk/src/common/Gdc2/8Bit.cpp \
-	../../lgi/trunk/src/common/Gdc2/Alpha.cpp \
-	../../lgi/trunk/src/common/Gdc2/Colour.cpp \
-	../../lgi/trunk/src/common/Gdc2/Filters/Filter.cpp \
-	../../lgi/trunk/src/common/Gdc2/Font/Charset.cpp \
-	../../lgi/trunk/src/common/Gdc2/Font/DisplayString.cpp \
-	../../lgi/trunk/src/common/Gdc2/Font/Font.cpp \
-	../../lgi/trunk/src/common/Gdc2/Font/FontSystem.cpp \
-	../../lgi/trunk/src/common/Gdc2/Font/FontType.cpp \
-	../../lgi/trunk/src/common/Gdc2/Font/StringLayout.cpp \
-	../../lgi/trunk/src/common/Gdc2/Font/TypeFace.cpp \
-	../../lgi/trunk/src/common/Gdc2/GdcCommon.cpp \
-	../../lgi/trunk/src/common/Gdc2/Path/Path.cpp \
-	../../lgi/trunk/src/common/Gdc2/Rect.cpp \
-	../../lgi/trunk/src/common/Gdc2/RopsCases.cpp \
-	../../lgi/trunk/src/common/Gdc2/Surface.cpp \
-	../../lgi/trunk/src/common/Gdc2/Tools/ColourReduce.cpp \
-	../../lgi/trunk/src/common/Gdc2/Tools/GdcTools.cpp \
-	../../lgi/trunk/src/common/General/Containers.cpp \
-	../../lgi/trunk/src/common/General/DateTime.cpp \
-	../../lgi/trunk/src/common/General/ExeCheck.cpp \
-	../../lgi/trunk/src/common/General/FileCommon.cpp \
-	../../lgi/trunk/src/common/General/Password.cpp \
-	../../lgi/trunk/src/common/General/Properties.cpp \
-	../../lgi/trunk/src/common/Hash/md5/md5.c \
-	../../lgi/trunk/src/common/Hash/md5/md5.h \
-	../../lgi/trunk/src/common/Hash/sha1/sha1.c \
-	../../lgi/trunk/src/common/Hash/sha1/sha1.h \
-	../../lgi/trunk/src/common/Lgi/Alert.cpp \
-	../../lgi/trunk/src/common/Lgi/AppCommon.cpp \
-	../../lgi/trunk/src/common/Lgi/ClipBoardCommon.cpp \
-	../../lgi/trunk/src/common/Lgi/Css.cpp \
-	../../lgi/trunk/src/common/Lgi/CssTools.cpp \
-	../../lgi/trunk/src/common/Lgi/DataDlg.cpp \
-	../../lgi/trunk/src/common/Lgi/DragAndDropCommon.cpp \
-	../../lgi/trunk/src/common/Lgi/FileSelect.cpp \
-	../../lgi/trunk/src/common/Lgi/FindReplace.cpp \
-	../../lgi/trunk/src/common/Lgi/FontSelect.cpp \
-	../../lgi/trunk/src/common/Lgi/GuiUtils.cpp \
-	../../lgi/trunk/src/common/Lgi/Input.cpp \
-	../../lgi/trunk/src/common/Lgi/LgiCommon.cpp \
-	../../lgi/trunk/src/common/Lgi/Library.cpp \
-	../../lgi/trunk/src/common/Lgi/LMsg.cpp \
-	../../lgi/trunk/src/common/Lgi/MemStream.cpp \
-	../../lgi/trunk/src/common/Lgi/MenuCommon.cpp \
-	../../lgi/trunk/src/common/Lgi/Mru.cpp \
-	../../lgi/trunk/src/common/Lgi/Mutex.cpp \
-	../../lgi/trunk/src/common/Lgi/Object.cpp \
-	../../lgi/trunk/src/common/Lgi/OptionsFile.cpp \
-	../../lgi/trunk/src/common/Lgi/Rand.cpp \
-	../../lgi/trunk/src/common/Lgi/Stream.cpp \
-	../../lgi/trunk/src/common/Lgi/SubProcess.cpp \
-	../../lgi/trunk/src/common/Lgi/ThreadCommon.cpp \
-	../../lgi/trunk/src/common/Lgi/ThreadEvent.cpp \
-	../../lgi/trunk/src/common/Lgi/ToolTip.cpp \
-	../../lgi/trunk/src/common/Lgi/TrayIcon.cpp \
-	../../lgi/trunk/src/common/Lgi/Variant.cpp \
-	../../lgi/trunk/src/common/Lgi/ViewCommon.cpp \
-	../../lgi/trunk/src/common/Lgi/WindowCommon.cpp \
-	../../lgi/trunk/src/common/Net/Base64.cpp \
-	../../lgi/trunk/src/common/Net/MDStringToDigest.cpp \
-	../../lgi/trunk/src/common/Net/Net.cpp \
-	../../lgi/trunk/src/common/Net/Uri.cpp \
-	../../lgi/trunk/src/common/Resource/LgiRes.cpp \
-	../../lgi/trunk/src/common/Resource/Res.cpp \
-	../../lgi/trunk/src/common/Skins/Gel/Gel.cpp \
-	../../lgi/trunk/src/common/Text/DocView.cpp \
-	../../lgi/trunk/src/common/Text/String.cpp \
-	../../lgi/trunk/src/common/Text/TextView3.cpp \
-	../../lgi/trunk/src/common/Text/Token.cpp \
-	../../lgi/trunk/src/common/Text/Unicode.cpp \
-	../../lgi/trunk/src/common/Text/Utf8.cpp \
-	../../lgi/trunk/src/common/Text/XmlTree.cpp \
-	../../lgi/trunk/src/common/Widgets/Bitmap.cpp \
-	../../lgi/trunk/src/common/Widgets/Box.cpp \
-	../../lgi/trunk/src/common/Widgets/Button.cpp \
-	../../lgi/trunk/src/common/Widgets/CheckBox.cpp \
-	../../lgi/trunk/src/common/Widgets/Combo.cpp \
-	../../lgi/trunk/src/common/Widgets/Edit.cpp \
-	../../lgi/trunk/src/common/Widgets/ItemContainer.cpp \
-	../../lgi/trunk/src/common/Widgets/List.cpp \
-	../../lgi/trunk/src/common/Widgets/Panel.cpp \
-	../../lgi/trunk/src/common/Widgets/Popup.cpp \
-	../../lgi/trunk/src/common/Widgets/Progress.cpp \
-	../../lgi/trunk/src/common/Widgets/ProgressDlg.cpp \
-	../../lgi/trunk/src/common/Widgets/RadioGroup.cpp \
-	../../lgi/trunk/src/common/Widgets/ScrollBar.cpp \
-	../../lgi/trunk/src/common/Widgets/Slider.cpp \
-	../../lgi/trunk/src/common/Widgets/Splitter.cpp \
-	../../lgi/trunk/src/common/Widgets/StatusBar.cpp \
-	../../lgi/trunk/src/common/Widgets/TableLayout.cpp \
-	../../lgi/trunk/src/common/Widgets/TabView.cpp \
-	../../lgi/trunk/src/common/Widgets/TextLabel.cpp \
-	../../lgi/trunk/src/common/Widgets/ToolBar.cpp \
-	../../lgi/trunk/src/common/Widgets/Tree.cpp \
-	../../lgi/trunk/src/haiku/App.cpp \
-	../../lgi/trunk/src/haiku/ClipBoard.cpp \
-	../../lgi/trunk/src/haiku/DragAndDrop.cpp \
-	../../lgi/trunk/src/haiku/File.cpp \
-	../../lgi/trunk/src/haiku/Gdc2.cpp \
-	../../lgi/trunk/src/haiku/General.cpp \
-	../../lgi/trunk/src/haiku/Layout.cpp \
-	../../lgi/trunk/src/haiku/Mem.cpp \
-	../../lgi/trunk/src/haiku/MemDC.cpp \
-	../../lgi/trunk/src/haiku/Menu.cpp \
-	../../lgi/trunk/src/haiku/PrintDC.cpp \
-	../../lgi/trunk/src/haiku/Printer.cpp \
-	../../lgi/trunk/src/haiku/ScreenDC.cpp \
-	../../lgi/trunk/src/haiku/ShowFileProp_Haiku.cpp \
-	../../lgi/trunk/src/haiku/Thread.cpp \
-	../../lgi/trunk/src/haiku/View.cpp \
-	../../lgi/trunk/src/haiku/Widgets.cpp \
-	../../lgi/trunk/src/haiku/Window.cpp
-	export Build=$(Build); \
-	$(MAKE) -C ../../lgi/trunk -f ./haiku/Makefile.haiku
-
 -include $(Objects:.o=.d)
 
 # Clean just this target
@@ -712,6 +443,7 @@ cleanall :
 
 VPATH=$(BuildDir) \
 	./utils/Tables \
+	./src/Test \
 	./src/Store3Webdav \
 	./src/Store3Mail3 \
 	./src/Store3Imap \

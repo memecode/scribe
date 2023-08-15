@@ -8,8 +8,9 @@
 #include <FindDirectory.h>
 #include <Directory.h>
 
-#include "Lgi.h"
+#include "lgi/common/Lgi.h"
 #include "Scribe.h"
+#include "Imp_Beos.h"
 
 #define P_NAME				"META:name"
 #define P_NICKNAME			"META:nickname"
@@ -26,7 +27,7 @@
 #define P_URL				"META:url"
 #define P_GROUP				"META:group"
 
-void MapField(Contact *c, char *Dest, BFile &f, char *Src)
+void MapField(Contact *c, const char *Dest, BFile &f, const char *Src)
 {
 	char Data[256];
 	struct attr_info Info;
@@ -133,7 +134,8 @@ bool Import_MailDir(ScribeWnd *App, BDirectory *Dir, ScribeFolder *Folder)
 								{
 									Buf[Size] = 0;
 									Ms->Parse();
-									NewMsg->OnAfterReceive(Mime);
+									#warning "Fixme"
+									// NewMsg->OnAfterReceive(Mime);
 									Status = true;
 								}
 							}
@@ -145,13 +147,13 @@ bool Import_MailDir(ScribeWnd *App, BDirectory *Dir, ScribeFolder *Folder)
 					// Directory
 					char FName[256];
 					BDirectory D(Dir, Str);
-					LAutoString Path = Folder->GetPath();					
+					auto Path = Folder->GetPath();					
 					sprintf(FName, "%s/%s", Path.Get(), Str);
 					ScribeFolder *F = App->GetFolder(FName);
 					if (!F)
 					{
 						// folder doesn't exist... so create it
-						F = Folder->CreateSubDirectory(Str, MAGIC_MAIL);
+						F = Folder->CreateSubFolder(Str, MAGIC_MAIL);
 					}
 					if (F)
 					{

@@ -1,5 +1,5 @@
-
-#ifdef BEOS
+#pragma once
+#ifdef HAIKU
 
 #define IMP_BEOS_PEOPLE					0x0001
 #define IMP_BEOS_MAIL					0x0002

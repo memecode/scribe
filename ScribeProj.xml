@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Project>
 	<Node Name="Build" Type="1" Platforms="15" Id="1">
-		<Node File="./build.py" Type="8" Platforms="15" />
-		<Node File="./linux/make-zip.linux" Type="8" Platforms="15" />
-		<Node File="./linux/make-install.linux" Type="7" Platforms="0" />
-		<Node File="./linux/Makefile.linux" Type="9" Platforms="15" />
+		<Node File=".\build.py" Type="8" Platforms="15" />
+		<Node File=".\linux\make-install.linux" Type="7" Platforms="0" />
+		<Node File=".\linux\make-zip.linux" Type="8" Platforms="15" />
+		<Node Name="Haiku" Type="1" Platforms="15" Id="1">
+			<Node File=".\haiku\buildHaiku.py" Type="8" Platforms="15" />
+			<Node File=".\haiku\makefile.haiku" Type="9" Platforms="15" />
+		</Node>
+		<Node File=".\linux\Makefile.linux" Type="9" Platforms="15" />
 	</Node>
 	<Node Name="Encryption" Type="1" Platforms="15" Open="0" Id="1">
-		<Node File="./src/Encryption/GnuPG.cpp" Type="2" Platforms="15" />
-		<Node File="./src/Encryption/GnuPG.h" Type="3" Platforms="15" />
+		<Node File=".\src\Encryption\GnuPG.cpp" Type="2" Platforms="15" />
+		<Node File=".\src\Encryption\GnuPG.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Gdc2" Type="1" Open="0" Platforms="7" Id="2">
 		<Node File="../../lgi/trunk/src/common/Gdc2/Filters/Gif.cpp" Type="2" Platforms="15" />
@@ -42,14 +46,15 @@
 			<Node File="../libs/Btree/config.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="WordStore" Type="1" Platforms="15" Id="1">
-			<Node File="../../lgi/trunk/include/lgi/common/WordStore.h" Type="3" Platforms="15" />
-			<Node File="./src/GBTreeWordStore.cpp" Type="2" Platforms="15" />
+			<Node File="..\..\lgi\trunk\include\lgi\common\WordStore.h" Type="3" Platforms="15" />
+			<Node File=".\src\GBTreeWordStore.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node File="./src/HtmlToText.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/General/SegmentTree.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/General/SharedMemory.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/General/TimeZone.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/General/Tnef.cpp" Type="2" Platforms="15" />
+		<Node File=".\src\HtmlToText.cpp" Type="2" Platforms="15" />
+		<Node File="..\..\lgi\trunk\src\common\General\SegmentTree.cpp" Type="2" Platforms="15" />
+		<Node File="..\..\lgi\trunk\src\common\General\SharedMemory.cpp" Type="2" Platforms="15" />
+		<Node File="..\..\lgi\trunk\include\lgi\common\SharedMemory.h" Type="3" Platforms="15" />
+		<Node File="..\..\lgi\trunk\src\common\General\TimeZone.cpp" Type="2" Platforms="15" />
+		<Node File="..\..\lgi\trunk\src\common\General\Tnef.cpp" Type="2" Platforms="15" />
 	</Node>
 	<Node Name="Help Files" Type="1" Open="0" Platforms="7" Id="5">
 		<Node File="./help/calendar.html" Type="3" Platforms="7" />
@@ -166,18 +171,19 @@
 			<Node File="./src/Components.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Import / Export" Type="1" Open="0" Platforms="7" Id="17">
-			<Node File="./src/Exp_Scribe.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Db/Db-Csv.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/include/lgi/common/Db.h" Type="3" Platforms="15" />
-			<Node File="./src/Imp_Beos.cpp" Type="2" Platforms="8" />
-			<Node File="./src/Imp_CsvContacts.cpp" Type="2" Platforms="15" />
-			<Node File="./src/Imp_Eml.cpp" Type="2" Platforms="15" />
-			<Node File="./src/Imp_Eudora.cpp" Type="2" Platforms="15" />
-			<Node File="./src/Imp_Mozilla.cpp" Type="2" Platforms="15" />
-			<Node File="./src/Imp_NetscapeContacts.cpp" Type="2" Platforms="15" />
-			<Node File="./src/Imp_OutlookExpress.cpp" Type="2" Platforms="15" />
-			<Node File="./src/ImpExp_Mbox.cpp" Type="2" Platforms="15" />
-			<Node File="./src/ImpExp_Outlook.cpp" Type="2" Platforms="1" />
+			<Node File="..\..\lgi\trunk\src\common\Db\Db-Csv.cpp" Type="2" Platforms="15" />
+			<Node File="..\..\lgi\trunk\include\lgi\common\Db.h" Type="3" Platforms="15" />
+			<Node File=".\src\Exp_Scribe.cpp" Type="2" Platforms="15" />
+			<Node File=".\src\Imp_Beos.cpp" Type="2" Platforms="8" />
+			<Node File=".\src\Imp_Beos.h" Type="3" Platforms="8" />
+			<Node File=".\src\Imp_CsvContacts.cpp" Type="2" Platforms="15" />
+			<Node File=".\src\Imp_Eml.cpp" Type="2" Platforms="15" />
+			<Node File=".\src\Imp_Eudora.cpp" Type="2" Platforms="15" />
+			<Node File=".\src\Imp_Mozilla.cpp" Type="2" Platforms="15" />
+			<Node File=".\src\Imp_NetscapeContacts.cpp" Type="2" Platforms="15" />
+			<Node File=".\src\Imp_OutlookExpress.cpp" Type="2" Platforms="15" />
+			<Node File=".\src\ImpExp_Mbox.cpp" Type="2" Platforms="15" />
+			<Node File=".\src\ImpExp_Outlook.cpp" Type="2" Platforms="1" />
 		</Node>
 		<Node Name="Objects" Type="1" Open="0" Platforms="7" Id="18">
 			<Node Name="Calendar" Type="1" Open="0" Platforms="7" Id="19">
@@ -238,9 +244,9 @@
 			<Node File="../../lgi/trunk/include/lgi/common/OpenSSLSocket.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Tables" Type="1" Platforms="15" Id="1">
-			<Node File="./utils/Tables/MailFlags.c" Type="2" Platforms="15" />
-			<Node File="./utils/Tables/MailFlags.txt" Type="8" Platforms="0" />
-			<Node File="./utils/Tables/Tables.h" Type="3" Platforms="15" />
+			<Node File=".\utils\Tables\MailFlags.c" Type="2" Platforms="15" />
+			<Node File=".\utils\Tables\MailFlags.txt" Type="8" Platforms="0" />
+			<Node File=".\utils\Tables\Tables.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Ui" Type="1" Open="0" Platforms="7" Id="28">
 			<Node Name="Colour" Type="1" Open="0" Platforms="7" Id="29">
@@ -354,6 +360,9 @@
 			<Node File="../../lgi/trunk/include/lgi/common/Store3Defs.h" Type="3" Platforms="15" />
 		</Node>
 	</Node>
+	<Node Name="Testing" Type="1" Platforms="15" Id="1">
+		<Node File=".\src\Test\UnitTests.cpp" Type="2" Platforms="15" />
+	</Node>
 	<Node File="../libs/aspell-0.60.6.1/linux/aspell-dist-0.60.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Node File="../libs/bzip2-1.0.6/linux/bzip2.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Node File="../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
@@ -361,8 +370,8 @@
 		<General>
 			<Makefile>
 				<Linux>./linux/Makefile.linux</Linux>
-				<Windows>.\Scribe_vs2015.sln</Windows>
-				<Haiku>Makefile.haiku</Haiku>
+				<Windows>.\haiku\buildHaiku.py</Windows>
+				<Haiku>haiku/makefile.haiku</Haiku>
 			</Makefile>
 			<Defines>
 				<All>
@@ -395,6 +404,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>./scribe</Debug>
 					<Release>./scribe</Release>
 				</Linux>
+				<Haiku />
 			</Executable>
 			<CCrossCompiler />
 			<CppCrossCompiler />
@@ -436,8 +446,8 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 </Release>
 				</Linux>
 				<Haiku>
-					<Debug>../../Lgi/trunk/include/beos</Debug>
-					<Release>../../Lgi/trunk/include/beos</Release>
+					<Debug>../../lgi/trunk/include/lgi/haiku</Debug>
+					<Release>../../lgi/trunk/include/lgi/haiku</Release>
 				</Haiku>
 				<Windows>
 					<Debug>../../Lgi/trunk/include/lgi/win</Debug>
@@ -465,8 +475,10 @@ z
 `pkg-config --libs gtk+-3.0`</Release>
 				</Linux>
 				<Haiku>
-					<Debug>be</Debug>
-					<Release>be</Release>
+					<Debug>be
+gnu</Debug>
+					<Release>be
+gnu</Release>
 				</Haiku>
 				<All>
 					<Debug>chardet</Debug>
@@ -490,22 +502,27 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>POSIX
 </Release>
 				</Linux>
+				<Haiku>
+					<Debug>_GNU_SOURCE</Debug>
+					<Release>_GNU_SOURCE</Release>
+				</Haiku>
 			</Defines>
 			<SystemIncludes>
 				<Linux>
 					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
 					<Release>`pkg-config --cflags gtk+-3.0`</Release>
 				</Linux>
+				<Haiku />
 			</SystemIncludes>
 			<LibraryPaths>
 				<All>
 					<Debug>../libs/build-x64/libchardet</Debug>
 					<Release>../libs/build-x64/libchardet</Release>
 				</All>
-				<Linux />
+				<Haiku />
 			</LibraryPaths>
 			<TargetName>
-				<Linux />
+				<Haiku />
 			</TargetName>
 			<ApplicationIcon />
 		</Build>
@@ -526,16 +543,16 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<CommentFunction />
 		</Editor>
 		<Advanced>
-			<PostBuildCommands>
-				<Linux />
-			</PostBuildCommands>
 			<OtherMakefileRules />
+			<PostBuildCommands>
+				<Haiku />
+			</PostBuildCommands>
 		</Advanced>
 		<Debug>
+			<Environment />
 			<Arguments>
 				<All />
 			</Arguments>
-			<Environment />
 			<DebugAdmin />
 			<InitialDir />
 		</Debug>
