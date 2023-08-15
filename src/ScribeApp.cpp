@@ -6551,6 +6551,433 @@ bool ScribeWnd::OnBayesResult(Mail *m, double Rating)
 	return true;
 }
 
+#if WINNATIVE
+struct DefaultClient
+{
+	char DefIcon[MAX_PATH_LEN];
+	char CmdLine[MAX_PATH_LEN];
+	char DllPath[MAX_PATH_LEN];
+
+	static constexpr const char *sCurrentMailClient = "HKCU\\SOFTWARE\\Clients\\Mail";
+	static constexpr const char *sSystemMailClient  = "HKLM\\SOFTWARE\\Clients\\Mail";
+
+	DefaultClient()
+	{
+		auto Exe = LGetExeFile();
+		sprintf_s(DefIcon, sizeof(DefIcon), "%s,1", Exe.Get());
+		sprintf_s(CmdLine, sizeof(CmdLine), "\"%s\" /m \"%%1\"", Exe.Get());
+		LMakePath(DllPath, sizeof(DllPath), Exe, "../ScribeMapi.dll");
+	}
+
+	bool IsWindowsXp()
+	{
+		LArray<int> Ver;
+		int Os = LGetOs(&Ver);
+		if
+			(
+				(
+					Os == LGI_OS_WIN32
+					||
+					Os == LGI_OS_WIN64
+					)
+				&&
+				Ver.Length() > 1
+				&&
+				Ver[0] == 5
+				&&
+				Ver[1] == 1
+				)
+			return true;
+
+		return false;
+	}
+
+	bool InstallMailto(bool Write)
+	{
+		LAutoPtr<LRegKey> mailto = CheckKey(Write, "HKCR\\mailto");
+		if (!mailto)
+			return false;
+		if (!CheckString(Write, mailto, NULL, "URL:MailTo Protocol"))
+			return false;
+
+		LAutoPtr<LRegKey> deficon = CheckKey(Write, "HKCR\\mailto\\DefaultIcon");
+		if (!deficon)
+			return false;
+		if (!CheckString(Write, deficon, NULL, DefIcon))
+			return false;
+
+		LAutoPtr<LRegKey> shell = CheckKey(Write, "HKCR\\mailto\\shell");
+		if (!shell)
+			return false;
+		if (!CheckString(Write, shell, NULL, "open"))
+			return false;
+
+		LAutoPtr<LRegKey> cmd = CheckKey(Write, "HKCR\\mailto\\shell\\open\\command");
+		if (!cmd)
+			return false;
+		if (!CheckString(Write, cmd, NULL, CmdLine))
+			return false;
+
+
+		return true;
+	}
+
+	LAutoPtr<LRegKey> CheckKey(bool Write, const char *Key, ...) const
+	{
+		char Buffer[512];
+		va_list Arg;
+		va_start(Arg, Key);
+		vsprintf_s(Buffer, sizeof(Buffer), Key, Arg);
+		va_end(Arg);
+
+		LAutoPtr<LRegKey> k(new LRegKey(Write, Buffer));
+		if (k && Write && !k->IsOk())
+		{
+			if (!k->Create())
+			{
+				k.Reset();
+				LgiTrace("%s:%i - Failed to create '%s'\n", _FL, Buffer);
+			}
+		}
+
+		return k;
+	}
+
+	bool CheckInt(bool Write, LRegKey *k, const char *Name, uint32_t Value)
+	{
+		if (!k)
+		{
+			LgiTrace("%s:%i - No key: '%s'\n", _FL, Name);
+			return false;
+		}
+
+		uint32_t Cur;
+		if (!k->GetInt(Name, Cur))
+			Cur = Value + 1;
+
+		if (Cur == Value)
+			return true;
+
+		if (Write)
+		{
+			bool Status = k->SetInt(Name, Value);
+			if (!Status)
+				LgiTrace("%s:%i - Failed to set key '%s': '%s' to %i\n", _FL, k->Name(), Name, Value);
+			return Status;
+		}
+
+		return false;
+	}
+
+	bool CheckString(bool Write, LRegKey *k, const char *StrName, const char *StrValue)
+	{
+		if (!k)
+		{
+			LgiTrace("%s:%i - No key: '%s' to '%s'\n", _FL, StrName, StrValue);
+			return false;
+		}
+
+		LString v;
+		if (k->GetStr(StrName, v))
+		{
+			bool Same = Stricmp(v.Get(), StrValue) == 0;
+			if (Write && !Same)
+			{
+				bool Status = k->SetStr(StrName, StrValue);
+				if (!Status)
+					LgiTrace("%s:%i - Failed to set key '%s': '%s' to '%s'\n", _FL, k->Name(), StrName, StrValue);
+				return Status;
+			}
+
+			return Same;
+		}
+		else if (Write)
+		{
+			bool Status = k->SetStr(StrName, StrValue);
+			if (!Status)
+				LgiTrace("%s:%i - Failed to set key '%s': '%s' to '%s'\n", _FL, k->Name(), StrName, StrValue);
+			return Status;
+		}
+
+		return false;
+	}
+
+	bool IsDefault()
+	{
+		LAutoPtr<LRegKey> mail = CheckKey(false, sCurrentMailClient);
+		if (!mail)
+			return false;
+
+		LString v;
+		if (!mail->GetStr(NULL, v))
+			return false;
+
+		return !Stricmp(v.Get(), AppName);
+	}
+
+	bool SetDefault() const
+	{
+		LAutoPtr<LRegKey> mail = CheckKey(true, sCurrentMailClient);
+		if (!mail)
+			return false;
+
+		// Set the default client in the current user tree.
+		mail->SetStr(NULL, "Scribe");
+
+		// Configure the mailto handler
+		const char *Base = "HKEY_ROOT";
+		bool Error = false;
+		LRegKey Mt(true, "%s\\mailto", Base);
+		if (Mt.IsOk() || Mt.Create())
+		{
+			if (!Mt.SetStr(0, "URL:MailTo Protocol") ||
+				!Mt.SetStr("URL Protocol", ""))
+				Error = true;
+		}
+		else
+		{
+			LgiTrace("%s:%i - Couldn't open/create registry key (err=%i).\n", _FL, GetLastError());
+			Error = true;
+		}
+
+		LRegKey Di(true, "%s\\mailto\\DefaultIcon", Base);
+		if (Di.IsOk() || Di.Create())
+		{
+			if (!Di.SetStr(0, DefIcon))
+				Error = true;
+		}
+		else
+		{
+			LgiTrace("%s:%i - Couldn't open/create registry key (err=%i).\n", _FL, GetLastError());
+			Error = true;
+		}
+
+		LRegKey c(true, "%s\\mailto\\shell\\open\\command", Base);
+		if (c.IsOk() || c.Create())
+		{
+			if (!c.SetStr(NULL, CmdLine))
+				Error = true;
+		}
+		else
+		{
+			LgiTrace("%s:%i - Couldn't open/create registry key (err=%i).\n", _FL, GetLastError());
+			Error = true;
+		}
+
+		return Error;
+	}
+
+	bool InstallAsClient(char *Base, bool Write)
+	{
+		// Create software client entry, to put Scribe in the Internet Options for mail clients.
+		LAutoPtr<LRegKey> mail = CheckKey(Write, "%s\\Software\\Clients\\Mail", Base);
+		if (!mail)
+			return false;
+
+		LAutoPtr<LRegKey> app = CheckKey(Write, "%s\\Software\\Clients\\Mail\\Scribe", Base);
+		if (!app)
+			return false;
+		if (!CheckString(Write, app, NULL, AppName))
+			return false;
+		if (!CheckString(Write, app, "DllPath", DllPath))
+			return false;
+
+		LAutoPtr<LRegKey> shell = CheckKey(Write, "%s\\Software\\Clients\\Mail\\Scribe\\shell\\open\\command", Base);
+		if (!shell)
+			return false;
+		if (!CheckString(Write, shell, NULL, CmdLine))
+			return false;
+
+		LAutoPtr<LRegKey> icon = CheckKey(Write, "%s\\Software\\Clients\\Mail\\Scribe\\DefaultIcon", Base);
+		if (!icon)
+			return false;
+		if (!CheckString(Write, icon, NULL, DefIcon))
+			return false;
+
+		LAutoPtr<LRegKey> proto = CheckKey(Write, "%s\\Software\\Classes\\Protocol\\mailto", Base);
+		if (!proto)
+			return false;
+		if (!CheckString(Write, proto, NULL, "URL:MailTo Protocol"))
+			return false;
+		if (!CheckString(Write, proto, "URL Protocol", ""))
+			return false;
+		if (!CheckInt(Write, proto, "EditFlags", 0x2))
+			return false;
+
+		LAutoPtr<LRegKey> proto_cmd = CheckKey(Write, "%s\\Software\\Classes\\Protocol\\mailto\\shell\\open\\command", Base);
+		if (!proto_cmd)
+			return false;
+		if (!CheckString(Write, proto_cmd, NULL, CmdLine))
+			return false;
+
+		return true;
+	}
+
+	struct FileType
+	{
+		char *Name;
+		char *Desc;
+		int Icon;
+	};
+
+	static FileType FileTypes[];
+
+	bool Win7Install(bool Write)
+	{
+		// http://msdn.microsoft.com/en-us/library/windows/desktop/cc144154%28v=vs.85%29.aspx
+		LArray<int> Ver;
+		int Os = LGetOs(&Ver);
+		if
+			(
+				(
+					Os == LGI_OS_WIN32
+					||
+					Os == LGI_OS_WIN64
+					)
+				&&
+				Ver[0] >= 6)
+		{
+			char Path[MAX_PATH_LEN];
+			auto Exe = LGetExeFile();
+
+			for (int i=0; FileTypes[i].Name; i++)
+			{
+				LAutoPtr<LRegKey> base = CheckKey(Write, "HKEY_CLASSES_ROOT\\%s", FileTypes[i].Name);
+				if (!base)
+					return false;
+				if (!CheckString(Write, base, NULL, FileTypes[i].Desc))
+					return false;
+
+				LAutoPtr<LRegKey> r = CheckKey(Write, "HKEY_CLASSES_ROOT\\%s\\shell\\Open\\command", FileTypes[i].Name);
+				if (!r)
+					return false;
+				sprintf_s(Path, sizeof(Path), "\"%s\" -u \"%%1\"", Exe.Get());
+				if (!CheckString(Write, r, NULL, Path))
+					return false;
+
+				LAutoPtr<LRegKey> ico = CheckKey(Write, "HKEY_CLASSES_ROOT\\%s\\DefaultIcon", FileTypes[i].Name);
+				if (!ico)
+					return false;
+				sprintf_s(Path, sizeof(Path), "%s,%i", Exe.Get(), FileTypes[i].Icon);
+				if (!CheckString(Write, ico, NULL, Path))
+					return false;
+			}
+
+			LAutoPtr<LRegKey> r = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities");
+			if (!r)
+				return false;
+			if (!CheckString(Write, r, "ApplicationDescription", "Scribe is a small lightweight email client.") &&
+				!CheckString(Write, r, "ApplicationName", "Scribe") &&
+				!CheckString(Write, r, "ApplicationIcon", DefIcon))
+				return false;
+
+			LAutoPtr<LRegKey> as = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities\\FileAssociations");
+			if (!as)
+				return false;
+			if (!CheckString(Write, as, ".eml", "Scribe.Email") &&
+				!CheckString(Write, as, ".msg", "Scribe.Email") &&
+				!CheckString(Write, as, ".mbox", "Scribe.Folder") &&
+				!CheckString(Write, as, ".mbx", "Scribe.Folder") &&
+				!CheckString(Write, as, ".ics", "Scribe.Calendar") &&
+				!CheckString(Write, as, ".vcs", "Scribe.Calendar") &&
+				!CheckString(Write, as, ".vcf", "Scribe.Contact") &&
+				!CheckString(Write, as, ".mail3", "Scribe.MailStore"))
+				return false;
+
+			LAutoPtr<LRegKey> ua = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities\\UrlAssociations");
+			if (!ua)
+				return false;
+			if (!CheckString(Write, ua, "mailto", "Scribe.Mailto"))
+				return false;
+
+			LAutoPtr<LRegKey> a = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\RegisteredApplications");
+			if (!a)
+				return false;
+			if (!CheckString(Write, a, "Scribe", "SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities"))
+				return false;
+		}
+
+		return true;
+	}
+
+	void Win7Uninstall()
+	{
+		for (int i=0; FileTypes[i].Name; i++)
+		{
+			LRegKey base(true, "HKEY_CLASSES_ROOT\\%s", FileTypes[i].Name);
+			base.DeleteKey();
+		}
+	}
+
+	void CleanRegistry(ScribeWnd *parent)
+	{
+		const char *keys[] = {
+			"HKCU\\SOFTWARE\\Memecode\\Scribe",
+			sCurrentMailClient,
+			sSystemMailClient
+		};
+
+		int deleted = 0;
+		LString deleteFailures;
+		for (int i=0; i<CountOf(keys); i++)
+		{
+			LRegKey k(true, keys[i]);
+			if (k.DeleteKey())
+				deleted++;
+			else
+				deleteFailures += LString(keys[i]) + " (" + k.GetErrorName().Strip() + ")\n";
+		}
+
+		const char *clients[] = {
+			sCurrentMailClient,
+			sSystemMailClient
+		};
+		LString clearFailures;
+		for (int i=0; i<CountOf(clients); i++)
+		{
+			LRegKey ro(true, clients[i]);
+			if (ro.IsOk())
+			{
+				auto cur = ro.GetStr();
+				if (Stricmp(cur, AppName))
+					continue;
+
+				LRegKey rw(true, clients[i]);
+				if (!rw.SetStr(NULL, NULL))
+					clearFailures += LString(clients[i]) + " (" + rw.GetErrorName().Strip() + ")\n";
+			}
+			else clearFailures += LString(clients[i]) + " (" + ro.GetErrorName().Strip() + ")\n";
+		}
+
+		LgiMsg(	parent,
+			"Registry keys deleted: %i of %i\n"
+			"%s\n"
+			"\n"
+			"Client strings cleared:\n"
+			"%s\n"
+			"\n"
+			"Note: for 'access denied' try running as administrator.",
+			AppName,
+			MB_OK,
+			deleted,
+			CountOf(keys),					
+			deleteFailures.Get(),
+			clearFailures.Get());
+	}
+};
+
+DefaultClient::FileType DefaultClient::FileTypes[] =
+{
+	{ "Scribe.Email", "Email", 2 },
+	{ "Scribe.Folder", "Mailbox", 0 },
+	{ "Scribe.Calendar", "Calendar Event", 6 },
+	{ "Scribe.Contact", "Contact", 4 },
+	{ "Scribe.MailStore", "Mail Store", 0 },
+	{ "Scribe.Mailto", "Mailto Protocol", 0 },
+	{ 0, 0 }
+};
+#endif
+
 static int AccountCmp(ScribeAccount *a, ScribeAccount *b, int Data)
 {
 	return a->Identity.Sort() - b->Identity.Sort();
@@ -7840,34 +8267,8 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 #ifdef WINDOWS
 		case IDM_CLEAR_REGISTRY:
 		{
-			const char *keys[] = {
-				"HKCU\\SOFTWARE\\Memecode\\Scribe",
-				"HKCU\\SOFTWARE\\Clients\\Mail\\Scribe",
-				"HKLM\\SOFTWARE\\Clients\\Mail\\Scribe"
-			};
-
-			int deleted = 0;
-			LString failures;
-			for (int i=0; i<CountOf(keys); i++)
-			{
-				LRegKey k(true, keys[i]);
-				if (k.DeleteKey())
-					deleted++;
-				else
-					failures += LString(keys[i]) + " (" + k.GetErrorName().Strip() + ")\n";
-			}
-
-			LgiMsg(	this,
-					"Registry keys deleted: %i of %i\n"
-					"\n"
-					"%s\n"
-					"\n"
-					"Note: for 'access denied' try running as administrator.",
-					AppName,
-					MB_OK,
-					deleted,
-					CountOf(keys),
-					failures.Get());
+			DefaultClient defaultClient;
+			defaultClient.CleanRegistry(this);
 			break;
 		} 
 #endif
@@ -8825,374 +9226,6 @@ public:
 	}
 
 };
-
-#if WINNATIVE
-struct DefaultClient
-{
-	char DefIcon[MAX_PATH_LEN];
-	char CmdLine[MAX_PATH_LEN];
-	char DllPath[MAX_PATH_LEN];
-
-	DefaultClient()
-	{
-		auto Exe = LGetExeFile();
-		sprintf_s(DefIcon, sizeof(DefIcon), "%s,1", Exe.Get());
-		sprintf_s(CmdLine, sizeof(CmdLine), "\"%s\" /m \"%%1\"", Exe.Get());
-		LMakePath(DllPath, sizeof(DllPath), Exe, "../ScribeMapi.dll");
-	}
-	
-	bool IsWindowsXp()
-	{
-		LArray<int> Ver;
-		int Os = LGetOs(&Ver);
-		if
-		(
-			(
-				Os == LGI_OS_WIN32
-				||
-				Os == LGI_OS_WIN64
-			)
-			&&
-			Ver.Length() > 1
-			&&
-			Ver[0] == 5
-			&&
-			Ver[1] == 1
-		)
-			return true;
-		
-		return false;
-	}
-	
-	bool InstallMailto(bool Write)
-	{
-		LAutoPtr<LRegKey> mailto = CheckKey(Write, "HKCR\\mailto");
-		if (!mailto)
-			return false;
-		if (!CheckString(Write, mailto, NULL, "URL:MailTo Protocol"))
-			return false;
-		
-		LAutoPtr<LRegKey> deficon = CheckKey(Write, "HKCR\\mailto\\DefaultIcon");
-		if (!deficon)
-			return false;
-		if (!CheckString(Write, deficon, NULL, DefIcon))
-			return false;
-
-		LAutoPtr<LRegKey> shell = CheckKey(Write, "HKCR\\mailto\\shell");
-		if (!shell)
-			return false;
-		if (!CheckString(Write, shell, NULL, "open"))
-			return false;
-			
-		LAutoPtr<LRegKey> cmd = CheckKey(Write, "HKCR\\mailto\\shell\\open\\command");
-		if (!cmd)
-			return false;
-		if (!CheckString(Write, cmd, NULL, CmdLine))
-			return false;
-		
-			
-		return true;
-	}
-
-	LAutoPtr<LRegKey> CheckKey(bool Write, const char *Key, ...) const
-	{
-		char Buffer[512];
-		va_list Arg;
-		va_start(Arg, Key);
-		vsprintf_s(Buffer, sizeof(Buffer), Key, Arg);
-		va_end(Arg);
-		
-		LAutoPtr<LRegKey> k(new LRegKey(Write, Buffer));
-		if (k && Write && !k->IsOk())
-		{
-			if (!k->Create())
-			{
-				k.Reset();
-				LgiTrace("%s:%i - Failed to create '%s'\n", _FL, Buffer);
-			}
-		}
-		
-		return k;
-	}
-
-	bool CheckInt(bool Write, LRegKey *k, const char *Name, uint32_t Value)
-	{
-		if (!k)
-		{
-			LgiTrace("%s:%i - No key: '%s'\n", _FL, Name);
-			return false;
-		}
-
-		uint32_t Cur;
-		if (!k->GetInt(Name, Cur))
-			Cur = Value + 1;
-		
-		if (Cur == Value)
-			return true;
-
-		if (Write)
-		{
-			bool Status = k->SetInt(Name, Value);
-			if (!Status)
-				LgiTrace("%s:%i - Failed to set key '%s': '%s' to %i\n", _FL, k->Name(), Name, Value);
-			return Status;
-		}
-		
-		return false;
-	}
-	
-	bool CheckString(bool Write, LRegKey *k, const char *StrName, const char *StrValue)
-	{
-		if (!k)
-		{
-			LgiTrace("%s:%i - No key: '%s' to '%s'\n", _FL, StrName, StrValue);
-			return false;
-		}
-
-		LString v;
-		if (k->GetStr(StrName, v))
-		{
-			bool Same = Stricmp(v.Get(), StrValue) == 0;
-			if (Write && !Same)
-			{
-				bool Status = k->SetStr(StrName, StrValue);
-				if (!Status)
-					LgiTrace("%s:%i - Failed to set key '%s': '%s' to '%s'\n", _FL, k->Name(), StrName, StrValue);
-				return Status;
-			}
-			
-			return Same;
-		}
-		else if (Write)
-		{
-			bool Status = k->SetStr(StrName, StrValue);
-			if (!Status)
-				LgiTrace("%s:%i - Failed to set key '%s': '%s' to '%s'\n", _FL, k->Name(), StrName, StrValue);
-			return Status;
-		}
-		
-		return false;
-	}
-
-	bool IsDefault()
-	{
-		LAutoPtr<LRegKey> mail = CheckKey(false, "HKCU\\Software\\Clients\\Mail");
-		if (!mail)
-			return false;
-		
-		LString v;
-		if (!mail->GetStr(NULL, v))
-			return false;
-		
-		return !_stricmp(v, "Scribe");
-	}
-
-	bool SetDefault() const
-	{
-		LAutoPtr<LRegKey> mail = CheckKey(true, "HKCU\\Software\\Clients\\Mail");
-		if (!mail)
-			return false;
-			
-		// Set the default client in the current user tree.
-		mail->SetStr(NULL, "Scribe");
-
-		// Configure the mailto handler
-		const char *Base = "HKEY_ROOT";
-		bool Error = false;
-		LRegKey Mt(true, "%s\\mailto", Base);
-		if (Mt.IsOk() || Mt.Create())
-		{
-			if (!Mt.SetStr(0, "URL:MailTo Protocol") ||
-				!Mt.SetStr("URL Protocol", ""))
-				Error = true;
-		}
-		else
-		{
-			LgiTrace("%s:%i - Couldn't open/create registry key (err=%i).\n", _FL, GetLastError());
-			Error = true;
-		}
-
-		LRegKey Di(true, "%s\\mailto\\DefaultIcon", Base);
-		if (Di.IsOk() || Di.Create())
-		{
-			if (!Di.SetStr(0, DefIcon))
-				Error = true;
-		}
-		else
-		{
-			LgiTrace("%s:%i - Couldn't open/create registry key (err=%i).\n", _FL, GetLastError());
-			Error = true;
-		}
-
-		LRegKey c(true, "%s\\mailto\\shell\\open\\command", Base);
-		if (c.IsOk() || c.Create())
-		{
-			if (!c.SetStr(NULL, CmdLine))
-				Error = true;
-		}
-		else
-		{
-			LgiTrace("%s:%i - Couldn't open/create registry key (err=%i).\n", _FL, GetLastError());
-			Error = true;
-		}
-		
-		return Error;
-	}
-
-	bool InstallAsClient(char *Base, bool Write)
-	{
-		// Create software client entry, to put Scribe in the Internet Options for mail clients.
-		LAutoPtr<LRegKey> mail = CheckKey(Write, "%s\\Software\\Clients\\Mail", Base);
-		if (!mail)
-			return false;
-
-		LAutoPtr<LRegKey> app = CheckKey(Write, "%s\\Software\\Clients\\Mail\\Scribe", Base);
-		if (!app)
-			return false;
-		if (!CheckString(Write, app, NULL, AppName))
-			return false;
-		if (!CheckString(Write, app, "DllPath", DllPath))
-			return false;
-
-		LAutoPtr<LRegKey> shell = CheckKey(Write, "%s\\Software\\Clients\\Mail\\Scribe\\shell\\open\\command", Base);
-		if (!shell)
-			return false;
-		if (!CheckString(Write, shell, NULL, CmdLine))
-			return false;
-
-		LAutoPtr<LRegKey> icon = CheckKey(Write, "%s\\Software\\Clients\\Mail\\Scribe\\DefaultIcon", Base);
-		if (!icon)
-			return false;
-		if (!CheckString(Write, icon, NULL, DefIcon))
-			return false;
-
-		LAutoPtr<LRegKey> proto = CheckKey(Write, "%s\\Software\\Classes\\Protocol\\mailto", Base);
-		if (!proto)
-			return false;
-		if (!CheckString(Write, proto, NULL, "URL:MailTo Protocol"))
-			return false;
-		if (!CheckString(Write, proto, "URL Protocol", ""))
-			return false;
-		if (!CheckInt(Write, proto, "EditFlags", 0x2))
-			return false;
-
-		LAutoPtr<LRegKey> proto_cmd = CheckKey(Write, "%s\\Software\\Classes\\Protocol\\mailto\\shell\\open\\command", Base);
-		if (!proto_cmd)
-			return false;
-		if (!CheckString(Write, proto_cmd, NULL, CmdLine))
-			return false;
-		
-		return true;
-	}
-	
-	struct FileType
-	{
-		char *Name;
-		char *Desc;
-		int Icon;
-	};
-	
-	static FileType FileTypes[];
-	
-	bool Win7Install(bool Write)
-	{
-		// http://msdn.microsoft.com/en-us/library/windows/desktop/cc144154%28v=vs.85%29.aspx
-		LArray<int> Ver;
-		int Os = LGetOs(&Ver);
-		if
-		(
-			(
-				Os == LGI_OS_WIN32
-				||
-				Os == LGI_OS_WIN64
-			)
-			&&
-			Ver[0] >= 6)
-		{
-			char Path[MAX_PATH_LEN];
-			auto Exe = LGetExeFile();
-
-			for (int i=0; FileTypes[i].Name; i++)
-			{
-				LAutoPtr<LRegKey> base = CheckKey(Write, "HKEY_CLASSES_ROOT\\%s", FileTypes[i].Name);
-				if (!base)
-					return false;
-				if (!CheckString(Write, base, NULL, FileTypes[i].Desc))
-					return false;
-
-				LAutoPtr<LRegKey> r = CheckKey(Write, "HKEY_CLASSES_ROOT\\%s\\shell\\Open\\command", FileTypes[i].Name);
-				if (!r)
-					return false;
-				sprintf_s(Path, sizeof(Path), "\"%s\" -u \"%%1\"", Exe.Get());
-				if (!CheckString(Write, r, NULL, Path))
-					return false;
-
-				LAutoPtr<LRegKey> ico = CheckKey(Write, "HKEY_CLASSES_ROOT\\%s\\DefaultIcon", FileTypes[i].Name);
-				if (!ico)
-					return false;
-				sprintf_s(Path, sizeof(Path), "%s,%i", Exe.Get(), FileTypes[i].Icon);
-				if (!CheckString(Write, ico, NULL, Path))
-					return false;
-			}
-			
-			LAutoPtr<LRegKey> r = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities");
-			if (!r)
-				return false;
-			if (!CheckString(Write, r, "ApplicationDescription", "Scribe is a small lightweight email client.") &&
-				!CheckString(Write, r, "ApplicationName", "Scribe") &&
-				!CheckString(Write, r, "ApplicationIcon", DefIcon))
-				return false;
-			
-			LAutoPtr<LRegKey> as = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities\\FileAssociations");
-			if (!as)
-				return false;
-			if (!CheckString(Write, as, ".eml", "Scribe.Email") &&
-				!CheckString(Write, as, ".msg", "Scribe.Email") &&
-				!CheckString(Write, as, ".mbox", "Scribe.Folder") &&
-				!CheckString(Write, as, ".mbx", "Scribe.Folder") &&
-				!CheckString(Write, as, ".ics", "Scribe.Calendar") &&
-				!CheckString(Write, as, ".vcs", "Scribe.Calendar") &&
-				!CheckString(Write, as, ".vcf", "Scribe.Contact") &&
-				!CheckString(Write, as, ".mail3", "Scribe.MailStore"))
-				return false;
-
-			LAutoPtr<LRegKey> ua = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities\\UrlAssociations");
-			if (!ua)
-				return false;
-			if (!CheckString(Write, ua, "mailto", "Scribe.Mailto"))
-				return false;
-			
-			LAutoPtr<LRegKey> a = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\RegisteredApplications");
-			if (!a)
-				return false;
-			if (!CheckString(Write, a, "Scribe", "SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities"))
-				return false;
-		}
-		
-		return true;
-	}
-
-	void Win7Uninstall()
-	{
-		for (int i=0; FileTypes[i].Name; i++)
-		{
-			LRegKey base(true, "HKEY_CLASSES_ROOT\\%s", FileTypes[i].Name);
-			base.DeleteKey();
-		}
-	}
-};
-
-DefaultClient::FileType DefaultClient::FileTypes[] =
-{
-	{ "Scribe.Email", "Email", 2 },
-	{ "Scribe.Folder", "Mailbox", 0 },
-	{ "Scribe.Calendar", "Calendar Event", 6 },
-	{ "Scribe.Contact", "Contact", 4 },
-	{ "Scribe.MailStore", "Mail Store", 0 },
-	{ "Scribe.Mailto", "Mailto Protocol", 0 },
-	{ 0, 0 }
-};
-#endif
 
 void ScribeWnd::SetDefaultHandler()
 {
