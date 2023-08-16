@@ -18,7 +18,6 @@
 #include "lgi/common/Password.h"
 #include "lgi/common/vCard-vCal.h"
 #include "lgi/common/WordStore.h"
-#include "lgi/common/SharedMemory.h"
 #include "lgi/common/XmlTreeUi.h"
 #include "lgi/common/Mime.h"
 #include "lgi/common/OptionsFile.h"
@@ -2297,9 +2296,7 @@ protected:
 	LTrayIcon		TrayIcon;
 	
 	// Ipc
-	LSharedMemory	*ScribeIpc = NULL;
-	class ScribeIpcInstance *ThisInst = NULL;
-	bool ShutdownIpc();
+	class ScribeIpc *Ipc = NULL;
 
 	// Accounts
 	List<ScribeAccount> Accounts;

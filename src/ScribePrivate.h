@@ -735,12 +735,6 @@ struct SystemFolderInfo
 extern SystemFolderInfo SystemFolders[];
 
 ////////////////////////////////////////////////////////////////////////////////////
-// Shared memory record format, used to pass argument data to the right running 
-// instance of Scribe. Mul also uses this to broker new instances of Scribe.
-#include "ScribeSharedMem.h"
-
-////////////////////////////////////////////////////////////////////////////////////
-//
 ScribeFunc void TraceTime(char *s);
 extern void LoadCalendarStringTable();
 

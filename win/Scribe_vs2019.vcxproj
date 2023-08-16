@@ -450,6 +450,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\src\GBTreeWordStore.cpp" />
     <ClCompile Include="..\src\NewMailDlg.cpp" />
     <ClCompile Include="..\src\RemoteCalendarSource.cpp" />
+    <ClCompile Include="..\src\ScribeIpc.cpp" />
     <ClCompile Include="..\src\SearchView.cpp" />
     <ClCompile Include="..\src\HtmlToText.cpp" />
     <ClCompile Include="..\src\ImpExp_Mbox.cpp" />
@@ -614,6 +615,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\src\ScribeFolderDlg.h" />
     <ClInclude Include="..\src\ScribeFolderSelect.h" />
     <ClInclude Include="..\src\ScribeInc.h" />
+    <ClInclude Include="..\src\ScribeIpc.h" />
     <ClInclude Include="..\src\ScribeListAddr.h" />
     <ClInclude Include="..\src\ScribePageSetup.h" />
     <ClInclude Include="..\src\ScribePrivate.h" />

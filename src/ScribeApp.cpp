@@ -66,7 +66,7 @@
 #include "Encryption/GnuPG.h"
 #include "Store3Webdav/WebdavStore.h"
 #include "resdefs.h"
-
+#include "ScribeIpc.h"
 
 #define DEBUG_STORE_EVENTS			0
 #if DEBUG_STORE_EVENTS
@@ -768,33 +768,8 @@ ScribeWnd::ScribeWnd() :
 	// init some variables
 	LApp::ObjInstance()->AppWnd = this;
 	LCharsetSystem::Inst()->DetectCharset = ::DetectCharset;
-	d = new ScribeWndPrivate(this);
-	ScribeIpc = new LSharedMemory("Scribe", SCRIBE_INSTANCE_MAX * sizeof(ScribeIpcInstance));
-	if (ScribeIpc && ScribeIpc->GetPtr())
-	{
-		ScribeIpcInstance *InstLst = (ScribeIpcInstance*) ScribeIpc->GetPtr();
-		for (int i=0; i<SCRIBE_INSTANCE_MAX; i++)
-		{
-			if (InstLst[i].Valid())
-			{
-				if (!LIsProcess(InstLst[i].Pid))
-				{
-					LgiTrace("Crashed instance %i\n", InstLst[i].Pid);
-					InstLst[i].Clear();
-				}
-			}
-			else if (!ThisInst)
-			{
-				ThisInst = InstLst + i;
-				memset(ThisInst, 0, sizeof(ScribeIpcInstance));
-				ThisInst->Magic = SCRIBE_INSTANCE_MAGIC;
-				ThisInst->Pid = LProcessId();
-				
-				// LgiTrace("Install Scribe pid=%i to pos=%i\n", LProcessId(), i);
-			}
-		}
-	}
-	else DeleteObj(ScribeIpc);
+	d = new ScribeWndPrivate(this);	
+	Ipc = new ScribeIpc();
 
 	#ifndef WIN32
 	printf("%s\n", GetFullAppName(true).Get());
@@ -1297,7 +1272,7 @@ ScribeWnd::~ScribeWnd()
 
 	// Other cleanup...
 	ClearTempPath();
-	ShutdownIpc();
+	DeleteObj(Ipc);
 	SetPulse();
 
 	// Save anything thats still dirty in the folders...
@@ -2210,33 +2185,6 @@ bool ScribeWnd::IsValid()
 	return true;
 }
 
-bool ScribeWnd::ShutdownIpc()
-{
-	// Remove our instance from the shared memory
-	if (ScribeIpc && ScribeIpc->GetPtr())
-	{
-		ScribeIpcInstance *InstLst = (ScribeIpcInstance*) ScribeIpc->GetPtr();
-
-		if (ThisInst)
-			memset(ThisInst, 0, sizeof(*ThisInst));
-
-		int c = 0;
-		for (int i=0; i<SCRIBE_INSTANCE_MAX; i++)
-		{
-			if (InstLst[i].Valid())
-				c++;
-		}
-
-		if (!c)
-			ScribeIpc->Destroy();
-	}	
-	
-	ThisInst = 0;
-	DeleteObj(ScribeIpc);
-
-	return true;
-}
-
 bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
 	ScribeDomType Fld = StrToDom(Name);
@@ -3022,128 +2970,35 @@ bool ScribeWnd::LoadOptions()
 	}
 	
 	// Do multi-instance stuff
-	if (d->Options && d->Options->GetFile())
+	if (Ipc &&
+		d->Options &&
+		d->Options->GetFile())
 	{
-		// Search for other instances of Scribe
-		if (ScribeIpc)
-		{
-			int i;
-			ScribeIpcInstance *InstLst = (ScribeIpcInstance*) ScribeIpc->GetPtr();
-			ScribeIpcInstance *Mul = 0;
-
-			for (i=0; i<SCRIBE_INSTANCE_MAX; i++)
-			{
-				if (InstLst[i].IsMul())
-				{
-					Mul = InstLst + i;
-					d->MulPassword = Mul->Password;
-					break;
-				}
-			}
-
-			for (i=0; i<SCRIBE_INSTANCE_MAX; i++, InstLst++)
-			{
-				// LgiTrace("[%i] %i, magic=%x, pid=%i\n", i, InstLst->IsScribe(), InstLst->Magic, InstLst->Pid);
-				if (InstLst->IsScribe() && InstLst != ThisInst)
-				{
-					// LgiTrace("%s, %s\n", InstLst->OptionsPath, d->Options->GetFile());
-					if (Mul || _stricmp(InstLst->OptionsPath, d->Options->GetFile()) == 0)
+		Ipc->OnLoad(d->Options->GetFile(),
+					&d->MulPassword,
+					[this](auto status)
 					{
-						int Pid = InstLst->Pid;
-						OsAppArguments *Args = LAppInst->GetAppArgs();
-						
-						if (!LIsProcess(Pid))
+						if (status)
 						{
-							continue;
+							Visible(true);
 						}
-						
-						char *Utf8 = 0;
-						#if WINNATIVE
-						Utf8 = WideToUtf8(Args->lpCmdLine);
-						#else
-						LStringPipe p;
-						for (int i=1; i<Args->Args; i++)
+						else
 						{
-							if (i > 1) p.Push(" ");
-							char *Sp = strchr(Args->Arg[i], ' ');
-							if (Sp) p.Push("\"");
-							p.Push(Args->Arg[i]);
-							if (Sp) p.Push("\"");
-						}
-						Utf8 = p.NewStr();
-						#endif
-						if (Utf8)
-						{
-							size_t Len = strlen(Utf8);
-							if (Len > 255)
-							{
-								InstLst->Flags |= SCRIBE_IPC_LONG_ARGS;
-								InstLst->Flags &= ~SCRIBE_IPC_CONTINUE_ARGS;
-								for (char *u = Utf8; Len > 0; u += 255)
-								{
-									ssize_t Part = MIN(sizeof(InstLst->Args)-1, Len);
-									
-									memcpy(InstLst->Args, u, Part);
-									Len -= Part;
-
-									int64 Start = LCurrentTime();
-									while (LCurrentTime() - Start < 60000)
-									{
-										if (TestFlag(InstLst->Flags, SCRIBE_IPC_CONTINUE_ARGS) &&
-											InstLst->Args[0] == 0)
-										{
-											Start = 0;
-											break;
-										}
-										LSleep(10);
-									}
-									if (Start)
-									{
-										LgiTrace("%s:%i - SendLA timed out.\n", _FL);
-										break;
-									}
-								}
-
-								InstLst->Flags &= ~(SCRIBE_IPC_CONTINUE_ARGS | SCRIBE_IPC_LONG_ARGS);
-							}
-							else
-							{
-								strcpy_s(InstLst->Args, sizeof(InstLst->Args), Utf8);
-							}
-							DeleteArray(Utf8);
-							
-							ShutdownIpc();
-							
-							LgiTrace("Passed args to the other running instance of Scribe (pid=%i)\n", Pid);
+							auto s = ScribeState;
+							ScribeState = ScribeExiting;
 							LCloseApp();
-							return false;
+							// Args have been passed on to running instance.
 						}
-						else LgiTrace("%s:%i - No arguments to pass.\n", _FL);
-					}
-				}
-			}
-			
-			if (Mul && LFileExists(Mul->OptionsPath))
-			{
-				// No instance of Scribe is running, but MUL may be keeping
-				// the previously run instance around. So we should run that
-				// by using the options file and password from MUL's instance
-				// record.
-				d->Options.Reset(new LOptionsFile(Mul->OptionsPath));
-			}
-		}
-		
-		// Insert ourselves into the instance list
-		if (ThisInst)
-		{
-			strcpy_s(ThisInst->OptionsPath, sizeof(ThisInst->OptionsPath), d->Options->GetFile());
-		}
+					});
 	}
+
+	if (ScribeState == ScribeExiting)
+		return false;
 
 	// Open file and load..
 	if (!Load && d->Options)
 	{
-		LOptionsFile *Opts = GetOptions();
+		auto Opts = GetOptions();
 		Load = Opts->SerializeFile(false);
 		if (Load)
 		{
@@ -4330,52 +4185,12 @@ void ScribeWnd::OnPulseSecond()
 	Prof.Add("Instance handling");
 	#endif
 
-	if (ThisInst && ValidStr(ThisInst->Args))
+	if (Ipc && Ipc->OnPulse())
 	{
-		LStringPipe p;
-		p.Push(ThisInst->Args);
-		if (ThisInst->Flags & SCRIBE_IPC_LONG_ARGS)
-		{
-			ThisInst->Flags |= SCRIBE_IPC_CONTINUE_ARGS;
-
-			int64 Start = LCurrentTime();
-			while (	TestFlag(ThisInst->Flags, SCRIBE_IPC_LONG_ARGS) &&
-					LCurrentTime() - Start < 60000)
-			{
-				ZeroObj(ThisInst->Args);
-				while (	TestFlag(ThisInst->Flags, SCRIBE_IPC_LONG_ARGS) &&
-						!ThisInst->Args[0] &&
-						LCurrentTime() - Start < 60000)
-				{
-					LSleep(10);
-				}
-				p.Push(ThisInst->Args);
-			}
-		}
-		ZeroObj(ThisInst->Args);
-
-		LAutoString Arg(p.NewStr());
-		if (Arg)
-		{
-			OsAppArguments AppArgs(0, 0);
-			
-			LgiTrace("Received cmd line: %s\n", Arg.Get());
-			AppArgs.Set(Arg);
-
-			LAppInst->SetAppArgs(AppArgs);
-
-			if (LAppInst->GetOption("m") &&
-				LAppInst->GetOption("f"))
-				;
-			else
-				LAppInst->OnCommandLine();
-			
-			OnCommandLine();
-
-			if (GetZoom() == LZoomMin)
-				SetZoom(LZoomNormal);
-			Visible(true);
-		}
+		OnCommandLine();
+		if (GetZoom() == LZoomMin)
+			SetZoom(LZoomNormal);
+		Visible(true);
 	}
 
 	#if PROFILE_ON_PULSE

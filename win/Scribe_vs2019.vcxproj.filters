@@ -508,6 +508,9 @@
     <ClCompile Include="..\src\Test\UnitTests.cpp">
       <Filter>Testing</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ScribeIpc.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\Btree\btree.h">
@@ -808,6 +811,9 @@
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ScribeWndPrivate.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeIpc.h">
       <Filter>Application</Filter>
     </ClInclude>
   </ItemGroup>
