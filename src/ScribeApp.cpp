@@ -5129,7 +5129,7 @@ void ScribeWnd::SetupUi()
 		MoveToCenter();
 	}
 
-	Visible(true);
+	// Visible(true);
 
 	// Main toolbar
 	Commands = LoadToolbar(this, GetResourceFile(ResToolbarFile), ToolbarImgs);

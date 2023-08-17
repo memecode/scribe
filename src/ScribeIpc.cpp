@@ -283,8 +283,28 @@ struct SocketIpc :
 	
 	void RunConnectionCallback(Connection *c, bool status)
 	{
-		if (c->callback && View)
+		if (c->callback)
 		{
+			if (!View)
+			{
+				TRACE("%s:%i - RunConnectionCallback: param err %i %i\n", _FL, c->callback != NULL, View != NULL);
+				return;
+			}
+
+			#if LGI_VIEW_HANDLE
+			// Wait for a handle, otherwise post event will fail...
+			auto Start = LCurrentTime();
+			while (!View->Handle())
+			{
+				LSleep(10);
+				if (LCurrentTime() - Start > 5000)
+				{
+					LAssert(!"No handle!");
+					return;
+				}
+			}
+			#endif
+
 			// Run the callback in the GUI thread and wait for it to complete...
 			auto result = View->RunCallback(
 				[this, callback = c->callback, status]()
@@ -294,8 +314,9 @@ struct SocketIpc :
 				},
 				5000, // no idea what this should be...?
 				this);
+
+			LAssert(result >= 0);
 		}
-		else TRACE("%s:%i - RunConnectionCallback: param err %i %i\n", _FL, c->callback != NULL, View != NULL);
 	}
 
 	void OnData(Connection *c)
