@@ -92,6 +92,7 @@ endif
 # Dependencies
 Source =	utils/Tables/MailFlags.c \
 			src/TitlePage.cpp \
+			src/Test/UnitTests.cpp \
 			src/Store3Webdav/WebdavThread.cpp \
 			src/Store3Webdav/WebdavStore.cpp \
 			src/Store3Webdav/WebdavFolder.cpp \
@@ -623,6 +624,7 @@ $(Target) : ../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).s
 	../../lgi/trunk/src/common/Hash/sha1/sha1.h \
 	../../lgi/trunk/src/common/Lgi/Alert.cpp \
 	../../lgi/trunk/src/common/Lgi/AppCommon.cpp \
+	../../lgi/trunk/src/common/Lgi/ClipBoardCommon.cpp \
 	../../lgi/trunk/src/common/Lgi/Css.cpp \
 	../../lgi/trunk/src/common/Lgi/CssTools.cpp \
 	../../lgi/trunk/src/common/Lgi/DataDlg.cpp \
@@ -726,6 +728,7 @@ cleanall :
 
 VPATH=$(BuildDir) \
 	./utils/Tables \
+	./src/Test \
 	./src/Store3Webdav \
 	./src/Store3Mail3 \
 	./src/Store3Imap \
