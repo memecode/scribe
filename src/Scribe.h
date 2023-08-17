@@ -2371,6 +2371,13 @@ protected:
 	void			LoadImageResources();
 	void			DoOnTimer(LScriptCallback *c);
 
+	enum CmdLineEvent
+	{
+		IpcEvent,
+		StartupEvent
+	};
+	void			OnCommandLineEvent(CmdLineEvent event);
+
 public:
 	ScribeWnd();
 	void Construct1();
@@ -2443,11 +2450,20 @@ public:
 
 	void			OnNewMail(List<Mail> *NewMailObjs, bool Add = true);
 	void			OnNewMailSound();
-	void			OnCommandLine();
 	void			OnTrayClick(LMouse &m) override;
 	void			OnTrayMenu(LSubMenu &m) override;
 	void			OnTrayMenuResult(int MenuId) override;
 	void			OnFolderSelect(ScribeFolder *f);
+
+	// This will be called for the first time when the following events have happened:
+	// - Startup of the application has completed
+	// - The ScribeIpc::OnLoad callback has been called with true
+	//
+	// And also potentially when a new (temporary) instance of Scribe has sent this 
+	// instance a command line.
+	//
+	// See also OnCommandLineEvent.
+	void			OnCommandLine();
 
 	void			AddThingSrc(ScribeFolder *src);
 	void			RemoveThingSrc(ScribeFolder *src);

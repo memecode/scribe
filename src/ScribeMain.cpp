@@ -22,7 +22,7 @@ ScribeApp::ScribeApp(OsAppArguments &AppArgs, LAppArguments *Opts) :
 {
 	Status = true;
 }
-
+ 
 bool ScribeOnIdle(void *Param)
 {
 	LApp *a = (LApp*)Param;

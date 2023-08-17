@@ -5,7 +5,14 @@
 #include "lgi/common/Thread.h"
 #include "lgi/common/Net.h"
 
+#include "Scribe.h"
 #include "ScribeIpc.h"
+
+#if 1
+#define TRACE(...) LgiTrace(__VA_ARGS__)
+#else
+#define TRACE(...)
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 // This is a shared memory block format for instances of Scribe to sort out who is
@@ -61,19 +68,19 @@ LString GetUtfArgs()
 	OsAppArguments *Args = LAppInst->GetAppArgs();
 
 	#if WINNATIVE
-	LAutoString u(WideToUtf8(Args->lpCmdLine));
-	return LString(u.Get());
+		LAutoString u(WideToUtf8(Args->lpCmdLine));
+		return LString(u.Get());
 	#else
-	LStringPipe p;
-	for (int i=1; i<Args->Args; i++)
-	{
-		if (i > 1) p.Push(" ");
-		char *Sp = strchr(Args->Arg[i], ' ');
-		if (Sp) p.Push("\"");
-		p.Push(Args->Arg[i]);
-		if (Sp) p.Push("\"");
-	}
-	return p.NewLStr();
+		LStringPipe p;
+		for (int i=1; i<Args->Args; i++)
+		{
+			if (i > 1) p.Push(" ");
+			char *Sp = strchr(Args->Arg[i], ' ');
+			if (Sp) p.Push("\"");
+			p.Push(Args->Arg[i]);
+			if (Sp) p.Push("\"");
+		}
+		return p.NewLStr();
 	#endif
 }
 
@@ -85,17 +92,24 @@ struct ScribeIpcPriv
 	virtual bool OnPulse() = 0;
 };
 
-struct SocketIpc : public ScribeIpcPriv
+struct SocketIpc :
+	public ScribeIpcPriv,
+	public LThread,
+	public LCancel
 {
 	struct Connection : public LSocket
 	{
 		bool connecting = false;
+		uint64_t connectTs = 0;
 		LString output;
 		LArray<char> input;
 		std::function<void(bool)> callback;
 	};
 
-	constexpr static int IPC_PORT = 4455;
+	#define SECONDS(s)						  ((s)*1000)
+	constexpr static int IPC_PORT 			  = 4455;
+	constexpr static int CONNECT_TIMEOUT      = SECONDS(2); // This is localhost... should be quick
+	constexpr static int LISTEN_RETRY         = SECONDS(30);
 	constexpr static const char *OptPid       = "Pid";
 	constexpr static const char *OptArgs      = "Args";
 	constexpr static const char *OptStatus    = "Status";
@@ -104,29 +118,184 @@ struct SocketIpc : public ScribeIpcPriv
 
 	LAutoPtr<LSocket> Listen;
 	LArray<Connection*> Connections;
+	LView *View = NULL;
 
 	const char *GetClass() { return "SocketIpc"; }
 
-	SocketIpc()
+	SocketIpc(LView *view) :
+		LThread("SocketIpc"),
+		View(view)
 	{
-		if (Listen.Reset(new LSocket))
-		{
-			if (!Listen->Listen(IPC_PORT))
-			{
-				LgiTrace("%s:%i - Listen on %i failed.\n", _FL, IPC_PORT);
-				Listen.Reset();
-			}
-		}
+		Run();
 	}
 
 	~SocketIpc()
 	{
+		Cancel();
+		WaitForExit();
 		Connections.DeleteObjects();
+	}
+	
+	int Main()
+	{
+		const int WAIT = 5; // ms
+		uint64_t ListenTs = 0;
+
+		// While we're running...
+		while (!IsCancelled())
+		{
+			// Check for incoming connections:
+			if (Listen)
+			{
+				if (Listen->IsReadable(WAIT))
+				{
+					// TRACE("%s:%i - listen is readable\n", _FL);
+					LAutoPtr<Connection> client(new Connection);
+					if (Listen->Accept(client))
+					{
+						TRACE("%s:%i - got client\n", _FL);
+						Connections.Add(client.Release());
+					}
+				}
+			}
+			else
+			{
+				// Keep trying to setup a listening socket:
+				auto Now = LCurrentTime();
+				if (Now - ListenTs >= LISTEN_RETRY)
+				{
+					// Setup a new listen socket:
+					if (Listen.Reset(new LSocket))
+					{
+						if (!Listen->Listen(IPC_PORT))
+						{
+							TRACE("%s:%i - Listen on %i failed.\n", _FL, IPC_PORT);
+							Listen.Reset();
+						}
+						else if (ListenTs)
+						{
+							TRACE("%s:%i - Listen on %i success!\n", _FL, IPC_PORT);
+						}
+					}
+					ListenTs = Now;
+				}
+			}
+			
+			// Process the existing connections:
+			LArray<Connection*> dead;
+			for (auto c: Connections)
+			{
+				if (c->connecting)
+				{
+					// For sockets that still need to connect:
+					if (c->Open("localhost", IPC_PORT))
+					{
+						TRACE("%s:%i - outgoing connection success.\n", _FL);
+						c->connecting = false;
+					}
+					else
+					{
+						if (c->connectTs)
+						{
+							if (LCurrentTime() - c->connectTs > CONNECT_TIMEOUT)
+							{
+								TRACE("%s:%i - outgoing connection time out.\n", _FL);
+								dead.Add(c);
+								
+								// Run the callback in the GUI thread:
+								RunConnectionCallback(	c,
+														// args were not passed successfully to another instance:
+														true);
+							}
+						}
+						else
+						{
+							c->connectTs = LCurrentTime();
+							// TRACE("%s:%i - outgoing connection failed.\n", _FL);
+						}
+					}
+				}
+				else if (c->output)
+				{
+					// There is some data to write first:
+					if (c->IsWritable(WAIT))
+					{
+						auto wr = c->Write(c->output.Get(), c->output.Length());
+						// TRACE("%s:%i - Wrote %i to socket\n", _FL, (int)wr);
+						if (wr != c->output.Length())
+							dead.Add(c);
+						else
+							c->output.Empty();
+					}
+					else
+					{
+						TRACE("%s:%i - not writeable.\n", _FL);
+					}
+				}
+				else if (c->IsReadable(WAIT))
+				{
+					// Check for incoming data:
+					char buf[256];
+					auto rd = c->Read(buf, sizeof(buf));
+					// TRACE("%s:%i - got %i bytes for connection\n", _FL, (int)rd);
+					if (rd > 0)
+					{
+						c->input.Add(buf, rd);
+						OnData(c);
+					}
+					else dead.Add(c);
+				}
+			}
+			
+			// Clean up the finished connections:
+			for (auto d: dead)
+			{
+				TRACE("%s:%i - deleting dead connection\n", _FL);
+				Connections.Delete(d);
+				DeleteObj(d);
+			}
+		}
+		
+		return 0;
 	}
 
 	void OnArgs(LString Args)
 	{
-		LgiTrace("%s:%i - OnArgs: %s\n", _FL, Args.Get());
+		TRACE("%s:%i - OnArgs: %s\n", _FL, Args.Get());
+		auto result = View->RunCallback(
+			[this, Args]()
+			{
+				OsAppArguments AppArgs(0, 0);
+				AppArgs.Set(LString(AppName) + " " + Args);
+				LAppInst->SetAppArgs(AppArgs);
+				
+				auto Wnd = dynamic_cast<ScribeWnd*>(View);
+				if (Wnd)
+					Wnd->OnCommandLine();
+				else
+					TRACE("%s:%i - View is not ScribeWnd?\n", _FL);
+
+				return 1;
+			},
+			5000, // no idea what this should be...?
+			this);
+	}
+	
+	void RunConnectionCallback(Connection *c, bool status)
+	{
+		if (c->callback && View)
+		{
+			// Run the callback in the GUI thread and wait for it to complete...
+			auto result = View->RunCallback(
+				[this, callback = c->callback, status]()
+				{
+					callback(status);
+					return 1;
+				},
+				5000, // no idea what this should be...?
+				this);
+		}
+		else TRACE("%s:%i - RunConnectionCallback: param err %i %i\n", _FL, c->callback != NULL, View != NULL);
 	}
 
 	void OnData(Connection *c)
@@ -134,6 +303,7 @@ struct SocketIpc : public ScribeIpcPriv
 		auto ptr = c->input.AddressOf();
 		if (!ptr)
 			return;
+
 		auto endOfFile = Strnstr(ptr, "\n\n", c->input.Length());
 		if (!endOfFile)
 			return;
@@ -159,9 +329,9 @@ struct SocketIpc : public ScribeIpcPriv
 				{
 					auto &response = v[1];
 					auto status = !response.Equals(OptProcessed);
-					LgiTrace("%s:%i - remote status: %i\n", _FL, status);
+					TRACE("%s:%i - remote status: %i\n", _FL, status);
 					if (c->callback)
-						c->callback(status);
+						RunConnectionCallback(c, status);
 
 					Connections.Delete(c);
 					DeleteObj(c);
@@ -176,7 +346,7 @@ struct SocketIpc : public ScribeIpcPriv
 			LString response;
 			response.Printf("%s:%s\n\n", OptStatus, status ? OptProcessed : OptIgnored);
 			auto wr = c->Write(response.Get(), response.Length());
-			LgiTrace("%s:%i - Wrote %i status bytes.\n", _FL, (int)wr);
+			TRACE("%s:%i - Wrote %i status bytes.\n", _FL, (int)wr);
 			Connections.Delete(c);
 			DeleteObj(c);
 			if (status)
@@ -202,7 +372,7 @@ struct SocketIpc : public ScribeIpcPriv
 			auto connected = s->Open("localhost", IPC_PORT);
 			if (connected)
 				s->connecting = false;
-			LgiTrace("%s:%i - outbound connection: %i\n", _FL, connected);
+			TRACE("%s:%i - outbound connection: %i\n", _FL, connected);
 			Connections.Add(s.Release());
 			return;
 		}
@@ -213,69 +383,7 @@ struct SocketIpc : public ScribeIpcPriv
 
 	bool OnPulse()
 	{
-		if (Listen &&
-			Listen->IsReadable())
-		{
-			LgiTrace("%s:%i - listen is readable\n", _FL);
-			LAutoPtr<Connection> client(new Connection);
-			if (Listen->Accept(client))
-			{
-				LgiTrace("%s:%i - got client\n", _FL);
-				Connections.Add(client.Release());
-			}
-		}
-		LArray<Connection*> dead;
-		for (auto c: Connections)
-		{
-			if (c->connecting)
-			{
-				if (c->Open("localhost", IPC_PORT))
-				{
-					LgiTrace("%s:%i - outgoing connection success.\n", _FL);
-					c->connecting = false;
-				}
-				else
-				{
-					LgiTrace("%s:%i - outgoing connection failed.\n", _FL);
-				}
-			}
-			else if (c->output)
-			{
-				if (c->IsWritable(1))
-				{
-					auto wr = c->Write(c->output.Get(), c->output.Length());
-					LgiTrace("%s:%i - Wrote %i to socket\n", _FL, (int)wr);
-					if (wr != c->output.Length())
-						dead.Add(c);
-					else
-						c->output.Empty();
-				}
-				else
-				{
-					LgiTrace("%s:%i - not writeable.\n", _FL);
-				}
-			}
-			else if (c->IsReadable())
-			{
-				char buf[256];
-				auto rd = c->Read(buf, sizeof(buf));
-				LgiTrace("%s:%i - got %i bytes for connection\n", _FL, (int)rd);
-				if (rd > 0)
-				{
-					c->input.Add(buf, rd);
-					OnData(c);
-				}
-				else dead.Add(c);
-			}
-		}
-		for (auto d: dead)
-		{
-			LgiTrace("%s:%i - deleting dead connection\n", _FL);
-			Connections.Delete(d);
-			DeleteObj(d);
-		}
-
-		return true;
+		return false;
 	}
 };
 
@@ -285,8 +393,9 @@ struct SharedMemIpc : public ScribeIpcPriv
 	LAutoPtr<LSharedMemory>	Mem;
 	ScribeIpcInstance *ThisInst = NULL;
 	ScribeIpcInstance *Mul = NULL;
+	LView *View = NULL;
 
-	SharedMemIpc()
+	SharedMemIpc(LView *view) : View(view)
 	{
 		#ifdef HAIKU
 
@@ -303,7 +412,7 @@ struct SharedMemIpc : public ScribeIpcPriv
 					{
 						if (!LIsProcess(InstLst[i].Pid))
 						{
-							LgiTrace("Crashed instance %i\n", InstLst[i].Pid);
+							TRACE("Crashed instance %i\n", InstLst[i].Pid);
 							InstLst[i].Clear();
 						}
 					}
@@ -422,7 +531,7 @@ struct SharedMemIpc : public ScribeIpcPriv
 				}
 				if (Start)
 				{
-					LgiTrace("%s:%i - SendLA timed out.\n", _FL);
+					TRACE("%s:%i - SendLA timed out.\n", _FL);
 					break;
 				}
 			}
@@ -445,7 +554,7 @@ struct SharedMemIpc : public ScribeIpcPriv
 		{
 			if (SendArgs(RunningInst))
 			{
-				LgiTrace("Passed args to the other running instance of Scribe (pid=%i)\n", RunningInst->Pid);
+				TRACE("Passed args to the other running instance of Scribe (pid=%i)\n", RunningInst->Pid);
 				if (Callback)
 					Callback(false);
 				return;
@@ -500,13 +609,13 @@ struct SharedMemIpc : public ScribeIpcPriv
 			}
 			ZeroObj(ThisInst->Args);
 
-			LAutoString Arg(p.NewStr());
-			if (Arg)
+			auto Args = p.NewLStr();
+			if (Args)
 			{
 				OsAppArguments AppArgs(0, 0);
 
-				LgiTrace("Received cmd line: %s\n", Arg.Get());
-				AppArgs.Set(Arg);
+				TRACE("Received cmd line: %s\n", Args.Get());
+				AppArgs.Set(LString(AppName) + " " + Args);
 
 				LAppInst->SetAppArgs(AppArgs);
 
@@ -524,12 +633,12 @@ struct SharedMemIpc : public ScribeIpcPriv
 	}
 };
 
-ScribeIpc::ScribeIpc()
+ScribeIpc::ScribeIpc(LView *view)
 {
-	#ifdef HAIKU
-	d = new SocketIpc;
+	#if 1 // def HAIKU
+	d = new SocketIpc(view);
 	#else
-	d = new SharedMemIpc;
+	d = new SharedMemIpc(view);
 	#endif
 }
 

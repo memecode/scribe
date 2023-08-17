@@ -457,7 +457,8 @@ bool LMail3Store::Check(int Code, const char *Sql)
 		Code, Err,
 		Sql?Sql:(char*)"",
 		Sql?"\n":"");
-	LAssert(!"Db Error");
+
+	// LAssert(!"Db Error");
 
 	#if MAIL3_TRACK_OBJS
 	for (int i=0; i<All.Length(); i++)

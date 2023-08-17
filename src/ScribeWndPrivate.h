@@ -93,6 +93,7 @@ public:
 	LArray<LDataEventsI*> Store3EventCallbacks;
 	LAutoPtr<LPrinter> PrintOptions;
 	LHashTbl<IntKey<SribeResourceType,ResNone>, LString> ResFiles;
+	int				CmdLineEvents = 0;
 
 	// These are for the LDataEventsI callbacks to store source context
 	// Mainly for debugging where various events came from.

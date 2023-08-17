@@ -769,7 +769,7 @@ ScribeWnd::ScribeWnd() :
 	LApp::ObjInstance()->AppWnd = this;
 	LCharsetSystem::Inst()->DetectCharset = ::DetectCharset;
 	d = new ScribeWndPrivate(this);	
-	Ipc = new ScribeIpc();
+	Ipc = new ScribeIpc(this);
 
 	#ifndef WIN32
 	printf("%s\n", GetFullAppName(true).Get());
@@ -1057,7 +1057,7 @@ void ScribeWnd::Construct3()
 				"scripts");
 			if (!LDirExists(s))
 				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
-					#if defined(LINUX) || defined(WINDOWS)
+					#if defined(WINDOWS)
 					"..\\"
 					#endif
 					"scripts");
@@ -1217,9 +1217,6 @@ void ScribeWnd::Construct3()
 		if (ScribeState == ScribeExiting)
 			return;
 
-		// Process command line
-		OnCommandLine();
-
 		// Update the templates sub-menu now that the folders are loaded
 		BuildDynMenus();
 
@@ -1239,6 +1236,8 @@ void ScribeWnd::Construct3()
 				Args.DeleteObjects();
 			}
 		}
+
+		OnCommandLineEvent(StartupEvent);
 	
 		ScribeState = ScribeRunning;
 	});
@@ -2978,9 +2977,11 @@ bool ScribeWnd::LoadOptions()
 					&d->MulPassword,
 					[this](auto status)
 					{
+						LgiTrace("%s:%i - Ipc.OnLoad=%i\n", _FL, status);
 						if (status)
 						{
 							Visible(true);
+							OnCommandLineEvent(IpcEvent);
 						}
 						else
 						{
@@ -3329,6 +3330,26 @@ bool ScribeWnd::SaveOptions()
 	return Status;
 }
 
+void ScribeWnd::OnCommandLineEvent(CmdLineEvent event)
+{
+	int flag = 1 << event;
+	if ((d->CmdLineEvents & flag) == 0)
+	{
+		auto AllFlags = (1 << IpcEvent) |
+						(1 << StartupEvent);
+
+		d->CmdLineEvents |= flag;
+		
+		if (d->CmdLineEvents == AllFlags)
+		{
+			LgiTrace("%s:%i - OnCommandLineEvent(%i) has all flags: calling OnCommandLine.\n", _FL, (int)event);
+			OnCommandLine();
+		}
+		else LgiTrace("%s:%i - OnCommandLineEvent(%i) hasn't got all flags yet.\n", _FL, (int)event);
+	}
+	else LgiTrace("%s:%i - OnCommandLineEvent(%i): flag %x already set?\n", _FL, (int)event, flag);
+}
+
 //
 // Command Line Options:
 //
@@ -3345,13 +3366,18 @@ bool ScribeWnd::SaveOptions()
 //
 void ScribeWnd::OnCommandLine()
 {
-	// check command line args
+	// Check command line args
 	LString Str, File;
+	
 	bool CreateMail = false;
 	CreateMail = LAppInst->GetOption("m", Str);
-	if (!CreateMail) CreateMail = LAppInst->GetOption("t", Str);
+	if (!CreateMail)
+		CreateMail = LAppInst->GetOption("t", Str);
+	LgiTrace("%s:%i - CreateMail=%i Str=%s\n", _FL, CreateMail, Str.Get());
+	
 	bool HasFile = LAppInst->GetOption("f", File);
-	if (!CreateMail) CreateMail = HasFile;
+	if (!CreateMail)
+		CreateMail = HasFile;
 
 	LString OpenArg;
 	if (LAppInst->GetOption("u", OpenArg))
