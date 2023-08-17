@@ -42,6 +42,7 @@
 		346E1A4D231293570019B4AA /* tray_error.png in Resources */ = {isa = PBXBuildFile; fileRef = 346E1A4A231293570019B4AA /* tray_error.png */; };
 		346E1A4E231293570019B4AA /* tray_small.png in Resources */ = {isa = PBXBuildFile; fileRef = 346E1A4B231293570019B4AA /* tray_small.png */; };
 		346E1A4F231293570019B4AA /* tray_mail.png in Resources */ = {isa = PBXBuildFile; fileRef = 346E1A4C231293570019B4AA /* tray_mail.png */; };
+		34723EB72A8EE5D200EC80E8 /* ScribeIpc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34723EA62A8EE5D200EC80E8 /* ScribeIpc.cpp */; };
 		34749B5F278B08B200C8197E /* LgiCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34749B44278B042500C8197E /* LgiCocoa.framework */; };
 		3474FC5F226DE0960064E0AD /* libBtree.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474FC4E226DCCDD0064E0AD /* libBtree.a */; };
 		3474FC60226DE0960064E0AD /* libbzip2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474FC49226DCCD10064E0AD /* libbzip2.a */; };
@@ -525,6 +526,8 @@
 		346E1A4A231293570019B4AA /* tray_error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_error.png; path = ../../Resources/tray_error.png; sourceTree = "<group>"; };
 		346E1A4B231293570019B4AA /* tray_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_small.png; path = ../../Resources/tray_small.png; sourceTree = "<group>"; };
 		346E1A4C231293570019B4AA /* tray_mail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_mail.png; path = ../../Resources/tray_mail.png; sourceTree = "<group>"; };
+		34723EA62A8EE5D200EC80E8 /* ScribeIpc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeIpc.cpp; path = ../../src/ScribeIpc.cpp; sourceTree = "<group>"; };
+		34723EB62A8EE5D200EC80E8 /* ScribeIpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeIpc.h; path = ../../src/ScribeIpc.h; sourceTree = "<group>"; };
 		34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LgiCocoa.xcodeproj; path = ../../../Lgi/trunk/src/mac/cocoa/LgiCocoa.xcodeproj; sourceTree = "<group>"; };
 		34749B52278B06A200C8197E /* scribeLibs.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = scribeLibs.xcodeproj; path = "../../libs/build-x64/scribeLibs.xcodeproj"; sourceTree = "<group>"; };
 		3477C21E1CBEFD940028B84B /* Scribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scribe.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1071,6 +1074,8 @@
 		3477C35F1CC226370028B84B /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				34723EA62A8EE5D200EC80E8 /* ScribeIpc.cpp */,
+				34723EB62A8EE5D200EC80E8 /* ScribeIpc.h */,
 				3477C3631CC227ED0028B84B /* AddressSelect.cpp */,
 				3477C3691CC227ED0028B84B /* Components.cpp */,
 				3477C3721CC227ED0028B84B /* NewMailDlg.cpp */,
@@ -1626,6 +1631,7 @@
 				3477C3F41CC227ED0028B84B /* Scripting.cpp in Sources */,
 				3477C3EA1CC227ED0028B84B /* ScribePassword.cpp in Sources */,
 				3445E5871F1F428400D0A824 /* ImageBlock.cpp in Sources */,
+				34723EB72A8EE5D200EC80E8 /* ScribeIpc.cpp in Sources */,
 				3477C3F01CC227ED0028B84B /* ScribeThing.cpp in Sources */,
 				341A78802699058600872FEB /* DatePopup.cpp in Sources */,
 				3477C3FF1CC22EF60028B84B /* MonthView.cpp in Sources */,
