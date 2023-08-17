@@ -355,7 +355,7 @@ struct SharedMemIpc : public ScribeIpcPriv
 	ScribeIpcInstance *FindRunningInstance(const char *FileName, LString *MulPassword)
 	{
 		if (!Mem)
-			return false;
+			return NULL;
 
 		auto InstLst = (ScribeIpcInstance*) Mem->GetPtr();
 

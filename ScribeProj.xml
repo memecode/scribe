@@ -156,15 +156,17 @@
 			<Node File="./resources/About.html" Type="3" Platforms="15" />
 			<Node File="./src/DomType.h" Type="3" Platforms="15" />
 			<Node File="./src/DomTypeValues.h" Type="3" Platforms="15" />
-			<Node File="./resources/Title.html" Type="3" Platforms="15" />
 			<Node File="./src/ScribeAbout.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeApp.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeIpc.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeIpc.h" Type="3" Platforms="15" />
 			<Node File="./src/ScribeMain.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeRepair.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeSharedMem.h" Type="3" Platforms="15" />
 			<Node File="./src/ScribeSockets.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeThing.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeUtils.cpp" Type="2" Platforms="15" />
+			<Node File="./resources/Title.html" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Components" Type="1" Platforms="15" Open="0" Id="16">
 			<Node File="./src/Components.cpp" Type="2" Platforms="15" />
@@ -404,7 +406,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>./scribe</Debug>
 					<Release>./scribe</Release>
 				</Linux>
-				<Haiku />
 			</Executable>
 			<CCrossCompiler />
 			<CppCrossCompiler />
@@ -512,17 +513,16 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
 					<Release>`pkg-config --cflags gtk+-3.0`</Release>
 				</Linux>
-				<Haiku />
 			</SystemIncludes>
 			<LibraryPaths>
 				<All>
 					<Debug>../libs/build-x64/libchardet</Debug>
 					<Release>../libs/build-x64/libchardet</Release>
 				</All>
-				<Haiku />
+				<Linux />
 			</LibraryPaths>
 			<TargetName>
-				<Haiku />
+				<Linux />
 			</TargetName>
 			<ApplicationIcon />
 		</Build>
@@ -545,7 +545,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 		<Advanced>
 			<OtherMakefileRules />
 			<PostBuildCommands>
-				<Haiku />
+				<Linux />
 			</PostBuildCommands>
 		</Advanced>
 		<Debug>

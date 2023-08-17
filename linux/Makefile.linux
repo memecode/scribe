@@ -130,6 +130,7 @@ Source =	utils/Tables/MailFlags.c \
 			src/ScribeListAddr.cpp \
 			src/ScribeLangDlg.cpp \
 			src/ScribeItemList.cpp \
+			src/ScribeIpc.cpp \
 			src/ScribeGroup.cpp \
 			src/ScribeFolderTree.cpp \
 			src/ScribeFolderSelect.cpp \
