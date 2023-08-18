@@ -656,7 +656,7 @@ struct SharedMemIpc : public ScribeIpcPriv
 
 ScribeIpc::ScribeIpc(LView *view)
 {
-	#if 1 // def HAIKU
+	#ifdef HAIKU
 	d = new SocketIpc(view);
 	#else
 	d = new SharedMemIpc(view);
