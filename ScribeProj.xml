@@ -522,6 +522,10 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 				<Linux />
 			</LibraryPaths>
 			<TargetName>
+				<Haiku>
+					<Debug>scribe</Debug>
+					<Release>scribe</Release>
+				</Haiku>
 				<Linux />
 			</TargetName>
 			<ApplicationIcon />
