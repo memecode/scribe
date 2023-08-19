@@ -365,9 +365,7 @@
 	<Node Name="Testing" Type="1" Platforms="15" Id="1">
 		<Node File=".\src\Test\UnitTests.cpp" Type="2" Platforms="15" />
 	</Node>
-	<Node File="../libs/aspell-0.60.6.1/linux/aspell-dist-0.60.xml" Type="4" Platforms="15" LinkAgainst="1" />
-	<Node File="../libs/bzip2-1.0.6/linux/bzip2.xml" Type="4" Platforms="15" LinkAgainst="1" />
-	<Node File="../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
+	<Node File="..\..\lgi\trunk\Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Settings>
 		<General>
 			<Makefile>
@@ -406,6 +404,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>./scribe</Debug>
 					<Release>./scribe</Release>
 				</Linux>
+				<Windows />
 			</Executable>
 			<CCrossCompiler />
 			<CppCrossCompiler />
@@ -485,6 +484,7 @@ gnu</Release>
 					<Debug>chardet</Debug>
 					<Release>chardet</Release>
 				</All>
+				<Windows />
 			</Libraries>
 			<Defines>
 				<All>
@@ -507,26 +507,28 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>_GNU_SOURCE</Debug>
 					<Release>_GNU_SOURCE</Release>
 				</Haiku>
+				<Windows />
 			</Defines>
 			<SystemIncludes>
 				<Linux>
 					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
 					<Release>`pkg-config --cflags gtk+-3.0`</Release>
 				</Linux>
+				<Windows />
 			</SystemIncludes>
 			<LibraryPaths>
 				<All>
 					<Debug>../libs/build-x64/libchardet</Debug>
 					<Release>../libs/build-x64/libchardet</Release>
 				</All>
-				<Linux />
+				<Windows />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
 					<Debug>scribe</Debug>
 					<Release>scribe</Release>
 				</Haiku>
-				<Linux />
+				<Windows />
 			</TargetName>
 			<ApplicationIcon />
 		</Build>
@@ -549,7 +551,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 		<Advanced>
 			<OtherMakefileRules />
 			<PostBuildCommands>
-				<Linux />
+				<Windows />
 			</PostBuildCommands>
 		</Advanced>
 		<Debug>
