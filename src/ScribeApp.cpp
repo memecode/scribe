@@ -6754,6 +6754,17 @@ struct DefaultClient
 		}
 	}
 
+	LString WrapResult(LRegKey &k)
+	{
+		auto code = k.GetErrorCode();
+		auto msg = k.GetErrorName();
+		LString s;
+		auto ok = code == 0 || code == 2;
+		auto cls = ok ? "ok" : "err";
+		s.Printf("<span class='%s'>%s (%i)</span>", cls, !msg && ok ? "ok" : msg.Get(), code);
+		return s;
+	}
+
 	void CleanRegistry(ScribeWnd *parent)
 	{
 		enum Action {
@@ -6785,22 +6796,26 @@ struct DefaultClient
 			{"Software\\Clients\\Mail\\Scribe\\Capabilities", removeKey},
 			{"Software\\Clients\\Mail\\Scribe", removeKey},
 			{"Software\\Classes\\Protocol\\mailto", checkDef},
+			{"Software\\Classes\\Protocol\\mailto\\shell\\open\\command", checkDef},
 		};
 
 		int deleted = 0;
 		LStringPipe log;
 
+		bool previous = LRegKey::AssertOnError;
+		LRegKey::AssertOnError = false;
+
 		for (int base=0; base<CountOf(bases); base++)
 		{
 			auto baseName = bases[base];
-			log.Print("%s\n", baseName);
+			log.Print("<h2>%s</h2><table>\n", baseName);
 
 			for (int key=0; key<CountOf(keys); key++)
 			{
 				auto &cur = keys[key];
 				LString keyName;
 				keyName.Printf("%s\\%s", baseName, cur.key);
-				log.Print("    %s: ", keyName.Get());
+				log.Print("<tr><td><span class=key>%s</span>", keyName.Get());
 					
 				switch (cur.action)
 				{
@@ -6809,48 +6824,48 @@ struct DefaultClient
 						LRegKey ro(false, keyName);
 						if (!ro.IsOk())
 						{
-							log.Print("error: %s\n", ro.GetErrorName().Strip().Get());
+							log.Print("<td>%s\n", WrapResult(ro).Get());
 							break;
 						}
 						
 						auto cur = ro.GetStr();
-						if (Stricmp(cur, AppName))
+						if (Stristr(cur, AppName) == NULL)
 						{
-							log.Print("not scribe, is '%s'.\n", cur);
+							log.Print("<td><span class='ok'>not scribe, is '%s'</span>\n", cur);
 							continue;
 						}
 
 						LRegKey rw(true, keyName);
-						if (rw.SetStr(NULL, NULL))
-							log.Print("ok\n");
-						else
-							log.Print("error: %s\n", rw.GetErrorName().Strip().Get());
+						if (rw.IsOk())
+							rw.SetStr(NULL, NULL);
+						log.Print("<td>%s\n", WrapResult(rw).Get());
 						break;
 					}
 					case removeKey:
 					{
 						LRegKey k(true, keyName);
 						if (k.DeleteKey())
-						{
-							log.Print("ok\n");
 							deleted++;
-						}
-						else
-						{
-							log.Print("error: %s\n", k.GetErrorName().Strip().Get());
-						}
+						log.Print("<td>%s\n", WrapResult(k).Get());
 						break;
 					}
 				}
 			}
+
+			log.Print("</table><br>\n");
 		}
 
-		LgiMsg(	parent,
+		LRegKey::AssertOnError = previous;
+		LHtmlMsg(NULL, parent,
+			"<html>\n"
+			"<head><style>\n"
+			".key { color: Teal; }\n"
+			".err { color: FireBrick; }\n"
+			".ok { color: ForestGreen; }\n"
+			"</style></head>\n"
+			"<body>\n"
 			"%s\n"
-			"Note: for 'access denied' try running as administrator.",
-			AppName,
-			MB_OK,
-			log.NewLStr().Get());
+			"</body></html>\n", AppName, MB_OK, log.NewLStr().Get());
 	}
 };
 
