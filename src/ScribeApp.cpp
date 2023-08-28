@@ -6756,58 +6756,101 @@ struct DefaultClient
 
 	void CleanRegistry(ScribeWnd *parent)
 	{
-		const char *keys[] = {
-			"HKCU\\SOFTWARE\\Memecode\\Scribe",
-			sCurrentMailClient,
-			sSystemMailClient
+		enum Action {
+			noAction,
+			checkDef,
+			removeKey,
+		};
+		struct Pair {
+			const char *key;
+			Action action;
+		};
+
+		const char *bases[] = {
+			"HKCU",
+			"HKLM"
+		};
+
+		Pair keys[] = {
+			{"mailto", checkDef},
+			{"mailto\\DefaultIcon", removeKey},
+			{"mailto\\shell\\open\\command", removeKey},
+			{"Software\\Clients\\Mail", checkDef},
+			{"Software\\Clients\\Mail\\Scribe\\shell\\open\\command", removeKey},
+			{"Software\\Clients\\Mail\\Scribe\\shell\\open", removeKey},
+			{"Software\\Clients\\Mail\\Scribe\\shell", removeKey},
+			{"Software\\Clients\\Mail\\Scribe\\DefaultIcon", removeKey},
+			{"Software\\Clients\\Mail\\Scribe\\Capabilities\\FileAssociations", removeKey},
+			{"Software\\Clients\\Mail\\Scribe\\Capabilities\\UrlAssociations", removeKey},
+			{"Software\\Clients\\Mail\\Scribe\\Capabilities", removeKey},
+			{"Software\\Clients\\Mail\\Scribe", removeKey},
+			{"Software\\Classes\\Protocol\\mailto", checkDef},
 		};
 
 		int deleted = 0;
-		LString deleteFailures;
-		for (int i=0; i<CountOf(keys); i++)
-		{
-			LRegKey k(true, keys[i]);
-			if (k.DeleteKey())
-				deleted++;
-			else
-				deleteFailures += LString(keys[i]) + " (" + k.GetErrorName().Strip() + ")\n";
-		}
+		LStringPipe log;
 
-		const char *clients[] = {
-			sCurrentMailClient,
-			sSystemMailClient
-		};
-		LString clearFailures;
-		for (int i=0; i<CountOf(clients); i++)
+		for (int base=0; base<CountOf(bases); base++)
 		{
-			LRegKey ro(true, clients[i]);
-			if (ro.IsOk())
+			auto baseName = bases[base];
+			log.Print("%s\n", baseName);
+
+			for (int key=0; key<CountOf(keys); key++)
 			{
-				auto cur = ro.GetStr();
-				if (Stricmp(cur, AppName))
-					continue;
+				auto &cur = keys[key];
+				LString keyName;
+				keyName.Printf("%s\\%s", baseName, cur.key);
+				log.Print("    %s: ", keyName.Get());
+					
+				switch (cur.action)
+				{
+					case checkDef:
+					{
+						LRegKey ro(false, keyName);
+						if (!ro.IsOk())
+						{
+							log.Print("error: %s\n", ro.GetErrorName().Strip().Get());
+							break;
+						}
+						
+						auto cur = ro.GetStr();
+						if (Stricmp(cur, AppName))
+						{
+							log.Print("not scribe, is '%s'.\n", cur);
+							continue;
+						}
 
-				LRegKey rw(true, clients[i]);
-				if (!rw.SetStr(NULL, NULL))
-					clearFailures += LString(clients[i]) + " (" + rw.GetErrorName().Strip() + ")\n";
+						LRegKey rw(true, keyName);
+						if (rw.SetStr(NULL, NULL))
+							log.Print("ok\n");
+						else
+							log.Print("error: %s\n", rw.GetErrorName().Strip().Get());
+						break;
+					}
+					case removeKey:
+					{
+						LRegKey k(true, keyName);
+						if (k.DeleteKey())
+						{
+							log.Print("ok\n");
+							deleted++;
+						}
+						else
+						{
+							log.Print("error: %s\n", k.GetErrorName().Strip().Get());
+						}
+						break;
+					}
+				}
 			}
-			else clearFailures += LString(clients[i]) + " (" + ro.GetErrorName().Strip() + ")\n";
 		}
 
 		LgiMsg(	parent,
-			"Registry keys deleted: %i of %i\n"
 			"%s\n"
-			"\n"
-			"Client strings cleared:\n"
-			"%s\n"
-			"\n"
 			"Note: for 'access denied' try running as administrator.",
 			AppName,
 			MB_OK,
-			deleted,
-			CountOf(keys),					
-			deleteFailures.Get(),
-			clearFailures.Get());
+			log.NewLStr().Get());
 	}
 };
 
