@@ -21,4 +21,4 @@ def cmd(c):
 		else:
 			break
 
-cmd("cd code/scribe/trunk_os && make -j5 -f haiku/makefile.haiku 2>&1")
+cmd("cd code/scribe/trunk_os && make -j7 -f haiku/makefile.haiku 2>&1")

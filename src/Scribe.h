@@ -2516,7 +2516,6 @@ public:
 	bool			OnMailStore(LMailStore **MailStore, bool Add);
 	ThingList		*GetItemList() { return MailList; }
 	LColour			GetColour(int i);
-	LMutex			*GetLock();
 	LFont			*GetPreviewFont();
 	LFont			*GetBoldFont() { return LSysBold; }
 	LToolBar		*LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LImageList> &Img);

@@ -10523,43 +10523,18 @@ void ScribeWnd::GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType Access
 	char *Opt = (char*)(AccessType == ScribeReadAccess ? OPT_AccPermRead : OPT_AccPermWrite);
 	GetOptions()->GetValue(Opt, Level);
 
-	/*
-	// Check if admin access is required
-	char *Admin = GetScribeAccountPerm((char*) (AccessType == ScribeReadAccess ? "Read" : "Write"));
-	if (Admin && _stricmp(Admin, "Admin") == 0)
-	{
-		Level = PermRequireAdmin;
-	}
-	*/
-
 	GetAccessLevel(Parent ? Parent : this, (ScribePerm)Level.CastInt32(), "Account Settings", Callback);
-}
-
-LMutex *ScribeWnd::GetLock()
-{
-	#ifndef HAIKU
-	return _Lock;
-	#else
-	#warning "Fixme: scribe wnd locking."
-	return NULL;
-	#endif
 }
 
 void ScribeWnd::OnBeforeConnect(ScribeAccount *Account, bool Receive)
 {
 	if (Receive)
-	{
 		Account->Receive.Enabled(false);
-	}
 	else
-	{
 		Account->Send.Enabled(true);
-	}
 
 	if (StatusPanel)
-	{
 		StatusPanel->Invalidate();
-	}
 }
 
 void ScribeWnd::OnAfterConnect(ScribeAccount *Account, bool Receive)
@@ -10574,18 +10549,12 @@ void ScribeWnd::OnAfterConnect(ScribeAccount *Account, bool Receive)
 	}
 
 	if (Receive)
-	{
 		Account->Receive.Enabled(true);
-	}
 	else
-	{
 		Account->Send.Enabled(true);
-	}
 
 	if (StatusPanel)
-	{
 		StatusPanel->Invalidate();
-	}
 
 	if (d->SendAfterReceive)
 	{
