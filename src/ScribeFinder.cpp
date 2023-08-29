@@ -1272,12 +1272,6 @@ int FindWnd::OnNotify(LViewI *Col, LNotification n)
 								m->GetMessageId();
 							}
 							prog.Value(n);
-							#ifdef HAIKU
-							#warning "Refactor find window."
-							#else
-							if (n % 10 == 0)
-								LYield();							
-							#endif
 						}
 
 						LArray<uint32_t> Colours;
