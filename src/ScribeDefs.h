@@ -333,7 +333,6 @@ enum ScribeMessages
 	M_SCRIBE_IDLE,
 	M_EXPORT_NEXT,
 	M_DELETE_STYLE,
-	M_GET_USER_INPUT,			// (UserInput*)MsgA(m)
 	M_SET_HTML,
 	M_UNIT_TEST,				// (LJson*)m->A()
 	M_CALENDAR_SOURCE_EVENT,	// (CalendarSource*)m->a, (LMessage*)m->b
@@ -341,6 +340,7 @@ enum ScribeMessages
 	M_LOAD_NEXT_MAIL_STORE,
 	M_UNIT_TEST_TICK,
 	M_GET_EVENTS_DONE,
+	M_CONSTRUCT_0,				// A=(LOptionsFile::PortableType)Type
 };
 
 enum ScribeControls

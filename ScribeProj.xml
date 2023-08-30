@@ -156,13 +156,13 @@
 			<Node File=".\resources\About.html" Type="3" Platforms="15" />
 			<Node File=".\src\DomType.h" Type="3" Platforms="15" />
 			<Node File=".\src\DomTypeValues.h" Type="3" Platforms="15" />
+			<Node File=".\src\LoadMailStoreState.h" Type="3" Platforms="15" />
 			<Node File=".\src\ScribeAbout.cpp" Type="2" Platforms="15" />
 			<Node File=".\src\ScribeApp.cpp" Type="2" Platforms="15" />
 			<Node File=".\src\ScribeIpc.cpp" Type="2" Platforms="15" />
 			<Node File=".\src\ScribeIpc.h" Type="3" Platforms="15" />
 			<Node File=".\src\ScribeMain.cpp" Type="2" Platforms="15" />
 			<Node File=".\src\ScribeRepair.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeSharedMem.h" Type="3" Platforms="15" />
 			<Node File=".\src\ScribeSockets.cpp" Type="2" Platforms="15" />
 			<Node File=".\src\ScribeThing.cpp" Type="2" Platforms="15" />
 			<Node File=".\src\ScribeUtils.cpp" Type="2" Platforms="15" />
@@ -405,10 +405,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>./scribe</Debug>
 					<Release>./scribe</Release>
 				</Linux>
-				<Windows />
 			</Executable>
-			<CCrossCompiler />
-			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -487,7 +484,6 @@ bzip2</Debug>
 					<Release>chardet
 bzip2</Release>
 				</All>
-				<Windows />
 			</Libraries>
 			<Defines>
 				<All>
@@ -510,14 +506,12 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>_GNU_SOURCE</Debug>
 					<Release>_GNU_SOURCE</Release>
 				</Haiku>
-				<Windows />
 			</Defines>
 			<SystemIncludes>
 				<Linux>
 					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
 					<Release>`pkg-config --cflags gtk+-3.0`</Release>
 				</Linux>
-				<Windows />
 			</SystemIncludes>
 			<LibraryPaths>
 				<All>
@@ -527,16 +521,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>../libs/build-x64-release/libchardet
 ../libs/build-x64-debug/bzip2-1.0.6</Release>
 				</All>
-				<Windows />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
 					<Debug>scribe</Debug>
 					<Release>scribe</Release>
 				</Haiku>
-				<Windows />
 			</TargetName>
-			<ApplicationIcon />
 		</Build>
 		<Editor>
 			<TabSize>
@@ -551,26 +542,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
-			<CommentFile />
-			<CommentFunction />
 		</Editor>
 		<Advanced>
-			<OtherMakefileRules />
-			<PostBuildCommands>
-				<Windows />
-			</PostBuildCommands>
+			<PostBuildCommands />
 		</Advanced>
 		<Debug>
-			<Environment />
-			<Arguments>
-				<All />
-			</Arguments>
-			<DebugAdmin />
-			<InitialDir />
+			<Arguments />
 		</Debug>
-		<Remote>
-			<RemoteUri />
-			<RemotePass />
-		</Remote>
+		<Remote />
 	</Settings>
 </Project>

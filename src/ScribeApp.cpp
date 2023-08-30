@@ -742,9 +742,9 @@ ScribeWnd::AppState ScribeWnd::ScribeState = ScribeConstructing;
  * - Do some basic init.
  * - Attempt to load the options (could make portable/desktop mode clear)
  * - If the portable/desktop mode is unclear ask the user.
- * - Call AppConstruct1.
+ * - Call Construct1.
  * - If the UI language is not known, ask the user.
- * - Call AppConstruct2.
+ * - Call Construct2.
  * 
  * Each time a dialog is needed the rest of the code needs to be in a callable function.
  * 
@@ -776,7 +776,6 @@ ScribeWnd::ScribeWnd() :
 	#endif
 
 	auto Type = d->GetInstallMode();
-
 	if (Type == LOptionsFile::UnknownMode)
 	{
 		 // This may make the mode more clear...
@@ -784,6 +783,23 @@ ScribeWnd::ScribeWnd() :
 			Type = d->GetInstallMode();
 	}
 
+	#ifdef HAIKU
+	// The event loop for this window won't start till the constructor finishes...
+	// And that is needed for the load mail stores state, so start the thread here:
+	if (WindowHandle()->Thread() < 0 &&
+		WindowHandle()->Lock())
+	{
+		WindowHandle()->Run();
+		WindowHandle()->Unlock();
+	}
+	PostEvent(M_CONSTRUCT_0, (LMessage::Param)Type);
+	#else
+	Construct0(Type);
+	#endif
+}
+
+void ScribeWnd::Construct0(LOptionsFile::PortableType Type)
+{
 	if (Type == LOptionsFile::UnknownMode)
 	{
 		d->AskUserForInstallMode([this](auto selectedMode)
@@ -1238,28 +1254,17 @@ void ScribeWnd::Construct3()
 		}
 
 		OnCommandLineEvent(StartupEvent);
+		if (d->FakeIpcEvent)
+		{
+			// This happens when there is no options file (yet). Ie on first start.
+			// Therefor no need for checking the IPC if there is another instance 
+			// running.
+			Visible(true);
+			OnCommandLineEvent(IpcEvent);
+		}
 	
 		ScribeState = ScribeRunning;
 	});
-}
-
-void ScribeWnd::SetLanguage()
-{
-	LVariant LangId;
-	if (GetOptions()->GetValue(OPT_UiLanguage, LangId))
-	{
-		// Set the language to load...
-		LAppInst->SetConfig("Language", LangId.Str());
-	}
-	LResources::SetLoadStyles(true);
-
-	// Load the resources (with the current lang)
-	if (!LgiGetResObj(true, "Scribe"))
-	{
-		LgiMsg(NULL, "The resource file 'Scribe.lr8' is missing.", AppName);
-		ScribeState = ScribeExiting;
-		LCloseApp();
-	}
 }
 
 ScribeWnd::~ScribeWnd()
@@ -1322,6 +1327,25 @@ ScribeWnd::~ScribeWnd()
 	EndSSL();
 
 	DeleteObj(d);
+}
+
+void ScribeWnd::SetLanguage()
+{
+	LVariant LangId;
+	if (GetOptions()->GetValue(OPT_UiLanguage, LangId))
+	{
+		// Set the language to load...
+		LAppInst->SetConfig("Language", LangId.Str());
+	}
+	LResources::SetLoadStyles(true);
+
+	// Load the resources (with the current lang)
+	if (!LgiGetResObj(true, "Scribe"))
+	{
+		LgiMsg(NULL, "The resource file 'Scribe.lr8' is missing.", AppName);
+		ScribeState = ScribeExiting;
+		LCloseApp();
+	}
 }
 
 LString ScribeWnd::GetResourceFile(SribeResourceType Type)
@@ -2079,7 +2103,6 @@ char *ScribeWnd::GetUiTags()
 
 void ScribeWnd::OnCreate()
 {
-	// LgiTrace("ScribeWnd::OnCreate. ScribeState=%i\n", ScribeState);
 	if (IsAttached() && ScribeState == ScribeConstructed)
 	{
 		ScribeState = ScribeInitializing;
@@ -2924,28 +2947,6 @@ bool ScribeWnd::LoadOptions()
 		d->UnitTestServer.Reset(new LUnitTestServer(this));
 	}
 
-	// Look in the XGate folder
-	#if WINNATIVE && !defined(_DEBUG)
-	LRegKey xgate(false, "HKEY_CURRENT_USER\\Software\\XGate");
-	if (xgate.IsOk())
-	{
-		char *Spool = xgate.GetStr("SpoolDir");
-		if (LDirExists(Spool))
-		{
-			char File[MAX_PATH_LEN];
-			LMakePath(File, sizeof(File), Spool, "spool");
-			LMakePath(File, sizeof(File), File, OptionsFileName);
-			strcat_s(File, sizeof(File), ".xml");
-			if (LFileExists(File))
-			{
-				d->SetInstallMode(LOptionsFile::DesktopMode);
-				LgiTrace("Selecting xgate mode based on options file path.\n");
-				d->Options.Reset(new LOptionsFile(File));
-			}
-		}
-	}
-	#endif
-
 	// Now look in the application install folder
 	LArray<OptionsInfo> Files;
 	if (!d->Options &&
@@ -2991,6 +2992,11 @@ bool ScribeWnd::LoadOptions()
 							// Args have been passed on to running instance.
 						}
 					});
+	}
+	else
+	{
+		// printf("%s:%i - Not calling IPC? %p, %p, %s\n", _FL, Ipc, d->Options, d->Options?d->Options->GetFile():NULL);
+		d->FakeIpcEvent = true;
 	}
 
 	if (ScribeState == ScribeExiting)
@@ -5794,45 +5800,26 @@ void ScribeWnd::OnZoom(LWindowZoom Action)
 	}
 }
 
-struct UserInput
-{
-	std::function<void(LString)> Callback;
-	LView *Parent;
-	LString Msg;
-	bool Password;
-
-	UserInput()
-	{
-		Password = false;
-	}
-};
-
 void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::function<void(LString)> Callback)
 {
-	if (InThread())
+	if (!InThread())
 	{
-		auto Inp = new LInput(Parent ? Parent : this, "", Msg, AppName, Password);
-		Inp->DoModal([this, Inp, Callback](auto dlg, auto id)
-		{
-			if (Callback)
-				Callback(id ? Inp->GetStr() : LString());
-			delete dlg;
-		});
+		// Run the function on the Window's thread:
+		RunCallback([this, Parent, Msg, Password, Callback]() -> auto
+			{
+				GetUserInput(Parent, Msg, Password, Callback);
+				return 0;
+			});
+		return;
 	}
-	else
+
+	auto Inp = new LInput(Parent ? Parent : this, "", Msg, AppName, Password);
+	Inp->DoModal([this, Inp, Callback](auto dlg, auto id)
 	{
-		auto i = new UserInput;
-		i->Parent = Parent;
-		i->Msg = Msg;
-		i->Password = Password;
-		i->Callback = Callback;
-		if (!PostEvent(M_GET_USER_INPUT, (LMessage::Param)i))
-		{
-			LAssert(!"PostEvent failed.");
-			if (Callback)
-				Callback(LString());
-		}
-	}
+		if (Callback)
+			Callback(id ? Inp->GetStr() : LString());
+		delete dlg;
+	});
 }
 
 LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
@@ -5842,6 +5829,13 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 	
 	switch (Msg->Msg())
 	{
+		case M_CONSTRUCT_0:
+		{
+			// Haiku: This allows Construct0 to run in the window's thread.
+			// This solves a bunch of locking issues.
+			Construct0((LOptionsFile::PortableType)Msg->A());
+			break;
+		}
 		case M_UNIT_TEST:
 		{
 			LAutoPtr<LJson> j((LJson*)Msg->A());
@@ -5862,15 +5856,6 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 			LAutoPtr<LMessage> m((LMessage*)Msg->B());
 			if (cs && m)
 				cs->OnEvent(m);
-			break;
-		}
-		case M_GET_USER_INPUT:
-		{
-			LAutoPtr<UserInput> i((UserInput*)Msg->A());
-			LAssert(i);
-			LAssert(InThread()); // Least we get stuck in an infinite loop
-			
-			GetUserInput(i->Parent, i->Msg, i->Password, i->Callback);
 			break;
 		}
 		case M_SET_HTML:

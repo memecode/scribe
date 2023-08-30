@@ -58,6 +58,15 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 		if (MailStores)
 			Que = MailStores->Children;
 	}
+	
+	~LoadMailStoreState()
+	{
+		if (MailStores)
+		{
+			Options->Unlock();
+			MailStores = NULL;
+		}
+	}
 
 	void Start()
 	{
@@ -67,7 +76,10 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 	bool OnStatus(bool b)
 	{
 		if (MailStores)
+		{
 			Options->Unlock();
+			MailStores = NULL;
+		}
 
 		if (OptionsDirty)
 			App->SaveOptions();

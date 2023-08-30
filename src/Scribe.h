@@ -2380,6 +2380,7 @@ protected:
 
 public:
 	ScribeWnd();
+	void Construct0(LOptionsFile::PortableType Type);
 	void Construct1();
 	void Construct2();
 	void Construct3();

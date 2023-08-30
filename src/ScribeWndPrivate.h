@@ -94,6 +94,7 @@ public:
 	LAutoPtr<LPrinter> PrintOptions;
 	LHashTbl<IntKey<SribeResourceType,ResNone>, LString> ResFiles;
 	int				CmdLineEvents = 0;
+	bool			FakeIpcEvent = false; // No options filename so do a fake OnCommandLineEvent(IpcEvent) after startup.
 
 	// These are for the LDataEventsI callbacks to store source context
 	// Mainly for debugging where various events came from.

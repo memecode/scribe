@@ -141,6 +141,8 @@ struct SocketIpc :
 		const int WAIT = 5; // ms
 		uint64_t ListenTs = 0;
 
+		TRACE("%s main running...\n", GetClass());
+
 		// While we're running...
 		while (!IsCancelled())
 		{
@@ -172,7 +174,7 @@ struct SocketIpc :
 							TRACE("%s:%i - Listen on %i failed.\n", _FL, IPC_PORT);
 							Listen.Reset();
 						}
-						else if (ListenTs)
+						else
 						{
 							TRACE("%s:%i - Listen on %i success!\n", _FL, IPC_PORT);
 						}
@@ -377,6 +379,8 @@ struct SocketIpc :
 
 	void OnLoad(const char *FileName, LString *MulPassword, std::function<void(bool)> Callback)
 	{
+		TRACE("%s:%i - OnLoad=%s\n", _FL, FileName);
+
 		// Try and send data to running inst:
 		LAutoPtr<Connection> s(new Connection);
 		if (s)
@@ -391,6 +395,7 @@ struct SocketIpc :
 							OptArgs, GetUtfArgs().Get());
 
 			auto connected = s->Open("localhost", IPC_PORT);
+			TRACE("%s:%i - connected=%i\n", _FL, connected);
 			if (connected)
 				s->connecting = false;
 			TRACE("%s:%i - outbound connection: %i\n", _FL, connected);
