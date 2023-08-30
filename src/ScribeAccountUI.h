@@ -3,11 +3,11 @@
 
 class AccountDlg : public TabDialog
 {
-	ScribeWnd *App;
-	ScribeAccount *Account;
-	LList *Plugins;
-	class LEdit *SendServer, *ReceiveServer;
-	class LEdit *SendPort, *ReceivePort;
+	ScribeWnd *App = NULL;
+	ScribeAccount *Account = NULL;
+	LList *Plugins = NULL;
+	class LEdit *SendServer = NULL, *ReceiveServer = NULL;
+	class LEdit *SendPort = NULL, *ReceivePort = NULL;
 
 	void UpdateDefaultPort(bool Send);
 

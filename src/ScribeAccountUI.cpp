@@ -59,11 +59,6 @@ AccountDlg::AccountDlg(LView *p, ScribeWnd *app, ScribeAccount *a, int Tab) :
 	SetParent(p);
 	App = app;
 	Account = a;
-	Plugins = 0;
-	SendServer = NULL;
-	SendPort = NULL;
-	ReceiveServer = NULL;
-	ReceivePort = NULL;
 
 	if (LoadFromResource(IDD_ACCOUNT, App->GetUiTags()))
 	{

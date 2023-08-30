@@ -8,7 +8,7 @@
 #include "Scribe.h"
 #include "ScribeIpc.h"
 
-#if 1
+#if 0
 #define TRACE(...) LgiTrace(__VA_ARGS__)
 #else
 #define TRACE(...)
