@@ -1337,10 +1337,7 @@ public:
 			prog.Value(i);
 			auto Now = LCurrentTime();
 			if (Now - UpdateTs > 100)
-			{
 				UpdateTs = Now;
-				LYield();
-			}
 		}
 
 		Code.Print(	"	}\n"

@@ -1341,13 +1341,7 @@ public:
 			if (Now > Last + 500)
 			{
 				if (Parent)
-				{
 					Parent->Invalidate(&Pos, true);
-					
-					#ifdef MAC
-					LYield();
-					#endif
-				}
 				Last = Now;
 			}
 			LSleep(0);
