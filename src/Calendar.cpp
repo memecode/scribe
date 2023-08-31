@@ -29,7 +29,7 @@
 #include "ObjectInspector.h"
 
 #define MAX_RECUR			1024
-#define DEBUG_REMINDER		0
+#define DEBUG_REMINDER		1
 #define DEBUG_DATES			1
 #if DEBUG_DATES
 #define LOG_DEBUG(...)		LgiTrace(__VA_ARGS__)
@@ -273,8 +273,11 @@ void Calendar::CheckReminders()
 {
 	LDateTime Now;
 	Now.SetNow();
-	LDateTime Then;
-	Then = Now;
+	#if DEBUG_REMINDER
+	// Get all the times for today, including recent ones
+	Now.SetTime("0:0:0");
+	#endif
+	LDateTime Then = Now;
 	Then.AddDays(1);
 
 	#if DEBUG_REMINDER
@@ -303,15 +306,23 @@ void Calendar::CheckReminders()
 		if (!c->GetTimes(Now, Then, Times))
 		{
 			#if DEBUG_REMINDER
-			LgiTrace("    No times for '%s'\n", Subj);
+			// LgiTrace("    No times for '%s', now=%s, then=%s\n", Subj, Now.Get().Get(), Then.Get().Get());
 			#endif
 			continue;
 		}
 		
-		LDataI *Obj = c->GetObject();
+		auto Obj = c->GetObject();
+		if (!Obj)
+			continue;
 		LDateTime LastCheck = *Obj->GetDate(FIELD_CAL_LAST_CHECK);
 		if (LastCheck.IsValid())
+		{
 			LastCheck.ToLocal();
+			#if DEBUG_REMINDER
+			// Helps with debugging...
+			LastCheck.AddDays(-1);
+			#endif
+		}
 
 		LString::Array r = Rem.SplitDelimit("\n");
 		for (unsigned i=0; i<r.Length(); i++)
@@ -840,7 +851,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 		BaseUtc.e.AddHours(1);
 	}
 
-	LArray<LDateTime::GDstInfo> Dst;
+	LArray<LDateTime::LDstInfo> Dst;
 	LDateTime::GetDaylightSavingsInfo(Dst, BaseUtc.s, &EndUtc);
 	LAssert(Dst.Length() > 0);
 

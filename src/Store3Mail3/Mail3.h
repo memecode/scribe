@@ -297,7 +297,7 @@ public:
 		int64 RowId;
 
 	public:
-		LUpdate(LMail3Store *store, const char *Tbl, int64 rowId, char *ExcludeField = 0);
+		LUpdate(LMail3Store *store, const char *Tbl, int64 rowId, char *ExcludeField = NULL);
 
 		int64 GetRowId() { return RowId; }
 	};
@@ -448,7 +448,7 @@ public:
 	LAutoStreamI GetStream(const char *file, int line) { LAssert(0); return LAutoStreamI(0); }
 	bool Serialize(LMail3Store::LStatement &s, bool Write) { LAssert(0); return false; }
 
-	Store3Status Save(LDataI *Folder = 0);
+	Store3Status Save(LDataI *Folder = NULL);
 	virtual bool DbDelete() { LAssert(0); return false; }
 };
 
@@ -556,7 +556,7 @@ public:
 	bool IsOrphan() override { return false; }
 	uint64 Size() override;
 	uint64 SizeChildren();
-	Store3Status Save(LDataI *Folder = 0) override;
+	Store3Status Save(LDataI *Folder = NULL) override;
 	void OnSave() override;
 };
 
@@ -610,7 +610,7 @@ public:
 	const char *GetClass() override { return "LMail3Mail"; }
 	LMail3Attachment *GetAttachment(int64 Id);
 	bool FindSegs(const char *MimeType, LArray<LMail3Attachment*> &Segs, bool Create = false);
-	int GetAttachments(LArray<LMail3Attachment*> *Lst = 0);
+	int GetAttachments(LArray<LMail3Attachment*> *Lst = NULL);
     bool ParseHeaders() override;
     void ResetCaches();
 

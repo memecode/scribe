@@ -514,7 +514,7 @@ protected:
 public:
 	ThingStorage *Data = NULL;
 
-	Thing(ScribeWnd *app, LDataI *object = 0);
+	Thing(ScribeWnd *app, LDataI *object = NULL);
 	~Thing();
 
 	// Dom
@@ -547,18 +547,18 @@ public:
 	ScribeFolder *GetFolder() override { return _ParentFolder; }
 	void SetParentFolder(ScribeFolder *f);
 	Store3Status SetFolder(ScribeFolder *f, int Param = -1) override;
-	LDataI *DefaultObject(LDataI *arg = 0);
+	LDataI *DefaultObject(LDataI *arg = NULL);
 
-	virtual ThingUi *DoUI(MailContainer *c = 0) { return NULL; }
-	virtual ThingUi *GetUI() { return 0; }
-	virtual bool SetUI(ThingUi *ui = 0) { return false; }
+	virtual ThingUi *DoUI(MailContainer *c = NULL) { return NULL; }
+	virtual ThingUi *GetUI() { return NULL; }
+	virtual bool SetUI(ThingUi *ui = NULL) { return false; }
 
 	virtual uint32_t GetFlags() { return 0; }
 	virtual void OnCreate() override;
 	virtual bool OnDelete();
-	virtual int *GetDefaultFields() { return 0; }
+	virtual int *GetDefaultFields() { return NULL; }
 	virtual const char *GetFieldText(int Field) { return 0; }
-	virtual void DoContextMenu(LMouse &m, LView *Parent = 0) {}
+	virtual void DoContextMenu(LMouse &m, LView *Parent = NULL) {}
 	virtual Thing &operator =(Thing &c) { LAssert(0); return *this; }
 	virtual char *GetDropFileName() = 0;
 	virtual bool GetDropFiles(LString::Array &Files) { return false; }
@@ -655,8 +655,8 @@ public:
 		QUOTED_PRINTABLE,
 	};	
 	
-	Attachment(ScribeWnd *App, Attachment *import = 0);
-	Attachment(ScribeWnd *App, LDataI *object, const char *import = 0);
+	Attachment(ScribeWnd *App, Attachment *import = NULL);
+	Attachment(ScribeWnd *App, LDataI *object, const char *import = NULL);
 	~Attachment();
 
 	const char *GetClass() override { return "Attachment"; }
@@ -677,7 +677,7 @@ public:
 	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
-	void OnOpen(LView *Parent, char *Dest = 0);
+	void OnOpen(LView *Parent, char *Dest = NULL);
 	void OnDeleteAttachment(LView *Parent, bool Ask);
 	void OnSaveAs(LView *Parent);
 	void OnMouseClick(LMouse &m) override;
@@ -707,7 +707,7 @@ public:
 	IoProgress Import(IoProgressFnArgs) override { return Store3Error; }
 	IoProgress Export(IoProgressFnArgs) override { return Store3Error; }
 
-	bool SaveTo(char *FileName, bool Quite = false, LView *Parent = 0);
+	bool SaveTo(char *FileName, bool Quite = false, LView *Parent = NULL);
 
 	const char *GetText(int i) override;
 	char *GetDropFileName() override;
@@ -729,7 +729,7 @@ public:
 	static LHashTbl<ConstStrKey<char,false>, int> PropMap;
 	static int DefaultContactFields[];
 
-	Contact(ScribeWnd *app, LDataI *object = 0);
+	Contact(ScribeWnd *app, LDataI *object = NULL);
 	~Contact();
 	
 	const char *GetClass() override { return "Contact"; }
@@ -748,8 +748,8 @@ public:
 	Contact *IsContact() override { return this; }
 
 	// Dom
-	bool GetVariant(const char *Name, LVariant &Value, const char *Array = 0) override;
-	bool SetVariant(const char *Name, LVariant &Value, const char *Array = 0) override;
+	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
+	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// Events
@@ -761,10 +761,10 @@ public:
 
 	// Misc
 	Store3ItemTypes Type() override { return MAGIC_CONTACT; }
-	ThingUi *DoUI(MailContainer *c = 0) override;
+	ThingUi *DoUI(MailContainer *c = NULL) override;
 	int Compare(LListItem *Arg, ssize_t Field) override;
 	bool IsAssociatedWith(char *PluginName);
-	char *GetLocalTime(const char *TimeZone = 0);
+	char *GetLocalTime(const char *TimeZone = NULL);
 	
 	// Email address
 	int GetAddrCount();
@@ -773,7 +773,7 @@ public:
 	bool HasEmail(LString email);
 
 	// Serialization
-	bool Save(ScribeFolder *Into = 0) override;
+	bool Save(ScribeFolder *Into = NULL) override;
 
 	// ListItem
 	const char *GetText(int i) override;
@@ -807,7 +807,7 @@ public:
 
 	LDATA_STR_PROP(Name, FIELD_GROUP_NAME);	
 
-	ContactGroup(ScribeWnd *app, LDataI *object = 0);
+	ContactGroup(ScribeWnd *app, LDataI *object = NULL);
 	~ContactGroup();
 
 	const char *GetClass() override { return "ContactGroup"; }
@@ -827,13 +827,13 @@ public:
 
 	// Misc
 	Store3ItemTypes Type() override { return MAGIC_GROUP; }
-	ThingUi *DoUI(MailContainer *c = 0) override;
+	ThingUi *DoUI(MailContainer *c = NULL) override;
 	int Compare(LListItem *Arg, ssize_t Field) override;
 	bool GetAddresses(List<char> &a);
 	LString::Array GetAddresses();
 
 	// Serialization
-	bool Save(ScribeFolder *Into = 0) override;
+	bool Save(ScribeFolder *Into = NULL) override;
 
 	// ListItem
 	const char *GetText(int i) override;
@@ -910,7 +910,7 @@ public:
 	#endif
 
 	// Methods
-	MContainer(const char *Id, Mail *m = 0);
+	MContainer(const char *Id, Mail *m = NULL);
 	~MContainer();
 
 	void SetMail(Mail *m);
@@ -1019,7 +1019,7 @@ public:
 	
 	NewEmailState NewEmail;
 
-	Mail(ScribeWnd *app, LDataI *object = 0);
+	Mail(ScribeWnd *app, LDataI *object = NULL);
 	~Mail();
 
 	const char *GetClass() override { return "Mail"; }
@@ -1128,14 +1128,14 @@ public:
 	char *GetNewText(int Max = 64 << 10, const char *AsCp = "utf-8");
 	int *GetDefaultFields() override;
 	Store3ItemTypes Type() override { return MAGIC_MAIL; }
-	void DoContextMenu(LMouse &m, LView *Parent = 0) override;
+	void DoContextMenu(LMouse &m, LView *Parent = NULL) override;
 	int Compare(LListItem *Arg, ssize_t Field) override;
 	char *GetDropFileName() override;
 	bool GetDropFiles(LString::Array &Files) override;
-	LAutoString GetSig(bool HtmlVersion, ScribeAccount *Account = 0);
+	LAutoString GetSig(bool HtmlVersion, ScribeAccount *Account = NULL);
 	bool LoadFromFile(char *File);
 	void PrepSend();
-	void NewRecipient(char *Email, char *Name = 0);
+	void NewRecipient(char *Email, char *Name = NULL);
 	void ClearCachedItems();
 	bool Send(bool Now);
 	void CreateMailHeaders();
@@ -1145,11 +1145,11 @@ public:
 
 	// UI
 	LDocView *CreateView(MailViewOwner *Owner, LString MimeType, bool Sunken, size_t MaxBytes, bool NoEdit = false);
-	ThingUi *DoUI(MailContainer *c = 0) override;
+	ThingUi *DoUI(MailContainer *c = NULL) override;
 
 	// Alt HTML
-	bool HasAlternateHtml(Attachment **Attach = 0);
-	char *GetAlternateHtml(List<Attachment> *Refs = 0); // dynamically allocated ptr
+	bool HasAlternateHtml(Attachment **Attach = NULL);
+	char *GetAlternateHtml(List<Attachment> *Refs = NULL); // dynamically allocated ptr
 	bool WriteAlternateHtml(char *File = NULL, int FileLen = 0); // defaults to TEMP dir
 
 	// Account stuff
@@ -1159,7 +1159,7 @@ public:
 
 	// Access
 	int64 TotalSizeof();
-	bool Save(ScribeFolder *Into = 0) override;
+	bool Save(ScribeFolder *Into = NULL) override;
 	
 	// Attachments
 	Attachment *AttachFile(LView *Parent, const char *FileName);
@@ -1302,9 +1302,9 @@ public:
 	int GetSortCol() { return abs((int)GetObject()->GetInt(FIELD_SORT)) - 1; }
 	int GetSortField();
 	void ReSort();
-	bool Save(ScribeFolder *Into = 0) override;
+	bool Save(ScribeFolder *Into = NULL) override;
 	bool ReindexField(int OldIndex, int NewIndex);
-	void CollectSubFolderMail(ScribeFolder *To = 0);
+	void CollectSubFolderMail(ScribeFolder *To = NULL);
 	bool InsertThing(Thing *Item);
 	void MoveTo(LArray<Thing*> &Items, bool CopyOnly, std::function<void(bool, LArray<Store3Status>&)> Callback = NULL);
 	bool Delete(LArray<Thing*> &Items, bool ToTrash);
@@ -1404,7 +1404,7 @@ public:
 	FilterCondition &operator =(FilterCondition &c);
 
 	// Object
-	ThingUi *DoUI(MailContainer *c = 0);
+	ThingUi *DoUI(MailContainer *c = NULL);
 };
 
 class FilterAction : public LListItem, public LDataPropI
@@ -1441,7 +1441,7 @@ public:
 	int OnNotify(LViewI *c, LNotification n) override;
 
 	// Object
-	ThingUi *DoUI(MailContainer *c = 0);
+	ThingUi *DoUI(MailContainer *c = NULL);
 	// bool Serialize(ObjProperties &f, bool Write);
 };
 
@@ -1472,7 +1472,7 @@ protected:
 	bool EvaluateXml(Mail *m, bool &Stop, LStream *Log);
 
 public:
-	Filter(ScribeWnd *app, LDataI *object = 0);
+	Filter(ScribeWnd *app, LDataI *object = NULL);
 	~Filter();
 	
 	const char *GetClass() override { return "Filter"; }
@@ -1512,8 +1512,8 @@ public:
 	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// Filter
-	bool Test(Mail *m, bool &Stop, LStream *Log = 0);
-	bool DoActions(Mail *&m, bool &Stop, LStream *Log = 0);
+	bool Test(Mail *m, bool &Stop, LStream *Log = NULL);
+	bool DoActions(Mail *&m, bool &Stop, LStream *Log = NULL);
 	Mail *GetCurrent() { return Current?*Current:0; }
 	
 	/// This filters all the mail in 'Email'. Anything that is handled by a filter
@@ -1531,9 +1531,9 @@ public:
 
 	// Object
 	Store3ItemTypes Type() override { return MAGIC_FILTER; }
-	ThingUi *DoUI(MailContainer *c = 0) override;
+	ThingUi *DoUI(MailContainer *c = NULL) override;
 	bool Serialize(LFile &f, bool Write);
-	bool Save(ScribeFolder *Into = 0) override;
+	bool Save(ScribeFolder *Into = NULL) override;
 	void OnMouseClick(LMouse &m) override;
 	void AddAction(FilterAction *a);
 	
@@ -1666,7 +1666,7 @@ public:
 };
 
 #define AccStrOption(func, opt) \
-	LVariant func(const char *Set = 0) { LVariant v; StrOption(opt, v, Set); return v; }
+	LVariant func(const char *Set = NULL) { LVariant v; StrOption(opt, v, Set); return v; }
 
 #define AccIntOption(name, opt) \
 	int name(int Set = -1) { LVariant v; IntOption(opt, v, Set); return v.CastInt32(); }
@@ -1823,8 +1823,8 @@ public:
 
 	// Virtuals
 	virtual void Main(AccountletThread *Thread) = 0;
-	virtual LVariant Server(const char *Set = 0) = 0;
-	virtual LVariant UserName(const char *Set = 0) = 0;
+	virtual LVariant Server(const char *Set = NULL) = 0;
+	virtual LVariant UserName(const char *Set = NULL) = 0;
 	virtual void Enabled(bool b) = 0;
 	virtual void OnPulse(char *s, int s_len) {}
 	virtual bool IsReceive() { return false; }
@@ -1852,8 +1852,8 @@ public:
 
 	int UseSSL(int Set = -1) { return 0; }
 	void Main(AccountletThread *Thread) {}
-	LVariant Server(const char *Set = 0) { return LVariant(); }
-	LVariant UserName(const char *Set = 0) { return LVariant(); }
+	LVariant Server(const char *Set = NULL) { return LVariant(); }
+	LVariant UserName(const char *Set = NULL) { return LVariant(); }
 	void Enabled(bool b) {}
 	void CreateMaps();
 	bool IsValid();
@@ -2406,9 +2406,9 @@ public:
 	// Methods
 	LAutoString		GetDataFolder();
 	LDataStoreI		*CreateDataStore(const char *Full, bool CreateIfMissing);
-	Thing			*CreateThingOfType(Store3ItemTypes Type, LDataI *obj = 0);
-	Thing			*CreateItem(int Type, ScribeFolder *Folder = 0, bool Ui = true);
-	Mail			*CreateMail(Contact *c = 0, const char *Email = 0, const char *Name = 0);
+	Thing			*CreateThingOfType(Store3ItemTypes Type, LDataI *obj = NULL);
+	Thing			*CreateItem(int Type, ScribeFolder *Folder = NULL, bool Ui = true);
+	Mail			*CreateMail(Contact *c = NULL, const char *Email = NULL, const char *Name = NULL);
 	Mail			*LookupMailRef(const char *MsgRef, bool TraceAllUids = false);
 	bool			CreateFolders(LAutoString &FileName);
 	bool			CompactFolders(LMailStore &Store, bool Interactive = true);
@@ -2428,7 +2428,7 @@ public:
 	void			ThingPrint(std::function<void(bool)> Callback, ThingType *m, LPrinter *Info = NULL, LView *Parent = NULL, int MaxPage = -1);
 	bool			OpenAMail(ScribeFolder *Folder);
 	void			BuildDynMenus();
-	LDocView		*CreateTextControl(int Id, const char *MimeType, bool Editor, Mail *m = 0);
+	LDocView		*CreateTextControl(int Id, const char *MimeType, bool Editor, Mail *m = NULL);
 	void			SetLastDrop() { LastDrop = LCurrentTime(); }
 	void			SetListPane(LView *v);
 	void			SetLayout(LayoutMode Mode = OptionsLayout);
@@ -2470,9 +2470,9 @@ public:
 	void			RemoveThingSrc(ScribeFolder *src);
 	LArray<ScribeFolder*> GetThingSources(Store3ItemTypes Type);
 
-	bool			GetContacts(List<Contact> &Contacts, ScribeFolder *f = 0, bool Deep = true);
+	bool			GetContacts(List<Contact> &Contacts, ScribeFolder *f = NULL, bool Deep = true);
 	List<Contact>	*GetEveryone();
-	void			HashContacts(LHashTbl<StrKey<char,false>,Contact*> &Contacts, ScribeFolder *Folder = 0, bool Deep = true);
+	void			HashContacts(LHashTbl<StrKey<char,false>,Contact*> &Contacts, ScribeFolder *Folder = NULL, bool Deep = true);
 	
     // CapabilityInstaller impl
     LString		     GetHttpProxy() override;
@@ -2603,7 +2603,7 @@ public:
 	void			OnPulse() override;
     void            OnPulseSecond();
 	bool			OnRequestClose(bool OsShuttingDown) override;
-	void			OnSelect(List<Thing> *l = 0, bool ChangeEvent = false);
+	void			OnSelect(List<Thing> *l = NULL, bool ChangeEvent = false);
 	void			OnReceiveFiles(LArray<const char*> &Files) override;
 	void			OnUrl(const char *Url) override;
 	void			OnZoom(LWindowZoom Action) override;

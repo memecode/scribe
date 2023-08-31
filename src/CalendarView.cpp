@@ -2045,7 +2045,7 @@ LDateTime *CalendarView::TimeAt(int x, int y, int SnapMinutes, LPoint *Cell)
 	return 0;
 }
 
-LDateTime::GDstInfo *CalendarView::GetDstForDate(LDateTime t)
+LDateTime::LDstInfo *CalendarView::GetDstForDate(LDateTime t)
 {
 	uint64 ts = t;
 
@@ -2137,7 +2137,7 @@ Calendar *CalendarView::NewEvent(LDateTime &dtStart, LDateTime &dtEnd)
 	}
 	
 	LDateTime n = Start;
-	LDateTime::GDstInfo *CurDst = GetDstForDate(Start);
+	LDateTime::LDstInfo *CurDst = GetDstForDate(Start);
 	if (CurDst)
 		n.SetTimeZone(CurDst->Offset, false);
 

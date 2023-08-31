@@ -8,29 +8,18 @@ enum GpgFlags
 
 struct GpgSigCheckResponse
 {
-	bool SignatureMatch;
+	bool SignatureMatch = false;
 	LString Error;
 	LString Identity;
 	LDateTime TimeStamp;
-	LMessage::Param UserValue;
-	
-	GpgSigCheckResponse()
-	{
-		SignatureMatch = false;
-		UserValue = 0;
-	}
+	LMessage::Param UserValue = 0;
 };
 
 struct GpgDecryptResponse
 {
 	LString Error;
 	LAutoStreamI Data;
-	LMessage::Param UserValue;
-	
-	GpgDecryptResponse()
-	{
-		UserValue = 0;
-	}
+	LMessage::Param UserValue = 0;
 };
 
 class GpgConnector

@@ -9,11 +9,11 @@ public:
 	FolderDlg(	LViewI *Parent,
 				ScribeWnd *App,
 				int LimitToType = MAGIC_ANY,
-				ScribeFolder *Root = 0,
-				const char *InitialSelect = 0,
+				ScribeFolder *Root = NULL,
+				const char *InitialSelect = NULL,
 				bool AllowCreate = true,
-				char *DefaultNewFolderName = 0,
-				char *DialogMsg = 0);
+				char *DefaultNewFolderName = NULL,
+				char *DialogMsg = NULL);
 	~FolderDlg();
 	
 	char *Get();

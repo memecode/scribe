@@ -296,10 +296,10 @@
 			<Node File="./src/SecurityDlg.cpp" Type="2" Platforms="15" />
 			<Node File="./src/TitlePage.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node File=".\src\Scribe.h" Type="3" Platforms="15" />
-		<Node File=".\src\ScribeDefs.h" Type="3" Platforms="15" />
-		<Node File=".\src\ScribeInc.h" Type="3" Platforms="15" />
-		<Node File=".\src\ScribePrivate.h" Type="3" Platforms="15" />
+		<Node File="./src/Scribe.h" Type="3" Platforms="15" />
+		<Node File="./src/ScribeDefs.h" Type="3" Platforms="15" />
+		<Node File="./src/ScribeInc.h" Type="3" Platforms="15" />
+		<Node File="./src/ScribePrivate.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Scripting" Type="1" Platforms="7" Open="0" Id="35">
 		<Node Name="Scripts" Type="1" Platforms="15" Open="0" Id="36">
@@ -366,7 +366,7 @@
 	<Node Name="Testing" Type="1" Platforms="15" Id="1">
 		<Node File=".\src\Test\UnitTests.cpp" Type="2" Platforms="15" />
 	</Node>
-	<Node File="..\..\lgi\trunk\Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
+	<Node File="../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Settings>
 		<General>
 			<Makefile>
@@ -406,6 +406,8 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>./scribe</Release>
 				</Linux>
 			</Executable>
+			<CCrossCompiler />
+			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -519,15 +521,18 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 ../libs/build-x64-debug/bzip2-1.0.6
 </Debug>
 					<Release>../libs/build-x64-release/libchardet
-../libs/build-x64-debug/bzip2-1.0.6</Release>
+../libs/build-x64-release/bzip2-1.0.6</Release>
 				</All>
+				<Linux />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
 					<Debug>scribe</Debug>
 					<Release>scribe</Release>
 				</Haiku>
+				<Linux />
 			</TargetName>
+			<ApplicationIcon />
 		</Build>
 		<Editor>
 			<TabSize>
@@ -542,13 +547,26 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
+			<CommentFile />
+			<CommentFunction />
 		</Editor>
 		<Advanced>
-			<PostBuildCommands />
+			<PostBuildCommands>
+				<Linux />
+			</PostBuildCommands>
+			<OtherMakefileRules />
 		</Advanced>
 		<Debug>
-			<Arguments />
+			<Arguments>
+				<All />
+			</Arguments>
+			<Environment />
+			<DebugAdmin />
+			<InitialDir />
 		</Debug>
-		<Remote />
+		<Remote>
+			<RemoteUri />
+			<RemotePass />
+		</Remote>
 	</Settings>
 </Project>

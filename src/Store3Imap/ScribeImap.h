@@ -290,7 +290,7 @@ class ImapAttachment : public Store3Attachment<ImapStore, ImapMail, ImapAttachme
 	bool InMemoryOnly;
 
 public:
-	ImapAttachment(ImapStore *store, ImapMail *mail = 0, LMime *seg = 0);
+	ImapAttachment(ImapStore *store, ImapMail *mail = NULL, LMime *seg = NULL);
 	ImapAttachment(ImapStore *store, ImapMail *mail, LDataPropI *att);
 	~ImapAttachment();
 
@@ -308,7 +308,7 @@ public:
 	uint32_t Type() override;
 	bool IsOnDisk() override;
 	uint64 Size() override;
-	Store3Status Save(LDataI *Folder = 0) override;
+	Store3Status Save(LDataI *Folder = NULL) override;
 	Store3Status Delete(bool ToTrash = false) override;
 	LAutoStreamI GetStream(const char *file, int line) override;
 	bool SetStream(LAutoStreamI stream) override;
@@ -404,7 +404,7 @@ public:
 	LDataPropI *GetObj(int id) override;
 	Store3Status SetObj(int id, LDataPropI *i) override;
 	LDataIt GetList(int id) override;
-	Store3Status Save(LDataI *Folder = 0) override;
+	Store3Status Save(LDataI *Folder = NULL) override;
 	LAutoStreamI GetStream(const char *file, int line) override;
 	bool SetStream(LAutoStreamI stream) override;
 
@@ -432,7 +432,7 @@ class ImapFolderFld : public LXmlTag, public LDataPropI
 	ImapFolder *Parent;
 
 public:
-	ImapFolderFld(LDataStoreI *s, ImapFolder *p = 0, int id = 0, int width = 100);
+	ImapFolderFld(LDataStoreI *s, ImapFolder *p = NULL, int id = 0, int width = 100);
 
 	const char *GetStr(int id);
 	int64 GetInt(int id);
@@ -522,7 +522,7 @@ public:
 	/// The configured fields in the folder
 	DIterator<LDataPropI, ImapFolderFld, ImapStore> Field;
 
-	ImapFolder(ImapStore *store, const char *path = 0);
+	ImapFolder(ImapStore *store, const char *path = NULL);
 	~ImapFolder();
 
 	const char *GetClass() override { return "ImapFolder"; }
@@ -550,7 +550,7 @@ public:
 	Store3Status Move(LArray<LDataI*> &Items);
 	LString MakeImapPath(char *From);
 	uint64 Size() override;
-	Store3Status Save(LDataI *Into = 0) override;
+	Store3Status Save(LDataI *Into = NULL) override;
 	Store3Status Delete(bool ToTrash = true) override;
 	LAutoStreamI GetStream(const char *file, int line) override;
 	bool SetStream(LAutoStreamI stream) override;

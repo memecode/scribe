@@ -76,8 +76,8 @@ protected:
 	int DayStart, DayEnd;
 
 	// DST info
-	LArray<LDateTime::GDstInfo> Dst;
-	LDateTime::GDstInfo *GetDstForDate(LDateTime t);
+	LArray<LDateTime::LDstInfo> Dst;
+	LDateTime::LDstInfo *GetDstForDate(LDateTime t);
 
 	// Layout data
 	LRect Title;
@@ -117,17 +117,17 @@ public:
 			cv->CalDelete(c);
 	}
 
-	CalendarView(ScribeFolder *folder, int Id = -1, LRect *r = 0, const char *Name = 0);
+	CalendarView(ScribeFolder *folder, int Id = -1, LRect *r = NULL, const char *Name = NULL);
 	~CalendarView();
 	
 	const char *GetClass() override { return "CalendarView"; }
 
 	// Methods
 	Calendar *CalendarAt(int x, int y);
-	LDateTime *TimeAt(int x, int y, int SnapMinutes, LPoint *Cell = 0);
+	LDateTime *TimeAt(int x, int y, int SnapMinutes, LPoint *Cell = NULL);
 	void OnDelete();
 	LArray<Calendar*> &GetSelection() { return Selection; }
-	void SelectDropTarget(LDateTime *Start = 0, LDateTime *End = 0);
+	void SelectDropTarget(LDateTime *Start = NULL, LDateTime *End = NULL);
 	bool GetEventsBetween(LArray<TimePeriod> &list, LDateTime Start, LDateTime End);
 	void LoadUsers();
 	void DeleteSource(CalendarSource *cs);

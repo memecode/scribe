@@ -50,8 +50,8 @@ public:
 	ListAddr(ScribeWnd *App);
 	ListAddr(ScribeWnd *App, LDataPropI *Prop);
 	ListAddr(ScribeWnd *App, RecipientItem *c);
-	ListAddr(ScribeWnd *App, AddressDescriptor *a, List<Contact> *Cache = 0);
-	ListAddr(ScribeWnd *App, const char *Email, const char *Name, List<Contact> *Cache = 0);
+	ListAddr(ScribeWnd *App, AddressDescriptor *a, List<Contact> *Cache = NULL);
+	ListAddr(ScribeWnd *App, const char *Email, const char *Name, List<Contact> *Cache = NULL);
 
 	ListAddr(Contact *c);
 	ListAddr(ContactGroup *g);
@@ -65,7 +65,7 @@ public:
 	ListAddr &operator =(AddressDescriptor &a) { CopyFrom(a); return *this; }
 
 	// Methods
-	void AddToContacts(bool Ui, ScribeFolder *Folder = 0);
+	void AddToContacts(bool Ui, ScribeFolder *Folder = NULL);
 	int Length();
 	RecipientItem *operator [](int i);
 	List<RecipientItem>::I begin();
@@ -79,7 +79,7 @@ public:
 	bool SetText(const char *s, int i = 0) override;
 	int GetImage(int Flags) override;
 	void OnFound(bool Persist = false);
-	void OnFind(List<Contact> *Cache = 0, bool Persist = false);
+	void OnFind(List<Contact> *Cache = NULL, bool Persist = false);
 	void OnMouseClick(LMouse &m) override;
 
 	// Dom

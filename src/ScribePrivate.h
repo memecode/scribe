@@ -318,7 +318,7 @@ protected:
 	void OnChildrenChanged(LViewI *Wnd, bool Attaching);
 
 public:
-	MailUi(Mail *item, MailContainer *Container = 0);
+	MailUi(Mail *item, MailContainer *Container = NULL);
 	~MailUi();
 
 	const char *GetClass() { return "MailUi"; }
@@ -586,7 +586,7 @@ public:
 	int SubType = -1;
 	LString SubName;
 
-	CreateSubFolderDlg(LView *parent, int defaulttype = 0, bool *enable = 0, char *default_name = 0);
+	CreateSubFolderDlg(LView *parent, int defaulttype = 0, bool *enable = NULL, char *default_name = NULL);
 
 	int OnNotify(LViewI *Ctrl, LNotification n);
 };

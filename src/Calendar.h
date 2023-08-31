@@ -113,7 +113,7 @@ public:
 	static int WorkWeekEnd;
 
 	// Object
-	Calendar(ScribeWnd *app, LDataI *object = 0);
+	Calendar(ScribeWnd *app, LDataI *object = NULL);
 	~Calendar();
 	
 	const char *GetClass() override { return "Calendar"; }
@@ -132,10 +132,10 @@ public:
 
 	// Thing
 	uint32_t GetFlags() override;
-	ThingUi *DoUI(MailContainer *c = 0) override;
+	ThingUi *DoUI(MailContainer *c = NULL) override;
 	ThingUi *GetUI() override;
-	bool SetUI(ThingUi *ui = 0) override;
-	void DoContextMenu(LMouse &m, LView *Parent = 0) override;
+	bool SetUI(ThingUi *ui = NULL) override;
+	void DoContextMenu(LMouse &m, LView *Parent = NULL) override;
 	void OnCreate() override;
 	bool OnDelete() override;
 	int Compare(LListItem *Arg, ssize_t FieldId) override;
@@ -151,7 +151,7 @@ public:
 	const char *GetFieldText(int Field) override;
 
 	// Misc
-	bool Save(ScribeFolder *Folder = 0) override;
+	bool Save(ScribeFolder *Folder = NULL) override;
 	bool Overlap(Calendar *c);
 
 	// Import/Export
@@ -471,7 +471,7 @@ class CalendarTodoItem : public LListItem
 	void OnColumnNotify(int Col, int64 Data);
 
 public:
-	CalendarTodoItem(ScribeWnd *app, Calendar *todo = 0);
+	CalendarTodoItem(ScribeWnd *app, Calendar *todo = NULL);
 	~CalendarTodoItem();
 
 	const char *GetText(int Col);

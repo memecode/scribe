@@ -24,8 +24,10 @@ ifeq ($(Build),Debug)
 	Tag = d
 	Defs = -D_DEBUG -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
-		-L../libs/build-x64/libchardet \
+		-L../libs/build-x64-debug/libchardet \
+		-L../libs/build-x64-debug/bzip2-1.0.6 \
 		-lchardet \
+		-lbzip2 \
 		-static-libgcc \
 		-lpthread \
 		-ldl \
@@ -33,10 +35,6 @@ ifeq ($(Build),Debug)
 		-ljpeg \
 		-lz \
 		`pkg-config --libs gtk+-3.0` \
-		-laspell-dist-060$(Tag) \
-		-L../libs/aspell-0.60.6.1/linux/$(BuildDir) \
-		-lbzip2$(Tag) \
-		-L../libs/bzip2-1.0.6/linux/$(BuildDir) \
 		-llgi-gtk3$(Tag) \
 		-L../../lgi/trunk/$(BuildDir)
 	Inc =  \
@@ -58,8 +56,10 @@ else
 	CppFlags += -s -Os
 	Defs = -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
-		-L../libs/build-x64/libchardet \
+		-L../libs/build-x64-release/libchardet \
+		-L../libs/build-x64-release/bzip2-1.0.6 \
 		-lchardet \
+		-lbzip2 \
 		-static-libgcc \
 		-lpthread \
 		-ldl \
@@ -67,10 +67,6 @@ else
 		-ljpeg \
 		-lz \
 		`pkg-config --libs gtk+-3.0` \
-		-laspell-dist-060$(Tag) \
-		-L../libs/aspell-0.60.6.1/linux/$(BuildDir) \
-		-lbzip2$(Tag) \
-		-L../libs/bzip2-1.0.6/linux/$(BuildDir) \
 		-llgi-gtk3$(Tag) \
 		-L../../lgi/trunk/$(BuildDir)
 	Inc =  \
@@ -268,177 +264,12 @@ $(BuildDir)/%.o: %.cpp
 
 # Target
 # Executable target
-$(Target) : ../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).so ../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
+$(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	mkdir -p $(BuildDir)
 	@echo Linking $(Target) [$(Build)]...
 	$(CPP) -Wl,-export-dynamic,-R. -o \
 		$(Target) $(Objects) $(Libs)
 	@echo Done.
-
-../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).so : ../libs/aspell-0.60.6.1/common/asc_ctype.hpp \
-	../libs/aspell-0.60.6.1/common/basic_list.hpp \
-	../libs/aspell-0.60.6.1/common/block_slist-t.hpp \
-	../libs/aspell-0.60.6.1/common/block_slist.hpp \
-	../libs/aspell-0.60.6.1/common/cache-t.hpp \
-	../libs/aspell-0.60.6.1/common/cache.cpp \
-	../libs/aspell-0.60.6.1/common/cache.hpp \
-	../libs/aspell-0.60.6.1/common/can_have_error.cpp \
-	../libs/aspell-0.60.6.1/common/can_have_error.hpp \
-	../libs/aspell-0.60.6.1/common/char_vector.hpp \
-	../libs/aspell-0.60.6.1/common/clone_ptr-t.hpp \
-	../libs/aspell-0.60.6.1/common/clone_ptr.hpp \
-	../libs/aspell-0.60.6.1/common/config.cpp \
-	../libs/aspell-0.60.6.1/common/config.hpp \
-	../libs/aspell-0.60.6.1/common/convert.cpp \
-	../libs/aspell-0.60.6.1/common/convert.hpp \
-	../libs/aspell-0.60.6.1/common/copy_ptr.hpp \
-	../libs/aspell-0.60.6.1/common/document_checker.cpp \
-	../libs/aspell-0.60.6.1/common/document_checker.hpp \
-	../libs/aspell-0.60.6.1/common/enumeration.hpp \
-	../libs/aspell-0.60.6.1/common/error.cpp \
-	../libs/aspell-0.60.6.1/common/error.hpp \
-	../libs/aspell-0.60.6.1/common/errors.cpp \
-	../libs/aspell-0.60.6.1/common/errors.hpp \
-	../libs/aspell-0.60.6.1/common/file_data_util.cpp \
-	../libs/aspell-0.60.6.1/common/file_data_util.hpp \
-	../libs/aspell-0.60.6.1/common/file_util.cpp \
-	../libs/aspell-0.60.6.1/common/file_util.hpp \
-	../libs/aspell-0.60.6.1/common/filter.cpp \
-	../libs/aspell-0.60.6.1/common/filter.hpp \
-	../libs/aspell-0.60.6.1/common/filter_char.hpp \
-	../libs/aspell-0.60.6.1/common/filter_char_vector.hpp \
-	../libs/aspell-0.60.6.1/common/fstream.cpp \
-	../libs/aspell-0.60.6.1/common/fstream.hpp \
-	../libs/aspell-0.60.6.1/common/generic_copy_ptr-t.hpp \
-	../libs/aspell-0.60.6.1/common/generic_copy_ptr.hpp \
-	../libs/aspell-0.60.6.1/common/getdata.cpp \
-	../libs/aspell-0.60.6.1/common/getdata.hpp \
-	../libs/aspell-0.60.6.1/common/gettext.h \
-	../libs/aspell-0.60.6.1/common/gettext_init.cpp \
-	../libs/aspell-0.60.6.1/common/hash-t.hpp \
-	../libs/aspell-0.60.6.1/common/hash.hpp \
-	../libs/aspell-0.60.6.1/common/hash_fun.hpp \
-	../libs/aspell-0.60.6.1/common/indiv_filter.hpp \
-	../libs/aspell-0.60.6.1/common/info.cpp \
-	../libs/aspell-0.60.6.1/common/info.hpp \
-	../libs/aspell-0.60.6.1/common/iostream.cpp \
-	../libs/aspell-0.60.6.1/common/iostream.hpp \
-	../libs/aspell-0.60.6.1/common/istream.hpp \
-	../libs/aspell-0.60.6.1/common/itemize.cpp \
-	../libs/aspell-0.60.6.1/common/itemize.hpp \
-	../libs/aspell-0.60.6.1/common/key_info.hpp \
-	../libs/aspell-0.60.6.1/common/lock.hpp \
-	../libs/aspell-0.60.6.1/common/lsort.hpp \
-	../libs/aspell-0.60.6.1/common/mutable_container.hpp \
-	../libs/aspell-0.60.6.1/common/mutable_string.hpp \
-	../libs/aspell-0.60.6.1/common/ndebug.hpp \
-	../libs/aspell-0.60.6.1/common/objstack.cpp \
-	../libs/aspell-0.60.6.1/common/objstack.hpp \
-	../libs/aspell-0.60.6.1/common/ostream.hpp \
-	../libs/aspell-0.60.6.1/common/parm_string.hpp \
-	../libs/aspell-0.60.6.1/common/posib_err.cpp \
-	../libs/aspell-0.60.6.1/common/posib_err.hpp \
-	../libs/aspell-0.60.6.1/common/simple_string.hpp \
-	../libs/aspell-0.60.6.1/common/speller.cpp \
-	../libs/aspell-0.60.6.1/common/speller.hpp \
-	../libs/aspell-0.60.6.1/common/stack_ptr.hpp \
-	../libs/aspell-0.60.6.1/common/string.cpp \
-	../libs/aspell-0.60.6.1/common/string.hpp \
-	../libs/aspell-0.60.6.1/common/string_enumeration.hpp \
-	../libs/aspell-0.60.6.1/common/string_list.cpp \
-	../libs/aspell-0.60.6.1/common/string_list.hpp \
-	../libs/aspell-0.60.6.1/common/string_map.cpp \
-	../libs/aspell-0.60.6.1/common/string_map.hpp \
-	../libs/aspell-0.60.6.1/common/string_pair.hpp \
-	../libs/aspell-0.60.6.1/common/string_pair_enumeration.hpp \
-	../libs/aspell-0.60.6.1/common/strtonum.cpp \
-	../libs/aspell-0.60.6.1/common/strtonum.hpp \
-	../libs/aspell-0.60.6.1/common/tokenizer.cpp \
-	../libs/aspell-0.60.6.1/common/tokenizer.hpp \
-	../libs/aspell-0.60.6.1/common/type_id.hpp \
-	../libs/aspell-0.60.6.1/common/vararray.hpp \
-	../libs/aspell-0.60.6.1/common/vector.hpp \
-	../libs/aspell-0.60.6.1/common/word_list.hpp \
-	../libs/aspell-0.60.6.1/gen/settings.h \
-	../libs/aspell-0.60.6.1/gen/static_filters.src.cpp \
-	../libs/aspell-0.60.6.1/interfaces/cc/aspell.h \
-	../libs/aspell-0.60.6.1/interfaces/cc/pspell.h \
-	../libs/aspell-0.60.6.1/lib/can_have_error-c.cpp \
-	../libs/aspell-0.60.6.1/lib/config-c.cpp \
-	../libs/aspell-0.60.6.1/lib/find_speller.cpp \
-	../libs/aspell-0.60.6.1/lib/info-c.cpp \
-	../libs/aspell-0.60.6.1/lib/new_checker.cpp \
-	../libs/aspell-0.60.6.1/lib/new_config.cpp \
-	../libs/aspell-0.60.6.1/lib/new_filter.cpp \
-	../libs/aspell-0.60.6.1/lib/new_fmode.cpp \
-	../libs/aspell-0.60.6.1/lib/speller-c.cpp \
-	../libs/aspell-0.60.6.1/lib/string_enumeration-c.cpp \
-	../libs/aspell-0.60.6.1/lib/word_list-c.cpp \
-	../libs/aspell-0.60.6.1/linux/dirs.h \
-	../libs/aspell-0.60.6.1/linux/Makefile.linux \
-	../libs/aspell-0.60.6.1/linux/settings.h \
-	../libs/aspell-0.60.6.1/modules/filter/context.cpp \
-	../libs/aspell-0.60.6.1/modules/filter/email.cpp \
-	../libs/aspell-0.60.6.1/modules/filter/nroff.cpp \
-	../libs/aspell-0.60.6.1/modules/filter/sgml.cpp \
-	../libs/aspell-0.60.6.1/modules/filter/tex.cpp \
-	../libs/aspell-0.60.6.1/modules/filter/texinfo.cpp \
-	../libs/aspell-0.60.6.1/modules/filter/url.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/affix.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/affix.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/asuggest.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/block_vector.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/check_list.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/data.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/data.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/data_id.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/data_util.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/editdist.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/editdist.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/editdist2.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/language.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/language.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/leditdist.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/leditdist.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/Makefile.in \
-	../libs/aspell-0.60.6.1/modules/speller/default/matrix.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/multi_ws.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/phonet.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/phonet.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/phonetic.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/phonetic.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/primes.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/primes.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/readonly_ws.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/speller_impl.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/speller_impl.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/suggest.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/suggest.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/typo_editdist.cpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/typo_editdist.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/vector_hash-t.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/vector_hash.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/weights.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/wordinfo.hpp \
-	../libs/aspell-0.60.6.1/modules/speller/default/writable.cpp \
-	../libs/aspell-0.60.6.1/modules/tokenizer/basic.cpp \
-	../libs/aspell-0.60.6.1/prog/prezip.c \
-	../libs/aspell-0.60.6.1/win32/api-glue.cpp \
-	../libs/aspell-0.60.6.1/win32/settings.h
-	export Build=$(Build); \
-	$(MAKE) -C ../libs/aspell-0.60.6.1/linux -f ./Makefile.linux
-
-../libs/bzip2-1.0.6/linux/$(BuildDir)/libbzip2$(Tag).a : ../libs/bzip2-1.0.6/blocksort.c \
-	../libs/bzip2-1.0.6/bzlib.c \
-	../libs/bzip2-1.0.6/bzlib.h \
-	../libs/bzip2-1.0.6/bzlib_private.h \
-	../libs/bzip2-1.0.6/compress.c \
-	../libs/bzip2-1.0.6/crctable.c \
-	../libs/bzip2-1.0.6/decompress.c \
-	../libs/bzip2-1.0.6/huffman.c \
-	../libs/bzip2-1.0.6/randtable.c
-	export Build=$(Build); \
-	$(MAKE) -C ../libs/bzip2-1.0.6/linux -f ./Makefile.linux
 
 ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so : ../../lgi/trunk/include/lgi/common/App.h \
 	../../lgi/trunk/include/lgi/common/Array.h \
@@ -567,6 +398,7 @@ $(Target) : ../libs/aspell-0.60.6.1/linux/$(BuildDir)/libaspell-dist-060$(Tag).s
 	../../lgi/trunk/include/lgi/common/ToolTip.h \
 	../../lgi/trunk/include/lgi/common/TrayIcon.h \
 	../../lgi/trunk/include/lgi/common/Tree.h \
+	../../lgi/trunk/include/lgi/common/TypeToString.h \
 	../../lgi/trunk/include/lgi/common/Undo.h \
 	../../lgi/trunk/include/lgi/common/Unicode.h \
 	../../lgi/trunk/include/lgi/common/UnicodeString.h \
@@ -723,8 +555,6 @@ clean :
 cleanall :
 	rm -rf $(BuildDir) $(Target)
 	@echo Cleaned $(BuildDir) $(Target)
-	+make -C "../libs/aspell-0.60.6.1/linux" -f ./Makefile.linux clean
-	+make -C "../libs/bzip2-1.0.6/linux" -f ./Makefile.linux clean
 	+make -C "../../lgi/trunk" -f ./linux/Makefile.linux clean
 
 VPATH=$(BuildDir) \

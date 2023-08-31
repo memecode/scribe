@@ -122,7 +122,7 @@ class WebdavFld : public LDataPropI
 	int Id, Width;
 
 public:
-	WebdavFld(LDataStoreI *s, WebdavFolder *p = 0, int id = 0, int width = 100);
+	WebdavFld(LDataStoreI *s, WebdavFolder *p = NULL, int id = 0, int width = 100);
 	
 	const char *GetClass() override { return "WebdavFld"; }
 	const char *GetStr(int id) override;
@@ -242,7 +242,7 @@ public:
 	uint64 Size() override { return vCal.Length(); }
 	
 	// LDataI Impl
-	Store3Status Save(LDataI *Parent = 0) override;
+	Store3Status Save(LDataI *Parent = NULL) override;
 	Store3Status Delete(bool ToTrash = true) override;
 	LAutoStreamI GetStream(const char *file, int line) override;
 	bool CopyProps(LDataPropI &p) override;
