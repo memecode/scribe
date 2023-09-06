@@ -478,7 +478,6 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Lgi/OptionsFile.cpp \
 	../../lgi/trunk/src/common/Lgi/Rand.cpp \
 	../../lgi/trunk/src/common/Lgi/Stream.cpp \
-	../../lgi/trunk/src/common/Lgi/SubProcess.cpp \
 	../../lgi/trunk/src/common/Lgi/ThreadCommon.cpp \
 	../../lgi/trunk/src/common/Lgi/ThreadEvent.cpp \
 	../../lgi/trunk/src/common/Lgi/ToolTip.cpp \
@@ -540,7 +539,8 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/linux/Lgi/Thread.cpp \
 	../../lgi/trunk/src/linux/Lgi/View.cpp \
 	../../lgi/trunk/src/linux/Lgi/Widgets.cpp \
-	../../lgi/trunk/src/linux/Lgi/Window.cpp
+	../../lgi/trunk/src/linux/Lgi/Window.cpp \
+	../../lgi/trunk/src/posix/SubProcess.cpp
 	export Build=$(Build); \
 	$(MAKE) -C ../../lgi/trunk -f ./linux/Makefile.linux
 
