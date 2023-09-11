@@ -166,10 +166,7 @@ void ScribePageSetup::Serialize(bool Write)
 			LoadBorder(IDC_RIGHT, OPT_MarginX2);
 			LoadBorder(IDC_BOTTOM, OPT_MarginY2);
 
-			if (Font.GetDescription(s, sizeof(s)))
-			{
-				SetCtrlName(IDC_FONT, s);
-			}
+			SetCtrlName(IDC_FONT, Font.GetDescription());
 		}
 	}
 }
@@ -201,9 +198,7 @@ int ScribePageSetup::OnNotify(LViewI *Ctrl, LNotification n)
 		{
 			Font.DoUI(this, [this](auto fontType)
 			{
-				char s[256];				
-				Font.GetDescription(s, sizeof(s));
-				SetCtrlName(IDC_FONT, s);
+				SetCtrlName(IDC_FONT, Font.GetDescription());
 			});
 			break;
 		}

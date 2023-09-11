@@ -663,15 +663,8 @@ void OptionsDlg::OnCreate()
 
 void OptionsDlg::UpdateFontDescription()
 {
-	char Str[256] = "";
-	if (EditorFont.GetDescription(Str, sizeof(Str)))
-	{
-		SetCtrlName(IDC_FONT, Str);
-	}
-	if (HtmlFont.GetDescription(Str, sizeof(Str)))
-	{
-		SetCtrlName(IDC_HTML_FONT, Str);
-	}
+	SetCtrlName(IDC_FONT, EditorFont.GetDescription());
+	SetCtrlName(IDC_HTML_FONT, HtmlFont.GetDescription());
 }
 
 void OptionsDlg::WriteNativeText(LFile &f, char *t)
