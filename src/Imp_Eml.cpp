@@ -45,7 +45,7 @@ public:
 			}
 			else
 			{
-				char *ext = strrchr(d.GetName(), '.');
+				auto ext = strrchr(d.GetName(), '.');
 				if (ext && !_stricmp(ext, ".eml"))
 				{
 					Email++;
@@ -133,7 +133,7 @@ void ImportEmlFolders(ScribeWnd *App, LProgressPane *Prog, ScribeFolder *Out, ch
 		{
 			if (!d.IsDir())
 			{
-				char *ext = strrchr(d.GetName(), '.');
+				auto ext = strrchr(d.GetName(), '.');
 				if (ext && !_stricmp(ext, ".eml"))
 				{
 					Thing *t = App->CreateItem(MAGIC_MAIL, NULL, false);
