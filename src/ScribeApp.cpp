@@ -9442,7 +9442,7 @@ public:
 		{
 			case M_CHECK_TEXT:
 			{
-				LAutoPtr<LSpellCheck::CheckText> Ct((LSpellCheck::CheckText*)m->A());
+				auto Ct = m->AutoA<LSpellCheck::CheckText>();
 				if (!Ct || !Thread)
 					break;
 				

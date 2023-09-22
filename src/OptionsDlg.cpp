@@ -1090,7 +1090,7 @@ LMessage::Result OptionsDlg::OnEvent(LMessage *m)
 				break;
 			}
 
-			LAutoPtr< LArray<LSpellCheck::LanguageId> > Langs((LArray<LSpellCheck::LanguageId>*)m->A());			
+			auto Langs = m->AutoA< LArray<LSpellCheck::LanguageId> >();
 			if (!Langs)
 			{
 				LgiTrace("%s:%i - Error: No dictionary list.\n", _FL);
@@ -1141,7 +1141,7 @@ LMessage::Result OptionsDlg::OnEvent(LMessage *m)
 			if (!GetViewById(IDC_ADVANCED, Ct))
 				break;
 
-			LAutoPtr< LArray<LSpellCheck::DictionaryId> > Dicts((LArray<LSpellCheck::DictionaryId>*)m->A());			
+			auto Dicts = m->AutoA<LArray<LSpellCheck::DictionaryId>>();			
 			if (!Dicts)
 			{
 				LgiTrace("%s:%i - Error: No dictionary list.\n", _FL);
