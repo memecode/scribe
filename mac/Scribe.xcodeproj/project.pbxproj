@@ -191,11 +191,11 @@
 		34C9A80B23C9615300129861 /* NoFace160.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A7FC23C9615200129861 /* NoFace160.png */; };
 		34C9A80C23C9615300129861 /* NoFace80.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A80A23C9615200129861 /* NoFace80.png */; };
 		34D2892F275B3EF5005961A8 /* RemoteCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D2892E275B3EF5005961A8 /* RemoteCalendarSource.cpp */; };
+		34D6E7162A2022BC0007C7D5 /* libpng16.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6E7102A20229D0007C7D5 /* libpng16.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34DD329823153AF000FA2B35 /* Title.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329423153AF000FA2B35 /* Title.html */; };
 		34DD329923153AF000FA2B35 /* About.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329523153AF000FA2B35 /* About.html */; };
 		34DD329A23153AF000FA2B35 /* Title.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329623153AF000FA2B35 /* Title.png */; };
 		34DD329C23153B2300FA2B35 /* About64px.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329B23153B2300FA2B35 /* About64px.png */; };
-		34E7C47F29DE2CE100C4DEB1 /* libpng16.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34E7C47B29DE2CDB00C4DEB1 /* libpng16.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34E7C48029DE2D6C00C4DEB1 /* libsqlite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D0512629DE2AC100BF0C5A /* libsqlite.a */; };
 		34EE8BB52748A6EC00F12915 /* HomoglyphsTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */; };
 		34EE8BB62748A6EC00F12915 /* Homoglyphs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */; };
@@ -217,7 +217,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 5E1C8B9622EA4278B15F2018;
+			remoteGlobalIDString = CCFA2A78D7924393B38E7020;
 			remoteInfo = chardet;
 		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
@@ -336,57 +336,64 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = B0CAA624B81B4C4DBAB27A1A;
+			remoteGlobalIDString = 7CFB0B10D67E44F193669BA9;
 			remoteInfo = libjpeg9a;
 		};
 		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 378CD3C1F4CC48539EB29497;
+			remoteGlobalIDString = 2077BEACD8B74A8C95CF2977;
 			remoteInfo = zlib;
 		};
 		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = BE7E8891BBF243839FEC8DE3;
+			remoteGlobalIDString = 2196D4AA0CC24A008A71E003;
 			remoteInfo = libiconv;
 		};
-		34E7C47429DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
+		34D6E7092A20229D0007C7D5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = B638AB99162445249E145476;
+			remoteGlobalIDString = 33FE58E567514B8281B98671;
 			remoteInfo = aspell;
 		};
-		34E7C47629DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
+		34D6E70B2A20229D0007C7D5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 75082250E5864A7EBF9D9841;
+			remoteGlobalIDString = 568252B363784D55BEFFB7E5;
 			remoteInfo = btree;
 		};
-		34E7C47829DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
+		34D6E70D2A20229D0007C7D5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = F3D3D4A7D3EA44AD8C46712E;
+			remoteGlobalIDString = 82E66D775D4148BFA624EB01;
 			remoteInfo = bzip2;
 		};
-		34E7C47A29DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
+		34D6E70F2A20229D0007C7D5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = E531CE736DDF466C8243AF28;
+			remoteGlobalIDString = BD01D57AEF9C439D9253D21F;
 			remoteInfo = libpng16;
 		};
-		34E7C47C29DE2CDB00C4DEB1 /* PBXContainerItemProxy */ = {
+		34D6E7112A20229D0007C7D5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = AD60EE03874244B0A38D3871;
+			remoteGlobalIDString = BF9282718D2947EA90B202CB;
 			remoteInfo = libpng16_static;
+		};
+		34D6E7142A2022A70007C7D5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = C8FAFD0DAF7A436EABA553B6;
+			remoteInfo = libpng16;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -397,7 +404,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				34E7C47F29DE2CE100C4DEB1 /* libpng16.dylib in Copy Files */,
+				34D6E7162A2022BC0007C7D5 /* libpng16.dylib in Copy Files */,
 				34C1D42928403CF000FCC98D /* libiconv.dylib in Copy Files */,
 				34C1D42828403CE800FCC98D /* libz_local.dylib in Copy Files */,
 				34C1D42628403CD300FCC98D /* libjpeg9a.dylib in Copy Files */,
@@ -715,17 +722,17 @@
 		34167B2E279FEAAF005422F6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				34E7C47529DE2CDB00C4DEB1 /* libaspell-dist-0.60d.dylib */,
-				34E7C47729DE2CDB00C4DEB1 /* libbtree.dylib */,
-				34E7C47929DE2CDB00C4DEB1 /* libbzip2.dylib */,
+				34D6E70A2A20229D0007C7D5 /* libaspell-dist-0.60d.dylib */,
+				34D6E70C2A20229D0007C7D5 /* libbtree.dylib */,
+				34D6E70E2A20229D0007C7D5 /* libbzip2.dylib */,
 				34167B34279FEAAF005422F6 /* libchardet.dylib */,
 				34D6AEDC283AF0A100897A16 /* example */,
 				34D6AEDE283AF0A100897A16 /* iconv */,
 				34D6AEE0283AF0A100897A16 /* libiconv.dylib */,
 				34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */,
 				34D6AEE4283AF0A100897A16 /* libjpeg9a_static.a */,
-				34E7C47B29DE2CDB00C4DEB1 /* libpng16.dylib */,
-				34E7C47D29DE2CDB00C4DEB1 /* libpng16_static.a */,
+				34D6E7102A20229D0007C7D5 /* libpng16.dylib */,
+				34D6E7122A20229D0007C7D5 /* libpng16_static.a */,
 				34D6AEEA283AF0A100897A16 /* minigzip */,
 				34D6AEEC283AF0A100897A16 /* pngtest */,
 				34D6AEEE283AF0A100897A16 /* libz_local.dylib */,
@@ -1019,7 +1026,6 @@
 		3477C2201CBEFD940028B84B /* Scribe */ = {
 			isa = PBXGroup;
 			children = (
-				345C53CF23F163D30035E9CA /* Scribe.entitlements */,
 				3477C35F1CC226370028B84B /* Core */,
 				34C1BF70238CA21700658B99 /* Help */,
 				3477C2241CBEFD940028B84B /* Lgi */,
@@ -1110,6 +1116,7 @@
 		3477C51E1CC3118E0028B84B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				345C53CF23F163D30035E9CA /* Scribe.entitlements */,
 				3477C22C1CBEFD940028B84B /* Info.plist */,
 				34364F8824CCE9FF00272F13 /* Themes */,
 				347CF82623F64FD00028F610 /* flags.png */,
@@ -1279,6 +1286,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				34D6E7152A2022A70007C7D5 /* PBXTargetDependency */,
 				34D6AEF8283AF0E400897A16 /* PBXTargetDependency */,
 				34D6AEF6283AF0BD00897A16 /* PBXTargetDependency */,
 				34D6AEF2283AF0B300897A16 /* PBXTargetDependency */,
@@ -1456,40 +1464,40 @@
 			remoteRef = 34D6AEEF283AF0A100897A16 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34E7C47529DE2CDB00C4DEB1 /* libaspell-dist-0.60d.dylib */ = {
+		34D6E70A2A20229D0007C7D5 /* libaspell-dist-0.60d.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			path = "libaspell-dist-0.60d.dylib";
-			remoteRef = 34E7C47429DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			remoteRef = 34D6E7092A20229D0007C7D5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34E7C47729DE2CDB00C4DEB1 /* libbtree.dylib */ = {
+		34D6E70C2A20229D0007C7D5 /* libbtree.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			path = libbtree.dylib;
-			remoteRef = 34E7C47629DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			remoteRef = 34D6E70B2A20229D0007C7D5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34E7C47929DE2CDB00C4DEB1 /* libbzip2.dylib */ = {
+		34D6E70E2A20229D0007C7D5 /* libbzip2.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			path = libbzip2.dylib;
-			remoteRef = 34E7C47829DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			remoteRef = 34D6E70D2A20229D0007C7D5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34E7C47B29DE2CDB00C4DEB1 /* libpng16.dylib */ = {
+		34D6E7102A20229D0007C7D5 /* libpng16.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			name = libpng16.dylib;
 			path = libpng16.15.29.0.dylib;
-			remoteRef = 34E7C47A29DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			remoteRef = 34D6E70F2A20229D0007C7D5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34E7C47D29DE2CDB00C4DEB1 /* libpng16_static.a */ = {
+		34D6E7122A20229D0007C7D5 /* libpng16_static.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libpng16_static.a;
-			remoteRef = 34E7C47C29DE2CDB00C4DEB1 /* PBXContainerItemProxy */;
+			remoteRef = 34D6E7112A20229D0007C7D5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1725,6 +1733,11 @@
 			isa = PBXTargetDependency;
 			name = libiconv;
 			targetProxy = 34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */;
+		};
+		34D6E7152A2022A70007C7D5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libpng16;
+			targetProxy = 34D6E7142A2022A70007C7D5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
