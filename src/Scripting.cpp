@@ -73,7 +73,7 @@ struct LScribeScriptPriv : public LStream, public LThread
 		LogMem.Length(64 << 10);
 
 		// Get the log path
-		if (!(LogFile = LgiTraceGetFilePath()))
+		if (!(LogFile = LTraceGetFilePath()))
 		{
 			LAssert(0);
 		}
@@ -84,7 +84,7 @@ struct LScribeScriptPriv : public LStream, public LThread
 
 		// Now register to get trace messages...
 		// ScribeInitTraceStore has all the trace logs before this point
-		LgiTraceSetStream(this);
+		LTraceSetStream(this);
 
 		auto TraceContent = ScribeInitTraceStore.NewLStr();
 		Write(TraceContent.Get(), TraceContent.Length());
@@ -97,7 +97,7 @@ struct LScribeScriptPriv : public LStream, public LThread
 	{
 		Loop = false;
 		
-		LgiTraceSetStream(NULL);
+		LTraceSetStream(NULL);
 		DeleteObj(Console);
 		
 		Event.Signal();

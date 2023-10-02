@@ -13,7 +13,18 @@
 #define IDLE_MAX						(28 * 60 * 1000)
 #define ERROR_RECONNECT_TIMEOUT			(10 * 1000)
 
-//static char HeaderParts[]		= "UID BODY.PEEK[HEADER]"; // If you change this, check HeadersCallback as well
+#define RUN_TEST_CMDS					0
+#if RUN_TEST_CMDS
+const char *TestCmds[] = {
+	"COPY 3455 Trash",
+	"SELECT INBOX",
+	"IDLE",
+	"SELECT TRASH",
+	"SELECT INBOX",
+};
+size_t CurTestCmd = 0;
+#endif
+
 static char BodyTag[]			= "BODY.PEEK[]"; // If you change this, check DownloadCallback as well
 static char MailListingParts[]	= "FLAGS UID RFC822.SIZE BODYSTRUCTURE BODY.PEEK[HEADER]";
 static char OtherListingParts[]	= "FLAGS UID";
@@ -921,6 +932,7 @@ int ImapThread::Main()
 
                             sprintf_s(UidRange, sizeof(UidRange), "%i:*", Inf.LastUid > 0 ? Inf.LastUid + 1 : 1);
 								
+							#if !RUN_TEST_CMDS
 							if (d->Imap->Fetch(	true,
 												UidRange,
 												ListingParts,
@@ -935,6 +947,7 @@ int ImapThread::Main()
 							}
 							else
 								d->Error(_FL, "Fetch failed.");
+							#endif
 						}
 					}
 					break;
@@ -1454,23 +1467,57 @@ int ImapThread::Main()
 			}
 			else if (IdleCount > 5000 / 50)
 			{
-				if (!d->CurrentFolder.Equals(d->InboxPath))
-					d->SelectFolder(d->InboxPath);
+				#if RUN_TEST_CMDS
 
-				if ((InIdle = d->Imap->StartIdle()))
-				{
-					IdleStart = LCurrentTime();
-				}
-				else
-				{
-					// This can happen when the connection dies... so closing
-					// it will allow proper cleanup and re-connection.
-					if (d->Lock(_FL))
+					if (CurTestCmd < CountOf(TestCmds))
 					{
-						d->Imap->Close();
-						d->Unlock();
+						auto parts = LString(TestCmds[CurTestCmd++]).SplitDelimit();
+						if (parts[0] == "COPY")
+						{
+							LAuto	
+							
+							Mv->Parent = d->CurrentFolder;
+							auto &m = Mv->Mail.New();
+							m.Uid = (uint32_t) parts[1].Int();
+							Mv->NewRemote = parts[2];
+
+							PostThread(Mv.Release(), false);
+						}
+						else if (parts[0] == "SELECT")
+						{
+							LAutoPtr<ImapMsg> Sel(new ImapMsg(IMAP_SELECT_FOLDER, _FL));
+							Sel->Fld[0].Remote = parts[1];
+							PostThread(Sel.Release(), false);
+						}
+						else if (parts[0] == "IDLE")
+						{
+							InIdle = d->Imap->StartIdle();
+							CurTestCmd++;
+						}
+						else LAssert(!"Unknown cmd");
 					}
-				}
+
+				#else
+
+					if (!d->CurrentFolder.Equals(d->InboxPath))
+						d->SelectFolder(d->InboxPath);
+
+					if ((InIdle = d->Imap->StartIdle()))
+					{
+						IdleStart = LCurrentTime();
+					}
+					else
+					{
+						// This can happen when the connection dies... so closing
+						// it will allow proper cleanup and re-connection.
+						if (d->Lock(_FL))
+						{
+							d->Imap->Close();
+							d->Unlock();
+						}
+					}
+
+				#endif
 			}
 			else if (IdleCount >= 0)
 			{

@@ -405,6 +405,26 @@ bool ImapFolder::Serialize(bool Write)
 				for (auto it : UidMap)
 					e->InsertTag(it.value);
 
+				#if 0 // def _DEBUG
+				if (!Stricmp(Local.Get(), "C:\\Users\\Matthew\\AppData\\Roaming\\Scribe\\ImapCache\\1045946855\\INBOX"))
+				{
+					e->Children.Sort([](auto a, auto b)
+						{
+							auto idA = (*a)->GetAttr("Uid");
+							auto idB = (*b)->GetAttr("Uid");
+							return (int) (Atoi(idA) - Atoi(idB));
+						});
+					while (e->Children.Length())
+					{
+						auto l = e->Children.Last();
+						if (Atoi(l->GetAttr("Uid")) > 549)
+							e->Children.Delete(l);
+						else
+							break;
+					}
+				}
+				#endif
+
 				if (Debug)
 					LgiTrace("%s:%i - Meta has " LPrintfSizeT " email.\n", _FL, e->Children.Length());
 			}
@@ -520,7 +540,7 @@ Store3Status ImapFolder::Move(LArray<LDataI*> &Items)
 
 	LHashTbl<IntKey<uint32_t>, bool> Has;
 	LArray<LDataI*> Moved;
-	LAutoPtr<ImapMsg> Mv(new ImapMsg(IMAP_MOVE_EMAIL, _FL));	
+	LAutoPtr<ImapMsg> Mv(new ImapMsg(IMAP_MOVE_EMAIL, _FL));
 	for (unsigned n=0; n<Items.Length(); n++)
 	{
 		if (Items[n]->Type() == MAGIC_MAIL)
