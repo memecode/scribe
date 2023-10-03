@@ -264,7 +264,7 @@ struct SocketIpc :
 	void OnArgs(LString Args)
 	{
 		TRACE("%s:%i - OnArgs: %s\n", _FL, Args.Get());
-		auto result = View->RunCallback(
+		auto result = View->RunCallback<int>(
 			[this, Args]()
 			{
 				OsAppArguments AppArgs(0, 0);
@@ -308,7 +308,7 @@ struct SocketIpc :
 			#endif
 
 			// Run the callback in the GUI thread and wait for it to complete...
-			auto result = View->RunCallback(
+			auto result = View->RunCallback<int>(
 				[this, callback = c->callback, status]()
 				{
 					callback(status);

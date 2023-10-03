@@ -532,10 +532,12 @@ const char *ImapMail::GetStr(int id)
 				if (!MsgId)
 				{
 					auto Headers = GetStr(FIELD_INTERNET_HEADER);
-					MsgId = LDecodeRfc2047(LGetHeaderField(Headers, "Message-ID"));
+					auto MsgIdHdr = LGetHeaderField(Headers, "Message-ID");
+					MsgId = LDecodeRfc2047(MsgIdHdr).Replace(" ", "").Replace("\n", "");
 					if (MsgId)
 					{
-					    LAssert(!strchr(MsgId, '\n'));
+						auto hasNewLine = strchr(MsgId, '\n');
+					    LAssert(!hasNewLine);
 					    
 					    if (m)
 					    {

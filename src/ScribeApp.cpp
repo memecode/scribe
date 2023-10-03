@@ -3829,24 +3829,25 @@ bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 				Online.Add(i);
 		}
 
-		LAssert(Online.Length() > 0);
-
-		auto Dlg = new LShutdown(Online);
-		Dlg->DoModal([this](auto dlg, auto id)
+		if (Online.Length() > 0)
 		{
-			if (id)
+			auto Dlg = new LShutdown(Online);
+			Dlg->DoModal([this](auto dlg, auto id)
 			{
-				ScribeState = ScribeExiting;
-				LCloseApp();
-			}
-			else
-			{
-				ScribeState = ScribeRunning;
-				Visible(true);
-			}
-			delete dlg;
-		});
-		return false; // At the very minimum the app has to wait for the user to respond.
+				if (id)
+				{
+					ScribeState = ScribeExiting;
+					LCloseApp();
+				}
+				else
+				{
+					ScribeState = ScribeRunning;
+					Visible(true);
+				}
+				delete dlg;
+			});
+			return false; // At the very minimum the app has to wait for the user to respond.
+		}
 	}
 	else
 	{
@@ -9072,10 +9073,11 @@ LPrinter *ScribeWnd::GetPrinter()
 int ScribeWnd::GetActiveThreads()
 {
 	int Status = 0;
-	for (auto i: Accounts)
+	for (ScribeAccount *i: Accounts)
 	{
 		if (i->IsOnline())
 		{
+			LgiTrace("ActiveThread:%s\n", i->Receive.Server().Str());
 			Status++;
 		}
 	}

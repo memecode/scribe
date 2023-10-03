@@ -954,7 +954,7 @@ void ImapStore::OnEvent(void *Param)
 					    }
 					}
 
-					LgiTrace("\tCallback->OnDelete %i\n", (int)Lst.Length());
+					// LgiTrace("\tCallback->OnDelete %i\n", (int)Lst.Length());
 					if (!Callback || Callback->OnDelete(Parent, Lst))
 					{
 						for (unsigned i=0; i<Lst.Length(); i++)
@@ -1179,7 +1179,7 @@ void ImapStore::OnEvent(void *Param)
 							ImapMail *Email = f->Mail.a.BinarySearch([Uid=e.Uid](auto a)
 							{
 								return (int32_t)a->Uid - (int32_t)Uid;
-							});
+							},	NULL);
 						#else
 							// On large folders this is sooooo slow...
 							ImapMail *Email = f->GetMail(e.Uid);

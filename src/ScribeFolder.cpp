@@ -2935,7 +2935,10 @@ class MoveToState
 	LArray<Store3Status> Status; // Per item status
 
 	// State
-	LArray<LDataI*> InStoreMove; // Object in the same store...
+	
+	// Group all the mail in the same store into one operation:
+	LArray<LDataI*> InStoreMove;
+	
 	LDataI *FolderObj = NULL;
 	LDataStoreI *FolderStore = NULL;
 	ScribeMailType NewBayesType = BayesMailUnknown;
@@ -3139,16 +3142,15 @@ public:
 
 	void OnMovesDone()
 	{
+		Store3Status s = Store3NotImpl;
+
 		if (InStoreMove.Length())
 		{
-			Store3Status s = Store3NotImpl;
 			auto Fld = dynamic_cast<LDataFolderI*>(Folder->GetObject());
 			if (!Fld)
 				s = Store3Error;
 			else
 				s = FolderStore->Move(Fld, InStoreMove);
-
-			Result = s >= Store3Delayed;
 
 			for (auto p: Map)
 			{
@@ -3162,6 +3164,14 @@ public:
 					p.key->OnMove();
 				}
 			}
+		}
+
+		// Calculate result based on the Status array:
+		Result = true;
+		for (auto s: Status)
+		{
+			if (s < Store3Delayed)
+				Result = false;
 		}
 
 		if (BuildDynMenus)
