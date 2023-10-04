@@ -192,21 +192,21 @@ class ImapStore : public LDataStoreI
 	LVariant Host, User, Pass;
 	int Port;
 	int ConnectFlags;
-	LDataEventsI *Callback;
-	ImapFolder *Root;
-	char *Cache;
+	LDataEventsI *Callback = NULL;
+	ImapFolder *Root = NULL;
+	char *Cache = NULL;
 	int AccountId;
-	ImapThread *Thread;
+	ImapThread *Thread = NULL;
 	LStream *Log;
-	ScribeAccountletStatusIcon Online;
+	ScribeAccountletStatusIcon Online = STATUS_OFFLINE;
 	LArray<ImapMsg*> Listing;
-	int64 LastPulse;
-	int64 SelectTime;
-	int64 ListingTime;
+	int64 LastPulse = 0;
+	int64 SelectTime = 0;
+	int64 ListingTime = 0;
 	LArray<ImapMsg*> Msgs;
 	LAutoString ErrorMsg;
 	LAutoPtr<LThread> FolderLoader;
-	MailProtocolProgress *ItemProgress, *DataProgress;
+	MailProtocolProgress *ItemProgress = NULL, *DataProgress = NULL;
 	
 	LAutoPtr<ProtocolSettingStore> SettingStore;
 
@@ -506,6 +506,8 @@ class ImapFolder : public LDataFolderI, public ImapFolderData
 	LArray<std::function<void(Store3Status)>> OnLoad;
 
 public:
+	static int Instances;
+
 	ImapStore *Store;
 	Store3SystemFolder System;
 	

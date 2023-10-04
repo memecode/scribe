@@ -17,6 +17,8 @@
 #include "lgi/common/DateTime.h"
 #include "lgi/common/EmojiFont.h"
 
+#include "Store3Imap/ScribeImap.h"
+
 ScribeApp::ScribeApp(OsAppArguments &AppArgs, LAppArguments *Opts) :
 	LApp(AppArgs, "Scribe", Opts)
 {
@@ -142,5 +144,11 @@ int LgiMain(OsAppArguments &AppArgs)
 	    }
 	}
 
+	DeleteObj(App.AppWnd);
+	LResources::FreeAllInstances();
+	LAssert(ImapFolder::Instances == 0);
+	LgiTrace("%s:%i - LXmlTag::Instances: %i\n", _FL, LXmlTag::Instances);
+	LAssert(LXmlTag::Instances == 0);
+	LgiTrace("%s:%i - LPalette inst: %i\n", _FL, (int)LPalette::Instances);
 	return 0;
 }

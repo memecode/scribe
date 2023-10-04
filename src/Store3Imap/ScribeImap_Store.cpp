@@ -75,12 +75,6 @@ ImapStore::ImapStore(char *host,
 					int accountid,
 					LAutoPtr<ProtocolSettingStore> store)
 {
-	Root = NULL;
-	Cache = 0;
-	Online = STATUS_OFFLINE;
-	LastPulse = 0;
-	ListingTime = SelectTime = 0;
-
 	AccountId = accountid;
 	Host = host;
 	Port = port;
