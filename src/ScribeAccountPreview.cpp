@@ -152,7 +152,7 @@ ScribeAccountPreview::ScribeAccountPreview(ScribeWnd *app, LArray<ScribeAccount*
 	
 	LRect WndPos(100, 100, 800, 600);
 
-	LAutoString Nme;
+	LString Nme;
 	LoadFromResource(	IDD_POPVIEW,
 						this,
 						NULL,

@@ -1029,7 +1029,7 @@ FindWnd::FindWnd(ScribeWnd *app, ScribeFolder *folder)
 	SetQuitOnClose(false);
 
 	// Setup controls
-	LAutoString ResName;
+	LString ResName;
 	LRect r;
 	if (LoadFromResource(IDD_FIND, this, &r, &ResName))
 	{

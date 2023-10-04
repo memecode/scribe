@@ -742,7 +742,7 @@ GroupUi::GroupUi(ContactGroup *item) : ThingUi(item, "Contact Group")
 	Edit = 0;
 
 	LRect p;
-	LAutoString n;
+	LString n;
 	if (LoadFromResource(IDD_GROUP, this, &p, &n))
 	{
 		SetPos(p);

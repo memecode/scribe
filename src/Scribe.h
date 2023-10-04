@@ -2544,7 +2544,7 @@ public:
 	void			OnSpellerSettingChange();
 	bool			OnMailTransferEvent(MailTransferEvent *e);
 	LViewI			*GetView() { return this; }
-	char			*GetUiTags();
+	const char		*GetUiTags();
 
 	struct MailStoreUpgradeParams
 	{

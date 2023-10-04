@@ -346,7 +346,7 @@ AccountStatusPanel::AccountStatusPanel(ScribeWnd *app, LImageList *imglst) :
 	}
 
 	LRect *Bounds = ImgLst ? ImgLst->GetBounds() : 0;
-	LAutoString n;
+	LString n;
 	LRect p;
 	if (Bounds && LoadFromResource(IDD_STATUS, this, &p, &n))
 	{

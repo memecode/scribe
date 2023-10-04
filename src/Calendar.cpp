@@ -29,8 +29,8 @@
 #include "ObjectInspector.h"
 
 #define MAX_RECUR			1024
-#define DEBUG_REMINDER		1
-#define DEBUG_DATES			1
+#define DEBUG_REMINDER		0
+#define DEBUG_DATES			0
 #if DEBUG_DATES
 #define LOG_DEBUG(...)		LgiTrace(__VA_ARGS__)
 #else

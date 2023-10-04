@@ -1993,7 +1993,7 @@ ContactUi::ContactUi(Contact *item) :
 	if (Attach(0))
 	{
 		LRect p;
-		LAutoString s(NewStr("Contact"));		
+		LString s = "Contact";
 		if (LoadFromResource(IDD_CONTACT, this, &p, &s))
 		{
 			// size/position

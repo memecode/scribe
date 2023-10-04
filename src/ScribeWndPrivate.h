@@ -76,7 +76,7 @@ public:
 	int				NewMailTimeout = -1;
 	bool			SendAfterReceive = false;
 	bool			IngoreOnClose = false;
-	LAutoString		UiTags;
+	LString			UiTags;
 	LAutoPtr<LGrowl> Growl;
 	LArray<Contact*> TrayMenuContacts;
 	bool            ExitAfterSend = false;

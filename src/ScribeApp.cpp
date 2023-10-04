@@ -2068,7 +2068,7 @@ HttpImageThread *ScribeWnd::GetImageLoader()
 	return d->ImageLoader;
 }
 
-char *ScribeWnd::GetUiTags()
+const char *ScribeWnd::GetUiTags()
 {
 	if (!d->UiTags)
 	{
@@ -2095,7 +2095,7 @@ char *ScribeWnd::GetUiTags()
 			sprintf_s(UiTags+Len, sizeof(UiTags)-Len, " %s", Tags.Str());
 		}
 
-		d->UiTags.Reset(NewStr(UiTags));
+		d->UiTags = UiTags;
 	}
 
 	return d->UiTags;
@@ -3374,6 +3374,8 @@ void ScribeWnd::OnCommandLine()
 {
 	// Check command line args
 	LString Str, File;
+
+	Visible(true);
 	
 	bool CreateMail = false;
 	CreateMail = LAppInst->GetOption("m", Str);
@@ -3463,7 +3465,7 @@ void ScribeWnd::OnCommandLine()
 				NewEmail->SetFlags(MAIL_CREATED | MAIL_READY_TO_SEND | NewEmail->GetFlags());
 				NewEmail->Save();
 				OnCommand(IDM_SEND_MAIL, 0,
-					#ifndef __GTK_H__
+					#if LGI_VIEW_HANDLE
 					Handle()
 					#else
 					NULL
@@ -5135,8 +5137,6 @@ void ScribeWnd::SetupUi()
 		SetPos(r);
 		MoveToCenter();
 	}
-
-	// Visible(true);
 
 	// Main toolbar
 	Commands = LoadToolbar(this, GetResourceFile(ResToolbarFile), ToolbarImgs);
