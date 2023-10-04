@@ -317,7 +317,7 @@ struct SocketIpc :
 				5000, // no idea what this should be...?
 				this);
 
-			LAssert(result >= 0);
+			LAssert(result);
 		}
 	}
 

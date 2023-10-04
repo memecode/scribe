@@ -13,7 +13,6 @@
 		3416149A238484F800A65477 /* WebdavFolder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161495238484F700A65477 /* WebdavFolder.cpp */; };
 		3416149B238484F800A65477 /* WebdavCalendar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161496238484F700A65477 /* WebdavCalendar.cpp */; };
 		3416149C238484F800A65477 /* WebdavThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161498238484F800A65477 /* WebdavThread.cpp */; };
-		34167B38279FEBA8005422F6 /* libchardet.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; };
 		341A02B823BD702800F0FF48 /* SpellCheckAspell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 341A02B723BD702800F0FF48 /* SpellCheckAspell.cpp */; };
 		341A78802699058600872FEB /* DatePopup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 341A787F2699058600872FEB /* DatePopup.cpp */; };
 		341BF47123231D0700BC3AB0 /* Jpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 341BF47023231D0600BC3AB0 /* Jpeg.cpp */; };
@@ -159,15 +158,15 @@
 		347CF82723F64FD00028F610 /* flags.png in Resources */ = {isa = PBXBuildFile; fileRef = 347CF82623F64FD00028F610 /* flags.png */; };
 		3486E9E22A86E8CA009BDA7E /* UnitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */; };
 		34918095222F1C6F00944FC4 /* OAuth2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34918094222F1C6F00944FC4 /* OAuth2.cpp */; };
-		3497D54F2399D288009FCC14 /* Add Senders To Contacts.script in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3497D5482399D260009FCC14 /* Add Senders To Contacts.script */; };
-		3497D5502399D288009FCC14 /* Delete Attachments.script in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3497D5472399D260009FCC14 /* Delete Attachments.script */; };
-		3497D5512399D288009FCC14 /* Delete Duplicate Messages.script in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3497D5492399D260009FCC14 /* Delete Duplicate Messages.script */; };
-		3497D5522399D288009FCC14 /* Mail Filters Menu.script in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3497D5462399D260009FCC14 /* Mail Filters Menu.script */; };
-		3497D5542399D2AB009FCC14 /* resdefs.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3497D5532399D2A5009FCC14 /* resdefs.h */; };
+		3497D54F2399D288009FCC14 /* Add Senders To Contacts.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5482399D260009FCC14 /* Add Senders To Contacts.script */; };
+		3497D5502399D288009FCC14 /* Delete Attachments.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5472399D260009FCC14 /* Delete Attachments.script */; };
+		3497D5512399D288009FCC14 /* Delete Duplicate Messages.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5492399D260009FCC14 /* Delete Duplicate Messages.script */; };
+		3497D5522399D288009FCC14 /* Mail Filters Menu.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5462399D260009FCC14 /* Mail Filters Menu.script */; };
+		3497D5542399D2AB009FCC14 /* resdefs.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5532399D2A5009FCC14 /* resdefs.h */; };
 		349AB0BE217B395B00573982 /* Png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 349AB0BD217B395B00573982 /* Png.cpp */; };
 		349AB0C0217B3D9500573982 /* scribe-mac-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */; };
 		34A66681237968A200ED0212 /* FolderCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A66680237968A200ED0212 /* FolderCalendarSource.cpp */; };
-		34AB68F6275240BC0045380B /* ScribeScripts.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34AB68E8275240B40045380B /* ScribeScripts.h */; };
+		34AB68F6275240BC0045380B /* ScribeScripts.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 34AB68E8275240B40045380B /* ScribeScripts.h */; };
 		34C1BF90238CAEC500658B99 /* calendar.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF71238CA23500658B99 /* calendar.html */; };
 		34C1BF91238CAEC500658B99 /* contacts.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF75238CA23500658B99 /* contacts.html */; };
 		34C1BF92238CAEC500658B99 /* email.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF73238CA23500658B99 /* email.html */; };
@@ -184,14 +183,12 @@
 		34C1BF9D238CAEC500658B99 /* scripting.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF7A238CA23600658B99 /* scripting.html */; };
 		34C1BF9E238CAEC500658B99 /* ui.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF74238CA23500658B99 /* ui.html */; };
 		34C1BF9F238CB05A00658B99 /* About64px.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34DD329B23153B2300FA2B35 /* About64px.png */; };
-		34C1D42528403C2400FCC98D /* libchardet.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34167B34279FEAAF005422F6 /* libchardet.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34C1D42628403CD300FCC98D /* libjpeg9a.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34C1D42828403CE800FCC98D /* libz_local.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEEE283AF0A100897A16 /* libz_local.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34C1D42928403CF000FCC98D /* libiconv.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6AEE0283AF0A100897A16 /* libiconv.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34C9A80B23C9615300129861 /* NoFace160.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A7FC23C9615200129861 /* NoFace160.png */; };
 		34C9A80C23C9615300129861 /* NoFace80.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A80A23C9615200129861 /* NoFace80.png */; };
 		34D2892F275B3EF5005961A8 /* RemoteCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D2892E275B3EF5005961A8 /* RemoteCalendarSource.cpp */; };
-		34D6E7162A2022BC0007C7D5 /* libpng16.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34D6E7102A20229D0007C7D5 /* libpng16.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34DB5ADA2ACD8C9C00321094 /* libchardet.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 348280942ACD890100BF085D /* libchardet.dylib */; };
+		34DB5ADD2ACD8DE100321094 /* PostBuildStep.py in Resources */ = {isa = PBXBuildFile; fileRef = 34DB5ADC2ACD8DE100321094 /* PostBuildStep.py */; };
+		34DB5ADE2ACD8DFC00321094 /* libpng16.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 348280A02ACD890100BF085D /* libpng16.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34DD329823153AF000FA2B35 /* Title.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329423153AF000FA2B35 /* Title.html */; };
 		34DD329923153AF000FA2B35 /* About.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329523153AF000FA2B35 /* About.html */; };
 		34DD329A23153AF000FA2B35 /* Title.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329623153AF000FA2B35 /* Title.png */; };
@@ -206,20 +203,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		34167B33279FEAAF005422F6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 87DEE21A1B6B43ACB718C926;
-			remoteInfo = chardet;
-		};
-		34167B35279FEAC2005422F6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = CCFA2A78D7924393B38E7020;
-			remoteInfo = chardet;
-		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
@@ -262,138 +245,117 @@
 			remoteGlobalIDString = 3477C4A71CC2792F0028B84B;
 			remoteInfo = Btree;
 		};
+		3482808D2ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2F474E9C46524B909629D2C2;
+			remoteInfo = aspell;
+		};
+		3482808F2ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A00EF314707A446AA55F7D40;
+			remoteInfo = btree;
+		};
+		348280912ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F236D1615460423691D0FEEE;
+			remoteInfo = bzip2;
+		};
+		348280932ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C034592DBEDF4C3098EC7B43;
+			remoteInfo = chardet;
+		};
+		348280952ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 901C93CF967B4021A04FE287;
+			remoteInfo = example;
+		};
+		348280972ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9F598A60FC4F498F99D2F6FF;
+			remoteInfo = iconv;
+		};
+		348280992ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0DF348D3D63341169FCF278F;
+			remoteInfo = libiconv;
+		};
+		3482809B2ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BC01C76E1BF94CC499C8F49D;
+			remoteInfo = libjpeg9a;
+		};
+		3482809D2ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B111C2B1C2204643B7212187;
+			remoteInfo = libjpeg9a_static;
+		};
+		3482809F2ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F730C428661C49BC98047F8D;
+			remoteInfo = libpng16;
+		};
+		348280A12ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E8A3F991621A4291982E8E3C;
+			remoteInfo = libpng16_static;
+		};
+		348280A32ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BED4680D5CA94941871355D2;
+			remoteInfo = minigzip;
+		};
+		348280A52ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B41FD41E18884569AB367A8E;
+			remoteInfo = pngtest;
+		};
+		348280A72ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AD953E522FD849BEBEEFC038;
+			remoteInfo = zlib;
+		};
+		348280A92ACD890100BF085D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 99E9008333CC4139B761FD7E;
+			remoteInfo = zlib_static;
+		};
 		34D0512529DE2AC100BF0C5A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 3477C4FC1CC3021B0028B84B;
 			remoteInfo = sqlite;
-		};
-		34D6AEDB283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FF72102AEA49492FB655D92A;
-			remoteInfo = example;
-		};
-		34D6AEDD283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 594564A70D2647C992398CB6;
-			remoteInfo = iconv;
-		};
-		34D6AEDF283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B3BAD2B1AEF34065AAEDBBFC;
-			remoteInfo = libiconv;
-		};
-		34D6AEE1283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 752092F92C094FEFA6322AA9;
-			remoteInfo = libjpeg9a;
-		};
-		34D6AEE3283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1860D095485B4874BD28CD68;
-			remoteInfo = libjpeg9a_static;
-		};
-		34D6AEE9283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 505D5B97A5D94B03A6D24F5B;
-			remoteInfo = minigzip;
-		};
-		34D6AEEB283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 41E3CCF185644EB3A43F7D64;
-			remoteInfo = pngtest;
-		};
-		34D6AEED283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 37BD6E3953634A6B9444B6F7;
-			remoteInfo = zlib;
-		};
-		34D6AEEF283AF0A100897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 619D79627D09459B9BF2FFDC;
-			remoteInfo = zlib_static;
-		};
-		34D6AEF1283AF0B300897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 7CFB0B10D67E44F193669BA9;
-			remoteInfo = libjpeg9a;
-		};
-		34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 2077BEACD8B74A8C95CF2977;
-			remoteInfo = zlib;
-		};
-		34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 2196D4AA0CC24A008A71E003;
-			remoteInfo = libiconv;
-		};
-		34D6E7092A20229D0007C7D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 33FE58E567514B8281B98671;
-			remoteInfo = aspell;
-		};
-		34D6E70B2A20229D0007C7D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 568252B363784D55BEFFB7E5;
-			remoteInfo = btree;
-		};
-		34D6E70D2A20229D0007C7D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 82E66D775D4148BFA624EB01;
-			remoteInfo = bzip2;
-		};
-		34D6E70F2A20229D0007C7D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = BD01D57AEF9C439D9253D21F;
-			remoteInfo = libpng16;
-		};
-		34D6E7112A20229D0007C7D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = BF9282718D2947EA90B202CB;
-			remoteInfo = libpng16_static;
-		};
-		34D6E7142A2022A70007C7D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = C8FAFD0DAF7A436EABA553B6;
-			remoteInfo = libpng16;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -404,11 +366,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				34D6E7162A2022BC0007C7D5 /* libpng16.dylib in Copy Files */,
-				34C1D42928403CF000FCC98D /* libiconv.dylib in Copy Files */,
-				34C1D42828403CE800FCC98D /* libz_local.dylib in Copy Files */,
-				34C1D42628403CD300FCC98D /* libjpeg9a.dylib in Copy Files */,
-				34C1D42528403C2400FCC98D /* libchardet.dylib in Copy Files */,
+				34DB5ADE2ACD8DFC00321094 /* libpng16.dylib in Copy Files */,
 				340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */,
 				34F1BD0D2442B03B0062DCF4 /* libcrypto.3.dylib in Copy Files */,
 				34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in Copy Files */,
@@ -416,19 +374,20 @@
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3497D54E2399D27A009FCC14 /* CopyFiles */ = {
+		3497D54E2399D27A009FCC14 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = Scripts;
 			dstSubfolderSpec = 7;
 			files = (
-				34AB68F6275240BC0045380B /* ScribeScripts.h in CopyFiles */,
-				3497D5542399D2AB009FCC14 /* resdefs.h in CopyFiles */,
-				3497D54F2399D288009FCC14 /* Add Senders To Contacts.script in CopyFiles */,
-				3497D5502399D288009FCC14 /* Delete Attachments.script in CopyFiles */,
-				3497D5512399D288009FCC14 /* Delete Duplicate Messages.script in CopyFiles */,
-				3497D5522399D288009FCC14 /* Mail Filters Menu.script in CopyFiles */,
+				34AB68F6275240BC0045380B /* ScribeScripts.h in Copy Files */,
+				3497D5542399D2AB009FCC14 /* resdefs.h in Copy Files */,
+				3497D54F2399D288009FCC14 /* Add Senders To Contacts.script in Copy Files */,
+				3497D5502399D288009FCC14 /* Delete Attachments.script in Copy Files */,
+				3497D5512399D288009FCC14 /* Delete Duplicate Messages.script in Copy Files */,
+				3497D5522399D288009FCC14 /* Mail Filters Menu.script in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		34C1BF8F238CAEAD00658B99 /* CopyFiles */ = {
@@ -536,7 +495,7 @@
 		34723EA62A8EE5D200EC80E8 /* ScribeIpc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeIpc.cpp; path = ../../src/ScribeIpc.cpp; sourceTree = "<group>"; };
 		34723EB62A8EE5D200EC80E8 /* ScribeIpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeIpc.h; path = ../../src/ScribeIpc.h; sourceTree = "<group>"; };
 		34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LgiCocoa.xcodeproj; path = ../../../Lgi/trunk/src/mac/cocoa/LgiCocoa.xcodeproj; sourceTree = "<group>"; };
-		34749B52278B06A200C8197E /* scribeLibs.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = scribeLibs.xcodeproj; path = "../../libs/build-x64/scribeLibs.xcodeproj"; sourceTree = "<group>"; };
+		34749B52278B06A200C8197E /* scribeLibs.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = scribeLibs.xcodeproj; path = "../../libs/build-x64-release/scribeLibs.xcodeproj"; sourceTree = "<group>"; };
 		3477C21E1CBEFD940028B84B /* Scribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scribe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3477C22C1CBEFD940028B84B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3477C3571CC1149F0028B84B /* LgiMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LgiMain.cpp; path = ../../../../Lgi/trunk/src/common/Lgi/LgiMain.cpp; sourceTree = "<group>"; };
@@ -685,6 +644,7 @@
 		34C9A7FC23C9615200129861 /* NoFace160.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NoFace160.png; path = ../../Resources/NoFace160.png; sourceTree = "<group>"; };
 		34C9A80A23C9615200129861 /* NoFace80.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NoFace80.png; path = ../../Resources/NoFace80.png; sourceTree = "<group>"; };
 		34D2892E275B3EF5005961A8 /* RemoteCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RemoteCalendarSource.cpp; path = ../../src/RemoteCalendarSource.cpp; sourceTree = "<group>"; };
+		34DB5ADC2ACD8DE100321094 /* PostBuildStep.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = PostBuildStep.py; sourceTree = SOURCE_ROOT; };
 		34DD329423153AF000FA2B35 /* Title.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = Title.html; path = ../../Resources/Title.html; sourceTree = "<group>"; };
 		34DD329523153AF000FA2B35 /* About.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = About.html; path = ../../Resources/About.html; sourceTree = "<group>"; };
 		34DD329623153AF000FA2B35 /* Title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Title.png; path = ../../Resources/Title.png; sourceTree = "<group>"; };
@@ -707,10 +667,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34DB5ADA2ACD8C9C00321094 /* libchardet.dylib in Frameworks */,
 				34E7C48029DE2D6C00C4DEB1 /* libsqlite.a in Frameworks */,
 				3477C5231CC315FC0028B84B /* Cocoa.framework in Frameworks */,
 				34749B5F278B08B200C8197E /* LgiCocoa.framework in Frameworks */,
-				34167B38279FEBA8005422F6 /* libchardet.dylib in Frameworks */,
 				3474FC5F226DE0960064E0AD /* libBtree.a in Frameworks */,
 				3474FC60226DE0960064E0AD /* libbzip2.a in Frameworks */,
 			);
@@ -719,28 +679,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		34167B2E279FEAAF005422F6 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				34D6E70A2A20229D0007C7D5 /* libaspell-dist-0.60d.dylib */,
-				34D6E70C2A20229D0007C7D5 /* libbtree.dylib */,
-				34D6E70E2A20229D0007C7D5 /* libbzip2.dylib */,
-				34167B34279FEAAF005422F6 /* libchardet.dylib */,
-				34D6AEDC283AF0A100897A16 /* example */,
-				34D6AEDE283AF0A100897A16 /* iconv */,
-				34D6AEE0283AF0A100897A16 /* libiconv.dylib */,
-				34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */,
-				34D6AEE4283AF0A100897A16 /* libjpeg9a_static.a */,
-				34D6E7102A20229D0007C7D5 /* libpng16.dylib */,
-				34D6E7122A20229D0007C7D5 /* libpng16_static.a */,
-				34D6AEEA283AF0A100897A16 /* minigzip */,
-				34D6AEEC283AF0A100897A16 /* pngtest */,
-				34D6AEEE283AF0A100897A16 /* libz_local.dylib */,
-				34D6AEF0283AF0A100897A16 /* libzlib_static.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		34417D83205FB69400D2E80C /* Utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -1116,6 +1054,7 @@
 		3477C51E1CC3118E0028B84B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				34DB5ADC2ACD8DE100321094 /* PostBuildStep.py */,
 				345C53CF23F163D30035E9CA /* Scribe.entitlements */,
 				3477C22C1CBEFD940028B84B /* Info.plist */,
 				34364F8824CCE9FF00272F13 /* Themes */,
@@ -1150,6 +1089,28 @@
 				3477C5221CC315FC0028B84B /* Cocoa.framework */,
 			);
 			name = Link;
+			sourceTree = "<group>";
+		};
+		348280792ACD890100BF085D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3482808E2ACD890100BF085D /* libaspell-dist-0.60d.dylib */,
+				348280902ACD890100BF085D /* libbtree.dylib */,
+				348280922ACD890100BF085D /* libbzip2.dylib */,
+				348280942ACD890100BF085D /* libchardet.dylib */,
+				348280962ACD890100BF085D /* example */,
+				348280982ACD890100BF085D /* iconv */,
+				3482809A2ACD890100BF085D /* libiconv.dylib */,
+				3482809C2ACD890100BF085D /* libjpeg9a.dylib */,
+				3482809E2ACD890100BF085D /* libjpeg9a_static.a */,
+				348280A02ACD890100BF085D /* libpng16.dylib */,
+				348280A22ACD890100BF085D /* libpng16_static.a */,
+				348280A42ACD890100BF085D /* minigzip */,
+				348280A62ACD890100BF085D /* pngtest */,
+				348280A82ACD890100BF085D /* libz_local.dylib */,
+				348280AA2ACD890100BF085D /* libzlib_static.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		3486E9D12A86E8AB009BDA7E /* Tests */ = {
@@ -1280,18 +1241,13 @@
 				3477C21C1CBEFD940028B84B /* Resources */,
 				3477C51C1CC304850028B84B /* Copy Files */,
 				34C1BF8F238CAEAD00658B99 /* CopyFiles */,
-				3497D54E2399D27A009FCC14 /* CopyFiles */,
+				3497D54E2399D27A009FCC14 /* Copy Files */,
 				3488015523FCF01800D24534 /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				34D6E7152A2022A70007C7D5 /* PBXTargetDependency */,
-				34D6AEF8283AF0E400897A16 /* PBXTargetDependency */,
-				34D6AEF6283AF0BD00897A16 /* PBXTargetDependency */,
-				34D6AEF2283AF0B300897A16 /* PBXTargetDependency */,
 				34749B5B278B06B900C8197E /* PBXTargetDependency */,
-				34167B36279FEAC2005422F6 /* PBXTargetDependency */,
 				3474FC5A226DE08D0064E0AD /* PBXTargetDependency */,
 				3474FC5C226DE08D0064E0AD /* PBXTargetDependency */,
 			);
@@ -1349,7 +1305,7 @@
 					ProjectRef = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
 				},
 				{
-					ProductGroup = 34167B2E279FEAAF005422F6 /* Products */;
+					ProductGroup = 348280792ACD890100BF085D /* Products */;
 					ProjectRef = 34749B52278B06A200C8197E /* scribeLibs.xcodeproj */;
 				},
 				{
@@ -1365,13 +1321,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		34167B34279FEAAF005422F6 /* libchardet.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libchardet.dylib;
-			remoteRef = 34167B33279FEAAF005422F6 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		34749B44278B042500C8197E /* LgiCocoa.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -1393,111 +1342,118 @@
 			remoteRef = 3474FC4D226DCCDD0064E0AD /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		3482808E2ACD890100BF085D /* libaspell-dist-0.60d.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = "libaspell-dist-0.60d.dylib";
+			remoteRef = 3482808D2ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280902ACD890100BF085D /* libbtree.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libbtree.dylib;
+			remoteRef = 3482808F2ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280922ACD890100BF085D /* libbzip2.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libbzip2.dylib;
+			remoteRef = 348280912ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280942ACD890100BF085D /* libchardet.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libchardet.dylib;
+			remoteRef = 348280932ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280962ACD890100BF085D /* example */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = example;
+			remoteRef = 348280952ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280982ACD890100BF085D /* iconv */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = iconv;
+			remoteRef = 348280972ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3482809A2ACD890100BF085D /* libiconv.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libiconv.dylib;
+			remoteRef = 348280992ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3482809C2ACD890100BF085D /* libjpeg9a.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libjpeg9a.dylib;
+			remoteRef = 3482809B2ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3482809E2ACD890100BF085D /* libjpeg9a_static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libjpeg9a_static.a;
+			remoteRef = 3482809D2ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280A02ACD890100BF085D /* libpng16.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			name = libpng16.dylib;
+			path = libpng16.15.29.0.dylib;
+			remoteRef = 3482809F2ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280A22ACD890100BF085D /* libpng16_static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libpng16_static.a;
+			remoteRef = 348280A12ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280A42ACD890100BF085D /* minigzip */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = minigzip;
+			remoteRef = 348280A32ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280A62ACD890100BF085D /* pngtest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = pngtest;
+			remoteRef = 348280A52ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280A82ACD890100BF085D /* libz_local.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			name = libz_local.dylib;
+			path = libz_local.1.2.5.dylib;
+			remoteRef = 348280A72ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		348280AA2ACD890100BF085D /* libzlib_static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libzlib_static.a;
+			remoteRef = 348280A92ACD890100BF085D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		34D0512629DE2AC100BF0C5A /* libsqlite.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libsqlite.a;
 			remoteRef = 34D0512529DE2AC100BF0C5A /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEDC283AF0A100897A16 /* example */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = example;
-			remoteRef = 34D6AEDB283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEDE283AF0A100897A16 /* iconv */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = iconv;
-			remoteRef = 34D6AEDD283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEE0283AF0A100897A16 /* libiconv.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libiconv.dylib;
-			remoteRef = 34D6AEDF283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEE2283AF0A100897A16 /* libjpeg9a.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libjpeg9a.dylib;
-			remoteRef = 34D6AEE1283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEE4283AF0A100897A16 /* libjpeg9a_static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libjpeg9a_static.a;
-			remoteRef = 34D6AEE3283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEEA283AF0A100897A16 /* minigzip */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = minigzip;
-			remoteRef = 34D6AEE9283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEEC283AF0A100897A16 /* pngtest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = pngtest;
-			remoteRef = 34D6AEEB283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEEE283AF0A100897A16 /* libz_local.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			name = libz_local.dylib;
-			path = libz_local.1.2.5.dylib;
-			remoteRef = 34D6AEED283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6AEF0283AF0A100897A16 /* libzlib_static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libzlib_static.a;
-			remoteRef = 34D6AEEF283AF0A100897A16 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6E70A2A20229D0007C7D5 /* libaspell-dist-0.60d.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = "libaspell-dist-0.60d.dylib";
-			remoteRef = 34D6E7092A20229D0007C7D5 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6E70C2A20229D0007C7D5 /* libbtree.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libbtree.dylib;
-			remoteRef = 34D6E70B2A20229D0007C7D5 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6E70E2A20229D0007C7D5 /* libbzip2.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libbzip2.dylib;
-			remoteRef = 34D6E70D2A20229D0007C7D5 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6E7102A20229D0007C7D5 /* libpng16.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			name = libpng16.dylib;
-			path = libpng16.15.29.0.dylib;
-			remoteRef = 34D6E70F2A20229D0007C7D5 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		34D6E7122A20229D0007C7D5 /* libpng16_static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libpng16_static.a;
-			remoteRef = 34D6E7112A20229D0007C7D5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1516,6 +1472,7 @@
 				34364F8924CCE9FF00272F13 /* Themes in Resources */,
 				34DD329C23153B2300FA2B35 /* About64px.png in Resources */,
 				346E1A4F231293570019B4AA /* tray_mail.png in Resources */,
+				34DB5ADD2ACD8DE100321094 /* PostBuildStep.py in Resources */,
 				345F314C1CC7A46B00656B8B /* xgate-icons-32.png in Resources */,
 				346E1A4D231293570019B4AA /* tray_error.png in Resources */,
 				34DD329923153AF000FA2B35 /* About.html in Resources */,
@@ -1699,11 +1656,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		34167B36279FEAC2005422F6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = chardet;
-			targetProxy = 34167B35279FEAC2005422F6 /* PBXContainerItemProxy */;
-		};
 		34749B5B278B06B900C8197E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = LgiCocoa;
@@ -1718,26 +1670,6 @@
 			isa = PBXTargetDependency;
 			name = Btree;
 			targetProxy = 3474FC5B226DE08D0064E0AD /* PBXContainerItemProxy */;
-		};
-		34D6AEF2283AF0B300897A16 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = libjpeg9a;
-			targetProxy = 34D6AEF1283AF0B300897A16 /* PBXContainerItemProxy */;
-		};
-		34D6AEF6283AF0BD00897A16 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = zlib;
-			targetProxy = 34D6AEF5283AF0BD00897A16 /* PBXContainerItemProxy */;
-		};
-		34D6AEF8283AF0E400897A16 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = libiconv;
-			targetProxy = 34D6AEF7283AF0E400897A16 /* PBXContainerItemProxy */;
-		};
-		34D6E7152A2022A70007C7D5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = libpng16;
-			targetProxy = 34D6E7142A2022A70007C7D5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1906,7 +1838,7 @@
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					"../../libs/build-x64/libpng",
+					"../../libs/build-x64-debug/libpng",
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
@@ -1955,7 +1887,7 @@
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					"../../libs/build-x64/libpng",
+					"../../libs/build-x64-debug/libpng",
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
