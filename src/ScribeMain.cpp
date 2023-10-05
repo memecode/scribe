@@ -149,6 +149,5 @@ int LgiMain(OsAppArguments &AppArgs)
 	LAssert(ImapFolder::Instances == 0);
 	LgiTrace("%s:%i - LXmlTag::Instances: %i\n", _FL, LXmlTag::Instances);
 	LAssert(LXmlTag::Instances == 0);
-	LgiTrace("%s:%i - LPalette inst: %i\n", _FL, (int)LPalette::Instances);
 	return 0;
 }

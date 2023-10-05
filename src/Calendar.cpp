@@ -871,31 +871,33 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 	{
 		LDateTime Diff = BaseUtc.e - BaseUtc.s;
 
-		int FilterFreq = -1;
+		int FilterFreq     = -1;
 		int FilterInterval = 0;
-		int FilterDay = 0;
-		int FilterMonth = 0;
-		const char *FilterYear = 0;
-		const char *FilterPos = 0;
-		int EndType = 0;
+		int FilterDay      = 0;
+		int FilterMonth    = 0;
+		int EndType        = 0;
+		int EndCount       = 0;
+		const char *FilterYear = NULL;
+		const char *FilterPos  = NULL;
 		LDateTime EndDate;
-		int EndCount = 0;
 			
-		GetField(FIELD_CAL_RECUR_FREQ, FilterFreq);
-		GetField(FIELD_CAL_RECUR_INTERVAL, FilterInterval);
-		GetField(FIELD_CAL_RECUR_FILTER_DAYS, FilterDay);
+		GetField(FIELD_CAL_RECUR_FREQ,          FilterFreq);
+		GetField(FIELD_CAL_RECUR_INTERVAL,      FilterInterval);
+		GetField(FIELD_CAL_RECUR_FILTER_DAYS,   FilterDay);
 		GetField(FIELD_CAL_RECUR_FILTER_MONTHS, FilterMonth);
-		GetField(FIELD_CAL_RECUR_FILTER_YEARS, FilterYear);
-		GetField(FIELD_CAL_RECUR_FILTER_POS, FilterPos);
-		GetField(FIELD_CAL_RECUR_END_TYPE, EndType);
-		GetField(FIELD_CAL_RECUR_END_DATE, EndDate);
-		GetField(FIELD_CAL_RECUR_END_COUNT, EndCount);
+		GetField(FIELD_CAL_RECUR_FILTER_YEARS,  FilterYear);
+		GetField(FIELD_CAL_RECUR_FILTER_POS,    FilterPos);
+		GetField(FIELD_CAL_RECUR_END_TYPE,      EndType);
+		GetField(FIELD_CAL_RECUR_END_DATE,      EndDate);
+		GetField(FIELD_CAL_RECUR_END_COUNT,     EndCount);
 
 		LDateTime CurUtc = BaseUtc.s;
-		const char *Error = 0;
+		const char *Error = NULL;
 		int Count = 0;
 		while (!Error)
 		{
+			LAssert(CurUtc.GetTimeZone() == 0);
+		
 			// Advance the current date by interval * freq
 			switch (FilterFreq)
 			{
@@ -915,8 +917,11 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 					Error = "Invalid freq.";
 					break;
 			}
+
+			LAssert(CurUtc.GetTimeZone() == 0);
 				
-			if (Error || CurUtc > EndUtc) break;
+			if (Error || CurUtc > EndUtc)
+				break;
 				
 			// Check against end conditions
 			bool IsEnded = CurUtc > EndUtc;
@@ -939,6 +944,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 			if (IsEnded) break;
 
 			// Check against filters
+			LAssert(CurUtc.GetTimeZone() == 0);
 			LDateTime CurLocal = CurUtc;
 			LDateTime::DstToLocal(Dst, CurLocal);
 				
