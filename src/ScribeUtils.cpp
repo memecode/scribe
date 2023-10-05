@@ -1776,7 +1776,7 @@ void InitStrToDom()
 {
 	if (Scribe_StrToDom.Length() == 0)
 	{
-		// If this asserts it's likely you have a duplicate value in Code/DomTypeValues.h
+		// If this asserts it's likely you have a duplicate value in DomTypeValues.h
 		#undef _
 		#define _(name) LAssert(Scribe_StrToDom.Find(#name) == SdNone); \
 						Scribe_StrToDom.Add(#name, Sd##name); \
@@ -1788,6 +1788,12 @@ void InitStrToDom()
 		#include "DomTypeValues.h"
 		#undef _
 	}
+}
+
+void FreeStrToDom()
+{
+	Scribe_StrToDom.Empty(true);
+	Scribe_DomToStr.Empty(true);
 }
 
 ScribeDomType StrToDom(const char *s)

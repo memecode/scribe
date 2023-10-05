@@ -72,82 +72,86 @@ int LgiMain(OsAppArguments &AppArgs)
 	// as LScribeScriptPriv::LScribeScriptPriv is called to take over.
 	LTraceSetStream(&ScribeInitTraceStore);
 
-	#if 0 && defined(__GTK_H__) && defined(_DEBUG)
-	LArray<char*> a;
-	for (int i=0; i<AppArgs.Args; i++)
-		a[i] = AppArgs.Arg[i];
-	a.Add("--g-fatal-warnings");
-	AppArgs.Arg = &a[0];
-	AppArgs.Args = a.Length();
-	#endif
-
-	LAppArguments Opts;
-
-	ScribeApp App(AppArgs, &Opts);
-	if (!App.IsOk())
 	{
-		LgiTrace("LApp initialization failed.\n");
-		return -1;
-	}
+		#if 0 && defined(__GTK_H__) && defined(_DEBUG)
+		LArray<char*> a;
+		for (int i=0; i<AppArgs.Args; i++)
+			a[i] = AppArgs.Arg[i];
+		a.Add("--g-fatal-warnings");
+		AppArgs.Arg = &a[0];
+		AppArgs.Args = a.Length();
+		#endif
 
-	InitStrToDom();
-	if (App.GetOption("crtcheck"))
-		return 0;
+		LAppArguments Opts;
 
-	#if !defined(MAC) || defined(__GTK_H__)
-	LAutoPtr<LFont> f(new LEmojiFont());
-	if (f && f->Create())
-		LFontSystem::Inst()->AddFont(f);
-	#endif
+		ScribeApp App(AppArgs, &Opts);
+		if (!App.IsOk())
+		{
+			LgiTrace("LApp initialization failed.\n");
+			return -1;
+		}
 
-    ScribeWnd *Wnd = NULL;
-	if (App.GetOption("help"))
-	{
-		printf(	"\n"
-				"Options:\n"
-				"    -m<address[,address]>          New email to address.\n"
-				"    -c<address[,address]>          Cc recipients.\n"
-				"    -s<\"subject\">                Message's subject.\n"
-				"    -f<filename>                   Body of message.\n"
-				"    -b                             Attach body as an attachment instead.\n"
-				"    -nch                           [Linux] Don't use KDE crash handler.\n"
-				"\n");
-	}
-	else if (!(Wnd = new ScribeWnd))
-	{
-		LgiTrace("Memory alloc failed.\n");
-		return -2;
-	}
+		InitStrToDom();
+		if (App.GetOption("crtcheck"))
+			return 0;
 
-    if (Wnd->GetScribeState() != ScribeWnd::ScribeExiting)
-    {
-        if (App.AppWnd->Attach(0))
-        {
-			auto State = Wnd->GetScribeState();
-            if (State != ScribeWnd::ScribeExiting)
-            {
-                #if 0
-		        App.Run(true, ScribeOnIdle, &App);
-		        #else
-		        App.Run();
-		        #endif
-		    }
-		    else
-		    {
-		    	LgiTrace("%s:%i - GetScribeState() not running.\n", _FL);
-		    }
-	    }
-	    else
-	    {
-		    LgiTrace("Couldn't create main window.\n");
-		    LgiMsg(0, "Couldn't create main window.");
-	    }
-	}
+		#if !defined(MAC) || defined(__GTK_H__)
+		LAutoPtr<LFont> f(new LEmojiFont());
+		if (f && f->Create())
+			LFontSystem::Inst()->AddFont(f);
+		#endif
 
-	DeleteObj(App.AppWnd);
-	LResources::FreeAllInstances();
+		ScribeWnd *Wnd = NULL;
+		if (App.GetOption("help"))
+		{
+			printf(	"\n"
+					"Options:\n"
+					"    -m<address[,address]>          New email to address.\n"
+					"    -c<address[,address]>          Cc recipients.\n"
+					"    -s<\"subject\">                Message's subject.\n"
+					"    -f<filename>                   Body of message.\n"
+					"    -b                             Attach body as an attachment instead.\n"
+					"    -nch                           [Linux] Don't use KDE crash handler.\n"
+					"\n");
+		}
+		else if (!(Wnd = new ScribeWnd))
+		{
+			LgiTrace("Memory alloc failed.\n");
+			return -2;
+		}
+
+		if (Wnd->GetScribeState() != ScribeWnd::ScribeExiting)
+		{
+			if (App.AppWnd->Attach(0))
+			{
+				auto State = Wnd->GetScribeState();
+				if (State != ScribeWnd::ScribeExiting)
+				{
+					#if 0
+					App.Run(true, ScribeOnIdle, &App);
+					#else
+					App.Run();
+					#endif
+				}
+				else
+				{
+		    		LgiTrace("%s:%i - GetScribeState() not running.\n", _FL);
+				}
+			}
+			else
+			{
+				LgiTrace("Couldn't create main window.\n");
+				LgiMsg(0, "Couldn't create main window.");
+			}
+		}
+	
+		FreeStrToDom();
+		Contact::PropMap.Empty();
+	}	// ~LApp will cleanup a lot of things.
+	
 	LAssert(ImapFolder::Instances == 0);
-	LgiTrace("%s:%i - LXmlTag::Instances: %i\n", _FL, LXmlTag::Instances);
-	LAssert(LXmlTag::Instances == 0);
+	// LAssert(LXmlTag::Instances == 0);
+	LgiTrace("LXmlTag::AllTags=%i\n", (int)LXmlTag::AllTags.Length());
+	
 	return 0;
 }

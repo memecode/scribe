@@ -81,6 +81,7 @@ ImapFolder::~ImapFolder()
 	Sub.DeleteObjects();
 	Field.DeleteObjects();
 	Mail.DeleteObjects();
+	UidMap.DeleteObjects();
 	
 	Instances--;
 }
@@ -109,7 +110,7 @@ void ImapFolder::SetParent(ImapFolder *p)
 void ImapFolder::SetDirty(bool b)
 {
 	Dirty = b;
-	if (Dirty && Mail.State != Store3Loaded)
+	if (Dirty && Mail.State == Store3Unloaded)
 	{
 		LAssert(!"State needs to be loaded before we modify it.");
 	}
@@ -438,6 +439,11 @@ bool ImapFolder::Serialize(bool Write)
 			{
 				LAssert(0);
 				return false;
+			}
+
+			if (e)
+			{
+				e->Children.Length(0);
 			}
 
 			if (Debug)
@@ -1025,8 +1031,12 @@ Store3Status ImapFolder::WhenLoaded(std::function<void(Store3Status)> cb)
 		return Store3Success;
 	}
 
-	// Save the callback for later...
-	OnLoad.Add(cb);
+	if (cb)
+	{
+		// Save the callback for later...
+		OnLoad.Add(std::move(cb));
+	}
+	else LAssert(!"No callback?");
 
 	if (Mail.State == Store3Unloaded)
 		LoadMail(); // Start the loading process...

@@ -779,5 +779,6 @@ extern void ExportScribe(ScribeWnd *App, LMailStore *Store);
 
 // DOM stuff
 extern void InitStrToDom();
+extern void FreeStrToDom();
 
 #endif

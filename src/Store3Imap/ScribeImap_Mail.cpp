@@ -562,7 +562,10 @@ const char *ImapMail::GetStr(int id)
 				if (!Headers)
 					return LLoadString(IDS_LOADING);
 
-				Subject = LDecodeRfc2047(LGetHeaderField(Headers, "Subject"));
+				auto enc = LGetHeaderField(Headers, "Subject");
+				// LgiTrace("EncSubj: %s\n", enc.Get());
+				Subject = LDecodeRfc2047(enc);
+				// LgiTrace("DecSubj: %s\n", Subject.Get());
 
 				auto Meta = GetMeta();
 				if (Meta)

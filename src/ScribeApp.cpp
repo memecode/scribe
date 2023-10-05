@@ -866,7 +866,7 @@ void ScribeWnd::Construct1()
 			LSysBold->PointSize(Pt + SzAdj);
 			LSysBold->Create();
 		
-			LFont *m = LMenu::GetFont();
+			auto m = GetMenu()->GetFont();
 			if (m)
 			{
 				m->PointSize(m->PointSize() + SzAdj);
@@ -4794,7 +4794,7 @@ void ScribeWnd::BuildDynMenus()
 													?
 													m->GetSubject()
 													:
-													(char*)"(no subject)",
+													"(no subject)",
 												IDM_NEW_FROM_TEMPLATE + d,
 												true);
 					d++;

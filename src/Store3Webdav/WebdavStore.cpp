@@ -204,7 +204,7 @@ LDataFolderI *WebdavStore::GetRoot(bool create)
 
 void WebdavStore::OnEvent(void *Param)
 {
-	WebdavEvent *e = (WebdavEvent*) Param;
+	LAutoPtr<WebdavEvent> e((WebdavEvent*) Param);
 	if (!e)
 		return;
 	
