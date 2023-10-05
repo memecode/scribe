@@ -150,8 +150,6 @@ int LgiMain(OsAppArguments &AppArgs)
 	}	// ~LApp will cleanup a lot of things.
 	
 	LAssert(ImapFolder::Instances == 0);
-	// LAssert(LXmlTag::Instances == 0);
-	LgiTrace("LXmlTag::AllTags=%i\n", (int)LXmlTag::AllTags.Length());
 	
 	return 0;
 }
