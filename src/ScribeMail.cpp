@@ -4380,7 +4380,7 @@ bool Mail::OnMenu(LDocView *View, int Id, void *Context)
 	return true;
 }
 
-LDocumentEnv::LoadType Mail::GetContent(LoadJob *&j)
+LDocumentEnv::LoadType Mail::GetContent(LAutoPtr<LoadJob> &j)
 {
 	if (!j)
 		return LoadError;
@@ -4407,7 +4407,6 @@ LDocumentEnv::LoadType Mail::GetContent(LoadJob *&j)
 			return LoadError;
 
 		Worker->AddJob(j);
-		j = 0;
 		return LoadDeferred;
 	}
 	else if (Uri.sProtocol && !_stricmp(Uri.sProtocol, "file"))

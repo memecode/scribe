@@ -16,14 +16,11 @@
 #define TIMEOUT_IDLE_STATUS			(60 * 1000)
 #define INVALID_CACHE				-1000
 
-int ImapFolder::Instances = 0;
-
 ImapFolder::ImapFolder(ImapStore *store, const char *path)
 	#if !IMAP_PROTOBUF
 	: Meta(TAG_FOLDER)
 	#endif
 {
-	Instances++;
 	System = Store3SystemNone;
 	Dirty = false;
 	SortCache = INVALID_CACHE;
@@ -82,8 +79,6 @@ ImapFolder::~ImapFolder()
 	Field.DeleteObjects();
 	Mail.DeleteObjects();
 	UidMap.DeleteObjects();
-	
-	Instances--;
 }
 
 void ImapFolder::SetParent(ImapFolder *p)

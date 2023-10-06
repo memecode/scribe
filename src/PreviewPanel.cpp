@@ -159,7 +159,7 @@ public:
 		return false;
 	}
 
-	LDocumentEnv::LoadType GetContent(LoadJob *&j) override
+	LDocumentEnv::LoadType GetContent(LAutoPtr<LoadJob> &j) override
 	{
 		LUri i;
 
@@ -204,8 +204,6 @@ public:
 			if (Worker)
 			{
 				Worker->AddJob(j);
-				j = 0;
-
 				return LoadDeferred;
 			}
 		}

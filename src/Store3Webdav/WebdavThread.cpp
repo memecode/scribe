@@ -27,7 +27,7 @@ WebdavThread::~WebdavThread()
 void WebdavThread::PostStore(void *Param)
 {
 	if (Src->Callback)
-		Src->Callback->Post(Src, Param);
+		Src->Post(Src, Param);
 	else
 		LAssert(0);
 }

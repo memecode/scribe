@@ -10,7 +10,8 @@ class WebdavThread;
 struct WebdavEvent;
 
 class WebdavStore :
-	public LDataStoreI
+	public LDataStoreI,
+	public LMutex
 {
 	friend class WebdavThread;
 	friend class WebdavCalendar;
@@ -26,9 +27,10 @@ protected:
 	ScribeWnd *App;
 	LRemote Remote;
 	LDataEventsI *Callback;
-	
+	LArray<WebdavEvent*> Events;
+
 	LString ContactUrl, CalUrl;
-	WebdavFolder *Root, *ContactFolder, *CalFolder;
+	WebdavFolder *Root = NULL, *ContactFolder = NULL, *CalFolder = NULL;
 
 	LXmlTag *LockSettings(const char *File, int Line);
 	void UnlockSettings();

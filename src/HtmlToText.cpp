@@ -33,7 +33,6 @@ LString HtmlToText(const char *InputHtml, const char *CharSet)
 	return Out;
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////
 LString TextToHtml(const char *Txt, const char *Charset)
 {

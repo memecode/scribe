@@ -995,7 +995,7 @@ private:
 	bool OnNavigate(LDocView *Parent, const char *Uri) override;
 	bool AppendItems(LSubMenu *Menu, const char *Param, int Base = 1000) override;
 	bool OnMenu(LDocView *View, int Id, void *Context) override;
-	LoadType GetContent(LoadJob *&j) override;
+	LoadType GetContent(LAutoPtr<LoadJob> &j) override;
 
 public:
 	static bool PreviewLines;

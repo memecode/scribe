@@ -7,8 +7,8 @@
 #include "WebdavStorePriv.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////
-WebdavStore::WebdavStore(ScribeWnd *a, LDataEventsI *cb, LString storeName) 
-	: ContactFolder(NULL), CalFolder(NULL)
+WebdavStore::WebdavStore(ScribeWnd *a, LDataEventsI *cb, LString storeName) :
+	LMutex("WebdavStore")
 {
 	App = a;
 	Callback = cb;
@@ -22,6 +22,7 @@ WebdavStore::~WebdavStore()
 	DeleteObj(CalFolder);
 	DeleteObj(ContactFolder);
 	DeleteObj(Root);
+	Events.DeleteObjects();
 }
 
 LXmlTag *WebdavStore::LockSettings(const char *File, int Line)
@@ -208,6 +209,14 @@ void WebdavStore::OnEvent(void *Param)
 	if (!e)
 		return;
 	
+	// Delete from our store of events, as the auto ptr now owns it.	
+	if (Lock(_FL))
+	{
+		LAssert(Events.HasItem(e));
+		Events.Delete(e);
+		Unlock();
+	}
+
 	switch (e->Type)
 	{
 		case CmdFile:
@@ -259,6 +268,12 @@ void WebdavStore::OnEvent(void *Param)
 
 void WebdavStore::Post(LDataStoreI *store, void *Param)
 {
+	if (Lock(_FL))
+	{
+		Events.Add((WebdavEvent*)Param); // Own the event memory...
+		Unlock();
+	}
+
 	App->PostEvent(M_STORAGE_EVENT, store->Id, (LMessage::Param)Param);
 }
 

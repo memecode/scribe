@@ -12,6 +12,8 @@ ThingType::ThingType()
 
 ThingType::~ThingType()
 {
+	OnLoadCallbacks.DeleteObjects();
+
 	if (Dirty)
 	{
 		if (DirtyThings.HasItem(this))

@@ -149,7 +149,7 @@ int LgiMain(OsAppArguments &AppArgs)
 		Contact::PropMap.Empty();
 	}	// ~LApp will cleanup a lot of things.
 	
-	LAssert(ImapFolder::Instances == 0);
+	LAssert(LMemDC::Instances == 0);
 	
 	return 0;
 }
