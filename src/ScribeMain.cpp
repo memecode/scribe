@@ -149,7 +149,11 @@ int LgiMain(OsAppArguments &AppArgs)
 		Contact::PropMap.Empty();
 	}	// ~LApp will cleanup a lot of things.
 	
-	LAssert(LMemDC::Instances == 0);
+	if (LMemDC::Instances)
+	{
+		LgiTrace("%s:%i - LMemDC::Instances: %i\n", _FL, (int)LMemDC::Instances);
+		LAssert(0);
+	}
 	
 	return 0;
 }

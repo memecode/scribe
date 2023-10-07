@@ -7,7 +7,9 @@
 #include "WebdavStorePriv.h"
 
 //////////////////////////////////////////////////////////////////////
-WebdavThread::WebdavThread(WebdavStore *src, WebdavFolder *fld, LString Url) : LThread("RemoteCal.Thread"), LMutex("RemoteCal.Mutex")
+WebdavThread::WebdavThread(WebdavStore *src, WebdavFolder *fld, LString Url) :
+	LThread("RemoteCal.Thread"),
+	LMutex("RemoteCal.Mutex")
 {
 	Src = src;
 	Folder = fld;
@@ -20,13 +22,12 @@ WebdavThread::WebdavThread(WebdavStore *src, WebdavFolder *fld, LString Url) : L
 WebdavThread::~WebdavThread()
 {
 	Cancel();
-	while (!IsExited())
-		LSleep(1);
+	WaitForExit();
 }
 
 void WebdavThread::PostStore(void *Param)
 {
-	if (Src->Callback)
+	if (Src)
 		Src->Post(Src, Param);
 	else
 		LAssert(0);

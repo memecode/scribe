@@ -274,7 +274,10 @@ void WebdavStore::Post(LDataStoreI *store, void *Param)
 		Unlock();
 	}
 
-	App->PostEvent(M_STORAGE_EVENT, store->Id, (LMessage::Param)Param);
+	if (App && store)
+		App->PostEvent(M_STORAGE_EVENT, store->Id, (LMessage::Param)Param);	
+	else
+		LAssert(0);
 }
 
 void WebdavStore::OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new)
