@@ -10,7 +10,7 @@ CC = gcc
 CPP = g++
 Target = ./scribe
 ifndef Build
-	Build = Debug
+	Build = Release
 endif
 MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
@@ -19,8 +19,8 @@ CFlags = -MMD -MP -g -fPIC -fno-inline
 CppFlags = $(CFlags) -fpermissive -std=c++14
 
 ifeq ($(Build),Debug)
-	CFlags += -g
-	CppFlags += -g
+	CFlags += -g -Wno-format-truncation
+	CppFlags += -g -Wno-format-truncation
 	Tag = d
 	Defs = -D_DEBUG -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
@@ -52,8 +52,8 @@ ifeq ($(Build),Debug)
 		-I../../lgi/trunk/include/lgi/linux \
 		-I../../lgi/trunk/include
 else
-	CFlags += -s -Os
-	CppFlags += -s -Os
+	CFlags += -s -Os -Wno-format-truncation
+	CppFlags += -s -Os -Wno-format-truncation
 	Defs = -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
 		-L../libs/build-x64-release/libchardet \
@@ -387,12 +387,14 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/include/lgi/common/SubProcess.h \
 	../../lgi/trunk/include/lgi/common/TableLayout.h \
 	../../lgi/trunk/include/lgi/common/TabView.h \
+	../../lgi/trunk/include/lgi/common/TextConvert.h \
 	../../lgi/trunk/include/lgi/common/TextFile.h \
 	../../lgi/trunk/include/lgi/common/TextLabel.h \
 	../../lgi/trunk/include/lgi/common/TextLog.h \
 	../../lgi/trunk/include/lgi/common/TextView3.h \
 	../../lgi/trunk/include/lgi/common/Thread.h \
 	../../lgi/trunk/include/lgi/common/ThreadEvent.h \
+	../../lgi/trunk/include/lgi/common/TimeZoneInfo.h \
 	../../lgi/trunk/include/lgi/common/Token.h \
 	../../lgi/trunk/include/lgi/common/ToolBar.h \
 	../../lgi/trunk/include/lgi/common/ToolTip.h \
@@ -494,6 +496,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Skins/Gel/Gel.cpp \
 	../../lgi/trunk/src/common/Text/DocView.cpp \
 	../../lgi/trunk/src/common/Text/String.cpp \
+	../../lgi/trunk/src/common/Text/TextConvert.cpp \
 	../../lgi/trunk/src/common/Text/TextView3.cpp \
 	../../lgi/trunk/src/common/Text/Token.cpp \
 	../../lgi/trunk/src/common/Text/Unicode.cpp \

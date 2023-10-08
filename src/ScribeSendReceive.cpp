@@ -2252,11 +2252,13 @@ if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Error, time=%i\n", Account->GetIn
 						MailTransferEvent *t = Thread->Files[Tran->Index];
 						if (t)
 						{
+							/*
 							LgiTrace("%s:%i - Trans[%i]: No 't' ptr for idx=%i files.len=%i.\n",
 								_FL,
 								i,
 								Tran->Index,
 								(int)Thread->Files.Length());
+							*/
 						}
 						else
 						{

@@ -533,6 +533,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 				<Linux />
 			</TargetName>
 			<ApplicationIcon />
+			<Options>
+				<All />
+				<Linux>
+					<Debug>-Wno-format-truncation</Debug>
+					<Release>-Wno-format-truncation</Release>
+				</Linux>
+			</Options>
 		</Build>
 		<Editor>
 			<TabSize>

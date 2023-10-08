@@ -1,63 +1,103 @@
-#!/usr/bin/make
-#
-.SILENT :
+#!/usr/bin/env bash
 
-CODELIB=../../../codelib
-LGI=../../lgi/trunk
-DEPLOY=$(CODELIB)/appimagetool-x86_64.AppImage
-VERSION=$(shell python ./Utils/getversion.py)
-APPIMG=$(VERSION).AppImage
-APPDIR=$(VERSION).AppDir
-BINDIR=$(APPDIR)/usr/bin
-LIBDIR=$(APPDIR)/usr/lib
-RESDIR=$(APPDIR)/usr/share/applications
+set -e
 
-$(APPIMG) : ./scribe
-	rm -rf $(APPDIR)
-	@echo "Building AppDir..."
-	mkdir -p $(BINDIR)
-	mkdir -p $(LIBDIR)
-	mkdir -p $(RESDIR)
-	@echo "Creating DOM documentation..."
-	python Code/Py/DomScan.py > $(RESDIR)/Dom.txt
-	@echo "Copying binaries..."
-	cp ./scribe $(BINDIR)
-	cp $(LGI)/Release/liblgi-gtk3.so $(LIBDIR)
-	cp ../libs/aspell-0.60.6.1/linux/Release/libaspell-dist-060.so $(LIBDIR)
-	cp ../libs/build-x64/libchardet/libchardet.so $(LIBDIR)
-	@echo "Copy resources..."
-	chmod 700 ./Resources/AppRun
-	cp ./Resources/AppRun $(APPDIR)
-	cp ./Resources/Linux/scribe.desktop $(APPDIR)
-	cp ./Resources/About64px.png $(APPDIR)
-	cp ./Resources/Scribe.lr8 $(RESDIR)/scribe.lr8
-	cp ./Resources/Flags.png $(RESDIR)
-	cp ./Resources/Icons-16.png $(RESDIR)
-	cp ./Resources/xgate-icons-32.png $(RESDIR)
-	cp ./Resources/About.html $(RESDIR)
-	cp ./Resources/About64px.png $(RESDIR)
-	cp ./Resources/Title.html $(RESDIR)
-	cp ./Resources/Title.png $(RESDIR)
-	cp ./Resources/NoFace*.png $(RESDIR)
-	cp ./Resources/EmojiMap.png $(RESDIR)
-	cp ./Resources/Preview*.html $(RESDIR)
-	cp ./Resources/tray_*.png $(RESDIR)
-	mkdir -p $(RESDIR)/Help/scripting
-	cp ./Help/*.html $(RESDIR)/Help
-	cp ./Help/*.css $(RESDIR)/Help
-	cp $(LGI)/docs/scripting/*.html $(RESDIR)/Help/scripting
-	cp $(LGI)/docs/scripting/*.css $(RESDIR)/Help/scripting
-	mkdir -p $(RESDIR)/Scripts
-	cp ./Scripts/*.script $(RESDIR)/Scripts
-	cp ./Resources/resdefs.h $(RESDIR)/Scripts
-	mkdir -p $(RESDIR)/Aspell/data
-	cp ./Resources/aspell-languages.csv $(RESDIR)/Aspell
-	cp ../libs/aspell-0.60.6.1/data/*.cmap $(RESDIR)/Aspell/data
-	cp ../libs/aspell-0.60.6.1/data/*.cset $(RESDIR)/Aspell/data
-	cp ../libs/aspell-0.60.6.1/data/*.kbd $(RESDIR)/Aspell/data
-	@echo "Building AppImage..."
-	$(DEPLOY) $(APPDIR)
+CODELIB=../../../../codelib
+if [ ! -d $CODELIB ] 
+then
+    echo "Error: codelib doesn't exist." 
+    exit -1
+fi
 
-scribe :
-	make -f Makefile.linux
+LGI=../../../lgi/trunk
+if [ ! -d $LGI ] 
+then
+    echo "Error: lgi doesn't exist." 
+    exit -1
+fi
+
+SRC=../src
+if [ ! -d $SRC ] 
+then
+    echo "Error: src doesn't exist." 
+    exit -1
+fi
+
+RES=../resources
+if [ ! -d $RES ] 
+then
+    echo "Error: resources doesn't exist." 
+    exit -1
+fi
+
+DEPLOY=$CODELIB/appimagetool-x86_64.AppImage
+if [ ! -f $DEPLOY ] 
+then
+    echo "Error: appimagetool doesn't exist." 
+    exit -1
+fi
+
+VERSION=$(python3 ../utils/getversion.py)
+APPIMG=$VERSION.AppImage
+APPDIR=$VERSION.AppDir
+BINDIR=$APPDIR/usr/bin
+LIBDIR=$APPDIR/usr/lib
+RESDIR=$APPDIR/usr/share/applications
+
+rm -rf $APPDIR
+
+echo "Building AppDir..."
+mkdir -p $BINDIR
+mkdir -p $LIBDIR
+mkdir -p $RESDIR
+
+echo "Creating DOM documentation..."
+python3 ../src/Py/DomScan.py > $RESDIR/Dom.txt
+
+echo "Copying binaries..."
+cp ../scribe $BINDIR
+cp $LGI/src/linux/CrashHandler/crash-handler $BINDIR
+cp $LGI/Release/liblgi-gtk3.so $LIBDIR
+cp ../../libs/aspell-0.60.6.1/linux/Release/libaspell-dist-060.so $LIBDIR
+cp ../../libs/build-x64-release/libchardet/libchardet.so $LIBDIR
+cp ../../libs/build-x64-release/bzip2-1.0.6/libbzip2.so $LIBDIR
+
+echo "Copy resources..."
+chmod 700 $RES/AppRun
+cp $RES/AppRun $APPDIR
+cp $RES/Linux/scribe.desktop $APPDIR
+cp $RES/About64px.png $APPDIR
+cp $RES/Scribe.lr8 $RESDIR/Scribe.lr8
+cp $RES/Flags.png $RESDIR
+cp $RES/Icons-16.png $RESDIR
+cp $RES/xgate-icons-32.png $RESDIR
+cp $RES/About.html $RESDIR
+cp $RES/About64px.png $RESDIR
+cp $RES/Title.html $RESDIR
+cp $RES/Title.png $RESDIR
+cp $RES/NoFace*.png $RESDIR
+cp $RES/EmojiMap.png $RESDIR
+cp $RES/Preview*.html $RESDIR
+cp $RES/tray_*.png $RESDIR
+
+mkdir -p $RESDIR/help/scripting
+cp ../help/*.html $RESDIR/help
+cp ../help/*.css $RESDIR/help
+cp $LGI/docs/scripting/*.html $RESDIR/help/scripting
+cp $LGI/docs/scripting/*.css $RESDIR/help/scripting
+
+mkdir -p $RESDIR/scripts
+cp ../scripts/*.script $RESDIR/scripts
+cp ../scripts/ScribeScripts.h $RESDIR/scripts
+cp $RES/resdefs.h $RESDIR/scripts
+
+mkdir -p $RESDIR/Aspell/data
+cp $RES/aspell-languages.csv $RESDIR/Aspell
+cp ../../libs/aspell-0.60.6.1/data/*.cmap $RESDIR/Aspell/data
+cp ../../libs/aspell-0.60.6.1/data/*.cset $RESDIR/Aspell/data
+cp ../../libs/aspell-0.60.6.1/data/*.kbd $RESDIR/Aspell/data
+
+echo "Building AppImage..."
+$DEPLOY $APPDIR
+
 
