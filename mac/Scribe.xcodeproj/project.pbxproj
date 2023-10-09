@@ -1585,7 +1585,7 @@
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					"../../libs/build-x64-debug/libpng",
+					"../../libs/build-release/libpng",
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
@@ -1607,7 +1607,11 @@
 					"-DPOSIX",
 					"-D_DEBUG",
 				);
-				OTHER_LDFLAGS = "-L../../libs/build-release/aspell-0.60.6.1";
+				OTHER_LDFLAGS = (
+					"-L../../libs/build-release/aspell-0.60.6.1",
+					"-L../../libs/build-release/bzip2-1.0.6",
+					"-L../../libs/build-release/libchardet",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.memecode.scribe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1635,7 +1639,7 @@
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					"../../libs/build-x64-debug/libpng",
+					"../../libs/build-release/libpng",
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
@@ -1656,7 +1660,11 @@
 					"-DSCRIBE_APP",
 					"-DPOSIX",
 				);
-				OTHER_LDFLAGS = "-L../../libs/build-release/aspell-0.60.6.1";
+				OTHER_LDFLAGS = (
+					"-L../../libs/build-release/aspell-0.60.6.1",
+					"-L../../libs/build-release/bzip2-1.0.6",
+					"-L../../libs/build-release/libchardet",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.memecode.scribe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
