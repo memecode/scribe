@@ -1794,11 +1794,15 @@ MailUi::~MailUi()
 
 Mail *MailUi::GetItem()
 {
-	return _Item ? _Item->IsMail() : 0;
+	THREAD_UNSAFE(NULL);
+
+	return _Item ? _Item->IsMail() : NULL;
 }
 
 void MailUi::SetItem(Mail *m)
 {
+	THREAD_UNSAFE();
+
 	if (_Item)
 	{
 		Mail *old = _Item->IsMail();
@@ -1818,6 +1822,8 @@ void MailUi::SetItem(Mail *m)
 
 bool MailUi::SetDirty(bool Dirty, bool Ui)
 {
+	THREAD_UNSAFE(false);
+
 	bool b = ThingUi::SetDirty(Dirty, Ui);
 	
 	if (MetaFieldsDirty && !Dirty)
@@ -1916,6 +1922,8 @@ void AddActions(LSubMenu *Menu, List<Filter> &Filters, LArray<ScribeFolder*> Fol
 
 bool MailUi::OnViewKey(LView *v, LKey &k)
 {
+	THREAD_UNSAFE(false);
+
 	if (k.Down() && k.CtrlCmd() && !k.Alt())
 	{
 		switch (k.vkey)
@@ -2001,6 +2009,8 @@ bool MailUi::OnViewKey(LView *v, LKey &k)
 
 void MailUi::SerializeText(bool FromCtrl)
 {
+	THREAD_UNSAFE();
+
 	if (GetItem() && TextView)
 	{
 		if (FromCtrl)
@@ -2029,6 +2039,8 @@ const char *FilePart(const char *Uri)
 
 void MailUi::OnAttachmentsChange()
 {
+	THREAD_UNSAFE();
+
 	Attachments->ResizeColumnsToContent();
 
 	if (GetItem())
@@ -2040,7 +2052,9 @@ void MailUi::OnAttachmentsChange()
 
 bool MailUi::NeedsCapability(const char *Name, const char *Param)
 {
-    if (!InThread())
+	THREAD_SAFE();
+
+	if (!InThread())
     {
         PostEvent(M_NEEDS_CAP, (LMessage::Param)NewStr(Name));
     }
@@ -2101,6 +2115,8 @@ bool MailUi::NeedsCapability(const char *Name, const char *Param)
 
 void MailUi::OnCloseInstaller()
 {
+	THREAD_UNSAFE();
+
 	if (MissingCaps)
 	{
 		DeleteObj(MissingCaps);
@@ -2110,10 +2126,13 @@ void MailUi::OnCloseInstaller()
 
 void MailUi::OnInstall(LCapabilityTarget::CapsHash *Caps, bool Status)
 {
+	THREAD_SAFE();
 }
 
 void MailUi::OnChildrenChanged(LViewI *Wnd, bool Attaching)
 {
+	THREAD_UNSAFE();
+
 	if (Wnd == (LViewI*)MissingCaps &&
 		!Attaching)
 	{
@@ -2124,6 +2143,8 @@ void MailUi::OnChildrenChanged(LViewI *Wnd, bool Attaching)
 
 LDocView *MailUi::GetDoc(const char *MimeType)
 {
+	THREAD_UNSAFE(NULL);
+
 	if (!MimeType)
 	{
 		MimeType = sTextPlain;
@@ -2147,6 +2168,8 @@ LDocView *MailUi::GetDoc(const char *MimeType)
 
 bool MailUi::SetDoc(LDocView *v, const char *MimeType)
 {
+	THREAD_UNSAFE(false);
+
 	if (!MimeType)
 	{
 		MimeType = sTextPlain;
@@ -2218,6 +2241,8 @@ bool MailUi::SetDoc(LDocView *v, const char *MimeType)
 
 bool MailUi::IsWorking(int Set)
 {
+	THREAD_UNSAFE(false);
+
 	if (!GetItem())
 		return false;
 
@@ -2277,6 +2302,8 @@ public:
 
 void MailUi::SetCmdAfterResize(int Cmd)
 {
+	THREAD_UNSAFE();
+
 	if (CmdAfterResize == 0)
 	{
 		CmdAfterResize = Cmd;
@@ -2295,6 +2322,8 @@ void MailUi::SetCmdAfterResize(int Cmd)
 
 bool MailUi::OnRequestClose(bool OsClose)
 {
+	THREAD_UNSAFE(true);
+
 	bool Working = IsWorking();
 	if (Working)
 	{
@@ -2307,6 +2336,8 @@ bool MailUi::OnRequestClose(bool OsClose)
 
 void MailUi::OnChange()
 {
+	THREAD_UNSAFE();
+
 	if (!IsDirty())
 		OnLoad();
 }
@@ -2324,6 +2355,8 @@ struct MailUiNameAddr
 
 void MailUi::OnLoad()
 {
+	THREAD_UNSAFE();
+
 	bool Edit = false;
 	bool ReadOnly = true;
 	Mail *Item = GetItem();
@@ -2660,6 +2693,8 @@ void MailUi::OnLoad()
 
 void MailUi::OnSave()
 {
+	THREAD_UNSAFE();
+
 	if (!GetItem())
 		return;
 
@@ -2905,6 +2940,8 @@ void MailUi::OnSave()
 
 bool MailUi::AddRecipient(AddressDescriptor *Addr)
 {
+	THREAD_UNSAFE(false);
+
 	if (Addr && To)
 	{
 		ListAddr *La = dynamic_cast<ListAddr *>(Addr);
@@ -2919,6 +2956,8 @@ bool MailUi::AddRecipient(AddressDescriptor *Addr)
 
 bool MailUi::AddRecipient(Contact *c)
 {
+	THREAD_UNSAFE(false);
+
 	ListAddr *La = new ListAddr(c);
 	if (La)
 	{
@@ -2931,6 +2970,8 @@ bool MailUi::AddRecipient(Contact *c)
 
 bool MailUi::AddRecipient(const char *Email, const char *Name)
 {
+	THREAD_UNSAFE(false);
+
 	ListAddr *La = new ListAddr(App, Email, Name);
 	if (La)
 	{
@@ -2943,6 +2984,8 @@ bool MailUi::AddRecipient(const char *Email, const char *Name)
 
 bool MailUi::SeekMsg(int delta)
 {
+	THREAD_UNSAFE(false);
+
 	bool Status = false;
 
 	if (Container)
@@ -2993,6 +3036,8 @@ bool MailUi::SeekMsg(int delta)
 
 void MailUi::AttachFile(const char *File)
 {
+	THREAD_UNSAFE();
+
 	auto m = GetItem();
 	if (!m)
 		return;
@@ -3007,6 +3052,8 @@ void MailUi::AttachFile(const char *File)
 
 int MailUi::HandleCmd(int Cmd)
 {
+	THREAD_UNSAFE(0);
+
 	switch (Cmd)
 	{
 		case IDM_READ_RECEIPT:
@@ -3248,6 +3295,8 @@ int MailUi::HandleCmd(int Cmd)
 
 int MailUi::OnCommand(int Cmd, int Event, OsView From)
 {
+	THREAD_UNSAFE(0);
+
 	if (GpgUi)
 	{
 		GpgUi->DoCommand(Cmd, [this, Cmd](auto r)
@@ -3264,25 +3313,10 @@ int MailUi::OnCommand(int Cmd, int Event, OsView From)
 	return LWindow::OnCommand(Cmd, Event, From);
 }
 
-LArray<Attachment*> Mail::GetCalendarAttachments()
-{
-	List<Attachment> Attachments;
-	if (!GetAttachments(&Attachments))
-		return false;
-
-	LArray<Attachment*> Cal;
-	for (auto a: Attachments)
-	{
-		LString Mt = a->GetMimeType();
-		if (Mt.Equals("text/calendar"))
-			Cal.Add(a);
-	}
-
-	return Cal;
-}
-
 bool MailUi::AddCalendarEvent(bool AddPopupReminder)
 {
+	THREAD_UNSAFE(false);
+
 	LString Msg;
 	auto Result = GetItem()->AddCalendarEvent(this, AddPopupReminder, &Msg);
 
@@ -3295,153 +3329,10 @@ bool MailUi::AddCalendarEvent(bool AddPopupReminder)
 }
 
 
-bool Mail::AddCalendarEvent(LViewI *Parent, bool AddPopupReminder, LString *Msg)
-{
-	LString Err, s;
-	auto Cal = GetCalendarAttachments();
-	int NewEvents = 0, DupeEvents = 0, Processed = 0, Cancelled = 0, NotMatched = 0;
-	ScribeFolder *Folder = NULL;
-	if (Cal.Length() == 0)
-	{
-		Err = "There are no attached events to add.";
-		goto OnError;
-	}
-
-	Folder = App->GetFolder(FOLDER_CALENDAR);
-	if (!Folder)
-	{
-		Err = "There no calendar folder to save to.";
-		goto OnError;
-	}
-
-	for (auto a: Cal)
-	{
-		auto Event = App->CreateThingOfType(MAGIC_CALENDAR);
-		if (Event)
-		{
-			LString Mt = a->GetMimeType();
-			LAutoPtr<LStreamI> Data(a->GotoObject(_FL));
-			if (Data)
-			{
-				if (Event->Import(AutoCast(Data), Mt))
-				{
-					auto c = Event->IsCalendar();
-					auto obj = c ? c->GetObject() : NULL;
-					if (!obj)
-						continue;
-					
-					if (AddPopupReminder)
-					{
-						LString s;
-						s.Printf("%g,%i,%i,", 10.0, CalMinutes, CalPopup);
-						obj->SetStr(FIELD_CAL_REMINDERS, s);
-					}
-					
-					// Is it a cancellation?
-					auto Status = obj->GetStr(FIELD_CAL_STATUS);
-					auto IsCancel = Stristr(Status, "CANCELLED") != NULL;
-					if (!IsCancel)
-					{
-						// Does the folder already have a copy of this event?
-						bool AlreadyAdded = false;
-						for (auto t: Folder->Items)
-						{
-							auto Obj = t->IsCalendar();
-							if (Obj && *Obj == *c)
-							{
-								AlreadyAdded = true;
-								break;
-							}
-						}
-
-						if (AlreadyAdded)
-						{
-							DupeEvents++;
-						}
-						else
-						{
-							// Write the event to the folder
-							auto Status = Folder->WriteThing(Event);
-							if (Status > Store3Error)
-							{
-								NewEvents++;
-								Event = NULL;
-							}
-						}
-					}
-					else
-					{
-						// Cancellation processing
-						auto Uid = obj->GetStr(FIELD_UID);
-						Thing *Match = NULL;
-						for (auto t: Folder->Items)
-						{
-							auto tCal = t->IsCalendar();
-							if (tCal && tCal->GetObject())
-							{
-								auto tUid = tCal->GetObject()->GetStr(FIELD_UID);
-								if (!Stricmp(Uid, tUid))
-								{
-									Match = t;
-									break;
-								}
-							}
-						}
-						if (Match)
-						{
-							if (!Parent || LgiMsg(Parent, "Delete cancelled event?", "Calendar", MB_YESNO) == IDYES)
-							{
-								auto f = Match->GetFolder();
-								LArray<Thing*> items;
-								items.Add(Match);
-								f->Delete(items, true);
-								Cancelled++;
-							}
-						}
-						else NotMatched++;
-					}
-				}
-				else LgiTrace("%s:%i - vCal event import failed.\n", _FL);
-			}
-			else LgiTrace("%s:%i - GotoObject failed.\n", _FL);
-
-			if (Event)
-				Event->DecRef();
-		}
-		else LgiTrace("%s:%i - CreateThingOfType failed.\n", _FL);
-	}
-
-	Processed = NewEvents + DupeEvents;
-	if (Processed != Cal.Length())
-	{
-		Err.Printf("There were errors processing %i events, check the console.", (int)Cal.Length() - Processed);
-		goto OnError;
-	}
-
-	if (NewEvents || DupeEvents)
-		s.Printf("%i new events, %i duplicates.", NewEvents, DupeEvents);
-	else
-		s.Printf("%i events cancelled, %i not matched.", Cancelled, NotMatched);
-
-	if (Msg)
-		*Msg = s;
-
-	if (Processed > 0)
-	{
-		for (auto v: CalendarView::CalendarViews)
-			v->OnContentsChanged();
-	}
-
-	return true;
-
-OnError:
-	if (Msg)
-		*Msg = Err;
-	return false;
-}
-
 int MailUi::OnNotify(LViewI *Col, LNotification n)
 {
+	THREAD_UNSAFE(0);
+
 	if (dynamic_cast<LPanel*>(Col))
 	{
 		Sx = Sy = -1;
@@ -3793,6 +3684,8 @@ int MailUi::OnNotify(LViewI *Col, LNotification n)
 
 void MailUi::OnDataEntered()
 {
+	THREAD_UNSAFE();
+
 	auto Name = Entry->Name();
 	if (ValidStr(Name))
 	{
@@ -3838,6 +3731,8 @@ void MailUi::OnDataEntered()
 
 void MailUi::OnPosChange()
 {	
+	THREAD_UNSAFE();
+
 	LWindow::OnPosChange();
 
 	if (Tab && (Sx != X() || Sy != Y()))
@@ -3870,6 +3765,8 @@ void MailUi::OnPaint(LSurface *pDC)
 
 void MailUi::OnPulse()
 {
+	THREAD_UNSAFE();
+
 	if (IsDirty() && TextView && GetItem())
 	{
 		// Ui -> Object
@@ -3886,6 +3783,8 @@ void MailUi::OnPulse()
 
 void MailUi::OnDirty(bool Dirty)
 {
+	THREAD_UNSAFE();
+
 	SetCtrlEnabled(IDM_SAVE, Dirty);
 	SetCtrlEnabled(IDM_SAVE_CLOSE, Dirty);
 	
@@ -3901,6 +3800,8 @@ void MailUi::OnDirty(bool Dirty)
 
 bool MailUi::CallMethod(const char *Name, LScriptArguments &Args)
 {
+	THREAD_UNSAFE(false);
+
 	ScribeDomType Method = StrToDom(Name);
 
 	*Args.GetReturn() = false;
@@ -3945,6 +3846,8 @@ bool MailUi::CallMethod(const char *Name, LScriptArguments &Args)
 
 LMessage::Result MailUi::OnEvent(LMessage *Msg)
 {
+	THREAD_UNSAFE(0);
+	
 	switch (Msg->Msg())
 	{
 		case M_SET_HTML:
@@ -4047,6 +3950,8 @@ LMessage::Result MailUi::OnEvent(LMessage *Msg)
 
 void MailUi::OnReceiveFiles(LArray<const char*> &Files)
 {
+	THREAD_UNSAFE();
+
 	List<Attachment> Att;
 	GetItem()->GetAttachments(&Att);
 
@@ -4150,6 +4055,169 @@ void Mail::_Delete()
 		Ui->PostEvent(M_CLOSE);
 	if (Ui)
 		Ui->SetItem(0);
+}
+
+bool Mail::AddCalendarEvent(LViewI *Parent, bool AddPopupReminder, LString *Msg)
+{
+	LString Err, s;
+	auto Cal = GetCalendarAttachments();
+	int NewEvents = 0, DupeEvents = 0, Processed = 0, Cancelled = 0, NotMatched = 0;
+	ScribeFolder *Folder = NULL;
+	if (Cal.Length() == 0)
+	{
+		Err = "There are no attached events to add.";
+		goto OnError;
+	}
+
+	Folder = App->GetFolder(FOLDER_CALENDAR);
+	if (!Folder)
+	{
+		Err = "There no calendar folder to save to.";
+		goto OnError;
+	}
+
+	for (auto a: Cal)
+	{
+		auto Event = App->CreateThingOfType(MAGIC_CALENDAR);
+		if (Event)
+		{
+			LString Mt = a->GetMimeType();
+			LAutoPtr<LStreamI> Data(a->GotoObject(_FL));
+			if (Data)
+			{
+				if (Event->Import(AutoCast(Data), Mt))
+				{
+					auto c = Event->IsCalendar();
+					auto obj = c ? c->GetObject() : NULL;
+					if (!obj)
+						continue;
+
+					if (AddPopupReminder)
+					{
+						LString s;
+						s.Printf("%g,%i,%i,", 10.0, CalMinutes, CalPopup);
+						obj->SetStr(FIELD_CAL_REMINDERS, s);
+					}
+
+					// Is it a cancellation?
+					auto Status = obj->GetStr(FIELD_CAL_STATUS);
+					auto IsCancel = Stristr(Status, "CANCELLED") != NULL;
+					if (!IsCancel)
+					{
+						// Does the folder already have a copy of this event?
+						bool AlreadyAdded = false;
+						for (auto t: Folder->Items)
+						{
+							auto Obj = t->IsCalendar();
+							if (Obj && *Obj == *c)
+							{
+								AlreadyAdded = true;
+								break;
+							}
+						}
+
+						if (AlreadyAdded)
+						{
+							DupeEvents++;
+						}
+						else
+						{
+							// Write the event to the folder
+							auto Status = Folder->WriteThing(Event);
+							if (Status > Store3Error)
+							{
+								NewEvents++;
+								Event = NULL;
+							}
+						}
+					}
+					else
+					{
+						// Cancellation processing
+						auto Uid = obj->GetStr(FIELD_UID);
+						Thing *Match = NULL;
+						for (auto t: Folder->Items)
+						{
+							auto tCal = t->IsCalendar();
+							if (tCal && tCal->GetObject())
+							{
+								auto tUid = tCal->GetObject()->GetStr(FIELD_UID);
+								if (!Stricmp(Uid, tUid))
+								{
+									Match = t;
+									break;
+								}
+							}
+						}
+						if (Match)
+						{
+							if (!Parent || LgiMsg(Parent, "Delete cancelled event?", "Calendar", MB_YESNO) == IDYES)
+							{
+								auto f = Match->GetFolder();
+								LArray<Thing*> items;
+								items.Add(Match);
+								f->Delete(items, true);
+								Cancelled++;
+							}
+						}
+						else NotMatched++;
+					}
+				}
+				else LgiTrace("%s:%i - vCal event import failed.\n", _FL);
+			}
+			else LgiTrace("%s:%i - GotoObject failed.\n", _FL);
+
+			if (Event)
+				Event->DecRef();
+		}
+		else LgiTrace("%s:%i - CreateThingOfType failed.\n", _FL);
+	}
+
+	Processed = NewEvents + DupeEvents;
+	if (Processed != Cal.Length())
+	{
+		Err.Printf("There were errors processing %i events, check the console.", (int)Cal.Length() - Processed);
+		goto OnError;
+	}
+
+	if (NewEvents || DupeEvents)
+		s.Printf("%i new events, %i duplicates.", NewEvents, DupeEvents);
+	else
+		s.Printf("%i events cancelled, %i not matched.", Cancelled, NotMatched);
+
+	if (Msg)
+		*Msg = s;
+
+	if (Processed > 0)
+	{
+		for (auto v: CalendarView::CalendarViews)
+			v->OnContentsChanged();
+	}
+
+	return true;
+
+OnError:
+	if (Msg)
+		*Msg = Err;
+	return false;
+}
+
+LArray<Attachment*> Mail::GetCalendarAttachments()
+{
+	LArray<Attachment*> Cal;
+	List<Attachment> Attachments;
+
+	if (GetAttachments(&Attachments))
+	{
+		for (auto a: Attachments)
+		{
+			LString Mt = a->GetMimeType();
+			if (Mt.Equals("text/calendar"))
+				Cal.Add(a);
+		}
+	}
+
+	return Cal;
 }
 
 bool Mail::AppendItems(LSubMenu *Menu, const char *Param, int Base)

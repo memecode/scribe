@@ -239,7 +239,7 @@ SystemFolderInfo SystemFolders[] =
 
 ScribeBehaviour *ScribeBehaviour::New(ScribeWnd *app)
 {
-	return 0;
+	return NULL;
 }
 
 void ScribeOptionsDefaults(LOptionsFile *f)
@@ -1350,6 +1350,7 @@ void ScribeWnd::SetLanguage()
 
 LString ScribeWnd::GetResourceFile(SribeResourceType Type)
 {
+	THREAD_UNSAFE(LString());
 	auto File = d->ResFiles.Find(Type);
 	if (!File)
 		LgiTrace("%s:%i - No file for resource type %i\n", _FL, Type);
@@ -1358,6 +1359,7 @@ LString ScribeWnd::GetResourceFile(SribeResourceType Type)
 
 void ScribeWnd::LoadImageResources()
 {
+	THREAD_UNSAFE();
 	auto Res = LgiGetResObj();
 	LString::Array Folders;
 	if (Res)
@@ -1400,11 +1402,13 @@ void ScribeWnd::LoadImageResources()
 
 int ScribeWnd::GetEventHandle()
 {
+	THREAD_SAFE();
 	return d->AppWndHnd;
 }
 
 void ScribeWnd::OnCloseInstaller()
 {
+	THREAD_UNSAFE();
 	d->Bar = NULL;
 	if (InThread())
 	{
@@ -1415,10 +1419,12 @@ void ScribeWnd::OnCloseInstaller()
 
 void ScribeWnd::OnInstall(CapsHash *Caps, bool Status)
 {
+	THREAD_UNSAFE();
 }
 
 bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 {
+	THREAD_SAFE();
 	#if DEBUG_CAPABILITIES
 	LgiTrace("ScribeWnd::NeedsCapability(%s, %s)\n", Name, Param);
 	#endif
@@ -1532,6 +1538,7 @@ bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 
 LAutoString ScribeWnd::GetDataFolder()
 {
+	THREAD_UNSAFE(LAutoString());
 	LVariant v;
 	GetOptions()->GetValue(OPT_IsPortableInstall, v);
 	
@@ -1550,11 +1557,13 @@ LAutoString ScribeWnd::GetDataFolder()
 
 LScriptEngine *ScribeWnd::GetScriptEngine()
 {
+	THREAD_SAFE();
 	return d->Engine;
 }
 
 LScriptCallback ScribeWnd::GetCallback(const char *CallbackMethodName)
 {
+	THREAD_UNSAFE(LScriptCallback());
 	LScriptCallback Cb;
 	
 	auto Cur = d->CurrentScript();
@@ -1579,6 +1588,7 @@ LScriptCallback ScribeWnd::GetCallback(const char *CallbackMethodName)
 
 int ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args)
 {
+	THREAD_UNSAFE(LScriptCallback::INVALID_CALLBACK);
 	if (!d->CurrentScript())
 	{
 		LgiTrace("%s:%i - No current script.\n", _FL);
@@ -1660,6 +1670,7 @@ int ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args
 
 bool ScribeWnd::RemoveCallback(int Uid)
 {
+	THREAD_UNSAFE(false);
 	for (auto script: d->Scripts)
 	{
 		for (unsigned i=0; i<script->Callbacks.Length(); i++)
@@ -1694,6 +1705,7 @@ bool ScribeWnd::RemoveCallback(int Uid)
 
 bool ScribeWnd::GetScriptCallbacks(LScriptCallbackType Type, LArray<LScriptCallback*> &Callbacks)
 {
+	THREAD_UNSAFE(false);
 	for (auto s: d->Scripts)
 	{
 		for (auto &c: s->Callbacks)
@@ -1708,6 +1720,7 @@ bool ScribeWnd::GetScriptCallbacks(LScriptCallbackType Type, LArray<LScriptCallb
 
 bool ScribeWnd::ExecuteScriptCallback(LScriptCallback &c, LScriptArguments &Args, bool ReturnArgs)
 {
+	THREAD_UNSAFE(false);
 	if (!c.Func || !c.Script)
 		return false;
 
@@ -1730,6 +1743,7 @@ bool ScribeWnd::ExecuteScriptCallback(LScriptCallback &c, LScriptArguments &Args
 
 LStream *ScribeWnd::ShowScriptingConsole()
 {
+	THREAD_UNSAFE(NULL);
 	auto Item = Menu->FindItem(IDM_SCRIPTING_CONSOLE);
 	if (Item)
 	{
@@ -1745,11 +1759,13 @@ LStream *ScribeWnd::ShowScriptingConsole()
 
 LOptionsFile::PortableType ScribeWnd::GetPortableType()
 {
+	THREAD_SAFE();
 	return d->GetInstallMode();
 }
 
 void ScribeWnd::RemoteContent_AddSender(const char *Addr, bool WhiteList)
 {
+	THREAD_UNSAFE();
 	if (!Addr)
 		return;
 
@@ -1777,6 +1793,7 @@ void ScribeWnd::RemoteContent_AddSender(const char *Addr, bool WhiteList)
 
 ScribeRemoteContent ScribeWnd::RemoteContent_GetSenderStatus(const char *Addr)
 {
+	THREAD_UNSAFE(RemoteDefault);
 	if (!d->RemoteContent_Init)
 	{
 		LVariant v;
@@ -1800,6 +1817,7 @@ ScribeRemoteContent ScribeWnd::RemoteContent_GetSenderStatus(const char *Addr)
 
 void ScribeWnd::RemoteContent_ClearCache()
 {
+	THREAD_UNSAFE();
 	d->RemoteWhiteLst.Empty();
 	d->RemoteBlackLst.Empty();
 	d->RemoteContent_Init = false;
@@ -1807,6 +1825,8 @@ void ScribeWnd::RemoteContent_ClearCache()
 
 void ScribeWnd::OnSpellerSettingChange()
 {
+	THREAD_UNSAFE();
+
 	// Kill the current thread
 	d->SpellerThread.Reset();
 	
@@ -1821,6 +1841,7 @@ void ScribeWnd::OnSpellerSettingChange()
 
 bool ScribeWnd::SetSpellThreadParams(LSpellCheck *Thread)
 {
+	THREAD_UNSAFE(false);
 	if (!Thread)
 		return false;
 	
@@ -1844,6 +1865,7 @@ bool ScribeWnd::SetSpellThreadParams(LSpellCheck *Thread)
 
 LSpellCheck *ScribeWnd::CreateSpellObject()
 {
+	THREAD_UNSAFE(NULL);
 	LVariant PrefAspell;
 	GetOptions()->GetValue(OPT_PreferAspell, PrefAspell);
 
@@ -1888,6 +1910,8 @@ LSpellCheck *ScribeWnd::CreateSpellObject()
 
 LSpellCheck *ScribeWnd::GetSpellThread(bool OverrideOpt)
 {
+	THREAD_UNSAFE(NULL);
+
 	LVariant Use;
 	if (OverrideOpt)
 		Use = true;
@@ -1904,6 +1928,7 @@ LSpellCheck *ScribeWnd::GetSpellThread(bool OverrideOpt)
 
 LString ScribeWnd::GetHttpProxy()
 {
+	THREAD_UNSAFE(NULL);
 	LString Proxy;
 	
 	LVariant v;
@@ -1923,6 +1948,7 @@ LString ScribeWnd::GetHttpProxy()
 
 InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::CapsHash *Components, const char *ActionParam)
 {
+	THREAD_UNSAFE(NULL);
 	if (!ActionParam)
 	{
 		LgiTrace("%s:%i - No action supplied.\n", _FL);
@@ -2070,6 +2096,7 @@ HttpImageThread *ScribeWnd::GetImageLoader()
 
 const char *ScribeWnd::GetUiTags()
 {
+	THREAD_UNSAFE(NULL);
 	if (!d->UiTags)
 	{
 		char UiTags[256] =
@@ -2112,6 +2139,7 @@ void ScribeWnd::OnCreate()
 
 ScribeAccount *ScribeWnd::GetAccountByEmail(const char *Email)
 {
+	THREAD_UNSAFE(NULL);
 	if (!Email)
 		return NULL;
 
@@ -2130,6 +2158,7 @@ ScribeAccount *ScribeWnd::GetAccountByEmail(const char *Email)
 
 ScribeAccount *ScribeWnd::GetAccountById(int Id)
 {
+	THREAD_UNSAFE(NULL);
 	for (auto a : *GetAccounts())
 	{
 		if (a->Receive.Id() == Id)
@@ -2143,6 +2172,7 @@ ScribeAccount *ScribeWnd::GetAccountById(int Id)
 
 const char *ScribeWnd::EditCtrlMimeType()
 {
+	THREAD_SAFE();
 	LVariant Html;
 	GetOptions()->GetValue(OPT_EditControl, Html);
 	return Html.CastInt32() ? sTextHtml : sTextPlain;
@@ -2150,6 +2180,7 @@ const char *ScribeWnd::EditCtrlMimeType()
 
 LAutoString ScribeWnd::GetReplyXml(const char *MimeType)
 {
+	THREAD_SAFE();
 	bool IsHtml = MimeType && !_stricmp(MimeType, sTextHtml);
 
 	LVariant s;
@@ -2159,6 +2190,7 @@ LAutoString ScribeWnd::GetReplyXml(const char *MimeType)
 
 LAutoString ScribeWnd::GetForwardXml(const char *MimeType)
 {
+	THREAD_SAFE();
 	bool IsHtml = MimeType && !_stricmp(MimeType, sTextHtml);
 
 	LVariant s;
@@ -2168,11 +2200,13 @@ LAutoString ScribeWnd::GetForwardXml(const char *MimeType)
 
 LVmCallback *ScribeWnd::GetDebuggerCallback()
 {
+	THREAD_SAFE();
 	return d;
 }
 
 GpgConnector *ScribeWnd::GetGpgConnector()
 {
+	THREAD_UNSAFE(NULL);
 	if (!d->GpgInst)
 	{
 		if (!GpgConnector::IsInstalled())
@@ -2186,11 +2220,13 @@ GpgConnector *ScribeWnd::GetGpgConnector()
 
 LFont *ScribeWnd::GetPreviewFont()
 {
+	THREAD_UNSAFE(NULL);
 	return d->PreviewFont;
 }
 
 bool ScribeWnd::IsValid()
 {
+	THREAD_SAFE();
 	#if 0
 	try
 	{
@@ -2209,6 +2245,8 @@ bool ScribeWnd::IsValid()
 
 bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
+	THREAD_UNSAFE(false);
+
 	ScribeDomType Fld = StrToDom(Name);
 	switch (Fld)
 	{
@@ -2517,6 +2555,8 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 
 bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
+	THREAD_UNSAFE(NULL);
+
 	ScribeDomType m = StrToDom(MethodName);
 	switch (m)
 	{
@@ -2759,6 +2799,8 @@ bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 LOptionsFile *ScribeWnd::GetOptions(bool Create)
 {
+	THREAD_SAFE();
+
 	if (!d->Options && Create)
 	{
 		LAssert(!"Not here... do it in LoadOptions.");
@@ -2941,6 +2983,8 @@ bool ScribeWnd::LoadOptions()
 {
 	bool Load = false;
 	
+	THREAD_UNSAFE(false);
+
 	// Check if we are running unit tests...
 	if ((IsUnitTest = LAppInst->GetOption("unittest")))
 	{
@@ -3162,6 +3206,8 @@ bool ScribeWnd::LoadOptions()
 
 bool ScribeWnd::SaveOptions()
 {
+	THREAD_UNSAFE(false);
+
 	LStringPipe Log(256);
 	bool Status = false;
 	bool WriteFailed = false;
@@ -3338,6 +3384,8 @@ bool ScribeWnd::SaveOptions()
 
 void ScribeWnd::OnCommandLineEvent(CmdLineEvent event)
 {
+	THREAD_UNSAFE();
+
 	int flag = 1 << event;
 	if ((d->CmdLineEvents & flag) == 0)
 	{
@@ -3372,6 +3420,8 @@ void ScribeWnd::OnCommandLineEvent(CmdLineEvent event)
 //
 void ScribeWnd::OnCommandLine()
 {
+	THREAD_UNSAFE();
+
 	// Check command line args
 	LString Str, File;
 
@@ -3490,6 +3540,8 @@ void ScribeWnd::OnCommandLine()
 
 void ScribeWnd::SetCurrentIdentity(int i)
 {
+	THREAD_UNSAFE();
+
 	LVariant v = i;
 	GetOptions()->SetValue(OPT_CurrentIdentity, v);
 	
@@ -3502,6 +3554,8 @@ void ScribeWnd::SetCurrentIdentity(int i)
 
 ScribeAccount *ScribeWnd::GetCurrentAccount()
 {
+	THREAD_UNSAFE(NULL);
+
 	auto Idx = GetCurrentIdentity();
 	ScribeAccount *a = (Idx >= 0 && Idx < (ssize_t)Accounts.Length()) ? Accounts.ItemAt(Idx) : NULL;
 	bool ValidId = a != NULL && a->IsValid();
@@ -3524,6 +3578,8 @@ ScribeAccount *ScribeWnd::GetCurrentAccount()
 
 int ScribeWnd::GetCurrentIdentity()
 {
+	THREAD_UNSAFE(-1);
+
 	LVariant i;
 	if (GetOptions()->GetValue(OPT_CurrentIdentity, i))
 		return i.CastInt32();
@@ -3535,6 +3591,7 @@ int ScribeWnd::GetCurrentIdentity()
 
 void ScribeWnd::SetupAccounts()
 {
+	THREAD_UNSAFE();
 	int i, CurrentIdentity = GetCurrentIdentity();
 
 	if (StatusPanel)
@@ -3793,6 +3850,8 @@ public:
 
 bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 {
+	THREAD_UNSAFE(false);
+
 	if (FolderTasks.Length() > 0)
 	{
 		LgiTrace("%s:%i - %i folder tasks still busy...\n", _FL, FolderTasks.Length());
@@ -3888,6 +3947,8 @@ bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 
 void ScribeWnd::DoOnTimer(LScriptCallback *c)
 {
+	THREAD_UNSAFE();
+
 	if (!c)
 		return;
 
@@ -3915,6 +3976,8 @@ void ScribeWnd::DoOnTimer(LScriptCallback *c)
 
 void ScribeWnd::OnMinute()
 {
+	THREAD_UNSAFE();
+
 	if (Folders.Length() == 0)
 		return;
 
@@ -3997,6 +4060,8 @@ void ScribeWnd::OnMinute()
 
 void ScribeWnd::OnHour()
 {
+	THREAD_UNSAFE();
+
 	// Force time zone update in case of daylight savings change.
 	LDateTime::SystemTimeZone(true);
 
@@ -4073,6 +4138,8 @@ void ScribeWnd::OnHour()
 
 bool ScribeWnd::SaveDirtyObjects(int TimeLimitMs)
 {
+	THREAD_UNSAFE(false);
+
 	bool Status = false;
 	if (Thing::DirtyThings.Length() > 0)
 	{
@@ -4142,6 +4209,8 @@ bool ScribeWnd::SaveDirtyObjects(int TimeLimitMs)
 
 void ScribeWnd::OnPulse()
 {
+	THREAD_UNSAFE();
+
 	if (ScribeState == ScribeRunning)
 	{
 		OnIdle();
@@ -4157,6 +4226,8 @@ void ScribeWnd::OnPulse()
 
 void ScribeWnd::OnPulseSecond()
 {
+	THREAD_UNSAFE();
+
 	#if PROFILE_ON_PULSE
 	LProfile Prof("NewMailLst handling");
 	Prof.HideResultsIfBelow(50);
@@ -4240,6 +4311,8 @@ void ScribeWnd::OnPulseSecond()
 
 void ScribeWnd::AddFolderToMru(char *FileName)
 {
+	THREAD_UNSAFE();
+
 	if (FileName)
 	{
 		// read MRU
@@ -4292,6 +4365,8 @@ void ScribeWnd::AddFolderToMru(char *FileName)
 
 bool ScribeWnd::CleanFolders(ScribeFolder *f)
 {
+	THREAD_UNSAFE(false);
+
 	if (!f)
 		return false;
 
@@ -4310,10 +4385,13 @@ bool ScribeWnd::CleanFolders(ScribeFolder *f)
 
 void ScribeWnd::OnFolderChanged(LDataFolderI *folder)
 {
+	THREAD_SAFE();
 }
 
 bool ScribeWnd::OnFolderTask(LEventTargetI *Ptr, bool Add)
 {
+	THREAD_UNSAFE(false);
+
 	if (Add)
 	{
 		if (FolderTasks.HasItem(Ptr))
@@ -4338,6 +4416,7 @@ bool ScribeWnd::OnFolderTask(LEventTargetI *Ptr, bool Add)
 
 LMailStore *ScribeWnd::GetDefaultMailStore()
 {
+	THREAD_UNSAFE(NULL);
 	LMailStore *Def = 0;
 
 	for (unsigned i=0; i<Folders.Length(); i++)
@@ -4374,6 +4453,8 @@ bool HasMailStore(LXmlTag *MailStores, char *Name)
 
 LDataStoreI *ScribeWnd::CreateDataStore(const char *_Full, bool CreateIfMissing)
 {
+	THREAD_UNSAFE(NULL);
+
 	LString Full(_Full);
 	auto Ext = LGetExtension(Full);
 	if (Ext)
@@ -4404,6 +4485,8 @@ LDataStoreI *ScribeWnd::CreateDataStore(const char *_Full, bool CreateIfMissing)
 
 bool ScribeWnd::ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName)
 {
+	THREAD_UNSAFE(false);
+
 	if (Store->GetInt(FIELD_VERSION) == 0)
 	{
 		// version error
@@ -4483,12 +4566,16 @@ bool ScribeWnd::ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName
 
 void ScribeWnd::LoadMailStores(std::function<void(bool)> Callback)
 {
+	THREAD_UNSAFE();
+
 	if (auto s = new LoadMailStoreState(this, Callback))
 		s->Start();
 }
 
 void ScribeWnd::LoadFolders(std::function<void(bool)> Callback)
 {
+	THREAD_UNSAFE();
+
 	AppState PrevState = ScribeState;
 	ScribeState = ScribeLoadingFolders;
 
@@ -4640,6 +4727,8 @@ void ScribeWnd::LoadFolders(std::function<void(bool)> Callback)
 
 bool ScribeWnd::UnLoadFolders()
 {
+	THREAD_UNSAFE(false);
+
 	if (FolderTasks.Length() > 0 ||
 		ScribeState == ScribeLoadingFolders)
 	{
@@ -4738,6 +4827,8 @@ bool ScribeWnd::UnLoadFolders()
 
 void ScribeWnd::BuildDynMenus()
 {
+	THREAD_UNSAFE();
+
 	if (MailMenu)
 	{
 		LString SendMail = LLoadString(IDS_SEND_MAIL);
@@ -4820,6 +4911,8 @@ int ScribeWnd::GetToolbarHeight()
 
 LToolBar *ScribeWnd::LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LImageList> &Img)
 {
+	THREAD_UNSAFE(NULL);
+
 	if (!Img)
 		Img.Reset(LLoadImageList(File));
 	if (!Img)
@@ -4863,6 +4956,8 @@ LToolBar *ScribeWnd::LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LIma
 
 void ScribeWnd::SetListPane(LView *v)
 {
+	THREAD_UNSAFE();
+
 	ThingList *ThingLst = dynamic_cast<ThingList*>(v);
 	DynamicHtml *Html = dynamic_cast<DynamicHtml*>(v);
 	if (!ThingLst)
@@ -4891,6 +4986,8 @@ void ScribeWnd::SetListPane(LView *v)
 
 bool ScribeWnd::SetItemPreview(LView *v)
 {
+	THREAD_UNSAFE(false);
+
 	v->Sunken(SUNKEN_CTRL);
 	if (d->SubSplit->IsAttached())
 	{
@@ -4911,6 +5008,8 @@ bool ScribeWnd::SetItemPreview(LView *v)
 
 ScribeWnd::LayoutMode ScribeWnd::GetEffectiveLayoutMode()
 {
+	THREAD_UNSAFE(OptionsLayout);
+
 	LVariant Mode;
 	GetOptions()->GetValue(OPT_LayoutMode, Mode);
 	ScribeFolder *Cur = GetCurrentFolder();
@@ -4930,8 +5029,7 @@ ScribeWnd::LayoutMode ScribeWnd::GetEffectiveLayoutMode()
 
 void ScribeWnd::SetLayout(LayoutMode Mode)
 {
-	// int TreeWidth = Tree ? Tree->X() : 200;
-	// int PreviewHt = PreviewPanel ? PreviewPanel->Y() : 200;
+	THREAD_UNSAFE();
 
 	if (Mode > 0)
 	{
@@ -5130,6 +5228,8 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 
 void ScribeWnd::SetupUi()
 {
+	THREAD_UNSAFE();
+
 	// Show the window
 	if (!SerializeState(GetOptions(), OPT_ScribeWndPos, true))
 	{
@@ -5272,6 +5372,8 @@ void ScribeWnd::SetupUi()
 
 Thing *ScribeWnd::CreateItem(int Type, ScribeFolder *Folder, bool Ui)
 {
+	THREAD_UNSAFE(NULL);
+
 	auto FolderStore = Folder && Folder->GetObject() ? Folder->GetObject()->GetStore() : NULL;
 	auto DefaultStore = GetDefaultMailStore();
 	auto Store = FolderStore ? FolderStore : (DefaultStore ? DefaultStore->Store : NULL);
@@ -5347,15 +5449,12 @@ Thing *ScribeWnd::CreateItem(int Type, ScribeFolder *Folder, bool Ui)
 
 void ScribeWnd::OnPaint(LSurface *pDC)
 {
-	#if 0
-	pDC->Colour(LColour::Red);
-	pDC->Rectangle();
-	#else
+	THREAD_UNSAFE();
+
 	LCssTools Tools(this);
 	auto c = GetClient();
 	// c.Offset(0, -26);
 	Tools.PaintContent(pDC, c);
-	#endif
 }
 
 int CompareContacts(Contact **a, Contact **b)
@@ -5373,6 +5472,8 @@ int CompareContacts(Contact **a, Contact **b)
 
 bool ScribeWnd::OpenAMail(ScribeFolder *Folder)
 {
+	THREAD_UNSAFE(false);
+
 	if (Folder &&
 		Tree)
 	{
@@ -5425,6 +5526,8 @@ void AddContactToMenu(LSubMenu *Menu, Contact *c, ssize_t Index)
 
 void ScribeWnd::AddContactsToMenu(LSubMenu *Menu)
 {
+	THREAD_UNSAFE();
+
 	if (!Menu)
 		return;
 
@@ -5501,6 +5604,8 @@ void ScribeWnd::AddContactsToMenu(LSubMenu *Menu)
 
 void ScribeWnd::OnUrl(const char *Url)
 {
+	THREAD_UNSAFE();
+
 	LUri u(Url);
 	if (u.sProtocol && !_stricmp(u.sProtocol, "mailto"))
 	{
@@ -5510,6 +5615,8 @@ void ScribeWnd::OnUrl(const char *Url)
 
 void ScribeWnd::OnReceiveFiles(LArray<const char*> &Files)
 {
+	THREAD_UNSAFE();
+
 	int UnknownFormats = 0;
 	int64 Period = LCurrentTime() - LastDrop;
 
@@ -5599,6 +5706,8 @@ void ScribeWnd::OnReceiveFiles(LArray<const char*> &Files)
 
 void ScribeWnd::OnTrayClick(LMouse &m)
 {
+	THREAD_UNSAFE();
+
 	if (m.Down())
 	{
 		#ifndef MAC
@@ -5654,6 +5763,8 @@ void ScribeWnd::OnTrayClick(LMouse &m)
 
 void ScribeWnd::OnTrayMenu(LSubMenu &m)
 {
+	THREAD_UNSAFE();
+
 	m.SetImageList(ImageList, false);
 	d->TrayMenuContacts.Length(0);
 
@@ -5740,6 +5851,8 @@ void ScribeWnd::OnTrayMenu(LSubMenu &m)
 
 void ScribeWnd::OnTrayMenuResult(int MenuId)
 {
+	THREAD_UNSAFE();
+
 	switch (MenuId)
 	{
 		case IDM_OPEN:
@@ -5791,6 +5904,8 @@ void ScribeWnd::OnTrayMenuResult(int MenuId)
 
 void ScribeWnd::OnZoom(LWindowZoom Action)
 {
+	THREAD_UNSAFE();
+
 	if (Action == LZoomMin)
 	{
 		LVariant i;
@@ -5803,6 +5918,8 @@ void ScribeWnd::OnZoom(LWindowZoom Action)
 
 void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::function<void(LString)> Callback)
 {
+	THREAD_UNSAFE();
+
 	if (!InThread())
 	{
 		// Run the function on the Window's thread:
@@ -6062,6 +6179,8 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 
 bool ScribeWnd::IsMyEmail(const char *Email)
 {
+	THREAD_UNSAFE(false);
+
 	if (Email)
 	{
 		LVariant e;
@@ -6080,11 +6199,13 @@ bool ScribeWnd::IsMyEmail(const char *Email)
 
 int ScribeWnd::GetMaxPages()
 {
+	THREAD_SAFE();
 	return d->PrintMaxPages;
 }
 
 void ScribeWnd::ThingPrint(std::function<void(bool)> Callback, ThingType *m, LPrinter *Printer, LView *Parent, int MaxPages)
 {
+	THREAD_UNSAFE();
 	d->PrintMaxPages = MaxPages;
 	
 	if (!Printer)
@@ -6125,6 +6246,7 @@ void ScribeWnd::ThingPrint(std::function<void(bool)> Callback, ThingType *m, LPr
 
 bool ScribeWnd::MailReplyTo(Mail *m, bool All)
 {
+	THREAD_UNSAFE(false);
 	bool Status = false;
 
 	if (m)
@@ -6160,6 +6282,7 @@ bool ScribeWnd::MailReplyTo(Mail *m, bool All)
 
 bool ScribeWnd::MailForward(Mail *m)
 {
+	THREAD_UNSAFE(false);
 	bool Status = false;
 
 	if (m)
@@ -6184,6 +6307,7 @@ bool ScribeWnd::MailForward(Mail *m)
 
 bool ScribeWnd::MailBounce(Mail *m)
 {
+	THREAD_UNSAFE(false);
 	bool Status = false;
 
 	if (m)
@@ -6208,6 +6332,7 @@ bool ScribeWnd::MailBounce(Mail *m)
 
 Mail *ScribeWnd::CreateMail(Contact *c, const char *Email, const char *Name)
 {
+	THREAD_UNSAFE(NULL);
 	Mail *m = dynamic_cast<Mail*>(CreateItem(MAGIC_MAIL, NULL, false));
 	if (m)
 	{
@@ -6242,6 +6367,7 @@ Mail *ScribeWnd::CreateMail(Contact *c, const char *Email, const char *Name)
 
 Mail *ScribeWnd::LookupMailRef(const char *MsgRef, bool TraceAllUids)
 {
+	THREAD_UNSAFE(NULL);
 	if (!MsgRef)
 		return 0;
 	
@@ -6285,6 +6411,7 @@ Mail *ScribeWnd::LookupMailRef(const char *MsgRef, bool TraceAllUids)
 
 void ScribeWnd::OnBayesAnalyse(const char *Msg, const char *WhiteListEmail)
 {
+	THREAD_UNSAFE();
 	LString s, q;
 	s.Printf("<html><body style='background:L_MED;'><pre>%s</pre>", Msg);
 	if (WhiteListEmail)
@@ -6306,6 +6433,7 @@ void ScribeWnd::OnBayesAnalyse(const char *Msg, const char *WhiteListEmail)
 
 bool ScribeWnd::OnBayesResult(const char *MailRef, double Rating)
 {
+	THREAD_UNSAFE(false);
 	Mail *m = LookupMailRef(MailRef);
 	if (m)
 		return OnBayesResult(m, Rating);
@@ -6323,6 +6451,7 @@ bool ScribeWnd::OnBayesResult(const char *MailRef, double Rating)
 
 bool ScribeWnd::OnBayesResult(Mail *m, double Rating)
 {
+	THREAD_UNSAFE(false);
 	if (!m)
 		return false;
 
@@ -8601,6 +8730,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 
 bool ScribeWnd::OnMailStore(LMailStore **MailStore, bool Add)
 {
+	THREAD_UNSAFE(false);
 	if (!MailStore)
 	{
 		LAssert(!"No mail store pointer?");
@@ -8633,6 +8763,7 @@ bool ScribeWnd::OnMailStore(LMailStore **MailStore, bool Add)
 
 LMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 {
+	THREAD_UNSAFE(NULL);
 	if (!Path)
 		return NULL;
 
@@ -8743,12 +8874,12 @@ ScribeFolder *ScribeWnd::GetFolder(const char *Name, LMailStore *s)
 
 void ScribeWnd::Update(int What)
 {
+	THREAD_UNSAFE();
 	if (What & UPDATE_TREE)
 	{
 		Tree->Invalidate();
 		return;
 	}
-
 	if (What & UPDATE_LIST)
 	{
 		if (MailList) MailList->Invalidate();
@@ -8762,6 +8893,7 @@ void ScribeWnd::DoDebug(char *s)
 
 Thing *ScribeWnd::CreateThingOfType(Store3ItemTypes Type, LDataI *obj)
 {
+	THREAD_UNSAFE(NULL);
 	Thing *t = NULL;
 	switch (Type)
 	{
@@ -8809,6 +8941,7 @@ Thing *ScribeWnd::CreateThingOfType(Store3ItemTypes Type, LDataI *obj)
 
 void ScribeWnd::GetFilters(List<Filter> &Filters, bool JustIn, bool JustOut, bool JustInternal)
 {
+	THREAD_UNSAFE();
 	auto Srcs = GetThingSources(MAGIC_FILTER);
 	for (auto f: Srcs)
 	{
@@ -8837,6 +8970,7 @@ void ScribeWnd::GetFilters(List<Filter> &Filters, bool JustIn, bool JustOut, boo
 
 bool ScribeWnd::ShowToolbarText()
 {
+	THREAD_UNSAFE(false);
 	LVariant i;
 	if (GetOptions()->GetValue(OPT_ToolbarText, i))
 	{
@@ -8849,6 +8983,7 @@ bool ScribeWnd::ShowToolbarText()
 
 void ScribeWnd::HashContacts(LHashTbl<StrKey<char,false>,Contact*> &Contacts, ScribeFolder *Folder, bool Deep)
 {
+	THREAD_UNSAFE();
 	if (!Folder)
 	{
 		// Default item is the contacts folder
@@ -8901,11 +9036,13 @@ void ScribeWnd::HashContacts(LHashTbl<StrKey<char,false>,Contact*> &Contacts, Sc
 
 List<Contact> *ScribeWnd::GetEveryone()
 {
+	THREAD_UNSAFE(NULL);
 	return &Contact::Everyone;
 }
 
 bool ScribeWnd::GetContacts(List<Contact> &Contacts, ScribeFolder *Folder, bool Deep)
 {
+	THREAD_UNSAFE(false);
 	LArray<ScribeFolder*> Folders;
 
 	if (!Folder)
@@ -8952,6 +9089,7 @@ bool ScribeWnd::GetContacts(List<Contact> &Contacts, ScribeFolder *Folder, bool 
 */
 bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 {
+	THREAD_UNSAFE(false);
 	char OptName[32];
 	sprintf_s(OptName, sizeof(OptName), "Folder-%i", Id);
 	
@@ -9010,6 +9148,7 @@ bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 
 void ScribeWnd::Validate(LMailStore *s)
 {
+	THREAD_UNSAFE();
 	// Check for all the basic folders
 
 	int Errors = 0;	
@@ -9042,11 +9181,13 @@ void ScribeWnd::Validate(LMailStore *s)
 
 ThingFilter *ScribeWnd::GetThingFilter()
 {
+	THREAD_UNSAFE(NULL);
 	return SearchView;
 }
 
 ScribeAccount *ScribeWnd::GetSendAccount()
 {
+	THREAD_UNSAFE(NULL);
 	LVariant DefSendAcc = 0;
 
 	if (!GetOptions()->GetValue(OPT_DefaultSendAccount, DefSendAcc))
@@ -9065,6 +9206,7 @@ ScribeAccount *ScribeWnd::GetSendAccount()
 
 LPrinter *ScribeWnd::GetPrinter()
 {
+	THREAD_UNSAFE(NULL);
 	if (!d->PrintOptions)
 		d->PrintOptions.Reset(new LPrinter);
 	return d->PrintOptions;
@@ -9072,6 +9214,8 @@ LPrinter *ScribeWnd::GetPrinter()
 
 int ScribeWnd::GetActiveThreads()
 {
+	THREAD_UNSAFE(0);
+
 	int Status = 0;
 	for (ScribeAccount *i: Accounts)
 	{
@@ -9081,6 +9225,7 @@ int ScribeWnd::GetActiveThreads()
 			Status++;
 		}
 	}
+
 	return Status;
 }
 
@@ -9119,6 +9264,7 @@ public:
 
 void ScribeWnd::SetDefaultHandler()
 {
+	THREAD_UNSAFE();
 	#if WINNATIVE
 
 	if (LAppInst->GetOption("noreg"))
@@ -9185,6 +9331,7 @@ void ScribeWnd::SetDefaultHandler()
 
 void ScribeWnd::OnSetDefaultHandler(bool Error, bool OldAssert)
 {
+	THREAD_UNSAFE();
 	#if WINDOWS
 	LRegKey::AssertOnError = OldAssert;
 	#endif
@@ -9194,6 +9341,7 @@ void ScribeWnd::OnSetDefaultHandler(bool Error, bool OldAssert)
 
 void ScribeWnd::OnSelect(List<Thing> *l, bool ChangeEvent)
 {
+	THREAD_UNSAFE();
 	Mail *m = (l && l->Length() == 1) ? (*l)[0]->IsMail() : 0;
 
 	if (Commands)
@@ -9565,6 +9713,7 @@ public:
 
 LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor, Mail *m)
 {
+	THREAD_UNSAFE(NULL);
 	LDocView *Ctrl = 0;
 	
 	// Get the default font
@@ -9656,6 +9805,7 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 
 void ScribeWnd::GrowlInfo(LString title, LString text)
 {
+	THREAD_UNSAFE();
 	LGrowl *g = d->GetGrowl();
 	if (!g)
 		return;
@@ -9669,6 +9819,7 @@ void ScribeWnd::GrowlInfo(LString title, LString text)
 
 void ScribeWnd::GrowlOnMail(Mail *m)
 {
+	THREAD_UNSAFE();
 	LVariant v;
 	LAutoPtr<LGrowl::LNotify> n(new LGrowl::LNotify);
 	n->Name = "new-mail";
@@ -9708,6 +9859,7 @@ void ScribeWnd::GrowlOnMail(Mail *m)
 
 void ScribeWnd::OnNewMailSound()
 {
+	THREAD_UNSAFE();
 	static uint64 PrevTs = 0;
 	auto Now = LCurrentTime();
 	if (Now - PrevTs > 30000)
@@ -9724,12 +9876,15 @@ void ScribeWnd::OnNewMailSound()
 
 void ScribeWnd::OnFolderSelect(ScribeFolder *f)
 {
+	THREAD_UNSAFE();
 	if (SearchView)
 		SearchView->OnFolder();
 }
 
 void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 {
+	THREAD_UNSAFE();
+
 	if (!MailObjs)
 		return;
 
@@ -10013,6 +10168,8 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 
 LColour ScribeWnd::GetColour(int i)
 {
+	THREAD_UNSAFE(LColour());
+	
 	static LColour MailPreview;
 	static LColour UnreadCount;
 	#define ReadColDef(Var, Tag, Default)		\
@@ -10085,6 +10242,8 @@ bool WriteXmlTag(LStream &p, LXmlTag *t)
 
 LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int &Cursor, const char *MimeType)
 {
+	THREAD_UNSAFE(LString());
+
 	LStringPipe p(256);
 
 	if (m && r && Xml)
@@ -10275,6 +10434,8 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 
 LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 {
+	THREAD_UNSAFE(LAutoString());
+
 	LStringPipe p;
 
 	if (!m || !Xml)
@@ -10398,6 +10559,8 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 // in this mode the same return values as sync mode are used.
 Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, const char *ResourceName, std::function<void(bool)> Callback)
 {
+	THREAD_UNSAFE(Store3Error);
+
 	if (CurrentAuthLevel >= Required)
 	{
 		if (Callback) Callback(true);
@@ -10504,6 +10667,8 @@ Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, cons
 
 void ScribeWnd::GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType AccessType, std::function<void(bool)> Callback)
 {
+	THREAD_UNSAFE();
+
 	LVariant Level = (int)PermRequireNone;
 	
 	// Check if user level access is required
@@ -10515,6 +10680,8 @@ void ScribeWnd::GetAccountSettingsAccess(LViewI *Parent, ScribeAccessType Access
 
 void ScribeWnd::OnBeforeConnect(ScribeAccount *Account, bool Receive)
 {
+	THREAD_UNSAFE();
+
 	if (Receive)
 		Account->Receive.Enabled(false);
 	else
@@ -10526,6 +10693,8 @@ void ScribeWnd::OnBeforeConnect(ScribeAccount *Account, bool Receive)
 
 void ScribeWnd::OnAfterConnect(ScribeAccount *Account, bool Receive)
 {
+	THREAD_UNSAFE();
+
 	if (Account)
 	{
 		SaveOptions();
@@ -10566,6 +10735,8 @@ void ScribeWnd::OnAfterConnect(ScribeAccount *Account, bool Receive)
 
 void ScribeWnd::Send(int Which, bool Quiet)
 {
+	THREAD_UNSAFE();
+
 	if (ScribeState == ScribeExiting)
 		return;
 
@@ -10714,6 +10885,8 @@ void ScribeWnd::Send(int Which, bool Quiet)
 
 void ScribeWnd::Receive(int Which)
 {
+	THREAD_UNSAFE();
+
 	#define LOG_RECEIVE		0
 	
 	if (ScribeState == ScribeExiting)
@@ -10767,6 +10940,8 @@ void ScribeWnd::Receive(int Which)
 
 bool ScribeWnd::GetHelpFilesPath(char *Path, int PathSize)
 {
+	THREAD_UNSAFE(false);
+
 	const char *Index = "index.html";
 	char Install[MAX_PATH_LEN];
 	strcpy_s(Install, sizeof(Install), ScribeResourcePath());
@@ -10817,6 +10992,8 @@ bool ScribeWnd::GetHelpFilesPath(char *Path, int PathSize)
 
 bool ScribeWnd::LaunchHelp(const char *File)
 {
+	THREAD_UNSAFE(false);
+
 	if (File)
 	{
 		char *Hash = 0;
@@ -10901,6 +11078,8 @@ bool ScribeWnd::LaunchHelp(const char *File)
 
 void ScribeWnd::Preview(int Which)
 {
+	THREAD_UNSAFE();
+
 	LArray<ScribeAccount*> a;
 	a.Add(Accounts[Which]);
 	OpenPopView(this, a);
@@ -10964,6 +11143,8 @@ bool MergeSegments(LDataPropI *DstProp, LDataPropI *SrcProp, LDom *Dom)
 // Either 'FileName' or 'Source' will be valid
 void ScribeWnd::MailMerge(LArray<ListAddr*> &Contacts, const char *FileName, Mail *Source)
 {
+	THREAD_UNSAFE();
+
 	ScribeFolder *Outbox = GetFolder(FOLDER_OUTBOX);
 
 	if (Outbox && Contacts.Length() && (FileName || Source))
@@ -11111,7 +11292,8 @@ LString _GetUids(LArray<LDataI*> &items)
 }
 
 /// Received new items from a storage backend.
-void ScribeWnd::OnNew(
+void ScribeWnd::OnNew
+(
 	/// The parent folder of the new item
 	LDataFolderI *Parent,
 	/// All the new items
@@ -11119,8 +11301,11 @@ void ScribeWnd::OnNew(
 	/// The position in the parent folder or -1
 	int Pos,
 	/// Non-zero if the object is a new email.
-	bool IsNew)
+	bool IsNew
+)
 {
+	THREAD_UNSAFE();
+
 	ScribeFolder *Fld = CastFolder(Parent);
 	int UnreadDiff = 0;
 
@@ -11266,6 +11451,8 @@ void ScribeWnd::OnNew(
 
 void ScribeWnd::OnPropChange(LDataStoreI *store, int Prop, LVariantType Type)
 {
+	THREAD_UNSAFE();
+
 	switch (Prop)
 	{
 		case FIELD_IS_ONLINE:
@@ -11302,12 +11489,16 @@ void ScribeWnd::OnPropChange(LDataStoreI *store, int Prop, LVariantType Type)
 
 void ScribeWnd::SetContext(const char *file, int line)
 {
+	THREAD_UNSAFE();
+
 	d->CtxFile = file;
 	d->CtxLine = line;
 }
 
 bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 {
+	THREAD_UNSAFE(false);
+
 	bool UpdateSelection = false;
 	List<Mail> NewMail;
 	ScribeFolder *Parent = 0;
@@ -11458,6 +11649,8 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 
 ContactGroup *ScribeWnd::FindGroup(char *SearchName)
 {
+	THREAD_UNSAFE(NULL);
+
 	ScribeFolder *g = GetFolder(FOLDER_GROUPS);
 	if (!g || !SearchName)
 		return 0;
@@ -11484,6 +11677,8 @@ ContactGroup *ScribeWnd::FindGroup(char *SearchName)
 
 bool ScribeWnd::Match(LDataStoreI *Store, LDataPropI *Address, int ObjType, LArray<LDom*> &Matches)
 {
+	THREAD_UNSAFE(false);
+
 	if (!Store || !Address)
 		return 0;
 
@@ -11552,6 +11747,8 @@ bool ScribeWnd::Match(LDataStoreI *Store, LDataPropI *Address, int ObjType, LArr
 
 bool ScribeWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items)
 {
+	THREAD_UNSAFE(false);
+
 	if (!new_parent || items.Length() == 0)
 		return false;
 
@@ -11634,6 +11831,8 @@ bool ScribeWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArra
 
 bool ScribeWnd::OnDelete(LDataFolderI *Parent, LArray<LDataI*> &Items)
 {
+	THREAD_UNSAFE(false);
+
 	int UnreadAdjust = 0;
 	int SelectIdx = -1;
 
@@ -11768,21 +11967,27 @@ bool ScribeWnd::OnDelete(LDataFolderI *Parent, LArray<LDataI*> &Items)
 
 bool ScribeWnd::AddStore3EventHandler(LDataEventsI *callback)
 {
+	THREAD_UNSAFE(false);
+
 	if (!d->Store3EventCallbacks.HasItem(callback))
-	{
 		d->Store3EventCallbacks.Add(callback);
-	}
+
 	return true;
 }
 
 bool ScribeWnd::RemoveStore3EventHandler(LDataEventsI *callback)
 {
+	THREAD_UNSAFE(false);
+
 	d->Store3EventCallbacks.Delete(callback);
+
 	return true;
 }
 
 bool ScribeWnd::OnMailTransferEvent(MailTransferEvent *t)
 {
+	THREAD_SAFE();
+
 	if (!Lock(_FL))
 		return false;
 
@@ -11795,6 +12000,8 @@ bool ScribeWnd::OnMailTransferEvent(MailTransferEvent *t)
 
 bool ScribeWnd::OnTransfer()
 {
+	THREAD_UNSAFE(false);
+
 	LVariant v;
 	LArray<MailTransferEvent*> Local;
 	
@@ -12012,6 +12219,8 @@ bool ScribeWnd::OnTransfer()
 
 bool ScribeWnd::OnIdle()
 {
+	THREAD_UNSAFE(false);
+
 	bool Status = false;
 	
 	for (auto a : Accounts)
@@ -12040,6 +12249,8 @@ bool ScribeWnd::OnIdle()
 
 void ScribeWnd::OnScriptCompileError(const char *Source, Filter *f)
 {
+	THREAD_UNSAFE();
+
 	const char *CompileMsg = LLoadString(IDS_ERROR_SCRIPT_COMPILE);
 	LArray<const char*> Actions;
 	Actions.Add(LLoadString(IDS_SHOW_CONSOLE));

@@ -827,6 +827,28 @@ Contact::~Contact()
 	DeleteObj(d);
 }
 
+LString Contact::GetLocalTime(const char *TimeZone)
+{
+	LString Status;
+
+	if (!ValidStr(TimeZone))
+	{
+		Get(OPT_TimeZone, TimeZone);
+	}
+
+	if (ValidStr(TimeZone))
+	{
+		double TheirTz = atof(TimeZone);
+		LDateTime d;
+		d.SetNow();
+		d.SetTimeZone((int)(TheirTz * 60), true);
+
+		Status = d.Get();
+	}
+
+	return Status;
+}
+
 Contact *Contact::LookupEmail(const char *Email)
 {
 	if (!Email)
@@ -2069,14 +2091,16 @@ ContactUi::~ContactUi()
 
 void ContactUi::OnDestroy()
 {
+	THREAD_UNSAFE();
 	if (Item)
 	{
-		Item->Ui = 0;
+		Item->Ui = NULL;
 	}
 }
 
 bool ContactUi::InitField(int Id, const char *Name)
 {
+	THREAD_UNSAFE(false);
 	if (Item)
 	{
 		const char *s;
@@ -2099,6 +2123,7 @@ bool ContactUi::InitField(int Id, const char *Name)
 
 bool ContactUi::SaveField(int Id, const char *Name)
 {
+	THREAD_UNSAFE(false);
 	if (Item)
 	{
 		if (Id == FIELD_UID)
@@ -2117,6 +2142,7 @@ bool ContactUi::SaveField(int Id, const char *Name)
 
 void ContactUi::OnLoad()
 {
+	THREAD_UNSAFE();
 	int Insert = 0;
 	ForAllContactFields(f)
 	{
@@ -2167,6 +2193,7 @@ void ContactUi::OnLoad()
 
 void ContactUi::OnSave()
 {
+	THREAD_UNSAFE();
 	auto Obj = Item->GetObject();
 	EmailAddr *Def = NULL;
 	List<EmailAddr> All;
@@ -2228,12 +2255,10 @@ void ContactUi::OnSave()
 	}
 }
 
-void ContactUi::OnPosChange()
-{
-}
-
 LMessage::Result ContactUi::OnEvent(LMessage *Msg)
 {
+	THREAD_UNSAFE(0);
+
 	switch (Msg->Msg())
 	{
 		case M_REMOVE_EMAIL_ADDR:
@@ -2252,6 +2277,8 @@ LMessage::Result ContactUi::OnEvent(LMessage *Msg)
 
 int ContactUi::OnNotify(LViewI *Ctrl, LNotification n)
 {
+	THREAD_UNSAFE(0);
+
 	switch (Ctrl->GetId())
 	{
 		case IDOK:
@@ -2346,38 +2373,10 @@ int ContactUi::OnNotify(LViewI *Ctrl, LNotification n)
 	return 0;
 }
 
-char *Contact::GetLocalTime(const char *TimeZone)
-{
-	char *Status = 0;
-
-	if (!ValidStr(TimeZone))
-	{
-		Get(OPT_TimeZone, TimeZone);
-	}
-
-	if (ValidStr(TimeZone))
-	{
-		double TheirTz = atof(TimeZone);
-		LDateTime d;
-		d.SetNow();
-		d.SetTimeZone((int)(TheirTz * 60), true);
-
-		char s[256];
-		d.Get(s, sizeof(s));
-		Status = NewStr(s);
-	}
-
-	return Status;
-}
-
 void ContactUi::OnPulse()
 {
-	char *Local = Item->GetLocalTime(GetCtrlName(IDC_TIMEZONE));
-	if (Local)
-	{
-		SetCtrlName(IDC_LOCALTIME, Local);
-		DeleteArray(Local);
-	}
+	THREAD_UNSAFE();
+	SetCtrlName(IDC_LOCALTIME, Item->GetLocalTime(GetCtrlName(IDC_TIMEZONE)));
 }
 
 

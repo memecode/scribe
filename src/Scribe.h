@@ -43,19 +43,19 @@
 #include "ScribeDefs.h"
 #include "DomType.h"
 
-class ListAddr;
+// Defines
 
-// The field definition type
-struct ItemFieldDef
-{
-	const char *DisplayText;
-	ScribeDomType Dom;
-	LVariantType Type;
-	int FieldId; // Was 'Id'
-	int CtrlId;
-	const char *Option;
-	bool UtcConvert;
-};
+// All functions in a LWindow or LView should use one of these at the top.
+// Until such time as a function has been checked for thread safety it should
+// use THREAD_UNSAFE([returnValue]) at the top. Otherwise THREAD_SAFE denotes
+// that the function IS safe to use in any thread.
+#define THREAD_UNSAFE(...)			if (!InThread()) \
+									{ \
+										LStackTrace("%s call out of thread.\n", __func__); \
+										LAssert(!"not thread safe"); \
+										return __VA_ARGS__; \
+									}
+#define THREAD_SAFE(...)
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -77,7 +77,6 @@ class Calendar;
 class CalendarSource;
 
 class AttachmentList;
-struct ItemFieldDef;
 class FolderDlg;
 class Filter;
 class ContactGroup;
@@ -85,6 +84,19 @@ class ScribeBehaviour;
 class AccountletThread;
 class ThingList;
 class LSpellCheck;
+class ListAddr;
+
+// The field definition type
+struct ItemFieldDef
+{
+	const char *DisplayText;
+	ScribeDomType Dom;
+	LVariantType Type;
+	int FieldId; // Was 'Id'
+	int CtrlId;
+	const char *Option;
+	bool UtcConvert;
+};
 
 ////////////////////////////////////////////////////////////////////////
 // Scripting support
@@ -764,7 +776,7 @@ public:
 	ThingUi *DoUI(MailContainer *c = NULL) override;
 	int Compare(LListItem *Arg, ssize_t Field) override;
 	bool IsAssociatedWith(char *PluginName);
-	char *GetLocalTime(const char *TimeZone = NULL);
+	LString GetLocalTime(const char *TimeZone = NULL);
 	
 	// Email address
 	int GetAddrCount();

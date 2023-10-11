@@ -3729,6 +3729,8 @@ FilterUi::~FilterUi()
 
 bool FilterUi::OnViewKey(LView *v, LKey &k)
 {
+	THREAD_UNSAFE(false);
+
 	if (k.CtrlCmd())
 	{
 		switch (k.c16)
@@ -3758,6 +3760,8 @@ bool FilterUi::OnViewKey(LView *v, LKey &k)
 
 int FilterUi::OnNotify(LViewI *Col, LNotification n)
 {
+	THREAD_UNSAFE(0);
+
 	int Reindex = 0;
 	int InsertOffset = 0;
 	switch (Col->GetId())
@@ -3930,6 +3934,8 @@ int FilterUi::OnNotify(LViewI *Col, LNotification n)
 
 LMessage::Result FilterUi::OnEvent(LMessage *Msg)
 {
+	THREAD_UNSAFE(0);
+
 	switch (Msg->Msg())
 	{
 		#ifdef WIN32
@@ -4000,6 +4006,8 @@ void LoadTree(LFilterView *v, LXmlTag *t, LTreeNode *i)
 
 void FilterUi::OnLoad()
 {
+	THREAD_UNSAFE();
+
 	if (Item)
 	{
 		LAutoPtr<LXmlTag> r = Item->Parse(true);
@@ -4101,6 +4109,8 @@ void SaveTree(LXmlTag *t, LTreeNode *i)
 
 void FilterUi::OnSave()
 {
+	THREAD_UNSAFE();
+
 	if (Item)
 	{
 		Item->SetName(GetCtrlName(IDC_NAME));
@@ -4161,6 +4171,8 @@ void FilterUi::OnSave()
 
 int FilterUi::OnCommand(int Cmd, int Event, OsView Window)
 {
+	THREAD_UNSAFE(0);
+
 	switch (Cmd)
 	{
 		case IDM_SAVE:

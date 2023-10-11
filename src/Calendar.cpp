@@ -2654,6 +2654,8 @@ CalendarUi::~CalendarUi()
 
 bool CalendarUi::OnViewKey(LView *v, LKey &k)
 {
+	THREAD_UNSAFE(false);
+
 	if (k.CtrlCmd())
 	{
 		switch (k.c16)
@@ -2694,16 +2696,20 @@ bool CalendarUi::OnViewKey(LView *v, LKey &k)
 
 int CalendarUi::OnCommand(int Cmd, int Event, OsView Window)
 {
+	THREAD_UNSAFE(0);
+
 	return 0;
 }
 
 void CalendarUi::OnPosChange()
 {
+	THREAD_UNSAFE();
 	LWindow::OnPosChange();
 }
 
 void CalendarUi::CheckConsistancy()
 {
+	THREAD_UNSAFE();
 	auto St = CurrentStart();
 	auto En = CurrentEnd();
 	if (En < St)
@@ -2719,21 +2725,29 @@ void CalendarUi::CheckConsistancy()
 LDateTime CalendarUi::CurrentStart()
 {
 	LDateTime dt;
+	THREAD_UNSAFE(dt);
+
 	dt.SetDate(GetCtrlName(IDC_START_DATE));
 	dt.SetTime(GetCtrlName(IDC_START_TIME));
+	
 	return dt;
 }
 
 LDateTime CalendarUi::CurrentEnd()
 {
 	LDateTime dt;
+	THREAD_UNSAFE(dt);
+
 	dt.SetDate(GetCtrlName(IDC_END_DATE));
 	dt.SetTime(GetCtrlName(IDC_END_TIME));
+
 	return dt;
 }
 
 void CalendarUi::UpdateStartRelative()
 {
+	THREAD_UNSAFE();
+
 	LDateTime dt = CurrentStart();
 	if (dt.IsValid())
 	{
@@ -2744,6 +2758,8 @@ void CalendarUi::UpdateStartRelative()
 
 void CalendarUi::UpdateEndRelative()
 {
+	THREAD_UNSAFE();
+	
 	LDateTime dt = CurrentEnd();
 	if (dt.IsValid())
 	{
@@ -2754,6 +2770,8 @@ void CalendarUi::UpdateEndRelative()
 
 void CalendarUi::UpdateRelative()
 {
+	THREAD_UNSAFE();
+
 	CheckConsistancy();
 	UpdateStartRelative();
 	UpdateEndRelative();
@@ -2761,6 +2779,8 @@ void CalendarUi::UpdateRelative()
 
 int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 {
+	THREAD_UNSAFE(0);
+
 	if (!NotifyOn)
 		return false;
 
@@ -2983,6 +3003,8 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 
 void CalendarUi::OnLoad()
 {
+	THREAD_UNSAFE();
+
 	// Sanity check
 	if (!Item) { LAssert(!"No item."); return; }
 	LDataI *o = Item->GetObject();
@@ -3141,6 +3163,8 @@ void CalendarUi::OnLoad()
 
 void CalendarUi::OnSave()
 {
+	THREAD_UNSAFE();
+
 	// Sanity check
 	if (!Item) { LAssert(!"No item."); return; }
 	LDataI *o = Item->GetObject();

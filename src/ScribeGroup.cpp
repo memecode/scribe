@@ -773,6 +773,8 @@ extern bool SerializeUi(ItemFieldDef *Defs, LDataI *Object, LViewI *View, bool T
 
 void GroupUi::OnLoad()
 {
+	THREAD_UNSAFE();
+
 	SerializeUi(GroupFieldDefs, Item->GetObject(), this, true);
 
 	auto GrpName = Item->GetObject()->GetStr(FIELD_GROUP_NAME);
@@ -786,6 +788,8 @@ void GroupUi::OnLoad()
 
 void GroupUi::ResolveAll()
 {
+	THREAD_UNSAFE();
+
 	// Turn all the references into email addresses
 	List<AddressMeta> Styles;
 	if (Edit && Edit->GetStyles(Styles))
@@ -803,6 +807,8 @@ void GroupUi::ResolveAll()
 
 void GroupUi::OnSave()
 {
+	THREAD_UNSAFE();
+
 	ResolveAll();
 	
 	// Save the group of contacts
@@ -814,6 +820,8 @@ void GroupUi::OnSave()
 
 int GroupUi::OnNotify(LViewI *c, LNotification n)
 {
+	THREAD_UNSAFE(0);
+
 	switch (c->GetId())
 	{
 		case IDOK:
@@ -836,6 +844,8 @@ int GroupUi::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
 
 void GroupUi::Add(char *Email)
 {
+	THREAD_UNSAFE();
+
 	ResolveAll();
 	
 	if (Edit)
@@ -866,6 +876,7 @@ void GroupUi::Add(char *Email)
 int GroupUi::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 {
 	int Status = DROPEFFECT_NONE;
+	THREAD_UNSAFE(Status);
 
 	for (unsigned n=0; n<Data.Length(); n++)
 	{

@@ -158,7 +158,6 @@ public:
 	void OnDestroy();
 	int OnNotify(LViewI *Col, LNotification n);
 	LMessage::Result OnEvent(LMessage *Msg);
-	void OnPosChange();
 	void OnPulse();
 };
 
