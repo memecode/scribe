@@ -607,16 +607,16 @@ class ThingUi : public LWindow
 {
 	friend class MailUiGpg;
 
-	bool _Dirty;
-	char *_Name;
+	bool _Dirty = false;
+	LString _Name;
 
 protected:
-	Thing *_Item;
-	bool _Running;
-	void SetItem(Thing *i) { _Item = i; }
+	Thing *_Item = NULL;
+	bool _Running = false;
+	void SetItem(Thing *i);
 
 public:
-	ScribeWnd *App;
+	ScribeWnd *App = NULL;
 	static LArray<ThingUi*> All;
 
 	ThingUi(Thing *item, const char *name);

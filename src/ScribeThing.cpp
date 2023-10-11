@@ -793,9 +793,7 @@ LArray<ThingUi*> ThingUi::All;
 
 ThingUi::ThingUi(Thing *item, const char *name)
 {	
-	_Dirty = false;
-	_Running = false;
-	_Name = NewStr(name);
+	_Name = name;
 	_Item = item;
 	App = item ? item->App : NULL;
 	LAssert(App != NULL);
@@ -815,11 +813,18 @@ ThingUi::~ThingUi()
 
 	_Running = false;
 	_Dirty = false;
-	DeleteArray(_Name);
+}
+
+void ThingUi::SetItem(Thing *i)
+{
+	THREAD_UNSAFE();
+	_Item = i;
 }
 
 bool ThingUi::OnViewKey(LView *v, LKey &k)
 {
+	THREAD_UNSAFE(false);
+
 	bool IsPopup = false;
 	#ifdef __GTK_H__
 	OsView Hnd = GtkCast(GetWindow()->WindowHandle(), gtk_widget, GtkWidget);
@@ -856,6 +861,8 @@ bool ThingUi::OnViewKey(LView *v, LKey &k)
 
 bool ThingUi::SetDirty(bool d, bool ui)
 {
+	THREAD_UNSAFE(false);
+
 	bool Status = true;
 
 	if (d ^ _Dirty)
@@ -896,7 +903,7 @@ bool ThingUi::SetDirty(bool d, bool ui)
 			char s[256];
 			if (_Dirty)
 			{
-				sprintf_s(s, sizeof(s), "%s (%s)", _Name, LLoadString(IDS_CHANGED));
+				sprintf_s(s, sizeof(s), "%s (%s)", _Name.Get(), LLoadString(IDS_CHANGED));
 			}
 			else
 			{
@@ -911,6 +918,8 @@ bool ThingUi::SetDirty(bool d, bool ui)
 
 bool ThingUi::OnRequestClose(bool OsShuttingDown)
 {
+	THREAD_UNSAFE(true);
+
 	static bool Processing = false;
 	bool Status = false;
 

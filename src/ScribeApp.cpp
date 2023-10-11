@@ -1841,7 +1841,8 @@ void ScribeWnd::OnSpellerSettingChange()
 
 bool ScribeWnd::SetSpellThreadParams(LSpellCheck *Thread)
 {
-	THREAD_UNSAFE(false);
+	THREAD_SAFE();
+
 	if (!Thread)
 		return false;
 	
