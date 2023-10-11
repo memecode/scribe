@@ -29,6 +29,7 @@ ifeq ($(Build),Debug)
 		-lchardet \
 		-lbzip2 \
 		-lbe \
+		-lnetwork \
 		-lgnu \
 		-llgi$(Tag) \
 		-L../../lgi/trunk/$(BuildDir)
@@ -50,10 +51,11 @@ else
 	Defs = -DHAIKU -D_REENTRANT -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -D_GNU_SOURCE
 	Libs =  \
 		-L../libs/build-x64-release/libchardet \
-		-L../libs/build-x64-debug/bzip2-1.0.6 \
+		-L../libs/build-x64-release/bzip2-1.0.6 \
 		-lchardet \
 		-lbzip2 \
 		-lbe \
+		-lnetwork \
 		-lgnu \
 		-llgi$(Tag) \
 		-L../../lgi/trunk/$(BuildDir)
@@ -465,7 +467,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Lgi/OptionsFile.cpp \
 	../../lgi/trunk/src/common/Lgi/Rand.cpp \
 	../../lgi/trunk/src/common/Lgi/Stream.cpp \
-	../../lgi/trunk/src/common/Lgi/SubProcess.cpp \
+	../../lgi/trunk/src/posix/SubProcess.cpp \
 	../../lgi/trunk/src/common/Lgi/ThreadCommon.cpp \
 	../../lgi/trunk/src/common/Lgi/ThreadEvent.cpp \
 	../../lgi/trunk/src/common/Lgi/ToolTip.cpp \

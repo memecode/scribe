@@ -11,6 +11,7 @@ print("platform.system():", platform.system())
 isMac = platform.system() == "Darwin"
 isWin = platform.system() == "Windows"
 isLinux = platform.system() == "Linux"
+isHaiku = platform.system() == "Haiku"
 buildDebug = False # ie build the Release build by default
 
 print("Build paths:")
@@ -145,7 +146,7 @@ Clone("https://phab.mallen.id.au/diffusion/11/libjpeg/", libjpeg)
 Openssl("git://git.openssl.org/openssl.git", openssl)
 
 print("\nBuilding dependencies:")
-if os.path.exists(os.path.join(scribeLibs, "build-x64")):
+if os.path.exists(os.path.join(scribeLibs, "build-x64-release")):
 	print("    Seems to be already built.")
 else:
 	args = [sys.executable, "build.py"]
@@ -165,10 +166,16 @@ elif isLinux:
 	jobs = multiprocessing.cpu_count()
 	if jobs > 1:
 		jobs = jobs - 1 # leave a core free
-	buildEnv["BUILD"] = "Debug" if buildDebug else "Release"
+	buildEnv["Build"] = "Debug" if buildDebug else "Release"
 	args = ["make", "-j", str(jobs), "-f", "linux/Makefile.linux"]
+elif isHaiku:
+	jobs = multiprocessing.cpu_count()
+	if jobs > 1:
+		jobs = jobs - 1 # leave a core free
+	buildEnv["Build"] = "Debug" if buildDebug else "Release"
+	args = ["make", "-j", str(jobs), "-f", "haiku/makefile.haiku"]
 else:
-	print("Error: unsupported system (haiku? Is that you? haha).")
+	print("Error: unsupported system:", platform.system())
 	sys.exit(1)
 
 p = subprocess.run(args, cwd=trunk, env=buildEnv)
