@@ -1929,7 +1929,7 @@ LSpellCheck *ScribeWnd::GetSpellThread(bool OverrideOpt)
 
 LString ScribeWnd::GetHttpProxy()
 {
-	THREAD_UNSAFE(NULL);
+	THREAD_SAFE();
 	LString Proxy;
 	
 	LVariant v;
