@@ -1866,7 +1866,7 @@ bool ScribeWnd::SetSpellThreadParams(LSpellCheck *Thread)
 
 LSpellCheck *ScribeWnd::CreateSpellObject()
 {
-	THREAD_UNSAFE(NULL);
+	THREAD_SAFE();
 	LVariant PrefAspell;
 	GetOptions()->GetValue(OPT_PreferAspell, PrefAspell);
 
