@@ -5199,7 +5199,7 @@ const char *Mail::GetMessageId(bool Create)
  	d->MsgIdCache = GetObject()->GetStr(FIELD_MESSAGE_ID);
  	if (!d->MsgIdCache)
 	{
-		bool InThread = GetCurrentThreadId() == LAppInst->GetGuiThreadId();
+		bool InThread = LCurrentThreadId() == LAppInst->GetGuiThreadId();
 
 		LAutoString Header(InetGetHeaderField(GetInternetHeader(), "Message-ID"));
 		if (Header)
