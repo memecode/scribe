@@ -157,7 +157,7 @@ struct LTempFile : public LFile
 		if (Path)
 		{
 			Close();
-			FileDev->Delete(Path, false);
+			FileDev->Delete(Path, NULL, false);
 		}
 	}
 };
@@ -609,7 +609,7 @@ private:
 		// The output file will be deleted by the M_GNUPG_DECRYPT handler.
 		if (LFileExists(InPath))
 		{
-			FileDev->Delete(InPath, false);
+			FileDev->Delete(InPath, NULL, false);
 		}
 		
 		j->Owner->PostEvent(M_GNUPG_DECRYPT, (LMessage::Param) Resp.Release());
@@ -1546,7 +1546,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 			LString OutFile(p);
 			if (LFileExists(OutFile))
 			{
-				FileDev->Delete(OutFile, false);
+				FileDev->Delete(OutFile, NULL, false);
 			}
 	
 			LString Args, s;

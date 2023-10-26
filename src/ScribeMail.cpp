@@ -4584,7 +4584,7 @@ LDocumentEnv::LoadType Mail::GetContent(LAutoPtr<LoadJob> &j)
 								j->pDC.Reset(GdcD->Load(s));
 								j->Filename = a->GetName();
 								GdcD->SetOption(GDC_PROMOTE_ON_LOAD, Promote);
-								FileDev->Delete(s, false);
+								FileDev->Delete(s, NULL, false);
 								return LoadImmediate;
 							}
 						}
@@ -6258,7 +6258,7 @@ bool Mail::WriteAlternateHtml(char *DstFile, int DstFileLen)
 		for (auto a: Refs)
 		{
 			LMakePath(FileName, sizeof(FileName), Tmp, a->GetName());
-			FileDev->Delete(FileName, false);
+			FileDev->Delete(FileName, NULL, false);
 			a->SaveTo(FileName);
 		}
 	}
@@ -8570,7 +8570,7 @@ bool Mail::Save(ScribeFolder *Into)
 
 			if (Status && DropFileName)
 			{
-				FileDev->Delete(DropFileName, false);
+				FileDev->Delete(DropFileName, NULL, false);
 				DropFileName.Reset();
 			}
 		}

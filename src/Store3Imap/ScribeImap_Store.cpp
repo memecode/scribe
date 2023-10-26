@@ -1108,7 +1108,7 @@ void ImapStore::OnEvent(void *Param)
 							{
 								// No uid, just destroy it, we'll get it eventually through the
 								// \recent mail search
-								FileDev->Delete(m->Path, false);
+								FileDev->Delete(m->Path, NULL, false);
 								m->Path.Empty();
 							}
 						}

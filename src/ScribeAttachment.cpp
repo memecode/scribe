@@ -707,7 +707,7 @@ bool Attachment::SaveTo(char *FileName, bool Quite, LView *Parent)
 					{
 						// Error writing to disk...
 						Out.Close();
-						FileDev->Delete(FileName, false);
+						FileDev->Delete(FileName, NULL, false);
 						LAssert(!"Failed to write whole attachment to disk.");
 						Status = false;
 					}

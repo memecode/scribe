@@ -1405,7 +1405,7 @@ bool ImapMail::OnDelete()
 
 	if (Path)
 	{
-		Status = FileDev->Delete(Path, false);
+		Status = FileDev->Delete(Path, NULL, false);
 	}
 
 	return Status;

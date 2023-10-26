@@ -1258,7 +1258,7 @@ public:
 		#endif
 
 		StatusMsg("Deleting temporary files...");
-		FileDev->Delete(RepairSql, false);
+		FileDev->Delete(RepairSql, NULL, false);
 
 		return OnStatus(0);
 	}

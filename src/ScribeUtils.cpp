@@ -500,7 +500,7 @@ void HttpImageThread::DoJob(LThreadJob *j)
 			if (!r)
 			{
 				Job->Status = LDocumentEnv::LoadJob::JobErr_GetUri;
-				FileDev->Delete(CachedFile, false);
+				FileDev->Delete(CachedFile, NULL, false);
 			}
 		}
 		else
@@ -525,7 +525,7 @@ void HttpImageThread::DoJob(LThreadJob *j)
 			{
 				char *d = strrchr(CachedFile, DIR_CHAR);
 				Job->Error.Printf("%s:%i - LoadDC(%s) failed [%s].", _FL, d?d+1:CachedFile.Get(), Job->Uri.Get());
-				FileDev->Delete(CachedFile, false);
+				FileDev->Delete(CachedFile, NULL, false);
 				Job->Status = LDocumentEnv::LoadJob::JobErr_ImageFilter;
 			}
 		}
@@ -608,7 +608,7 @@ void ClearTempPath()
 			{
 				char p[256];
 				d.Path(p, sizeof(p));
-				FileDev->Delete(p, false);
+				FileDev->Delete(p, NULL, false);
 			}
 		}
 	}	

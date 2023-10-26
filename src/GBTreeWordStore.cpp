@@ -126,7 +126,7 @@ void LWordStore::Empty()
 {
 	d->Tree.Reset();
 	if (d->File)
-		FileDev->Delete(d->File, false);
+		FileDev->Delete(d->File, NULL, false);
 	d->Tree.Reset(new LBTree(d->File));
 }
 

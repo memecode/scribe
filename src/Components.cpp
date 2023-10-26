@@ -605,7 +605,7 @@ public:
 											{
 												Msg(j->Prog, "Error: Download component '%s' failed with HTTP %i.", InFiles[i], Status);
 												Out.Close();
-												FileDev->Delete(OutPath, false);
+												FileDev->Delete(OutPath, NULL, false);
 											}
 										}
 
@@ -619,7 +619,7 @@ public:
 											if (Writable)
 											{
 												f.Close();
-												FileDev->Delete(p, false);
+												FileDev->Delete(p, NULL, false);
 											}
 											
 											if (Writable)
@@ -638,7 +638,7 @@ public:
 														if (FileDev->Copy(t, p, &CopyStatus))
 														{
 															Copied++;
-															FileDev->Delete(t, false);
+															FileDev->Delete(t, NULL, false);
 														}
 														else
 														{

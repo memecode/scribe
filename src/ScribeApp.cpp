@@ -543,7 +543,7 @@ void LogMsg(char *str, ...)
 	}
 	else
 	{
-		FileDev->Delete(f, false);
+		FileDev->Delete(f, NULL, false);
 	}
 	#endif
 }
@@ -3242,7 +3242,7 @@ bool ScribeWnd::SaveOptions()
 				if (f.Open(Path, O_WRITE))
 				{
 					f.Close();
-					FileDev->Delete(Path, false);
+					FileDev->Delete(Path, NULL, false);
 					d->Options->SetFile(Path);
 				}
 				else
@@ -3286,7 +3286,7 @@ bool ScribeWnd::SaveOptions()
 				if (f.Open(Path, O_WRITE))
 				{
 					f.Close();
-					FileDev->Delete(Path, false);
+					FileDev->Delete(Path, NULL, false);
 					d->Options->SetFile(Path);
 				}
 				else

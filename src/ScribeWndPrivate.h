@@ -428,7 +428,7 @@ public:
 			{
 				// Clean up
 				f.Close();
-				FileDev->Delete(Wr, false);
+				FileDev->Delete(Wr, NULL, false);
 			}
 			else
 			{
