@@ -221,74 +221,81 @@ void Thing::SetParentFolder(ScribeFolder *f)
 	}
 }
 
-Store3Status Thing::SetFolder(ScribeFolder *New, int Param)
+void Thing::SetFolder(ScribeFolder *New, std::function<void(Store3Status)> callback)
 {
-	Store3Status Moved = Store3Error;
-
-	if (New)
+	if (!New)
 	{
-		ScribeFolder *Old = GetFolder();
-		if (Old)
+		if (callback) callback(Store3Error);
+		return;
+	}
+
+	ScribeFolder *Old = GetFolder();
+	if (Old)
+	{
+		if (Old->GetObject() &&
+			New->GetObject() &&
+			Old->GetObject()->GetStore() != 0 &&
+			Old->GetObject()->GetStore() == New->GetObject()->GetStore())
 		{
-			if (Old->GetObject() &&
-				New->GetObject() &&
-				Old->GetObject()->GetStore() != 0 &&
-				Old->GetObject()->GetStore() == New->GetObject()->GetStore())
-			{
-				// Both source and dest are local folders...
-				// This is really an optimization to reduce the overhead of moving objects
-				// between folders, a function which is provided by the storage sub-system
-				// does all the work for us.
-				LArray<LDataI*> Mv;
-				Mv.Add(GetObject());
+			// Both source and dest are local folders...
+			// This is really an optimization to reduce the overhead of moving objects
+			// between folders, a function which is provided by the storage sub-system
+			// does all the work for us.
+			LArray<LDataI*> Mv;
+			Mv.Add(GetObject());
 
-				Moved = Old->GetObject()->GetStore()->Move(New->GetFldObj(), Mv);
-				if (Moved == Store3Success)
-				{
-					LAssert(!Old->Items.HasItem(this));
-					LAssert(GetFolder() == New);
-					LAssert(New->Items.HasItem(this));
-				}
+			auto status = Old->GetObject()->GetStore()->Move(New->GetFldObj(), Mv);
+			if (status == Store3Success)
+			{
+				LAssert(!Old->Items.HasItem(this));
+				LAssert(GetFolder() == New);
+				LAssert(New->Items.HasItem(this));
 			}
-			else
+
+			if (callback)
+				callback(status);
+		}
+		else if (IsPlaceHolder())
+		{
+			return;
+		}
+		else if (New->GetObject() && GetObject() && New->GetObject()->GetStore())
+		{
+			// Source OR Dest are remote...
+			auto NewObject = New->GetObject()->GetStore()->Create(Type());
+			if (NewObject)
 			{
-				if (IsPlaceHolder())
-				{
-				}
-				else if (New->GetObject() && GetObject() && New->GetObject()->GetStore())
-				{
-					// Source OR Dest are remote...
-					LDataI *NewObject = New->GetObject()->GetStore()->Create(Type());
-					if (NewObject)
+				LDataI *OldObject = GetObject();
+
+				// Copy the current data into the new object
+				NewObject->CopyProps(*GetObject());
+				SetObject(NewObject, false, _FL);
+
+				// Try writing it to the store...
+				// bool InOld = Old->Items.HasItem(this);
+				Store3Status SyncStatus = New->WriteThing(
+					this,
+					[this, Old, OldObject, New, NewObject](auto AsyncStatus)
 					{
-						LDataI *OldObject = GetObject();
-
-						// Copy the current data into the new object
-						NewObject->CopyProps(*GetObject());
-						SetObject(NewObject, false, _FL);
-
-						// Try writing it to the store...
-						// bool InOld = Old->Items.HasItem(this);
-						Store3Status WrStatus = New->WriteThing(this);
-						switch (WrStatus)
+						switch (AsyncStatus)
 						{
 							default:
 							case Store3Error:
 							{
 								// It failed, delete the new object...
 								SetObject(OldObject, false, _FL);
-								DeleteObj(NewObject);
+								delete NewObject;
 								break;
 							}
 							case Store3Success:
 							{
 								// Ok, immediate save, set new object
 								// delete old object
-								Moved = OldObject->Delete(false);
+								auto Moved = OldObject->Delete(false);
 								if (Moved == Store3Error)
 								{
 									SetObject(OldObject, false, _FL);
-									DeleteObj(NewObject);
+									delete NewObject;
 								}
 								else if (Moved == Store3Success)
 								{
@@ -345,21 +352,20 @@ Store3Status Thing::SetFolder(ScribeFolder *New, int Param)
 									t->DeleteOnAdd.Obj = this;
 								}
 
-								Moved = WrStatus;
+								// Moved = WrStatus;
 								break;
 							}
 						}
-					}
-				}
+					});
 			}
 		}
-		else
-		{
-			Moved = New->WriteThing(this);
-		}
 	}
-
-	return Moved;
+	else
+	{
+		auto status = New->WriteThing(this);
+		if (callback)
+			callback(status);
+	}
 }
 
 void Thing::OnCreate()

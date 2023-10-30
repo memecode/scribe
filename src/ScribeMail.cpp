@@ -2706,7 +2706,7 @@ void MailUi::OnSave()
 		{
 			*Copy = *_Item;
 			Copy->SetFlags(MAIL_READ | MAIL_CREATED, true);
-			Copy->SetFolder(GetItem()->GetFolder());				
+			Copy->SetFolder(GetItem()->GetFolder(), NULL);
 			Copy->SetDateSent(0);
 			SetItem(Copy);
 		}

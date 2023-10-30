@@ -439,7 +439,7 @@ public:
 	virtual bool Save(ScribeFolder *Into) { return false; }
 	virtual void OnProperties(int Tab = -1) {}
 	virtual ScribeFolder *GetFolder() = 0;
-	virtual Store3Status SetFolder(ScribeFolder *f, int Param = -1) = 0;
+	virtual void SetFolder(ScribeFolder *f, std::function<void(Store3Status)> callback) = 0;
 	virtual bool IsPlaceHolder() { return false; }
 
 	// Events
@@ -558,7 +558,7 @@ public:
 	// Thing
 	ScribeFolder *GetFolder() override { return _ParentFolder; }
 	void SetParentFolder(ScribeFolder *f);
-	Store3Status SetFolder(ScribeFolder *f, int Param = -1) override;
+	void SetFolder(ScribeFolder *f, std::function<void(Store3Status)> callback) override;
 	LDataI *DefaultObject(LDataI *arg = NULL);
 
 	virtual ThingUi *DoUI(MailContainer *c = NULL) { return NULL; }
@@ -1281,7 +1281,7 @@ public:
 	ScribeFolder *GetFolder() override { return dynamic_cast<ScribeFolder*>(LTreeItem::GetParent()); }
 	ScribeFolder *GetChildFolder() { return dynamic_cast<ScribeFolder*>(LTreeItem::GetChild()); }
 	ScribeFolder *GetNextFolder() { return dynamic_cast<ScribeFolder*>(LTreeItem::GetNext()); }
-	Store3Status SetFolder(ScribeFolder *f, int Param = -1) override;
+	void SetFolder(ScribeFolder *f, std::function<void(Store3Status)> callback) override;
 	ScribeFolder *IsFolder() { return this; }
 	Store3Status CopyTo(ScribeFolder *NewParent, int NewIndex = -1);
 

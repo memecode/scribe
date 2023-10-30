@@ -597,9 +597,7 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 								{
 									// Work out the index
 									for (LTreeItem *Item = NewParent->GetChild(); Item && Item!=Leaf; Item=Item->GetNext())
-									{
 										Index++;
-									}
 									Index++;
 								}
 							}
@@ -639,11 +637,17 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 								else
 								{
 									// Move
-									Status = Folder->SetFolder(NewParent, Index);
-									if (Status)
-									{
-										NewParent->Sort(FolderItemCmp);
-									}
+									#ifdef _MSC_VER
+										#pragma message("Reimplement index and async handler here.")
+									#else
+										#warning("Reimplement index and async handler here.")
+									#endif
+									Folder->SetFolder(NewParent,
+										[this, NewParent](auto Status)
+										{
+											if (Status == Store3Success)
+												NewParent->Sort(FolderItemCmp);
+										});
 								}
 							}
 								

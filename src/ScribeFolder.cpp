@@ -492,29 +492,39 @@ Store3Status ScribeFolder::CopyTo(ScribeFolder *NewParent, int NewIndex)
 	return Copied;
 }
 
-Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
+void ScribeFolder::SetFolder(ScribeFolder *newParent, std::function<void(Store3Status)> callback)
 {
-	Store3Status Moved = Store3Error;
-
-	if (f == this)
+	LDataI *obj = NULL;
+	LDataStoreI *store = NULL;
+	if (newParent == this || !newParent)
 	{
-		LAssert(0);
+		LAssert(!"invalid ptr");
+		if (callback)
+			callback(Store3Error);
 	}
-	else if (f &&
-			GetObject() &&
-			GetObject()->GetStore() &&
-			f->GetObject() &&
-			f->GetObject()->GetStore())
+	else if (!(obj = GetObject()) ||
+			!(store = obj->GetStore()) ||
+			!newParent->GetObject() ||
+			!newParent->GetObject()->GetStore())
 	{
-		if (GetObject()->GetStore() == f->GetObject()->GetStore())
+		LAssert(!"missing object");
+		if (callback)
+			callback(Store3Error);
+	}
+	else
+	{
+		Store3Status status = Store3Error;
+
+		if (store == newParent->GetObject()->GetStore())
 		{
 			// Simple in storage movement
 			LArray<LDataI*> Mv;
-			Mv.Add(GetObject());
-			Moved = GetObject()->GetStore()->Move(f->GetFldObj(), Mv);
-			if (Moved && Param >= 0)
+			Mv.Add(obj);
+			status = store->Move(newParent->GetFldObj(), Mv);
+			if (status)
 			{
-				GetObject()->SetInt(FIELD_FOLDER_INDEX, Param);
+				//  && Param >= 0
+				// GetObject()->SetInt(FIELD_FOLDER_INDEX, Param);
 			}
 		}
 		else
@@ -522,13 +532,13 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 			// Cross storage movement...
 
 			// Find or create the destinate folder
-			LDataFolderI *Dst = 0;
+			LDataFolderI *Dst = NULL;
 			int Idx = 0;
-			auto Name = GetObject()->GetStr(FIELD_FOLDER_NAME);
-			for (ScribeFolder *c = f->GetChildFolder(); c; c = c->GetNextFolder(), Idx++)
+			auto Name = obj->GetStr(FIELD_FOLDER_NAME);
+			for (auto c = newParent->GetChildFolder(); c; c = c->GetNextFolder(), Idx++)
 			{
 				auto n = c->GetObject()->GetStr(FIELD_FOLDER_NAME);
-				if (n && !_stricmp(n, Name))
+				if (n && !Stricmp(n, Name))
 				{
 					Dst = c->GetFldObj();
 					break;
@@ -537,7 +547,7 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 
 			if (!Dst)
 			{
-				Dst = dynamic_cast<LDataFolderI*>(f->GetObject()->GetStore()->Create(f->Type()));
+				Dst = dynamic_cast<LDataFolderI*>(newParent->GetObject()->GetStore()->Create(newParent->Type()));
 			}
 			else
 			{
@@ -545,7 +555,6 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 				if (c)
 				{
 					c->Remove();
-					Param = Idx;
 					DeleteObj(c);
 				}
 			}
@@ -572,26 +581,26 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 				}
 
 				// Copy ourself over...
-				Dst->CopyProps(*GetObject());
+				Dst->CopyProps(*obj);
 				
 				LDataFolderI *Old = GetFldObj();
 				SetObject(Dst, false, _FL);				
 
 				// Save the object to the new store...
-				Store3Status s = GetObject()->Save(f->GetObject());
+				Store3Status s = obj->Save(newParent->GetObject());
 				if (s != Store3Error)
 				{
 					// And replicate all the children objects...
-					Moved = Store3ReplicateFolders(App, GetFldObj(), Old, true, true, 0);
+					status = Store3ReplicateFolders(App, GetFldObj(), Old, true, true, 0);
 				}
 			}
 			else LAssert(!"Not a valid folder");
 		}
 
-		if (Moved == Store3Success)
+		if (status == Store3Success)
 		{
 			// Move LTreeItem node...
-			f->Insert(this, Param);
+			newParent->Insert(this, NULL);
 			Select(true);
 			LoadFolders();
 
@@ -607,10 +616,10 @@ Store3Status ScribeFolder::SetFolder(ScribeFolder *f, int Param)
 				}
 			}
 		}
-	}
-	else LAssert(!"Pointer error");
 
-	return Moved;
+		if (callback)
+			callback(status);
+	}
 }
 
 Store3Status ScribeFolder::DeleteAllThings(std::function<void(Store3Status)> Callback)
@@ -708,10 +717,10 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 		App->GetAccessLevel(App,
 							GetWriteAccess(),
 							Path,
-							[OnAllow](auto Allow)
+							[cb=std::move(OnAllow)](auto Allow)
 							{
 								if (Allow)
-									OnAllow();
+									cb();
 							});
 	else
 		OnAllow();	
@@ -1503,7 +1512,7 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 					LgiMsg(App, s, AppName);
 					#endif
 			
-					t->SetFolder(this);
+					t->SetFolder(this, NULL);
 				}
 
 				Mail *m = t->IsMail();
@@ -2948,7 +2957,9 @@ class MoveToState
 	bool BayesInc = false;
 	size_t Moves = 0;
 
-	// Returns true if the object is deleted.
+	// Returns true the total operation is complete and
+	// 'this' object has been deleted. Ie exit immediately
+	// from the calling context.
 	bool SetStatus(int i, Store3Status s)
 	{
 		LAssert(Status[i] == Store3NotImpl);
@@ -3123,13 +3134,20 @@ public:
 				else
 				{
 					// Out of store more... use the old single object method... for the moment..
-					r = t->SetFolder(Folder);
-					if (r == Store3Success)
-					{
-						// Remove from the list..
-						if (Old && Old->Select() && App->GetMailList())
-							App->GetMailList()->Remove(t);
-					}
+					t->SetFolder(Folder,
+						[this, Old, t, i](auto r)
+						{
+							if (r == Store3Success)
+							{
+								// Remove from the list..
+								if (Old && Old->Select() && App->GetMailList())
+									App->GetMailList()->Remove(t);
+								t->OnMove();
+							}
+
+							return SetStatus(i, r);
+						});
+					return false; // SetFolder callback will call the SetStatus function;
 				}
 			}
 		}
