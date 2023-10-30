@@ -600,7 +600,7 @@ void ScribeFolder::SetFolder(ScribeFolder *newParent, std::function<void(Store3S
 		if (status == Store3Success)
 		{
 			// Move LTreeItem node...
-			newParent->Insert(this, NULL);
+			newParent->Insert(this); // FIXME: Missing index for insert...
 			Select(true);
 			LoadFolders();
 
