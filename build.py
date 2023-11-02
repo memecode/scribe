@@ -32,6 +32,46 @@ print("    codeLib:   ", codeLib)
 lgi = os.path.abspath(os.path.join(code, "lgi/trunk"))
 print("    lgi:       ", lgi)
 
+def PackageSearch(name):
+	p = subprocess.run(["apt-cache","search",name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	for line in p.stdout.decode().split("\n"):
+		parts = line.split()
+		if parts[0] == name:
+			print("requiredPackage:", line)
+			return True
+	return False
+
+def PackageInstalled(names):
+	for name in names:
+		p = subprocess.run(["dpkg","-l",name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		if p.returncode == 0:
+			return True
+	return False
+
+requiredPackages = [
+	["cmake"],
+	["mercurial"]
+]
+if isLinux:
+	requiredPackages += [
+		["build-essential"],
+		["libgtk-3-dev"],
+		["libmagic-dev"],
+		["libgstreamer1.0-dev"],
+		["libayatana-appindicator3-dev"],
+		["libssh-dev"]
+	] 
+
+missingReqPackage = False
+for package in requiredPackages:
+	if not PackageInstalled(package):
+		PackageSearch(package[0])
+		missingReqPackage = True
+	else:
+		print("ok:", package[0])
+if missingReqPackage:
+	sys.exit(-1)
+
 def Clone(repo, folder):
 	if not os.path.exists(folder):
 		args = ["hg", "clone", repo, folder]

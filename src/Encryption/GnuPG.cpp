@@ -511,8 +511,8 @@ private:
 
 			#ifndef _DEBUG
 			// Clean up temporary files...
-			FileDev->Delete(TextPath, false);
-			FileDev->Delete(SigPath, false);
+			FileDev->Delete(TextPath, NULL, false);
+			FileDev->Delete(SigPath, NULL, false);
 			#endif
 			
 			printf("Txt=%s\nSig=%s\n", (const char*)TextPath, (const char*)SigPath);
@@ -1612,8 +1612,8 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 
 			#ifndef _DEBUG
 			// Clean up temporary files...
-			FileDev->Delete(InFile, false);
-			FileDev->Delete(OutFile, false);
+			FileDev->Delete(InFile, NULL, false);
+			FileDev->Delete(OutFile, NULL, false);
 			#endif
 	
 			if (uEncrypt)
