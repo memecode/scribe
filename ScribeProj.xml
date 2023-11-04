@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Project>
 	<Node Name="Build" Type="1" Platforms="15" Id="1">
-		<Node File=".\build.py" Type="8" Platforms="15" />
-		<Node File=".\linux\make-install.linux" Type="7" Platforms="0" />
-		<Node File=".\linux\make-zip.linux" Type="8" Platforms="15" />
+		<Node File="./build.py" Type="8" Platforms="15" />
+		<Node File="./linux/make-install.linux" Type="7" Platforms="0" />
+		<Node File="./linux/make-zip.linux" Type="8" Platforms="15" />
 		<Node Name="Haiku" Type="1" Platforms="15" Id="1">
-			<Node File=".\haiku\buildHaiku.py" Type="8" Platforms="15" />
-			<Node File=".\haiku\makefile.haiku" Type="9" Platforms="15" />
+			<Node File="./haiku/buildHaiku.py" Type="8" Platforms="15" />
+			<Node File="./haiku/makefile.haiku" Type="9" Platforms="15" />
 		</Node>
-		<Node File=".\linux\Makefile.linux" Type="9" Platforms="15" />
+		<Node File="./linux/Makefile.linux" Type="9" Platforms="15" />
 	</Node>
 	<Node Name="Encryption" Type="1" Platforms="15" Open="0" Id="1">
-		<Node File=".\src\Encryption\GnuPG.cpp" Type="2" Platforms="15" />
-		<Node File=".\src\Encryption\GnuPG.h" Type="3" Platforms="15" />
+		<Node File="./src/Encryption/GnuPG.cpp" Type="2" Platforms="15" />
+		<Node File="./src/Encryption/GnuPG.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Gdc2" Type="1" Open="0" Platforms="7" Id="2">
 		<Node File="../../lgi/trunk/src/common/Gdc2/Filters/Gif.cpp" Type="2" Platforms="15" />
@@ -364,7 +364,7 @@
 		</Node>
 	</Node>
 	<Node Name="Testing" Type="1" Platforms="15" Id="1">
-		<Node File=".\src\Test\UnitTests.cpp" Type="2" Platforms="15" />
+		<Node File="./src/Test/UnitTests.cpp" Type="2" Platforms="15" />
 	</Node>
 	<Node File="../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
 	<Settings>
@@ -406,8 +406,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>./scribe</Release>
 				</Linux>
 			</Executable>
-			<CCrossCompiler />
-			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -459,15 +457,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			</TargetType>
 			<Libraries>
 				<Linux>
-					<Debug>-static-libgcc
--lpthread
+					<Debug>-lpthread
 -ldl
 png
 jpeg
 z
 `pkg-config --libs gtk+-3.0`</Debug>
-					<Release>-static-libgcc
--lpthread
+					<Release>-lpthread
 -ldl
 png
 jpeg
@@ -523,16 +519,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>../libs/build-x64-release/libchardet
 ../libs/build-x64-release/bzip2-1.0.6</Release>
 				</All>
-				<Linux />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
 					<Debug>scribe</Debug>
 					<Release>scribe</Release>
 				</Haiku>
-				<Linux />
 			</TargetName>
-			<ApplicationIcon />
 			<Options>
 				<All />
 				<Linux>
@@ -554,26 +547,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
-			<CommentFile />
-			<CommentFunction />
 		</Editor>
 		<Advanced>
-			<PostBuildCommands>
-				<Linux />
-			</PostBuildCommands>
-			<OtherMakefileRules />
+			<PostBuildCommands />
 		</Advanced>
 		<Debug>
-			<Arguments>
-				<All />
-			</Arguments>
-			<Environment />
-			<DebugAdmin />
-			<InitialDir />
+			<Arguments />
 		</Debug>
-		<Remote>
-			<RemoteUri />
-			<RemotePass />
-		</Remote>
+		<Remote />
 	</Settings>
 </Project>

@@ -812,16 +812,24 @@ void ScribeWnd::Construct0(LOptionsFile::PortableType Type)
 			Construct1();
 		});
 	}
-	else Construct1();
+	else
+	{
+		if (!d->Options)
+			d->Options.Reset(new LOptionsFile(Type, OptionsFileName));
+
+		Construct1();
+	}
 }
 
 void ScribeWnd::Construct1()
 {
-	if (!d->Options && !LoadOptions())
+	if (!d->Options)
 	{
+		LgiTrace("%s:%i - Error: no options object.\n", _FL);
 		ScribeState = ScribeExiting;
 		return;
 	}
+	LoadOptions();
 	ScribeOptionsDefaults(d->Options);
 
 	LVariant GlyphSub;
@@ -1032,8 +1040,15 @@ void ScribeWnd::Construct3()
 	Menu = new LMenu(AppName);
 	if (Menu)
 	{
-		Menu->Attach(this);
-		if (Menu->Load(this, "ID_MENU", GetUiTags()))
+		if (!Menu->Attach(this))
+		{
+			LgiTrace("%s:%i - Failed to attach menu.\n", _FL);
+		}
+		else if (!Menu->Load(this, "ID_MENU", GetUiTags()))
+		{
+			LgiTrace("%s:%i - Failed to load 'ID_MENU'.\n", _FL);
+		}
+		else
 		{
 			LAssert(ImageList != NULL);
 			Menu->SetImageList(ImageList, false);
@@ -3013,12 +3028,13 @@ bool ScribeWnd::LoadOptions()
 		d->SetInstallMode(LOptionsFile::DesktopMode);
 		LgiTrace("Selecting desktop mode based on options file path.\n");
 	}
-	
+
 	// Do multi-instance stuff
 	if (Ipc &&
 		d->Options &&
 		d->Options->GetFile())
 	{
+		// printf("%s:%i - Calling Ipc->OnLoad...\n", _FL);
 		Ipc->OnLoad(d->Options->GetFile(),
 					&d->MulPassword,
 					[this](auto status)
@@ -3040,7 +3056,7 @@ bool ScribeWnd::LoadOptions()
 	}
 	else
 	{
-		// printf("%s:%i - Not calling IPC? %p, %p, %s\n", _FL, Ipc, d->Options, d->Options?d->Options->GetFile():NULL);
+		// printf("%s:%i - Not calling IPC? %p, %p, %s\n", _FL, Ipc, d->Options.Get(), d->Options?d->Options->GetFile():NULL);
 		d->FakeIpcEvent = true;
 	}
 
@@ -3048,7 +3064,9 @@ bool ScribeWnd::LoadOptions()
 		return false;
 
 	// Open file and load..
-	if (!Load && d->Options)
+	if (!Load &&
+		d->Options &&
+		LFileExists(d->Options->GetFile()))
 	{
 		auto Opts = GetOptions();
 		Load = Opts->SerializeFile(false);
@@ -3056,12 +3074,13 @@ bool ScribeWnd::LoadOptions()
 		{
 			LVariant v = d->GetInstallMode() == LOptionsFile::PortableMode;
 			GetOptions()->SetValue(OPT_IsPortableInstall, v);
+			LgiTrace("LoadOptions(%s)\n", d->Options->GetFile());
 		}
 		else
 		{
             auto err = GetOptions()->GetError();
 			LgiMsg(	this,
-					LLoadString(IDS_ERROR_LR8_FAILURE),
+					"Error: loading options: %s",
 					AppName,
 					MB_OK,
 					err);
@@ -3215,7 +3234,12 @@ bool ScribeWnd::SaveOptions()
 	bool WndStateSet = false;
 	
 	RestartSave:
-	if (d->Options && !d->Options->GetFile())
+	
+	if (!d->Options)
+	{
+		Log.Print("No options object to save.\n");
+	}	
+	else if (!d->Options->GetFile())
 	{
 		bool PortableOk = true;
 		char Path[MAX_PATH_LEN];
@@ -3296,13 +3320,14 @@ bool ScribeWnd::SaveOptions()
 			}
 		}
 	}
+	else Log.Print("%s:%i - %p %s\n", _FL, d->Options.Get(), d->Options?d->Options->GetFile():"#NoOptions");
 
 	if (d->Options && d->Options->GetFile() && d->Options->IsValid())
 	{
 		// Backup options file
 		char Backup[MAX_PATH_LEN];
 		strcpy_s(Backup, sizeof(Backup), d->Options->GetFile());
-		char *Ext = LGetExtension(Backup);
+		auto Ext = LGetExtension(Backup);
 		if (Ext)
 		{
 			*--Ext = 0;
@@ -3366,7 +3391,13 @@ bool ScribeWnd::SaveOptions()
 			}
 		}
 	}
-	
+	#ifdef _DEBUG
+	else Log.Print("%s:%i - %p %s %i\n", _FL,
+		d->Options.Get(),
+		d->Options ? d->Options->GetFile() : NULL,
+		d->Options ? d->Options->IsValid() : false);
+	#endif
+
 	if (!Status)
 	{
 		LString a = Log.NewLStr();
@@ -3432,7 +3463,7 @@ void ScribeWnd::OnCommandLine()
 	CreateMail = LAppInst->GetOption("m", Str);
 	if (!CreateMail)
 		CreateMail = LAppInst->GetOption("t", Str);
-	LgiTrace("%s:%i - CreateMail=%i Str=%s\n", _FL, CreateMail, Str.Get());
+	// LgiTrace("%s:%i - CreateMail=%i Str=%s\n", _FL, CreateMail, Str.Get());
 	
 	bool HasFile = LAppInst->GetOption("f", File);
 	if (!CreateMail)

@@ -15,7 +15,7 @@ endif
 MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
 
-CFlags = -MMD -MP -g -fPIC -fno-inline
+CFlags = -MMD -MP -fPIC -fno-inline
 CppFlags = $(CFlags) -fpermissive -std=c++14
 
 ifeq ($(Build),Debug)
@@ -28,7 +28,6 @@ ifeq ($(Build),Debug)
 		-L../libs/build-x64-debug/bzip2-1.0.6 \
 		-lchardet \
 		-lbzip2 \
-		-static-libgcc \
 		-lpthread \
 		-ldl \
 		-lpng \
@@ -60,7 +59,6 @@ else
 		-L../libs/build-x64-release/bzip2-1.0.6 \
 		-lchardet \
 		-lbzip2 \
-		-static-libgcc \
 		-lpthread \
 		-ldl \
 		-lpng \
@@ -377,6 +375,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/include/lgi/common/SkinEngine.h \
 	../../lgi/trunk/include/lgi/common/Slider.h \
 	../../lgi/trunk/include/lgi/common/Splitter.h \
+	../../lgi/trunk/include/lgi/common/Stat.h \
 	../../lgi/trunk/include/lgi/common/StatusBar.h \
 	../../lgi/trunk/include/lgi/common/Store3Defs.h \
 	../../lgi/trunk/include/lgi/common/Stream.h \
@@ -534,6 +533,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/linux/Gtk/ScreenDC.cpp \
 	../../lgi/trunk/src/linux/Lgi/App.cpp \
 	../../lgi/trunk/src/linux/Lgi/ClipBoard.cpp \
+	../../lgi/trunk/src/linux/Lgi/Dialog.cpp \
 	../../lgi/trunk/src/linux/Lgi/DragAndDrop.cpp \
 	../../lgi/trunk/src/linux/Lgi/General.cpp \
 	../../lgi/trunk/src/linux/Lgi/Layout.cpp \
@@ -541,7 +541,6 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/linux/Lgi/Printer.cpp \
 	../../lgi/trunk/src/linux/Lgi/Thread.cpp \
 	../../lgi/trunk/src/linux/Lgi/View.cpp \
-	../../lgi/trunk/src/linux/Lgi/Dialog.cpp \
 	../../lgi/trunk/src/linux/Lgi/Window.cpp \
 	../../lgi/trunk/src/posix/SubProcess.cpp
 	export Build=$(Build); \

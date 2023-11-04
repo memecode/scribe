@@ -424,6 +424,7 @@ public:
 			char Wr[MAX_PATH_LEN];
 			LMakePath(Wr, sizeof(Wr), Inst, "_write_test.txt");
 			LFile f;
+			f.onErrorCb = [](auto err) {}; // Don't log error... we're kinda expecting it to fail.
 			if (f.Open(Wr, O_WRITE))
 			{
 				// Clean up
