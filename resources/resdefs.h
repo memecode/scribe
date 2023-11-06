@@ -897,7 +897,6 @@
 #define IDC_PUBLIC								1092
 #define IDC_PRIVATE								1093
 #define IDC_NEW_FILTER_ACTION					1094
-#define IDC_DELETE_FILTER_ACTION				1095
 #define IDS_MAIL								1096
 #define IDC_RADIO1								1097
 #define IDC_RADIO2								1098
@@ -1100,6 +1099,7 @@
 #define IDS_ERROR_REPLICATION_FAILED			1375
 #define IDS_ERROR_IMPORT_COUNT					1388
 #define IDS_GNUPG_ERR_NOT_INSTALLED				1458
+#define IDC_1459								1459
 #define IDD_FOLDER_SELECT						1469
 #define IDS_REPARSE								1471
 #define IDD_FOLDER_FORMAT						1472

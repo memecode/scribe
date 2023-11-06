@@ -139,7 +139,6 @@
 		<String Ref="178" Cid="-1" Define="IDC_STATIC" en="Limit to colour:" fr="Limiter à la couleur:" />
 		<String Ref="179" Cid="-1" Define="IDC_STATIC" en="Limit to:" fr="Limiter à:" />
 		<String Ref="181" Cid="673" Define="IDD_FILTER_ACTION" en="Actions" it="Azioni" cs="Akce" es="Acciones" de="Filter Einstellungen" nl="Acties" pt_br="Ações" pt="Acção do Filtro" pl="Zadania" vi="Thao tác" zh_tw="動作" ja="動作" sr="Akcije" no="Handlinger" lt="Veiksmai" fa="عمليات" da="Aktioner" sv="Filterinställning" lg="Eby&apos;Okukola" tr="İşlemler" hu="Műveletek" ru="Действия" ko="동작" uk="Дії" />
-		<String Ref="182" Cid="1095" Define="IDC_DELETE_FILTER_ACTION" en="Del" fr="Sup." it="Cancella" cs="Smazat" es="Eliminar" de="Löschen" nl="Verwijderen" pt_br="Excluir" pt="Apagar" pl="Usuń" vi="Xóa" zh_tw="刪除" ja="削除" sr="Briši" no="Slett" lt="Pašalinti" fa="پاک کن" da="Slet" sv="Ta bort" lg="Sangula" tr="Sil" hu="Töröl" ru="Удалить" ko="삭제" uk="Видалити" />
 		<String Ref="183" Cid="970" Define="IDC_LAUNCH_HELP" en="Help" fr="Aide" it="Aiuto" cs="Nápověda" es="Ayuda" de="Hilfe" pt_br="Ajuda" ru="Помощь" nl="Hulp" ja="ヘルプ" pt="Ajuda" pl="Pomoc" vi="Giúp đỡ" zh_tw="說明" no="Hjelp" lt="Žinynas" fa="کمک" sr="Pomoć" da="Hjælp" sv="Hjälp" lg="Obuyambi" tr="Yardım" hu="Súgó" ko="도움말" uk="Допомога" />
 		<String Ref="184" Cid="184" Define="IDC_SIGNATURE_TAB" />
 		<String Ref="185" Cid="876" Define="IDC_TAB1" en="Plain Text" ko="암호화하지 않은 데이터" uk="Простий текст" de="Nur Text" fr="Texte" />
@@ -542,7 +541,7 @@
 		<String Ref="889" Cid="889" Define="IDS_3" vi="Tên:" lg="Erinnya:" pt="Nome:" />
 		<String Ref="890" Cid="922" Define="IDC_APR_NONE" en="None" pt="Nenhum" cs="Bez omezení" pl="Brak" it="Nessuno" vi="Không ai cả" zh_tw="無" ja="無し" nl="Geen" sr="Niko" es="Ninguno" no="Ingen" lt="Visiems" fa="هيچ يک" de="Niemand" da="Ingen" sv="Ingen" pt_br="Nenhum" lg="Temuli" tr="Yok" hu="Nincs" ru="Нет" ko="없음" uk="Ні" fr="Aucun" />
 		<String Ref="891" Cid="686" Define="IDC_APR_USER" en="User" pt="Utilizador" it="Utente" vi="Người dùng" zh_tw="用戶" ja="ユーザ:" nl="Gebruiker" sr="Korisnik" es="Usuario" cs="Uživatel" no="Bruker" lt="Naudotojui" fa="کاربر" de="Benutzer" da="Bruger" sv="Användare" pt_br="Usuário" lg="Omukozesa" tr="Kullanıcı" hu="Felhasználó" ru="Пользователь" pl="Użytkownik" ko="사용자" uk="Користувач" fr="Usager" />
-		<String Ref="893" Cid="-1" Define="IDC_STATIC" />
+		<String Ref="893" Cid="-1" Define="IDC_STATIC" en="Edit" />
 		<String Ref="895" Cid="512" Define="IDC_REPEATS" />
 		<String Ref="896" Cid="471" Define="IDC_CREATE_FOLDER" en="Create a new folder file" fr="Creer un nouveau dossier" cs="Vytvořit nový soubor zpráv" de="Neue Mail-Datenbank erzeugen" nl="Nieuwe map maken" es="Crear un nuevo Archivo de Carpetas" pt_br="Criar um novo arquivo de pastas" ru="Создать новую папку" pt="Criar um novo ficheiro de pastas" pl="Utwórz nowy plik folderu" it="Crea un nuovo file cartella " vi="Tạo tập tin danh mục mới" zh_tw="建立新的資料夾檔案" ja="新規フォルダ・ファイルを作成" sr="Kreiraj novi fajl omotnice" no="Lag ny mappefil" lt="Sukurti naują laiškų rinkmeną" fa="يک پرونده براي پوشه جديد بساز" da="Indret ny mappefil" sv="Skapa ny mappfil" lg="Tondawo Kabada empya" tr="Yeni bir klasör dosyası oluştur" hu="Új mappafájl létrehozása" ko="새로운 폴더 파일 생성" uk="Створити нову теку" />
 		<String Ref="897" Cid="-1" Define="IDC_STATIC" en="&Off" pl="Wyłącz" it="Inattivo" vi="Tắt" pt="Desligado" zh_tw="關閉" ja="OFF" nl="Uit" sr="Isključeno" cs="Vypnuto" no="Av" lt="Atjungta" fa="خاموش" de="Aus" da="Deaktiv" sv="Av" es="Desactivado" pt_br="Desligado" lg="Yee" tr="Kapalı" hu="Ki" ru="Выкл." ko="꺼짐" uk="Вимк." />
@@ -863,6 +862,7 @@
 		<String Ref="1371" Cid="1371" Define="IDS_SPELL_CHECK" en="Spell Check:" pl="Sprawdzanie pisowni:" ko="철자 체크:" uk="Перевірка орфографії:" de="Rechtschreibprüfung:" fr="Vérification d&apos;orthographe:" />
 		<String Ref="1372" Cid="1372" Define="IDS_SPELL_DICT" en="Dictionary:" pl="Słownik:" ko="사전:" uk="Словник:" de="Wörterbuch:" fr="Dictionnaire:" />
 		<String Ref="1376" Cid="-1" Define="IDC_STATIC" en="Start in folder:" pl="Rozpocznij w folderze:" pt="Localização das sub-pastas" nl="Begin in map:" sr="Počni u omotnici:" lt="Pradžios aplankas:" cs="Výchozí složka:" de="Start im Ordner:" da="Start i mappe:" fa="پوشه شروع:" vi="Bắt đầu trong danh mục:" sv="Starta i:" es="Iniciar en Carpeta:" pt_br="Começar na pasta:" lg="Salawo awaterekerwa bu kabada" tr="Başlangıç klasörü:" hu="Kezdő mappa" ru="Запускать в папке:" ko="시작 폴더:" uk="Запустити в теці:" fr="Débuter dans le dossier:" />
+		<String Ref="1459" Cid="1459" Define="IDC_1459" en="Control" />
 		<String Ref="1469" Cid="1469" Define="IDD_FOLDER_SELECT" en="Select Folder" ko="폴더 선택" uk="Вибір теки" de="Ordner auswählen" fr="Sélectionner dossier" />
 		<String Ref="1470" Cid="540" Define="IDC_LAYOUT" />
 		<String Ref="1472" Cid="1472" Define="IDD_FOLDER_FORMAT" en="Mail3 Folder Format" ko="Mail3 폴더 형식" uk="Формат теки Mail3" de="Mail3 Ordnerformat" fr="Format du dossier Mail3" />
@@ -875,8 +875,6 @@
 		<String Ref="1480" Cid="893" Define="IDC_FORMAT" en="Mail3 Format:" ko="Mail3 형식:" uk="Mail3 Формат:" fr="Format de Mail3:" />
 		<String Ref="1481" Cid="1481" Define="IDC_V1" en="v1" />
 		<String Ref="1482" Cid="1482" Define="IDC_V2" en="v2" />
-		<String Ref="1483" Cid="1483" Define="IDC_UP" en="Up" ko="위" uk="Вгору" fr="Haut" />
-		<String Ref="1484" Cid="1018" Define="IDC_DOWN" en="Down" ko="아래" uk="Униз" de="Runter" fr="Bas" />
 		<String Ref="1485" Cid="1485" Define="IDS_GROWL_SUPPORT" en="Growl notification support" ko="Growl 알림 지원" uk="Підтримка повідомлень Growl" de="Unterstützung von Growl-Benachrichtigungen" fr="Prise en charge des notifications Growl" />
 		<String Ref="1486" Cid="1486" Define="IDS_GROWL" en="Use growl:" ko="Growl 사용" uk="Використовувати growl:" de="Verwende Growl:" fr="Utilisez le grognement:" />
 		<String Ref="1487" Cid="1165" Define="IDC_TABLE" />
@@ -3025,20 +3023,17 @@
 				<td addr="0,1" colspan="3">
 					<ListView pos="0,42,426,167" ref="880">
 						<Column ref="881" width="174" />
-						<Column ref="886" width="191" />
+						<Column ref="886" width="117" />
 						<Column ref="893" width="39" />
+						<Column ref="1459" width="50" />
 					</ListView>
 				</td>
 			</tr>
 			<tr>
-				<td addr="0,2">
-					<Button pos="167,210,187,230" ref="1483" toggle="0" />
-					<Button pos="146,210,187,230" ref="1484" toggle="0" />
-				</td>
+				<td addr="0,2" />
 				<td addr="1,2" />
 				<td addr="2,2" align="Max">
-					<Button pos="385,203,447,223" ref="182" toggle="0" />
-					<Button pos="329,203,384,223" ref="633" toggle="0" />
+					<Button pos="364,217,419,237" ref="633" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -4890,7 +4885,7 @@
 		</TableLayout>
 	</Dialog>
 	<Dialog pos="7,7,300,188" ref="157">
-		<TableLayout pos="7,7,286,153" ref="114" Style="padding:0.7em;" CellStyle="padding-top:0.7em;" cols="1.000" rows="0.559,0.211,0.230">
+		<TableLayout pos="7,7,286,153" ref="114" Style="padding:0.7em;" cols="1.000" rows="0.559,0.211,0.230">
 			<tr>
 				<td addr="0,0">
 					<StaticText pos="0,0,251,55" ref="116" />

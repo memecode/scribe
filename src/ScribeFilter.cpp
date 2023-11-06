@@ -1001,19 +1001,42 @@ ThingUi *FilterCondition::DoUI(MailContainer *c)
 #define IDC_ARG_EDIT	2001
 #define IDC_BROWSE_ARG	2002
 
-FilterAction::FilterAction(LDataStoreI *Store)
+static FilterIcon FilterActionIcons[] = { IconMoveDown, IconMoveUp, IconDelete };
+
+FilterAction::FilterAction(Filter *Owner, LDataStoreI *Store)
 {
-	Type = ACTION_MOVE_TO_FOLDER;
-	TypeCbo = 0;
-	ArgEdit = 0;
-	Btn = 0;
+	owner = Owner;
 }
 
 FilterAction::~FilterAction()
 {
-	DeleteObj(TypeCbo);
-	DeleteObj(ArgEdit);
-	DeleteObj(Btn);
+}
+
+LImageList *FilterAction::GetIcons()
+{
+	return owner->GetIcons();
+}
+
+void FilterAction::OnMouseClick(LMouse &m)
+{
+	for (size_t i=0; i<iconPos.Length(); i++)
+	{
+		if (iconPos[i].Overlap(m))
+		{
+			if (m.Down())
+				OnIconClick(FilterActionIcons[i]);
+			return; // item could be deleted by now.
+		}
+	}
+
+	LListItem::OnMouseClick(m);
+}
+
+void FilterAction::OnIconClick(int icon)
+{
+	LNotification n(LNotifyItemChange);
+	n.Int[0] = icon;
+	LListItem::GetList()->SendNotify(n);
 }
 
 int FilterAction::OnNotify(LViewI *c, LNotification n)
@@ -1036,6 +1059,8 @@ int FilterAction::OnNotify(LViewI *c, LNotification n)
 				ArgEdit->Name(Arg1);
 			break;
 		}
+		default:
+			break;
 	}
 
 	return 0;
@@ -1066,6 +1091,29 @@ void FilterAction::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c
 		ArgEdit->SetPos(*GetPos(i));
 	else if (i == 2 && Btn)
 		Btn->SetPos(*GetPos(i));
+	else if (i == 3)
+	{
+		auto icons = GetIcons();
+		if (!icons)
+		{
+			LDisplayString ds(GetFont(), "#errNoIcons");
+			GetFont()->Colour(Ctx.Fore, Ctx.Back);
+			ds.Draw(Ctx.pDC, Ctx.x1, Ctx.y1);
+			return;
+		}
+
+		int x = Ctx.x1;
+		int y = Ctx.y1 + ((Ctx.Y() - icons->TileY()) >> 1);
+		for (int i=0; i<CountOf(FilterActionIcons); i++)
+		{
+			iconPos[i].ZOff(icons->TileX()-1, icons->TileY()-1);
+			iconPos[i].Offset(x, y);
+
+			icons->Draw(Ctx.pDC, iconPos[i].x1, iconPos[i].y1, FilterActionIcons[i], Ctx.Back);
+			
+			x += icons->TileX() + 2;
+		}
+	}
 }
 
 void FilterAction::Select(bool b)
@@ -1081,7 +1129,8 @@ void FilterAction::Select(bool b)
 
 			if (!TypeCbo)
 			{
-				TypeCbo = new LCombo(IDC_TYPE_CBO, r->x1, r->y1, r->X(), r->Y(), 0);
+				if (!TypeCbo.Reset(new LCombo(IDC_TYPE_CBO, r->x1, r->y1, r->X(), r->Y(), 0)))
+					return;
 				for (int i=0; ActionNames[i].Id; i++)
 					TypeCbo->Insert(LLoadString(ActionNames[i].Id));
 				TypeCbo->Attach(Lst);
@@ -1092,7 +1141,8 @@ void FilterAction::Select(bool b)
 			r = GetPos(1);
 			if (!ArgEdit)
 			{
-				ArgEdit = new LEdit(IDC_ARG_EDIT, r->x1, r->y1, r->X(), r->Y(), 0);
+				if (!ArgEdit.Reset(new LEdit(IDC_ARG_EDIT, r->x1, r->y1, r->X(), r->Y(), 0)))
+					return;
 				ArgEdit->Attach(Lst);
 			}
 			ArgEdit->Name(Arg1);
@@ -1101,7 +1151,8 @@ void FilterAction::Select(bool b)
 			r = GetPos(2);
 			if (!Btn)
 			{
-				Btn = new LButton(IDC_BROWSE_ARG, r->x1, r->y1, r->X(), r->Y(), "...");
+				if (!Btn.Reset(new LButton(IDC_BROWSE_ARG, r->x1, r->y1, r->X(), r->Y(), "...")))
+					return;
 				Btn->Attach(Lst);
 			}
 			Btn->SetPos(*r);
@@ -1109,9 +1160,9 @@ void FilterAction::Select(bool b)
 	}
 	else
 	{
-		DeleteObj(TypeCbo);
-		DeleteObj(ArgEdit);
-		DeleteObj(Btn);
+		TypeCbo.Reset();
+		ArgEdit.Reset();
+		Btn.Reset();
 	}
 }
 
@@ -2404,7 +2455,7 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 	return Status;
 }
 
-Filter *Filter::GetFilterAt(int Index)
+Filter *Filter::GetFilterAt(size_t Index)
 {
 	ScribeFolder *f = GetFolder();
 	if (f)
@@ -2731,7 +2782,7 @@ bool Filter::CallMethod(const char *MethodName, LScriptArguments &Args)
 				break;
 			}
 			
-			FilterAction a(GetObject()->GetStore());
+			FilterAction a(this, GetObject()->GetStore());
 			for (ActionName *an = ActionNames; an->Id; an++)
 			{
 				if (Action.Equals(an->Default))
@@ -2970,7 +3021,7 @@ LAutoString Filter::DescribeHtml()
 				if (!c->IsTag(ELEMENT_ACTION))
 					continue;
 
-				LAutoPtr<FilterAction> a(new FilterAction(GetObject()->GetStore()));
+				LAutoPtr<FilterAction> a(new FilterAction(this, GetObject()->GetStore()));
 				if (a->Set(c))
 				{
 					p.Print("<li> ");
@@ -3157,7 +3208,7 @@ bool Filter::DoActions(Mail *&m, bool &Stop, LStream *Log)
 		{
 			if (c->IsTag(ELEMENT_ACTION))
 			{
-				FilterAction *a = new FilterAction(GetObject()->GetStore());
+				auto a = new FilterAction(this, GetObject()->GetStore());
 				if (a)
 				{
 					if (a->Set(c))
@@ -3368,6 +3419,12 @@ const char *Filter::GetFieldText(int Field)
 	}
 
 	return NULL;
+}
+
+LImageList *Filter::GetIcons()
+{
+	LAssert(Ui);
+	return Ui ? Ui->GetIcons() : NULL;
 }
 
 void Filter::OnColumnNotify(int Col, int64 Data)
@@ -3587,6 +3644,12 @@ int FilterCallback(	LFilterView *View,
 //////////////////////////////////////////////////////////
 struct FilterUiPriv
 {
+	LDocView *Script = NULL;
+	LScriptUi Commands;
+	LTabView *Tab = NULL;
+	LFilterView *Conditions = NULL;
+	LList *Actions = NULL;
+	LAutoPtr<LImageList> FilterIcons;
 };
 
 FilterUi::FilterUi(Filter *item) :
@@ -3599,14 +3662,10 @@ FilterUi::FilterUi(Filter *item) :
 		return;
 	}
 
-	Script = 0;
-	Tab = 0;
-	Actions = 0;
-	Conditions = 0;
-
 	LRect r(100, 100, 800, 600);
 	SetPos(r);
 	MoveSameScreen(item->App);
+	d->FilterIcons = LFilterView::CreateIcons();
 
 	// Create window
 	#if WINNATIVE
@@ -3616,28 +3675,26 @@ FilterUi::FilterUi(Filter *item) :
 	if (Attach(0))
 	{
 		// Setup UI
-		Commands.Toolbar = Item->App->LoadToolbar(this,
-												Item->App->GetResourceFile(ResToolbarFile),
-												Item->App->GetToolbarImgList());
-		if (Commands.Toolbar)
+		d->Commands.Toolbar = Item->App->LoadToolbar(this,
+													Item->App->GetResourceFile(ResToolbarFile),
+													Item->App->GetToolbarImgList());
+		if (d->Commands.Toolbar)
 		{
-			Commands.Toolbar->Attach(this);
-			Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_SAVE)), IDM_SAVE, TBT_PUSH, true, IMG_SAVE);
-			Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_SAVE_CLOSE)), IDM_SAVE_CLOSE, TBT_PUSH, true, IMG_SAVE_AND_CLOSE);
-			Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_DELETE)), IDM_DELETE, TBT_PUSH, true, IMG_TRASH);
-			Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), IDM_HELP, TBT_PUSH, true, IMG_HELP);
-			Commands.SetupCallbacks(GetItem()->App, this, GetItem(), LThingUiToolbar);
+			d->Commands.Toolbar->Attach(this);
+			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_SAVE)), IDM_SAVE, TBT_PUSH, true, IMG_SAVE);
+			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_SAVE_CLOSE)), IDM_SAVE_CLOSE, TBT_PUSH, true, IMG_SAVE_AND_CLOSE);
+			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_DELETE)), IDM_DELETE, TBT_PUSH, true, IMG_TRASH);
+			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), IDM_HELP, TBT_PUSH, true, IMG_HELP);
+			d->Commands.SetupCallbacks(GetItem()->App, this, GetItem(), LThingUiToolbar);
 		}
 
-		LTabPage *Cond = 0;
-		LTabPage *Act = 0;
-		Tab = new LTabView(91, 0, 0, 1000, 1000, 0);
-		if (Tab)
+		d->Tab = new LTabView(91, 0, 0, 1000, 1000, 0);
+		if (d->Tab)
 		{
-			Tab->Attach(this);
-			Tab->SetPourChildren(true);
+			d->Tab->Attach(this);
+			d->Tab->SetPourChildren(true);
 
-			LTabPage *Filter = Tab->Append(LLoadString(IDS_FILTER));
+			auto Filter = d->Tab->Append(LLoadString(IDS_FILTER));
 			if (Filter)
 			{
 				#ifdef _DEBUG
@@ -3648,18 +3705,18 @@ FilterUi::FilterUi(Filter *item) :
 				Name(Filter->Name());
 			}
 
-			Cond = Tab->Append(LLoadString(IDS_CONDITIONS));
+			auto Cond = d->Tab->Append(LLoadString(IDS_CONDITIONS));
 			if (Cond)
 			{
-				Conditions = new LFilterView(FilterCallback, Item);
-				if (Conditions)
+				d->Conditions = new LFilterView(FilterCallback, Item);
+				if (d->Conditions)
 				{
-					Cond->Append(Conditions);
-					Conditions->SetPourLargest(true);
+					Cond->Append(d->Conditions);
+					d->Conditions->SetPourLargest(true);
 				}
 			}
 
-			Act = Tab->Append(LLoadString(IDS_ACTIONS));
+			auto Act = d->Tab->Append(LLoadString(IDS_ACTIONS));
 			if (Act)
 			{
 				#ifdef _DEBUG
@@ -3667,19 +3724,19 @@ FilterUi::FilterUi(Filter *item) :
 				#endif
 				Act->LoadFromResource(IDD_FILTER_ACTION);
 				LAssert(Status);
-				if (GetViewById(IDC_FILTER_ACTIONS, Actions))
-					Actions->MultiSelect(false);
+				if (GetViewById(IDC_FILTER_ACTIONS, d->Actions))
+					d->Actions->MultiSelect(false);
 			}
 
-			LTabPage *ScriptTab = Tab->Append("");
+			auto ScriptTab = d->Tab->Append("");
 			if (ScriptTab &&
 				ScriptTab->LoadFromResource(IDD_FILTER_SCRIPT))
 			{
-				if (GetViewById(IDC_SCRIPT, Script))
+				if (GetViewById(IDC_SCRIPT, d->Script))
 				{
-					Script->SetWrapType(L_WRAP_NONE);
-					Script->Sunken(true);
-					Script->SetPourLargest(true);
+					d->Script->SetWrapType(L_WRAP_NONE);
+					d->Script->Sunken(true);
+					d->Script->SetPourLargest(true);
 				}
 				else LAssert(0);
 			}
@@ -3688,7 +3745,7 @@ FilterUi::FilterUi(Filter *item) :
 		// Show window
 		Visible(true);
 
-		if (Cond && Item)
+		if (Item)
 		{
 			LCombo *Cbo;
 			if (GetViewById(IDC_ACTION, Cbo))
@@ -3712,6 +3769,11 @@ FilterUi::~FilterUi()
     if (Item)
 	    Item->Ui = 0;
 	DeleteObj(d);
+}
+
+LImageList *FilterUi::GetIcons()
+{
+	return d->FilterIcons;
 }
 
 bool FilterUi::OnViewKey(LView *v, LKey &k)
@@ -3745,21 +3807,92 @@ bool FilterUi::OnViewKey(LView *v, LKey &k)
 	return false;
 }
 
+void FilterUi::ReorderAction(int offset)
+{
+	if (!d->Actions)
+		return;
+
+	List<FilterAction> Items;
+	if (!d->Actions->GetSelection(Items) && Items[0])
+		return;
+
+	auto Idx = d->Actions->IndexOf(Items[0]) + offset;
+	FilterAction *Last = NULL;
+	for (auto a: Items)
+	{
+		d->Actions->Remove(a);
+		d->Actions->Insert(a, Idx++);
+		Last = a;
+	}
+	if (Last)
+	{
+		d->Actions->Focus(true);
+		Last->Select(true);
+	}
+}
+
+void FilterUi::DeleteAction()
+{
+	List<FilterAction> Items;
+	if (d->Actions &&
+		d->Actions->GetSelection(Items) &&
+		Items.Length())
+	{
+		int Idx = d->Actions->IndexOf(Items[0]);
+		Items.DeleteObjects();
+
+		if (Idx >= (int)d->Actions->Length())
+			Idx = (int)d->Actions->Length() - 1;
+		d->Actions->Select(d->Actions->ItemAt(Idx));
+		d->Actions->Focus(true);
+	}
+}
+
 int FilterUi::OnNotify(LViewI *Col, LNotification n)
 {
 	THREAD_UNSAFE(0);
 
 	int Reindex = 0;
-	int InsertOffset = 0;
 	switch (Col->GetId())
 	{
+		case IDC_FILTER_ACTIONS:
+		{
+			switch (n.Type)
+			{
+				case LNotifyItemChange:
+				{
+					// Catch the user clicking on an action item icon
+					switch (n.Int[0])
+					{
+						case IconMoveDown:
+						{
+							ReorderAction(1);
+							break;
+						}
+						case IconMoveUp:
+						{
+							ReorderAction(-1);
+							break;
+						}
+						case IconDelete:
+						{
+							DeleteAction();
+							break;
+						}
+					}
+					break;
+				}
+				default: break;
+			}
+			break;
+		}
 		case IDC_TYPE_CBO:
 		case IDC_ARG_EDIT:
 		{
-			if (Actions)
+			if (d->Actions)
 			{
 				List<FilterAction> Sel;
-				if (Actions->GetSelection(Sel))
+				if (d->Actions->GetSelection(Sel))
 				{
 					for (auto a: Sel)
 						a->OnNotify(Col, n);
@@ -3769,10 +3902,10 @@ int FilterUi::OnNotify(LViewI *Col, LNotification n)
 		}
 		case IDC_BROWSE_ARG:
 		{
-			if (Actions)
+			if (d->Actions)
 			{
 				List<FilterAction> Sel;
-				if (Actions->GetSelection(Sel))
+				if (d->Actions->GetSelection(Sel))
 				{
 					FilterAction *a = Sel[0];
 					if (a)
@@ -3784,66 +3917,20 @@ int FilterUi::OnNotify(LViewI *Col, LNotification n)
 			}
 			break;			
 		}
-        case IDC_UP:
-            InsertOffset = -1;
-            // fall thru
-        case IDC_DOWN:
-        {
-            if (!InsertOffset)
-                InsertOffset = 1;
-            if (!Actions)
-                break;
-			List<FilterAction> Items;
-			if (!Actions->GetSelection(Items) && Items[0])
-			    break;
-
-			int Idx = Actions->IndexOf(Items[0]) + InsertOffset;
-			FilterAction *Last = 0;
-			for (auto a: Items)
-			{
-			    Actions->Remove(a);
-			    Actions->Insert(a, Idx++);
-			    Last = a;
-			}
-			if (Last)
-			{
-			    Actions->Focus(true);
-			    Last->Select(true);
-			}
-            break;
-        }
 		case IDC_NEW_FILTER_ACTION:
 		{
-			if (Actions)
+			if (d->Actions)
 			{
-				FilterAction *n = new FilterAction(Item->GetObject()->GetStore());
-				Actions->Insert(n);
-				Actions->Select(n);
-				Actions->Focus(true);
-			}
-			break;
-		}
-		case IDC_DELETE_FILTER_ACTION:
-		{
-			if (Actions)
-			{
-				List<FilterAction> Items;
-				if (Actions->GetSelection(Items) && Items[0])
-				{
-					int Idx = Actions->IndexOf(Items[0]);
-					Items.DeleteObjects();
-
-					if (Idx >= (int)Actions->Length())
-						Idx = (int)Actions->Length() - 1;
-					Actions->Select(Actions->ItemAt(Idx));
-					Actions->Focus(true);
-				}
+				FilterAction *n = new FilterAction(Item, Item->GetObject()->GetStore());
+				d->Actions->Insert(n);
+				d->Actions->Select(n);
+				d->Actions->Focus(true);
 			}
 			break;
 		}
 		case IDC_LAUNCH_HELP:
 		{
-			switch (Tab->Value())
+			switch (d->Tab->Value())
 			{
 				case 0: // Name/Index
 				default:
@@ -3891,10 +3978,10 @@ int FilterUi::OnNotify(LViewI *Col, LNotification n)
 		}
 
 		// Swap entries
-		int i = (int)GetCtrlValue(IDC_FILTER_INDEX);
+		auto i = GetCtrlValue(IDC_FILTER_INDEX);
 		if (i >= 0)
 		{
-			Filter *f = Item->GetFilterAt(i - Reindex);
+			auto f = Item->GetFilterAt(i - Reindex);
 			if (f)
 			{
 				int n = f->GetIndex();
@@ -3995,19 +4082,21 @@ void FilterUi::OnLoad()
 {
 	THREAD_UNSAFE();
 
-	if (Item)
+	if (Item &&
+		d->Actions &&
+		d->Conditions)
 	{
-		LAutoPtr<LXmlTag> r = Item->Parse(true);
-		if (r && Actions)
+		auto r = Item->Parse(true);
+		if (r)
 		{
 			for (auto c: r->Children)
 			{
-				FilterAction *a = new FilterAction(Item->GetObject()->GetStore());
+				auto a = new FilterAction(Item, Item->GetObject()->GetStore());
 				if (a)
 				{
 					if (a->Set(c))
 					{
-						Actions->Insert(a);
+						d->Actions->Insert(a);
 					}
 					else LAssert(!"Can't convert xml to action.");
 				}
@@ -4024,7 +4113,7 @@ void FilterUi::OnLoad()
 		SetCtrlValue(IDC_INTERNAL_FILTERING, Item->GetInternal());
 
 		auto Xml = Item->GetConditionsXml();
-		if (Conditions && Xml)
+		if (Xml)
 		{
 			LAutoPtr<LXmlTag> x(new LXmlTag);
 			if (x)
@@ -4033,11 +4122,11 @@ void FilterUi::OnLoad()
 				LXmlTree t;
 				if (t.Read(x, &p, 0))
 				{
-					Conditions->Empty();
-					LoadTree(Conditions, x, Conditions->GetRootNode());
-					if (!Conditions->GetRootNode()->GetChild())
+					d->Conditions->Empty();
+					LoadTree(d->Conditions, x, d->Conditions->GetRootNode());
+					if (!d->Conditions->GetRootNode()->GetChild())
 					{
-						Conditions->SetDefault();
+						d->Conditions->SetDefault();
 					}
 				}
 			}
@@ -4056,7 +4145,7 @@ void SaveTree(LXmlTag *t, LTreeNode *i)
 {
 	for (LTreeNode *c = i->GetChild(); c; c = c->GetNext())
 	{
-		LFilterItem *fi = dynamic_cast<LFilterItem*>(c);
+		auto fi = dynamic_cast<LFilterItem*>(c);
 		if (fi)
 		{
 			const char *Tag = 0;
@@ -4098,7 +4187,8 @@ void FilterUi::OnSave()
 {
 	THREAD_UNSAFE();
 
-	if (Item)
+	if (Item &&
+		d->Actions)
 	{
 		Item->SetName(GetCtrlName(IDC_NAME));
 		Item->SetScript(GetCtrlName(IDC_SCRIPT));
@@ -4110,12 +4200,12 @@ void FilterUi::OnSave()
 		Item->ChkOutgoing->Value(GetCtrlValue(IDC_OUTGOING));
 		Item->ChkInternal->Value(GetCtrlValue(IDC_INTERNAL_FILTERING));
 
-		if (Conditions)
+		if (d->Conditions)
 		{
 			LXmlTag *x = new LXmlTag(ELEMENT_CONDITIONS);
 			if (x)
 			{
-				SaveTree(x, Conditions->GetRootNode());
+				SaveTree(x, d->Conditions->GetRootNode());
 
 				LXmlTree t;
 				LStringPipe p;
@@ -4132,7 +4222,7 @@ void FilterUi::OnSave()
 
 		LXmlTag x("Actions");
 		List<FilterAction> Act;
-		Actions->GetAll(Act);
+		d->Actions->GetAll(Act);
 		for (size_t i=0; i<Act.Length(); i++)
 		{
 			FilterAction *a = Act[i];
@@ -4190,22 +4280,9 @@ int FilterUi::OnCommand(int Cmd, int Event, OsView Window)
 			App->LaunchHelp("filters.html");
 			break;
 		}
-		case IDC_NEW_FILTER_ACTION:
-		{
-			LList *l;
-			if (GetViewById(IDC_FILTER_ACTIONS, l))
-			{
-				
-			}
-			break;
-		}
-		case IDC_DELETE_FILTER_ACTION:
-		{
-			break;
-		}
 		default:
 		{
-			Commands.ExecuteCallbacks(GetItem()->App, this, GetItem(), Cmd);
+			d->Commands.ExecuteCallbacks(GetItem()->App, this, GetItem(), Cmd);
 			break;
 		}
 	}

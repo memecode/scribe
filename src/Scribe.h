@@ -1421,17 +1421,21 @@ public:
 
 class FilterAction : public LListItem, public LDataPropI
 {
-	LCombo *TypeCbo;
-	LEdit *ArgEdit;
-	LButton *Btn;
+	LAutoPtr<LCombo>  TypeCbo;
+	LAutoPtr<LEdit>   ArgEdit;
+	LAutoPtr<LButton> Btn;
+	Filter *owner = NULL;
+	LArray<LRect> iconPos;
+
+	LImageList *GetIcons();
 
 public:
 	// Data
-	FilterActionTypes Type;
+	FilterActionTypes Type = ACTION_MOVE_TO_FOLDER;
 	LString Arg1;
 
 	// Methods
-	FilterAction(LDataStoreI *Store);
+	FilterAction(Filter *Owner, LDataStoreI *Store);
 	~FilterAction();
 	
 	const char *GetClass() override { return "FilterAction"; }
@@ -1451,10 +1455,11 @@ public:
 	void Select(bool b) override;
 	void OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c) override;
 	int OnNotify(LViewI *c, LNotification n) override;
+	void OnMouseClick(LMouse &m);
+	void OnIconClick(int icon);
 
 	// Object
 	ThingUi *DoUI(MailContainer *c = NULL);
-	// bool Serialize(ObjProperties &f, bool Write);
 };
 
 class ScribeClass Filter : public Thing
@@ -1505,6 +1510,7 @@ public:
 	static void Reindex(ScribeFolder *Folder);
 	int *GetDefaultFields() override;
 	const char *GetFieldText(int Field) override;
+	LImageList *GetIcons();
 
 	// Methods
 	void Empty();
@@ -1556,7 +1562,7 @@ public:
 	void OnColumnNotify(int Col, int64 Data) override;
 
 	// Index
-	Filter *GetFilterAt(int Index);
+	Filter *GetFilterAt(size_t Index);
 };
 
 //////////////////////////////////////////////////////////////////////

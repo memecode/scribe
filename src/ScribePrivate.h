@@ -452,15 +452,12 @@ class FilterUi : public ThingUi
 protected:
 	struct FilterUiPriv *d;
 	Filter *Item;
-	LDocView *Script;
-	LScriptUi Commands;
-	LTabView *Tab;
-	class LFilterView *Conditions;
-	LList *Actions;
 
 	void OnLoad();
 	void OnSave();
 	bool OnViewKey(LView *v, LKey &k);
+	void ReorderAction(int offset);
+	void DeleteAction();
 
 public:
 	FilterUi(Filter *item);
@@ -468,6 +465,7 @@ public:
 
 	// Data access
 	Filter *GetItem() { return Item; }
+	LImageList *GetIcons();
 
 	// Events
 	int OnNotify(LViewI *Col, LNotification n);
