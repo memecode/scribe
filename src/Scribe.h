@@ -1226,7 +1226,7 @@ class ScribeClass ScribeFolder :
 	friend class FolderPropertiesDlg;
 	friend class ThingList;
 	friend class ScribeWnd;
-	friend class MoveToState;
+	friend class AsyncOperationState;
 	friend struct MboxExportTask;
 
 protected:

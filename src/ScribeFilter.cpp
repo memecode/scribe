@@ -1948,37 +1948,32 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		}
 		case ACTION_DELETE:
 		{
-			auto RClick = new LSubMenu;
-			if (RClick)
+			LSubMenu RClick;
+			RClick.AppendItem("Local (default)", IDM_LOCAL, true);
+			RClick.AppendItem("From Server", IDM_SERVER, true);
+			RClick.AppendItem("Local and from Server", IDM_LOCAL_AND_SERVER, true);
+
+			LMouse m;
+			if (!Parent->GetMouse(m, true))
+				break;
+
+			switch (RClick.Float(Parent, m.x, m.y))
 			{
-				RClick->AppendItem("Local (default)", IDM_LOCAL, true);
-				RClick->AppendItem("From Server", IDM_SERVER, true);
-				RClick->AppendItem("Local and from Server", IDM_LOCAL_AND_SERVER, true);
-
-				LMouse m;
-				if (Parent->GetMouse(m, true))
+				case IDM_LOCAL:
 				{
-					switch (RClick->Float(Parent, m.x, m.y))
-					{
-						case IDM_LOCAL:
-						{
-							Arg1 = "local";
-							break;
-						}
-						case IDM_SERVER:
-						{
-							Arg1 = "server";
-							break;
-						}
-						case IDM_LOCAL_AND_SERVER:
-						{
-							Arg1 = "local,server";
-							break;
-						}
-					}
+					Arg1 = "local";
+					break;
 				}
-
-				DeleteObj(RClick);
+				case IDM_SERVER:
+				{
+					Arg1 = "server";
+					break;
+				}
+				case IDM_LOCAL_AND_SERVER:
+				{
+					Arg1 = "local,server";
+					break;
+				}
 			}
 			break;
 		}
@@ -3306,56 +3301,48 @@ void Filter::OnMouseClick(LMouse &m)
 		// open the UI for the Item
 		DoUI();
 	}
-	else if (m.Right())
+	else if (m.IsContextMenu())
 	{
 		// open the right click menu
-		auto RClick = new LSubMenu;
-		if (RClick)
+		LSubMenu RClick;
+		RClick.AppendItem(LLoadString(IDS_OPEN), IDM_OPEN);
+		RClick.AppendItem(LLoadString(IDS_DELETE), IDM_DELETE);
+		RClick.AppendItem(LLoadString(IDS_EXPORT), IDM_EXPORT);
+
+		switch (RClick.Float(Parent, m))
 		{
-			RClick->AppendItem(LLoadString(IDS_OPEN), IDM_OPEN);
-			RClick->AppendItem(LLoadString(IDS_DELETE), IDM_DELETE);
-			RClick->AppendItem(LLoadString(IDS_EXPORT), IDM_EXPORT);
-
-			if (Parent->GetMouse(m, true))
+			case IDM_OPEN:
 			{
-				switch (RClick->Float(Parent, m.x, m.y))
-				{
-					case IDM_OPEN:
-					{
-						DoUI();
-						break;
-					}
-					case IDM_DELETE:
-					{
-						LVariant ConfirmDelete;
-						App->GetOptions()->GetValue(OPT_ConfirmDelete, ConfirmDelete);
+				DoUI();
+				break;
+			}
+			case IDM_DELETE:
+			{
+				LVariant ConfirmDelete;
+				App->GetOptions()->GetValue(OPT_ConfirmDelete, ConfirmDelete);
 
-						if (!ConfirmDelete.CastInt32() ||
-							LgiMsg(GetList(), LLoadString(IDS_DELETE_ASK), AppName, MB_YESNO) == IDYES)
-						{
-							List<LListItem> Del;
-							LList *ParentList = LListItem::Parent;
-							if (ParentList && ParentList->GetSelection(Del))
-							{
-								for (auto m: Del)
-								{
-									auto f = dynamic_cast<Filter*>(m);
-									if (f)
-										f->OnDelete();
-								}
-							}
-						}
-						break;
-					}
-					case IDM_EXPORT:
+				if (!ConfirmDelete.CastInt32() ||
+					LgiMsg(GetList(), LLoadString(IDS_DELETE_ASK), AppName, MB_YESNO) == IDYES)
+				{
+					List<LListItem> Del;
+					LList *ParentList = LListItem::Parent;
+					if (ParentList && ParentList->GetSelection(Del))
 					{
-						ExportAll(GetList(), sTextXml, NULL);
-						break;
+						for (auto m: Del)
+						{
+							auto f = dynamic_cast<Filter*>(m);
+							if (f)
+								f->OnDelete();
+						}
 					}
 				}
+				break;
 			}
-
-			DeleteObj(RClick);
+			case IDM_EXPORT:
+			{
+				ExportAll(GetList(), sTextXml, NULL);
+				break;
+			}
 		}
 	}
 }

@@ -1471,29 +1471,42 @@ void Calendar::DoContextMenu(LMouse &m, LView *Parent)
 					int Idx = Result - IDM_MOVE_TO;
 					if (Idx >= 0 && Idx < (int)CalendarSource::GetSources().Length())
 					{
-						CalendarSource *Dst = CalendarSource::GetSources().ItemAt(Idx);
-						if (Dst)
+						auto Dst = CalendarSource::GetSources().ItemAt(Idx);
+						if (!Dst)
 						{
-							FolderCalendarSource *Fsrc = dynamic_cast<FolderCalendarSource*>(Dst);
-							if (Fsrc)
-							{
-								const char *Path = Fsrc->GetPath();
-								ScribeFolder *DstFolder = App->GetFolder(Path);
-								if (DstFolder)
-								{
-									LArray<Thing*> Items;
-									Items.Add(this);
-									DstFolder->MoveTo(Items, false);
-									// FIXME: Impl moveto callback properly.
-									if (Items[0] != (Thing*)this)
-										return;
+							LAssert(!"No dst?");
+							return;
+						}
 
+						auto Fsrc = dynamic_cast<FolderCalendarSource*>(Dst);
+						if (!Fsrc)
+						{
+							LAssert(!"No cal src?");
+							break;
+						}
+
+						auto Path = Fsrc->GetPath();
+						auto DstFolder = App->GetFolder(Path);
+						if (!DstFolder)
+						{
+							LAssert(!"Path doesn't exist?");
+							return;
+						}
+
+						LArray<Thing*> Items{ this };
+						DstFolder->MoveTo(
+							Items,
+							false,
+							[this, Cv, Dst](auto result, auto itemStatus)
+							{							
+								if (result)
+								{
 									Source = Dst;
 									Cv->Invalidate();
 								}
 							}
-							else LAssert(!"Impl me.");
-						}
+						);
+						return;
 					}
 				}
 
