@@ -757,8 +757,7 @@ ScribeWnd::ScribeWnd() :
 	CapabilityInstaller("Scribe",
 						ScribeVer,
 						"http://memecode.com/components/lookup.php",
-						ScribeTempPath()),
-	TrayIcon(this)
+						ScribeTempPath())
 {
 	#ifndef HAIKU
 	if (_Lock)
@@ -4270,7 +4269,7 @@ void ScribeWnd::OnPulseSecond()
 		LVariant Blink;
 		if (GetOptions()->GetValue(OPT_BlinkNewMail, Blink) && Blink.CastInt32())
 		{
-			TrayIcon.Value((TrayIcon.Value() == TRAY_ICON_MAIL) ? TRAY_ICON_NONE : TRAY_ICON_MAIL);
+			d->TrayIcon->Value((d->TrayIcon->Value() == TRAY_ICON_MAIL) ? TRAY_ICON_NONE : TRAY_ICON_MAIL);
 		}
 	}
 	else
@@ -4285,7 +4284,7 @@ void ScribeWnd::OnPulseSecond()
 			}
 		}
 		
-		TrayIcon.Value(Err ? TRAY_ICON_ERROR : TRAY_ICON_NORMAL);
+		d->TrayIcon->Value(Err ? TRAY_ICON_ERROR : TRAY_ICON_NORMAL);
 	}
 	
 	#if PROFILE_ON_PULSE
@@ -5365,9 +5364,9 @@ void ScribeWnd::SetupUi()
 	TrayIcon.Load(MAKEINTRESOURCE(IDI_MAIL));
 	TrayIcon.Load(MAKEINTRESOURCE(IDI_BLANK));
 	#else
-	TrayIcon.Load(_T("tray_small.png"));
-	TrayIcon.Load(_T("tray_error.png"));
-	TrayIcon.Load(_T("tray_mail.png"));
+	d->TrayIcon->Load(_T("tray_small.png"));
+	d->TrayIcon->Load(_T("tray_error.png"));
+	d->TrayIcon->Load(_T("tray_mail.png"));
 	#endif
 	
 	LStringPipe s(256);
@@ -5379,11 +5378,11 @@ void ScribeWnd::SetupUi()
 		s.Print(" [%s]", UserName.Str());
 	}
 	auto AppTitle = s.NewLStr();
-	TrayIcon.Name(AppTitle);
+	d->TrayIcon->Name(AppTitle);
 	Name(AppTitle);
 
-	TrayIcon.Value(TRAY_ICON_NORMAL);
-	TrayIcon.Visible(true);
+	d->TrayIcon->Value(TRAY_ICON_NORMAL);
+	d->TrayIcon->Visible(true);
 
 	auto Item = Menu->FindItem(IDM_SCRIPTING_CONSOLE);
 	if (Item)
@@ -5974,7 +5973,7 @@ void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::fun
 
 LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 {
-	TrayIcon.OnEvent(Msg);
+	d->TrayIcon->OnEvent(Msg);
 	BayesianFilter::OnEvent(Msg);
 	
 	switch (Msg->Msg())
@@ -5988,12 +5987,15 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_UNIT_TEST:
 		{
-			LAutoPtr<LJson> j((LJson*)Msg->A());
-			if (!j) break;
+			auto j = Msg->AutoA<LJson>();
+			if (!j)
+				break;
 
 			auto cmd = j->Get("cmd");
-			if (!cmd) break;
+			if (!cmd)
+				break;
 
+			LAssert(!"Impl me.");
 			if (cmd.Equals("somecmd"))
 			{
 				
@@ -6010,11 +6012,11 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_SET_HTML:
 		{
-			LAutoPtr<LString> Html((LString*)Msg->A());
+			auto Html = Msg->AutoA<LString*>();
 			if (PreviewPanel && Html)
 			{
 				LScriptArguments Arg(NULL);
-				Arg.Add(new LVariant(Html->Get()));
+				Arg.Add(new LVariant(Html.Get()));
 				PreviewPanel->CallMethod(DomToStr(SdSetHtml), Arg);
 			}
 			break;
@@ -6035,7 +6037,7 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_STORAGE_EVENT:
 		{
-			LDataStoreI *Store = LDataStoreI::Map.Find((int)Msg->A());
+			auto Store = LDataStoreI::Map.Find((int)Msg->A());
 			if (Store)
 				Store->OnEvent((void*)Msg->B());
 			break;
@@ -6043,33 +6045,34 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		case M_SCRIBE_SET_MSG_FLAG:
 		{
 			LAutoString p((char*)Msg->A());
-			if (p)
+			if (!p)
+				break;
+
+			auto d = strrchr(p, '/');
+			if (!d)
+				break;
+
+			*d++ = 0;
+
+			if (auto f = GetFolder(p))
 			{
-				char *d = strrchr(p, '/');
-				if (d)
-				{
-					*d++ = 0;
-					ScribeFolder *f = GetFolder(p);
-					if (f)
+				LUri u;
+				LString a = u.DecodeStr(d);
+				f->GetMessageById(a,
+					[this, NewFlag=(int)Msg->B()](auto r)
 					{
-						LUri u;
-						LString a = u.DecodeStr(d);
-						f->GetMessageById(a, [this, NewFlag=(int)Msg->B()](auto r)
+						if (r)
 						{
-							if (r)
-							{
-								int ExistingFlags = r->GetFlags();
-								r->SetFlags(ExistingFlags | NewFlag);
-							}
-						});
-					}
-				}
+							int ExistingFlags = r->GetFlags();
+							r->SetFlags(ExistingFlags | NewFlag);
+						}
+					});
 			}
 			break;
 		}
 		case M_SCRIBE_DEL_THING:
 		{
-			Thing *t = (Thing*)Msg->A();
+			auto t = (Thing*)Msg->A();
 			DeleteObj(t);
 			break;
 		}
@@ -6087,8 +6090,8 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		case M_SCRIBE_THREAD_DONE:
 		{
 			// Finialize connection
-			AccountThread *Thread = (AccountThread*) Msg->A();
-			Accountlet *Acc = (Accountlet*) Msg->B();
+			auto Thread = (AccountThread*) Msg->A();
+			auto Acc = (Accountlet*) Msg->B();
 			if (Thread && Acc)
 			{
 				OnAfterConnect(Acc->GetAccount(), Acc->IsReceive());
@@ -6104,48 +6107,23 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_SCRIBE_MSG:
 		{
-			char *m = (char*)Msg->A();
-			if (m)
-			{
-				if (Msg->B())
-				{
-					if (LgiMsg(this, m, AppName, MB_YESNO) == IDYES)
-					{
-						PostEvent(M_COMMAND, IDM_OPTIONS, 0);						
-					}
-				}
-				else
-				{
-					LgiMsg(this, "%s", AppName, MB_OK, m);
-				}
+			LAutoString m((char*)Msg->A());
+			if (!m)
+				break;
 
-				DeleteArray(m);
+			if (Msg->B())
+			{
+				if (LgiMsg(this, m, AppName, MB_YESNO) == IDYES)
+				{
+					PostEvent(M_COMMAND, IDM_OPTIONS, 0);						
+				}
+			}
+			else
+			{
+				LgiMsg(this, "%s", AppName, MB_OK, m);
 			}
 			break;
 		}
-		/*
-		case M_SCRIBE_LOG_MSG:
-		{
-			List<LogEntry> *Log = (List<LogEntry>*)Msg->A();
-			LAutoPtr<LogEntry> Entry((LogEntry*)Msg->B());
-
-			if (ScribeState != ScribeExiting &&
-				Log &&
-				Entry)
-			{
-				Log->Insert(Entry.Release());
-
-				// Trim long list...
-				while (Log->Length() > 1024)
-				{
-					LogEntry *e = Log->First();
-					Log->Delete(e);
-					DeleteObj(e);
-				}
-			}
-			break;
-		}
-		*/
 		case M_SCRIBE_NEW_MAIL:
 		{
 			if (Lock(_FL))
@@ -6160,7 +6138,7 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_SCRIBE_OPEN_THING:
 		{
-			Thing *t = (Thing*) Msg->A();
+			auto t = (Thing*) Msg->A();
 			if (t)
 			{
 				t->DoUI();
@@ -6179,26 +6157,26 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_URL:
 		{
-			LAutoPtr<LString> Url((LString*)Msg->A());
-			if (Url)
+			auto Url = Msg->AutoA<LString>();
+			if (!Url)
+				break;
+
+			LUri u(*Url);
+			if (u.sProtocol && !_stricmp(u.sProtocol, "mailto"))
 			{
-				LUri u(*Url);
-				if (u.sProtocol && !_stricmp(u.sProtocol, "mailto"))
+				Mailto mt(this, *Url);
+				if (mt.To.Length() > 0)
 				{
-					Mailto mt(this, *Url);
-					if (mt.To.Length() > 0)
+					Thing *t = CreateItem(MAGIC_MAIL, NULL, false);
+					if (t)
 					{
-						Thing *t = CreateItem(MAGIC_MAIL, NULL, false);
-						if (t)
+						Mail *m = t->IsMail();
+						if (m)
 						{
-							Mail *m = t->IsMail();
-							if (m)
-							{
-								mt.Apply(m);
-								m->DoUI();
-							}
-							else DeleteObj(t);
+							mt.Apply(m);
+							m->DoUI();
 						}
+						else DeleteObj(t);
 					}
 				}
 			}

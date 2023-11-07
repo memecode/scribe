@@ -2310,8 +2310,6 @@ public:
 
 protected:
 	class ScribeWndPrivate *d = NULL;
-
-	LTrayIcon		TrayIcon;
 	
 	// Ipc
 	class ScribeIpc *Ipc = NULL;

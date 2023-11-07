@@ -4,6 +4,7 @@
 #include "lgi/common/ClipBoard.h"
 #include "lgi/common/Growl.h"
 #include "lgi/common/EventTargetThread.h"
+#include "lgi/common/TrayIcon.h"
 
 #include "../unittests/UnitTest.h"
 #include "../src/common/Coding/ScriptingPriv.h"
@@ -95,6 +96,7 @@ public:
 	LHashTbl<IntKey<SribeResourceType,ResNone>, LString> ResFiles;
 	int				CmdLineEvents = 0;
 	bool			FakeIpcEvent = false; // No options filename so do a fake OnCommandLineEvent(IpcEvent) after startup.
+	LAutoPtr<class LTrayIcon> TrayIcon;
 
 	// These are for the LDataEventsI callbacks to store source context
 	// Mainly for debugging where various events came from.
@@ -163,7 +165,8 @@ public:
 
 	ScribeWndPrivate(ScribeWnd *app) :
 		App(app),
-		TextControlFactory(app)
+		TextControlFactory(app),
+		TrayIcon(new LTrayIcon(app))
 	{
 		NoContact = new NoContactType(app);
 		NoContact->DecRef(); // 2->1
