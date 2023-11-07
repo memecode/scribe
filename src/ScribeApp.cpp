@@ -5359,10 +5359,10 @@ void ScribeWnd::SetupUi()
 
 
 	#if WINNATIVE
-	TrayIcon.Load(MAKEINTRESOURCE(IDI_SMALL));
-	TrayIcon.Load(MAKEINTRESOURCE(IDI_ERR));
-	TrayIcon.Load(MAKEINTRESOURCE(IDI_MAIL));
-	TrayIcon.Load(MAKEINTRESOURCE(IDI_BLANK));
+	d->TrayIcon->Load(MAKEINTRESOURCE(IDI_SMALL));
+	d->TrayIcon->Load(MAKEINTRESOURCE(IDI_ERR));
+	d->TrayIcon->Load(MAKEINTRESOURCE(IDI_MAIL));
+	d->TrayIcon->Load(MAKEINTRESOURCE(IDI_BLANK));
 	#else
 	d->TrayIcon->Load(_T("tray_small.png"));
 	d->TrayIcon->Load(_T("tray_error.png"));
