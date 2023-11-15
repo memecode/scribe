@@ -6120,7 +6120,7 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 			}
 			else
 			{
-				LgiMsg(this, "%s", AppName, MB_OK, m);
+				LgiMsg(this, "%s", AppName, MB_OK, m.Get());
 			}
 			break;
 		}
