@@ -38,15 +38,9 @@ enum CalRecurFreq {
 // Classes
 struct TimePeriod
 {
-	Calendar *c;
-	CalendarSource *src;
+	Calendar *c = NULL;
+	CalendarSource *src = NULL;
 	LDateTime s, e;
-
-	TimePeriod()
-	{
-		c = NULL;
-		src = NULL;
-	}
 
 	void ToLocal()
 	{
@@ -373,7 +367,7 @@ class FolderCalendarSource :
 {
 protected:
 	LString Path;
-	ScribeFolder *Folder;
+	ScribeFolder *Folder = NULL;
 	bool IsReading = false;
 
 public:

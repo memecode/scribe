@@ -2,6 +2,7 @@
 #define _WEBDAV_STORE_H_
 
 #include "lgi/common/WebDav.h"
+#include "Store3CalendarObj.h"
 
 //////////////////////////////////////////////////////////////////////
 class WebdavFolder;

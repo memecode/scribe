@@ -7,18 +7,38 @@
 #include "lgi/common/Http.h"
 #include "lgi/common/vCard-vCal.h"
 
+#include "Store3CalendarObj.h"
+
 enum Msgs {
 	M_LOAD_URI = M_USER + 1000,
 	M_LOADED
 };
 
-struct RemoteCalendarSourcePriv : public LEventTargetThread
+class RemoteCalEvent : public Store3CalendarObj<LDataI>
+{
+	LDataStoreI *store = NULL;
+
+public:
+	RemoteCalEvent(LDataStoreI *s)
+	{
+		store = s;
+	}
+
+	const char *GetClass() override { return "RemoteCalEvent"; }
+	LDataStoreI *GetStore() override { return store; }
+};
+
+struct RemoteCalendarSourcePriv :
+	public LEventTargetThread,
+	public LDataStoreI
 {
 	RemoteCalendarSource *Source;
 	LString Uri;
 	LString Name;
 	bool Error = false;
 	bool Loaded = false;
+
+	const char *GetClass() override { return "RemoteCalendarSourcePriv"; }
 
 	// Lock before using
 	LArray<Calendar*> Events;
@@ -33,8 +53,69 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 	{
 		for (auto c: Events)
 			c->DecRef();
+	}
 
-		LStackTrace("%p::~RemoteCalendarSourcePriv()", this);
+	uint64 Size()
+	{
+		uint64 sz = 0;
+		if (Lock(_FL))
+		{
+			for (auto c: Events)
+				sz += c->GetObject()->Size();
+			Unlock();
+		}
+		return sz;
+	}
+
+	LDataI *Create(int Type)
+	{
+		if (Type == MAGIC_CALENDAR)
+			return new RemoteCalEvent(this);
+		return NULL;
+	}
+
+	LDataFolderI *GetRoot(bool create = false)
+	{
+		LAssert(0);
+		return NULL;
+	}
+
+	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
+	{
+		LAssert(0);
+		return Store3NotImpl;
+	}
+
+	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash)
+	{
+		LAssert(0);
+		return Store3NotImpl;
+	}
+
+	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator)
+	{
+		LAssert(0);
+		return Store3NotImpl;
+	}
+
+	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus)
+	{
+		LAssert(0);
+	}
+
+	void OnEvent(void *Param)
+	{
+	}
+
+	bool OnIdle()
+	{
+		return true;
+	}
+
+	LDataEventsI *GetEvents()
+	{
+		LAssert(0);
+		return NULL;
 	}
 
 	void Post(int m, LMessage::Param a = 0, LMessage::Param b = 0)
@@ -59,7 +140,7 @@ struct RemoteCalendarSourcePriv : public LEventTargetThread
 					VCal imp;
 					while (true)
 					{
-						auto c = new Calendar(Source->GetApp());
+						auto c = new Calendar(Source->GetApp(), Create(MAGIC_CALENDAR));
 						if (imp.Import(c->GetObject(), &out))
 						{
 							if (Lock(_FL))

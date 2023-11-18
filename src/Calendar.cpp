@@ -809,7 +809,6 @@ LString TimePeriod::ToString()
 Calendar::Calendar(ScribeWnd *app, LDataI *object) : Thing(app, object)
 {
 	DefaultObject(object);
-	Source = 0;
 	SetImage(ICON_CALENDAR);
 }
 
@@ -851,9 +850,16 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 		BaseUtc.e.AddHours(1);
 	}
 
+	if (BaseUtc.s > EndUtc)
+		return true;
+
 	LArray<LDateTime::LDstInfo> Dst;
 	LDateTime::GetDaylightSavingsInfo(Dst, BaseUtc.s, &EndUtc);
-	LAssert(Dst.Length() > 0);
+	if (Dst.Length() < 2)
+	{
+		LgiTrace("%s:%i - GetDaylightSavingsInfo(%s, %s)\n", _FL, BaseUtc.s.Get().Get(), EndUtc.Get().Get());
+		LAssert(!"Need 2 dst points.");
+	}
 
 	Periods.Add(BaseUtc);
 
@@ -1148,9 +1154,7 @@ LColour Calendar::GetColour()
 	{
 		int64 c = GetObject()->GetInt(FIELD_COLOUR);
 		if (c >= 0)
-		{
 			return LColour((uint32_t)c, 32);
-		}
 	}
 
 	if (Source)
@@ -1202,9 +1206,10 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 	else
 	{
 		LColour Text(0x80, 0x80, 0x80);
-		LColour Base = GetColour();
-		LColour Qtr = GdcMixColour(Base, LColour(L_WORKSPACE), 0.1f);
-		LColour Half = GdcMixColour(Base, LColour(L_WORKSPACE), 0.4f);
+		LColour Ws(L_WORKSPACE);
+		auto Base = GetColour();
+		auto Qtr = Ws.Mix(Base, 0.1f);
+		auto Half = Ws.Mix(Base, 0.4f);
 
 		// not selected
 		LColour f, b;

@@ -4,6 +4,7 @@
 #include "lgi/common/Lgi.h"
 #include "Store3Common.h"
 #include "v3.41.2/sqlite3.h"
+#include "Store3CalendarObj.h"
 
 // Debugging stuff
 #define MAIL3_TRACK_OBJS		0
@@ -432,7 +433,7 @@ protected:
 public:
 	LMail3Folder *Parent = NULL;
 
-	LMail3Thing(LMail3Store *store) : LMail3Obj(store)
+	LMail3Thing(LMail3Store *store = NULL) : LMail3Obj(store)
 	{
 	}
 
@@ -722,64 +723,19 @@ public:
 	Store3Status SetDate(int id, const LDateTime *i) override;
 };
 
-class LMail3Calendar : public LMail3Thing
+class LMail3Calendar : public Store3CalendarObj<LMail3Thing>
 {
-	LString ToCache;
-
 private:
-	int CalType = 0; // FIELD_CAL_TYPE
-	LString To; // FIELD_TO
-	CalendarPrivacyType CalPriv = CalDefaultPriv; // FIELD_CAL_PRIVACY
-	int Completed = 0; // FIELD_CAL_COMPLETED
-	LDateTime Start; // FIELD_CAL_START_UTC
-	LDateTime  End; // FIELD_CAL_END_UTC
-	LString TimeZone; // FIELD_CAL_TIMEZONE
-	LString Subject; // FIELD_CAL_SUBJECT
-	LString Location; // FIELD_CAL_LOCATION
-	LString Uid; // FIELD_UID
-	bool AllDay = false; // FIELD_CAL_ALL_DAY
-	int64 StoreStatus = Store3Success; // FIELD_STATUS - ie the current Store3Status
-	LString EventStatus; // FIELD_CAL_STATUS
-	LDateTime Modified; // FIELD_DATE_MODIFIED
-
-	LString Reminders; // FIELD_CAL_REMINDERS
-	LDateTime LastCheck; // FIELD_CAL_LAST_CHECK
-	int ShowTimeAs = 0; // FIELD_CAL_SHOW_TIME_AS
-
-	int Recur = 0; // FIELD_CAL_RECUR
-	int RecurFreq = 0; // FIELD_CAL_RECUR_FREQ
-	int RecurInterval = 0; // FIELD_CAL_RECUR_INTERVAL
-	LDateTime RecurEnd; // FIELD_CAL_RECUR_END_DATE
-	int RecurCount = 0; // FIELD_CAL_RECUR_END_COUNT
-	int RecurEndType = 0; // FIELD_CAL_RECUR_END_TYPE
-	LString RecurPos; // FIELD_CAL_RECUR_FILTER_POS
-	
-	int FilterDays = 0; // FIELD_CAL_RECUR_FILTER_DAYS
-	int FilterMonths = 0; // FIELD_CAL_RECUR_FILTER_MONTHS
-	LString FilterYears; // FIELD_CAL_RECUR_FILTER_YEARS
-	LString Notes; // FIELD_CAL_NOTES
-	
-	LColour Colour;
-
 	const char *GetTable() override { return MAIL3_TBL_CALENDAR; }
 
 public:
 	LMail3Calendar(LMail3Store *store);
 	~LMail3Calendar();
 
-	uint32_t Type() override { return MAGIC_CALENDAR; }
 	LDataStoreI *GetStore() override { return Store; }
 	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
-	Store3CopyDecl;
 	const char *GetClass() override { return "LMail3Filter"; }
 	bool DbDelete() override;
-
-	const char *GetStr(int id) override;
-	Store3Status SetStr(int id, const char *str) override;
-	int64 GetInt(int id) override;
-	Store3Status SetInt(int Col, int64 n) override;
-	const LDateTime *GetDate(int id) override;
-	Store3Status SetDate(int id, const LDateTime *t) override;
 };
 
 #endif

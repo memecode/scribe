@@ -676,11 +676,11 @@ bool CalendarView::GetEventsBetween(LArray<TimePeriod> &Events, LDateTime Start,
 	LDateTime EndMinute = End;
 	EndMinute.AddMinutes(-1);
 
-	for (unsigned i=0; i<Current.Length(); i++)
+	for (auto &t: Current)
 	{
-		if (Current[i].Overlap(Start, End))
+		if (t.Overlap(Start, End))
 		{
-			Events.Add(Current[i]);
+			Events.Add(t);
 			Status = true;
 		}
 	}
@@ -715,7 +715,7 @@ LMessage::Result CalendarView::OnEvent(LMessage *Msg)
 			if (SourceEventsDirty)
 			{
 				SourceEventsDirty = false;
-				OnContentsChanged();
+				Invalidate();
 			}
 			break;
 		}
@@ -970,10 +970,8 @@ void CalendarView::OnContentsChanged(CalendarSource *Source)
 
 				LHashTbl<PtrKey<Calendar*>, bool> InCur;
 				for (auto &c: Current)
-				{
-					// LgiTrace("%s\n", c.ToString().Get());
 					InCur.Add(c.c, true);
-				}
+
 				for (unsigned i=0; i<Selection.Length(); i++)
 				{
 					if (!InCur.Find(Selection[i]))
@@ -1015,10 +1013,13 @@ void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)
 			e.AddDays(MonthX * MonthY);
 		}
 
+		/*	Why is this here?
+			It breaks the colouring of CalendarView drawing...
 		for (unsigned i=0; i<Current.Length(); i++)
 		{
-			Current[i].c->Source = 0;
+			Current[i].c->Source = NULL;
 		}
+		*/
 
 		if (!GetEvents)
 		{
@@ -1409,10 +1410,10 @@ void CalendarView::OnPaint(LSurface *pDC)
 				{
 					// Draw events
 					LArray<TimePeriod> All;
-					for (uint32_t i=0; i<Current.Length(); i++)
+					for (auto &t: Current)
 					{
-						if (Current[i].Overlap(Dt, Tomorrow))
-							All.Add(Current[i]);
+						if (t.Overlap(Dt, Tomorrow))
+							All.Add(t);
 					}
 					All.Sort(EventSorter);
 
@@ -1458,9 +1459,6 @@ void CalendarView::OnPaint(LSurface *pDC)
 					{
 						EventArray &Group = *(Groups[g]);
 
-						// Work out how many columns we need to display the group
-						// int Columns = 1;
-
 						// Now do layout and painting
 						for (uint32_t i=0; i<Group.Length(); i++)
 						{
@@ -1486,7 +1484,6 @@ void CalendarView::OnPaint(LSurface *pDC)
 										(int)HourToY(EndH) - 3);
 
 							// LgiTrace("paint: %s %s\n", Vp.GetStr(), t.c->ToString().Get());
-
 							t.c->OnPaintView(pDC, Font, &Vp, &t);
 						}
 					}
