@@ -3331,9 +3331,11 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 				{
 					if (Cv)
 					{
-						FolderCalendarSource *Src = dynamic_cast<FolderCalendarSource*>(CalLst->GetSelected());
-						if (Src)
-							Cv->OnContentsChanged(Src);
+						auto src = dynamic_cast<CalendarSource*>(CalLst->GetSelected());
+						if (src)
+							Cv->OnContentsChanged(src);
+						else
+							LAssert(0);
 					}
 					break;
 				}
