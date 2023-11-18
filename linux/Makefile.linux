@@ -10,7 +10,7 @@ CC = gcc
 CPP = g++
 Target = ./scribe
 ifndef Build
-	Build = Debug
+	Build = Release
 endif
 MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
@@ -542,8 +542,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/linux/Lgi/Thread.cpp \
 	../../lgi/trunk/src/linux/Lgi/View.cpp \
 	../../lgi/trunk/src/linux/Lgi/Window.cpp \
-	../../lgi/trunk/src/posix/SubProcess.cpp \
-	../../../../../usr/include/libayatana-appindicator3-0.1/libayatana-appindicator/app-indicator.h
+	../../lgi/trunk/src/posix/SubProcess.cpp
 	export Build=$(Build); \
 	$(MAKE) -C ../../lgi/trunk -f ./linux/Makefile.linux
 
