@@ -24,7 +24,7 @@ ThingType::~ThingType()
 	}
 }
 
-void ThingType::WhenLoaded(const char *file, int line, std::function<void()> Callback, int index)
+void ThingType::WhenLoaded(const char *file, int line, std::function<void(Store3Status)> Callback, int index, bool waitForResults)
 {
 	if (!Callback)
 	{
@@ -45,9 +45,9 @@ void ThingType::WhenLoaded(const char *file, int line, std::function<void()> Cal
 
 	if (Loaded)
 	{
-		Callback();
+		Callback(Store3Success);
 	}
-	else
+	else if (waitForResults)
 	{
 		ThingEventInfo *cb = new ThingEventInfo;
 		cb->File = file;
@@ -58,6 +58,10 @@ void ThingType::WhenLoaded(const char *file, int line, std::function<void()> Cal
 			OnLoadCallbacks.Add(cb);
 		else
 			OnLoadCallbacks.AddAt(index, cb);
+	}
+	else
+	{
+		Callback(Store3Delayed);
 	}
 }
 
@@ -72,7 +76,7 @@ bool ThingType::IsLoaded(int Set)
 			for (auto cb: OnLoadCallbacks)
 			{
 				// LgiTrace("OnLoadCallbacks %s:%i\n", cb.File, cb.Line);
-				cb->Callback();
+				cb->Callback(Store3Success);
 			}
 			OnLoadCallbacks.DeleteObjects();
 		}

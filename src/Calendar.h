@@ -283,7 +283,7 @@ public:
 	virtual bool GetEvents(	const LDateTime Start,
 							const LDateTime End,
 							GetEventCb Callback) = 0;
-	virtual Calendar *NewEvent() = 0;
+	virtual Calendar *NewEvent(LError *err) = 0;
 	virtual void OnFolderDelete(ScribeFolder *f) = 0;
 	virtual void OnPulse() = 0;
 	virtual LString ToString() = 0;
@@ -297,7 +297,6 @@ class CalendarSourceGetEvents : public LView::ViewEventTarget
     LArray<CalendarSource*> Sources;
 	LArray<TimePeriod> Events;
 	LDateTime Start, End;
-	int Done = 0;
 	CalendarSource::GetEventCb Callback;
 	CalendarSourceGetEvents **Owner = NULL;
 
@@ -311,55 +310,11 @@ public:
 							LDateTime start,
 							LDateTime end,
 							LArray<CalendarSource*> sources,
-							CalendarSource::GetEventCb callback) :
-		LView::ViewEventTarget(app, M_CALENDAR_SOURCE_FINISH),
-		Owner(owner)
-	{
-		*Owner = this;
-		Sources = sources;
-		Start = start;
-		End = end;
-		Callback = callback;
+							CalendarSource::GetEventCb callback);
+	~CalendarSourceGetEvents();
 
-		for (auto src: Sources)
-		{
-			if (!App)
-				App = src->GetApp();
-
-			// LgiTrace("CalendarSourceGetEvents: %s\n", src->ToString().Get());
-			src->GetEvents(Start, End, [this, src](auto events)
-			{
-				#ifdef _DEBUG
-				LAssert(!GotCb.Find(src));
-				GotCb.Add(src, true);
-				#endif
-
-				// LgiTrace("Callback %s %i\n", src->ToString().Get(), (int)events.Length());
-				Done++;
-				Events += events;
-				if (Done >= Sources.Length())
-					// By sending an event to ourselves the code avoids deleting itself in
-					// the constructor in the case that the callbacks are all synchronous.
-					PostEvent(M_CALENDAR_SOURCE_FINISH);
-			});
-		}
-	}
-
-	~CalendarSourceGetEvents()
-	{
-		*Owner = NULL;
-	}
-
-	LMessage::Result OnEvent(LMessage *Msg)
-	{
-		if (Msg->Msg() == M_CALENDAR_SOURCE_FINISH)
-		{
-			if (Callback)
-				Callback(Events);
-			delete this;
-		}
-		return 0;
-	}
+	void OnState();
+	LMessage::Result OnEvent(LMessage *Msg);
 };
 
 class FolderCalendarSource :
@@ -386,7 +341,7 @@ public:
 	bool Read();
 	bool Write();
 	bool Delete();
-	Calendar *NewEvent();
+	Calendar *NewEvent(LError *err);
 	bool Match(char *Email);
 	bool GetEvents(	const LDateTime Start,
 					const LDateTime End,
@@ -429,7 +384,7 @@ public:
 	bool Read();
 	bool Write();
 	bool Delete();
-	Calendar *NewEvent();
+	Calendar *NewEvent(LError *err);
 	bool Match(char *Email);
 	bool GetEvents(const LDateTime Start, const LDateTime End, GetEventCb Callback);
 	void EditPath(LView *parent, CalendarView *cv);

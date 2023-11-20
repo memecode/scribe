@@ -736,6 +736,10 @@ public:
 	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
 	const char *GetClass() override { return "LMail3Filter"; }
 	bool DbDelete() override;
+	bool IsOrphan() override;
+	Store3Status Save(LDataI *Parent = NULL) override;
+	Store3Status Delete(bool ToTrash = true) override;
+	LAutoStreamI GetStream(const char *file, int line) override;
 };
 
 #endif

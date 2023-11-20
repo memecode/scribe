@@ -698,7 +698,7 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 		// saving a thing that already has an item on disk
 		auto Obj = GetObject();
 		auto Status = t->GetObject()->Save(Obj);
-		if (Status != Store3Error)
+		if (Status > Store3Error)
 		{
 			// The ScribeWnd::OnNew will take care of inserting the item into the
 			// right folder, updating the unread count, any filtering etc.
@@ -1461,12 +1461,12 @@ bool ScribeFolder::UnloadThings()
 	#define PROFILE(str)
 #endif
 
-void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Status)> Callback)
+void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Status)> Callback, bool waitForResults)
 {
 	auto FldObj = GetFldObj();
 
 	WhenLoaded(_FL,
-		[this, OldUnread, Callback, FldObj]()
+		[this, OldUnread, Callback, FldObj](auto loadStatus)
 		{
 			// This is called when all the Store3 objects are loaded
 			int Unread = OldUnread;
@@ -1475,25 +1475,28 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 
 			Loading.Reset();
 
-			auto &Children = GetFldObj()->Children();
-			if (Children.GetState() != Store3Loaded)
+			if (loadStatus == Store3Success)
 			{
-				LAssert(!"Really should be loaded by now.");
-				return;
-			}
-
-			for (auto c = Children.First(); c; c = Children.Next())
-			{
-				auto t = CastThing(c);
-				if (t)
+				auto &Children = GetFldObj()->Children();
+				if (Children.GetState() != Store3Loaded)
 				{
-					// LAssert(Items.HasItem(t));
+					LAssert(!"Really should be loaded by now.");
+					return;
 				}
-				else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
+
+				for (auto c = Children.First(); c; c = Children.Next())
 				{
-					t->SetObject(c, false, _FL);
-					t->SetParentFolder(this);
-					t->OnSerialize(false);
+					auto t = CastThing(c);
+					if (t)
+					{
+						// LAssert(Items.HasItem(t));
+					}
+					else if ((t = App->CreateThingOfType((Store3ItemTypes) c->Type(), c)))
+					{
+						t->SetObject(c, false, _FL);
+						t->SetParentFolder(this);
+						t->OnSerialize(false);
+					}
 				}
 			}
 
@@ -1536,9 +1539,10 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 			}
 
 			if (Callback)
-				Callback(Store3Success);
+				Callback(loadStatus);
 		},
-		0);
+		0,
+		waitForResults);
 
 	if (!IsLoaded())
 	{
@@ -1560,7 +1564,7 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 	}
 }
 
-Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback)
+Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback, bool waitForResults)
 {
 	int OldUnRead = GetUnRead();
 
@@ -1568,6 +1572,8 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 	if (!FldObj)
 	{
 		LgiTrace("%s:%i - No folder object.\n", _FL);
+		if (Callback)
+			Callback(Store3Error);
 		return Store3Error;
 	}
 
@@ -1578,6 +1584,8 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 	if (!App || !Path)
 	{
 		LAssert(!"We should probably always have an 'App' and 'Path' ptrs...");
+		if (Callback)
+			Callback(Store3Error);
 		return Store3Error;
 	}
 
@@ -1585,10 +1593,10 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3S
 		Parent,
 		GetReadAccess(),
 		Path,
-		[this, OldUnRead, Callback](auto access)
+		[this, OldUnRead, Callback, waitForResults](auto access)
 		{
 			if (access)
-				ContinueLoading(OldUnRead, Callback);
+				ContinueLoading(OldUnRead, Callback, waitForResults);
 			else if (Callback)
 				Callback(Store3NoPermissions);
 		});

@@ -41,7 +41,7 @@ public:
 
 		App->OnFolderTask(this, true);
 
-		Folder->WhenLoaded(_FL, [this]()
+		Folder->WhenLoaded(_FL, [this](auto status)
 		{
 			Loading = false;
 			SetPulse(PULSE_MS);

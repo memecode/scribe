@@ -186,11 +186,13 @@ bool FolderCalendarSource::Write()
 	return true;
 }
 
-Calendar *FolderCalendarSource::NewEvent()
+Calendar *FolderCalendarSource::NewEvent(LError *err)
 {
-	Calendar *c = new Calendar(App);
+	auto c = new Calendar(App);
 	if (!c)
 	{
+		if (err)
+			err->Set(LErrorNoMem);
 		return NULL;
 	}
 
@@ -202,15 +204,17 @@ Calendar *FolderCalendarSource::NewEvent()
 
 	if (!Folder)
 	{
-		LAssert(!"No folder?");
+		if (err)
+			err->Set(LErrorPathNotFound, "Folder not found.");
 		DeleteObj(c);
 		return NULL;
 	}
 
-	LDataStoreI *Ms = Folder->GetObject()->GetStore();
+	auto Ms = Folder->GetObject()->GetStore();
 	if (!Ms)
 	{
-		LAssert(!"No mail store?");
+		if (err)
+			err->Set(LErrorPathNotFound, "MailStore not found.");
 		DeleteObj(c);
 		return NULL;
 	}
@@ -262,40 +266,43 @@ bool FolderCalendarSource::GetEvents(const LDateTime StartTs,
 		return false;
 	}
 	
-	Folder->LoadThings(NULL, [this, StartTs, EndTs, Callback](auto Status)
-	{
-		LArray<TimePeriod> Events;
-
-		LDateTime Start = StartTs;
-		Start.ToUtc();
-		LDateTime End = EndTs;
-		End.ToUtc();
-
-		for (auto t : Folder->Items)
+	Folder->LoadThings(
+		NULL,
+		[this, StartTs, EndTs, Callback](auto Status)
 		{
-			Calendar *c = t->IsCalendar();
-			if (!c)
-				continue;
+			LArray<TimePeriod> Events;
 
-			LDateTime s;
-			if (c->GetCalType() == CalEvent &&
-				c->GetField(FIELD_CAL_START_UTC, s))
+			LDateTime Start = StartTs;
+			Start.ToUtc();
+			LDateTime End = EndTs;
+			End.ToUtc();
+
+			for (auto t : Folder->Items)
 			{
-				LArray<TimePeriod> Times;
-				if (c->GetTimes(Start, End, Times))
-				{						    
-					SetCalendarsSource(c);
+				Calendar *c = t->IsCalendar();
+				if (!c)
+					continue;
 
-					for (auto &t: Times)
-						t.src = this;
+				LDateTime s;
+				if (c->GetCalType() == CalEvent &&
+					c->GetField(FIELD_CAL_START_UTC, s))
+				{
+					LArray<TimePeriod> Times;
+					if (c->GetTimes(Start, End, Times))
+					{						    
+						SetCalendarsSource(c);
+
+						for (auto &t: Times)
+							t.src = this;
 					
-					Events.Add(Times);
+						Events.Add(Times);
+					}
 				}
 			}
-		}
 
-		Callback(Events);
-	});
+			Callback(Events);
+		},
+		false);
 
 	return true;
 }

@@ -1766,6 +1766,12 @@ bool Calendar::Save(ScribeFolder *Folder)
 		}
 	};
 
+	if (!Folder)
+		Folder = GetFolder();
+
+	if (!Folder && App)
+		Folder = App->GetFolder(FOLDER_CALENDAR);
+
 	if (GetObject() &&
 		GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Webdav)
 	{
@@ -1779,15 +1785,6 @@ bool Calendar::Save(ScribeFolder *Folder)
 	}
 	else
 	{
-		if (!Folder)
-		{
-			Folder = GetFolder();
-		}
-		if (!Folder && App)
-		{
-			Folder = App->GetFolder(FOLDER_CALENDAR);
-		}
-
 		// FIXME: This can't wait for WriteThing to finish it's call back...
 		Status = true;
 		if (Folder)
@@ -3001,7 +2998,7 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 		{
 			if (Item)
 			{
-				// Is the user cancelling an object that hasn't been saved yet?
+				// Is the user canceling an object that hasn't been saved yet?
 				// If so delete the object.
 				auto obj = Item->GetObject();
 				if (obj && obj->IsOrphan())

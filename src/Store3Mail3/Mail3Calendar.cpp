@@ -59,6 +59,26 @@ bool LMail3Calendar::DbDelete()
 	return true;
 }
 
+bool LMail3Calendar::IsOrphan()
+{
+	return Store == NULL || Parent == NULL;
+}
+
+Store3Status LMail3Calendar::Save(LDataI *Obj)
+{
+	return Store3Error;
+}
+
+Store3Status LMail3Calendar::Delete(bool ToTrash)
+{
+	return Store3Error;
+}
+
+LAutoStreamI LMail3Calendar::GetStream(const char *file, int line)
+{
+	return LAutoStreamI();
+}
+
 bool LMail3Calendar::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	int i = 0;

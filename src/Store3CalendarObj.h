@@ -377,5 +377,4 @@ public:
 	Store3Status Save(LDataI *Obj = NULL) override { return Store3NotImpl; }
 	Store3Status Delete(bool ToTrash = true) override { return Store3NotImpl; }
 	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
-
 };

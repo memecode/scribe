@@ -285,9 +285,11 @@ bool RemoteCalendarSource::Delete()
 	return r;
 }
 
-Calendar *RemoteCalendarSource::NewEvent()
+Calendar *RemoteCalendarSource::NewEvent(LError *err)
 {
 	// Can't create remote events... read only feed.
+	if (err)
+		err->Set(LErrorReadOnly, "RemoteCalendarSource is read only.");
 	return NULL;
 }
 

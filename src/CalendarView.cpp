@@ -16,6 +16,7 @@
 #include "lgi/common/Notifications.h"
 #include "lgi/common/Box.h"
 #include "lgi/common/LgiRes.h"
+#include "lgi/common/PopupNotification.h"
 
 #include "CalendarView.h"
 #include "ScribePageSetup.h"
@@ -2113,13 +2114,23 @@ bool CalendarView::HitTest(int x, int y, EventDragMode &mode, Calendar *&event)
 
 Calendar *CalendarView::NewEvent(LDateTime &dtStart, LDateTime &dtEnd)
 {
-	CalendarSource *Src = FolderCalendarSource::GetCreateIn();
+	auto Src = FolderCalendarSource::GetCreateIn();
 	if (!Src)
 		return NULL;
 
-	Calendar *c = Src->NewEvent();
+	LError createErr;
+	auto c = Src->NewEvent(&createErr);
 	if (!c)
+	{
+		LPopupNotification::Message
+		(
+			GetWindow(),
+			LString::Fmt("Can't create event in %s: %s",
+						Src->GetClass(),
+						createErr.ToString().Get())
+		);
 		return NULL;
+	}
 
 	LDateTime Start, End;
 	if (dtStart < dtEnd)
@@ -2134,7 +2145,7 @@ Calendar *CalendarView::NewEvent(LDateTime &dtStart, LDateTime &dtEnd)
 	}
 	
 	LDateTime n = Start;
-	LDateTime::LDstInfo *CurDst = GetDstForDate(Start);
+	auto CurDst = GetDstForDate(Start);
 	if (CurDst)
 		n.SetTimeZone(CurDst->Offset, false);
 
@@ -2147,8 +2158,6 @@ Calendar *CalendarView::NewEvent(LDateTime &dtStart, LDateTime &dtEnd)
 	c->SetField(FIELD_CAL_START_UTC, Start);
 	End.ToUtc(true);
 	c->SetField(FIELD_CAL_END_UTC, End);
-	
-	LgiTrace("Start=%s, End=%s\n", Start.Get().Get(), End.Get().Get());
 	
 	c->OnCreate();
 
@@ -2645,9 +2654,15 @@ int CalendarView::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 					auto type = LGetFileMimeType(f);
 					if (in->Open(f, O_READ))
 					{
-						auto c = First->NewEvent();
+						LError createErr;
+						auto c = First->NewEvent(&createErr);
 						if (c)
 							c->Import(c->AutoCast(in), type);
+						else
+							LgiTrace("%s:%i - Failed to create calendar event in %s: %s\n",
+									_FL,
+									First->GetClass(),
+									createErr.ToString().Get());
 					}
 				}
 			}
@@ -3550,3 +3565,68 @@ LColour CalendarSource::FindUnusedColour()
 	return LColour();
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+CalendarSourceGetEvents::CalendarSourceGetEvents(ScribeWnd *app,
+	CalendarSourceGetEvents **owner,
+	LDateTime start,
+	LDateTime end,
+	LArray<CalendarSource*> sources,
+	CalendarSource::GetEventCb callback) :
+	LView::ViewEventTarget(app, M_CALENDAR_SOURCE_STATE),
+	Owner(owner)
+{
+	*Owner = this;
+	Sources = sources;
+	Start = start;
+	End = end;
+	Callback = callback;
+	PostEvent(M_CALENDAR_SOURCE_STATE);
+}
+
+CalendarSourceGetEvents::~CalendarSourceGetEvents()
+{
+	*Owner = NULL;
+}
+
+void CalendarSourceGetEvents::OnState()
+{
+	if (Sources.Length() == 0)
+	{
+		LgiTrace("CalendarSourceGetEvents: finished...\n");
+		if (Callback)
+			Callback(Events);
+		delete this;
+	}
+	else if (auto src = Sources[0])
+	{
+		Sources.DeleteAt(0);
+		if (!App)
+			App = src->GetApp();
+
+		if (src->ToString().Find("FolderCalendarSource(/NextCloud/Calendar)") > 0)
+		{
+			int asd=0;
+		}
+		LgiTrace("CalendarSourceGetEvents: %s\n", src->ToString().Get());
+		src->GetEvents(Start, End, [this, src](auto events)
+			{
+				#ifdef _DEBUG
+				LAssert(!GotCb.Find(src));
+				GotCb.Add(src, true);
+				#endif
+
+				LgiTrace("CalendarSourceGetEvents: Callback %s %i\n", src->ToString().Get(), (int)events.Length());
+				Events += events;
+
+				PostEvent(M_CALENDAR_SOURCE_STATE);
+			});
+	}
+}
+
+LMessage::Result CalendarSourceGetEvents::OnEvent(LMessage *Msg)
+{
+	if (Msg->Msg() == M_CALENDAR_SOURCE_STATE)
+		OnState();
+
+	return 0;
+}

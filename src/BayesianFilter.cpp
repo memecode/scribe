@@ -950,7 +950,7 @@ bool BuildSpamDB::Process()
 			if (Type != BayesMailUnknown && Parent)
 			{
 				FolderLoads++;
-				f->WhenLoaded(_FL, [this, f, Type, Path]()
+				f->WhenLoaded(_FL, [this, f, Type, Path](auto status)
 				{
 					LgiTrace("%s:%i - Scanning '%s' got %i items, FolderLoads=%i\n", _FL, Path.Get(), (int)f->Items.Length(), FolderLoads);
 					for (auto i: f->Items)
@@ -1005,7 +1005,7 @@ bool BuildSpamDB::Process()
 
 					// auto loaded = i.m->GetLoaded();
 
-					i.m->WhenLoaded(_FL, [this, mail = i.m, type = i.type]
+					i.m->WhenLoaded(_FL, [this, mail = i.m, type = i.type](auto status)
 					{
 						ProcessMail(mail, type);
 						MailLoads--;
@@ -1543,7 +1543,7 @@ Store3Status BayesianFilter::IsSpam(double &Result, Mail *m, bool Analyse)
 	if (Status == Store3Delayed)
 	{
 		// Not loaded yet, retry it later...
-		m->WhenLoaded(_FL, [this, Analyse, m]()
+		m->WhenLoaded(_FL, [this, Analyse, m](auto status)
 		{
 			double r;
 			IsSpam(r, m, Analyse);

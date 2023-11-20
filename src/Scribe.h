@@ -371,7 +371,7 @@ protected:
 	{
 		const char *File = NULL;
 		int Line = 0;
-		std::function<void()> Callback;
+		std::function<void(Store3Status)> Callback;
 	};
 	LArray<ThingEventInfo*> OnLoadCallbacks;
 
@@ -386,7 +386,7 @@ public:
 	{
 		// This is the main result to look at:
 		//		Store3NotImpl - typically means the mime type is wrong.
-		//		Store3Error - an error occurred.
+		//		Store3Error   - an error occurred.
 		//		Store3Delayed - means the operation will take a long time.
 		//			However progress is report via 'prog' if not NULL.
 		//			And the 'onComplete' handler will be called at the end.
@@ -443,7 +443,7 @@ public:
 	virtual bool IsPlaceHolder() { return false; }
 
 	// Events
-	void WhenLoaded(const char *file, int line, std::function<void()> Callback, int index = -1);
+	void WhenLoaded(const char *file, int line, std::function<void(Store3Status)> Callback, int index = -1, bool waitForResults = true);
 	bool IsLoaded(int Set = -1);
 
 	// Printing
@@ -1247,7 +1247,7 @@ protected:
 	void EmptyFieldList();
 	void SetLoadFolder(Thing *t) { if (t) t->SetParentFolder(this); }
 	bool HasFieldId(int Id);
-	void ContinueLoading(int OldUnread, std::function<void(Store3Status)> Callback);
+	void ContinueLoading(int OldUnread, std::function<void(Store3Status)> Callback, bool waitForResults);
 
 	// Tree item stuff
 	void _PourText(LPoint &Size) override;
@@ -1342,7 +1342,12 @@ public:
 	///				the user) then it'll return Store3Delayed immediately.
 	///		async:	Call with a valid callback, and the method will possibly wait 
 	///				for the user and then either return Store3Error or Store3Success.
-	Store3Status LoadThings(LViewI *Parent = NULL,	std::function<void(Store3Status)> Callback = NULL);
+	///
+	/// If waitForResults is false, LoadThings won't wait for things to load over the network, but
+	/// return Store3Delayed in the status immediately. Currently this is used by CalendarSourceGetEvents
+	/// to return a combined list of events available immediately. Some remote calendar or Webdav sources
+	/// can take a while to get their content.
+	Store3Status LoadThings(LViewI *Parent = NULL,	std::function<void(Store3Status)> Callback = NULL, bool waitForResults = true);
 	Store3Status WriteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
 	Store3Status DeleteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
 	Store3Status DeleteAllThings(					std::function<void(Store3Status)> Callback = NULL);
