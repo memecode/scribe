@@ -175,6 +175,10 @@
 		349AB0BE217B395B00573982 /* Png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 349AB0BD217B395B00573982 /* Png.cpp */; };
 		349AB0C0217B3D9500573982 /* scribe-mac-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */; };
 		34A66681237968A200ED0212 /* FolderCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A66680237968A200ED0212 /* FolderCalendarSource.cpp */; };
+		34A891DF2B0C177100D2930B /* libcrypto.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A891DD2B0C177100D2930B /* libcrypto.3.dylib */; };
+		34A891E12B0C178000D2930B /* libssl.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A891E02B0C178000D2930B /* libssl.3.dylib */; };
+		34A891E22B0C17B200D2930B /* libssl.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34A891E02B0C178000D2930B /* libssl.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34A891E32B0C17B900D2930B /* libcrypto.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34A891DD2B0C177100D2930B /* libcrypto.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34AB68F6275240BC0045380B /* ScribeScripts.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 34AB68E8275240B40045380B /* ScribeScripts.h */; };
 		34C1BF90238CAEC500658B99 /* calendar.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF71238CA23500658B99 /* calendar.html */; };
 		34C1BF91238CAEC500658B99 /* contacts.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF75238CA23500658B99 /* contacts.html */; };
@@ -203,8 +207,6 @@
 		34E7C48029DE2D6C00C4DEB1 /* libsqlite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D0512629DE2AC100BF0C5A /* libsqlite.a */; };
 		34EE8BB52748A6EC00F12915 /* HomoglyphsTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */; };
 		34EE8BB62748A6EC00F12915 /* Homoglyphs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */; };
-		34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34F1BD082442B0050062DCF4 /* libssl.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34F1BD0D2442B03B0062DCF4 /* libcrypto.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34F1BD092442B0050062DCF4 /* libcrypto.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34FB966F237D07740039423C /* WebdavStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB9661237D07740039423C /* WebdavStore.cpp */; };
 		34FB968A23835BB40039423C /* WebDav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB968923835BB40039423C /* WebDav.cpp */; };
 /* End PBXBuildFile section */
@@ -254,6 +256,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				34A891E32B0C17B900D2930B /* libcrypto.3.dylib in Copy Files */,
+				34A891E22B0C17B200D2930B /* libssl.3.dylib in Copy Files */,
 				34452C9E2AD4A30300AE820D /* libaspell-dist-0.60.dylib in Copy Files */,
 				34452C9D2AD4A2EA00AE820D /* libpng16.15.29.0.dylib in Copy Files */,
 				34452C9C2AD4A2E100AE820D /* libjpeg9a.dylib in Copy Files */,
@@ -262,8 +266,6 @@
 				34452C992AD4A2BF00AE820D /* libiconv.dylib in Copy Files */,
 				34452C972AD4A2B800AE820D /* libz_local.1.2.5.dylib in Copy Files */,
 				340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */,
-				34F1BD0D2442B03B0062DCF4 /* libcrypto.3.dylib in Copy Files */,
-				34F1BD0C2442B0340062DCF4 /* libssl.3.dylib in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -524,6 +526,8 @@
 		349AB0BD217B395B00573982 /* Png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Png.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Filters/Png.cpp; sourceTree = "<group>"; };
 		349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "scribe-mac-icon.icns"; path = "../../Resources/scribe-mac-icon.icns"; sourceTree = "<group>"; };
 		34A66680237968A200ED0212 /* FolderCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FolderCalendarSource.cpp; path = ../../src/FolderCalendarSource.cpp; sourceTree = "<group>"; };
+		34A891DD2B0C177100D2930B /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.3.dylib; path = ../../../../../../opt/local/libexec/openssl3/lib/libcrypto.3.dylib; sourceTree = "<group>"; };
+		34A891E02B0C178000D2930B /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.3.dylib; path = ../../../../../../opt/local/libexec/openssl3/lib/libssl.3.dylib; sourceTree = "<group>"; };
 		34AB68E8275240B40045380B /* ScribeScripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeScripts.h; path = ../../Scripts/ScribeScripts.h; sourceTree = "<group>"; };
 		34C1BF71238CA23500658B99 /* calendar.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = calendar.html; path = ../../Help/calendar.html; sourceTree = "<group>"; };
 		34C1BF72238CA23500658B99 /* features.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = features.html; path = ../../Help/features.html; sourceTree = "<group>"; };
@@ -553,8 +557,6 @@
 		34EE8BAF2748A32C00F12915 /* Html.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Html.h; path = ../../../../Lgi/trunk/include/lgi/common/Html.h; sourceTree = "<group>"; };
 		34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HomoglyphsTable.cpp; path = ../../../../Lgi/trunk/src/common/Text/Homoglyphs/HomoglyphsTable.cpp; sourceTree = "<group>"; };
 		34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Homoglyphs.cpp; path = ../../../../Lgi/trunk/src/common/Text/Homoglyphs/Homoglyphs.cpp; sourceTree = "<group>"; };
-		34F1BD082442B0050062DCF4 /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.3.dylib; path = ../../../../codelib/openssl/libssl.3.dylib; sourceTree = "<group>"; };
-		34F1BD092442B0050062DCF4 /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.3.dylib; path = ../../../../codelib/openssl/libcrypto.3.dylib; sourceTree = "<group>"; };
 		34F6152127E55CA700FE5B0C /* EventTargetThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EventTargetThread.h; path = ../../../../lgi/trunk/include/lgi/common/EventTargetThread.h; sourceTree = "<group>"; };
 		34FB9661237D07740039423C /* WebdavStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavStore.cpp; path = ../../src/Store3Webdav/WebdavStore.cpp; sourceTree = "<group>"; };
 		34FB968923835BB40039423C /* WebDav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebDav.cpp; path = ../../../../Lgi/trunk/src/common/Net/WebDav.cpp; sourceTree = "<group>"; };
@@ -566,10 +568,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34A891E12B0C178000D2930B /* libssl.3.dylib in Frameworks */,
 				34E7C48029DE2D6C00C4DEB1 /* libsqlite.a in Frameworks */,
 				3477C5231CC315FC0028B84B /* Cocoa.framework in Frameworks */,
 				34749B5F278B08B200C8197E /* LgiCocoa.framework in Frameworks */,
 				3474FC5F226DE0960064E0AD /* libBtree.a in Frameworks */,
+				34A891DF2B0C177100D2930B /* libcrypto.3.dylib in Frameworks */,
 				34452C8D2AD4A25500AE820D /* libaspell-dist-0.60.dylib in Frameworks */,
 				34452C8B2AD4A23D00AE820D /* libbzip2.dylib in Frameworks */,
 				34452C8F2AD4A26B00AE820D /* libchardet.dylib in Frameworks */,
@@ -983,8 +987,8 @@
 				34452C8A2AD4A23C00AE820D /* libbzip2.dylib */,
 				34452C882AD4A22F00AE820D /* libjpeg9a.dylib */,
 				34452C862AD4A22000AE820D /* libpng16.15.29.0.dylib */,
-				34F1BD092442B0050062DCF4 /* libcrypto.3.dylib */,
-				34F1BD082442B0050062DCF4 /* libssl.3.dylib */,
+				34A891DD2B0C177100D2930B /* libcrypto.3.dylib */,
+				34A891E02B0C178000D2930B /* libssl.3.dylib */,
 				3477C5221CC315FC0028B84B /* Cocoa.framework */,
 			);
 			name = Link;
@@ -1590,11 +1594,15 @@
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
 					"../../../../codelib/libjpeg-9a",
-					../../../../codelib/openssl/include,
+					/opt/local/libexec/openssl3/include,
 					../../../../codelib/libpng,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/libexec/openssl3/lib,
+				);
 				OTHER_CFLAGS = (
 					"-D__NCURSES_H=1",
 					"-DNCURSES_UNCTRL_H_incl=1",
@@ -1644,11 +1652,15 @@
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
 					"../../../../codelib/libjpeg-9a",
-					../../../../codelib/openssl/include,
+					/opt/local/libexec/openssl3/include,
 					../../../../codelib/libpng,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/libexec/openssl3/lib,
+				);
 				OTHER_CFLAGS = (
 					"-D__NCURSES_H=1",
 					"-DNCURSES_UNCTRL_H_incl=1",
