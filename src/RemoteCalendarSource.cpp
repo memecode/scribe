@@ -26,6 +26,11 @@ public:
 
 	const char *GetClass() override { return "RemoteCalEvent"; }
 	LDataStoreI *GetStore() override { return store; }
+	bool IsOnDisk() override { return false; }
+	bool IsOrphan() override { return false; }
+	Store3Status Save(LDataI *Obj = NULL) override { return Store3NotImpl; }
+	Store3Status Delete(bool ToTrash = true) override { return Store3NotImpl; }
+	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
 };
 
 struct RemoteCalendarSourcePriv :

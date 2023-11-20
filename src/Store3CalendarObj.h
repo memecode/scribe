@@ -361,8 +361,6 @@ public:
 	}
 
 	// LDataI impl:
-	bool IsOnDisk() override { return false; }
-	bool IsOrphan() override { return false; }
 	uint64 Size() override
 	{
 		return sizeof(*this) +
@@ -374,7 +372,12 @@ public:
 			Uid.Length() +
 			Reminders.Length();
 	}
-	Store3Status Save(LDataI *Obj = NULL) override { return Store3NotImpl; }
-	Store3Status Delete(bool ToTrash = true) override { return Store3NotImpl; }
-	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
+
+	/* Impl this is subclass:
+		bool IsOnDisk() override { return false; }
+		bool IsOrphan() override { return false; }
+		Store3Status Save(LDataI *Obj = NULL) override { return Store3NotImpl; }
+		Store3Status Delete(bool ToTrash = true) override { return Store3NotImpl; }
+		LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
+	*/
 };
