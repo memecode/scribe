@@ -30,26 +30,15 @@ char NotAllowed[] = "\\/";
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-char *StripPath(const char *Full)
+static LString StripPath(LString Full)
 {
-	if (Full)
-	{
-		auto Dos = strrchr(Full, '\\');
-		auto Unix = strrchr(Full, '/');
-		if (Dos)
-		{
-			return NewStr(Dos+1);
-		}
-		else if (Unix)
-		{
-			return NewStr(Unix+1);
-		}
-	}
-
-	return NewStr(Full);
+	if (!Full)
+		return LString();
+	auto parts = Full.SplitDelimit("\\/");
+	return parts.Last();
 }
 
-void CleanFileName(char *i)
+static void CleanFileName(char *i)
 {
 	if (i)
 	{
@@ -340,7 +329,7 @@ bool Attachment::IsVCard()
 char *Attachment::GetDropFileName()
 {
 	if (!DropFileName)
-		DropFileName = MakeFileName();
+		DropFileName.Reset(NewStr(MakeFileName()));
 	return DropFileName;
 }
 
@@ -362,14 +351,14 @@ bool Attachment::GetDropFiles(LString::Array &Files)
 	return Status;
 }
 
-LAutoString Attachment::MakeFileName()
+LString Attachment::MakeFileName()
 {
 	auto Name = GetName();
-	LAutoString CleanName;
+	LString CleanName;
 	
 	if (Name)
 	{
-		CleanName.Reset(StripPath(Name));
+		CleanName = StripPath(Name);
 		CleanFileName(CleanName);
 	}
 	else
@@ -384,7 +373,7 @@ LAutoString Attachment::MakeFileName()
 			size_t len = strlen(s);
 			sprintf_s(s+len, sizeof(s)-len, ".%s", Ext[0].Get());
 		}
-		CleanName.Reset(NewStr(s));
+		CleanName = s;
 	}
 
 	return CleanName;
@@ -509,7 +498,7 @@ void Attachment::OnOpen(LView *Parent, char *Dest)
 				
 			// get the file name
 			char FileName[MAX_PATH_LEN];
-			LAutoString CleanName = MakeFileName();
+			auto CleanName = MakeFileName();
 			if (CleanName)
 			{
 				LMakePath(FileName, sizeof(FileName), Tmp, CleanName);
@@ -734,96 +723,87 @@ bool Attachment::SaveTo(char *FileName, bool Quite, LView *Parent)
 	return Status;
 }
 
+void Attachment::DoSave(LFileSelect *Select, const LArray<LListItem*> Files)
+{
+	char Dir[MAX_PATH_LEN];
+	strcpy_s(Dir, sizeof(Dir), Select->Name());
+
+	if (Files.Length() > 1)
+	{
+		// Loop through all the files and write them to that directory
+		for (unsigned idx=0; idx<Files.Length(); idx++)
+		{
+			auto a = dynamic_cast<Attachment*>(Files.ItemAt(idx));
+			if (a)
+			{
+				char Path[MAX_PATH_LEN];
+				auto d = StripPath(a->GetName());
+				if (!d)
+				{
+					d = a->MakeFileName();
+				}
+				if (d)
+				{
+					sprintf_s(Path, sizeof(Path), "%s%s%s", Dir, DIR_STR, d.Get());
+					a->SaveTo(Path);
+				}
+			}
+		}
+	}
+	else
+	{
+		// Write the file
+		auto a = dynamic_cast<Attachment*>(Files.ItemAt(0));
+		if (a)
+			a->SaveTo(Dir, false, Parent);
+	}
+}
+
 void Attachment::OnSaveAs(LView *Parent)
 {
-	auto Name = GetName();
-	char *n = StripPath(Name);
-	if (!n)
-	{
-		n = NewStr("untitled");
-	}
+	auto name = StripPath(GetName());
+	if (!name)
+		name = "untitled";
 	
-	if (n)
+	if (name)
 	{
-		CleanFileName(n);
+		CleanFileName(name);
 
 		auto Select = new LFileSelect(Parent);
 
 		Select->Type("All files", LGI_ALL_FILES);
-		Select->Name(n);
+		Select->Name(name);
 
-		List<LListItem> Files;
-
+		LArray<LListItem*> Files;
 		if (LListItem::Parent)
-		{
 			LListItem::Parent->GetSelection(Files);
-		}
 		else
-		{
-			Files.Insert(this);
-		}
+			Files.Add(this);
 
 		if (Files.Length() > 0)
 		{
-			auto DoSave = [this, Files, Parent](LFileSelect *Select)
-			{
-				char Dir[MAX_PATH_LEN];
-				strcpy_s(Dir, sizeof(Dir), Select->Name());
-
-				if (Files.Length() > 1)
-				{
-					// Loop through all the files and write them to that directory
-					for (unsigned idx=0; idx<Files.Length(); idx++)
-					{
-						LListItem *i = Files[idx];
-						Attachment *a = dynamic_cast<Attachment*>(i);
-						if (a)
-						{
-							char Path[MAX_PATH_LEN];
-							auto d = StripPath(a->GetName());
-							if (d)
-							{
-								sprintf_s(Path, sizeof(Path), "%s%s%s", Dir, DIR_STR, d);
-								a->SaveTo(Path);
-								DeleteArray(d);
-							}
-						}
-					}
-				}
-				else
-				{
-					// Write the file
-					Attachment *a = dynamic_cast<Attachment*>(Files[0]);
-					if (a)
-					{
-						a->SaveTo(Dir, false, Parent);
-					}
-				}
-			};
 
 			if (Files.Length() > 1)
 			{
 				// multiple files, ask which directory to write to
-				Select->OpenFolder([DoSave](auto dlg, auto status)
+				Select->OpenFolder([this, Files](auto dlg, auto status)
 				{
 					if (status)
-						DoSave(dlg);
+						DoSave(dlg, Files);
 					delete dlg;
 				});
 			}
 			else
 			{
 				// single file, ask for filename and path
-				Select->Save([DoSave](auto dlg, auto status)
+				Select->Save([this, Files](auto dlg, auto status)
 				{
 					if (status)
-						DoSave(dlg);
+						DoSave(dlg, Files);
 					delete dlg;
 				});
 			}
 		}
-
-		DeleteArray(n);
 	}
 }
 
@@ -970,7 +950,7 @@ bool Attachment::GetData(LArray<LDragData> &Data)
 						a->DropSourceFile.Reset();
 
 						char p[MAX_PATH_LEN];
-						LAutoString Clean = a->MakeFileName();
+						auto Clean = a->MakeFileName();
 						LMakePath(p, sizeof(p), ScribeTempPath(), Clean);
 
 						char Ext[256];

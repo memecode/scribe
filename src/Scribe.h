@@ -657,6 +657,7 @@ protected:
 	bool GetData(LArray<LDragData> &Data) override;
 
 	void _New(LDataI *object);
+	void DoSave(LFileSelect *Select, const LArray<LListItem*> Files);
 
 public:
 	enum Encoding
@@ -700,7 +701,7 @@ public:
 	bool Set(char *ptr, ssize_t size);
 	bool Set(LAutoStreamI Stream);
 	Attachment *IsAttachment() override { return this; }
-	LAutoString MakeFileName();
+	LString MakeFileName();
 	bool GetIsResizing();
 	void SetIsResizing(bool b);
 	bool IsMailMessage();
