@@ -40,9 +40,10 @@ class ScribeClass ListAddr :
 	public LListItem,
 	public LDataPropI
 {
-	char *MakeName(const char *Delim = "", bool LocalTime = true);
+	LString MakeName(const char *Delim = "", bool LocalTime = true);
 
 	bool Loaded;
+	LString sNameCache;
 	ScribeWnd *App;
 	List<RecipientItem> Who;
 
@@ -87,8 +88,8 @@ public:
 	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override;
 
 	// Clipboard
-	char *Copy();
-	void Paste(char *s);
+	LString Copy();
+	void Paste(const char *s);
 
 	// DataI
 	const char *GetStr(int id) override;

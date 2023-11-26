@@ -481,38 +481,31 @@ List<RecipientItem>::I ListAddr::end()
 	return Who.end();
 }
 
-char *ListAddr::MakeName(const char *Delim, bool LocalTime)
+LString ListAddr::MakeName(const char *Delim, bool LocalTime)
 {
-	static char Buf[512];
+	LString name;
 	if (sAddr && sName)
 	{
 		RecipientItem *i = Who[0];
 		Contact *c = i ? i->GetContact() : 0;
-		char *Local = LocalTime ? (c ? c->GetLocalTime() : 0) : 0;
+		LString Local;
+		if (LocalTime && c)
+			Local = c->GetLocalTime();
 		if (Local)
-		{
-			sprintf_s(Buf, sizeof(Buf), "%s%s%s <%s> (%s)", Delim, sName.Get(), Delim, sAddr.Get(), Local);
-			DeleteArray(Local);
-		}
+			name.Printf("%s%s%s <%s> (%s)", Delim, sName.Get(), Delim, sAddr.Get(), Local.Get());
 		else
-		{
-			sprintf_s(Buf, sizeof(Buf), "%s%s%s <%s>", Delim, sName.Get(), Delim, sAddr.Get());
-		}
+			name.Printf("%s%s%s <%s>", Delim, sName.Get(), Delim, sAddr.Get());
 	}
 	else if (sAddr)
 	{
-		sprintf_s(Buf, sizeof(Buf), "<%s>", sAddr.Get());
+		name.Printf("<%s>", sAddr.Get());
 	}
 	else if (sName)
 	{
-		sprintf_s(Buf, sizeof(Buf), "%s%s%s", Delim, sName.Get(), Delim);
+		name.Printf("%s%s%s", Delim, sName.Get(), Delim);
 	}
-	else
-	{
-		return 0;
-	}
-
-	return Buf;
+	
+	return name;
 }
 
 const char *ListAddr::GetText(int i)
@@ -527,20 +520,22 @@ const char *ListAddr::GetText(int i)
 				switch (CC)
 				{
 					case MAIL_ADDR_TO:
-						return (char*)"To:";
+						return "To:";
 					case MAIL_ADDR_CC:
-						return (char*)"Cc:";
+						return "Cc:";
 					case MAIL_ADDR_BCC:
-						return (char*)"Bcc:";
+						return "Bcc:";
+					case MAIL_ADDR_FROM:
+						return NULL;
 					default:
-						break;
+						return "#ErrUnknownCC";
 				}
 				break;
 			}
 			case 1:
 			{
-				return MakeName();
-				break;
+				sNameCache = MakeName();
+				return sNameCache;
 			}
 		}
 	}
@@ -549,15 +544,9 @@ const char *ListAddr::GetText(int i)
 		switch (i)
 		{
 			case 0:
-			{
-				if (sAddr) return sAddr;
-				break;
-			}
+				return sAddr;
 			case 1:
-			{
-				if (sName) return sName;
-				break;
-			}
+				return sName;
 		}
 	}
 
@@ -1160,19 +1149,15 @@ bool ListAddr::GetVariant(const char *VarName, LVariant &Value, const char *Arra
 	return true;
 }
 
-char *ListAddr::Copy()
+LString ListAddr::Copy()
 {
-	return NewStr(MakeName("\"", false));
+	return MakeName("\"", false);
 }
 
-void ListAddr::Paste(char *s)
+void ListAddr::Paste(const char *s)
 {
 	_Delete();
-
-	LAutoString a, n;
-	DecodeAddrName(s, n, a, 0);
-	sName = n.Get();
-	sAddr = a.Get();
+	DecodeAddrName(s, sName, sAddr, 0);
 }
 
 void ListAddr::_Delete()

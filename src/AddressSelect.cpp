@@ -154,27 +154,20 @@ void AddressList::Copy()
 			ListAddr *La = dynamic_cast<ListAddr*>(i);
 			if (La)
 			{
-				char *s = La->Copy();
+				auto s = La->Copy();
 				if (s)
-				{
-					p.Print("%s\r\n", s);
-					DeleteArray(s);
-				}
+					p.Print("%s\r\n", s.Get());
 			}
 		}
 
-		char *t = p.NewStr();
+		auto t = p.NewLStr();
 		if (t)
 		{
 			LClipBoard Clip(this);
 			Clip.Text(t);
-			char16 *w = Utf8ToWide(t);
+			LAutoWString w(Utf8ToWide(t));
 			if (w)
-			{
 				Clip.TextW(w, false);
-				DeleteArray(w);
-			}
-			DeleteArray(t);
 		}
 	}
 }
