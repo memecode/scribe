@@ -982,6 +982,9 @@
     <None Include="..\src\Encryption\Examples\encrypted.eml">
       <Filter>Testing\Email</Filter>
     </None>
+    <None Include="..\Scripts\MoveTest.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Utils\Tables\MailFlags.txt">

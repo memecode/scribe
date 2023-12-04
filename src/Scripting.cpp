@@ -31,7 +31,7 @@ LView *CastLView(LVariant *v)
 	{
 		if (v->Type == GV_DOM)
 			return dynamic_cast<LView*>(v->Value.Dom);
-		else if (v->Type == GV_GVIEW)
+		else if (v->Type == GV_LVIEW)
 			return v->Value.View;
 	}
 	return 0;
@@ -339,10 +339,14 @@ bool LScribeScript::GetFolder(LScriptArguments &Args)
 		}
 	}
 
-	char *f = Args[0]->Str();
-	if (f)
+	auto path = Args.StringAt(0);
+	if (path)
 	{
-		*Args.GetReturn() = (LDom*)App->GetFolder(f);
+		auto folder = App->GetFolder(path);
+		if (folder)
+		{
+			*Args.GetReturn() = static_cast<LDom*>(folder);
+		}
 	}
 
 	return true;
@@ -353,7 +357,7 @@ bool LScribeScript::GetSourceFolders(LScriptArguments &Args)
 	ARG_CHECK(!=, 1);
 
 	LArray<ScribeFolder*> Folders;
-	auto FolderType = Args[0]->CastInt32();
+	auto FolderType = Args.Int32At(0);
 	Store3ItemTypes ItemType = MAGIC_NONE;
 	switch (FolderType)
 	{
@@ -397,9 +401,9 @@ bool LScribeScript::BrowseFolder(LScriptArguments &Args)
 	ARG_CHECK(<, 4);
 
 	LView *Parent = CastLView(Args[0]);
-	LString MessageTxt = Args[1]->Str();
-	LString DefaultFolderName = Args[2]->Str();
-	LString CallbackName = Args[3]->Str();
+	LString MessageTxt = Args.StringAt(1);
+	LString DefaultFolderName = Args.StringAt(2);
+	LString CallbackName = Args.StringAt(3);
 
 	if (!CallbackName)
 	{
@@ -739,7 +743,7 @@ bool LScribeScript::ShowThingWindow(LScriptArguments &Args)
 
 bool LScribeScript::AddToolsMenuItem(LScriptArguments &Args)
 {
-	ARG_CHECK(!=, 2);
+	ARG_CHECK(<, 2);
 
 	*Args.GetReturn() = App->RegisterCallback(LToolsMenu, Args);
 

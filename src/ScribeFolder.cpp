@@ -30,6 +30,8 @@
 #include "lgi/common/Com.h"
 #endif
 
+size_t AsyncOperationState::Instances = 0;
+
 class LDndFilePromise
 	#if defined(WINDOWS)
 	#elif defined(__GTK_H__)
@@ -673,7 +675,8 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 {
 	if (!t)
 	{
-		if (Callback) Callback(Store3Error);
+		if (Callback)
+			Callback(Store3Error);
 		return Store3Error;
 	}
 
@@ -691,7 +694,8 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 		{
 			LAssert(!"No object?");
 			LgiTrace("%s:%i - No object to save.\n", _FL);
-			if (Callback) Callback(Store3Error);
+			if (Callback)
+				Callback(Store3Error);
 			return;
 		}
 
@@ -703,14 +707,16 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 			// The ScribeWnd::OnNew will take care of inserting the item into the
 			// right folder, updating the unread count, any filtering etc.
 			t->OnSerialize(true);
-			if (Callback) Callback(Status);
+			if (Callback)
+				Callback(Status);
 		}
 		else
 		{
 			if (Create)
 				t->SetObject(NULL, false, _FL);
 			LgiTrace("%s:%i - Object->Save returned %i.\n", _FL, Status);
-			if (Callback) Callback(Store3Error);
+			if (Callback)
+				Callback(Store3Error);
 		}
 	};
 
@@ -731,32 +737,25 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 
 int ThingContainerNameCmp(LTreeItem *a, LTreeItem *b, NativeInt d)
 {
-	ScribeFolder *A = dynamic_cast<ScribeFolder*>(a);
-	ScribeFolder *B = dynamic_cast<ScribeFolder*>(b);
+	auto A = dynamic_cast<ScribeFolder*>(a);
+	auto B = dynamic_cast<ScribeFolder*>(b);
 	if (A && B)
-	{
-		const char *s1 = A->GetText();
-		const char *s2 = B->GetText();
-		const char *Empty = "";
-		return _stricmp(s1?s1:Empty, s2?s2:Empty);
-	}
-	else LAssert(!"Invalid objects.");
+		return Stricmp(A->GetText(), B->GetText());
 
+	LAssert(!"Invalid objects.");
 	return 0;
 }
 
 int ThingContainerIdxCmp(LTreeItem *a, LTreeItem *b, NativeInt d)
 {
-	ScribeFolder *A = dynamic_cast<ScribeFolder*>(a);
-	ScribeFolder *B = dynamic_cast<ScribeFolder*>(b);
+	auto A = dynamic_cast<ScribeFolder*>(a);
+	auto B = dynamic_cast<ScribeFolder*>(b);
 	if (A && B)
 	{
-		int Aidx = A->GetSortIndex();
-		int Bidx = B->GetSortIndex();
+		auto Aidx = A->GetSortIndex();
+		auto Bidx = B->GetSortIndex();
 		if (Aidx >= 0 || Bidx >= 0)
-		{
 			return Aidx - Bidx;
-		}
 	}
 	else LAssert(!"Invalid objects.");
 
@@ -807,8 +806,8 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 	}
 	else if (!IsRoot())
 	{
-		auto *LiteralNew = LLoadString(IDS_NEW);
-		const char *Type = 0;
+		auto LiteralNew = LLoadString(IDS_NEW);
+		const char *Type = "";
 		switch (GetItemType())
 		{
 			case MAGIC_MAIL:
@@ -823,16 +822,15 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			case MAGIC_FILTER:
 				Type = LLoadString(IDS_FILTER);
 				break;
+			case MAGIC_GROUP:
+				Type = LLoadString(IDS_GROUP);
+				break;
 			default:
 				break;
 		}
 
 		if (Type)
-		{
-			char Str[256];
-			sprintf_s(Str, sizeof(Str), "%s %s", LiteralNew, Type);
-			s.Sub->AppendItem(Str, IDM_NEW_EMAIL, true);
-		}
+			s.Sub->AppendItem(LString::Fmt("%s %s", LiteralNew, Type), IDM_NEW_EMAIL, true);
 	}
 
 	switch (GetItemType())
@@ -942,20 +940,10 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 	{
 		case IDM_NEW_EMAIL:
 		{
-			switch (GetItemType())
-			{
-				case MAGIC_MAIL:
-				case MAGIC_CONTACT:
-				case MAGIC_CALENDAR:
-				case MAGIC_FILTER:
-				{
-					if (App)
-						App->CreateItem(GetItemType(), this);
-					break;
-				}
-				default:
-					break;
-			}
+			if (App)
+				App->CreateItem(GetItemType(), this);
+			else
+				LAssert(!"No app");
 			break;
 		}
 		case IDM_MARK_SEND:

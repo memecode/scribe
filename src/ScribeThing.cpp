@@ -209,19 +209,20 @@ void Thing::SetParentFolder(ScribeFolder *f)
 	
 	if (_ParentFolder)
 	{
-		if (!_ParentFolder->Items.HasItem(this))
-		{
+		if (_ParentFolder->Items.HasItem(this))
+			_ParentFolder->Items.Delete(this);
+		else
 			LAssert(!"_ParentFolder->Items incorrect.");
-		}
-		_ParentFolder->Items.Delete(this);
 	}
 
 	_ParentFolder = f;
 
 	if (_ParentFolder)
 	{
-		LAssert(!_ParentFolder->Items.HasItem(this));
-		_ParentFolder->Items.Insert(this);
+		if (_ParentFolder->Items.HasItem(this))
+			LAssert(!"Folder already has item?");
+		else
+			_ParentFolder->Items.Insert(this);
 	}
 }
 
@@ -229,147 +230,155 @@ void Thing::SetFolder(ScribeFolder *New, std::function<void(Store3Status)> callb
 {
 	if (!New)
 	{
-		if (callback) callback(Store3Error);
+		if (callback)
+			callback(Store3Error);
 		return;
 	}
 
-	ScribeFolder *Old = GetFolder();
-	if (Old)
-	{
-		if (Old->GetObject() &&
-			New->GetObject() &&
-			Old->GetObject()->GetStore() != 0 &&
-			Old->GetObject()->GetStore() == New->GetObject()->GetStore())
-		{
-			// Both source and dest are local folders...
-			// This is really an optimization to reduce the overhead of moving objects
-			// between folders, a function which is provided by the storage sub-system
-			// does all the work for us.
-			LArray<LDataI*> Mv;
-			Mv.Add(GetObject());
-
-			auto status = Old->GetObject()->GetStore()->Move(New->GetFldObj(), Mv);
-			if (status == Store3Success)
-			{
-				LAssert(!Old->Items.HasItem(this));
-				LAssert(GetFolder() == New);
-				LAssert(New->Items.HasItem(this));
-			}
-
-			if (callback)
-				callback(status);
-		}
-		else if (IsPlaceHolder())
-		{
-			return;
-		}
-		else if (New->GetObject() && GetObject() && New->GetObject()->GetStore())
-		{
-			// Source OR Dest are remote...
-			auto NewObject = New->GetObject()->GetStore()->Create(Type());
-			if (NewObject)
-			{
-				LDataI *OldObject = GetObject();
-
-				// Copy the current data into the new object
-				NewObject->CopyProps(*GetObject());
-				SetObject(NewObject, false, _FL);
-
-				// Try writing it to the store...
-				// bool InOld = Old->Items.HasItem(this);
-				Store3Status SyncStatus = New->WriteThing(
-					this,
-					[this, Old, OldObject, New, NewObject](auto AsyncStatus)
-					{
-						switch (AsyncStatus)
-						{
-							default:
-							case Store3Error:
-							{
-								// It failed, delete the new object...
-								SetObject(OldObject, false, _FL);
-								delete NewObject;
-								break;
-							}
-							case Store3Success:
-							{
-								// Ok, immediate save, set new object
-								// delete old object
-								auto Moved = OldObject->Delete(false);
-								if (Moved == Store3Error)
-								{
-									SetObject(OldObject, false, _FL);
-									delete NewObject;
-								}
-								else if (Moved == Store3Success)
-								{
-									// Remove the Thing from the old folder.
-									Old->Items.Delete(this);
-									LAssert(New->Items.HasItem(this));
-									
-									if (GetList())
-										GetList()->Remove(this);
-								}
-								else // Delayed
-								{
-									// Because the list item is the Mail object itself we can't leave a 
-									// place holder in the LList until the delayed delete happens. The 
-									// mail object is need to appear in the destination folder, as it's
-									// now associated with 'NewObject'.
-									Old->Items.Delete(this);
-									if (GetList())
-										GetList()->Remove(this);
-								}
-								break;
-							}
-							case Store3Delayed:
-							{
-								// We have to wait for the object to be written.
-								// There will be a ScribeWnd::OnNew(...) call back 
-								// when that happens.
-								// 
-								// If is succeeds:
-								// - we need to swap the objects over... complete
-								// the updating of the UI.
-								//
-								// If it fails:
-								// - do nothing...
-								//
-								// In the meantime change the object back to the old
-								// one. But leave the UserData pointing to us. This
-								// is so the OnNew handler can finish the move for
-								// us later, and still know whats going on.
-								LAssert(Old->Items.HasItem(this));	// The old folder needs to have 
-																		// a pointer to us until "OnNew".
-								SetObject(OldObject, false, _FL);
-
-								// Setup a new Thing for the new Object...
-								Thing *t = App->CreateThingOfType(Type(), NewObject);
-								if (t)
-								{
-									// Add it to the new folder...
-									New->Items.Add(t);
-
-									// Setup a delete operation to be executed when the object arrives
-									// back at the app with an OnNew events.
-									t->DeleteOnAdd.Path = Old->GetPath();
-									t->DeleteOnAdd.Obj = this;
-								}
-
-								// Moved = WrStatus;
-								break;
-							}
-						}
-					});
-			}
-		}
-	}
-	else
+	auto Old = GetFolder();
+	if (!Old)
 	{
 		auto status = New->WriteThing(this);
 		if (callback)
 			callback(status);
+		return;
 	}
+
+	if (Old->GetObject() &&
+		New->GetObject() &&
+		Old->GetObject()->GetStore() != NULL &&
+		Old->GetObject()->GetStore() == New->GetObject()->GetStore())
+	{
+		// Both source and dest are local folders...
+		// This is really an optimization to reduce the overhead of moving objects
+		// between folders, a function which is provided by the storage sub-system
+		// does all the work for us.
+		LArray<LDataI*> Mv;
+		Mv.Add(GetObject());
+
+		auto status = Old->GetObject()->GetStore()->Move(New->GetFldObj(), Mv);
+		if (status == Store3Success)
+		{
+			LAssert(!Old->Items.HasItem(this));
+			LAssert(GetFolder() == New);
+			LAssert(New->Items.HasItem(this));
+		}
+
+		if (callback)
+			callback(status);
+	}
+	else if (IsPlaceHolder())
+	{
+		return;
+	}
+	else if (New->GetObject() && GetObject() && New->GetObject()->GetStore())
+	{
+		// Source OR Dest are remote...
+		auto NewObject = New->GetObject()->GetStore()->Create(Type());
+		if (!NewObject)
+		{
+			if (callback)
+				callback(Store3Error);
+			return;
+		}
+
+		auto OldObject = GetObject();
+
+		// Copy the current data into the new object
+		NewObject->CopyProps(*GetObject());
+		SetObject(NewObject, false, _FL);
+
+		// Try writing it to the store...
+		Store3Status SyncStatus = New->WriteThing(
+			this,
+			[this, Old, OldObject, New, NewObject, callback=std::move(callback)](auto AsyncStatus)
+			{
+				switch (AsyncStatus)
+				{
+					default:
+					case Store3Error:
+					{
+						// It failed, delete the new object...
+						SetObject(OldObject, false, _FL);
+						delete NewObject;
+						break;
+					}
+					case Store3Success:
+					{
+						// Ok, immediate save, set new object
+						// delete old object
+						auto Moved = OldObject->Delete(false);
+						if (Moved == Store3Error)
+						{
+							SetObject(OldObject, false, _FL);
+							delete NewObject;
+						}
+						else if (Moved == Store3Success)
+						{
+							// Remove the Thing from the old folder.
+							Old->Items.Delete(this);
+							LAssert(New->Items.HasItem(this));
+									
+							if (GetList())
+								GetList()->Remove(this);
+						}
+						else // Delayed
+						{
+							// Because the list item is the Mail object itself we can't leave a 
+							// place holder in the LList until the delayed delete happens. The 
+							// mail object needs to appear in the destination folder, as it's
+							// now associated with 'NewObject'.
+							Old->Items.Delete(this);
+							if (GetList())
+								GetList()->Remove(this);
+						}
+
+						if (callback)
+							callback(Moved);
+						break;
+					}
+					case Store3Delayed:
+					{
+						// We have to wait for the object to be written.
+						// There will be a ScribeWnd::OnNew(...) call back 
+						// when that happens.
+						// 
+						// If is succeeds:
+						// - we need to swap the objects over... complete
+						// the updating of the UI.
+						//
+						// If it fails:
+						// - do nothing...
+						//
+						// In the meantime change the object back to the old
+						// one. But leave the UserData pointing to us. This
+						// is so the OnNew handler can finish the move for
+						// us later, and still know whats going on.
+						LAssert(Old->Items.HasItem(this));	// The old folder needs to have 
+															// a pointer to us until "OnNew".
+						SetObject(OldObject, false, _FL);
+
+						// Setup a new Thing for the new Object...
+						auto t = App->CreateThingOfType(Type(), NewObject);
+						if (t)
+						{
+							// Setup a delete operation to be executed when the object arrives
+							// back at the app with an OnNew events.
+							t->DeleteOnAdd.Path = Old->GetPath();
+							t->DeleteOnAdd.Obj = this;
+							t->DeleteOnAdd.Callback = callback;
+						}
+						else
+						{
+							if (callback)
+								callback(Store3Error);
+						}
+						break;
+					}
+				}
+			});
+	}
+
 }
 
 void Thing::OnCreate()

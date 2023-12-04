@@ -163,6 +163,7 @@
 #define FIELD_IMAP_SEQ							167
 #define FIELD_RECEIVED_DOMAIN					170
 #define IDD_FILTER_ITEMS						175
+#define IDS_GROUP								182
 #define IDC_SIGNATURE_TAB						184
 #define IDC_RESET_REPLY							186
 #define IDC_SIG									187

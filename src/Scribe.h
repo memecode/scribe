@@ -515,12 +515,9 @@ protected:
 	struct ThingReference
 	{
 		LString Path;
-		Thing *Obj;
+		Thing *Obj = NULL;
+		std::function<void(Store3Status)> Callback;
 
-		ThingReference()
-		{
-			Obj = NULL;
-		}
 	}	DeleteOnAdd;
 
 public:

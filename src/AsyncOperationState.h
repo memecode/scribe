@@ -1,7 +1,15 @@
 #pragma once
 
+#define DEBUG_ASYNC_OP_STATE		0
+#if DEBUG_ASYNC_OP_STATE
+#define LOG_ASYNC(...)				LgiTrace(__VA_ARGS__)
+#else
+#define LOG_ASYNC(...)
+#endif
+
 class AsyncOperationState
 {
+	static size_t Instances;
 	ScribeWnd *App = NULL;
 
 	// Input
@@ -56,6 +64,9 @@ public:
 		CopyOnly(copyOnly),
 		Callback(callback)
 	{
+		Instances++;
+		LOG_ASYNC("%p.AsyncOperationState f=%p items=%i copyOnly=%i inst=%i\n", this, folder, (int)items.Length(), copyOnly, (int)Instances);
+		
 		// Validate parameters
 		if (Folder &&
 			(App = Folder->App))
@@ -74,6 +85,7 @@ public:
 		{
 			FolderStore = Folder->GetObject()->GetStore();
 		}
+		LOG_ASYNC("%p.AsyncOperationState obj=%p store=%p\n", this, FolderObj, FolderStore);
 
 		Status.Length(Moves = Items.Length());
 		for (auto &s: Status)
@@ -91,6 +103,7 @@ public:
 			auto t = Items[i];
 			if (!t || !t->GetObject())
 			{
+				LOG_ASYNC("%p.AsyncOperationState error[%i]: no object\n", this, i);
 				if (SetStatus(i, Store3Error))
 					return;
 				continue;
@@ -99,12 +112,13 @@ public:
 			auto ThingItemType = t->Type();
 			if (FolderItemType != ThingItemType && FolderItemType != MAGIC_ANY)
 			{
+				LOG_ASYNC("%p.AsyncOperationState error[%i]: wrong type\n", this, i);
 				if (SetStatus(i, Store3Error))
 					return;
 				continue;
 			}
 
-			ScribeFolder *Old = t->GetFolder();
+			auto Old = t->GetFolder();
 			LString Path;
 			if (Old)
 			{
@@ -123,6 +137,7 @@ public:
 					Path,
 					[this, i, t, &IsDeleted](bool Allow)
 					{
+						LOG_ASYNC("%p.AsyncOperationState i=%i GetAccessLevel=%i\n", this, i, Allow);
 						if (Allow)
 							IsDeleted = Move(i, t);
 						else
@@ -130,7 +145,10 @@ public:
 					});
 				// If the callback has already been executed and the object is deleted, exit immediately.
 				if (IsDeleted)
+				{
+					LOG_ASYNC("%p.AsyncOperationState IsDeleted\n", this, i);
 					return;
+				}
 			}
 			else
 			{
@@ -141,6 +159,12 @@ public:
 
 	}
 
+	~AsyncOperationState()
+	{
+		Instances--;
+		LOG_ASYNC("%p.~AsyncOperationState inst=%i\n", this, (int)Instances);
+	}
+		
 	// This must call SetStatus once and only once for each item it's called with.
 	// Returns true if the SetStatus call indicates deletion.
 	// 'this' will be invalid after SetStatus returns true.
@@ -162,6 +186,7 @@ public:
 			NewFolderType == FOLDER_TRASH)
 		{
 			// Delete for good
+			LOG_ASYNC("%p.Move[%i] DeleteThing(%p)\n", this, i, t);
 			r = Old ? Old->DeleteThing(t, NULL) : Store3Error;
 		}
 		else
@@ -180,10 +205,12 @@ public:
 				{
 					NewT->CopyProps(*t->GetObject());
 					r = NewT->Save(Folder->GetObject());
+					LOG_ASYNC("%p.Move[%i] CopyOnly.Save(%p)=%i\n", this, i, t, r);
 				}
 				else
 				{
 					r = Store3Error;
+					LOG_ASYNC("%p.Move[%i] CopyOnly.Save error creating object\n", this, i);
 				}
 			}
 			else
@@ -200,14 +227,19 @@ public:
 				{
 					InStoreMove.Add(o);
 					Map.Add(t, i);
+					LOG_ASYNC("%p.Move[%i] InStoreMove.Add(%p)\n", this, i, o);
 					r = Store3Delayed;
 				}
 				else
 				{
+					bool Deleted = false;
+
 					// Out of store more... use the old single object method... for the moment..
+					LOG_ASYNC("%p.Move[%i] OutStoreMove.SetFolder(%p)\n", this, i, t);
 					t->SetFolder(Folder,
-						[this, Old, t, i](auto r)
+						[this, Old, t, i, &Deleted](auto r)
 						{
+							LOG_ASYNC("%p.Move[%i] OutStoreMove.Cb t=%p r=%i\n", this, i, t, r);
 							if (r == Store3Success)
 							{
 								// Remove from the list..
@@ -216,13 +248,16 @@ public:
 								t->OnMove();
 							}
 
-							return SetStatus(i, r);
+							Deleted = SetStatus(i, r);
 						});
-					return false; // SetFolder callback will call the SetStatus function;
+
+					LOG_ASYNC("%p.Move[%i] OutStoreMove.SetFolder t=%p return false\n", this, i, t);
+					return Deleted;
 				}
 			}
 		}
 
+		LOG_ASYNC("%p.Move[%i] finished: t=%p r=%i\n", this, i, t, r);
 		if (r == Store3Success)
 			t->OnMove();
 
@@ -240,6 +275,8 @@ public:
 				s = Store3Error;
 			else
 				s = FolderStore->Move(Fld, InStoreMove);
+
+			LOG_ASYNC("%p.OnComplete InStoreMove=%i\n", this, s);
 
 			for (auto p: Map)
 			{
@@ -267,6 +304,7 @@ public:
 			// Moving to or from the templates folder... update the menu
 			App->BuildDynMenus();
 
+		LOG_ASYNC("%p.OnComplete calling cb\n", this);
 		if (Callback)
 			Callback(Result, Status);
 

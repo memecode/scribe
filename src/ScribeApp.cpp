@@ -1609,7 +1609,7 @@ int ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args
 		return LScriptCallback::INVALID_CALLBACK;
 	}
 
-	auto Fn = Args[1]->Str();
+	auto Fn = Args.StringAt(1);
 	auto Cb = GetCallback(Fn);
 	if (!Cb.Func)
 	{
@@ -1621,7 +1621,8 @@ int ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args
 	{
 		case LToolsMenu:
 		{
-			char *Menu = Args[0]->Str();
+			auto Menu = Args.StringAt(0);
+			auto Shortcut = Args.StringAt(2);
 			auto Cur = d->CurrentScript();
 			if (!Menu || !Fn || !Cur)
 			{
@@ -1636,7 +1637,7 @@ int ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args
 			c.Param = d->NextToolMenuId;
 
 			LMenuItem *Tools = GetMenu()->FindItem(IDM_TOOLS_MENU);
-			auto ToolSub = Tools ? Tools->Sub() : 0;
+			auto ToolSub = Tools ? Tools->Sub() : NULL;
 			if (ToolSub)
 			{
 				if (d->NextToolMenuId == IDM_TOOL_SCRIPT_BASE)
@@ -1644,7 +1645,7 @@ int ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args
 					ToolSub->AppendSeparator();
 				}
 
-				ToolSub->AppendItem(Menu, c.Param, true);			
+				ToolSub->AppendItem(Menu, c.Param, true, -1, Shortcut);
 				d->NextToolMenuId++;
 			}
 			return c.Uid;
@@ -11316,14 +11317,16 @@ void ScribeWnd::OnNew
 {
 	THREAD_UNSAFE();
 
-	ScribeFolder *Fld = CastFolder(Parent);
+	auto Fld = CastFolder(Parent);
 	int UnreadDiff = 0;
 
+	/*
 	if (Stricmp(Parent->GetStr(FIELD_FOLDER_NAME), "Contacts") &&
 		Stricmp(Parent->GetStr(FIELD_FOLDER_NAME), "Calendar"))
 	{
 		LOG_STORE("OnNew(%s, %s, %i, %i)\n", Parent->GetStr(FIELD_FOLDER_NAME), _GetUids(NewItems).Get(), Pos, IsNew);
 	}
+	*/
 
 	if (!Fld)
 	{
@@ -11401,14 +11404,24 @@ void ScribeWnd::OnNew
 					if (!OldFolder)
 					{
 						LgiTrace("%s:%i - Couldn't resolve old folder '%s'\n", _FL, t->DeleteOnAdd.Path.Get());
+						if (t->DeleteOnAdd.Callback)
+							t->DeleteOnAdd.Callback(Store3Error);
 					}
 					else
 					{
 						auto OldItem = t->DeleteOnAdd.Obj;
 						if (!OldFolder->Items.HasItem(OldItem))
+						{
 							LgiTrace("%s:%i - Couldn't find old obj.\n", _FL);
+							if (t->DeleteOnAdd.Callback)
+								t->DeleteOnAdd.Callback(Store3Error);
+						}
 						else
+						{
 							OldItem->OnDelete();
+							if (t->DeleteOnAdd.Callback)
+								t->DeleteOnAdd.Callback(Store3Success); // I guess?
+						}
 					}
 				}
 

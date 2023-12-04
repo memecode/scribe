@@ -398,7 +398,7 @@
 		<String Ref="641" Cid="1158" Define="IDC_SHOW_EXTRA" en="+" />
 		<String Ref="642" Cid="-1" Define="IDC_STATIC" en="State:" fr="Dép/Prov:" it="Provincia:" cs="Stát:" es="Provincia:" de="Bundesland" nl="Provincie:" pt_br="Estado:" ja="地域" pt="Concelho:" pl="Prowincja:" vi="Tỉnh/TP:" zh_tw="州:" sr="Država:" no="Fylke:" lt="Rajonas:" fa="ايالت" da="Stat:" sv="Län/provins:" lg="Essaza:" tr="Şehir:" hu="Állam:" ru="Штат:" ko="주:" uk="Область:" />
 		<String Ref="643" Cid="-1" Define="IDC_STATIC" en="Advanced..." uk="Додатково ..." de="Erweitert..." fr="Avancement..." />
-		<String Ref="644" Cid="644" Define="IDC_INTERNAL_FILTERING" en="Internal filtering" ko="내부 필터링" uk="Внутрішня фільтрація" de="Internem Filtern" fr="Filtrage interne" />
+		<String Ref="644" Cid="644" Define="IDC_INTERNAL_FILTERING" en="Internal &filtering" ko="내부 필터링" uk="Внутрішня фільтрація" de="Internem Filtern" fr="Filtrage interne" />
 		<String Ref="645" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="646" Cid="647" Define="IDC_FOLDER_WRITE" en="Write/Delete" pt="Escrita" pl="Pisanie/Usuwanie" it="Scrittura/Cancellazione" vi="Ghi/Xóa" zh_tw="寫入 / 刪除" ja="書き込み/削除" nl="Schrijven/Verwijderen" sr="Piši/Briši" es="Escritura/Borrado" cs="Zápis/Výmaz" no="Skrive/slette" lt="Įrašymas, šalinimas" fa="نوشتن/پاک کردن" de="Schreiben/Löschen" da="Skrive/slette" sv="Skriv/Ta bort" pt_br="Gravar/Apagar" lg="Wandiika/Sangula" tr="Yazma/Silme" hu="Ír/Töröl" ru="Запись/Удаление" ko="작성/삭제" uk="Запис/Видалення" fr="Écrire/Éffacer" />
 		<String Ref="647" Cid="683" Define="IDC_FOLDER_READ" en="Read" pt="Leitura" cs="Čtení" pl="Czytanie" it="Lettura" vi="Đọc" zh_tw="讀取" ja="読み取り" nl="Lezen" sr="Čitaj" es="Lectura" no="Lese" lt="Skaitymas" fa="خواندن" de="Lesen" da="Læse" sv="Läs" pt_br="Leitura" lg="Ebisomeddwa" tr="Okuma" hu="Olvas" ru="Чтение" ko="읽기" uk="Читання" fr="Lire" />
@@ -466,9 +466,9 @@
 		<String Ref="744" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" />
 		<String Ref="745" Cid="-1" Define="IDC_STATIC" en="Store name:" fr="Nom du dépôt:" />
 		<String Ref="746" Cid="746" Define="IDC_DESC" />
-		<String Ref="749" Cid="751" Define="IDC_FILTER_UP" en="Up" nl="Omhoog" cs="Nahoru" pt="Acima" pl="Góra" it="Su" vi="Lên" zh_tw="上" ja="上" sr="Gore" es="Arriba" no="Opp" lt="Aukštyn" fa="بالا" de="Rauf" da="Op" sv="Upp" pt_br="Acima" lg="wagulu" tr="Yukarı" hu="Fel" ru="Вверх" ko="위" uk="Вгору" fr="Haut" />
+		<String Ref="749" Cid="751" Define="IDC_FILTER_UP" en="&Up" nl="Omhoog" cs="Nahoru" pt="Acima" pl="Góra" it="Su" vi="Lên" zh_tw="上" ja="上" sr="Gore" es="Arriba" no="Opp" lt="Aukštyn" fa="بالا" de="Rauf" da="Op" sv="Upp" pt_br="Acima" lg="wagulu" tr="Yukarı" hu="Fel" ru="Вверх" ko="위" uk="Вгору" fr="Haut" />
 		<String Ref="750" Cid="-1" Define="IDC_STATIC" en="Use this filter on:" lt="Šį filtrą naudoti:" cs="Použít tento filtr na:" sv="Använd detta filter på:" de="Filter anwenden bei:" tr="Filtre kullanma koşulu:" hu="Használja ezt a szűrőt:" ru="Использовать с" pl="Zastosuj ten filtr względem:" ko="필터 적용:" uk="Використовувати цей фільтр з:" fr="Utiliser ce filtre sur:" />
-		<String Ref="751" Cid="752" Define="IDC_FILTER_DOWN" en="Down" nl="Omlaag" cs="Dolů" pt="Abaixo" pl="Dół" it="Giù" vi="Xuống" zh_tw="下" ja="下" sr="Dole" es="Abajo" no="Ned" lt="Žemyn" fa="پايين" de="Runter" da="Ned" sv="Ner" pt_br="Abaixo" lg="Wansi" tr="Aşağı" hu="Le" ru="Вниз" ko="아래" uk="Униз" fr="Bas" />
+		<String Ref="751" Cid="752" Define="IDC_FILTER_DOWN" en="&Down" nl="Omlaag" cs="Dolů" pt="Abaixo" pl="Dół" it="Giù" vi="Xuống" zh_tw="下" ja="下" sr="Dole" es="Abajo" no="Ned" lt="Žemyn" fa="پايين" de="Runter" da="Ned" sv="Ner" pt_br="Abaixo" lg="Wansi" tr="Aşağı" hu="Le" ru="Вниз" ko="아래" uk="Униз" fr="Bas" />
 		<String Ref="752" Cid="750" Define="IDC_FILTER_INDEX" />
 		<String Ref="753" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="757" Cid="757" Define="IDC_BAYES_READ" en="Set spam to read when processing." fr="Configurez le spam à lire lors du traitement." />
@@ -726,7 +726,7 @@
 		<String Ref="1186" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="1187" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1188" Cid="509" Define="IDC_SEARCH" />
-		<String Ref="1189" Cid="1189" Define="IDC_OUTGOING" en="Outgoing mail" lt="Išsiuntimui" cs="odchozí zprávy" sv="Utgående e-post" de="ausgehenden E-Mails" tr="Giden e-posta" hu="Kimenő levél" ru="Исходящими письмами" pl="Poczta wychodząca" ko="발신 메일" uk="Вихідними повідомленнями" fr="Courriel sortant" />
+		<String Ref="1189" Cid="1189" Define="IDC_OUTGOING" en="&Outgoing mail" lt="Išsiuntimui" cs="odchozí zprávy" sv="Utgående e-post" de="ausgehenden E-Mails" tr="Giden e-posta" hu="Kimenő levél" ru="Исходящими письмами" pl="Poczta wychodząca" ko="발신 메일" uk="Вихідними повідомленнями" fr="Courriel sortant" />
 		<String Ref="1193" Cid="1193" Define="IDD_SCRIBE_EXPORT" en="Export To Scribe Folders" sv="Exportera till Scribe-mappar" lt="Eksportuoti į „Scribe“ aplankus" de="Export von und zu Scribe Ordnern" cs="Exportovat do složek Scribe" tr="Scribe Klasörlerine Çıkart" hu="Export a Scribe mappákba" ru="Экспорт в папки Scribe" pl="Eksportuj do folderów Scribe" ko="Scribe 폴더로 내보내기" uk="Експорт у теки Scribe" fr="Exporter vers dossiers Scribe" />
 		<String Ref="1194" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1195" Cid="-1" Define="IDC_STATIC" en="Destination mail store:" sv="Mottagarklient:" lt="Kur eksportuoti:" de="Export in Datei:" cs="Cílová složka zpráv:" tr="Hedef e-posta klasörü:" hu="Cél üzenet tároló:" ru="Конечное хранилище:" pl="Docelowy magazyn poczty:" ko="대상 메일 사서함:" uk="Місце  розташування поштової бази:" fr="Messagerie de destination:" />
@@ -883,7 +883,7 @@
 		<String Ref="1490" Cid="-1" Define="IDC_STATIC" en="Filter Name:" fr="Nom du filtre:" it="Nome del filtro:" cs="Jméno filtru:" es="Nombre del Filtro:" de="Filterbezeichnung:" nl="Naam van het filter:" pt_br="Nome do filtro:" pt="Nome do filtro:" pl="Nazwa filtru:" vi="Tên bộ lọc:" zh_tw="過濾器名稱:" ja="フィルタ名" sr="Ime filtera:" no="Filternavn:" lt="Filtro vardas:" fa="نام فيلتر" da="Filternavn:" sv="Filternamn:" lg="Erinnya ly&apos;Akasengenja" tr="Filtre Adı:" hu="Szűrő neve:" ru="Название фильтра:" ko="필터 이름:" uk="Назва фільтру" />
 		<String Ref="1491" Cid="1042" Define="IDC_REPLYWITHSIG" en="&Append signature to replies and forwards" fr="&Ajouter signature aux réponses et redirections" it="Aggiungi la firma a risposte ed inoltri" cs="Podepisovat odpovědi a přesměrování" es="Agregar firma a Respuestas y Redirecciones" de="Signatur an Antwort- und Weiterleitungs-E-Mails anhängen" nl="Handtekening invoegen bij beantwoorden" pt_br="Adicionar assinatura ao responder ou encaminhar" ja="返信時と転送時に署名を付ける" pt="Acrescentar assinatura ao responder ou encaminhar" pl="Dodaj sygnaturę przy przesyłaniu dalej i odpowiadaniu" vi="Thêm chữ chữ ký vào thư trả lời và chuyển tiếp" zh_tw="回信與轉寄時加入簽名檔" sr="Dodaj potpis pri odgovoru i prosledjivanju" no="Legg til signatur ved svar og videresending" lt="Persiunčiant ir atsakant naudoti šabloną:" fa="امضا را به پاسخ ها و ارسال ها اضافه کن" da="Tilføj signatur ved svar og videresendelse" sv="Lägg till signatur vid svar och vidarebefordran" lg="Teekako sayini ku zididdwamu n&apos;eziwerezeddwa" tr="Yanıt ve yönlendirmelere imzamı ekle" hu="Aláírás csatolása válaszhoz és továbbításhoz" ru="Добавлять подпись при ответе и пересылке" ko="회신과 전달에 서명 첨부" uk="Додавати підпис до відповідей і пересилань" />
 		<String Ref="1492" Cid="-1" Define="IDC_STATIC" en="Forward format:" pt_br="Modelo para encaminhamento:" nl="Doorsturen:" cs="Formát pro &apos;Poslat dál&apos;:" ja="転送:" pt="Encaminhar:" pl="Prześlij dalej:" it="Inoltri:" vi="Chuyển tiếp:" zh_tw="轉寄:" sr="Format prosleđivanja:" es="Formato al Reenviar:" no="Videresendingsformat:" lt="Persiuntimo šablonas:" fa="قالب ارسال ها" de="Weiterleitungs-Format:" da="Videresendelsesformat:" sv="Vidaresändningsformat:" lg="Ebbago ly&apos;ebiwererezebwa:" tr="Yönlendirme formatı:" hu="Továbbítás formátum:" ru="Формат пересылки:" ko="포맷 전달:" uk="Формат пересилання:" fr="Format faire suivre:" />
-		<String Ref="1493" Cid="1194" Define="IDC_INCOMING" en="Incoming mail" lt="Parsiuntimui" cs="příchozí zprávy" sv="Inkommande e-post" de="eingehenden E-Mails" tr="Gelen e-posta" hu="Bejövő levél" ru="Входящими письмами" pl="Poczta przychodząca" ko="수신 메일" uk="Вхідними повідомленнями" fr="Courrier entrant" />
+		<String Ref="1493" Cid="1194" Define="IDC_INCOMING" en="&Incoming mail" lt="Parsiuntimui" cs="příchozí zprávy" sv="Inkommande e-post" de="eingehenden E-Mails" tr="Gelen e-posta" hu="Bejövő levél" ru="Входящими письмами" pl="Poczta przychodząca" ko="수신 메일" uk="Вхідними повідомленнями" fr="Courrier entrant" />
 		<String Ref="1494" Cid="712" Define="IDC_SRC" />
 		<String Ref="1495" Cid="-1" Define="IDC_STATIC" en="Default To/Cc/Bcc setting for reply all:" nl="Instelling Aan/Cc/Bcc bij Antwoord allen:" zh_tw="預設於回覆To/Cc/Bcc 的設定值" pt="Ao &apos;Responder a todos&apos; usar:" pl="Domyślne ustawienie To/Cc/Bcc do odpowiadania wszystkim:" cs="Výchozí nastavení To/Cc/Bcc pro &apos;Odpovědět všem&apos;" no="Standard Til/Kopi/Blindkopi" lt="Atsakant visiems numatytuoju laikyti laukelį:" fa="هنگام پاسخ به همه نامه هاTo/Cc/Bccتنظيمات پيشفرض " de="Standard An/Cc/Bcc Einstellung bei &apos;Allen antworten&apos;:" sr="Podrazumevano podešavanje To/Cc/Bcc za odgovor svima:" da="Standard Til/Kopi/Blindkopi" ja="応答のためのデフォルトTo/Cc/Bcc の設定すべて" vi="Thiết lập mặc định cho trả lời tất cả:" sv="Standardinställning för Till/Kopia/Blindkopia vid svara alla" es="Al responder a todos usar por defecto:" pt_br="Ajuste padrão Para/CC/CCo(BCc) ao responder a todos:" lg="Eby&apos;Enkalakalira Eri/Koppa eri/Kweka eri, ng&apos; oddamu bonna:" tr="Tümünü yanıtla&apos;da kullanılacak Kime/Cc/Bcc formatı:" hu="Válasz mindenkinek alapértelmezett To/Cc/Bcc beállítása " ru="Настройки To/Cc/Bcc по умолчанию для ответа всем:" ko="전체 회신의 기본값 설정   받는사람/참조/숨은참조:" uk="За замовчуванням To / Cc / Bcc (кому, копія, прихована копія) установка для відповіді всім:" fr="Paramètre par défaut To/Cc/Bcc pour répondre à tous:" />
 		<String Ref="1496" Cid="1157" Define="IDC_DEL" en="-" />
@@ -1567,6 +1567,7 @@
 		<String Ref="1032" Cid="744" Define="IDS_EXITING" en="exiting..." />
 		<String Ref="1034" Cid="951" Define="IDS_WAITING_FOR" en="Waiting for &apos;%s&apos;" />
 		<String Ref="1497" Cid="1497" Define="IDS_KILL" en="Kill" />
+		<String Ref="182" Cid="182" Define="IDS_GROUP" en="Contact Group" />
 	</string-group>
 	<string-group Name="Title.html">
 		<String Ref="1062" Cid="782" Define="IDS_SUMMARY" en="Summary" de="Zusammenfassung" lt="Bendrai" da="Oversigt" pt="Caminho" fa="گزارش" cs="Přehled" sv="Sammanfattning" pt_br="Resumo" es="Sumario" lg="Panya" tr="Özet" hu="Összegzés" pl="Podsumowanie" ko="요약" uk="Резюме" fr="Résumé" />
@@ -2986,7 +2987,7 @@
 					<StaticText pos="0,53,114,66" ref="169" />
 				</td>
 				<td addr="1,2">
-					<Button pos="172,53,220,73" ref="749" toggle="0" />
+					<Button pos="175,56,223,76" ref="749" image="" toggle="0" />
 				</td>
 			</tr>
 			<tr>
@@ -2994,7 +2995,7 @@
 					<EditBox Pos="0,81,114,101" Enabled="0" ref="752" />
 				</td>
 				<td addr="1,3">
-					<Button pos="172,81,220,101" ref="751" toggle="0" />
+					<Button pos="175,84,223,104" ref="751" image="" toggle="0" />
 				</td>
 			</tr>
 			<tr>

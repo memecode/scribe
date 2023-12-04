@@ -27,7 +27,7 @@
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.dll'
 
 ; Generate the DOM documentation
-!system "py ..\Code\Py\DomScan.py > scribe-setup\Dom.txt"
+!system "py ..\src\Py\DomScan.py > scribe-setup\Dom.txt"
 
 !system "python ..\Utils\Store\store.py .\x64ReleaseNoOptimize19\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
 !system "python ..\Utils\Store\store.py .\x64Release19\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0

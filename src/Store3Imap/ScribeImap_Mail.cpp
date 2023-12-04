@@ -300,6 +300,7 @@ LProfile Prof("ReadMime");
 #if DEBUG_READ_MIME
 Prof.Add(_FL);
 #endif
+	LgiTrace("ReadMime Path=%s\n", Path.Get());
 	if (!LFileExists(Path))
 	{
 		if (State != ImapMailGettingBody)

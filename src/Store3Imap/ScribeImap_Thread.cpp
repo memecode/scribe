@@ -432,8 +432,9 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 
 	if (!Uid)
 	{
-		LAssert(!"No uid?");
-		return true; // Lets get all we can, even if this is borked.
+		// This happens when the server sends us FETCH lines outside of what we requested
+		// Ideally we'd handle them properly, but for the moment, lets just keep trucking.
+		return true;
 	}
 
     uint32_t uid = atoi(Uid);
@@ -549,18 +550,18 @@ struct DownloadInfo
 {
 	uint64_t Uid;
 	LString Parent;
-	LVariant Local;
+	LString Local;
 	ImapThread *Thread;
 };
 
 bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void *UserData)
 {
 	DownloadInfo *Inf = (DownloadInfo*) UserData;
-	char *sUid = Parts.Find("UID");
-	char *Body = Parts.Find("BODY[]");
+	auto sUid = Parts.Find("UID");
+	auto Body = Parts.Find("BODY[]");
 	if (sUid && Body)
 	{
-		int Uid = atoi(sUid);
+		auto Uid = atoi(sUid);
 
 		// Do a UID check on the email...
 		if (!Inf->Uid || Uid != Inf->Uid)
@@ -574,9 +575,10 @@ bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, voi
 		{
 			// Write it out (loop is because windows is shit)
 			LFile f;
-			for (int i=0; !f.Open(Inf->Local.Str(), O_WRITE) && i<100; i++)
+			for (int i=0; !f.Open(Inf->Local, O_WRITE) && i<100; i++)
 				LSleep(20);
 
+			LgiTrace("LocalImapFile: %s\n", Inf->Local.Get());
 			if (f)
 			{
 				size_t BodyLen = strlen(Body);
@@ -588,10 +590,10 @@ bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, voi
 				else
 				{
 					f.SetSize(0);
-					f.Write(Body, (int)BodyLen);
+					f.Write(Body, BodyLen);
 					f.Close();
 
-					ImapMsg *Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
+					auto Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
 					if (Msg)
 					{
 						ImapMailInfo &i = Msg->Mail.New();
@@ -604,7 +606,7 @@ bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, voi
 			else
 			{
 				LAssert(!"Can't open IMAP cache file?");
-				LgiTrace("%s:%i - Failed to open '%s' for writing.\n", _FL, Inf->Local.Str());
+				LgiTrace("%s:%i - Failed to open '%s' for writing.\n", _FL, Inf->Local.Get());
 				return false;
 			}
 		}
@@ -981,7 +983,7 @@ int ImapThread::Main()
 							LString s;
 							s.Printf("%i", mi.Uid);
 							LError Err;
-							int Status = d->Imap->Fetch(true, s, BodyTag, DownloadCallback, Inf, NULL, mi.Size, &Err);
+							auto Status = d->Imap->Fetch(true, s, BodyTag, DownloadCallback, Inf, NULL, mi.Size, &Err);
 							if (!Status)
 							{
 								// Ok the fetch failed because the object doesn't exist anymore?
@@ -1330,6 +1332,7 @@ int ImapThread::Main()
 									n.Print("%s", Numbers[i].Get());
 								}
 								auto Range = n.NewLStr();
+								LgiTrace("Recent.Range=%s\n", Range.Get());
 
 								LAutoPtr<ImapMsg> New(new ImapMsg(IMAP_ON_NEW, _FL));
 								if (d->Imap->Fetch(true, Range, GetListingParts(d->CurrentFolder), ListingCallback, New))
@@ -1361,7 +1364,8 @@ int ImapThread::Main()
 									sprintf_s(Range, sizeof(Range), "%i:%i", d->Exists + 1, NewExists);
 										
 								LAutoPtr<ImapMsg> Update(new ImapMsg(IMAP_SET_FLAGS, _FL));
-								int b = d->Imap->Fetch(false, Range, GetListingParts(d->CurrentFolder), ListingCallback, Update);
+								auto ListingParts = GetListingParts(d->CurrentFolder);
+								int b = d->Imap->Fetch(false, Range, ListingParts, ListingCallback, Update);
 								if (b)
 								{
 									Update->Parent = d->CurrentFolder.Get();
@@ -1395,10 +1399,18 @@ int ImapThread::Main()
 										if (!FlagsUpdate->Parent)
 											FlagsUpdate->Parent = d->CurrentFolder.Get();
 
+										auto Seq = (int)Id.Int();
 										auto &m = FlagsUpdate->Mail.New();
-										m.Seq = (uint32_t)Id.Int();
+										m.Seq = Seq;
 										m.Uid = Uid;
 										m.Flags.Set(Val);
+
+										if (d->Exists >= 0 && d->Exists < Seq)
+										{
+											// Update the exists...
+											LgiTrace("%s:%i - Updating exists %i->%i\n", _FL, d->Exists, Seq);
+											d->Exists = Seq;
+										}
 									}
 								}
 								else

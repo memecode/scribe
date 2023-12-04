@@ -989,48 +989,52 @@ void ImapStore::OnEvent(void *Param)
 			}
 			case IMAP_DOWNLOAD:
 			{
-				ImapFolder *f = Root->Find(0, m->Parent);
-				if (f)
+				auto f = Root->Find(0, m->Parent);
+				if (!f)
 				{
-					_in_download = true;
+					LAssert(!"No folder");
+					LgiTrace("%s:%i - No folder in IMAP_DOWNLOAD: '%s'\n", _FL, m->Parent.Get());
+					break;
+				}
 
-					LArray<LDataI*> Changed;
-					for (unsigned i=0; i<m->Mail.Length(); i++)
+				_in_download = true;
+
+				LArray<LDataI*> Changed;
+				for (unsigned i=0; i<m->Mail.Length(); i++)
+				{
+					ImapMailInfo &Inf = m->Mail[i];
+					auto e = f->GetMail(Inf.Uid);
+					if (e)
 					{
-						ImapMailInfo &Inf = m->Mail[i];
-						ImapMail *e = f->GetMail(Inf.Uid);
-						if (e)
-						{
-							e->SetState(ImapMail::ImapMailIdle);
+						e->SetState(ImapMail::ImapMailIdle);
 
-							auto t = e->GetMeta();
-							if (t)
-							{
-								e->ReadMime(t);
-								Changed.Add(e);
-							}
-							else
-							{
-								f->Save();
-								LgiTrace("Error: Can't find meta data for email %s\n", strrchr(e->Path, DIR_CHAR));
-								LAssert(!"No meta tag for this email?");
-							}
+						auto t = e->GetMeta();
+						if (t)
+						{
+							e->ReadMime(t);
+							Changed.Add(e);
 						}
 						else
 						{
-							// That can happen if you delete something before the IMAP_DOWNLOAD msg
-							// gets back from the worker thread.
+							f->Save();
+							LgiTrace("Error: Can't find meta data for email %s\n", strrchr(e->Path, DIR_CHAR));
+							LAssert(!"No meta tag for this email?");
 						}
 					}
-
-					_in_download = false;
-
-					f->SetDirty();
-
-					if (Changed.Length())
-						OnChange(_FL, Changed, 0);
+					else
+					{
+						// That can happen if you delete something before the IMAP_DOWNLOAD msg
+						// gets back from the worker thread.
+					}
 				}
-				else LAssert(!"No folder");
+
+				_in_download = false;
+
+				f->SetDirty();
+
+				if (Changed.Length())
+					OnChange(_FL, Changed, 0);
+
 				break;
 			}
 			case IMAP_CREATE_FOLDER:
@@ -1142,7 +1146,7 @@ void ImapStore::OnEvent(void *Param)
 			{
 				LArray<LDataI*> Change, Delete, OnNew;
 				
-				ImapFolder *f = Root->Find(0, m->Parent	);
+				ImapFolder *f = Root->Find(0, m->Parent);
 				if (!f)
 				{
 					LgiTrace("%s:%i - Missing folder '%s'\n", _FL, m->Parent.Get());

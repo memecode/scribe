@@ -647,6 +647,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     </CustomBuild>
     <None Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\gen.py" />
     <None Include="..\..\libs\build.py" />
+    <None Include="..\Scripts\MoveTest.script" />
     <None Include="..\src\Encryption\Examples\encrypted+attach.eml" />
     <None Include="..\src\Encryption\Examples\encrypted+html+attach+key.eml" />
     <None Include="..\src\Encryption\Examples\encrypted.eml" />
