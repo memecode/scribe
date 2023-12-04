@@ -379,7 +379,7 @@ public:
 
 	const char *GetClass() override { return "ImapMail"; }
 	
-	void SetState(ImapMailState s);
+	void SetState(ImapMailState s, const char *file, int line);
 	void SetRemoteFlags(ImapMailFlags f);
 	bool IsOrphan() override { return Parent == 0; }
 	uint32_t Type() override { return MAGIC_MAIL; }
@@ -414,6 +414,8 @@ public:
 	bool OnDelete();
 	void OnDownload(LAutoString &Headers);
 };
+
+extern const char *ToString(ImapMail::ImapMailState s);
 
 #if IMAP_PROTOBUF
 	#define FOLDER_META_NAME	"Folder.proto"
@@ -584,5 +586,7 @@ public:
 	bool OnRename(const char *NewRemote);
 };
 
+#define CUR_FL LString::Fmt("%s:%i", _FL)
+extern LHashTbl<IntKey<int>, LString> DownloadMap;
 
 #endif

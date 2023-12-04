@@ -556,12 +556,18 @@ struct DownloadInfo
 
 bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void *UserData)
 {
-	DownloadInfo *Inf = (DownloadInfo*) UserData;
+	auto Inf = (DownloadInfo*) UserData;
 	auto sUid = Parts.Find("UID");
 	auto Body = Parts.Find("BODY[]");
 	if (sUid && Body)
 	{
 		auto Uid = atoi(sUid);
+
+		if (Inf->Local.Find(sUid) < 0)
+		{
+			// Ugh no, the UID and file need to match.
+			LAssert(!"UID not in file name?");
+		}
 
 		// Do a UID check on the email...
 		if (!Inf->Uid || Uid != Inf->Uid)
@@ -578,7 +584,6 @@ bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, voi
 			for (int i=0; !f.Open(Inf->Local, O_WRITE) && i<100; i++)
 				LSleep(20);
 
-			LgiTrace("LocalImapFile: %s\n", Inf->Local.Get());
 			if (f)
 			{
 				size_t BodyLen = strlen(Body);
@@ -598,9 +603,16 @@ bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, voi
 					{
 						ImapMailInfo &i = Msg->Mail.New();
 						i.Uid = Uid;
+						i.Local = Inf->Local;
 						Msg->Parent = Inf->Parent;
+
+						auto exists = LFileExists(i.Local);
+
+						LgiTrace("LocalImapFile: uid=%i file=%s exists=%i\n", Uid, Inf->Local.Get(), exists);
+
 						Inf->Thread->PostStore(Msg);
 					}
+					else LAssert(!"Alloc err");
 				}
 			}
 			else
@@ -965,9 +977,9 @@ int ImapThread::Main()
 						LAutoPtr<DownloadInfo> Inf(new DownloadInfo);
 						if (Inf)
 						{
-							Inf->Uid = mi.Uid;
+							Inf->Uid    = mi.Uid;
+							Inf->Local  = mi.Local;
 							Inf->Parent = m->Parent;
-							Inf->Local = m->Mail[0].Local; // m->Local.Str();
 							Inf->Thread = this;
 
 							MailProtocolProgress *p = m->Mail.Length() == 1 ? d->Store->DataProgress : NULL;

@@ -581,7 +581,7 @@ Store3Status ImapFolder::Move(LArray<LDataI*> &Items)
 							Mv->NewRemote = Remote.Get();
 
 						m->RemoteFlags.ImapDeleted = true; // It'll be set soon anyway...
-						m->SetState(ImapMail::ImapMailMoving);
+						m->SetState(ImapMail::ImapMailMoving, _FL);
 						Moved.Add(m);
 						Status = Store3Delayed;
 					}

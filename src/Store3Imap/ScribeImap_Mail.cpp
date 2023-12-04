@@ -10,6 +10,22 @@
 #include "include/Scribe.pb.cc"
 #endif
 
+
+LHashTbl<IntKey<int>, LString> DownloadMap;
+
+const char *ToString(ImapMail::ImapMailState s)
+{
+	switch (s)
+	{
+		case ImapMail::ImapMailIdle: return "ImapMailIdle";
+		case ImapMail::ImapMailGettingBody: return "ImapMailGettingBody";
+		case ImapMail::ImapMailMoving: return "ImapMailMoving";
+		case ImapMail::ImapMailDeleting: return "ImapMailDeleting";
+	}
+	return "#errInvalidImapMailState";
+}
+
+
 ImapMail::ImapMail(ImapStore *store, const char *file, int line, uint32_t uid) :
 	AllocFile(file), AllocLine(line),
 	From(store),
@@ -207,13 +223,9 @@ void ImapMail::Serialize(IMeta m, bool Write)
 	#endif
 }
 
-void ImapMail::SetState(ImapMailState s)
+void ImapMail::SetState(ImapMailState s, const char *file, int line)
 {
-	/*
-	if (s == ImapMailGettingBody)
-		LgiTrace("%s:%i - SetStart ImapMailGettingBody for %i\n", _FL, Uid);
-	*/
-
+	LgiTrace("%s:%i - %i::SetState(%s)\n", file, line, Uid, ToString(s));
 	State = s;
 }
 
@@ -300,15 +312,16 @@ LProfile Prof("ReadMime");
 #if DEBUG_READ_MIME
 Prof.Add(_FL);
 #endif
-	LgiTrace("ReadMime Path=%s\n", Path.Get());
+	bool exists = LFileExists(Path);
+	LgiTrace("ReadMime Path=%s exists=%i\n", Path.Get(), exists);
 	if (!LFileExists(Path))
 	{
 		if (State != ImapMailGettingBody)
 		{
-			/*bool InParent =*/ Parent && Parent->GetMail(Uid);
+			// bool InParent = Parent && Parent->GetMail(Uid);
 
 			// We don't have a local copy of the message, tell the thread to fetch it...
-			ImapMsg *Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
+			auto Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
 			if (Msg)
 			{
 #if DEBUG_READ_MIME
@@ -316,16 +329,24 @@ Prof.Add(_FL);
 #endif
 				ImapMailInfo &Info = Msg->Mail.New();
 				#if IMAP_PROTOBUF
-				Info.Size = t->size();
+					Info.Size = t->size();
 				#else
-				Info.Size = t->GetAsInt(ATTR_SIZE);
+					Info.Size = t->GetAsInt(ATTR_SIZE);
 				#endif
 				Info.Uid = Uid;
 				Info.Local = Path.Get();
+
+				auto prev = DownloadMap.Find(Info.Uid);
+				if (prev.Get())
+					LAssert(!"Already downloaded!?");
+				else
+					DownloadMap.Add(Info.Uid, CUR_FL);
+
+
 				Msg->Parent = Parent->Remote.Get();
 				if (Store->PostThread(Msg, true))
 				{
-					SetState(ImapMailGettingBody);
+					SetState(ImapMailGettingBody, _FL);
 					Loaded = Store3Loading;
 				}
 				else
@@ -360,7 +381,7 @@ Prof.Add(_FL);
 			if (Load->GetSize() < 8)
 			{
 				// Hmmm, really? Try and re-download the mail
-				ImapMsg *Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
+				auto Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
 				if (Msg)
 				{
 					Loaded = Store3Headers;
@@ -368,14 +389,21 @@ Prof.Add(_FL);
 #if DEBUG_READ_MIME
 Prof.Add(_FL);
 #endif
-					ImapMailInfo &Info = Msg->Mail.New();
+					auto &Info = Msg->Mail.New();
 					#if IMAP_PROTOBUF
-					Info.Size = t->size();
-					Info.Uid = t->uid();
+						Info.Size = t->size();
+						Info.Uid = t->uid();
 					#else
-					Info.Size = t->GetAsInt(ATTR_SIZE);
-					Info.Uid = t->GetAsInt(ATTR_UID);
+						Info.Size = t->GetAsInt(ATTR_SIZE);
+						Info.Uid = t->GetAsInt(ATTR_UID);
 					#endif
+
+					auto prev = DownloadMap.Find(Info.Uid);
+					if (prev.Get())
+						LAssert(!"Already downloaded!?");
+					else
+						DownloadMap.Add(Info.Uid, CUR_FL);
+
 					Info.Local = Path.Get();
 					Msg->Parent = Parent->Remote.Get();
 					Store->PostThread(Msg, true);
@@ -491,7 +519,7 @@ const char *ImapMail::GetStr(int id)
 				else if (State == ImapMailIdle)
 				{
 					// Request the headers from the worker thread...
-					ImapMsg *Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
+					auto Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
 					if (Msg)
 					{
 						auto t = GetMeta();
@@ -503,12 +531,18 @@ const char *ImapMail::GetStr(int id)
 							Info.Size = t ? t->GetAsInt(ATTR_SIZE) : -1;
 							Info.Uid = Uid;
 						#endif
+
+						if (auto prev = DownloadMap.Find(Info.Uid))
+							LAssert(!"Already downloaded!?");
+						else
+							DownloadMap.Add(Info.Uid, CUR_FL);
+
 						Info.Local = Path.Get();
 						Msg->Parent = Parent->Remote.Get();
 
 						if (Store->PostThread(Msg, false))
 						{
-							SetState(ImapMailGettingBody);
+							SetState(ImapMailGettingBody, _FL);
 							Loaded = Store3Loading;
 						}
 						else LgiTrace("%s:%i - PostThread failed.\n", _FL);
@@ -1383,7 +1417,7 @@ Store3Status ImapMail::Delete(bool ToTrash)
 	m->Parent = Parent->Remote.Get();
 	if (Store->PostThread(m.Release(), false))
 	{
-		SetState(ImapMailDeleting);
+		SetState(ImapMailDeleting, _FL);
 		Status = Store3Delayed;
 		
 		LArray<LDataI*> a;
@@ -1472,7 +1506,7 @@ void ImapMail::OnDownload(LAutoString &Headers)
 	HeaderCache = Headers;
 	Loaded = Store3Headers;
 
-	SetState(ImapMailIdle);
+	SetState(ImapMailIdle, _FL);
 	auto t = GetMeta();
 	if (t)
 	{

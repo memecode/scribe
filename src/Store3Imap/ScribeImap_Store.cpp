@@ -429,7 +429,7 @@ Store3Status ImapStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 					}
 
 					Dl.Add(m);
-					m->SetState(ImapMail::ImapMailDeleting);
+					m->SetState(ImapMail::ImapMailDeleting, _FL);
 					DelMsg->Mail.New().Uid = m->Uid;
 				}
 			}
@@ -617,8 +617,13 @@ void MailInfToObject(LAutoPtr<ImapMsg> &DownloadMsg, LArray<LDataI*> *OnNew, Ima
 			ImapMailInfo &Info = DownloadMsg->Mail.New();
 			Info.Uid = o->Uid;
 			Info.Local = o->Path.Get();
+
+			if (auto prev = DownloadMap.Find(Info.Uid))
+				LAssert(!"Already downloaded!?");
+			else
+				DownloadMap.Add(Info.Uid, CUR_FL);
 			
-			o->SetState(ImapMail::ImapMailGettingBody);
+			o->SetState(ImapMail::ImapMailGettingBody, _FL);
 		}
 	}
 
@@ -1002,11 +1007,23 @@ void ImapStore::OnEvent(void *Param)
 				LArray<LDataI*> Changed;
 				for (unsigned i=0; i<m->Mail.Length(); i++)
 				{
-					ImapMailInfo &Inf = m->Mail[i];
+					auto &Inf = m->Mail[i];
 					auto e = f->GetMail(Inf.Uid);
 					if (e)
 					{
-						e->SetState(ImapMail::ImapMailIdle);
+						e->SetState(ImapMail::ImapMailIdle, _FL);
+
+						if (Inf.Local)
+						{
+							if (!LFileExists(Inf.Local))
+								LAssert(!"Shouldn't the thread download create this file?");
+							else
+								LgiTrace("%s:%i - inf.local for %i exists.. yay\n", _FL, Inf.Uid);
+						}
+						else
+						{
+							LgiTrace("%s:%i - No inf.local for %i?\n", _FL, Inf.Uid);
+						}
 
 						auto t = e->GetMeta();
 						if (t)
