@@ -11388,7 +11388,7 @@ void ScribeWnd::OnNew
 		}
 		else
 		{
-			Thing *t = CastThing(Item);
+			auto t = CastThing(Item);
 			if (!t)
 			{
 				// Completely new thing...
@@ -11428,6 +11428,7 @@ void ScribeWnd::OnNew
 				t->SetParentFolder(Fld);
 				Fld->Update();
 
+				auto fldPath = Fld->GetPath();
 				if (Fld->Select())
 				{
 					// Existing thing...
@@ -11440,10 +11441,9 @@ void ScribeWnd::OnNew
 					}
 				}
 
-				Mail *m = t->IsMail();
+				auto m = t->IsMail();
 				if (m)
 				{
-					// LgiTrace("OnNew %p\n", m->GetObject());
 					UnreadDiff += TestFlag(m->GetFlags(), MAIL_READ) ? 0 : 1;
 
 					#if DEBUG_NEW_MAIL

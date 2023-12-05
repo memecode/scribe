@@ -329,8 +329,13 @@ void Thing::SetFolder(ScribeFolder *New, std::function<void(Store3Status)> callb
 							// mail object needs to appear in the destination folder, as it's
 							// now associated with 'NewObject'.
 							Old->Items.Delete(this);
+							
+							/*	This is deleting the new object out of the destination folder 
+								listing... so don't do that I guess?
+							
 							if (GetList())
 								GetList()->Remove(this);
+							*/
 						}
 
 						if (callback)
