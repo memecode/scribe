@@ -623,7 +623,7 @@ bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, voi
 			}
 		}
 	}
-	else LgiTrace("%s:%i - Missing parts: %p %p\n", _FL, sUid, Body);
+	else LgiTrace("%s:%i - Missing parts: %p %p\n", _FL, sUid.Get(), Body.Get());
 
 	return true;
 }

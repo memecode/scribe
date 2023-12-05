@@ -926,7 +926,7 @@ void ListAddr::OnMouseClick(LMouse &m)
 							int i = 0;
 							for (auto la: Sel)
 							{
-								p.Print("%s%s", i?EOL_SEQUENCE:"", la->MakeName("\"", false));
+								p.Print("%s%s", i?EOL_SEQUENCE:"", la->MakeName("\"", false).Get());
 								i++;
 							}
 
