@@ -263,6 +263,26 @@ void WebdavStore::OnEvent(void *Param)
 			}
 			break;
 		}
+		case CmdDelete:
+		{
+			for (auto o: e->Folder->Items.a)
+			{
+				if (o->Href == e->Href)
+				{
+					// Tell the app...
+					LArray<LDataI*> items;
+					items.Add(o);
+					Callback->OnDelete(e->Folder, items);
+
+					// Remove locally...
+					e->Folder->Items.Delete(o);
+					o->Parent = NULL;
+
+					delete o;
+				}
+			}
+			break;
+		}
 		default:
 			break;
 	}
