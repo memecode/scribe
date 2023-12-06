@@ -40,7 +40,6 @@ bool WebdavCalendar::ConvertToText()
 	else
 		vCal.Empty();
 
-	LgiTrace("vCal=%s\n", vCal.Get());
 	return Converted;
 }
 
@@ -49,37 +48,48 @@ Store3Status WebdavCalendar::Save(LDataI *parent)
 	Store3Status Ret = Store3Error;
 
 	// Convert the object to text...
-	if (ConvertToText())
+	if (!ConvertToText())
 	{
-		if (!Parent)
-		{
-			Parent = dynamic_cast<WebdavFolder*>(parent);
-			if (Parent)
-			{
-				LAssert(Parent->Items.IndexOf(this) < 0);
-				Parent->Items.Insert(this);
-			}
-		}
-		if (!Parent)
-			return Ret;
-
-		// Now save the vCal object to the WebDav server...
-		if (Parent->Thread)
-		{
-			if (!Href)
-				Href = Parent->AllocateAddress();
-
-			Ret = Parent->Thread->Save(Href, vCal);
-			if (StoreStatus != Ret)
-			{
-				StoreStatus = Ret;
-				FireOnChange(FIELD_STATUS);
-			}
-		}
-		else
-			LAssert(!"No thread?");
+		LgiTrace("%s:%i - Failed to convert to text.\n", _FL);
+		return Ret;
 	}
-	else LAssert(!"vCal export failed.");
+
+	if (!Parent)
+	{
+		Parent = dynamic_cast<WebdavFolder*>(parent);
+		if (Parent)
+		{
+			LAssert(Parent->Items.IndexOf(this) < 0);
+			Parent->Items.Insert(this);
+		}
+	}
+	if (!Parent)
+	{
+		LgiTrace("%s:%i - No Parent folder.\n", _FL);
+		return Ret;
+	}
+
+	// Now save the vCal object to the WebDav server...
+	if (!Parent->Thread)
+	{
+		LgiTrace("%s:%i - No Parent thread.\n", _FL);
+		return Ret;
+	}
+
+	if (!Href)
+		Href = Parent->AllocateAddress();
+	if (!Href)
+	{
+		LgiTrace("%s:%i - No Href.\n", _FL);
+		return Ret;
+	}
+
+	Ret = Parent->Thread->Save(Href, vCal);
+	if (StoreStatus != Ret)
+	{
+		StoreStatus = Ret;
+		FireOnChange(FIELD_STATUS);
+	}
 		
 	return Ret;
 }

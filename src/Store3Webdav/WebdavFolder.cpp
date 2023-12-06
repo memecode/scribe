@@ -11,6 +11,7 @@ WebdavFolder::WebdavFolder(WebdavStore *store, WebdavFolder *parent)
 {
 	Store = store;
 	Field.State = Store3Loaded;
+	Items.State = Store3Loaded;
 
 	if ((Parent = parent))
 	{

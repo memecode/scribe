@@ -122,6 +122,7 @@ void WebdavStore::OnChanged()
 	}
 	else return;
 
+	#if 1
 	if (ContactUrl)
 	{
 		if (!ContactFolder)
@@ -139,6 +140,7 @@ void WebdavStore::OnChanged()
 	{
 		DeleteObj(ContactFolder);
 	}
+	#endif
 
 	if (CalUrl)
 	{

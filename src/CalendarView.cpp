@@ -3592,7 +3592,7 @@ void CalendarSourceGetEvents::OnState()
 {
 	if (Sources.Length() == 0)
 	{
-		LgiTrace("CalendarSourceGetEvents: finished...\n");
+		//LgiTrace("CalendarSourceGetEvents: finished...\n");
 		if (Callback)
 			Callback(Events);
 		delete this;
@@ -3607,7 +3607,7 @@ void CalendarSourceGetEvents::OnState()
 		{
 			int asd=0;
 		}
-		LgiTrace("CalendarSourceGetEvents: %s\n", src->ToString().Get());
+		//LgiTrace("CalendarSourceGetEvents: %s\n", src->ToString().Get());
 		src->GetEvents(Start, End, [this, src](auto events)
 			{
 				#ifdef _DEBUG
@@ -3615,7 +3615,7 @@ void CalendarSourceGetEvents::OnState()
 				GotCb.Add(src, true);
 				#endif
 
-				LgiTrace("CalendarSourceGetEvents: Callback %s %i\n", src->ToString().Get(), (int)events.Length());
+				//LgiTrace("CalendarSourceGetEvents: Callback %s %i\n", src->ToString().Get(), (int)events.Length());
 				Events += events;
 
 				PostEvent(M_CALENDAR_SOURCE_STATE);
