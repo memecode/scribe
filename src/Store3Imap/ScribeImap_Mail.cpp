@@ -11,8 +11,6 @@
 #endif
 
 
-LHashTbl<IntKey<int>, LString> DownloadMap;
-
 const char *ToString(ImapMail::ImapMailState s)
 {
 	switch (s)
@@ -225,7 +223,7 @@ void ImapMail::Serialize(IMeta m, bool Write)
 
 void ImapMail::SetState(ImapMailState s, const char *file, int line)
 {
-	LgiTrace("%s:%i - %i::SetState(%s)\n", file, line, Uid, ToString(s));
+	// LgiTrace("%s:%i - %i::SetState(%s)\n", file, line, Uid, ToString(s));
 	State = s;
 }
 
@@ -313,7 +311,7 @@ LProfile Prof("ReadMime");
 Prof.Add(_FL);
 #endif
 	bool exists = LFileExists(Path);
-	LgiTrace("ReadMime Path=%s exists=%i\n", Path.Get(), exists);
+	// LgiTrace("ReadMime Path=%s exists=%i\n", Path.Get(), exists);
 	if (!LFileExists(Path))
 	{
 		if (State != ImapMailGettingBody)
@@ -335,13 +333,6 @@ Prof.Add(_FL);
 				#endif
 				Info.Uid = Uid;
 				Info.Local = Path.Get();
-
-				auto prev = DownloadMap.Find(Info.Uid);
-				if (prev.Get())
-					LAssert(!"Already downloaded!?");
-				else
-					DownloadMap.Add(Info.Uid, CUR_FL);
-
 
 				Msg->Parent = Parent->Remote.Get();
 				if (Store->PostThread(Msg, true))
@@ -397,12 +388,6 @@ Prof.Add(_FL);
 						Info.Size = t->GetAsInt(ATTR_SIZE);
 						Info.Uid = t->GetAsInt(ATTR_UID);
 					#endif
-
-					auto prev = DownloadMap.Find(Info.Uid);
-					if (prev.Get())
-						LAssert(!"Already downloaded!?");
-					else
-						DownloadMap.Add(Info.Uid, CUR_FL);
 
 					Info.Local = Path.Get();
 					Msg->Parent = Parent->Remote.Get();
@@ -531,11 +516,6 @@ const char *ImapMail::GetStr(int id)
 							Info.Size = t ? t->GetAsInt(ATTR_SIZE) : -1;
 							Info.Uid = Uid;
 						#endif
-
-						if (auto prev = DownloadMap.Find(Info.Uid))
-							LAssert(!"Already downloaded!?");
-						else
-							DownloadMap.Add(Info.Uid, CUR_FL);
 
 						Info.Local = Path.Get();
 						Msg->Parent = Parent->Remote.Get();

@@ -607,9 +607,7 @@ bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, voi
 						Msg->Parent = Inf->Parent;
 
 						auto exists = LFileExists(i.Local);
-
-						LgiTrace("LocalImapFile: uid=%i file=%s exists=%i\n", Uid, Inf->Local.Get(), exists);
-
+						// LgiTrace("LocalImapFile: uid=%i file=%s exists=%i\n", Uid, Inf->Local.Get(), exists);
 						Inf->Thread->PostStore(Msg);
 					}
 					else LAssert(!"Alloc err");

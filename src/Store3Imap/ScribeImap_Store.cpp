@@ -618,11 +618,6 @@ void MailInfToObject(LAutoPtr<ImapMsg> &DownloadMsg, LArray<LDataI*> *OnNew, Ima
 			Info.Uid = o->Uid;
 			Info.Local = o->Path.Get();
 
-			if (auto prev = DownloadMap.Find(Info.Uid))
-				LAssert(!"Already downloaded!?");
-			else
-				DownloadMap.Add(Info.Uid, CUR_FL);
-			
 			o->SetState(ImapMail::ImapMailGettingBody, _FL);
 		}
 	}
@@ -1017,8 +1012,8 @@ void ImapStore::OnEvent(void *Param)
 						{
 							if (!LFileExists(Inf.Local))
 								LAssert(!"Shouldn't the thread download create this file?");
-							else
-								LgiTrace("%s:%i - inf.local for %i exists.. yay\n", _FL, Inf.Uid);
+							//else
+							//	LgiTrace("%s:%i - inf.local for %i exists.. yay\n", _FL, Inf.Uid);
 						}
 						else
 						{

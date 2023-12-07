@@ -586,7 +586,4 @@ public:
 	bool OnRename(const char *NewRemote);
 };
 
-#define CUR_FL LString::Fmt("%s:%i", _FL)
-extern LHashTbl<IntKey<int>, LString> DownloadMap;
-
 #endif
