@@ -10,7 +10,7 @@ CC = gcc
 CPP = g++
 Target = ./scribe
 ifndef Build
-	Build = Release
+	Build = Debug
 endif
 MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
