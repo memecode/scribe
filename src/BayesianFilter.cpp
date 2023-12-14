@@ -1586,17 +1586,41 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 	}
 	else
 	{
-		auto t = Path.SplitDelimit("/");
-		ssize_t spamIdx = -1;
-		for (size_t i=0; i<t.Length(); i++)
-			if (t[i].Equals("Spam"))
+		LVariant v;
+		if (App->GetOptions()->GetValue(OPT_SpamFolder, v))
+		{
+			auto spamPath = LString(v.Str()).SplitDelimit("/");
+			auto inPath = Path.SplitDelimit("/");
+			unsigned matching = 0;
+			while (matching < spamPath.Length() &&
+				   matching < inPath.Length())
 			{
-				spamIdx = i;
-				break;
+				if (spamPath[matching] == inPath[matching])
+					matching++;
+				else
+					break;
 			}
+			
+			if (matching >= 2)
+				return matching == inPath.Length() ? BayesMailSpam : BayesMailUnknown;
+		}
+		else
+		{
+			// This code should never run anymore, it's deprecated...
+			LAssert(!"Dont use old hard coding spam name.");
+			
+			auto t = Path.SplitDelimit("/");
+			ssize_t spamIdx = -1;
+			for (size_t i=0; i<t.Length(); i++)
+				if (t[i].Equals("Spam"))
+				{
+					spamIdx = i;
+					break;
+				}
 
-		if (spamIdx == 0 || spamIdx == 1)
-			return (ssize_t)t.Length() > spamIdx + 1 ? BayesMailUnknown : BayesMailSpam;
+			if (spamIdx == 0 || spamIdx == 1)
+				return (ssize_t)t.Length() > spamIdx + 1 ? BayesMailUnknown : BayesMailSpam;
+		}
 	}
 
 	return BayesMailHam;
@@ -1851,5 +1875,28 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 			break;
     	}	    
 	}
+}
+
+bool BayesianFilter::UnitTests(ScribeWnd *app)
+{
+	BayesianFilter inst(app);
+	ScribeMailType prob, none;
+	auto spam = inst.BayesTypeFromPath("/Folders1/Spam");
+	if (spam != BayesMailSpam)
+		goto OnError;
+	
+	prob = inst.BayesTypeFromPath("/Folders1/Spam/Probably");
+	if (prob != BayesMailUnknown)
+		goto OnError;
+		
+	none = inst.BayesTypeFromPath("/Folders1/Inbox");
+	if (none != BayesMailHam)
+		goto OnError;
+		
+	return true;
+	
+OnError:
+	LAssert(!"Failed.");
+	return false;
 }
 

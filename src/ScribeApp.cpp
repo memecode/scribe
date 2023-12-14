@@ -1019,6 +1019,10 @@ void ScribeWnd::Construct2()
 	LFinishXWindowsStartup(this);
 	#endif
 
+	#ifdef _DEBUG
+	BayesianFilter::UnitTests(this);
+	#endif
+
 	ScribeState = ScribeConstructed;
 	OnCreate();
 }

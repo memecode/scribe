@@ -49,4 +49,8 @@ public:
     
     /// Impl
     void OnEvent(LMessage *Msg);
+    
+    
+    //////////////////////////////////////////////////
+    static bool UnitTests(ScribeWnd *app);
 };
