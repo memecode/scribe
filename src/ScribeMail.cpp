@@ -7906,46 +7906,54 @@ void Mail::DeleteAsSpam(LView *View)
 	auto Parts = FolderPath.SplitDelimit("/");
 	
 	if (Parts.Length() == 0)
+	{
 		LgiMsg(View, "Error: No folder path?", AppName);
+		return;
+	}
+
+	LString SpamPath, SpamLeaf = "Spam";
+	LVariant v;
+	if (App->GetOptions()->GetValue(OPT_SpamFolder, v))
+	{
+		SpamPath = v.Str();
+	}
 	else
 	{
-		LString SpamPath;
-		LString SpamLeaf = "Spam";
 		SpamPath.Printf("/%s/%s", Parts[0].Get(), SpamLeaf.Get());
+	}
 
-		ScribeFolder *Spam = App->GetFolder(SpamPath);
-		if (!Spam)
+	auto Spam = App->GetFolder(SpamPath);
+	if (!Spam)
+	{
+		auto Ms = App->GetMailStoreForPath(FolderPath);
+		if (!Ms)
 		{
-			LMailStore *Ms = App->GetMailStoreForPath(FolderPath);
-			if (!Ms)
+			if (GetFolder()->GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Imap)
 			{
-				if (GetFolder()->GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Imap)
+				Ms = App->GetDefaultMailStore();
+				if (Ms && Ms->Root)
 				{
-					Ms = App->GetDefaultMailStore();
-					if (Ms && Ms->Root)
-					{
-						Spam = Ms->Root->GetSubFolder(SpamLeaf);
-						if (!Spam)
-							Spam = Ms->Root->CreateSubFolder(SpamLeaf, MAGIC_MAIL);
-					}
+					Spam = Ms->Root->GetSubFolder(SpamLeaf);
+					if (!Spam)
+						Spam = Ms->Root->CreateSubFolder(SpamLeaf, MAGIC_MAIL);
 				}
-				else
-					LgiMsg(View, "Error: Couldn't get mail store for '%s'.", AppName, MB_OK, FolderPath.Get());
 			}
-			else
-				Spam = Ms->Root->CreateSubFolder("Spam", MAGIC_MAIL);
+			else LgiMsg(View, "Error: Couldn't get mail store for '%s'.", AppName, MB_OK, FolderPath.Get());
 		}
+		else Spam = Ms->Root->CreateSubFolder("Spam", MAGIC_MAIL);
+	}
 
-		if (Spam && Spam != GetFolder())
-		{
-			LArray<Thing*> Items;
-			Items.Add(this);
-			Spam->MoveTo(Items, false, [View](auto result, auto status)
+	if (Spam && Spam != GetFolder())
+	{
+		LArray<Thing*> Items;
+		Items.Add(this);
+		Spam->MoveTo(Items,
+			false,
+			[View](auto result, auto status)
 			{
 				if (!result)
 					LgiMsg(View, "Error: Couldn't move email to spam folder.", AppName);
 			});
-		}
 	}
 }
 

@@ -996,7 +996,7 @@ void LMail3Mail::ResetCaches()
 
 const char *LMail3Mail::InferCharset(const char *ExampleTxt)
 {
-	if (!InferredCharset)
+	if (!InferredCharset && Seg)
 	{
 		// Sometimes mailers don't follow the rules... *cough*outlook*cough*
 		// So lets play the "guess the charset" game...
