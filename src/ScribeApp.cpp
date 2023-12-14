@@ -7057,15 +7057,19 @@ public:
 		auto Start = LCurrentTime();
 		static int TimeSlice = 300; //ms
 
+		// LgiTrace("OnPulse state=%i cancelled=%i\n", State, IsCancelled());
 		if (State == LoadingThings)
 		{
 			while (	Idx < tl->Length() &&
 					!IsCancelled() &&
 					LCurrentTime() - Start < TimeSlice)
 			{
-				Thing *t = tl->ThingAt(Idx++);
+				auto t = tl->ThingAt(Idx++);
 				if (!t)
+				{
+					LgiTrace("%s:%i - not a thing\n", _FL);
 					continue;
+				}
 
 				auto Obj = t->GetObject();
 				if (Obj->GetInt(FIELD_LOADED) < Store3Loaded)
@@ -7073,6 +7077,7 @@ public:
 			}
 
 			Value(Idx);
+			// LgiTrace("%s:%i %i >= %i\n", _FL, (int)Idx, (int)tl->Length());
 			if (Idx >= tl->Length())
 			{
 				State = SavingThings;
@@ -7081,18 +7086,27 @@ public:
 		}
 		else if (State == SavingThings)
 		{
+			// Having this check at the top means the UI gets a chance to update to it's complete state..
+			if (Idx >= tl->Length())
+			{
+				if (Errors > 0)
+					LgiMsg(this, "Failed to save %i of %i objects.", AppName, MB_OK, Errors, tl->Length());
+				Quit();
+				return;
+			}
+
 			while (	Idx < tl->Length() &&
 					!IsCancelled() &&
 					LCurrentTime() - Start < TimeSlice)
 			{
-				Thing *t = tl->ThingAt(Idx++);
+				auto t = tl->ThingAt(Idx++);
 				if (!t)
 					continue;
 
 				auto Obj = t->GetObject();
 				LAssert(Obj->GetInt(FIELD_LOADED) == Store3Loaded); // Load loop should have done this already
 
-				Thing *Dst = App->CreateItem(Obj->Type(), Folder, false);
+				auto Dst = App->CreateItem(Obj->Type(), Folder, false);
 				if (Dst)
 				{
 					*Dst = *t;
@@ -7108,13 +7122,6 @@ public:
 			}
 
 			SavePane->Value(Idx);
-			if (Idx >= tl->Length())
-			{
-				if (Errors > 0)
-					LgiMsg(this, "Failed to save %i of %i objects.", AppName, MB_OK, Errors, tl->Length());
-				Quit();
-				return;
-			}
 		}
 
 		LProgressDlg::OnPulse();
@@ -7576,7 +7583,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				break;
 			}
 
-			ScribeFolder *Folder = dynamic_cast<ScribeFolder*>(Tree->Selection());
+			auto Folder = dynamic_cast<ScribeFolder*>(Tree->Selection());
 			if (!Folder || !Folder->GetObject())
 			{
 				LgiMsg(this, "No current folder.", AppName, MB_OK);
@@ -7590,20 +7597,21 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				break;
 			}
 
-			Clip.Binary(d->ClipboardFormat, [this, Folder](auto Data, auto Err)
-			{
-				if (Data)
+			Clip.Binary(d->ClipboardFormat,
+				[this, Folder](auto Data, auto Err)
 				{
-					if (ScribeClipboardFmt::IsThing(Data.Get(), Data.Length()))
+					if (Data)
 					{
-						new ScribePasteState(this, Folder, Data);
+						if (ScribeClipboardFmt::IsThing(Data.Get(), Data.Length()))
+						{
+							new ScribePasteState(this, Folder, Data);
+						}
 					}
-				}
-				else
-				{
-					LgiMsg(this, "Couldn't get the clipboard data: %s", AppName, MB_OK, Err.Get());
-				}
-			});
+					else
+					{
+						LgiMsg(this, "Couldn't get the clipboard data: %s", AppName, MB_OK, Err.Get());
+					}
+				});
 			break;
 		}
 		case IDM_DELETE:
@@ -7628,33 +7636,35 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_DELETE_AS_SPAM:
 		{
-			if (MailList)
+			if (!MailList)
 			{
-				List<LListItem> Sel;
-				MailList->GetSelection(Sel);
-				int Index = -1;
+				LAssert(0);
+				break;
+			}
 
-				for (auto i: Sel)
-				{
-					Mail *m = IsMail(i);
-					if (m)
-					{
-						if (Index < 0)
-						{
-							Index = MailList->IndexOf(i);
-						}
-						m->DeleteAsSpam(this);
-					}
-				}
+			List<LListItem> Sel;
+			MailList->GetSelection(Sel);
+			int Index = -1;
 
-				if (Index >= 0)
+			for (auto i: Sel)
+			{
+				Mail *m = IsMail(i);
+				if (m)
 				{
-					LListItem *i = MailList->ItemAt(Index);
-					if (!i)
-						i = MailList->ItemAt(MailList->Length()-1);
-					if (i)
-						i->Select(true);
+					if (Index < 0)
+						Index = MailList->IndexOf(i);
+					m->DeleteAsSpam(this);
 				}
+				else LgiTrace("%s:%i - can't mark as spam things that aren't mail.\n", _FL);
+			}
+
+			if (Index >= 0)
+			{
+				LListItem *i = MailList->ItemAt(Index);
+				if (!i)
+					i = MailList->ItemAt(MailList->Length()-1);
+				if (i)
+					i->Select(true);
 			}
 			break;
 		}
