@@ -345,9 +345,9 @@ public:
 	typedef LXmlTag *IMeta;
 	#endif
 
-	ImapStore *Store = NULL;
-	ImapFolderData *Data = NULL;
-	ImapFolder *Parent = NULL;
+	ImapStore      *Store  = NULL;
+	ImapFolderData *Data   = NULL;
+	ImapFolder     *Parent = NULL;
 
 	Store3State Loaded = Store3Unloaded;
 	LString Path;
@@ -356,23 +356,23 @@ public:
 	ImapMailFlags RemoteFlags;
 	int LocalFlags;
 
-	int Priority;
-	int64 DataSize;
+	int     Priority;
+	int64   DataSize;
 	uint8_t SegDirty : 1;
 
-	LString MsgId;
-	LString Subject;
-	LString Label;
-	LString Structure;
+	LString    MsgId;
+	LString    Subject;
+	LString    Label;
+	LString    Structure;
 	Store3Addr From;
 	Store3Addr Reply;
-	LDateTime DateReceived;
-	LDateTime DateSent;
-	LColour Colour;
+	LDateTime  DateReceived;
+	LDateTime  DateSent;
+	LColour    Colour;
 	DIterator<LDataPropI, Store3Addr, ImapStore> To;
 	
-	LAutoStreamI Stream;
-	ImapAttachment *Seg;
+	LAutoStreamI   Stream;
+	ImapAttachment *Seg = NULL;
 
 	ImapMail(ImapStore *store, const char *file = NULL, int line = 0, uint32_t uid = 0);
 	~ImapMail();

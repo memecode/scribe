@@ -253,8 +253,7 @@ void Thing::SetFolder(ScribeFolder *New, std::function<void(Store3Status)> callb
 		// This is really an optimization to reduce the overhead of moving objects
 		// between folders, a function which is provided by the storage sub-system
 		// does all the work for us.
-		LArray<LDataI*> Mv;
-		Mv.Add(GetObject());
+		LArray<LDataI*> Mv{ GetObject() };
 
 		auto status = Old->GetObject()->GetStore()->Move(New->GetFldObj(), Mv);
 		if (status == Store3Success)
@@ -271,7 +270,9 @@ void Thing::SetFolder(ScribeFolder *New, std::function<void(Store3Status)> callb
 	{
 		return;
 	}
-	else if (New->GetObject() && GetObject() && New->GetObject()->GetStore())
+	else if (GetObject() &&
+			 New->GetObject() &&
+			 New->GetObject()->GetStore())
 	{
 		// Source OR Dest are remote...
 		auto NewObject = New->GetObject()->GetStore()->Create(Type());
@@ -283,15 +284,23 @@ void Thing::SetFolder(ScribeFolder *New, std::function<void(Store3Status)> callb
 		}
 
 		auto OldObject = GetObject();
+		auto InListView = GetList() != NULL;
 
 		// Copy the current data into the new object
-		NewObject->CopyProps(*GetObject());
+		NewObject->CopyProps(*OldObject);
 		SetObject(NewObject, false, _FL);
 
 		// Try writing it to the store...
-		Store3Status SyncStatus = New->WriteThing(
+		New->WriteThing(
 			this,
-			[this, Old, OldObject, New, NewObject, callback=std::move(callback)](auto AsyncStatus)
+			[
+				this,
+				Old, OldObject,
+				New, NewObject,
+				InListView,
+				callback = std::move(callback)
+			]
+			(auto AsyncStatus)
 			{
 				switch (AsyncStatus)
 				{
@@ -305,6 +314,11 @@ void Thing::SetFolder(ScribeFolder *New, std::function<void(Store3Status)> callb
 					}
 					case Store3Success:
 					{
+						// GUI object is definately associated with the new folder by now
+						// So make sure it's not in the old folder view.
+						if (InListView)
+							GetList()->Remove(this);
+						
 						// Ok, immediate save, set new object
 						// delete old object
 						auto Moved = OldObject->Delete(false);
@@ -329,13 +343,6 @@ void Thing::SetFolder(ScribeFolder *New, std::function<void(Store3Status)> callb
 							// mail object needs to appear in the destination folder, as it's
 							// now associated with 'NewObject'.
 							Old->Items.Delete(this);
-							
-							/*	This is deleting the new object out of the destination folder 
-								listing... so don't do that I guess?
-							
-							if (GetList())
-								GetList()->Remove(this);
-							*/
 						}
 
 						if (callback)

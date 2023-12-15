@@ -4013,11 +4013,9 @@ Mail::Mail(ScribeWnd *app, LDataI *object) : Thing(app, object)
 
 Mail::~Mail()
 {
-    if (GetObject())
+    if (d->MsgIdCache)
     {
-        auto Id = GetObject()->GetStr(FIELD_MESSAGE_ID);
-        if (Id)
-            MessageIdMap.Delete(Id);
+		MessageIdMap.Delete(d->MsgIdCache);
     }
 
 	NewMailLst.Delete(this);

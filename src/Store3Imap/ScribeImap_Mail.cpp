@@ -525,7 +525,10 @@ const char *ImapMail::GetStr(int id)
 							SetState(ImapMailGettingBody, _FL);
 							Loaded = Store3Loading;
 						}
-						else LgiTrace("%s:%i - PostThread failed.\n", _FL);
+						else
+						{
+							LgiTrace("%s:%i - PostThread failed.\n", _FL);
+						}
 					}
 				}
 			}

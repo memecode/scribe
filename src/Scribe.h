@@ -986,13 +986,13 @@ private:
 	int PreviewCacheX;
 	List<LDisplayString> PreviewCache;
 	
-	int64_t TotalSizeCache;
-	int64_t FlagsCache;
-	MailUi *Ui;
+	int64_t TotalSizeCache = 0;
+	int64_t FlagsCache = 0;
+	MailUi *Ui = NULL;
 	int Cursor; // Stores the cursor position in reply/forward format until the UI needs it
-	Attachment *ParentFile;
+	Attachment *ParentFile = NULL;
 	List<Attachment> Attachments;
-	Mail *PreviousMail; // the mail we are replying to / forwarding
+	Mail *PreviousMail = NULL; // the mail we are replying to / forwarding
 
 	void _New();
 	void _Delete();
@@ -1015,7 +1015,7 @@ public:
 	static List<Mail> NewMailLst;
 	constexpr static float MarkColourMix = 0.9f;
 
-	uint8_t SendAttempts;
+	uint8_t SendAttempts = 0;
 	
 	enum NewEmailState
 	{
