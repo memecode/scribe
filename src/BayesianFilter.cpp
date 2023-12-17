@@ -1591,7 +1591,7 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 		{
 			auto spamPath = LString(v.Str()).SplitDelimit("/");
 			auto inPath = Path.SplitDelimit("/");
-			unsigned matching = 0;
+			unsigned matching = 1;
 			while (matching < spamPath.Length() &&
 				   matching < inPath.Length())
 			{
@@ -1601,7 +1601,7 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 					break;
 			}
 			
-			if (matching >= 2)
+			if (matching > 1)
 				return matching == inPath.Length() ? BayesMailSpam : BayesMailUnknown;
 		}
 		else
