@@ -60,21 +60,15 @@ const char *ELEMENT_ACTION			= "Action";
 class FilterPrivate
 {
 public:
-	bool *Stop;
-	LStream *Log;
-
-	FilterPrivate()
-	{
-		Stop = 0;
-		Log = 0;
-	}
+	bool *Stop = NULL;
+	LStream *Log = NULL;
 };
 
 //////////////////////////////////////////////////////////////
 // Filter field definitions
 ItemFieldDef FilterFieldDefs[] = {
-	{"Name", SdName, 			GV_STRING,	FIELD_FILTER_NAME},
-	{"Index", SdIndex, 			GV_INT32,	FIELD_FILTER_INDEX},
+	{"Name",     SdName, 		GV_STRING,	FIELD_FILTER_NAME},
+	{"Index",    SdIndex, 		GV_INT32,	FIELD_FILTER_INDEX},
 	{"Incoming", SdIncoming, 	GV_INT32,	FIELD_FILTER_INCOMING},
 	{"Outgoing", SdOutgoing, 	GV_INT32,	FIELD_FILTER_OUTGOING},
 	{"Internal", SdInternal, 	GV_INT32,	FIELD_FILTER_INTERNAL},
@@ -115,7 +109,6 @@ int DefaultFilterFields[] =
 		case 18: Macro("From.Groups"); break;				\
 		case 19: Macro("*"); break;							\
 	}
-// Macro("", FIELD_FLAGS)
 
 struct ActionName
 {
@@ -203,7 +196,8 @@ const char **GetOpNames(bool Translated)
 //////////////////////////////////////////////////////////////
 void SkipSep(const char *&s)
 {
-	while (s && *s && strchr(" \t,", *s)) s++;
+	while (s && *s && strchr(" \t,", *s))
+		s++;
 }
 
 LCombo *LoadTemplates(ScribeWnd *App, LView *Wnd, List<char> &MsgIds, int Ctrl, char *Template)
@@ -3665,7 +3659,7 @@ FilterUi::FilterUi(Filter *item) :
 	LRect r(100, 100, 800, 600);
 	SetPos(r);
 	MoveSameScreen(item->App);
-	d->FilterIcons = LFilterView::CreateIcons();
+	d->FilterIcons = LFilterView::CreateIcons(this);
 
 	// Create window
 	#if WINNATIVE
