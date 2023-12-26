@@ -250,14 +250,22 @@ void AccountStatusItem::OnMouseClick(LMouse &m)
 			for (auto i: Sel)
 			{
 				auto *si = dynamic_cast<AccountStatusItem*>(i);
+				auto account = si->Account;
+				auto name = account->Identity.Name();
 
-				Acc.Add(si->Account);
+				Acc.Add(account);
 
-				if (!si->Account->Receive.Disabled())
+				if (!account->Receive.Disabled())
 				{
-					RecAcc += si->Account->Receive.Server().Str() ? 1 : 0;
-					SendAcc += si->Account->Send.Server().Str() ? 1 : 0;
+					auto receiveServer = account->Receive.Server();
+					auto sendServer = account->Send.Server();
+
+					RecAcc += receiveServer.Str() ? 1 : 0;
+					SendAcc += sendServer.Str() ? 1 : 0;
+
+					// LgiTrace("%s:%i - account '%s' servers: %s/%s\n", _FL, name.Str(), receiveServer.Str(), sendServer.Str());
 				}
+				// else LgiTrace("%s:%i - account '%s' is disabled.\n", _FL, name.Str());
 			}
 		}
 

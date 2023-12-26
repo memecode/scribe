@@ -1734,22 +1734,22 @@ private:
 
 protected:
 	// Data
-	ScribeAccount *Account;
+	ScribeAccount *Account = NULL;
 	LAutoPtr<AccountThread> Thread;
-	bool ConnectionStatus;
-	MailProtocol *Client;
-	uint64 LastOnline;
+	bool ConnectionStatus = true;
+	MailProtocol *Client = NULL;
+	uint64 LastOnline = 0;
 	LString TempPsw;
-	bool Quiet;
-	LView *Parent;
+	bool Quiet = false;
+	LView *Parent = NULL;
 
 	// Pointers
-	ScribeFolder *Root;
-	LDataStoreI *DataStore;
-	LMailStore *MailStore; // this memory is owned by ScribeWnd
+	ScribeFolder *Root = NULL;
+	LDataStoreI *DataStore = NULL;
+	LMailStore *MailStore = NULL; // this memory is owned by ScribeWnd
 
 	// Options
-	const char *OptPassword;
+	const char *OptPassword = NULL;
 
 	// Members
 	LSocketI *CreateSocket(bool Sending, LCapabilityClient *Caps, bool RawLFCheck);

@@ -1975,7 +1975,10 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
+				{
 					Arg1 = Dlg->Get();
+					OnNotify(Btn, LNotifyValueChanged);
+				}
 				delete dlg;
 			});
 			break;
@@ -1986,7 +1989,10 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			s->OpenFolder([this](auto s, auto status)
 			{
 				if (status)
+				{
 					Arg1 = s->Name();
+					OnNotify(Btn, LNotifyValueChanged);
+				}
 				delete s;
 			});
 			break;
@@ -2019,7 +2025,13 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Arg1 = "local,server";
 					break;
 				}
+				default:
+				{
+					return;
+				}
 			}
+
+			OnNotify(Btn, LNotifyValueChanged);
 			break;
 		}
 		case ACTION_OPEN:
@@ -2029,65 +2041,66 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		}
 		case ACTION_SET_READ:
 		{
-			auto RClick = new LSubMenu;
-			if (RClick)
+			LSubMenu s;
+			s.AppendItem("Read", IDM_TRUE, true);
+			s.AppendItem("Unread", IDM_FALSE, true);
+			s.AppendItem("Unread But Not New", IDM_NOTNEW, true);
+
+			LMouse m;
+			if (!Parent->GetMouse(m, true))
+				break;
+
+			switch (s.Float(Parent, m.x, m.y))
 			{
-				RClick->AppendItem("Read", IDM_TRUE, true);
-				RClick->AppendItem("Unread", IDM_FALSE, true);
-				RClick->AppendItem("Unread But Not New", IDM_NOTNEW, true);
-
-				LMouse m;
-				if (Parent->GetMouse(m, true))
+				case IDM_TRUE:
 				{
-					switch (RClick->Float(Parent, m.x, m.y))
-					{
-						case IDM_TRUE:
-						{
-							Arg1 = "true";
-							break;
-						}
-						case IDM_FALSE:
-						{
-							Arg1 = "false";
-							break;
-						}
-						case IDM_NOTNEW:
-						{
-							Arg1 = "false,notnew";
-							break;
-						}
-					}
+					Arg1 = "true";
+					break;
 				}
-
-				DeleteObj(RClick);
+				case IDM_FALSE:
+				{
+					Arg1 = "false";
+					break;
+				}
+				case IDM_NOTNEW:
+				{
+					Arg1 = "false,notnew";
+					break;
+				}
+				default:
+				{
+					return;
+				}
 			}
+
+			OnNotify(Btn, LNotifyValueChanged);
 			break;
 		}
 		case ACTION_MARK:
 		{
-			auto RClick = new LSubMenu;
-			if (RClick)
+			LSubMenu s;
+			BuildMarkMenu(&s, MS_One, 0);
+
+			LMouse m;
+			if (!Parent->GetMouse(m, true))
+				break;
+
+			int Result = s.Float(Parent, m.x, m.y);
+			if (Result == IDM_UNMARK)
 			{
-				BuildMarkMenu(RClick, MS_One, 0);
-				LMouse m;
-				if (Parent->GetMouse(m, true))
-				{
-					int Result = RClick->Float(Parent, m.x, m.y);
-					if (Result == IDM_UNMARK)
-					{
-						Arg1 = "False";
-					}
-					else if (Result >= IDM_MARK_BASE)
-					{
-						char s[32];
-						sprintf_s(s, sizeof(s),
-								"%i,%i,%i",
-								R32(MarkColours32[Result-IDM_MARK_BASE]),
-								G32(MarkColours32[Result-IDM_MARK_BASE]),
-								B32(MarkColours32[Result-IDM_MARK_BASE]));
-						Arg1 = s;
-					}
-				}
+				Arg1 = "False";
+				OnNotify(Btn, LNotifyValueChanged);
+			}
+			else if (Result >= IDM_MARK_BASE)
+			{
+				char s[32];
+				sprintf_s(s, sizeof(s),
+						"%i,%i,%i",
+						R32(MarkColours32[Result-IDM_MARK_BASE]),
+						G32(MarkColours32[Result-IDM_MARK_BASE]),
+						B32(MarkColours32[Result-IDM_MARK_BASE]));
+				Arg1 = s;
+				OnNotify(Btn, LNotifyValueChanged);
 			}
 			break;
 		}
@@ -2126,7 +2139,10 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Select->Open([this](auto s, auto ok)
 			{
 				if (ok)
+				{
 					Arg1 = s->Name();
+					OnNotify(Btn, LNotifyValueChanged);
+				}
 				delete s;
 			});
 			break;
@@ -2137,7 +2153,10 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
+				{
 					Arg1 = Dlg->Arg;
+					OnNotify(Btn, LNotifyValueChanged);
+				}
 				delete dlg;
 			});
 			break;
@@ -2148,7 +2167,10 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
+				{
 					Arg1 = Dlg->Arg;
+					OnNotify(Btn, LNotifyValueChanged);
+				}
 				delete dlg;
 			});
 			break;
@@ -2159,7 +2181,10 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
+				{
 					Arg1 = Dlg->Arg;
+					OnNotify(Btn, LNotifyValueChanged);
+				}
 				delete dlg;
 			});
 			break;
@@ -2170,69 +2195,69 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
 				if (id)
+				{
 					Arg1 = Dlg->Arg;
+					OnNotify(Btn, LNotifyValueChanged);
+				}
 				delete dlg;
 			});
 			break;
 		}
 		case ACTION_CHANGE_CHARSET:
 		{
-			auto s = new LSubMenu;
-			if (s)
+			LSubMenu s;
+
+			LArray<LCharset*> Cs;
+			for (LCharset *c = LGetCsList(); c->Charset; c++)
 			{
-				LArray<LCharset*> Cs;
-				for (LCharset *c = LGetCsList(); c->Charset; c++)
+				Cs.Add(c);
+			}
+			Cs.Sort(CsCmp);
+			for (unsigned i=0; i<Cs.Length(); i++)
+			{
+				unsigned n = 1;
+				while (i + n < Cs.Length())
 				{
-					Cs.Add(c);
+					if (Cs[i + n]->Charset[0] != Cs[i]->Charset[0])
+						break;
+					n++;
 				}
-				Cs.Sort(CsCmp);
-				for (unsigned i=0; i<Cs.Length(); i++)
+				if (n > 1)
 				{
-					unsigned n = 1;
-					while (i + n < Cs.Length())
-					{
-						if (Cs[i + n]->Charset[0] != Cs[i]->Charset[0])
-							break;
-						n++;
-					}
-					if (n > 1)
-					{
-						char a[64];
-						char *One = LSeekUtf8(Cs[i]->Charset, 1);
-						ssize_t Len = One - Cs[i]->Charset;
-						memcpy(a, Cs[i]->Charset, Len);
-						strcpy_s(a + Len, sizeof(a) - Len, "...");
+					char a[64];
+					char *One = LSeekUtf8(Cs[i]->Charset, 1);
+					ssize_t Len = One - Cs[i]->Charset;
+					memcpy(a, Cs[i]->Charset, Len);
+					strcpy_s(a + Len, sizeof(a) - Len, "...");
 
-						auto Sub = s->AppendSub(a);
-						if (Sub)
+					auto Sub = s.AppendSub(a);
+					if (Sub)
+					{
+						for (unsigned k=0; k<n; k++)
 						{
-							for (unsigned k=0; k<n; k++)
-							{
-								Sub->AppendItem(Cs[i+k]->Charset, i+k+1, Cs[i+k]->IsAvailable());
-							}
-
-							i += n - 1;
+							Sub->AppendItem(Cs[i+k]->Charset, i+k+1, Cs[i+k]->IsAvailable());
 						}
-					}
-					else
-					{
-						s->AppendItem(Cs[i]->Charset, i+1, Cs[i]->IsAvailable());
+
+						i += n - 1;
 					}
 				}
-
-				LMouse m;
-				Parent->GetMouse(m, true);
-				int Result = s->Float(Parent, m.x, m.y, true);
-				if (Result)
+				else
 				{
-					Result--;
-					if (Result >= 0 && Result < (int)Cs.Length())
-					{
-						Arg1 = Cs[Result]->Charset;
-					}
+					s.AppendItem(Cs[i]->Charset, i+1, Cs[i]->IsAvailable());
 				}
+			}
 
-				DeleteObj(s);
+			LMouse m;
+			Parent->GetMouse(m, true);
+			int Result = s.Float(Parent, m.x, m.y, true);
+			if (Result)
+			{
+				Result--;
+				if (Result >= 0 && Result < (int)Cs.Length())
+				{
+					Arg1 = Cs[Result]->Charset;
+					OnNotify(Btn, LNotifyValueChanged);
+				}
 			}
 			break;
 		}
@@ -3531,110 +3556,6 @@ enum ConditionOptions
 	FIELD_ANYWHERE = FIELD_MAX
 };
 
-int FilterCallback(	LFilterView *View,
-					LFilterItem *Item,
-					LFilterMenu Menu,
-					LRect &r,
-					LArray<char*> *GetList,
-					void *Data)
-{
-	int Status = -1;
-
-	if (!View)
-		return Status;
-
-	switch (Menu)
-	{
-		case FMENU_FIELD:
-		{
-			LSubMenu s;
-
-			LString::Array Names;
-			ItemFieldDef *FieldDefs = MailFieldDefs;
-			for (ItemFieldDef *i = FieldDefs; i->DisplayText; i++)
-			{
-				const char *Trans = LLoadString(i->FieldId);
-				auto idx = (i - FieldDefs) + 1;
-				Names[idx] = DomToStr(i->Dom);
-				s.AppendItem(Trans ? Trans : i->DisplayText, (int)idx, true);
-			}
-
-			s.AppendItem(LLoadString(IDS_ATTACHMENTS_DATA), FIELD_ATTACHMENTS_DATA, true);
-			s.AppendItem(LLoadString(IDS_ATTACHMENTS_NAME), FIELD_ATTACHMENTS_NAME, true);
-			s.AppendItem(LLoadString(IDS_MEMBER_OF_GROUP), FIELD_MEMBER_OF_GROUP, true);
-			s.AppendItem(LLoadString(IDS_ANYWHERE), FIELD_ANYWHERE, true);
-
-			LPoint p(r.x1, r.y2 + 1);
-			View->PointToScreen(p);
-			int Cmd = s.Float(View, p.x, p.y, true);
-			switch (Cmd)
-			{
-				case FIELD_ATTACHMENTS_DATA:
-					Item->SetField("mail.Attachments");
-					break;
-				case FIELD_ATTACHMENTS_NAME:
-					Item->SetField("mail.AttachmentNames");
-					break;
-				case FIELD_MEMBER_OF_GROUP:
-					Item->SetField("mail.From.Groups");
-					break;
-				case FIELD_ANYWHERE:
-					Item->SetField("mail.*");
-					break;
-				default:
-					if (Cmd > 0 && Cmd < Names.Length())
-						Item->SetField(LString("mail.") + Names[Cmd]);
-					break;
-			}
-			break;
-		}
-		case FMENU_OP:
-		{
-			if (GetList)
-			{
-				for (const char **o = GetOpNames(true); *o; o++)
-				{
-					GetList->Add(NewStr(*o));
-				}
-				Status = true;
-			}
-			/*
-			else
-			{
-				auto s = new LSubMenu;
-				if (s)
-				{
-					int n = 1;
-
-					for (char **o = GetOpNames(true); *o; o++)
-					{
-						s->AppendItem(*o, n++, true);
-					}
-
-					LPoint p(r.x1, r.y2 + 1);
-					View->PointToScreen(p);
-					int Cmd = s->Float(View, p.x, p.y, true);
-
-					if (Cmd > 0)
-					{
-						Item->SetOp(OpNames[Cmd - 1]);
-					}
-					
-					DeleteObj(s);
-				}
-			}
-			*/
-			break;
-		}
-		case FMENU_VALUE:
-		{
-			break;
-		}
-	}
-
-	return Status;
-}
-
 //////////////////////////////////////////////////////////
 struct FilterUiPriv
 {
@@ -3702,7 +3623,104 @@ FilterUi::FilterUi(Filter *item) :
 			auto Cond = d->Tab->Append(LLoadString(IDS_CONDITIONS));
 			if (Cond)
 			{
-				d->Conditions = new LFilterView(FilterCallback, Item);
+				d->Conditions = new LFilterView(this, [this](auto View, auto Item, auto Menu, auto &r, auto GetList)
+					{
+						int Status = -1;
+						if (!View)
+							return Status;
+
+						switch (Menu)
+						{
+							case FMENU_FIELD:
+							{
+								LSubMenu s;
+
+								LString::Array Names;
+								ItemFieldDef *FieldDefs = MailFieldDefs;
+								for (ItemFieldDef *i = FieldDefs; i->DisplayText; i++)
+								{
+									const char *Trans = LLoadString(i->FieldId);
+									auto idx = (i - FieldDefs) + 1;
+									Names[idx] = DomToStr(i->Dom);
+									s.AppendItem(Trans ? Trans : i->DisplayText, (int)idx, true);
+								}
+
+								s.AppendItem(LLoadString(IDS_ATTACHMENTS_DATA), FIELD_ATTACHMENTS_DATA, true);
+								s.AppendItem(LLoadString(IDS_ATTACHMENTS_NAME), FIELD_ATTACHMENTS_NAME, true);
+								s.AppendItem(LLoadString(IDS_MEMBER_OF_GROUP), FIELD_MEMBER_OF_GROUP, true);
+								s.AppendItem(LLoadString(IDS_ANYWHERE), FIELD_ANYWHERE, true);
+
+								LPoint p(r.x1, r.y2 + 1);
+								View->PointToScreen(p);
+								int Cmd = s.Float(View, p.x, p.y, true);
+								switch (Cmd)
+								{
+									case FIELD_ATTACHMENTS_DATA:
+										Item->SetField("mail.Attachments");
+										break;
+									case FIELD_ATTACHMENTS_NAME:
+										Item->SetField("mail.AttachmentNames");
+										break;
+									case FIELD_MEMBER_OF_GROUP:
+										Item->SetField("mail.From.Groups");
+										break;
+									case FIELD_ANYWHERE:
+										Item->SetField("mail.*");
+										break;
+									default:
+										if (Cmd > 0 && Cmd < Names.Length())
+											Item->SetField(LString("mail.") + Names[Cmd]);
+										break;
+								}
+								break;
+							}
+							case FMENU_OP:
+							{
+								if (GetList)
+								{
+									for (const char **o = GetOpNames(true); *o; o++)
+									{
+										GetList->Add(NewStr(*o));
+									}
+									Status = true;
+								}
+								/*
+								else
+								{
+									auto s = new LSubMenu;
+									if (s)
+									{
+										int n = 1;
+										
+										for (char **o = GetOpNames(true); *o; o++)
+										{
+											s->AppendItem(*o, n++, true);
+										}
+
+										LPoint p(r.x1, r.y2 + 1);
+										View->PointToScreen(p);
+										int Cmd = s->Float(View, p.x, p.y, true);
+
+										if (Cmd > 0)
+										{
+											Item->SetOp(OpNames[Cmd - 1]);
+										}
+
+										DeleteObj(s);
+									}
+								}
+								*/
+								break;
+							}
+							case FMENU_VALUE:
+							{
+								break;
+							}
+						}
+
+						return Status;
+					});
+
 				if (d->Conditions)
 				{
 					Cond->Append(d->Conditions);
@@ -3901,12 +3919,9 @@ int FilterUi::OnNotify(LViewI *Col, LNotification n)
 				List<FilterAction> Sel;
 				if (d->Actions->GetSelection(Sel))
 				{
-					FilterAction *a = Sel[0];
+					auto a = Sel[0];
 					if (a)
-					{
 						a->Browse(Item->App, this);
-						a->OnNotify(Col, n);
-					}
 				}
 			}
 			break;			

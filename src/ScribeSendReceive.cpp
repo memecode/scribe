@@ -363,16 +363,7 @@ LList *MailTransferEvent::GetList()
 ////////////////////////////////////////////////////////////////////////////
 Accountlet::Accountlet(ScribeAccount *a) : PrivLock("Accountlet")
 {
-	DataStore = NULL;
-	MailStore = NULL;
-	Root = 0;
 	Account = a;
-	ConnectionStatus = true;
-	OptPassword = 0;
-	Client = 0;
-	LastOnline = 0;
-	Parent = 0;
-
 	State = ThreadIdle;
 
 	// Update sig to new format...
