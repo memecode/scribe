@@ -3457,6 +3457,7 @@ void Filter::OnColumnNotify(int Col, int64 Data)
 			case 4:
 			{
 				SetDirty(true);
+				Update();
 				break;
 			}
 		}
