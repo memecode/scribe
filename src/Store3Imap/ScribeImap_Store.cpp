@@ -1069,17 +1069,26 @@ void ImapStore::OnEvent(void *Param)
 			}
 			case IMAP_APPEND:
 			{
-				LDataFolderI *NewItemParent = 0;
+				LDataFolderI *NewItemParent = NULL;
 				LArray<LDataI*> NewItems;
 				
-				ImapFolder *f = Root->Find(0, m->Parent);
-				if (f)
+				auto f = Root->Find(0, m->Parent);
+				if (!f)
+				{
+					LAssert(!"Folder missing.");
+					LgiTrace("%s:%i - Folder '%s' missing.\n", _FL, m->Parent.Get());
+				}
+				else
 				{
 					for (unsigned i=0; i<m->Mail.Length(); i++)
 					{
-						ImapMailInfo &Inf = m->Mail[i];
-						ImapMail *m = f->FindByFile(Inf.Local);
-						if (m)
+						auto &Inf = m->Mail[i];
+						auto m = f->FindMail(Inf.Local, Inf.Uid);
+						if (!m)
+						{
+							LAssert(!"There should be an email by this point.");
+						}
+						else
 						{
 							if (Inf.Uid)
 							{

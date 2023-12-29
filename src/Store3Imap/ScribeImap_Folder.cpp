@@ -2237,22 +2237,20 @@ ImapFolder *ImapFolder::Find(const char *local, const char *remote)
 	return NULL;
 }
 
-ImapMail *ImapFolder::FindByFile(char *File)
+ImapMail *ImapFolder::FindMail(const char *File, int32 Uid)
 {
-	if (!File)
-		return 0;
-
-	for (unsigned i=0; i<Mail.Length(); i++)
+	for (auto m: Mail.a)
 	{
-		ImapMail *m = Mail.a[i];
-		if (m->Path)
+		if (File && m->Path)
 		{
 			if (!_stricmp(m->Path, File))
 				return m;
 		}
+		if (m->Uid == Uid)
+			return m;
 	}
 
-	return 0;
+	return NULL;
 }
 
 ImapMail::IMeta ImapFolderData::GetMeta(uint32_t id, bool Create)

@@ -573,7 +573,7 @@ public:
 	LString MailPath(uint32_t Uid, bool CheckExists = true);
 
 	// Mail container stuff
-	ImapMail *FindByFile(char *File);
+	ImapMail *FindMail(const char *File, int32 Uid);
 	bool Serialize(bool Write);
 
 	// Events
