@@ -735,7 +735,7 @@ public:
 	LDataStoreI *GetStore() override { return Store; }
 	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
 	const char *GetClass() override { return "LMail3Filter"; }
-	bool DbDelete();
+	bool DbDelete() override;
 };
 
 #endif

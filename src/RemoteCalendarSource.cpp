@@ -60,7 +60,7 @@ struct RemoteCalendarSourcePriv :
 			c->DecRef();
 	}
 
-	uint64 Size()
+	uint64 Size() override
 	{
 		uint64 sz = 0;
 		if (Lock(_FL))
@@ -72,52 +72,52 @@ struct RemoteCalendarSourcePriv :
 		return sz;
 	}
 
-	LDataI *Create(int Type)
+	LDataI *Create(int Type) override
 	{
 		if (Type == MAGIC_CALENDAR)
 			return new RemoteCalEvent(this);
 		return NULL;
 	}
 
-	LDataFolderI *GetRoot(bool create = false)
+	LDataFolderI *GetRoot(bool create = false) override
 	{
 		LAssert(0);
 		return NULL;
 	}
 
-	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
+	Store3Status Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items) override
 	{
 		LAssert(0);
 		return Store3NotImpl;
 	}
 
-	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash)
+	Store3Status Delete(LArray<LDataI*> &Items, bool ToTrash) override
 	{
 		LAssert(0);
 		return Store3NotImpl;
 	}
 
-	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator)
+	Store3Status Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator) override
 	{
 		LAssert(0);
 		return Store3NotImpl;
 	}
 
-	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus)
+	void Compact(LViewI *Parent, LDataPropI *Props, std::function<void(bool)> OnStatus) override
 	{
 		LAssert(0);
 	}
 
-	void OnEvent(void *Param)
+	void OnEvent(void *Param) override
 	{
 	}
 
-	bool OnIdle()
+	bool OnIdle() override
 	{
 		return true;
 	}
 
-	LDataEventsI *GetEvents()
+	LDataEventsI *GetEvents() override
 	{
 		LAssert(0);
 		return NULL;
@@ -131,7 +131,7 @@ struct RemoteCalendarSourcePriv :
 						(LMessage::Param)new LMessage(m, a, b));
 	}
 
-	LMessage::Result OnEvent(LMessage *Msg)
+	LMessage::Result OnEvent(LMessage *Msg) override
 	{
 		switch (Msg->Msg())
 		{

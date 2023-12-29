@@ -3603,10 +3603,6 @@ void CalendarSourceGetEvents::OnState()
 		if (!App)
 			App = src->GetApp();
 
-		if (src->ToString().Find("FolderCalendarSource(/NextCloud/Calendar)") > 0)
-		{
-			int asd=0;
-		}
 		//LgiTrace("CalendarSourceGetEvents: %s\n", src->ToString().Get());
 		src->GetEvents(Start, End, [this, src](auto events)
 			{

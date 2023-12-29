@@ -310,7 +310,7 @@ LProfile Prof("ReadMime");
 #if DEBUG_READ_MIME
 Prof.Add(_FL);
 #endif
-	bool exists = LFileExists(Path);
+	// bool exists = LFileExists(Path);
 	// LgiTrace("ReadMime Path=%s exists=%i\n", Path.Get(), exists);
 	if (!LFileExists(Path))
 	{

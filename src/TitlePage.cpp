@@ -18,12 +18,9 @@ DynamicHtml::DynamicHtml(ScribeWnd *app, const char *file) :
 	auto f = LFindFile(file);
 	if (f)
 	{
-		char *s = LReadTextFile(f);
+		auto s = LReadFile(f);
 		if (s)
-		{
 			Name(s);
-			DeleteArray(s);
-		}
 	}
 	else
 	{

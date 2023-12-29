@@ -1113,7 +1113,7 @@ void ScribeWnd::Construct3()
 					Dir.Path(s, sizeof(s));
 
 					LStringPipe Log;
-					char *Source = LReadTextFile(s);
+					auto Source = LReadFile(s);
 					if (Source)
 					{
 						LScript *Cur = new LScript;
@@ -1172,8 +1172,6 @@ void ScribeWnd::Construct3()
 								DeleteObj(Cur);
 							}
 						}
-
-						DeleteArray(Source);
 					}
 				}
 
@@ -3169,12 +3167,9 @@ bool ScribeWnd::LoadOptions()
 				LDateTime::SetDefaultFormat(DateTimeFormats[Idx]);
 		}
 		
-		/*
 		// SSL debug logging
-		/*
-		if (GetOptions()->GetValue(OPT_DebugSSL, v))
-			SslSocket::DebugLogging = v.CastInt32() != 0;
-		*/
+		//if (GetOptions()->GetValue(OPT_DebugSSL, v))
+		//	SslSocket::DebugLogging = v.CastInt32() != 0;
 
 		// Growl
 		if (GetOptions()->GetValue(OPT_GrowlEnabled, v) &&
@@ -3527,11 +3522,9 @@ void ScribeWnd::OnCommandLine()
 				else
 				{
 					// insert as the body
-					LAutoString b(LReadTextFile(&File[0]));
+					auto b = LReadFile(&File[0]);
 					if (b)
-					{
 						NewEmail->SetBody(b);
-					}
 				}
 			}
 
@@ -10499,11 +10492,11 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 					char *FileName = 0;
 					if ((FileName = Tag->GetAttr("Filename")))
 					{
-						char *File = LReadTextFile(FileName);
+						auto File = LReadFile(FileName);
 						if (File)
 						{
 							List<char> Para;
-							for (char *f=File; f && *f; )
+							for (auto f = File.Get(); f && *f; )
 							{
 								// skip whitespace
 								while (strchr(" \t\r\n", *f)) f++;
@@ -10525,9 +10518,8 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 									Para.Insert(NewStr(Start, f-Start));
 								}
 							}
-							DeleteArray(File);
 
-							char *RandomPara = Para.ItemAt(LRand((int)Para.Length()));
+							auto RandomPara = Para.ItemAt(LRand((int)Para.Length()));
 							if (RandomPara)
 							{
 								p.Push(RandomPara);
@@ -10542,12 +10534,9 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 					char *FileName = 0;
 					if ((FileName = Tag->GetAttr("filename")))
 					{
-						char *File = LReadTextFile(FileName);
+						auto File = LReadFile(FileName);
 						if (File)
-						{
 							p.Push(File);
-							DeleteArray(File);
-						}
 					}
 				}
 				else if (Tag->IsTag("quote-file"))

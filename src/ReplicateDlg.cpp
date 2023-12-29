@@ -984,7 +984,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 			}
 			else
 			{
-				int r = DoNext();
+				DoNext();
 			}
 		}
 		

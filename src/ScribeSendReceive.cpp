@@ -373,12 +373,9 @@ Accountlet::Accountlet(ScribeAccount *a) : PrivLock("Accountlet")
 	{
 		if (LFileExists(Old.Str()))
 		{
-			char *Xml = LReadTextFile(Old.Str());
+			auto Xml = LReadFile(Old.Str());
 			if (Xml)
-			{
 				GetAccount()->Identity.TextSig(Xml);
-				DeleteArray(Xml);
-			}
 		}
 		
 		GetApp()->GetOptions()->DeleteValue(Buf);

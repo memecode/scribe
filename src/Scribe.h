@@ -1458,7 +1458,7 @@ public:
 	void Select(bool b) override;
 	void OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c) override;
 	int OnNotify(LViewI *c, LNotification n) override;
-	void OnMouseClick(LMouse &m);
+	void OnMouseClick(LMouse &m) override;
 	void OnIconClick(int icon);
 
 	// Object

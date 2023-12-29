@@ -177,7 +177,7 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 	bool Status = false;
 	if (!stricmp(Ext, "mab"))
 	{
-		char *Text = LReadTextFile(File);
+		auto Text = LReadFile(File);
 		if (Text)
 		{
 			int Angle = 0;
@@ -188,7 +188,7 @@ bool ImportMozillaAddresss(ScribeWnd *App, ScribeFolder *Folder, char *File)
 			char *StartSquare = 0;
 
 			// Parse MAB...
-			for (char *s=Text; s && *s; s++)
+			for (auto s = Text.Get(); s && *s; s++)
 			{
 				if (*s == '<')
 				{

@@ -606,7 +606,7 @@ bool DownloadCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, voi
 						i.Local = Inf->Local;
 						Msg->Parent = Inf->Parent;
 
-						auto exists = LFileExists(i.Local);
+						// auto exists = LFileExists(i.Local);
 						// LgiTrace("LocalImapFile: uid=%i file=%s exists=%i\n", Uid, Inf->Local.Get(), exists);
 						Inf->Thread->PostStore(Msg);
 					}
@@ -1230,29 +1230,27 @@ int ImapThread::Main()
 				}
 				case IMAP_APPEND:
 				{
-					for (unsigned i=0; i<m->Mail.Length(); i++)
+					for (auto &mi: m->Mail)
 					{
-						ImapMailInfo &mi = m->Mail[i];
-
-						LAutoString Rfc822(LReadTextFile(mi.Local));
+						auto Rfc822 = LReadFile(mi.Local);
 						LString NewUid;
 						if (d->Imap->Append(m->Parent, &mi.Flags, Rfc822, NewUid))
 						{
 							if (NewUid)
-								m->Mail[i].Uid = atoi(NewUid);
+								mi.Uid = (uint32_t)NewUid.Int();
 							else
 							{
 								// Do a specific search to find the UID....
 								// (Although this is not tested and doesn't work on at least exchange...)
 								char Key[256];
 								LArray<LString> Uids;
-								LAutoString MessageId(InetGetHeaderField(Rfc822, "Message-Id"));
-								MessageId.Reset(TrimStr(MessageId, "<>"));
+								auto MessageId = LGetHeaderField(Rfc822, "Message-Id").Strip("<>");
+								
 								sprintf_s(Key, sizeof(Key), "HEADER Message-Id \"%s\"", MessageId.Get());
 								if (d->Imap->Search(true, Uids, Key))
 								{
 								    if (Uids.Length() > 0)
-    								    m->Mail[i].Uid = (uint32_t)Uids[0].Int();
+    								    mi.Uid = (uint32_t)Uids[0].Int();
     								else
     								    LAssert(!"No uid?");
 								}

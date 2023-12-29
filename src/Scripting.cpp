@@ -1082,10 +1082,10 @@ bool OnToolScript(ScribeWnd *App, const char *File)
 
 	if (App && File && LScribeScript::Inst)
 	{
-		LAutoString Script(LReadTextFile(File));
+		auto Script = LReadFile(File);
 		if (Script)
 		{
-			LScriptEngine *e = App->GetScriptEngine();
+			auto e = App->GetScriptEngine();
 			if (e)
 			{
 				LAutoPtr<LCompiledCode> Obj(new LCompiledCode);
