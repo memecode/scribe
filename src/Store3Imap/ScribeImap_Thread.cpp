@@ -1230,14 +1230,14 @@ int ImapThread::Main()
 				}
 				case IMAP_APPEND:
 				{
-					for (auto &mi: m->Mail)
+					for (auto &inf: m->Mail)
 					{
-						auto Rfc822 = LReadFile(mi.Local);
+						auto Rfc822 = LReadFile(inf.Local);
 						LString NewUid;
-						if (d->Imap->Append(m->Parent, &mi.Flags, Rfc822, NewUid))
+						if (d->Imap->Append(m->Parent, &inf.Flags, Rfc822, NewUid))
 						{
 							if (NewUid)
-								mi.Uid = (uint32_t)NewUid.Int();
+								inf.Uid = (uint32_t)NewUid.Int();
 							else
 							{
 								// Do a specific search to find the UID....
@@ -1250,7 +1250,7 @@ int ImapThread::Main()
 								if (d->Imap->Search(true, Uids, Key))
 								{
 								    if (Uids.Length() > 0)
-    								    mi.Uid = (uint32_t)Uids[0].Int();
+    								    inf.Uid = (uint32_t)Uids[0].Int();
     								else
     								    LAssert(!"No uid?");
 								}

@@ -9239,7 +9239,7 @@ int ScribeWnd::GetActiveThreads()
 	{
 		if (i->IsOnline())
 		{
-			LgiTrace("ActiveThread:%s\n", i->Receive.Server().Str());
+			// LgiTrace("ActiveThread:%s\n", i->Receive.Server().Str());
 			Status++;
 		}
 	}
