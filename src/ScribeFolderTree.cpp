@@ -72,7 +72,7 @@ const char *GetCompareHdrs(LDataI *Mail, LDataI *a)
 
 void CompareTrimWhite(LArray<char> &a)
 {
-	while (a.Length() > 0 && strchr(WhiteSpace, a[a.Length()-1]))
+	while (a.Length() > 0 && strchr(LWhiteSpace, a[a.Length()-1]))
 		a.Length(a.Length()-1);
 
 	a.Add(0);

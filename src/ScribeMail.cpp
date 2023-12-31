@@ -4945,7 +4945,7 @@ LString::Array ParseIdList(const char *In)
     if (!In)
         return result;
         
-    while (*In && strchr(WhiteSpace, *In))
+    while (*In && strchr(LWhiteSpace, *In))
         In++;
 
     if (*In == '<')
@@ -5496,7 +5496,7 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 
 				for (auto c = Body; c && *c; )
 				{
-					while (*c && strchr(WhiteSpace, *c)) c++;
+					while (*c && strchr(LWhiteSpace, *c)) c++;
 					auto Start = c;
 					while (*c && *c != ':' && *c != '\n') c++;
 					if (*c == ':')
@@ -5510,10 +5510,10 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 						{
 							// Match...
 							c++;
-							while (*c && strchr(WhiteSpace, *c)) c++;
+							while (*c && strchr(LWhiteSpace, *c)) c++;
 							Start = c;
 							while (*c && *c != '\n') c++;
-							while (c > Start && strchr(WhiteSpace, c[-1])) c--;
+							while (c > Start && strchr(LWhiteSpace, c[-1])) c--;
 
 							h.Reset(NewStr(Start, c - Start));
 							break;
@@ -8702,9 +8702,9 @@ void WrapAndQuote(	LStream &Pipe,
 				{
 					// Find end of the word.
 					char *End = Start;
-					while (*End && strchr(WhiteSpace, *End))
+					while (*End && strchr(LWhiteSpace, *End))
 						End++;
-					while (*End && !strchr(WhiteSpace, *End))
+					while (*End && !strchr(LWhiteSpace, *End))
 						End++;
 					ssize_t WordLen = End - Start;
 					LAssert(WordLen > 0);

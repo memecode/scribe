@@ -421,7 +421,7 @@ bool ListAddr::Serialize(LString &s, bool write)
 		char *c = s;
 		while (*c)
 		{
-			while (*c && strchr(WhiteSpace, *c))
+			while (*c && strchr(LWhiteSpace, *c))
 				c++;
 			
 			if (*c == '\'' || *c == '<')

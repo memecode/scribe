@@ -412,7 +412,7 @@ private:
 					}
 					
 					char *m = Msg;
-					while (IsWhiteSpace(m[k]))
+					while (IsWhite(m[k]))
 						k++;
 					LRange &r = Segs.New();
 					r.Start = k;
@@ -1504,7 +1504,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 					char c;
 					ssize_t Rd = f.Read(&c, 1);
 					if (Rd == 1 &&
-						strchr(WhiteSpace, c))
+						strchr(LWhiteSpace, c))
 					{
 						f.SetSize(Size - 1);
 					}

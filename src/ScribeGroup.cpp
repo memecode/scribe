@@ -402,7 +402,7 @@ bool ContactGroup::CallMethod(const char *MethodName, LScriptArguments &Args)
 		int Added = 0;
 		
 		LString Addrs = GetObject()->GetStr(FIELD_GROUP_LIST);
-		LString::Array a = Addrs.SplitDelimit(WhiteSpace);
+		LString::Array a = Addrs.SplitDelimit(LWhiteSpace);
 
 		for (unsigned i=0; i<Args.Length(); i++)
 		{

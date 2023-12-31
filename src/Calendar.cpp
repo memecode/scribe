@@ -2882,7 +2882,7 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 			{
 				for (char *c = Loc; *c; c++)
 				{
-					if (Strchr(WhiteSpace, *c))
+					if (Strchr(LWhiteSpace, *c))
 						*c = '+';
 				}
 			

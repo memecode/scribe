@@ -377,7 +377,7 @@ bool LMail3Mail::Serialize(LMail3Store::LStatement &s, bool Write)
 			char *c = ToStr;
 			while (*c)
 			{
-				while (*c && (strchr(WhiteSpace, *c) || *c == ','))
+				while (*c && (strchr(LWhiteSpace, *c) || *c == ','))
 					c++;
 					
 				char *e = strchr(c, '>');

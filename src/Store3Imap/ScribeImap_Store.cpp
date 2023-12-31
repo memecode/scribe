@@ -51,10 +51,10 @@ char *TrimWhite(char *c)
 		return 0;
 
 	char *s = c;
-	while (*s && strchr(WhiteSpace, *s))
+	while (*s && strchr(LWhiteSpace, *s))
 		s++;
 	char *e = s + strlen(s);
-	while (e > s && strchr(WhiteSpace, e[-1]))
+	while (e > s && strchr(LWhiteSpace, e[-1]))
 		e--;
 	*e = 0;
 	if (s > c)

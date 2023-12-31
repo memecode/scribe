@@ -4048,7 +4048,7 @@ void ScribeWnd::OnMinute()
 			{
 				// Work out the period from 'Data'
 				char *s = c->Data.Str();
-				while (*s && IsWhiteSpace(*s)) s++;
+				while (*s && IsWhite(*s)) s++;
 				char *u = s;
 				while (*u && !IsAlpha(*u)) u++;
 				double v = atof(s);
