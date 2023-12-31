@@ -862,23 +862,16 @@ void ScribeWnd::Construct1()
 		(SzAdj = SizeAdj.CastInt32()) >= 0 &&
 		SzAdj < 5)
 	{
-		SzAdj -= 2;
-		if (SzAdj)
+		d->FontSizeAdjust = SzAdj - 2;
+		if (d->FontSizeAdjust)
 		{
 			int Pt = LSysFont->PointSize();
 		
-			LSysFont->PointSize(Pt + SzAdj);
+			LSysFont->PointSize(Pt + d->FontSizeAdjust);
 			LSysFont->Create();
 
-			LSysBold->PointSize(Pt + SzAdj);
+			LSysBold->PointSize(Pt + d->FontSizeAdjust);
 			LSysBold->Create();
-		
-			auto m = GetMenu()->GetFont();
-			if (m)
-			{
-				m->PointSize(m->PointSize() + SzAdj);
-				m->Create();
-			}
 		}
 	}
 	else
@@ -1053,6 +1046,16 @@ void ScribeWnd::Construct3()
 		}
 		else
 		{
+			if (d->FontSizeAdjust)
+			{
+				auto m = Menu->GetFont();
+				if (m)
+				{
+					m->PointSize(m->PointSize() + d->FontSizeAdjust);
+					m->Create();
+				}
+			}
+
 			LAssert(ImageList != NULL);
 			Menu->SetImageList(ImageList, false);
 
