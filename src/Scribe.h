@@ -1405,10 +1405,10 @@ protected:
 
 public:
 	// Data
-	LAutoString Source; // Data Source (used to be "int Field")
-	LAutoString Value; // Constant
-	char Op;
-	uint8_t Not;
+	LString Source; // Data Source (used to be "int Field")
+	LString Value; // Constant
+	char Op = 0;
+	uint8_t Not = false;
 
 	// Methods
 	FilterCondition();
@@ -1416,7 +1416,7 @@ public:
 
 	// Test condition against email
 	bool Test(Filter *F, Mail *m, LStream *Log);
-	FilterCondition &operator =(FilterCondition &c);
+	FilterCondition &operator =(const FilterCondition &c);
 
 	// Object
 	ThingUi *DoUI(MailContainer *c = NULL);

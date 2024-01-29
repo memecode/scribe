@@ -507,23 +507,21 @@ bool LgiCreateTempFileName(char *Path, int PathLen)
 //////////////////////////////////////////////////////////////
 FilterCondition::FilterCondition()
 {
-	Op = 0;
-	Not = false;
 }
 
-FilterCondition &FilterCondition::operator=(FilterCondition &c)
+FilterCondition &FilterCondition::operator=(const FilterCondition &c)
 {
-	Source.Reset(NewStr(c.Source));
-	Op = c.Op;
-	Not = c.Not;
-	Value.Reset(NewStr(c.Value));
+	Source = c.Source;
+	Value  = c.Value;
+	Op     = c.Op;
+	Not    = c.Not;
 	
 	return *this;
 }
 
 bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 {
-	if (Log) Log->Print("\tCondition.Test Fld='%s'\n", (char*)Source);
+	if (Log) Log->Print("\tCondition.Test Fld='%s'\n", Source.Get());
 
 	if (ValidStr(Source))
 	{
@@ -535,7 +533,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 		LVariant v;
 
 		// Get data
-		if (_stricmp(Source, "mail.attachments") == 0)
+		if (Source.Equals("mail.attachments"))
 		{
 			// attachment(s) data
 			List<Attachment> Attachments;
@@ -565,7 +563,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 
 			return false;
 		}
-		else if (_stricmp(Source, "mail.attachmentnames") == 0)
+		else if (Source.Equals("mail.attachmentnames"))
 		{
 			// attachment(s) name
 			List<Attachment> Attachments;
@@ -589,8 +587,8 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 		else
 		{
 			bool Status = false;
-			ItemFieldDef *f = 0;
-			if (_stricmp(Source, "mail.*") == 0)
+			ItemFieldDef *f = NULL;
+			if (Source.Equals("mail.*"))
 			{
 				ItemFieldDef *Start = MailFieldDefs;
 				ItemFieldDef *End = MailFieldDefs + Flds - 1;
@@ -700,7 +698,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 	return false;
 }
 
-char *LogPreview(char *s)
+LString LogPreview(char *s)
 {
 	LStringPipe p(1 << 10);
 	if (s)
@@ -724,7 +722,8 @@ char *LogPreview(char *s)
 			p.Push("...");
 		}
 	}
-	return p.NewStr();
+
+	return p.NewLStr();
 }
 
 bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
@@ -770,11 +769,13 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 			}
 			case GV_STRING:
 			{
-				char *sVar = Var.Str();
-				char *sVal = Val.Str();
-				bool IsStr = ValidStr(sVar);
-				bool IsVal = ValidStr(sVal);
-				char *VarLog = Log ? LogPreview(sVar) : 0;
+				auto sVar = Var.Str();
+				auto sVal = Val.Str();
+				auto IsStr = ValidStr(sVar);
+				auto IsVal = ValidStr(sVal);
+				LString VarLog;
+				if (Log)
+					VarLog = LogPreview(sVar);
 				bool m = false;
 
 				switch (Op)
@@ -790,13 +791,13 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 							m = _stricmp(sVal, sVar) == 0;
 						}
 
-						if (Log) Log->Print("\t\t\t'%s' == '%s' = %i\n", VarLog, sVal, m);
+						if (Log) Log->Print("\t\t\t'%s' == '%s' = %i\n", VarLog.Get(), sVal, m);
 						break;
 					}
 					case OP_LIKE:
 					{
 						m = MatchStr(sVal, sVar);
-						if (Log) Log->Print("\t\t\t'%s' like '%s' = %i\n", VarLog, sVal, m);
+						if (Log) Log->Print("\t\t\t'%s' like '%s' = %i\n", VarLog.Get(), sVal, m);
 						break;
 					}
 					case OP_CONTAINS:
@@ -804,7 +805,7 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 						if (IsVal && IsStr)
 						{
 							m = stristr(sVar, sVal) != 0;
-							if (Log) Log->Print("\t\t\t'%s' contains '%s' = %i\n", VarLog, sVal, m);
+							if (Log) Log->Print("\t\t\t'%s' contains '%s' = %i\n", VarLog.Get(), sVal, m);
 						}
 						break;
 					}
@@ -814,7 +815,7 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 						{
 							size_t Len = strlen(sVal);
 							m = _strnicmp(sVar, sVal, Len) == 0;
-							if (Log) Log->Print("\t\t\t'%s' starts with '%s' = %i\n", VarLog, sVal, m);
+							if (Log) Log->Print("\t\t\t'%s' starts with '%s' = %i\n", VarLog.Get(), sVal, m);
 						}
 						break;
 					}
@@ -827,7 +828,7 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 							if (SLen >= VLen)
 							{
 								m = _strnicmp(sVar + SLen - VLen, sVal, VLen) == 0;
-								if (Log) Log->Print("\t\t\t'%s' ends with '%s' = %i\n", VarLog, sVal, m);
+								if (Log) Log->Print("\t\t\t'%s' ends with '%s' = %i\n", VarLog.Get(), sVal, m);
 							}
 							else
 							{
@@ -842,7 +843,6 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 					}
 				}
 
-				DeleteArray(VarLog);
 				return m;
 				break;
 			}
@@ -2722,7 +2722,7 @@ bool Filter::CallMethod(const char *MethodName, LScriptArguments &Args)
 			}
 			
 			const char *Field = Args[0]->Str();
-			const char *Op = Args[1]->Str();
+			const char *Op    = Args[1]->Str();
 			const char *Value = Args[2]->Str();
 			if (!Field || !Op || !Value)
 			{
@@ -2750,8 +2750,8 @@ bool Filter::CallMethod(const char *MethodName, LScriptArguments &Args)
 				if (c->IsTag(ELEMENT_CONDITION))
 				{
 					char *CFeild = c->GetAttr(ATTR_FIELD);
-					char *COp = c->GetAttr(ATTR_OP);
-					char *CVal = c->GetAttr(ATTR_VALUE);
+					char *COp    = c->GetAttr(ATTR_OP);
+					char *CVal   = c->GetAttr(ATTR_VALUE);
 					if (!Stricmp(Field, CFeild) &&
 						!Stricmp(Op, COp) &&
 						!Stricmp(Value, CVal))
@@ -2992,9 +2992,9 @@ void DescribeCondition(LStream &s, LXmlTag *t)
 	else
 	{
 		// Condition
-		char *f = t->GetAttr(ATTR_FIELD);
-		char *v = t->GetAttr(ATTR_VALUE);
-		int Not = t->GetAsInt(ATTR_NOT) > 0;
+		auto f = t->GetAttr(ATTR_FIELD);
+		auto v = t->GetAttr(ATTR_VALUE);
+		auto Not = t->GetAsInt(ATTR_NOT) > 0;
 		const char *o = t->GetAttr(ATTR_OP);
 		if (o && IsDigit(*o))
 			o = OpNames[atoi(o)];
@@ -3142,8 +3142,8 @@ bool FilterCondition::Set(LXmlTag *t)
 	if (!t)
 		return false;
 
-	Source.Reset(NewStr(t->GetAttr(ATTR_FIELD)));
-	Value.Reset(NewStr(t->GetAttr(ATTR_VALUE)));
+	Source = t->GetAttr(ATTR_FIELD);
+	Value  = t->GetAttr(ATTR_VALUE);
 	Not = t->GetAsInt(ATTR_NOT) > 0;
 
 	char *o = t->GetAttr(ATTR_OP);
@@ -3331,9 +3331,7 @@ bool Filter::Save(ScribeFolder *Into)
 	{
 		Into = GetFolder();
 		if (!Into)
-		{
 			Into = App->GetFolder(FOLDER_FILTERS);
-		}
 	}
 	
 	if (Into)
@@ -3341,11 +3339,11 @@ bool Filter::Save(ScribeFolder *Into)
 		SetParentFolder(Into);
 
 		if (ChkIncoming)
-			SetIncoming(ChkIncoming->Value()!=0);
+			SetIncoming(ChkIncoming->Value() != 0);
 		if (ChkOutgoing)
-			SetOutgoing(ChkOutgoing->Value()!=0);
+			SetOutgoing(ChkOutgoing->Value() != 0);
 		if (ChkInternal)
-			SetInternal(ChkInternal->Value()!=0);
+			SetInternal(ChkInternal->Value() != 0);
 
 		LDateTime Now;
 		GetObject()->SetDate(FIELD_DATE_MODIFIED, &Now.SetNow());
@@ -4127,6 +4125,8 @@ void FilterUi::OnLoad()
 		auto Xml = Item->GetConditionsXml();
 		if (Xml)
 		{
+			// LgiTrace("condition xml load: %s\n", Xml);
+
 			LAutoPtr<LXmlTag> x(new LXmlTag);
 			if (x)
 			{
@@ -4158,38 +4158,36 @@ void SaveTree(LXmlTag *t, LTreeNode *i)
 	for (LTreeNode *c = i->GetChild(); c; c = c->GetNext())
 	{
 		auto fi = dynamic_cast<LFilterItem*>(c);
-		if (fi)
+		if (!fi)
+			continue;
+
+		const char *Tag = NULL;
+		bool Cond = false;
+		switch (fi->GetNode())
 		{
-			const char *Tag = 0;
-			bool Cond = false;
-			switch (fi->GetNode())
-			{
-				default: break;
-				case LNODE_AND:
-					Tag = ELEMENT_AND; break;
-				case LNODE_OR:
-					Tag = ELEMENT_OR; break;
-				case LNODE_COND:
-					Cond = true; Tag = ELEMENT_CONDITION; break;
-			}
+			default: break;
+			case LNODE_AND:
+				Tag = ELEMENT_AND; break;
+			case LNODE_OR:
+				Tag = ELEMENT_OR; break;
+			case LNODE_COND:
+				Tag = ELEMENT_CONDITION; Cond = true; break;
+		}
 
-			if (Tag)
+		if (Tag)
+		{
+			if (auto n = new LXmlTag(Tag))
 			{
-				LXmlTag *n = new LXmlTag(Tag);
-				if (n)
+				if (Cond)
 				{
-					if (Cond)
-					{
-						n->SetAttr(ATTR_NOT, fi->GetNot());
-						n->SetAttr(ATTR_FIELD, fi->GetField());
-						n->SetAttr(ATTR_OP, fi->GetOp());
-						n->SetAttr(ATTR_VALUE, fi->GetValue());
-					}
-
-					t->InsertTag(n);
-
-					SaveTree(n, fi);
+					n->SetAttr(ATTR_NOT,   fi->GetNot());
+					n->SetAttr(ATTR_FIELD, fi->GetField());
+					n->SetAttr(ATTR_OP,    fi->GetOp());
+					n->SetAttr(ATTR_VALUE, fi->GetValue());
 				}
+
+				t->InsertTag(n);
+				SaveTree(n, fi);
 			}
 		}
 	}
@@ -4214,8 +4212,7 @@ void FilterUi::OnSave()
 
 		if (d->Conditions)
 		{
-			LXmlTag *x = new LXmlTag(ELEMENT_CONDITIONS);
-			if (x)
+			if (auto x = new LXmlTag(ELEMENT_CONDITIONS))
 			{
 				SaveTree(x, d->Conditions->GetRootNode());
 
@@ -4223,9 +4220,11 @@ void FilterUi::OnSave()
 				LStringPipe p;
 				if (t.Write(x, &p))
 				{
-				    LAutoString a(p.NewStr());
 				    Item->ConditionsCache.Reset();
-					Item->SetConditionsXml(a);
+
+					auto xml = p.NewLStr();
+					// LgiTrace("condition xml save: %s\n", xml.Get());
+					Item->SetConditionsXml(xml);
 				}
 
 				DeleteObj(x);
@@ -4235,26 +4234,20 @@ void FilterUi::OnSave()
 		LXmlTag x("Actions");
 		List<FilterAction> Act;
 		d->Actions->GetAll(Act);
-		for (size_t i=0; i<Act.Length(); i++)
+		for (auto a: Act)
 		{
-			FilterAction *a = Act[i];
 			LAutoPtr<LXmlTag> c(new LXmlTag("Action"));
 			if (a->Get(c))
-			{
 				x.InsertTag(c.Release());
-			}
 		}
 
 		LXmlTree t;
 		LStringPipe p;
-		t.Write(&x, &p);
-		LAutoString s(p.NewStr());
-		Item->SetActionsXml(s);
+		if (t.Write(&x, &p))
+			Item->SetActionsXml(p.NewLStr());
 
 		if (Item->Save())
-		{
 			Item->Reindex(Item->GetFolder());
-		}
 	}
 }
 
@@ -4281,9 +4274,9 @@ int FilterUi::OnCommand(int Cmd, int Event, OsView Window)
 		}
 		case IDM_DELETE:
 		{
-		    Item->Ui = 0;
+		    Item->Ui = NULL;
 		    Item->OnDelete();
-		    Item = 0;
+		    Item = NULL;
 		    Quit();
 		    break;
 		}
