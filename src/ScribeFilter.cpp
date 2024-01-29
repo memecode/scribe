@@ -1371,7 +1371,9 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 	{
 		case ACTION_MOVE_TO_FOLDER:
 		{
-			ScribeFolder *Folder = App->GetFolder(Arg1);
+			bool isRead = (m->GetFlags() | MAIL_READ) != 0;
+
+			auto Folder = App->GetFolder(Arg1);
 			if (Folder)
 			{
 				LArray<Thing*> Items;
@@ -3218,7 +3220,7 @@ bool Filter::DoActions(Mail *&m, bool &Stop, LStream *Log)
 
 	Current = &m;
 
-	LAutoPtr<LXmlTag> r = Parse(true);
+	auto r = Parse(true);
 	if (r)
 	{
 		LArray<FilterAction*> Act;
@@ -3241,14 +3243,14 @@ bool Filter::DoActions(Mail *&m, bool &Stop, LStream *Log)
 
 		for (unsigned i=0; i<Act.Length() && m->GetObject(); i++)
 		{
-			FilterAction *a = Act[i];
+			auto a = Act[i];
 			a->Do(this, App, m, Log);
 		}
 
 		Act.DeleteObjects();
 	}
 
-	Current = 0;
+	Current = NULL;
 
 	if (GetStopFiltering())
 	{

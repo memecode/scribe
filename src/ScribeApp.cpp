@@ -11450,10 +11450,13 @@ void ScribeWnd::OnNew
 				auto m = t->IsMail();
 				if (m)
 				{
-					UnreadDiff += TestFlag(m->GetFlags(), MAIL_READ) ? 0 : 1;
+					bool unread = TestFlag(m->GetFlags(), MAIL_READ);
+					UnreadDiff += unread ? 0 : 1;
 
-					#if DEBUG_NEW_MAIL
-					LgiTrace("%s:%i - NewMail.OnNew t=%p uid=%s IsNew=%i\n", _FL, t, m->GetServerUid().ToString().Get(), IsNew);
+					#if 1 // DEBUG_NEW_MAIL
+					LgiTrace("%s:%i - NewMail.OnNew t=%p uid=%s unread=%i IsNew=%i\n", _FL,
+						t, m->GetServerUid().ToString().Get(),
+						unread, IsNew);
 					#endif
 
 					if (IsNew)
