@@ -539,7 +539,7 @@ struct ParserThread :
 	
 	int Main()
 	{
-		LAutoString Raw(LReadTextFile(File));
+		auto Raw = LReadFile(File);
 		if (Parse(Html, Raw))
 		{
 			List<LListItem> Items;
@@ -1636,11 +1636,10 @@ int LgiMain(OsAppArguments &AppArgs)
 	{
 		#if 0
 		
-		LAutoString Txt(LReadTextFile("all-chars.csv"));
-		if (Txt)
+		auto t = LReadFile("all-chars.csv");
+		if (t)
 		{
-			LString t = Txt;
-			LString::Array Lines = t.Split("\n");
+			auto Lines = t.Split("\n");
 			LArray<uint64> Ch;
 			for (unsigned i=0; i<Lines.Length(); i++)
 			{

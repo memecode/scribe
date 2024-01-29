@@ -714,11 +714,10 @@ void UpgradeRfOption(ScribeWnd *App, const char *New, const char *Old, const cha
 		ScribePath *Path = new ScribePath(App, Old);
 		if (Path)
 		{
-			char *Xml = LReadTextFile(*Path);
+			auto Xml = LReadFile(*Path);
 			if (Xml)
 			{
 				App->GetOptions()->SetValue(New, v = Xml);
-				DeleteArray(Xml);
 			}
 			App->GetOptions()->DeleteValue(Old);
 			DeleteObj(Path);

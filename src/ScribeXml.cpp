@@ -87,7 +87,7 @@ Xml::Xml(Mail *mailitem, ObjProperties *options)
 	Options = options;
 }
 
-char *Xml::LReadTextFile(char *FileName)
+char *Xml::ReadTextFile(char *FileName)
 {
 	if (FileName)
 	{
@@ -131,7 +131,7 @@ bool Xml::ProcessTag(char *TagName)
 			char *FileName = GetValue();
 			if (FileName)
 			{
-				char *File = LReadTextFile(FileName);
+				auto File = LReadFile(FileName);
 				if (File)
 				{
 					List<char> Lines;
@@ -180,7 +180,6 @@ bool Xml::ProcessTag(char *TagName)
 					}
 
 					Status = true;
-					DeleteArray(File);
 				}
 			}
 		}
@@ -190,12 +189,11 @@ bool Xml::ProcessTag(char *TagName)
 			char *FileName = GetValue();
 			if (FileName)
 			{
-				char *File = LReadTextFile(FileName);
+				auto File = LReadFile(FileName);
 				if (File)
 				{
 					Str.Push(File);
 					Status = true;
-					DeleteArray(File);
 				}
 			}
 		}
