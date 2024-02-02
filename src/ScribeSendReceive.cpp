@@ -2555,6 +2555,7 @@ bool MsgList::Load()
 
 		if (Msg)
 		{
+			LArray<LXmlTag*> postDelete;
 			for (auto t: Msg->Children)
 			{
 				if (!t->GetAttr(OPT_MsgDate))
@@ -2568,8 +2569,14 @@ bool MsgList::Load()
 					t->SetAttr(OPT_MsgDate, n);
 				}
 
-				Parent::Add(t->GetContent(), t);
+				auto id = t->GetContent();
+				if (id)
+					Parent::Add(t->GetContent(), t);
+				else
+					postDelete.Add(t);
 			}
+
+			postDelete.DeleteObjects();
 
 			Opts->Unlock();
 		}
