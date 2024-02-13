@@ -817,7 +817,7 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 
 				LStringPipe p;
 				LDateTime Start, End;
-				uint64 StartTs, EndTs;
+				LTimeStamp StartTs, EndTs;
 				char s[256];
 				if (c->GetField(FIELD_CAL_START_UTC, Start))
 				{

@@ -545,7 +545,7 @@ const char *RelativeTime(LDateTime &Then)
 	Now.SetNow();
 
 	char Val[64];
-	uint64 n, t;
+	LTimeStamp n, t;
 	Now.Get(n);
 	Then.Get(t);
 	int64_t Diff = (int64)t - (int64)n;
@@ -591,9 +591,9 @@ const char *RelativeTime(LDateTime &Then)
 
 		if (Months)
 		{
-			uint64 remaining;
+			LTimeStamp remaining;
 			i.Get(remaining);
-			Diff = (int64_t)t - (int64_t)remaining;
+			Diff = (int64_t)t.Get() - (int64_t)remaining.Get();
 			Days = (int) (Diff / DAY_1);
 		}
 

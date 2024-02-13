@@ -1278,7 +1278,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 			{
 				LDateTime Tomorrow = Dt;
 				Tomorrow.AddDays(1);
-				uint64 TodayTs, TomorrowTs;
+				LTimeStamp TodayTs, TomorrowTs;
 				Dt.Get(TodayTs);
 				Tomorrow.Get(TomorrowTs);
 
@@ -1656,7 +1656,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 
 					for (auto rng : Ranges)
 					{
-						if (rng.Overlap(i, Tomorrow))
+						if (rng.Overlap(i.Ts(), Tomorrow.Ts()))
 						{							
 							LRect Vp(p.x1 + (int)SX(3), p.y1 + CalY, p.x2 - (int)SX(4), p.y1 + CalY + ObjY);
 							DrawSelectionBox(pDC, Vp);
@@ -1798,7 +1798,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 
 					for (auto rng : Ranges)
 					{
-						if (rng.Overlap(t, Tomorrow))
+						if (rng.Overlap(t.Ts(), Tomorrow.Ts()))
 						{							
 							LRect Vp(p.x1 + (int)SX(1), Cy, p.x2 - (int)SX(2), Cy + Fy);
 							DrawSelectionBox(pDC, Vp);
@@ -2045,7 +2045,7 @@ LDateTime *CalendarView::TimeAt(int x, int y, int SnapMinutes, LPoint *Cell)
 
 LDateTime::LDstInfo *CalendarView::GetDstForDate(LDateTime t)
 {
-	uint64 ts = t;
+	uint64 ts = t.Ts();
 
 	for (uint32_t i=0; i<Dst.Length(); i++)
 	{
@@ -2053,13 +2053,13 @@ LDateTime::LDstInfo *CalendarView::GetDstForDate(LDateTime t)
 		{
 			LDateTime Prev = Dst[i].GetLocal();
 			LDateTime Next = Dst[i+1].GetLocal();
-			if (ts >= Prev &&
-				ts < Next)
+			if (ts >= Prev.Ts() &&
+				ts < Next.Ts())
 			{
 				return &Dst[i];
 			}
 		}
-		else if (ts > Dst[i].UtcTimeStamp)
+		else if (ts > Dst[i].Utc)
 		{
 			return &Dst[i];
 		}
