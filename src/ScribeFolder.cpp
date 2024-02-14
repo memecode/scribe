@@ -2338,7 +2338,7 @@ struct SortPairInt
 		auto obj = th->GetObject();
 		// Store3State loaded = (Store3State)obj->GetInt(FIELD_LOADED);
 		auto dt = obj->GetDate(sf);
-		ts = dt && dt->Year() ? dt->Ts() : 0;
+		ts = dt && dt->Year() ? dt->Ts() : LTimeStamp();
 	}
 
 	void SetInt(Thing *th, int sf)

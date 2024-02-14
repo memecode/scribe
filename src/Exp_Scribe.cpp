@@ -308,7 +308,7 @@ struct ScribeExportTask : public FolderTask
 				auto sub = obj.GetStr(FIELD_CAL_SUBJECT);
 				auto start = obj.GetDate(FIELD_CAL_START_UTC);
 				LString s;
-				s.Printf("%s," LPrintfInt64, sub, start?start->Ts():0);
+				s.Printf("%s," LPrintfInt64, sub, start?start->Ts().Get():0);
 				return s;
 				break;
 			}
