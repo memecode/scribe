@@ -548,7 +548,7 @@ const char *RelativeTime(LDateTime &Then)
 	LTimeStamp n, t;
 	Now.Get(n);
 	Then.Get(t);
-	int64_t Diff = (int64)t - (int64)n;
+	auto Diff = t - n;
 
 	int Yrs = 0;
 	int Months = 0;
@@ -565,7 +565,7 @@ const char *RelativeTime(LDateTime &Then)
 		if (!i.IsValid())
 			break;
 		i.Get(n);
-		Diff = (int64)t - (int64)n;
+		Diff = t - n;
 	}
 
 	int TotalDays = 0;
@@ -593,7 +593,7 @@ const char *RelativeTime(LDateTime &Then)
 		{
 			LTimeStamp remaining;
 			i.Get(remaining);
-			Diff = (int64_t)t.Get() - (int64_t)remaining.Get();
+			Diff = t - remaining;
 			Days = (int) (Diff / DAY_1);
 		}
 
