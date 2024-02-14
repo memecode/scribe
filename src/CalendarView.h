@@ -22,10 +22,10 @@ class CalendarView :
 public:
 	struct TsRange
 	{
-		uint64 StartTs;
-		uint64 EndTs;
+		LTimeStamp StartTs;
+		LTimeStamp EndTs;
 		
-		bool Overlap(uint64 s, uint64 e)
+		bool Overlap(LTimeStamp s, LTimeStamp e)
 		{
 			if (EndTs < s || StartTs > e)
 				return false;

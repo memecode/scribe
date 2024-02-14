@@ -90,8 +90,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,8,327
- PRODUCTVERSION 3,8,327
+ FILEVERSION 3,9,328
+ PRODUCTVERSION 3,9,328
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -108,12 +108,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Memecode"
             VALUE "FileDescription", "Scribe"
-            VALUE "FileVersion", "3,8,327\0"
+            VALUE "FileVersion", "3,9,328\0"
             VALUE "InternalName", "Scribe"
             VALUE "LegalCopyright", "Copyright © 2016"
             VALUE "OriginalFilename", "Scribe.exe"
             VALUE "ProductName", "i.Scribe\0"
-            VALUE "ProductVersion", "3,8,327\0"
+            VALUE "ProductVersion", "3,9,328\0"
         END
     END
     BLOCK "VarFileInfo"

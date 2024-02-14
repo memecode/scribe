@@ -1495,7 +1495,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 					for (unsigned i=0; i<Ranges.Length(); i++)
 					{
 						TsRange &rng = Ranges[i];
-						if (rng.Overlap(TodayTs, TomorrowTs))
+						if (rng.Overlap(TodayTs.Get(), TomorrowTs.Get()))
 						{							
 							int StartSec, EndSec;
 
@@ -2045,7 +2045,7 @@ LDateTime *CalendarView::TimeAt(int x, int y, int SnapMinutes, LPoint *Cell)
 
 LDateTime::LDstInfo *CalendarView::GetDstForDate(LDateTime t)
 {
-	uint64 ts = t.Ts();
+	auto ts = t.Ts();
 
 	for (uint32_t i=0; i<Dst.Length(); i++)
 	{
@@ -2274,8 +2274,8 @@ void CalendarView::OnMouseClick(LMouse &m)
 						DragEvent = c;
 						
 						TsRange &r = Ranges.New();
-						DragStart.Get(r.StartTs);
-						DragEnd.Get(r.EndTs);
+						r.StartTs = DragStart;
+						r.EndTs = DragEnd;
 					}
 					else if (HitMode == DragMoveEnd)
 					{
@@ -2287,8 +2287,8 @@ void CalendarView::OnMouseClick(LMouse &m)
 						DragEvent = c;
 						
 						TsRange &r = Ranges.New();
-						DragStart.Get(r.StartTs);
-						DragEnd.Get(r.EndTs);
+						r.StartTs = DragStart;
+						r.EndTs = DragEnd;
 					}
 					else if (Selection.Length())
 					{
@@ -2302,7 +2302,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 							
 							LDateTime dt = *s->GetObject()->GetDate(FIELD_CAL_START_UTC);
 							dt.ToLocal(true);
-							dt.Get(r.StartTs);
+							r.StartTs = dt.Ts().Get();
 							dt = *s->GetObject()->GetDate(FIELD_CAL_END_UTC);
 							if (dt.IsValid())
 							{
@@ -2521,7 +2521,7 @@ void CalendarView::OnMouseMove(LMouse &m)
 				case DragMoveSelection:
 				{
 					DragEnd = *Hit;
-					int64 TsOffset = DragEnd.Ts() - DragStart.Ts();
+					auto TsOffset = DragEnd.Ts() - DragStart.Ts();
 					if (LastTsOffset != TsOffset)
 					{
 						LastTsOffset = TsOffset;

@@ -650,8 +650,8 @@ const char *RelativeTime(LDateTime &Then)
 		return s;
 	}
 
-	auto NowDay = n / DAY_1;
-	auto ThenDay = t / DAY_1;
+	auto NowDay = n.Get() / DAY_1;
+	auto ThenDay = t.Get() / DAY_1;
 	auto DaysDiff = (int64_t)ThenDay - (int64_t)NowDay;
 
 	int Ch = 0;
