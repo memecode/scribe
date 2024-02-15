@@ -367,16 +367,7 @@ void ScribeAccountPreview::SetSort(int s)
 		{
 			int Col = abs(d->SortCol)-1;
 			int Ascend = d->SortCol > 0;
-
-			for (int i=0; i<d->Lst->GetColumns(); i++)
-			{
-				LItemColumn *c = d->Lst->ColumnAt(i);
-				if (c)
-				{
-					c->Mark(i == Col ? (Ascend ? GLI_MARK_DOWN_ARROW : GLI_MARK_UP_ARROW) : GLI_MARK_NONE);
-				}
-			}
-
+			d->Lst->SetSortingMark(Col, !Ascend);
 			d->Lst->Sort<NativeInt>(MsgCompare, d->SortCol);
 		}
 	}

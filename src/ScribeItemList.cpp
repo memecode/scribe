@@ -416,14 +416,7 @@ void ThingList::SetSort(int Col, int Ascend)
 		}
 	}
 
-	for (int i=0; i<GetColumns(); i++)
-	{
-		LItemColumn *c = ColumnAt(i);
-		if (c)
-		{
-			c->Mark( (Col == i) ? (Ascend) ? GLI_MARK_DOWN_ARROW : GLI_MARK_UP_ARROW : GLI_MARK_NONE);
-		}
-	}
+	SetSortingMark(Col, Ascend ? false : true);
 }
 
 void ThingList::OnItemClick(LListItem *Item, LMouse &m)

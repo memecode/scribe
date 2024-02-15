@@ -385,15 +385,7 @@ public:
 		Col = col;
 		Ascend = ascend != 0;
 		Sort(FindCompare, (NativeInt) this);
-
-		for (int i=0; i<GetColumns(); i++)
-		{
-			LItemColumn *c = ColumnAt(i);
-			if (c)
-			{
-				c->Mark( (Col == i) ? (Ascend) ? GLI_MARK_DOWN_ARROW : GLI_MARK_UP_ARROW : GLI_MARK_NONE);
-			}
-		}
+		SetSortingMark(Col, !Ascend);
 	}
 
 	void OnColumnClick(int col, LMouse &m)

@@ -38,7 +38,7 @@ ImportExportDlg::ImportExportDlg
 
 		if (Src)
 		{
-			Src->ShowColumnHeader(false);
+			Src->ColumnHeaders(false);
 			if (srcFiles)
 			{
 				for (auto f: *srcFiles)

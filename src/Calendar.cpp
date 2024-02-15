@@ -2579,13 +2579,13 @@ CalendarUi::CalendarUi(Calendar *item) : ThingUi(item, LLoadString(IDS_CAL_EVENT
 		{
 			d->Guests->AddColumn(LLoadString(IDS_ADDRESS), 120);
 			d->Guests->AddColumn(LLoadString(IDS_NAME), 120);
-			d->Guests->ShowColumnHeader(false);
+			d->Guests->ColumnHeaders(false);
 		}
 		if (GetViewById(IDC_REMINDERS, d->Reminders))
 		{
 			d->Reminders->AddColumn(LLoadString(FIELD_CAL_REMINDER_TIME), 200);
 			d->Reminders->AddColumn(LLoadString(IDC_DELETE), 20);
-			d->Reminders->ShowColumnHeader(false);
+			d->Reminders->ColumnHeaders(false);
 		}
 		if (GetViewById(IDC_REMINDER_TYPE, d->ReminderType))
 		{

@@ -720,7 +720,7 @@ public:
 	{
 		if (Ctrl->GetId() == GetId())
 		{
-			switch (Flags)
+			switch (n.Type)
 			{
 				case LNotifyItemChange:
 				{
@@ -2028,7 +2028,7 @@ ContactUi::ContactUi(Contact *item) :
 			// list setup
 			if (GetViewById(IDC_EMAIL, Lst))
 			{
-				Lst->ShowColumnHeader(false);
+				Lst->ColumnHeaders(false);
 				Lst->AddColumn("Email", Lst->X());
 				Lst->Insert(new EmailAddr(Item));
 			}

@@ -270,15 +270,15 @@ void CalendarTodoItem::Resort()
 		int Sort = 1;
 		for (int i=0; i<GetList()->GetColumns(); i++)
 		{
-			LItemColumn *c = GetList()->ColumnAt(i);
+			auto c = GetList()->ColumnAt(i);
 			if (c)
 			{
-				if (c->Mark() == GLI_MARK_UP_ARROW)
+				if (c->UpArrow())
 				{
 					Sort = -(i + 1);
 					break;
 				}
-				else if (c->Mark() == GLI_MARK_DOWN_ARROW)
+				else if (c->DownArrow())
 				{
 					Sort = i + 1;
 					break;
@@ -3494,20 +3494,21 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 						{
 							if (i == Col)
 							{
-								if (c->Mark() == GLI_MARK_DOWN_ARROW)
+								if (c->DownArrow())
 								{
-									c->Mark(GLI_MARK_UP_ARROW);
+									c->UpArrow(true);
 									Sort = -(i + 1);
 								}
 								else
 								{
-									c->Mark(GLI_MARK_DOWN_ARROW);
+									c->DownArrow(true);
 									Sort = i + 1;
 								}
 							}
 							else
 							{
-								c->Mark(GLI_MARK_NONE);
+								c->DownArrow(false);
+								c->UpArrow(false);
 							}
 						}
 					}

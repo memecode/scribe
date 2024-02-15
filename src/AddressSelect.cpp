@@ -15,7 +15,7 @@ AddressList::AddressList(ScribeWnd *app, int id, int x, int y, int cx, int cy, c
 {
 	App = app;
 	SetObjectName(Res_Custom);
-	ColumnHeaders = false;
+	ColumnHeaders(false);
 }
 
 int AddressList::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
