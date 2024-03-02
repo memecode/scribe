@@ -1050,7 +1050,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 
 		if (!n.s.IsSameDay(n.e))
 		{
-			for (LDateTime i = n.s; true; i.AddDays(1))
+			for (LDateTime i = n.s; i.Year() < 2100; i.AddDays(1))
 			{
 				if (i.IsSameDay(n.s))
 				{

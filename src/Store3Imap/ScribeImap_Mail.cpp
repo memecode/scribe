@@ -1089,18 +1089,9 @@ const LDateTime *ImapMail::GetDate(int id)
 	if ((id == FIELD_DATE_RECEIVED && !DateReceived.Year())
 	    ||
 	    (id == FIELD_DATE_SENT && !DateSent.Year()))
-	{
-		/*
-		auto m = GetMeta(false);
-		if (m)
-		{
-			auto s = m->GetAttr(ATTR_DATE);
-			int asd=0;
-		}
-		*/
-
+	{		
 		auto Headers = GetStr(FIELD_INTERNET_HEADER);
-		LAutoString h(InetGetHeaderField(Headers, "Date"));
+		auto h = LGetHeaderField(Headers, "Date");
 		if (h)
 		{
 			DateReceived.Decode(h);
