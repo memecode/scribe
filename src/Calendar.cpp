@@ -1362,20 +1362,16 @@ bool Calendar::SetUI(ThingUi *ui)
 
 void Calendar::OnMouseClick(LMouse &m)
 {
-	if (m.Down())
+	if (m.IsContextMenu())
 	{
-		if (m.Left())
-		{
-			if (m.Double())
-			{
-				DoUI();
-			}
-		}
-		else if (m.Right())
-		{
-			auto View = GetView();
-			DoContextMenu(m, View ? (LView*)View : (LView*)App);
-		}
+		auto View = GetView();
+		DoContextMenu(m, View ? (LView*)View : (LView*)App);
+	}
+	else if (m.Down() &&
+			m.Left() &&
+			m.Double())
+	{
+		DoUI();
 	}
 }
 
@@ -1409,9 +1405,10 @@ bool Calendar::GetParentSelection(LList *Lst, List<LListItem> &s)
 	if (auto View = GetView())
 	{
 		LArray<Calendar*> &a = View->GetSelection();
-		for (unsigned i=0; i<a.Length(); i++)
+		for (auto cal: a)
 		{
-			s.Insert(dynamic_cast<LListItem*>(a[i]));
+			auto str = cal->ToString();
+			s.Insert(cal);
 		}
 		return true;
 	}
@@ -1425,166 +1422,152 @@ void Calendar::DoContextMenu(LMouse &m, LView *Parent)
 {
     LSubMenu Sub;
 	LScriptUi s(&Sub);
-	if (s.Sub)
+
+	s.Sub->AppendItem(LLoadString(IDS_OPEN), IDM_OPEN);
+	s.Sub->AppendItem(LLoadString(IDS_DELETE), IDM_DELETE);
+	s.Sub->AppendItem(LLoadString(IDS_EXPORT), IDM_EXPORT);
+	s.Sub->AppendSeparator();
+	s.Sub->AppendItem(LLoadString(IDS_INSPECT), IDM_INSPECT);
+
+	auto Cv = dynamic_cast<CalendarView*>(Parent);
+	if (Cv)
 	{
-		s.Sub->AppendItem(LLoadString(IDS_OPEN), IDM_OPEN);
-		s.Sub->AppendItem(LLoadString(IDS_DELETE), IDM_DELETE);
-		s.Sub->AppendItem(LLoadString(IDS_EXPORT), IDM_EXPORT);
 		s.Sub->AppendSeparator();
-		s.Sub->AppendItem(LLoadString(IDS_INSPECT), IDM_INSPECT);
 
-		CalendarView *Cv = dynamic_cast<CalendarView*>(Parent);
-		if (Cv)
+		for (unsigned n = 0; n<CalendarSource::GetSources().Length(); n++)
 		{
-			s.Sub->AppendSeparator();
-
-			for (unsigned n = 0; n<CalendarSource::GetSources().Length(); n++)
+			auto Cs = CalendarSource::GetSources().ItemAt(n);
+			if (Cs->GetName() && Cs->IsWritable())
 			{
-				char m[256];
-				auto Cs = CalendarSource::GetSources().ItemAt(n);
-				if (Cs->GetName() && Cs->IsWritable())
-				{
-					sprintf_s(m, sizeof(m), "Move to '%s'\n", Cs->GetName());
-					s.Sub->AppendItem(m, IDM_MOVE_TO + n, Source != Cs);
-				}
+				auto msg = LString::Fmt("Move to '%s'\n", Cs->GetName());
+				s.Sub->AppendItem(msg, IDM_MOVE_TO + n, Source != Cs);
 			}
 		}
+	}
 
-		LArray<LScriptCallback*> Callbacks;
-		if (App->GetScriptCallbacks(LThingContextMenu, Callbacks))
+	LArray<LScriptCallback*> Callbacks;
+	if (App->GetScriptCallbacks(LThingContextMenu, Callbacks))
+	{
+		LScriptArguments Args(NULL);
+
+		Args[0] = new LVariant(App);
+		Args[1] = new LVariant(this);
+		Args[2] = new LVariant(&s);
+
+		for (auto cb: Callbacks)
+			App->ExecuteScriptCallback(*cb, Args);
+
+		Args.DeleteObjects();
+	}
+
+	int Result = s.Sub->Float(Parent, m);
+	switch (Result)
+	{
+		default:
 		{
-			LScriptArguments Args(NULL);
+			auto Idx = Result - IDM_MOVE_TO;
+			if (Cv && Idx >= 0 && Idx < (int)CalendarSource::GetSources().Length())
+			{
+				auto Dst = CalendarSource::GetSources().ItemAt(Idx);
+				if (!Dst)
+				{
+					LAssert(!"No dst?");
+					return;
+				}
 
-			Args[0] = new LVariant(App);
-			Args[1] = new LVariant(this);
-			Args[2] = new LVariant(&s);
+				auto Fsrc = dynamic_cast<FolderCalendarSource*>(Dst);
+				if (!Fsrc)
+				{
+					LAssert(!"No cal src?");
+					break;
+				}
 
-			for (unsigned i=0; i<Callbacks.Length(); i++)
-				App->ExecuteScriptCallback(*Callbacks[i], Args);
+				auto Path = Fsrc->GetPath();
+				auto DstFolder = App->GetFolder(Path);
+				if (!DstFolder)
+				{
+					LAssert(!"Path doesn't exist?");
+					return;
+				}
 
-			Args.DeleteObjects();
+				LArray<Thing*> Items{ this };
+				DstFolder->MoveTo(
+					Items,
+					false,
+					[this, Cv, Dst](auto result, auto itemStatus)
+					{							
+						if (result)
+						{
+							Source = Dst;
+							Cv->Invalidate();
+						}
+					}
+				);
+				return;
+			}
+
+			// Handle any installed callbacks for menu items
+			for (auto &cb: s.Callbacks)
+			{
+				if (cb.Param == Result)
+				{
+					LScriptArguments Args(NULL);
+					Args[0] = new LVariant(App);
+					Args[1] = new LVariant(this);
+					Args[2] = new LVariant(cb.Param);					
+					App->ExecuteScriptCallback(cb, Args);
+					Args.DeleteObjects();
+				}
+			}
+			break;
 		}
-
-		m.ToScreen();
-		int Result = s.Sub->Float(App, m.x, m.y);
-		switch (Result)
+		case IDM_OPEN:
 		{
-			default:
+			DoUI();
+			break;
+		}
+		case IDM_DELETE:
+		{
+			LVariant ConfirmDelete;
+			App->GetOptions()->GetValue(OPT_ConfirmDelete, ConfirmDelete);
+
+			if (!ConfirmDelete.CastInt32() ||
+				LgiMsg(Parent, LLoadString(IDS_DELETE_ASK), AppName, MB_YESNO) == IDYES)
 			{
-				if (Cv)
+				List<LListItem> Del;
+
+				auto PList = dynamic_cast<LList*>(Parent);
+				if (GetParentSelection(PList ? PList : GetList(), Del))
 				{
-					int Idx = Result - IDM_MOVE_TO;
-					if (Idx >= 0 && Idx < (int)CalendarSource::GetSources().Length())
+					for (auto i: Del)
 					{
-						auto Dst = CalendarSource::GetSources().ItemAt(Idx);
-						if (!Dst)
+						if (auto t = dynamic_cast<Thing*>(i))
 						{
-							LAssert(!"No dst?");
-							return;
+							t->OnDelete();
 						}
-
-						auto Fsrc = dynamic_cast<FolderCalendarSource*>(Dst);
-						if (!Fsrc)
+						else if (auto Todo = dynamic_cast<CalendarTodoItem*>(i))
 						{
-							LAssert(!"No cal src?");
-							break;
+							if (auto c = Todo->GetTodo())
+								c->OnDelete();
 						}
-
-						auto Path = Fsrc->GetPath();
-						auto DstFolder = App->GetFolder(Path);
-						if (!DstFolder)
-						{
-							LAssert(!"Path doesn't exist?");
-							return;
-						}
-
-						LArray<Thing*> Items{ this };
-						DstFolder->MoveTo(
-							Items,
-							false,
-							[this, Cv, Dst](auto result, auto itemStatus)
-							{							
-								if (result)
-								{
-									Source = Dst;
-									Cv->Invalidate();
-								}
-							}
-						);
-						return;
 					}
 				}
-
-				// Handle any installed callbacks for menu items
-				for (unsigned i=0; i<s.Callbacks.Length(); i++)
+				else
 				{
-					LScriptCallback &Cb = s.Callbacks[i];
-					if (Cb.Param == Result)
-					{
-						LScriptArguments Args(NULL);
-						Args[0] = new LVariant(App);
-						Args[1] = new LVariant(this);
-						Args[2] = new LVariant(Cb.Param);
-						
-						App->ExecuteScriptCallback(Cb, Args);
-					}
+					OnDelete();
 				}
-				break;
 			}
-			case IDM_OPEN:
-			{
-				DoUI();
-				break;
-			}
-			case IDM_DELETE:
-			{
-				LVariant ConfirmDelete;
-				App->GetOptions()->GetValue(OPT_ConfirmDelete, ConfirmDelete);
-
-				if (!ConfirmDelete.CastInt32() ||
-					LgiMsg(Parent, LLoadString(IDS_DELETE_ASK), AppName, MB_YESNO) == IDYES)
-				{
-					List<LListItem> Del;
-
-					LList *PList = dynamic_cast<LList*>(Parent);
-					if (GetParentSelection(PList ? PList : GetList(), Del))
-					{
-						for (auto i: Del)
-						{
-							Thing *t = dynamic_cast<Thing*>(i);
-							if (t)
-							{
-								t->OnDelete();
-							}
-							else
-							{
-								CalendarTodoItem *Todo = dynamic_cast<CalendarTodoItem*>(i);
-								if (Todo)
-								{
-									Calendar *c = Todo->GetTodo();
-									c->OnDelete();
-								}
-							}
-						}
-					}
-					else
-					{
-						Thing *t = this;
-						t->OnDelete();
-					}
-				}
-				break;
-			}
-			case IDM_EXPORT:
-			{
-				ExportAll(GetList(), sMimeVCalendar, NULL);
-				break;
-			}
-			case IDM_INSPECT:
-			{
-				new ObjectInspector(App, this);
-				break;
-			}
+			break;
+		}
+		case IDM_EXPORT:
+		{
+			ExportAll(GetList(), sMimeVCalendar, NULL);
+			break;
+		}
+		case IDM_INSPECT:
+		{
+			new ObjectInspector(App, this);
+			break;
 		}
 	}
 }

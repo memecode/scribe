@@ -2657,7 +2657,17 @@ int CalendarView::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 						LError createErr;
 						auto c = First->NewEvent(&createErr);
 						if (c)
-							c->Import(c->AutoCast(in), type);
+						{
+							if (c->Import(c->AutoCast(in), type))
+							{
+								c->Save();
+								Invalidate();
+							}
+							else
+							{
+								delete c;
+							}
+						}
 						else
 							LgiTrace("%s:%i - Failed to create calendar event in %s: %s\n",
 									_FL,
