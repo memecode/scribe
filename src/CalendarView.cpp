@@ -24,7 +24,7 @@
 #include "resdefs.h"
 #include "resource.h"
 
-char ScribeCalendarObject[] =	"com.memecode.Calendar";
+auto ScribeCalendarObject	=	"com.memecode.Calendar";
 
 #define BORDER_YEAR				28
 #define THRESHOLD_EDGE			3		// Px
@@ -2638,11 +2638,9 @@ void CalendarView::OnDragExit()
 
 int CalendarView::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 {
-	for (unsigned di=0; di<Data.Length(); di++)
+	for (auto &dd: Data)
 	{
-		LDragData &dd = Data[di];
-		
-		if (_stricmp(dd.Format, LGI_FileDropFormat) == 0)
+		if (dd.IsFileDrop())
 		{
 			LDropFiles Files(dd);
 			CalendarSource *First = CalendarSource::GetCreateIn();
@@ -2652,36 +2650,47 @@ int CalendarView::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 				{
 					LAutoPtr<LFile> in(new LFile);
 					auto type = LGetFileMimeType(f);
-					if (in->Open(f, O_READ))
+					LString errMsg;
+					LError createErr;
+
+					if (!in->Open(f, O_READ))
 					{
-						LError createErr;
-						auto c = First->NewEvent(&createErr);
-						if (c)
+						errMsg.Printf("Failed to open '%s' for reading.", f);
+					}
+					else if (auto c = First->NewEvent(&createErr))
+					{
+						if (c->Import(c->AutoCast(in), type))
 						{
-							if (c->Import(c->AutoCast(in), type))
-							{
-								c->Save();
-								Invalidate();
-							}
-							else
-							{
-								delete c;
-							}
+							c->Save();
+							Invalidate();
 						}
 						else
-							LgiTrace("%s:%i - Failed to create calendar event in %s: %s\n",
-									_FL,
+						{
+							errMsg.Printf("Calendar import failed: %s", c->ErrMsg.Get());
+							c->DecRef();
+						}
+					}
+					else
+					{
+						errMsg.Printf("Failed to create calendar event in %s: %s",
 									First->GetClass(),
 									createErr.ToString().Get());
+					}
+
+					if (errMsg)
+					{
+						LPopupNotification::Message(GetWindow(), errMsg);
+						LgiTrace("%s:%i - %s\n", _FL, errMsg.Get());
 					}
 				}
 			}
 			else LgiTrace("%s:%i - Do data sources?\n", _FL);
 		}
-		else if (_stricmp(dd.Format, ScribeCalendarObject) == 0)
+		else if (dd.IsFormat(ScribeCalendarObject))
 		{
 			if (dd.Data.Length() == 0)
 				continue;
+
 			LVariant *v = &dd.Data[0];
 			if (v->Type == GV_BINARY &&
 				v->Value.Binary.Length >= sizeof(NativeInt)*2 &&

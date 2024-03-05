@@ -521,6 +521,7 @@ protected:
 	}	DeleteOnAdd;
 
 public:
+	LString ErrMsg;
 	ThingStorage *Data = NULL;
 
 	Thing(ScribeWnd *app, LDataI *object = NULL);

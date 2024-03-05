@@ -1799,12 +1799,18 @@ Thing::IoProgress Calendar::Import(IoProgressImplArgs)
 {
 	if (Stricmp(mimeType, sMimeVCalendar) &&
 		Stricmp(mimeType, sMimeICalendar))
+	{
+		ErrMsg.Printf("Unknown mimetype '%s'", mimeType);
 		IoProgressNotImpl();
+	}
 
 
 	VCal vCal;
 	if (!vCal.Import(GetObject(), stream))
-		IoProgressError("vCal import failed.");
+	{
+		ErrMsg.Printf("vCal import failed");
+		IoProgressError(ErrMsg);
+	}
 
 	IoProgressSuccess();
 }
