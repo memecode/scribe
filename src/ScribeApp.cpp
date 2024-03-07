@@ -9869,8 +9869,7 @@ void ScribeWnd::GrowlOnMail(Mail *m)
 		}
 	}
 	
-	LGrowl *g = d->GetGrowl();
-	if (g)
+	if (auto g = d->GetGrowl())
 	{
 		g->Notify(n);
 		m->NewEmail = Mail::NewEmailTray;
@@ -9988,6 +9987,9 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 				case Mail::NewEmailTray:
 				{
 					LAssert(m->GetObject());
+					LAssert(!Mail::NewMailLst.HasItem(m));
+
+					m->NewEmail = Mail::NewEmailNone;
 					Mail::NewMailLst.Insert(m);
 					OnNewMailSound();
 					break;
@@ -10136,10 +10138,8 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 				}
 				else
 				{
-					for (unsigned i=0; i<NeedsGrowl.Length(); i++)
+					for (auto m: NeedsGrowl)
 					{
-						auto m = NeedsGrowl[i];
-						
 						#ifdef _DEBUG
 						auto state =
 						#endif
@@ -10152,17 +10152,12 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 				}
 			}
 
-			for (unsigned i=0; i<NeedsGrowl.Length(); i++)
+			for (auto m: NeedsGrowl)
 			{
-				auto m = NeedsGrowl[i];
-				m->NewEmail = Mail::NewEmailTray;
-
-				#if DEBUG_NEW_MAIL
-				LgiTrace("%s:%i - NewMail.OnNewMail.Growl->Tray t=%p, msgid=%s\n",
-					_FL, (Thing*)m, m->GetMessageId());
-				#endif
+				m->NewEmail = Mail::NewEmailNone;
 
 				LAssert(m->GetObject());
+				LAssert(!Mail::NewMailLst.HasItem(m));
 				Mail::NewMailLst.Insert(m);
 				OnNewMailSound();
 			}
@@ -10174,14 +10169,14 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 			PostEvent(M_SCRIBE_NEW_MAIL);
 		}
 
-		for (unsigned i=0; i<Resort.Length(); i++)
+		for (auto f: Resort)
 		{
 			#if DEBUG_NEW_MAIL
 			auto Path = Resort[i]->GetPath();
 			LgiTrace("%s:%i - NewMail.OnNewMail.Resort=%s\n", _FL, Path.Get());
 			#endif
 
-			Resort[i]->ReSort();
+			f->ReSort();
 		}
 	}
 }
