@@ -338,6 +338,8 @@ LDataPropI *LMapiMail::GetObj(int id)
 				}
 			}
 			return Seg;
+		case FIELD_PARENT:
+			return Parent;
 		default:
 			LAssert(0);
 			break;

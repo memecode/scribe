@@ -980,7 +980,7 @@ class ScribeClass Mail :
 	friend class ScribeWnd;
 
 private:
-	class MailPrivate *d;
+	class MailPrivate *d = NULL;
 	static LHashTbl<ConstStrKey<char>,Mail*> MessageIdMap;
 
 	// List item preview

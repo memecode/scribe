@@ -584,7 +584,7 @@ bool LMail3Mail::SetStream(LAutoStreamI stream)
 			Seg->SetInMemoryOnly(true);
 			Seg->AttachTo(this);
 			
-			GMimeToStore3(Seg, &Mime);
+			LMimeToStore3(Seg, &Mime);
 		}
 	}
 
@@ -964,29 +964,6 @@ void LMail3Mail::OnSave()
 	}
 }
 
-void LMail3Mail::ParseAddresses(char *Str, int CC)
-{
-	List<char> Addr;
-	TokeniseStrList(Str, Addr, ",");
-	
-	for (auto RawAddr: Addr)
-	{
-		LAutoPtr<LDataPropI> a(To.Create(Store));
-		if (a)
-		{
-			Store3Addr *sa = dynamic_cast<Store3Addr*>(a.Get());
-			LAssert(sa != NULL);
-			if (sa)
-			{
-				DecodeAddrName(RawAddr, sa->Name, sa->Addr, 0);
-				sa->CC = CC;
-				To.Insert(a.Release());
-			}
-		}
-	}
-	Addr.DeleteArrays();
-}
-
 void LMail3Mail::ResetCaches()
 {
 	TextCache.Reset();
@@ -1091,44 +1068,11 @@ bool LMail3Mail::Utf8Check(LVariant &v)
 bool LMail3Mail::ParseHeaders()
 {
 	// Reload from headers...
-	LString InetHdrs = GetStr(FIELD_INTERNET_HEADER);
-	Subject = LDecodeRfc2047(LGetHeaderField(InetHdrs, "subject"));
-	Utf8Check(Subject);
+	if (!LDataI::ParseHeaders())
+		return false;
 
-	// From
-	auto s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "from"));
-	Utf8Check(s);
-	From.Empty();
-	DecodeAddrName(s, From.Name, From.Addr, NULL);
-
-	s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "reply-to"));
-	Utf8Check(s);
-	Reply.Empty();
-	DecodeAddrName(s, Reply.Name, Reply.Addr, NULL);
-
-	// Parse To and CC headers.
-	To.DeleteObjects();
-	if ((s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "to"))))
-	{
-		Utf8Check(s);
-		ParseAddresses(s, MAIL_ADDR_TO);
-	}
-	if ((s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "cc"))))
-	{
-		Utf8Check(s);
-		ParseAddresses(s, MAIL_ADDR_CC);
-	}
-
-	// Data
-	if ((s = LGetHeaderField(InetHdrs, "date")))
-	{
-	    DateSent.Decode(s);
-		DateSent.ToUtc();
-	}
-				
 	DeleteObj(Seg);
 	ResetCaches();
-	
 	return true;
 }
 
@@ -1392,6 +1336,8 @@ LDataPropI *LMail3Mail::GetObj(int id)
 
 			return Seg;
 		}
+		case FIELD_PARENT:
+			return Parent;
 	}
 
 	LAssert(0);

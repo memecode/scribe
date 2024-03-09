@@ -5391,7 +5391,7 @@ void DescribeMime(LStream &p, LDataI *Seg)
 
 bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
-	ScribeDomType Fld = StrToDom(Name);
+	auto Fld = StrToDom(Name);
 	switch (Fld)
 	{
 		case SdFrom: // Type: ListAddr
@@ -5827,6 +5827,11 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		case SdReceivedDomain: // Type: String
 		{
 			Value = GetFieldText(FIELD_RECEIVED_DOMAIN);
+			break;
+		}
+		case SdObject: // Type: LDataI*
+		{
+			Value = GetObject();
 			break;
 		}
 		default:
@@ -8586,7 +8591,7 @@ bool Mail::Save(ScribeFolder *Into)
 		}
 	}
 	
-	// This frees the resizer thread... 
+	// This frees the resize thread... 
 	// so they aren't hanging around pointlessly
 	d->OnSave();	
 	

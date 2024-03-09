@@ -286,7 +286,7 @@ public:
 };
 
 extern bool Store3ToLMime(LMime *Out, LDataPropI *In);
-extern bool GMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly = false);
+extern bool LMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly = false);
 extern LString HeadersFromStream(LStreamI *Msg);
 extern LString CreateMboxHeader(LDataI *Object);
 

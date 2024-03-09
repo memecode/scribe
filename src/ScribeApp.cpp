@@ -2807,6 +2807,35 @@ bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 			*Args.GetReturn() = status >= Store3Delayed;
 			break;
 		}
+		case SdOnNew: // Type: (ScribeFolder, Thing)
+		{
+			// This is mostly for scripting new email debugging / testing.
+			*Args.GetReturn() = false;
+			if (Args.Length() != 2)
+			{
+				LgiTrace("%s:%i - Wrong arg count.\n", _FL);
+				return true;
+			}
+
+			auto fld = dynamic_cast<ScribeFolder*>(Args[0]->CastDom());
+			if (!fld)
+			{
+				LgiTrace("%s:%i - no folder.\n", _FL);
+				return true;
+			}
+
+			auto thing = dynamic_cast<Thing*>(Args[1]->CastDom());
+			if (!thing)
+			{
+				LgiTrace("%s:%i - no thing.\n", _FL);
+				return true;
+			}
+
+			auto dataFolder = dynamic_cast<LDataFolderI*>(fld->GetObject());
+			LArray<LDataI*> a = { thing->GetObject() };
+			OnNew(dataFolder, a, 0, true);
+			break;
+		}
 		default:
 		{
 			LAssert(!"Unsupported method.");

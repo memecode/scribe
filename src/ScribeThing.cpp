@@ -620,30 +620,36 @@ bool Thing::CallMethod(const char *MethodName, LScriptArguments &Args)
 	ScribeDomType Fld = StrToDom(MethodName);
 	switch (Fld)
 	{
-		case SdImport: // Type: (String FileName, String MimeType)
+		case SdImport: // Type: (String FileName[, String MimeType])
 		{
 			*Args.GetReturn() = false;
-			if (Args.Length() != 2)
-				LgiTrace("%s:%i - Error: expecting 2 arguments to 'Import'.\n", _FL);
-			else
+			if (Args.Length() < 1)
 			{
-				auto FileName = Args[0]->Str();
-				LAutoPtr<LFile> f(new LFile);
-				if (f->Open(FileName, O_READ))
-				{
-					auto status = Import(AutoCast(f), Args[1]->Str());
-					*Args.GetReturn() = status.status;
-				}
-				else
-					LgiTrace("%s:%i - Error: Can't open '%s' for reading.\n", _FL, FileName);
+				LgiTrace("%s:%i - Error: expecting at least 1 argument to 'Import(File[, MimeType])'.\n", _FL);
+				return true;
 			}
+
+			auto FileName = Args.StringAt(0);
+			LString MimeType = Args.StringAt(1);
+			if (!MimeType)
+				MimeType = ScribeGetFileMimeType(FileName);
+
+			LAutoPtr<LFile> f(new LFile);
+			if (f->Open(FileName, O_READ))
+			{
+				auto status = Import(AutoCast(f), MimeType);
+				*Args.GetReturn() = status.status;
+				if (status.status < Store3Delayed)
+					LgiTrace("%s:%i - Error: import return %i (%s)\n", _FL, status.status, status.errMsg.Get());
+			}
+			else LgiTrace("%s:%i - Error: Can't open '%s' for reading.\n", _FL, FileName);
 			break;
 		}
 		case SdExport: // Type: (String FileName, String MimeType)
 		{
 			*Args.GetReturn() = false;
 			if (Args.Length() != 2)
-				LgiTrace("%s:%i - Error: expecting 2 arguments to 'Export'.\n", _FL);
+				LgiTrace("%s:%i - Error: expecting 2 arguments to 'Export(File, MimeType)'.\n", _FL);
 			else
 			{
 				auto FileName = Args[0]->Str();

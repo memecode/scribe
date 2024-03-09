@@ -2,6 +2,7 @@
 
 #include "lgi/common/Lgi.h"
 #include "lgi/common/Mail.h"
+#include "lgi/common/TextConvert.h"
 
 #include "Store3Common.h"
 #include "ScribeInc.h"
@@ -70,7 +71,89 @@ bool LDataUserI::SetObject(LDataI *o, bool InDestuctor, const char *File, int Li
 }
 
 //////////////////////////////////////////////////////////////////////////////
+bool LDataI::ParseHeaders()
+{
+	// Reload from headers...
+	LString InetHdrs = GetStr(FIELD_INTERNET_HEADER);
+	auto Subject = LDecodeRfc2047(LGetHeaderField(InetHdrs, "subject"));
+	if (LIsUtf8(Subject))
+		SetStr(FIELD_SUBJECT, Subject);
 
+	// From
+	auto s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "from"));
+	if (LIsUtf8(s))
+	{
+		auto from = GetObj(FIELD_FROM);
+		DecodeAddrName(s, [&](auto name, auto email)
+		{
+			from->SetStr(FIELD_NAME, name);
+			from->SetStr(FIELD_EMAIL, email);
+		},	NULL);
+	}
+
+	s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "reply-to"));
+	if (LIsUtf8(s))
+	{
+		auto replyTo = GetObj(FIELD_REPLY);
+		DecodeAddrName(s, [&](auto name, auto email)
+		{
+			replyTo->SetStr(FIELD_NAME, name);
+			replyTo->SetStr(FIELD_EMAIL, email);
+		},	NULL);
+	}
+
+	// Parse To and CC headers.
+	s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "to"));
+	if (s.IsUtf8())
+		ParseAddresses(s, MAIL_ADDR_TO);
+	s = LDecodeRfc2047(LGetHeaderField(InetHdrs, "cc"));
+	if (s.IsUtf8())
+		ParseAddresses(s, MAIL_ADDR_CC);
+
+	// Data
+	if ((s = LGetHeaderField(InetHdrs, "date")))
+	{
+		LDateTime dt;
+		if (dt.Decode(s))
+		{
+			dt.ToUtc();
+			SetDate(FIELD_DATE_SENT, &dt);
+		}
+	}
+
+	return true;
+}
+
+bool LDataI::ParseAddresses(const char *Str, int CC)
+{
+	LString::Array Addr;
+	TokeniseStrList(Str, Addr, ",");
+
+	auto store = GetStore();
+	auto to = GetList(FIELD_TO);
+	if (!to || !store)
+		return false;
+
+	for (auto &RawAddr: Addr)
+	{
+		LAutoPtr<LDataPropI> a(to->Create(store));
+		if (!a)
+			return false;
+
+		auto sa = dynamic_cast<Store3Addr*>(a.Get());
+		LAssert(sa != NULL);
+		if (!sa)
+			return false;
+
+		DecodeAddrName(RawAddr, sa->Name, sa->Addr, 0);
+		sa->CC = CC;
+		to->Insert(a.Release());
+	}
+
+	return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 Store3Addr::Store3Addr(LDataStoreI *store, LDataPropI *i)
 {
 	LAssert(store != NULL);
@@ -86,10 +169,9 @@ Store3Addr::~Store3Addr()
 
 size_t Store3Addr::Sizeof()
 {
-	size_t s = sizeof(*this);
-	if (Addr) s += strlen(Addr);
-	if (Name) s += strlen(Name);
-	return s;
+	return	sizeof(*this) +
+			Addr.Length() +
+			Name.Length();
 }
 
 void Store3Addr::SetStore(LDataStoreI *s)
@@ -414,7 +496,7 @@ bool Store3ToLMime(LMime *Out, LDataPropI *InInterface)
 	return true;
 }
 
-bool GMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly)
+bool LMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly)
 {
 	LDataI *DataOut = dynamic_cast<LDataI*>(Out);
 	if (!DataOut || !In)
@@ -452,7 +534,7 @@ bool GMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly)
 			return false;
 		
 		LMime *cIn = (*In)[i];
-		if (!GMimeToStore3(cOut, cIn))
+		if (!LMimeToStore3(cOut, cIn))
 			return false;
 		
 		Store3Status s = cOut->Save(DataOut);
@@ -524,9 +606,9 @@ LString CreateMboxHeader(LDataI *Object)
 	Ft.tm_sec = Rec.Seconds();			/* seconds after the minute - [0,59] */
 	Ft.tm_min = Rec.Minutes();			/* minutes after the hour - [0,59] */
 	Ft.tm_hour = Rec.Hours();			/* hours since midnight - [0,23] */
-	Ft.tm_mday = Rec.Day();			/* day of the month - [1,31] */
+	Ft.tm_mday = Rec.Day();				/* day of the month - [1,31] */
 	Ft.tm_mon = Rec.Month() - 1;		/* months since January - [0,11] */
-	Ft.tm_year = Rec.Year() - 1900;    /* years since 1900 */
+	Ft.tm_year = Rec.Year() - 1900;		/* years since 1900 */
 	Ft.tm_wday = Rec.DayOfWeek();
 
 	char Temp[64];

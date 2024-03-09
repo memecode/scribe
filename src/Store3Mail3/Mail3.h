@@ -574,7 +574,6 @@ class LMail3Mail : public LMail3Thing
 	void OnSave() override;
 
 	const char *GetTable() override { return MAIL3_TBL_MAIL; }
-	void ParseAddresses(char *Str, int CC);
 	const char *InferCharset(const char *ExampleTxt);
 	bool Utf8Check(LString &v);
 	bool Utf8Check(LVariant &v);

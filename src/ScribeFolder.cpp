@@ -3620,7 +3620,7 @@ Mail *ScribeFolder::operator [](size_t i)
 
 bool ScribeFolder::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
-	ScribeDomType Fld = StrToDom(Name);
+	auto Fld = StrToDom(Name);
 	switch (Fld)
 	{
 		case SdType: // Type: Int32
@@ -3757,7 +3757,7 @@ bool ScribeFolder::GetVariant(const char *Name, LVariant &Value, const char *Arr
 
 bool ScribeFolder::SetVariant(const char *Name, LVariant &Value, const char *Array)
 {
-	ScribeDomType Fld = StrToDom(Name);
+	auto Fld = StrToDom(Name);
 	switch (Fld)
 	{
 		case SdName: // Type: String
@@ -3783,9 +3783,29 @@ bool ScribeFolder::SetVariant(const char *Name, LVariant &Value, const char *Arr
 
 bool ScribeFolder::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
-	ScribeDomType m = StrToDom(MethodName);
+	auto m = StrToDom(MethodName);
 	switch (m)
 	{
+		case SdAdd: // Type: (Thing obj)
+		{
+			*Args.GetReturn() = false;
+			auto obj = Args.DomAt(0);
+			if (!obj)
+			{
+				LgiTrace("%s:%i - Not an object.\n", _FL);
+				return true;
+			}
+
+			auto thing = dynamic_cast<Thing*>(obj);
+			if (!thing)
+			{
+				LgiTrace("%s:%i - object not a 'Thing'.\n", _FL);
+				return true;
+			}
+
+			*Args.GetReturn() = InsertThing(thing);
+			return true;
+		}
 		case SdLoad: // Type: ()
 		{
 			LoadThings(App);
@@ -3795,6 +3815,17 @@ bool ScribeFolder::CallMethod(const char *MethodName, LScriptArguments &Args)
 		case SdSelect: // Type: ()
 		{
 			Select(true);
+			return true;
+		}
+		case SdCreate: // Type: ()
+		{
+			// Create an object suitable for storing in this folder...
+			if (!GetObject())
+				return false;
+
+			auto data = GetObject()->GetStore()->Create(GetItemType());
+			auto thing = data ? App->CreateThingOfType(GetItemType(), data) : NULL;
+			*Args.GetReturn() = static_cast<LDom*>(thing);
 			return true;
 		}
 		case SdImport: // Type: (String FileName, String MimeType)

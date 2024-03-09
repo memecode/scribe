@@ -247,7 +247,7 @@ void ImapMail::Load()
 				if (e)
 				{
 					ssize_t HeaderSize = e - &Buf[0];
-					HeaderCache.Reset(NewStr(&Buf[0], HeaderSize));
+					HeaderCache.Set(&Buf[0], HeaderSize);
 					break;
 				}
 
@@ -255,7 +255,7 @@ void ImapMail::Load()
 					break;
 			}
 
-			LAutoString Type(InetGetHeaderField(HeaderCache, "Content-Type"));
+			auto Type = LGetHeaderField(HeaderCache, "Content-Type");
 			if (Type)
 			{
 				if (_strnicmp(Type, "multipart/", 10) == 0 &&
@@ -297,39 +297,33 @@ void ImapMail::ReadMime(IMeta MetaTag)
 #if DEBUG_READ_MIME
 LProfile Prof("ReadMime");
 #endif
-	if (Loaded == Store3Loaded || !Uid)
+	if (Loaded == Store3Loaded && Seg != NULL)
 		return;
 
-	auto t = MetaTag ? MetaTag : GetMeta();
-	if (!t)
-	{
-		LAssert(!"No Meta");
-		return;
-	}
+	auto meta = MetaTag ? MetaTag : GetMeta();
 	
 #if DEBUG_READ_MIME
 Prof.Add(_FL);
 #endif
-	// bool exists = LFileExists(Path);
-	// LgiTrace("ReadMime Path=%s exists=%i\n", Path.Get(), exists);
-	if (!LFileExists(Path))
+	if (!LFileExists(Path) && !Stream)
 	{
 		if (State != ImapMailGettingBody)
 		{
 			// bool InParent = Parent && Parent->GetMail(Uid);
 
 			// We don't have a local copy of the message, tell the thread to fetch it...
-			auto Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
-			if (Msg)
+			if (!meta)
+				LgiTrace("%s:%i - No meta for IMAP_DOWNLOAD.\n", _FL);
+			else if (auto Msg = new ImapMsg(IMAP_DOWNLOAD, _FL))
 			{
 #if DEBUG_READ_MIME
 Prof.Add(_FL);
 #endif
 				ImapMailInfo &Info = Msg->Mail.New();
 				#if IMAP_PROTOBUF
-					Info.Size = t->size();
+					Info.Size = meta->size();
 				#else
-					Info.Size = t->GetAsInt(ATTR_SIZE);
+					Info.Size = meta->GetAsInt(ATTR_SIZE);
 				#endif
 				Info.Uid = Uid;
 				Info.Local = Path.Get();
@@ -372,8 +366,9 @@ Prof.Add(_FL);
 			if (Load->GetSize() < 8)
 			{
 				// Hmmm, really? Try and re-download the mail
-				auto Msg = new ImapMsg(IMAP_DOWNLOAD, _FL);
-				if (Msg)
+				if (!meta)
+					LgiTrace("%s:%i - No meta for IMAP_DOWNLOAD.\n", _FL);
+				else if (auto Msg = new ImapMsg(IMAP_DOWNLOAD, _FL))
 				{
 					Loaded = Store3Headers;
 
@@ -382,11 +377,11 @@ Prof.Add(_FL);
 #endif
 					auto &Info = Msg->Mail.New();
 					#if IMAP_PROTOBUF
-						Info.Size = t->size();
-						Info.Uid = t->uid();
+						Info.Size = meta->size();
+						Info.Uid = meta->uid();
 					#else
-						Info.Size = t->GetAsInt(ATTR_SIZE);
-						Info.Uid = t->GetAsInt(ATTR_UID);
+						Info.Size = meta->GetAsInt(ATTR_SIZE);
+						Info.Uid = meta->GetAsInt(ATTR_UID);
 					#endif
 
 					Info.Local = Path.Get();
@@ -531,6 +526,11 @@ const char *ImapMail::GetStr(int id)
 						}
 					}
 				}
+			}
+			else if (Stream)
+			{
+				HeaderCache = HeadersFromStream(Stream);
+				Stream->SetPos(0);
 			}
 
 			return HeaderCache;
@@ -865,7 +865,7 @@ Store3Status ImapMail::SetStr(int id, const char *str)
 		case FIELD_INTERNET_HEADER:
 		{
 			if (HeaderCache.Get() != str)
-				HeaderCache.Reset(NewStr(str));
+				HeaderCache = str;
 			
 			// Reset all the cached values...
 			MsgId.Empty();
@@ -1180,19 +1180,15 @@ LDataPropI *ImapMail::GetObj(int id)
 	switch (id)
 	{
 		case FIELD_MIME_SEG:
-		{
 			if (!Seg)
 				ReadMime(NULL);
 			return Seg;
-		}
 		case FIELD_FROM:
-		{
 			return ProcessAddress(From, ATTR_FROM, "From");
-		}
 		case FIELD_REPLY:
-		{
 			return ProcessAddress(Reply, ATTR_REPLYTO, "Reply-To");
-		}
+		case FIELD_PARENT:
+			return Parent;
 	}
 
 	return 0;
@@ -1218,7 +1214,7 @@ LDataIt ImapMail::GetList(int id)
 				auto h = LDecodeRfc2047(LGetHeaderField(Headers, "To"));
 				if (h)
 				{
-					List<char> Addr;
+					LString::Array Addr;
 					TokeniseStrList(h, Addr, ",");
 					for (auto a: Addr)
 					{
@@ -1229,13 +1225,12 @@ LDataIt ImapMail::GetList(int id)
 							To.Insert(la, -1, true);
 						}
 					}
-					Addr.DeleteArrays();
 				}
 				To.State = Store3Loaded;
 
 				if ((h = LDecodeRfc2047(LGetHeaderField(Headers, "Cc"))))
 				{
-					List<char> Addr;
+					LString::Array Addr;
 					TokeniseStrList(h, Addr, ",");
 					for (auto a: Addr)
 					{
@@ -1247,7 +1242,6 @@ LDataIt ImapMail::GetList(int id)
 							To.Insert(la);
 						}
 					}
-					Addr.DeleteArrays();
 				}
 			}
 			return &To;
@@ -1468,6 +1462,7 @@ bool ImapMail::SetStream(LAutoStreamI stream)
 	return false;
 }
 
+/*
 void ImapMail::OnDownload(LAutoString &Headers)
 {
 	LFile f;
@@ -1477,7 +1472,7 @@ void ImapMail::OnDownload(LAutoString &Headers)
 		f.Close();
 	}
 
-	HeaderCache = Headers;
+	HeaderCache = Headers.Get();
 	Loaded = Store3Headers;
 
 	SetState(ImapMailIdle, _FL);
@@ -1496,3 +1491,4 @@ void ImapMail::OnDownload(LAutoString &Headers)
 		Serialize(t, true);
 	}
 }
+*/

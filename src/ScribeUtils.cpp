@@ -1150,47 +1150,47 @@ char sMimeXml[] = "text/xml";
 LString ScribeGetFileMimeType(const char *File)
 {
 	LString Ret;
-	if (File)
-	{
-		char *Ext = LGetExtension((char*)File);
-		if (Ext)
-		{
-			if (_stricmp(Ext, "lr8") == 0)
-			{
-				Ret = sMimeLgiResource;
-			}
-			else if (_stricmp(Ext, "ici") == 0)
-			{
-				Ret = "application/x-ici";
-			}
-			else if (_stricmp(Ext, "vcf") == 0)
-			{
-				Ret = sMimeVCard;
-			}
-			else if (_stricmp(Ext, "vcs") == 0 ||
-					 _stricmp(Ext, "ics") == 0)
-			{
-				Ret = sMimeVCalendar;
-			}
-			else if (_stricmp(Ext, "eml") == 0)
-			{
-				Ret = sMimeMessage;
-			}
-			#if defined WIN32
-			// Hard code extensions (because windows doesn't get it right)
-			else if (_stricmp(Ext, "mbx") == 0 ||
-					 _stricmp(Ext, "mbox") == 0)
-			{
-				Ret = sMimeMbox;
-			}
-			#endif
-		}
+	if (!File)
+		return Ret;
 
-		if (!Ret)
+	auto Ext = LGetExtension(File);
+	if (Ext)
+	{
+		if (_stricmp(Ext, "lr8") == 0)
 		{
-			// Do normal lookup
-			Ret = LGetFileMimeType(File);
+			Ret = sMimeLgiResource;
 		}
+		else if (_stricmp(Ext, "ici") == 0)
+		{
+			Ret = "application/x-ici";
+		}
+		else if (_stricmp(Ext, "vcf") == 0)
+		{
+			Ret = sMimeVCard;
+		}
+		else if (_stricmp(Ext, "vcs") == 0 ||
+					_stricmp(Ext, "ics") == 0)
+		{
+			Ret = sMimeVCalendar;
+		}
+		else if (_stricmp(Ext, "eml") == 0)
+		{
+			Ret = sMimeMessage;
+		}
+		#if defined WIN32
+		// Hard code extensions (because windows doesn't get it right)
+		else if (_stricmp(Ext, "mbx") == 0 ||
+					_stricmp(Ext, "mbox") == 0)
+		{
+			Ret = sMimeMbox;
+		}
+		#endif
+	}
+
+	if (!Ret)
+	{
+		// Do normal lookup
+		Ret = LGetFileMimeType(File);
 	}
 
 	return Ret;

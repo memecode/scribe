@@ -330,7 +330,7 @@ public:
 protected:
 	ImapMailState State;
 	LAutoString TextCache, HtmlCache;
-	LAutoString HeaderCache;
+	LString HeaderCache;
 	LString UidCache;
 
 	Store3Addr *ProcessAddress(Store3Addr &Addr, const char *FieldId, const char *RfcField);
@@ -412,7 +412,7 @@ public:
 	Store3Status Delete(bool ToTrash) override;
 	/// When the thread has deleted the email, this is called to finialize the deletion.
 	bool OnDelete();
-	void OnDownload(LAutoString &Headers);
+	// void OnDownload(LAutoString &Headers);
 };
 
 extern const char *ToString(ImapMail::ImapMailState s);
