@@ -26,3 +26,28 @@
 #define SystemFolderCalendar	7
 #define SystemFolderGroups		8
 #define SystemFolderSpam		9
+
+// Mail flags
+#define ScribeMailSend			(1 << 0)
+#define ScribeMailReceived		(1 << 1)
+#define ScribeMailCreated		(1 << 2)
+#define ScribeMailForwarded		(1 << 3)
+#define ScribeMailReplies		(1 << 4)
+#define ScribeMailAttachments	(1 << 5)
+#define ScribeMailRead			(1 << 6)
+// 7 is deleted
+#define ScribeMailReadyToSend	(1 << 8)
+#define ScribeMailReadReceipt	(1 << 9)
+#define ScribeMailIgnore		(1 << 10)
+#define ScribeMailMonospace		(1 << 11)
+#define ScribeMailBounced		(1 << 12)
+#define ScribeMailBounce		(1 << 13)
+#define ScribeMailShowImages	(1 << 14)
+#define ScribeMailNew			(1 << 15)
+#define ScribeMailStoredFlat	(1 << 16)
+#define ScribeMailBayesHam		(1 << 17)
+#define ScribeMailBayesSpam		(1 << 18)
+// 19?
+#define ScribeMailHamDb			(1 << 20)
+#define ScribeMailSpamDb		(1 << 21)
+

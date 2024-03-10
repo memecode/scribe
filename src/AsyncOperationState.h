@@ -21,9 +21,7 @@ class AsyncOperationState
 	// Output
 	bool Result = false; // Overall success/failure
 	LArray<Store3Status> Status; // Per item status
-
 								 // State
-
 								 // Group all the mail in the same store into one operation:
 	LArray<LDataI*> InStoreMove;
 
@@ -166,7 +164,7 @@ public:
 	}
 		
 	// This must call SetStatus once and only once for each item it's called with.
-	// Returns true if the SetStatus call indicates deletion.
+	// Returns true if the SetStatus call indicates AsyncOperationState deletion.
 	// 'this' will be invalid after SetStatus returns true.
 	bool Move(int i, Thing *t)
 	{
