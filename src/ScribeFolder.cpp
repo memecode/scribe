@@ -3803,7 +3803,18 @@ bool ScribeFolder::CallMethod(const char *MethodName, LScriptArguments &Args)
 				return true;
 			}
 
-			*Args.GetReturn() = InsertThing(thing);
+			if (!InsertThing(thing))
+			{
+				LgiTrace("%s:%i - InsertThing failed.\n", _FL);
+				return true;
+			}
+
+			auto fld = GetObject();
+			auto data = thing->GetObject();
+			if (fld && data)
+				data->Save(fld);
+
+			*Args.GetReturn() = true;
 			return true;
 		}
 		case SdLoad: // Type: ()

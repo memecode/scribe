@@ -1402,7 +1402,7 @@ class Filter;
 class FilterCondition
 {
 protected:
-	bool TestData(Filter *F, LVariant &v, LStream *Log);
+	bool TestData(Filter *F, LVariant &v, LStream *Log, LStream *errLog);
 
 public:
 	// Data
@@ -1416,7 +1416,7 @@ public:
 	bool Set(class LXmlTag *t);
 
 	// Test condition against email
-	bool Test(Filter *F, Mail *m, LStream *Log);
+	bool Test(Filter *F, Mail *m, LStream *Log, LStream *errLog);
 	FilterCondition &operator =(const FilterCondition &c);
 
 	// Object
@@ -1446,7 +1446,7 @@ public:
 
 	bool Set(LXmlTag *t);
 	bool Get(LXmlTag *t);
-	bool Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *log);
+	bool Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *log, LStream *errLog);
 	void Browse(ScribeWnd *App, LView *Parent);
 	void DescribeHtml(Filter *Flt, LStream &s);
 
@@ -1489,8 +1489,8 @@ protected:
 	LAutoPtr<LXmlTag> Parse(bool Actions);
 
 	// Methods
-	bool EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log);
-	bool EvaluateXml(Mail *m, bool &Stop, LStream *Log);
+	bool EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log, LStream *errLog);
+	bool EvaluateXml(Mail *m, bool &Stop, LStream *Log, LStream *errLog);
 
 public:
 	Filter(ScribeWnd *app, LDataI *object = NULL);
@@ -1534,8 +1534,8 @@ public:
 	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// Filter
-	bool Test(Mail *m, bool &Stop, LStream *Log = NULL);
-	bool DoActions(Mail *&m, bool &Stop, LStream *Log = NULL);
+	bool Test(Mail *m, bool &Stop, LStream *Log = NULL, LStream *errLog = NULL);
+	bool DoActions(Mail *&m, bool &Stop, LStream *Log = NULL, LStream *errLog = NULL);
 	Mail *GetCurrent() { return Current?*Current:0; }
 	
 	/// This filters all the mail in 'Email'. Anything that is handled by a filter

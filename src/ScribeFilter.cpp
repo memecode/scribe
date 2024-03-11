@@ -28,6 +28,7 @@
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/FileSelect.h"
 #include "lgi/common/Charset.h"
+#include "lgi/common/PopupNotification.h"
 
 #include "resdefs.h"
 #include "resource.h"
@@ -55,6 +56,7 @@ const char *ELEMENT_CONDITIONS		= "Conditions";
 const char *ELEMENT_ACTION			= "Action";
 
 #define SkipWs(s)					while ((*s) && strchr(WhiteSpace, *s)) s++;
+#define ERR_LOG(...)				if (errLog) { errLog->Print(__VA_ARGS__); }
 
 //////////////////////////////////////////////////////////////
 class FilterPrivate
@@ -519,7 +521,7 @@ FilterCondition &FilterCondition::operator=(const FilterCondition &c)
 	return *this;
 }
 
-bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
+bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log, LStream *errLog)
 {
 	if (Log) Log->Print("\tCondition.Test Fld='%s'\n", Source.Get());
 
@@ -553,7 +555,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 						v.SetBinary(Length, Data);
 
 						// Test the file
-						if (TestData(F, v, Log))
+						if (TestData(F, v, Log, errLog))
 						{
 							return true;
 						}
@@ -575,7 +577,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 				for (auto a: Attachments)
 				{
 					LVariant v = a->GetName();
-					if (TestData(F, v, Log))
+					if (TestData(F, v, Log, errLog))
 					{
 						return true;
 					}
@@ -608,7 +610,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 										a->GetStr(FIELD_NAME),
 										a->GetStr(FIELD_EMAIL));
 								LVariant v(Data);
-								if (TestData(F, v, Log))
+								if (TestData(F, v, Log, errLog))
 								{
 									Status |= true;
 								}
@@ -684,7 +686,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log)
 			if (v.Type)
 			{
 				// Test data
-				Status |= TestData(F, v, Log);
+				Status |= TestData(F, v, Log, errLog);
 			}
 			else if (Log)
 			{
@@ -726,7 +728,7 @@ LString LogPreview(char *s)
 	return p.NewLStr();
 }
 
-bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
+bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log, LStream *errLog)
 {
 	// Do DOM lookup on the Value
 	LVariant Val;
@@ -739,7 +741,7 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 			{
 				for (auto v: *Var.Value.Lst)
 				{
-					if (TestData(F, *v, Log))
+					if (TestData(F, *v, Log, errLog))
 					{
 						return true;
 					}
@@ -752,7 +754,7 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 				LVariant n;
 				if (Var.Value.Dom->GetValue("Name", n))
 				{
-					if (TestData(F, n, Log))
+					if (TestData(F, n, Log, errLog))
 					{
 						return true;
 					}
@@ -760,7 +762,7 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log)
 
 				if (Var.Value.Dom->GetValue("Email", n))
 				{
-					if (TestData(F, n, Log))
+					if (TestData(F, n, Log, errLog))
 					{
 						return true;
 					}
@@ -1357,12 +1359,13 @@ public:
 	}
 };
 
-bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
+bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream *errLog)
 {
     bool Status = false;
     
     if (!F || !App || !m)
     {
+		ERR_LOG("Do: Param error.\n");
         LAssert(!"Param error.");
         return false;
     }
@@ -1385,9 +1388,12 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 				});
 				Status = true;
 			}
-			else if (Log)
+			else
 			{
-			    Log->Print("\tACTION_MOVE_TO_FOLDER(%s) failed, folder missing.\n", Arg1.Get());
+				auto msg = LString::Fmt("ACTION_MOVE_TO_FOLDER(%s) failed, folder missing.", Arg1.Get());
+				ERR_LOG("%s\n", msg.Get());
+				if (Log)
+					Log->Print("\t%s\n", msg.Get());
 			}
 			break;
 		}
@@ -1405,9 +1411,12 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log)
 				});
 				Status = true;
 			}
-			else if (Log)
+			else
 			{
-			    Log->Print("\tACTION_COPY(%s) failed, folder missing.\n", Arg1.Get());
+				auto msg = LString::Fmt("ACTION_COPY(%s) failed, folder missing.", Arg1.Get());
+				ERR_LOG("%s\n", msg.Get());
+				if (Log)
+					Log->Print("\t%s\n", msg.Get());
 			}
 			break;
 		}
@@ -2418,6 +2427,7 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 	if (!App)
 		return 0;
 
+	LStringPipe errLog;
 	bool Logging = App->LogFilterActivity();
 	LStream *LogStream = NULL;
 	if (Logging)
@@ -2442,9 +2452,9 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 			if (Stop)
 				break;
 
-			if (f->Test(m, Stop, LogStream))
+			if (f->Test(m, Stop, LogStream, &errLog))
 			{
-				f->DoActions(m, Stop, LogStream);
+				f->DoActions(m, Stop, LogStream, &errLog);
 				Act = true;
 			}
 		}
@@ -2471,6 +2481,18 @@ int Filter::ApplyFilters(LView *Parent, List<Filter> &Filters, List<Mail> &Email
 			if (Prog->IsCancelled())
 				break;
 		}
+	}
+
+	if (errLog.GetSize() > 0)
+	{
+		LString nl("\n"), errs;
+		auto lines = errLog.NewLStr().SplitDelimit(nl);
+		if (lines.Length() > 8)
+			errs = nl.Join(lines.Slice(0, 8)) + "...";
+		else
+			errs = nl.Join(lines);
+		auto wnd = Parent ? Parent->GetWindow() : App;
+		LPopupNotification::Message(wnd, LString::Fmt("Error(s) applying filters:\n%s", errs.Get()));
 	}
 
 	return Status;
@@ -2880,7 +2902,7 @@ bool Filter::GetVariant(const char *Var, LVariant &Value, const char *Array)
 			{
 				bool s;
 				bool &Stop = d->Stop ? *d->Stop : s;
-				Value = EvaluateXml(*Current, Stop, d->Log);
+				Value = EvaluateXml(*Current, Stop, d->Log, NULL);
 			}
 			else return false;
 			break;
@@ -3074,7 +3096,7 @@ void Filter::Empty()
 	}
 }
 
-bool Filter::EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log)
+bool Filter::EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log, LStream *errLog)
 {
 	bool Status = false;
 
@@ -3085,7 +3107,7 @@ bool Filter::EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log)
 			if (Log) Log->Print("\tAnd {\n");
 			for (auto c: n->Children)
 			{
-				if (!EvaluateTree(c, m, Stop, Log))
+				if (!EvaluateTree(c, m, Stop, Log, errLog))
 				{
 					if (Log) Log->Print("\t} (false)\n");
 					return false;
@@ -3100,7 +3122,7 @@ bool Filter::EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log)
 			if (Log) Log->Print("\tOr {\n");
 			for (auto c: n->Children)
 			{
-				if (EvaluateTree(c, m, Stop, Log))
+				if (EvaluateTree(c, m, Stop, Log, errLog))
 				{
 					if (Log) Log->Print("\t} (true)\n");
 					return true;
@@ -3119,7 +3141,7 @@ bool Filter::EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log)
 				}
 				else
 				{
-					Status = c->Test(this, m, Log);
+					Status = c->Test(this, m, Log, errLog);
 					if (c->Not) Status = !Status;
 					if (Log)
 					{
@@ -3167,7 +3189,7 @@ bool FilterCondition::Set(LXmlTag *t)
 	return true;
 }
 
-bool Filter::EvaluateXml(Mail *m, bool &Stop, LStream *Log)
+bool Filter::EvaluateXml(Mail *m, bool &Stop, LStream *Log, LStream *errLog)
 {
 	bool Status = false;
 
@@ -3177,13 +3199,13 @@ bool Filter::EvaluateXml(Mail *m, bool &Stop, LStream *Log)
 		    ConditionsCache = Parse(false);
 		if (ConditionsCache &&
 			ConditionsCache->Children.Length())
-			Status = EvaluateTree(ConditionsCache->Children[0], m, Stop, Log);
+			Status = EvaluateTree(ConditionsCache->Children[0], m, Stop, Log, errLog);
 	}
 
 	return Status;
 }
 
-bool Filter::Test(Mail *m, bool &Stop, LStream *Log)
+bool Filter::Test(Mail *m, bool &Stop, LStream *Log, LStream *errLog)
 {
 	bool Status = false;
 
@@ -3201,22 +3223,24 @@ bool Filter::Test(Mail *m, bool &Stop, LStream *Log)
 		}
 		else if (ValidStr(GetConditionsXml()))
 		{
-			Status = EvaluateXml(m, Stop, Log);
+			Status = EvaluateXml(m, Stop, Log, errLog);
 		}
 		else LAssert(0);
 
-		d->Stop = 0;
-		d->Log = 0;
+		d->Stop = NULL;
+		d->Log = NULL;
 	}
 	Current = 0;
 
 	return Status;
 }
 
-bool Filter::DoActions(Mail *&m, bool &Stop, LStream *Log)
+bool Filter::DoActions(Mail *&m, bool &Stop, LStream *Log, LStream *errLog)
 {
 	if (!App || !m)
+	{
 		return false;
+	}
 
 	Current = &m;
 
@@ -3244,7 +3268,7 @@ bool Filter::DoActions(Mail *&m, bool &Stop, LStream *Log)
 		for (unsigned i=0; i<Act.Length() && m->GetObject(); i++)
 		{
 			auto a = Act[i];
-			a->Do(this, App, m, Log);
+			a->Do(this, App, m, Log, errLog);
 		}
 
 		Act.DeleteObjects();

@@ -5712,7 +5712,9 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 			}
 			else
 			{
-				Value = (int)GetFlags();
+				auto f = GetFlags();
+				bool read = f & MAIL_READ;
+				Value = (int)f;
 			}
 			break;
 		}
@@ -5937,7 +5939,9 @@ bool Mail::SetVariant(const char *Name, LVariant &Value, const char *Array)
 			}
 			else
 			{
-				SetFlags(Value.CastInt32());
+				auto f = Value.CastInt32();
+				bool read = f & MAIL_READ;
+				SetFlags(f);
 			}
 			break;
 		}
