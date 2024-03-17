@@ -1589,13 +1589,11 @@
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					"../../libs/build-release/libpng",
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
-					"../../../../codelib/libjpeg-9a",
+					/opt/local/include,
 					/opt/local/libexec/openssl3/include,
-					../../../../codelib/libpng,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1647,13 +1645,11 @@
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
-					"../../libs/build-release/libpng",
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
-					"../../../../codelib/libjpeg-9a",
+					/opt/local/include,
 					/opt/local/libexec/openssl3/include,
-					../../../../codelib/libpng,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
