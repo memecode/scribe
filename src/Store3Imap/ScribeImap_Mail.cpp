@@ -29,14 +29,8 @@ ImapMail::ImapMail(ImapStore *store, const char *file, int line, uint32_t uid) :
 	From(store),
 	Reply(store)
 {
-	LocalFlags = 0;
-	Seg = 0;
-	State = ImapMailIdle;
-	Loaded = Store3Unloaded;
-	Parent = 0;
 	SegDirty = false;
 	RemoteFlags.ImapSeen = true;
-	Priority = MAIL_PRIORITY_NORMAL;
 	Store = store;
 	Uid = uid;
 }
@@ -937,8 +931,7 @@ int64 ImapMail::GetInt(int id)
 				#if IMAP_PROTOBUF
 				return DataSize = Meta->size();
 				#else
-				char *Sz = Meta->GetAttr(ATTR_SIZE);
-				if (Sz)
+				if (auto Sz = Meta->GetAttr(ATTR_SIZE))
 					return atoi64(Sz);
 				#endif
 			}
@@ -975,6 +968,8 @@ int64 ImapMail::GetInt(int id)
 			return Store->GetInt(id);
 		case FIELD_SERVER_UID:
 			return Uid;
+		case FIELD_IMAP_SEQ:
+			return Parent ? Parent->GetSequence(this) : 0;
 	}
 
 	return -1;

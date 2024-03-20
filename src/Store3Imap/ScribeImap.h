@@ -328,7 +328,7 @@ public:
 	};
 
 protected:
-	ImapMailState State;
+	ImapMailState State = ImapMailIdle;
 	LAutoString TextCache, HtmlCache;
 	LString HeaderCache;
 	LString UidCache;
@@ -354,9 +354,9 @@ public:
 	uint32_t Uid; // Server UID
 
 	ImapMailFlags RemoteFlags;
-	int LocalFlags;
+	int LocalFlags = 0;
 
-	int     Priority;
+	int     Priority = MAIL_PRIORITY_NORMAL;
 	int64   DataSize;
 	uint8_t SegDirty : 1;
 
@@ -477,12 +477,14 @@ class ImapFolder : public LDataFolderI, public ImapFolderData
 {
 	friend struct ImapFolderLoadThread;
 
+	constexpr static int INVALID_CACHE = -1000;
+
 	int64 LastIdleSelect;
-	bool IsOnline;
-	int SortCache;
+	bool IsOnline = false;
+	int SortCache = INVALID_CACHE;
 	LString RootName;
 	LAutoPtr<LThread> WriteThread;
-	ImapFolder *_Parent;
+	ImapFolder *_Parent = NULL;
 
 	// Threaded loading...
 	LAutoPtr<struct ImapFolderLoadThread> LoadThread;
@@ -499,20 +501,20 @@ class ImapFolder : public LDataFolderI, public ImapFolderData
 	#endif
 
 	// Loading of the files and folder
-	int ScanState;
+	int ScanState = 0;
 	LArray<LString> Folders;
 	LArray<LString> Files;
-	bool Dirty;
+	bool Dirty = false;
 
 	// Events...
 	LArray<std::function<void(Store3Status)>> OnLoad;
 
 public:
 	ImapStore *Store;
-	Store3SystemFolder System;
+	Store3SystemFolder System = Store3SystemNone;
 	
 	/// The item type...
-	int ItemType;
+	int ItemType = MAGIC_MAIL;
 	/// The IMAP path
 	LString Remote;
 	/// The on disk cache folder
@@ -571,6 +573,7 @@ public:
 	Store3Status DeleteAllChildren() override;
 	void SetDirty(bool b = true) override;
 	LString MailPath(uint32_t Uid, bool CheckExists = true);
+	int32_t GetSequence(ImapMail *mail);
 
 	// Mail container stuff
 	ImapMail *FindMail(const char *File, int32 Uid);

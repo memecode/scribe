@@ -1089,13 +1089,13 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="..\Resources\ScribeWindows.manifest">
-      <Filter>Scripting</Filter>
-    </Manifest>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="..\src\Resource.rc">
       <Filter>Resources</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Resources\ScribeWindows.manifest">
+      <Filter>Resources</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>

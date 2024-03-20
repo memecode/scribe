@@ -1675,6 +1675,10 @@ int ScribeWnd::RegisterCallback(LScriptCallbackType Type, LScriptArguments &Args
 			c.Uid = d->NextScriptUid++;
 			if (Args.Length() > 2)
 				c.Data = *Args[2];
+
+			if (Type == LOnTimer)
+				SetupScriptTimers();
+
 			return c.Uid;
 		}
 		default:
@@ -4034,6 +4038,56 @@ void ScribeWnd::DoOnTimer(LScriptCallback *c)
 	}
 }
 
+void ScribeWnd::SetupScriptTimers()
+{
+	LArray<LScriptCallback*> Cb;
+	if (!GetScriptCallbacks(LOnTimer, Cb))
+		return;
+
+	for (auto c: Cb)
+	{
+		if (!c->Func)
+			continue;
+
+		if (c->fParam == 0.0)
+		{
+			// Work out the period from 'Data'
+			char *s = c->Data.Str();
+			while (*s && IsWhite(*s)) s++;
+			char *u = s;
+			while (*u && !IsAlpha(*u)) u++;
+			double v = atof(s);
+
+			switch (*u)
+			{
+				case 's': case 'S': // seconds
+					c->fParam = v;
+					break;
+				case 'm': case 'M': // mins
+					c->fParam = v * LDateTime::MinuteLength;
+					break;
+				case 'h': case 'H': // hours
+					c->fParam = v * LDateTime::HourLength;
+					break;
+				case 'd': case 'D': // days
+					c->fParam = v * LDateTime::DayLength;
+					break;
+				default:
+				{
+					LgiTrace("%s:%i - Couldn't understand period '%s'\n", _FL, c->Data.Str());
+					c->Data.Empty();
+					break;
+				}
+			}
+
+			if ((c->OnSecond = c->fParam < 60.0))
+			{
+				d->OnSecondTimerCallbacks.Add(c);
+			}
+		}
+	}
+}
+
 void ScribeWnd::OnMinute()
 {
 	THREAD_UNSAFE();
@@ -4045,8 +4099,7 @@ void ScribeWnd::OnMinute()
 	Calendar::CheckReminders();
 
 	// Check for any outgoing email that should be re-attempted...
-	ScribeFolder *Outbox = GetFolder(FOLDER_OUTBOX);
-	if (Outbox)
+	if (auto Outbox = GetFolder(FOLDER_OUTBOX))
 	{
 		bool Resend = false;
 
@@ -4072,48 +4125,12 @@ void ScribeWnd::OnMinute()
 	{
 		for (auto c: Cb)
 		{
-			if (!c->Func)
-				continue;
-
-			if (c->fParam == 0.0)
+			if (c->Func &&
+				c->fParam >= 0.001 &&
+				!c->OnSecond)
 			{
-				// Work out the period from 'Data'
-				char *s = c->Data.Str();
-				while (*s && IsWhite(*s)) s++;
-				char *u = s;
-				while (*u && !IsAlpha(*u)) u++;
-				double v = atof(s);
-
-				switch (*u)
-				{
-					case 's': case 'S': // seconds
-						c->fParam = v;
-						break;
-					case 'm': case 'M': // mins
-						c->fParam = v * LDateTime::MinuteLength;
-						break;
-					case 'h': case 'H': // hours
-						c->fParam = v * LDateTime::HourLength;
-						break;
-					case 'd': case 'D': // days
-						c->fParam = v * LDateTime::DayLength;
-						break;
-					default:
-					{
-						LgiTrace("%s:%i - Couldn't understand period '%s'\n", _FL, c->Data.Str());
-						c->Data.Empty();
-						break;
-					}
-				}
-
-				if ((c->OnSecond = c->fParam < 60.0))
-				{
-					d->OnSecondTimerCallbacks.Add(c);
-				}
-			}
-
-			if (!c->OnSecond)
 				DoOnTimer(c);
+			}
 		}
 	}
 }
@@ -11473,13 +11490,13 @@ void ScribeWnd::OnNew
 				auto m = t->IsMail();
 				if (m)
 				{
-					bool unread = TestFlag(m->GetFlags(), MAIL_READ);
-					UnreadDiff += unread ? 0 : 1;
+					bool read = TestFlag(m->GetFlags(), MAIL_READ);
+					UnreadDiff += read ? 0 : 1;
 
 					#if 1 // DEBUG_NEW_MAIL
-					LgiTrace("%s:%i - NewMail.OnNew t=%p uid=%s unread=%i IsNew=%i\n", _FL,
+					LgiTrace("%s:%i - NewMail.OnNew t=%p uid=%s read=%i IsNew=%i\n", _FL,
 						t, m->GetServerUid().ToString().Get(),
-						unread, IsNew);
+						read, IsNew);
 					#endif
 
 					if (IsNew)

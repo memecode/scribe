@@ -247,9 +247,9 @@ public:
 	LStream *GetLog() override;
 	LHostFunc *GetCommands() override;	
 	LString GetIncludeFile(const char *FileName) override;
+	void SetEngine(LScriptEngine *eng);
 
 	// System
-	void SetEngine(LScriptEngine *eng);
 	bool MsgBox(LScriptArguments &Args);
 
 	// Paths
@@ -2632,6 +2632,7 @@ public:
 	void			OnHour();
 	bool			OnIdle();
     void            OnBayesAnalyse(const char *Msg, const char *WhiteListEmail) override;
+	void			SetupScriptTimers();
     
     /// \returns true if spam
     bool            OnBayesResult(const char *MailRef, double Rating) override;

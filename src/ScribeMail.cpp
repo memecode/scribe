@@ -807,7 +807,7 @@ ItemFieldDef MailFieldDefs[] =
 	
 	{"File", SdFile, 						GV_STRING,		FIELD_CACHE_FILENAME},
 	{"ImapFlags", SdImapFlags, 				GV_STRING,		FIELD_CACHE_FLAGS},
-	{"ImapSeq", SdFile, 					GV_INT32,		FIELD_IMAP_SEQ},
+	{"ImapSeq", SdSequence,					GV_INT32,		FIELD_IMAP_SEQ},
 	{"ImapUid", SdImapFlags, 				GV_INT32,		FIELD_SERVER_UID},
 	{"ReceivedDomain", SdReceivedDomain,	GV_STRING,		FIELD_RECEIVED_DOMAIN},
 	{"MessageId", SdMessageId,				GV_STRING,		FIELD_MESSAGE_ID},
@@ -5787,7 +5787,7 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		}
 		case SdMimeTree: // Type: String
 		{
-			LDataI *Root = dynamic_cast<LDataI*>(GetObject()->GetObj(FIELD_MIME_SEG));
+			auto Root = dynamic_cast<LDataI*>(GetObject()->GetObj(FIELD_MIME_SEG));
 			if (!Root)
 				return false;
 			
@@ -5834,6 +5834,22 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		case SdObject: // Type: LDataI*
 		{
 			Value = GetObject();
+			break;
+		}
+		case SdUid: // Type: Int64
+		{
+			if (GetObject())
+				Value = GetObject()->GetInt(FIELD_SERVER_UID);
+			else
+				Value.Empty();
+			break;
+		}
+		case SdSequence:
+		{
+			if (GetObject())
+				Value = GetObject()->GetInt(FIELD_IMAP_SEQ);
+			else
+				Value.Empty();
 			break;
 		}
 		default:

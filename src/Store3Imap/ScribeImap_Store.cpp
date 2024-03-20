@@ -624,7 +624,7 @@ void MailInfToObject(LAutoPtr<ImapMsg> &DownloadMsg, LArray<LDataI*> *OnNew, Ima
 
 	Parent->WhenLoaded([Parent, o, OnNew](auto Status)
 	{
-		Parent->AddMail(o, Status == Store3Success ? OnNew : NULL);
+		Parent->AddMail(o, Status > Store3Error ? OnNew : NULL);
 	});
 }
 

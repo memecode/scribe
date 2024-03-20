@@ -14,21 +14,14 @@
 #define DEBUG_RENAME_OLD_XML		0
 #endif
 #define TIMEOUT_IDLE_STATUS			(60 * 1000)
-#define INVALID_CACHE				-1000
 
 ImapFolder::ImapFolder(ImapStore *store, const char *path)
 	#if !IMAP_PROTOBUF
 	: Meta(TAG_FOLDER)
 	#endif
 {
-	System = Store3SystemNone;
-	Dirty = false;
-	SortCache = INVALID_CACHE;
-	IsOnline = false;
 	LastIdleSelect = LCurrentTime();
-	_Parent = NULL;
 	Store = store;
-	ScanState = 0;
 	Remote = path;
 
 	#if IMAP_PROTOBUF
@@ -40,7 +33,6 @@ ImapFolder::ImapFolder(ImapStore *store, const char *path)
 		UnreadCount = 0;
 	#endif
 	
-	ItemType = MAGIC_MAIL;
 	if (Remote)
 	{
 		if (!_stricmp(Remote, "/"))
@@ -1469,6 +1461,11 @@ LString ImapFolder::MailPath(uint32_t Uid, bool CheckExists)
 		LAssert(!LFileExists(p));
 	}
 	return p;
+}
+
+int32_t ImapFolder::GetSequence(ImapMail *mail)
+{
+	return (int32_t) Mail.a.IndexOf(mail);
 }
 
 #define IMAP_ONLISTING_LOG		0

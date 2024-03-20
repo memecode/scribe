@@ -1118,23 +1118,12 @@ int ImapThread::Main()
 
 					MailIMap::StrMap NewFolderValues;
 					auto OldFolder = d->CurrentFolder;
-					if (d->SelectFolder(Remote, &NewFolderValues) &&
-						m.Reset(new ImapMsg(IMAP_ON_NEW, _FL)))
+					if (d->SelectFolder(Remote, &NewFolderValues))
 					{
-						m->Parent = Remote;
-											
-						// Add the new messages to 'm' here
 						// Not sure of the UIDs so search them
 						LString::Array Uids;
 						if (d->Imap->Search(true, Uids, "RECENT"))
-						{
 							d->DownloadIds(GetListingParts(d->CurrentFolder), true, Uids);
-						}
-						else
-						{
-							// Reselect the previous folder...
-							d->SelectFolder(OldFolder);
-						}
 					}
 					break;
 				}
