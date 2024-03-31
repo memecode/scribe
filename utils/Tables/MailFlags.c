@@ -153,3 +153,4 @@ int StringToMailFlag(const char *s)
 	struct MailFlagMap *f = in_word_set(s, strlen(s));
 	return f ? f->value : 0;
 }
+
