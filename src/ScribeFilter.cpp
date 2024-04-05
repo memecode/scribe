@@ -1450,34 +1450,45 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 		}
 		case ACTION_DELETE:
 		{
-			bool Local = ValidStr(Arg1) ? stristr(Arg1, "local") != 0 : true;
-			bool Server = stristr(Arg1, "server") != 0;
+			bool Local = true, Server = false;
+			if (!Arg1.IsEmpty())
+			{
+				Local = false;
+				auto parts = Arg1.SplitDelimit(",");
+				for (auto p: parts)
+				{
+					p = p.Strip();
+					if (p.Equals("local"))
+						Local = true;
+					else if (p.Equals("server"))
+						Server = true;
+				}
+			}
 
 			if (Server)
 			{
-				ScribeAccount *a = m->GetAccountSentTo();
-				if (!a)
-				    break;
-
-				auto Uid = m->GetServerUid();
-				if (Uid.Str())
+				if (auto a = m->GetAccountSentTo())
 				{
-					if (Log)
-					    Log->Print("\tACTION_DELETE - Setting '%s' to be deleted on the server (Uid=%s)\n", m->GetSubject(), Uid.Str());
-					    
-					a->Receive.DeleteAsSpam(Uid.Str());
-					Uid.Empty();
-					m->SetServerUid(Uid);
-				}
-				else
-				{
-					LVariant Uid;
-					if (m->GetValue("InternetHeader[X-UIDL]", Uid))
+					auto Uid = m->GetServerUid();
+					if (Uid.Str())
 					{
 						if (Log)
-					        Log->Print("\tACTION_DELETE - Setting '%s' to be deleted on the server (Uid=%s)\n", m->GetSubject(), Uid.Str());
-					        
+							Log->Print("\tACTION_DELETE - Setting '%s' to be deleted on the server (Uid=%s)\n", m->GetSubject(), Uid.Str());
+					    
 						a->Receive.DeleteAsSpam(Uid.Str());
+						Uid.Empty();
+						m->SetServerUid(Uid);
+					}
+					else
+					{
+						LVariant Uid;
+						if (m->GetValue("InternetHeader[X-UIDL]", Uid))
+						{
+							if (Log)
+								Log->Print("\tACTION_DELETE - Setting '%s' to be deleted on the server (Uid=%s)\n", m->GetSubject(), Uid.Str());
+					        
+							a->Receive.DeleteAsSpam(Uid.Str());
+						}
 					}
 				}
 			}
@@ -1487,23 +1498,6 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 				bool DeleteStatus = m->OnDelete();
 				if (Log)
 			        Log->Print("\tACTION_DELETE(%s) status %i.\n", Arg1.Get(), DeleteStatus);
-
-				/*
-				ScribeFolder *Folder = App->GetFolder(FOLDER_TRASH);
-				if (Folder)
-				{
-					Thing *t = m;
-					Status = Folder->MoveTo(t);
-					m = t->IsMail();
-
-                    if (Log)
-			            Log->Print("\tACTION_DELETE(%s) = %i.\n", Arg1.Get(), Status);
-				}
-			    else if (Log)
-			    {
-			        Log->Print("\tACTION_DELETE(%s) failed, trash missing.\n", Arg1.Get());
-			    }
-			    */
 			}
 			break;
 		}
