@@ -278,6 +278,17 @@ void ScribeOptionsDefaults(LOptionsFile *f)
 	DefaultIntOption(OPT_HasGroups, 1);
 	DefaultIntOption(OPT_HasFilters, 1);
 	DefaultIntOption(OPT_HasSpam, 0);
+
+	DefaultStrOption(OPT_Inbox,      LLoadString(IDS_FOLDER_INBOX, "Inbox"));
+	DefaultStrOption(OPT_Outbox,     LLoadString(IDS_FOLDER_OUTBOX, "Outbox"));
+	DefaultStrOption(OPT_Sent,       LLoadString(IDS_FOLDER_SENT, "Sent"));
+	DefaultStrOption(OPT_Trash,      LLoadString(IDS_FOLDER_TRASH, "Trash"));
+	DefaultStrOption(OPT_Contacts,   LLoadString(IDS_FOLDER_CONTACTS, "Contacts"));
+	DefaultStrOption(OPT_Templates,  LLoadString(IDS_FOLDER_TEMPLATES, "Templates"));
+	DefaultStrOption(OPT_Filters,    LLoadString(IDS_FOLDER_FILTERS, "Filters"));
+	DefaultStrOption(OPT_Calendar,   LLoadString(IDS_FOLDER_CALENDAR, "Calendar"));
+	DefaultStrOption(OPT_Groups,     LLoadString(IDS_FOLDER_GROUPS, "Groups"));
+	DefaultStrOption(OPT_SpamFolder, LLoadString(IDS_SPAM, "Spam"));
 }
 
 const char *Store3ItemTypeName(Store3ItemTypes t)
@@ -288,7 +299,7 @@ const char *Store3ItemTypeName(Store3ItemTypes t)
 		case MAGIC_BASE:		return "MAGIC_BASE";
 		case MAGIC_MAIL:		return "MAGIC_MAIL";
 		case MAGIC_CONTACT:		return "MAGIC_CONTACT";
-		// case MAGIC_FOLDER:		return "MAGIC_FOLDER";
+		// case MAGIC_FOLDER:	return "MAGIC_FOLDER";
 		case MAGIC_MAILBOX:		return "MAGIC_MAILBOX";
 		case MAGIC_ATTACHMENT:	return "MAGIC_ATTACHMENT";
 		case MAGIC_ANY:			return "MAGIC_ANY";
@@ -312,7 +323,7 @@ void SetRecipients(ScribeWnd *App, char *Start, LDataIt l, EmailAddressType CC)
 	while (Start && *Start)
 	{
 		LString Str;
-		char *End = strchr(Start, ',');
+		auto End = strchr(Start, ',');
 		if (End)
 		{
 			Str.Set(Start, End-Start);
@@ -326,7 +337,7 @@ void SetRecipients(ScribeWnd *App, char *Start, LDataIt l, EmailAddressType CC)
 
 		if (Str)
 		{
-			ListAddr *a = new ListAddr(App);
+			auto a = new ListAddr(App);
 			if (a)
 			{
 				a->CC = CC;
@@ -342,7 +353,7 @@ void SetRecipients(ScribeWnd *App, char *Start, LDataIt l, EmailAddressType CC)
 	}
 }
 
-static char SoftwareUpdateUri[] = "http://www.memecode.com/update.php";
+static const char SoftwareUpdateUri[] = "http://www.memecode.com/update.php";
 
 enum SoftwareStatus
 {
@@ -355,7 +366,7 @@ enum SoftwareStatus
 static LString ExtractVer(const char *s)
 {
 	char Buf[256], *Out = Buf;
-	for (const char *In = s; *In && Out < Buf + sizeof(Buf) - 1; In++)
+	for (auto In = s; *In && Out < Buf + sizeof(Buf) - 1; In++)
 	{
 		if (*In == ' ')
 			break;
@@ -366,7 +377,10 @@ static LString ExtractVer(const char *s)
 	return LString(Buf);
 }
 
-void IsSoftwareUpToDate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::function<void(SoftwareStatus, LSoftwareUpdate::UpdateInfo*)> callback)
+void IsSoftwareUpToDate(ScribeWnd *Parent,
+                        bool WithUI,
+                        bool IncBetas,
+                        std::function<void(SoftwareStatus, LSoftwareUpdate::UpdateInfo*)> callback)
 {
 	// LSoftwareUpdate::UpdateInfo Info
 	// Software update?
@@ -434,22 +448,22 @@ void IsSoftwareUpToDate(ScribeWnd *Parent, bool WithUI, bool IncBetas, std::func
 		IncBetas);
 }
 
-void UpgradeSoftware(const LSoftwareUpdate::UpdateInfo *Info, ScribeWnd *Parent, bool WithUI, std::function<void(bool)> Callback)
+void UpgradeSoftware(const LSoftwareUpdate::UpdateInfo *Info,
+                     ScribeWnd *Parent,
+                     bool WithUI,
+                     std::function<void(bool)> Callback)
 {
 	bool DownloadUpdate = true;
 
 	if (WithUI)
 	{
-		char Ds[64];
-		Info->Date.Get(Ds, sizeof(Ds));
-
 		DownloadUpdate = LgiMsg(Parent,
 								LLoadString(IDS_SOFTWARE_UPDATE_DOWNLOAD),
 								AppName,
 								MB_YESNO,
 								Info->Build.Get(),
 								Info->Uri.Get(),
-								Ds)
+                                Info->Date.Get().Get())
 							==
 								IDYES;
 	}
@@ -521,9 +535,8 @@ extern void Log(char *File, char *Str, ...);
 void LogMsg(char *str, ...)
 {
 	#ifdef _DEBUG
-	char f[256];
-	LMakePath(f, sizeof(f), LGetExePath(), "log.txt");
-
+    LFile::Path f(LSP_EXE);
+    f += "log.txt";
 	if (str)
 	{
 		char buffer[256];
@@ -533,7 +546,7 @@ void LogMsg(char *str, ...)
 		va_end(arg);
 
 		LFile File;
-		while (!File.Open(f, O_WRITE))
+		while (!File.Open(f.GetFull(), O_WRITE))
 		{
 			LSleep(5);
 		}
@@ -543,7 +556,7 @@ void LogMsg(char *str, ...)
 	}
 	else
 	{
-		FileDev->Delete(f, NULL, false);
+		FileDev->Delete(f.GetFull(), NULL, false);
 	}
 	#endif
 }

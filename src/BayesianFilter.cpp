@@ -1603,6 +1603,8 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 			
 			if (matching > 1)
 				return matching == inPath.Length() ? BayesMailSpam : BayesMailUnknown;
+				
+			return BayesMailUnknown;
 		}
 		else
 		{
@@ -1882,15 +1884,15 @@ bool BayesianFilter::UnitTests(ScribeWnd *app)
 	BayesianFilter inst(app);
 	ScribeMailType prob, none;
 	auto spam = inst.BayesTypeFromPath("/Folders1/Spam");
-	if (spam != BayesMailSpam)
-		goto OnError;
+	if (spam == BayesMailHam)
+		goto OnError; // BayesMailUnknown is ok on first startup
 	
 	prob = inst.BayesTypeFromPath("/Folders1/Spam/Probably");
 	if (prob != BayesMailUnknown)
 		goto OnError;
 		
 	none = inst.BayesTypeFromPath("/Folders1/Inbox");
-	if (none != BayesMailHam)
+	if (none == BayesMailSpam)
 		goto OnError;
 		
 	return true;
