@@ -9790,6 +9790,45 @@ public:
 	}
 };
 
+class ScribeRichTextEdit : public LRichTextEdit
+{
+	ScribeWnd *App;
+
+public:
+	ScribeRichTextEdit(ScribeWnd *app, int Id, LFontType *FontInfo = NULL) :
+		LRichTextEdit(Id, 0, 0, 100, 100, FontInfo),
+		App(app)
+	{
+	}
+
+	bool MaxImageFilter(ImgParams &params)
+	{
+		auto opts = App->GetOptions();
+		LVariant v;
+		if (!opts->GetValue(OPT_ResizeImgAttachments, v) ||
+			!v.CastInt32())
+			return false;
+
+		if (opts->GetValue(OPT_ResizeJpegQual, v))
+			params.JpegQuality = v.CastInt32();
+
+		if (!opts->GetValue(OPT_ResizeMaxPx, v))
+			return false;
+
+		if (params.Sz.x > v.CastInt32())
+			return true;
+
+		if (!opts->GetValue(OPT_ResizeMaxKb, v))
+			return false;
+
+		auto byteLimit = (size_t)v.CastInt64() << 10/*KiB->bytes*/;
+		if (params.Bytes > byteLimit)
+			return true;
+
+		return false;
+	}
+};
+
 LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor, Mail *m)
 {
 	THREAD_UNSAFE(NULL);
@@ -9805,7 +9844,7 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 		{		
 			// Use the built in html editor
 			LRichTextEdit *Rte;
-			if ((Ctrl = Rte = new LRichTextEdit(Id)))
+			if ((Ctrl = Rte = new ScribeRichTextEdit(this, Id)))
 			{
 				if (UseFont)
 					Ctrl->SetFont(FontType.Create(), true);
@@ -9822,8 +9861,7 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 					
 					
 					// Set the spell thread:
-					LSpellCheck *t = GetSpellThread();
-					if (t)
+					if (auto t = GetSpellThread())
 						Rte->SetSpellCheck(t);
 				}
 			}
