@@ -20,6 +20,7 @@
 #include "lgi/common/Button.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/Json.h"
+#include "lgi/common/FileSelect.h"
 
 #include "CalendarView.h"
 #include "PrintContext.h"
@@ -780,6 +781,82 @@ void Calendar::OnSerialize(bool Write)
 		TodoView->Update();
 		TodoView->Resort();
 	}
+}
+
+LArray<LDataI*> Calendar::GetAttachments()
+{
+	LArray<LDataI*> attachments;
+
+	if (GetObject())
+	{
+		auto iter = GetObject()->GetList(FIELD_CAL_ATTACHMENTS);
+		for (auto i = iter->First(); i; i = iter->Next())
+		{
+			auto data = dynamic_cast<LDataI*>(i);
+			if (data)
+				attachments.Add(data);
+			else
+				LAssert(!"Wrong object type.");
+		}
+	}
+
+	return attachments;
+}
+
+LDataI *Calendar::ImportAttachment(LString Path)
+{
+	if (!GetObject())
+	{
+		LgiTrace("%s:%i - No object.\n", _FL);
+		return NULL;
+	}
+
+	auto lst = GetObject()->GetList(FIELD_CAL_ATTACHMENTS);
+	if (!lst)
+	{
+		LgiTrace("%s:%i - No FIELD_CAL_ATTACHMENTS.\n", _FL);
+		return NULL;
+	}
+
+	LFile f(Path, O_READ);
+	if (!f)
+	{
+		LgiTrace("%s:%i - Failed to open '%s' for reading.\n", _FL, Path.Get());
+		return NULL;
+	}
+
+	auto store = GetObject()->GetStore();
+	auto attachment = store->Create(MAGIC_CALENDAR_FILE);
+	if (!attachment)
+	{
+		LgiTrace("%s:%i - Store didn't create a MAGIC_CALENDAR_FILE.\n", _FL);
+		return NULL;
+	}
+
+	attachment->SetStr(FIELD_NAME, LGetLeaf(Path));
+	attachment->SetStr(FIELD_MIME_TYPE, LGetFileMimeType(Path));
+	attachment->SetDate(FIELD_DATE_MODIFIED, &LDateTime::Now());
+	attachment->SetStr(FIELD_ATTACHMENTS_DATA, f.Read());
+
+	auto status = attachment->Save(GetObject());
+	if (status > Store3Error)
+		lst->Insert(attachment);
+	else
+		DeleteObj(attachment);
+
+	return attachment;
+}
+
+bool Calendar::DeleteAttachment(LDataI *attachment)
+{
+	if (!attachment)
+	{
+		LgiTrace("%s:%i - No object.\n", _FL);
+		return false;
+	}
+
+	auto result = attachment->Delete(false);
+	return result > Store3Error;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2524,6 +2601,72 @@ struct CalendarUiPriv
 	}
 };
 
+//////////////////////////////////////////////////////////////////////////////
+class CalendarAttachmentItem : public LListItem
+{
+	CalendarUi *Ui;
+	LDataI *Obj;
+	LString Cache;
+
+public:
+	enum Columns
+	{
+		CFileName,
+		CMimeType,
+		CDateMod,
+		CSize
+	};
+
+	CalendarAttachmentItem(CalendarUi *ui, LDataI *obj) :
+		Ui(ui),
+		Obj(obj)
+	{
+	}
+
+	LDataI *GetObject()
+	{
+		return Obj;
+	}
+
+	bool OnKey(LKey &k) override
+	{
+		switch (k.vkey)
+		{
+			case VK_DELETE:
+				if (k.Down())
+					Ui->PostEvent(M_DELETE_ATTACHMENT, (LMessage::Param)this);
+				return true;
+			default:
+				break;
+		}
+
+		return false;
+	}
+
+	const char *GetText(int Col = 0)
+	{
+		switch (Col)
+		{
+			case CFileName:
+				return Obj->GetStr(FIELD_NAME);
+			case CMimeType:
+				return Obj->GetStr(FIELD_MIME_TYPE);
+			case CDateMod:
+			{
+				auto mod = Obj->GetDate(FIELD_DATE_MODIFIED);
+				if (mod)
+					Cache = mod->Get();
+				return Cache;
+			}
+			case CSize:
+				return Obj->GetStr(FIELD_SIZE);
+		}
+
+		return NULL;
+	}
+};
+
+//////////////////////////////////////////////////////////////////////////////
 CalendarUi::CalendarUi(Calendar *item) : ThingUi(item, LLoadString(IDS_CAL_EVENT))
 {
 	NotifyOn = false;
@@ -2709,6 +2852,30 @@ void CalendarUi::OnPosChange()
 {
 	THREAD_UNSAFE();
 	LWindow::OnPosChange();
+}
+
+LMessage::Result CalendarUi::OnEvent(LMessage *Msg)
+{
+	THREAD_UNSAFE(0);
+
+	switch (Msg->Msg())
+	{
+		case M_DELETE_ATTACHMENT:
+		{
+			auto item = (CalendarAttachmentItem*)Msg->A();
+			if (!item)
+				break;
+
+			auto lst = item->GetList();
+			lst->Remove(item);
+
+			Item->DeleteAttachment(item->GetObject());
+			delete item;
+			break;
+		}
+	}
+
+	return ThingUi::OnEvent(Msg);
 }
 
 void CalendarUi::CheckConsistancy()
@@ -2966,6 +3133,53 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 		case IDC_ADD_GUEST:
 		{
 			d->OnGuest();
+			break;
+		}
+		case IDC_ADD_FILE:
+		{
+			if (!Item)
+			{
+				LAssert(!"No item");
+				break;
+			}
+
+			auto sel = new LFileSelect(this);
+			sel->MultiSelect(true);
+			sel->Open([this, sel](auto dlg, auto ok)
+			{
+				if (ok)
+				{
+					LList *attachLst = NULL;
+					if (!GetViewById(IDC_ATTACHMENTS, attachLst))
+					{
+						LAssert(!"No list");
+					}
+					else
+					{
+						for (size_t i=0; i<sel->Length(); i++)
+						{
+							auto fn = (*sel)[i];
+							if (!fn)
+							{
+								LAssert(!"No filename");
+								continue;
+							}
+
+							auto data = Item->ImportAttachment(fn);
+							if (!data)
+							{
+								LAssert(!"ImportAttachment failed");
+								break;
+							}
+						
+							attachLst->Insert(new CalendarAttachmentItem(this, data));
+						}
+
+						attachLst->ResizeColumnsToContent();
+					}
+				}
+				delete dlg;
+			});
 			break;
 		}
 		case IDC_SAVE:
@@ -3385,4 +3599,4 @@ class LDateTimeViewFactory : public LViewFactory
 	}
 
 public:
-} DateTimeViewFactory;
+}	DateTimeViewFactory;

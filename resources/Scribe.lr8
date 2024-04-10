@@ -329,8 +329,6 @@
 		<String Ref="529" Cid="1050" Define="IDC_DEFAULT" en="Default" ko="기본" uk="За замовчуванням" de="Standard" fr="Défaut" />
 		<String Ref="530" Cid="1092" Define="IDC_PUBLIC" en="Public" ko="공공" uk="Відкритий" de="Öffentlich" fr="Publique" />
 		<String Ref="531" Cid="1093" Define="IDC_PRIVATE" en="Private" ko="개인" uk="Особистий" de="Privat" fr="Privé" />
-		<String Ref="532" Cid="1124" Define="IDC_SAVE" en="Save" ko="저장" uk="Зберегти" de="Speichern" fr="Enregistrer" />
-		<String Ref="533" Cid="2" Define="IDCANCEL" en="Cancel" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
 		<String Ref="534" Cid="-1" Define="IDC_STATIC" en="Signature &XML:" fr="Fichier signature:" it="File firma XML:" cs="XML podpis:" es="Firma XML:" de="XML-Signatur:" nl="Handtekening:" pt_br="Assinatura XML:" ru="Подпись XML:" pt="Assinatura XML:" pl="Sygnatura XML:" vi="Chữ ký XML:" zh_tw="XML 簽名檔:" ja="XML署名:" sr="XML potpis:" no="Signatur XML" lt="XML parašas:" fa="XMLامضاي" da="Signatur XML:" sv="XML-signatur:" lg="Sayini ya XML:" tr="XML İmza:" hu="Aláírás XML:" ko="서명 XML:" uk="Підпис XML:" />
 		<String Ref="535" Cid="535" Define="IDC_ID_TABLE" />
 		<String Ref="536" Cid="1165" Define="IDC_TABLE" />
@@ -875,6 +873,7 @@
 		<String Ref="1480" Cid="893" Define="IDC_FORMAT" en="Mail3 Format:" ko="Mail3 형식:" uk="Mail3 Формат:" fr="Format de Mail3:" />
 		<String Ref="1481" Cid="1481" Define="IDC_V1" en="v1" />
 		<String Ref="1482" Cid="1482" Define="IDC_V2" en="v2" />
+		<String Ref="1483" Cid="-1" Define="IDC_STATIC" en="Attachments:" />
 		<String Ref="1485" Cid="1485" Define="IDS_GROWL_SUPPORT" en="Growl notification support" ko="Growl 알림 지원" uk="Підтримка повідомлень Growl" de="Unterstützung von Growl-Benachrichtigungen" fr="Prise en charge des notifications Growl" />
 		<String Ref="1486" Cid="1486" Define="IDS_GROWL" en="Use growl:" ko="Growl 사용" uk="Використовувати growl:" de="Verwende Growl:" fr="Utilisez le grognement:" />
 		<String Ref="1487" Cid="1165" Define="IDC_TABLE" />
@@ -894,11 +893,13 @@
 		<String Ref="1504" Cid="855" Define="IDS_780" en="Destination Field" cs="Cílové pole" pt="Campo de destino" nl="Bestemming" pl="Folder docelowy" vi="Trường mô tả" zh_tw="目的範圍" ja="保存先のフィールド" sr="Odredišno polje" es="Campo de Destino" no="Mottaksfelt" lt="Į kurį lauką importuoti" fa="کادر مقصد" de="Ziel-Feld" da="Modtagelsesfelt" sv="Mottagarfält" pt_br="Campo de Destino" lg="Omuwatwa webiraga" tr="Hedef Alan" hu="Cél mező" ru="Поле назначения" ko="대상 필드" uk="Поле призначення" fr="Champ destination" />
 		<String Ref="1505" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="삭제" uk="Скасувати" />
 		<String Ref="1506" Cid="623" Define="IDS_DOWNLOAD" en="Download" fr="Récupérer" it="Scarica" cs="Stáhnout" es="Descargar" de="Empfangen" nl="Ophalen" pt_br="Receber" ru="Загрузить" pt="Ler" pl="Pobierz" vi="Tải về" zh_tw="下載" ja="ダウンロード" sr="Preuzmi" no="Last ned" lt="Parsiųsti" fa="بارگيري کن" sv="Ladda ner" lg="Ttikula" tr="Yükle" hu="Letölt" ko="다운로드" uk="Завантажити" />
+		<String Ref="1507" Cid="988" Define="IDC_ATTACHMENTS" />
 		<String Ref="1508" Cid="205" Define="IDS_205" en="Delete" fr="Supprimer" it="Cancella" cs="Smazat" es="Eliminar" de="Löschen" nl="Verwijderen" pt_br="Excluir" ru="Удалить" pt="Apagar" pl="Usuń" vi="Xóa" zh_tw="刪除" ja="削除" sr="Briši" no="Slett" lt="Pašalinti" fa="پاک کن" da="Slet" sv="Ta bort" lg="Sangula" tr="Sil" hu="Töröl" ko="삭제" uk="Видалити" />
 		<String Ref="1509" Cid="1489" Define="IDC_MSG_DEL_CLOSE" en="Close" ko="닫기" uk="Закрити" de="Schließen" fr="Fermer" />
 		<String Ref="1510" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="1511" Cid="1490" Define="IDC_MSG_DEL_PREV" en="Prev" ko="미리보기" uk="Попередній" de="Vorige E-Mail" fr="Préc" />
 		<String Ref="1512" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="?????" pt="Cancelar" pl="Anuluj" vi="Hu?y" zh_tw="??" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
+		<String Ref="1513" Cid="1513" Define="IDC_ADD_FILE" en="+" />
 		<String Ref="1514" Cid="1514" Define="IDC_RECEIVE_LOG" />
 		<String Ref="1515" Cid="3002" Define="IDC_FPR_ADMIN" en="Admin" pt="Administrador" zh_tw="管理員" ja="管理者" nl="Beheerder" sr="Administrator" es="Administrador" cs="Správce" lt="Admin." fa="مدير" de="Administrator" vi="Người quản lý" sv="Administratör" pt_br="Administrador" lg="Alabirira" tr="Yönetici" ru="Администратор" ko="관리자" uk="Адміністратор" />
 		<String Ref="1518" Cid="-1" Define="IDC_STATIC" en="Port:" vi="Cổng:" lt="Prievadas:" es="Puerto:" ru="порт:" nl="Poort:" pt_br="Porta:" ja="ポート:" pt="Porta:" ko="포트:" uk="Порт:" />
@@ -957,6 +958,12 @@
 		<String Ref="1626" Cid="1626" Define="IDC_1626" />
 		<String Ref="1627" Cid="975" Define="IDS_975" en="Language" nl="Taal" pt="Linguagem" pl="Język" cs="Jazyk" no="Språk" lt="Kalba" fa="زبان" de="Sprache" sr="Jezik" da="Sprog" vi="Ngôn ngữ:" sv="Språk" pt_br="Idioma" es="Idioma" lg="Olulimi" tr="Lisan" hu="Nyelv" ru="Язык" ko="언어" uk="Мова" fr="Langue" />
 		<String Ref="1628" Cid="976" Define="IDS_976" en="Id" de="ID" vi="ID" tr="Kod" hu="Azon." ru="№" ko="아이디" uk="№" />
+		<String Ref="1629" Cid="1629" Define="IDC_1629" en="FileName" />
+		<String Ref="1630" Cid="1630" Define="IDC_1630" en="MimeType" />
+		<String Ref="1631" Cid="1631" Define="IDC_1631" en="Date Modified" />
+		<String Ref="1632" Cid="1632" Define="IDC_1632" en="Size" />
+		<String Ref="1633" Cid="2" Define="IDCANCEL" en="Cancel" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
+		<String Ref="1634" Cid="1124" Define="IDC_SAVE" en="Save" ko="저장" uk="Зберегти" de="Speichern" fr="Enregistrer" />
 	</string-group>
 	<string-group Name="General">
 		<String Ref="19" Cid="2000" Define="IDS_MBOX_SELECT_FOLDER" en="Select the input MBOX files and then a folder to import to:" fr="Sélectionner un dossier à importer au format unix MBOX" cs="Vyberte vstupní MBOX soubory a složku do které budou soubory importovány:" nl="Kies een map voor het importeren van het Unix MBOX formaat:" es="Seleccione una carpeta para importar del formato de unix MBOX:" pt_br="Selecione a pasta para importar o formato MBOX do Unix:" pt="Selecione a pasta para importar do formato MBOX do unix:" pl="Wybierz pliki wejściowe MBOX a następnie folder, do którego importować:" vi="Chọn danh mục để nhập từ định dạng MBOX" zh_tw="選擇資料夾以便匯入unix MBOX 格式:" ja="Unix MBOXフォーマットのフォルダからインポートするフォルダを選択してください" sr="Izaberite omotnicu iz koje uvozite unix MBOX format" no="Velg MBOX fil som skal leses, og så en mappe som det skal importeres til." lt="Pasirinkite MBOX rinkmeną, o vėliau ir aplanką importavimui:" fa="را انتخاب کنید unix MBOX formatپوشه مورد نظر برای وارد کردن" de="Wählen Sie die MBOX Datei und dann den Ordner in den importiert werden soll:" da="Vælg MBOX fil som skal læses, og så en mappe som den skal importeres til." sv="Välj MBOX-fil som skall läsas, samt en mapp att importera till:" lg="Londawo Etterekero, era ne Kabada ey&apos;okuttikuliramu ebiragirizidwa:" tr="Kaynak MBOX dosyasını ve içe aktarılacak klasörü seçiniz:" hu="Válassza ki a bejövő MBOX fájlt majd a mappát, ahova importálni akarja:" ru="Выберите входящие MBOX файлы и потом папку сохранения:" ko="입력 MBOX파일과 폴더를 선택한 후 다음 위치로 불러옵니다:" uk="Визначення" />
@@ -2087,10 +2094,10 @@
 			</tr>
 		</TableLayout>
 	</Dialog>
-	<Dialog pos="7,7,520,602" ref="588">
-		<TableLayout pos="7,0,475,559" ref="714" Style="padding: 4px;&#10;width: 600px;" cols="0.200,0.200,0.200,0.200,0.200" rows="0.220,0.080,0.065,0.072,0.080,0.058,0.064,0.067,0.092,0.072,0.066,0.065">
+	<Dialog pos="7,7,526,697" ref="588">
+		<TableLayout pos="7,7,517,650" ref="714" Style="padding: 4px;&#10;width: 600px;" cols="0.250,0.250,0.250,0.250" rows="0.195,0.071,0.058,0.064,0.071,0.051,0.057,0.059,0.081,0.064,0.058,0.058,0.058,0.058">
 			<tr>
-				<td addr="0,0" colspan="5">
+				<td addr="0,0" colspan="4">
 					<TableLayout pos="7,7,447,104" ref="850" cols="0.167,0.167,0.167,0.167,0.167,0.167" rows="0.333,0.333,0.333">
 						<tr>
 							<td addr="0,0" colspan="6">
@@ -2131,8 +2138,8 @@
 				</td>
 			</tr>
 			<tr>
-				<td addr="0,1" colspan="5">
-					<TableLayout pos="6,126,236,160" ref="869" cols="0.500,0.500" rows="1.000">
+				<td addr="0,1" colspan="4">
+					<TableLayout pos="6,129,236,163" ref="869" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0">
 								<CheckBox pos="0,0,104,18" ref="870" />
@@ -2146,63 +2153,63 @@
 			</tr>
 			<tr>
 				<td addr="0,2" align="Max" valign="Center">
-					<StaticText pos="14,172,76,192" ref="1159" />
+					<StaticText pos="14,176,76,196" ref="1159" />
 				</td>
-				<td addr="1,2" colspan="3">
-					<EditBox Pos="102,173,353,193" ref="1160" />
+				<td addr="1,2" colspan="2">
+					<EditBox Pos="124,177,370,197" ref="1160" />
 				</td>
-				<td addr="4,2">
-					<Button pos="380,173,442,193" ref="1161" toggle="0" />
+				<td addr="3,2">
+					<Button pos="388,177,450,197" ref="1161" toggle="0" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,3" />
-				<td addr="1,3" colspan="3">
-					<ListView pos="100,205,358,225" ref="1217" Style="height: 4em;" />
+				<td addr="1,3" colspan="2">
+					<ListView pos="124,210,370,230" ref="1217" Style="height: 4em;" />
 				</td>
-				<td addr="4,3" />
+				<td addr="3,3" />
 			</tr>
 			<tr>
 				<td addr="0,4" align="Max">
-					<StaticText pos="14,241,62,254" ref="871" />
+					<StaticText pos="14,247,62,260" ref="871" />
 				</td>
-				<td addr="1,4" colspan="3">
-					<EditBox Pos="93,245,358,265" Style="height: 4em;" MultiLine="1" ref="771" />
+				<td addr="1,4" colspan="2">
+					<EditBox Pos="124,251,370,271" Style="height: 4em;" MultiLine="1" ref="771" />
 				</td>
-				<td addr="4,4">
-					<Button pos="373,245,435,265" ref="872" toggle="0" />
+				<td addr="3,4">
+					<Button pos="381,251,443,271" ref="872" toggle="0" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,5" align="Max" valign="Center">
-					<StaticText pos="14,284,69,304" ref="873" />
+					<StaticText pos="14,291,69,311" ref="873" />
 				</td>
-				<td addr="1,5" colspan="4">
-					<ComboBox pos="104,284,341,304" ref="874" />
+				<td addr="1,5" colspan="3">
+					<ComboBox pos="137,291,374,311" ref="874" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,6" align="Max">
-					<StaticText pos="7,310,69,330" ref="906" />
+					<StaticText pos="7,318,69,338" ref="906" />
 				</td>
-				<td addr="1,6" colspan="4">
-					<EditBox Pos="102,318,388,338" Style="height: 4em;" MultiLine="1" ref="910" />
+				<td addr="1,6" colspan="3">
+					<EditBox Pos="135,326,421,346" Style="height: 4em;" MultiLine="1" ref="910" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,7" align="Max" valign="Center">
-					<StaticText pos="7,347,69,360" ref="911" />
+					<StaticText pos="7,355,69,368" ref="911" />
 				</td>
-				<td addr="1,7" colspan="4">
-					<Custom pos="109,347,206,367" ref="912" Ctrl="LColourSelect" />
+				<td addr="1,7" colspan="3">
+					<Custom pos="142,355,239,375" ref="912" Ctrl="LColourSelect" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,8" align="Max">
-					<StaticText pos="7,390,69,403" ref="715" />
+					<StaticText pos="7,399,69,412" ref="715" />
 				</td>
-				<td addr="1,8" colspan="4">
-					<TableLayout pos="102,386,451,427" ref="913" cols="0.167,0.167,0.167,0.167,0.167,0.167" rows="1.000">
+				<td addr="1,8" colspan="3">
+					<TableLayout pos="135,395,484,436" ref="913" cols="0.167,0.167,0.167,0.167,0.167,0.167" rows="1.000">
 						<tr>
 							<td addr="0,0">
 								<ComboBox pos="0,0,53,20" ref="1153" />
@@ -2228,16 +2235,16 @@
 			</tr>
 			<tr>
 				<td addr="0,9" />
-				<td addr="1,9" colspan="4">
-					<ListView pos="102,437,381,464" ref="921" Style="height: 5em;" />
+				<td addr="1,9" colspan="3">
+					<ListView pos="135,447,414,474" ref="921" Style="height: 5em;" />
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,10" align="Max" valign="Center">
-					<StaticText pos="14,470,62,486" ref="922" />
+					<StaticText pos="14,481,62,497" ref="922" />
 				</td>
-				<td addr="1,10" colspan="4">
-					<Group pos="95,471,437,498" ref="923">
+				<td addr="1,10" colspan="3">
+					<Group pos="128,482,470,509" ref="923">
 						<RadioBox pos="21,11,104,24" ref="1009" />
 						<RadioBox pos="119,14,209,27" ref="1548" />
 						<RadioBox pos="245,14,321,27" ref="1038" />
@@ -2246,20 +2253,36 @@
 			</tr>
 			<tr>
 				<td addr="0,11" align="Max" valign="Center">
-					<StaticText pos="14,508,62,521" ref="1048" />
+					<StaticText pos="14,519,62,532" ref="1048" />
 				</td>
-				<td addr="1,11" colspan="2">
-					<Group pos="90,508,271,535" ref="528">
-						<RadioBox pos="7,14,76,27" ref="529" />
-						<RadioBox pos="70,7,146,20" ref="530" />
-						<RadioBox pos="119,14,181,27" ref="531" />
+				<td addr="1,11" colspan="3">
+					<Group pos="124,515,497,542" ref="528">
+						<RadioBox pos="21,14,90,27" ref="529" />
+						<RadioBox pos="112,14,188,27" ref="530" />
+						<RadioBox pos="238,14,286,27" ref="531" />
 					</Group>
 				</td>
-				<td addr="3,11">
-					<Button pos="289,514,358,534" ref="532" toggle="0" />
+			</tr>
+			<tr>
+				<td addr="0,12">
+					<StaticText pos="14,558,76,578" ref="1483" />
 				</td>
-				<td addr="4,11">
-					<Button pos="380,514,442,534" ref="533" toggle="0" />
+				<td addr="1,12" colspan="2">
+					<ListView pos="124,554,370,588" ref="1507">
+						<Column ref="1629" width="66" />
+						<Column ref="1630" width="70" />
+						<Column ref="1631" width="86" />
+						<Column ref="1632" width="50" />
+					</ListView>
+				</td>
+				<td addr="3,12">
+					<Button pos="390,565,417,585" ref="1513" image="" toggle="0" />
+				</td>
+			</tr>
+			<tr>
+				<td addr="0,13" colspan="4" align="Max">
+					<Button pos="413,605,482,625" ref="1633" toggle="0" />
+					<Button pos="336,605,405,625" ref="1634" toggle="0" />
 				</td>
 			</tr>
 		</TableLayout>
@@ -4664,9 +4687,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4674,23 +4711,9 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>

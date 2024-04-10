@@ -146,6 +146,7 @@ LMail3Store::LMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool C
 	Fields.Add(MAIL3_TBL_GROUP, TblGroup);
 	Fields.Add(MAIL3_TBL_FILTER, TblFilter);
 	Fields.Add(MAIL3_TBL_CALENDAR, TblCalendar);
+	Fields.Add(MAIL3_TBL_CALENDAR_FILES, TblCalendarFiles);
 
 	bool Exist = LDirExists(Mail3Folder);
 	if (!Create && !Exist)
@@ -495,6 +496,8 @@ LDataI *LMail3Store::Create(int Type)
 			return new LMail3Filter(this);
 		case MAGIC_CALENDAR:
 			return new LMail3Calendar(this);
+		case MAGIC_CALENDAR_FILE:
+			return new LMail3CalendarFile(this);
 		case MAGIC_ATTACHMENT:
 			return new LMail3Attachment(this);
 

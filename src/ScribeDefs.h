@@ -341,6 +341,7 @@ enum ScribeMessages
 	M_UNIT_TEST_TICK,
 	M_GET_EVENTS_DONE,
 	M_CONSTRUCT_0,				// A=(LOptionsFile::PortableType)Type
+	M_DELETE_ATTACHMENT,		// A=(CalendarAttachmentItem*)
 };
 
 enum ScribeControls

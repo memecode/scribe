@@ -37,6 +37,19 @@ LMail3Def TblCalendar[] =
 	{0, 0}
 };
 
+LMail3Def TblCalendarFiles[] =
+{
+	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
+	{"ParentId",		"INTEGER"}, // ID of the calendar event...
+
+	{"FileName",		"TEXT"},	// FIELD_NAME
+	{"MimeType",		"TEXT"},	// FIELD_MIME_TYPE
+	{"DateModified",	"TEXT"},	// FIELD_DATE_MODIFIED
+	{"Data",			"TEXT"},	// FIELD_ATTACHMENTS_DATA
+
+	{0, 0}
+};
+
 LMail3Calendar::LMail3Calendar(LMail3Store *store)
 {
 	Store = store;
@@ -57,6 +70,41 @@ bool LMail3Calendar::DbDelete()
 		return false;
 
 	return true;
+}
+
+LDataIt LMail3Calendar::GetList(int id)
+{
+	switch (id)
+	{
+		case FIELD_CAL_ATTACHMENTS:
+		{
+			if (Attachments.State == Store3Unloaded)
+			{
+				auto Sql = LString::Fmt("select * from %s where ParentId=" LPrintfInt64, MAIL3_TBL_CALENDAR_FILES, Id);
+
+				LMail3Store::LStatement s(Store, Sql);
+				if (s.IsOk())
+				{
+					while (s.Row())
+					{
+						if (auto a = new LMail3CalendarFile(Store))
+						{
+							a->Calendar = this;
+							if (a->Serialize(s, false))
+								Attachments.a.Add(a);
+							else
+								delete a;
+						}
+					}
+
+					Attachments.State = Store3Loaded;
+				}
+			}
+			return &Attachments;
+		}
+	}
+
+	return NULL;
 }
 
 bool LMail3Calendar::Serialize(LMail3Store::LStatement &s, bool Write)
@@ -111,5 +159,152 @@ bool LMail3Calendar::Serialize(LMail3Store::LStatement &s, bool Write)
 
 	
 	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+LMail3CalendarFile::LMail3CalendarFile(LMail3Store *store) :
+	Store(store)
+{
+}
+
+bool LMail3CalendarFile::CopyProps(LDataPropI &p)
+{
+	SetStr(FIELD_NAME, p.GetStr(FIELD_NAME));
+	SetStr(FIELD_MIME_TYPE, p.GetStr(FIELD_MIME_TYPE));
+	SetDate(FIELD_DATE_MODIFIED, p.GetDate(FIELD_DATE_MODIFIED));
+	SetStr(FIELD_ATTACHMENTS_DATA, p.GetStr(FIELD_ATTACHMENTS_DATA));
+
+	return true;
+}
+
+bool LMail3CalendarFile::Serialize(LMail3Store::LStatement &s, bool Write)
+{
+	int i = 0;
+
+	SERIALIZE_INT64(Id, i++);
+	SERIALIZE_INT64(ParentId, i++);
+
+	SERIALIZE_LSTR(FileName, i++); // FIELD_NAME
+	SERIALIZE_LSTR(MimeType, i++); // FIELD_MIME_TYPE
+	SERIALIZE_DATE(DateModified, i++); // FIELD_DATE_MODIFIED
+	SERIALIZE_LSTR(Data, i++); // FIELD_ATTACHMENTS_DATA
+
+	return true;
+}
+
+const char *LMail3CalendarFile::GetStr(int id)
+{
+	switch (id)
+	{
+		case FIELD_NAME:
+			return FileName;
+		case FIELD_MIME_TYPE:
+			return MimeType;
+		case FIELD_ATTACHMENTS_DATA:
+			return Data;
+		case FIELD_SIZE:
+			SizeCache = LFormatSize(Data.Length());
+			return SizeCache;
+	}
+
+	return NULL;
+}
+
+Store3Status LMail3CalendarFile::SetStr(int id, const char *str)
+{
+	switch (id)
+	{
+		case FIELD_NAME:
+			FileName = str;
+			break;
+		case FIELD_MIME_TYPE:
+			MimeType = str;
+			break;
+		case FIELD_ATTACHMENTS_DATA:
+			Data = str;
+			break;
+		default:
+			return Store3NotImpl;
+	}
+
+	Dirty = true;
+	return Store3Success;
+}
+
+const LDateTime *LMail3CalendarFile::GetDate(int id)
+{
+	switch (id)
+	{
+		case FIELD_DATE_MODIFIED:
+			return &DateModified;
+	}
+
+	return NULL;
+}
+
+Store3Status LMail3CalendarFile::SetDate(int id, const LDateTime *i)
+{
+	switch (id)
+	{
+		case FIELD_DATE_MODIFIED:
+			if (i)
+				DateModified = *i;
+			else
+				DateModified.Empty();
+			break;
+		default:
+			return Store3NotImpl;
+	}
+
+	Dirty = true;
+	return Store3Success;
+}
+
+uint64 LMail3CalendarFile::Size()
+{
+	return sizeof(this) +
+		FileName.Length() + 
+		MimeType.Length() +
+		sizeof(DateModified) +
+		Data.Length();
+}
+
+Store3Status LMail3CalendarFile::Save(LDataI *Parent)
+{
+	if (Parent)
+	{
+		Calendar = dynamic_cast<LMail3Calendar*>(Parent);
+		if (!Calendar)
+		{
+			LAssert(!"Wrong object type!");
+			return Store3Error;
+		}
+	}
+
+	// FIXME: impl database write here..
+	LAssert(!"Impl db write");
+
+	return Store3NotImpl;
+}
+
+Store3Status LMail3CalendarFile::Delete(bool ToTrash)
+{
+	if (!Calendar)
+	{
+		LAssert(!"No calendar object?");
+		return Store3Error;
+	}
+
+	auto idx = Calendar->Attachments.IndexOf(this);
+	if (idx < 0)
+	{
+		LAssert(!"Calendar doesn't have this file?");
+		return Store3Error;
+	}
+
+	// FIXME: impl database delete here..
+	LAssert(!"Impl db delete");
+
+	return Store3NotImpl;
 }
 

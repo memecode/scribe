@@ -1115,6 +1115,7 @@
 #define IDC_MSG_DEL_CLOSE						1489
 #define IDC_MSG_DEL_PREV						1490
 #define IDS_KILL								1497
+#define IDC_ADD_FILE							1513
 #define IDC_RECEIVE_LOG							1514
 #define IDS_EMAIL_PROGRESS						1516
 #define IDS_COPY_LOG_TO_CLIP					1517
@@ -1186,6 +1187,10 @@
 #define IDC_END_REL								1621
 #define IDS_YESTERDAY							1622
 #define IDC_1626								1626
+#define IDC_1629								1629
+#define IDC_1630								1630
+#define IDC_1631								1631
+#define IDC_1632								1632
 #define IDS_MBOX_SELECT_FOLDER					2000
 #define IDS_MBOX_READING						2001
 #define IDS_MBOX_EXPORT							2002

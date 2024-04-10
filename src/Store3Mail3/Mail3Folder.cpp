@@ -196,10 +196,7 @@ bool LMail3Folder::Serialize(LMail3Store::LStatement &s, bool Write)
 			Flds.DeleteObjects();
 			while (s.Row())
 			{
-				Store3Field *i = new Store3Field(GetStore(),
-												s.GetInt(2),
-												s.GetInt(3));
-				if (i)
+				if (auto i = new Store3Field(GetStore(), s.GetInt(2), s.GetInt(3)))
 					Flds.Insert(i, -1, true);
 			}
 

@@ -155,9 +155,10 @@ public:
 	char *GetDropFileName() override;
 	bool GetDropFiles(LString::Array &Files) override;
 
-	// Property storage
-	bool GetObjects(List<LDataI> &l);
-	LDataI *NewObject(int Type);
+	// File attachment storage
+	LArray<LDataI*> GetAttachments();
+	LDataI *ImportAttachment(LString Path);
+	bool DeleteAttachment(LDataI *attachment);
 
 	// Printing
 	void OnPrintHeaders(struct ScribePrintContext &Context) override;
@@ -203,6 +204,7 @@ public:
 	int OnCommand(int Cmd, int Event, OsView Window);
 	int OnNotify(LViewI *Ctrl, LNotification n);
 	void OnPosChange();
+	LMessage::Result OnEvent(LMessage *Msg);
 
 	void OnLoad();
 	void OnSave();

@@ -7,17 +7,18 @@
 #include "Store3CalendarObj.h"
 
 // Debugging stuff
-#define MAIL3_TRACK_OBJS		0
+#define MAIL3_TRACK_OBJS			0
 
-#define MAIL3_DB_FILE			"Database.sqlite"
-#define MAIL3_TBL_FOLDER		"Folder"
-#define MAIL3_TBL_FOLDER_FLDS	"FolderFields"
-#define MAIL3_TBL_MAIL			"Mail"
-#define MAIL3_TBL_MAILSEGS		"MailSegs"
-#define MAIL3_TBL_CONTACT		"Contact"
-#define MAIL3_TBL_GROUP			"ContactGroup"
-#define MAIL3_TBL_FILTER		"Filter"
-#define MAIL3_TBL_CALENDAR		"Calendar"
+#define MAIL3_DB_FILE				"Database.sqlite"
+#define MAIL3_TBL_FOLDER			"Folder"
+#define MAIL3_TBL_FOLDER_FLDS		"FolderFields"
+#define MAIL3_TBL_MAIL				"Mail"
+#define MAIL3_TBL_MAILSEGS			"MailSegs"
+#define MAIL3_TBL_CONTACT			"Contact"
+#define MAIL3_TBL_GROUP				"ContactGroup"
+#define MAIL3_TBL_FILTER			"Filter"
+#define MAIL3_TBL_CALENDAR			"Calendar"
+#define MAIL3_TBL_CALENDAR_FILES	"CalendarFiles"
 
 class LMail3Store;
 class LMail3Mail;
@@ -77,6 +78,7 @@ extern LMail3Def TblContact[];
 extern LMail3Def TblFilter[];
 extern LMail3Def TblGroup[];
 extern LMail3Def TblCalendar[];
+extern LMail3Def TblCalendarFiles[];
 
 #define SERIALIZE_STR(Var, Col) \
 	if (Write) \
@@ -722,10 +724,64 @@ public:
 	Store3Status SetDate(int id, const LDateTime *i) override;
 };
 
+class LMail3CalendarFile : public LDataI
+{
+	friend class LMail3Calendar;
+
+	LMail3Store *Store = NULL;
+	LMail3Calendar *Calendar = NULL;
+	
+	int64 Id = -1;
+	int64 ParentId = -1;
+	LString FileName;
+	LString MimeType;
+	LDateTime DateModified;
+	LString Data;
+
+	LString SizeCache;
+
+public:
+	bool Dirty = false;
+
+	LMail3CalendarFile(LMail3Store *store);
+	const char *GetClass() override { return "LMail3CalendarFile"; }
+
+	bool CopyProps(LDataPropI &p) override;
+	bool Serialize(LMail3Store::LStatement &s, bool Write);
+
+	// Impl LDataPropI
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	const LDateTime *GetDate(int id) override;
+	Store3Status SetDate(int id, const LDateTime *i) override;
+
+	// Impl LDataI
+	uint32_t Type() override { return MAGIC_CALENDAR_FILE; }
+	bool IsOnDisk() override { return Id >= 0; }
+	bool IsOrphan() override { return Calendar == NULL; }
+	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
+	LDataStoreI *GetStore() override { return Store; }
+	uint64 Size() override;
+	Store3Status Save(LDataI *Parent = NULL) override;
+	Store3Status Delete(bool ToTrash = true) override;
+
+	// Stubs
+	int64 GetInt(int id) override { return 0; }
+	Store3Status SetInt(int id, int64 i) override { return Store3NotImpl; }
+	const LVariant *GetVar(int id) override { return NULL; }
+	Store3Status SetVar(int id, LVariant *i) override { return Store3NotImpl; }
+	LDataPropI *GetObj(int id) override { return NULL; }
+	Store3Status SetObj(int id, LDataPropI *i) override { return Store3NotImpl; }
+	LDataIt GetList(int id) override { EmptyVirtual(NULL); }
+};
+
 class LMail3Calendar : public Store3CalendarObj<LMail3Thing>
 {
+	friend class LMail3CalendarFile;
+
 private:
 	const char *GetTable() override { return MAIL3_TBL_CALENDAR; }
+	DIterator<LDataPropI, LMail3CalendarFile, LMail3Store> Attachments;
 
 public:
 	LMail3Calendar(LMail3Store *store);
@@ -735,6 +791,7 @@ public:
 	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
 	const char *GetClass() override { return "LMail3Filter"; }
 	bool DbDelete() override;
+	LDataIt GetList(int id) override;
 };
 
 #endif
