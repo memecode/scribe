@@ -44,8 +44,8 @@ extern char sMimeMessage[];
 extern char sMimeXml[];
 
 // Default templates
-extern char DefaultTextReplyTemplate[];
-extern char DefaultHtmlReplyTemplate[];
+extern const char DefaultTextReplyTemplate[];
+extern const char DefaultHtmlReplyTemplate[];
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Functions

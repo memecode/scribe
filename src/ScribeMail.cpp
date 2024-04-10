@@ -65,8 +65,9 @@ static char ScribeReplyStyles[] =	"margin-left: 0.5em;\n"
 									"padding-left: 0.5em;\n"
 									"border-left: 1px solid #ccc;";
 
-char DefaultTextReplyTemplate[] =
+const char DefaultTextReplyTemplate[] =
 {
+	"\n"
 	"---------- Original Message ----------\n"
 	"To: <mail.to[0].name> &lt;<mail.to[0].email>&gt;\n"
 	"From: <mail.from.name> &lt;<mail.from.email>&gt;\n"
@@ -78,7 +79,7 @@ char DefaultTextReplyTemplate[] =
 	"<mail.sig>\n"
 };
 
-char DefaultHtmlReplyTemplate[] =
+const char DefaultHtmlReplyTemplate[] =
 {
 	"<html>\n"
 	"<head>\n"
@@ -95,6 +96,7 @@ char DefaultHtmlReplyTemplate[] =
 	"	</style>\n"
 	"</head>\n"
 	"<body>\n"
+	"	<br>\n"
 	"	<p><span class='Style1'>---------- Original Message ----------</span><br>\n"
 	"	<b>To:</b> &lt;?mail.tohtml?&gt;<br>\n"
 	"	<b>From:</b> &lt;?mail.fromhtml?&gt;<br>\n"
