@@ -2632,7 +2632,7 @@ public:
 	{
 		switch (k.vkey)
 		{
-			case VK_DELETE:
+			case LK_DELETE:
 				if (k.Down())
 					Ui->PostEvent(M_DELETE_ATTACHMENT, (LMessage::Param)this);
 				return true;

@@ -22,6 +22,7 @@
 
 class LMail3Store;
 class LMail3Mail;
+class LMail3Calendar;
 
 enum Mail3SubFormat
 {

@@ -782,7 +782,7 @@ void AccountStatusPanel::OnPaint(LSurface *pDC)
 		auto Send = App->GetSendAccount();
 		LColour Background(L_MED);
 
-		LRect *Bounds = ImgLst->GetBounds();
+		auto Bounds = ImgLst->GetBounds();
 		if (Bounds)
 		{
 			// SMTP
