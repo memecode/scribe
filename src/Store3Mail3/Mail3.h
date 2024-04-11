@@ -743,7 +743,8 @@ class LMail3CalendarFile : public LDataI
 	LString FileName;
 	LString MimeType;
 	LDateTime DateModified;
-	LString Data;
+	LString Uri; // Either 'Uri' or 'Data' must be valid
+	LString Data; // Store the data inline
 
 	LString SizeCache;
 	bool Dirty = false;
@@ -766,8 +767,9 @@ public:
 	uint32_t Type() override { return MAGIC_CALENDAR_FILE; }
 	bool IsOnDisk() override { return Id >= 0; }
 	bool IsOrphan() override { return Calendar == NULL; }
-	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
 	LDataStoreI *GetStore() override { return Store; }
+
+	LAutoStreamI GetStream(const char *file, int line) override;
 	uint64 Size() override;
 	Store3Status Save(LDataI *Parent = NULL) override;
 	Store3Status Delete(bool ToTrash = true) override;

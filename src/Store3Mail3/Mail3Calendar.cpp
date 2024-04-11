@@ -45,6 +45,7 @@ LMail3Def TblCalendarFiles[] =
 	{"FileName",		"TEXT"},	// FIELD_NAME
 	{"MimeType",		"TEXT"},	// FIELD_MIME_TYPE
 	{"DateModified",	"TEXT"},	// FIELD_DATE_MODIFIED
+	{"Uri",				"TEXT"},	// FIELD_URI
 	{"Data",			"TEXT"},	// FIELD_ATTACHMENTS_DATA
 
 	{0, 0}
@@ -225,6 +226,7 @@ bool LMail3CalendarFile::CopyProps(LDataPropI &p)
 	SetStr(FIELD_NAME, p.GetStr(FIELD_NAME));
 	SetStr(FIELD_MIME_TYPE, p.GetStr(FIELD_MIME_TYPE));
 	SetDate(FIELD_DATE_MODIFIED, p.GetDate(FIELD_DATE_MODIFIED));
+	SetStr(FIELD_URI, p.GetStr(FIELD_URI));
 	SetStr(FIELD_ATTACHMENTS_DATA, p.GetStr(FIELD_ATTACHMENTS_DATA));
 
 	return true;
@@ -243,6 +245,7 @@ bool LMail3CalendarFile::Serialize(LMail3Store::LStatement &s, bool Write)
 	SERIALIZE_LSTR(FileName, i++); // FIELD_NAME
 	SERIALIZE_LSTR(MimeType, i++); // FIELD_MIME_TYPE
 	SERIALIZE_DATE(DateModified, i++); // FIELD_DATE_MODIFIED
+	SERIALIZE_LSTR(Uri, i++); // FIELD_URI
 	SERIALIZE_LSTR(Data, i++); // FIELD_ATTACHMENTS_DATA
 
 	return true;
@@ -256,6 +259,8 @@ const char *LMail3CalendarFile::GetStr(int id)
 			return FileName;
 		case FIELD_MIME_TYPE:
 			return MimeType;
+		case FIELD_URI:
+			return Uri;
 		case FIELD_ATTACHMENTS_DATA:
 			return Data;
 		case FIELD_SIZE:
@@ -275,6 +280,9 @@ Store3Status LMail3CalendarFile::SetStr(int id, const char *str)
 			break;
 		case FIELD_MIME_TYPE:
 			MimeType = str;
+			break;
+		case FIELD_URI:
+			Uri = str;
 			break;
 		case FIELD_ATTACHMENTS_DATA:
 			Data = str;
@@ -316,12 +324,21 @@ Store3Status LMail3CalendarFile::SetDate(int id, const LDateTime *i)
 	return Store3Success;
 }
 
+LAutoStreamI LMail3CalendarFile::GetStream(const char *file, int line)
+{
+	LAutoStreamI s;
+	if (Data)
+		s.Reset(new LMemStream(Data.Get(), Data.Length(), false));
+	return s;
+}
+
 uint64 LMail3CalendarFile::Size()
 {
 	return sizeof(this) +
 		FileName.Length() + 
 		MimeType.Length() +
 		sizeof(DateModified) +
+		Uri.Length() +
 		Data.Length();
 }
 
