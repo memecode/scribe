@@ -2605,8 +2605,8 @@ struct CalendarUiPriv
 //////////////////////////////////////////////////////////////////////////////
 class CalendarAttachmentItem : public LListItem
 {
-	CalendarUi *Ui;
-	LDataI *Obj;
+	CalendarUi *Ui = NULL;
+	LDataI *Obj = NULL;
 	LString Cache;
 
 public:
@@ -2629,13 +2629,98 @@ public:
 		return Obj;
 	}
 
+	bool IsRemote()
+	{
+		return Obj->GetStr(FIELD_URI) != NULL;
+	}
+
+	void SaveAs()
+	{
+		auto sel = new LFileSelect(GetList());
+		sel->Name(Obj->GetStr(FIELD_NAME));
+		sel->Save([this, sel](auto dlg, auto ok)
+		{
+			if (ok)
+				Save(sel->Name());
+			delete dlg;
+		});
+	}
+
+	bool Save(LString path)
+	{
+		auto in = Obj->GetStream(_FL);
+		if (!in)
+			return false;
+
+		auto inSize = in->GetSize();
+		LFile out(path, O_WRITE);
+		if (!out)
+			return false;
+
+		LCopyStreamer cp;
+		ssize_t copied = cp.Copy(in, &out);
+		return copied == inSize;
+	}
+
+	void Open()
+	{
+		if (IsRemote())
+		{
+			auto uri = Obj->GetStr(FIELD_URI);
+			LExecute(uri);
+		}
+		else // Local: save and open
+		{
+			auto file = Obj->GetStr(FIELD_NAME);
+			LFile::Path p(ScribeTempPath(), LGetLeaf(file));
+			if (Save(p.GetFull()))
+			{
+				LExecute(p.GetFull());
+			}
+		}
+	}
+
+	void Delete()
+	{
+		Ui->PostEvent(M_DELETE_ATTACHMENT, (LMessage::Param)this);
+	}
+
+	void OnMouseClick(LMouse &m) override
+	{
+		if (m.IsContextMenu())
+		{
+			LSubMenu sub;
+			sub.AppendItem("Save As",  IDM_SAVEAS, !IsRemote());
+			sub.AppendItem("Open Uri", IDM_OPEN, IsRemote());
+			sub.AppendSeparator();
+			sub.AppendItem("Delete", IDM_DELETE);
+			switch (sub.Float(GetList(), m))
+			{
+				case IDM_SAVEAS:
+					SaveAs();
+					break;
+				case IDM_OPEN:
+					Open();
+					break;
+				case IDM_DELETE:
+					Delete();
+					break;
+			}
+		}
+		else if (m.Left())
+		{
+			if (m.Down() && m.Double())
+				Open();
+		}
+	}
+
 	bool OnKey(LKey &k) override
 	{
 		switch (k.vkey)
 		{
 			case LK_DELETE:
 				if (k.Down())
-					Ui->PostEvent(M_DELETE_ATTACHMENT, (LMessage::Param)this);
+					Delete();
 				return true;
 			default:
 				break;
