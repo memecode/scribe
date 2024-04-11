@@ -184,7 +184,8 @@ class CalendarUi :
 	LTabPage *AttendTab;
 	LScriptUi Commands;
 	class LAttendees *Attendees;
-	bool NotifyOn;
+	bool NotifyOn = false;
+	bool FirstLayout = true;
 
 	bool OnViewKey(LView *v, LKey &k);	
 	void CheckConsistancy();

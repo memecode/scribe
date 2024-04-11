@@ -1939,8 +1939,7 @@ LProfile Prof("LMail3Obj::Write");
 			PROFILE("3");
 			if (Insert)
 			{
-				Id = s->LastInsertId();
-				if (Id < 0)			
+				if (!SetId(s->LastInsertId()))
 				{
 					LAssert(!"No ID returned.");
 					LgiTrace("%s:%i - No ID from statement.\n", _FL);

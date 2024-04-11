@@ -835,7 +835,8 @@ LDataI *Calendar::ImportAttachment(LString Path)
 
 	attachment->SetStr(FIELD_NAME, LGetLeaf(Path));
 	attachment->SetStr(FIELD_MIME_TYPE, LGetFileMimeType(Path));
-	attachment->SetDate(FIELD_DATE_MODIFIED, &LDateTime::Now());
+	auto now = LDateTime::Now();
+	attachment->SetDate(FIELD_DATE_MODIFIED, &now);
 	attachment->SetStr(FIELD_ATTACHMENTS_DATA, f.Read());
 
 	auto status = attachment->Save(GetObject());
@@ -2669,7 +2670,6 @@ public:
 //////////////////////////////////////////////////////////////////////////////
 CalendarUi::CalendarUi(Calendar *item) : ThingUi(item, LLoadString(IDS_CAL_EVENT))
 {
-	NotifyOn = false;
 	Item = item;
 	d = new CalendarUiPriv(this);
 	#if WINNATIVE
@@ -2852,6 +2852,14 @@ void CalendarUi::OnPosChange()
 {
 	THREAD_UNSAFE();
 	LWindow::OnPosChange();
+
+	if (FirstLayout && NotifyOn)
+	{
+		FirstLayout = false;
+		LList *attachLst;
+		if (GetViewById(IDC_ATTACHMENTS, attachLst))
+			attachLst->ResizeColumnsToContent();
+	}
 }
 
 LMessage::Result CalendarUi::OnEvent(LMessage *Msg)
@@ -3257,11 +3265,10 @@ void CalendarUi::OnLoad()
 		d->Reminders->Empty();
 		
 		LString Rem = o->GetStr(FIELD_CAL_REMINDERS);
-		LString::Array a = Rem.SplitDelimit("\n");
+		auto a = Rem.SplitDelimit("\n");
 		for (unsigned i=0; i<a.Length(); i++)
 		{
-			ReminderItem *ri = new ReminderItem(CalPopup, 0, CalMinutes, LString());
-			if (ri)
+			if (auto ri = new ReminderItem(CalPopup, 0, CalMinutes, LString()))
 			{
 				if (ri->SetString(a[i]))
 					d->Reminders->Insert(ri);
@@ -3273,7 +3280,7 @@ void CalendarUi::OnLoad()
 		d->Reminders->ResizeColumnsToContent();
 	}
 
-	CalendarShowTimeAs Show = (CalendarShowTimeAs)o->GetInt(FIELD_CAL_SHOW_TIME_AS);
+	auto Show = (CalendarShowTimeAs)o->GetInt(FIELD_CAL_SHOW_TIME_AS);
 	switch (Show)
 	{
 		case CalFree:
@@ -3287,7 +3294,8 @@ void CalendarUi::OnLoad()
 			SetCtrlValue(IDC_AVAILABLE_TYPE, 2);
 			break;
 	}
-	CalendarPrivacyType Priv = (CalendarPrivacyType)o->GetInt(FIELD_CAL_PRIVACY);
+	
+	auto Priv = (CalendarPrivacyType)o->GetInt(FIELD_CAL_PRIVACY);
 	switch (Priv)
 	{
 		default:
@@ -3300,7 +3308,8 @@ void CalendarUi::OnLoad()
 			SetCtrlValue(IDC_PRIVACY_TYPE, 2);
 			break;
 	}
-	int64 Col = o->GetInt(FIELD_COLOUR);
+	
+	auto Col = o->GetInt(FIELD_COLOUR);
 	if (Col >= 0)
 		d->Colour->Value(Col);
 
@@ -3321,7 +3330,6 @@ void CalendarUi::OnLoad()
 		}
 	}
 	
-	char s[256] = "";
 	auto dt = o->GetDate(FIELD_CAL_START_UTC);
 	if (dt)
 	{
@@ -3333,11 +3341,9 @@ void CalendarUi::OnLoad()
 
 		LOG_DEBUG("%s:%i - Load.Start.Local=%s\n", _FL, tmp.Get().Get());
 
-		tmp.GetDate(s, sizeof(s));
-		SetCtrlName(IDC_START_DATE, s);
+		SetCtrlName(IDC_START_DATE, tmp.GetDate());
 		
-		tmp.GetTime(s, sizeof(s));
-		SetCtrlName(IDC_START_TIME, AllDay ? "" : s);
+		SetCtrlName(IDC_START_TIME, AllDay ? "" : tmp.GetTime().Get());
 		SetCtrlEnabled(IDC_START_TIME, !AllDay);
 	}
 
@@ -3352,11 +3358,9 @@ void CalendarUi::OnLoad()
 
 		LOG_DEBUG("%s:%i - Load.End.Local=%s\n", _FL, tmp.Get().Get());
 
-		tmp.GetDate(s, sizeof(s));
-		SetCtrlName(IDC_END_DATE, s);
+		SetCtrlName(IDC_END_DATE, tmp.GetDate());
 
-		tmp.GetTime(s, sizeof(s));
-		SetCtrlName(IDC_END_TIME, AllDay ? "" : s);
+		SetCtrlName(IDC_END_TIME, AllDay ? "" : tmp.GetTime().Get());
 		SetCtrlEnabled(IDC_END_TIME, !AllDay);
 	}
 
@@ -3370,10 +3374,29 @@ void CalendarUi::OnLoad()
 	}
 	
 	if (ValidStr(CalSubject))
+		Name(LString::Fmt("%s - %s", LLoadString(IDS_CAL_EVENT), CalSubject));
+
+	// Load the list of attached files:
+	LList *attachLst;
+	if (GetViewById(IDC_ATTACHMENTS, attachLst))
 	{
-		LString s;
-		s.Printf("%s - %s", LLoadString(IDS_CAL_EVENT), CalSubject);
-		Name(s);
+		auto fileLst = Item->GetObject()->GetList(FIELD_CAL_ATTACHMENTS);
+		if (fileLst)
+		{
+			for (auto i=fileLst->First(); i; i=fileLst->Next())
+			{
+				auto data = dynamic_cast<LDataI*>(i);
+				if (data)
+					attachLst->Insert(new CalendarAttachmentItem(this, data));
+				else
+					LAssert(!"Wrong object!");
+			}
+			
+			// No point resizing the columns here, as the table hasn't has it's first layout
+			// And will most likely be too small
+			
+			attachLst->ResizeColumnsToContent();
+		}
 	}
 
 	UpdateRelative();

@@ -61,14 +61,22 @@ LMail3Calendar::~LMail3Calendar()
 
 bool LMail3Calendar::DbDelete()
 {
-	char s[256];
+	Attachments.a.DeleteObjects();
+	Attachments.State = Store3Unloaded;
+
+	// Delete any attachments.
+	auto Sql = LString::Fmt("delete from " MAIL3_TBL_CALENDAR_FILES " where ParentId=" LPrintfInt64, Id);
+	LMail3Store::LStatement FileDel(Store, Sql);
+	if (!FileDel.Exec())
+		return false;
 
 	// Delete the calendar itself
-	sprintf_s(s, sizeof(s), "delete from " MAIL3_TBL_CALENDAR " where Id=" LPrintfInt64, Id);
-	LMail3Store::LStatement Del(Store, s);
+	Sql = LString::Fmt("delete from " MAIL3_TBL_CALENDAR " where Id=" LPrintfInt64, Id);
+	LMail3Store::LStatement Del(Store, Sql);
 	if (!Del.Exec())
 		return false;
 
+	Id = -1;
 	return true;
 }
 
@@ -105,6 +113,46 @@ LDataIt LMail3Calendar::GetList(int id)
 	}
 
 	return NULL;
+}
+
+bool LMail3Calendar::SaveAttachments()
+{
+	if (Id < 0)
+	{
+		LAssert(!"Needs an ID before you can call this.");
+		return false;
+	}
+
+	printf("LMail3Calendar::Serialize attachments=%i\n", (int)Attachments.Length());
+	for (auto i: Attachments.a)
+	{
+		printf("LMail3Calendar::Serialize dirty=%i\n", i->IsDirty());
+		if (i->IsDirty())
+		{
+			auto result = i->Save(this);
+			printf("LMail3Calendar::Serialize result=%i\n", result);
+			if (result != Store3Success)
+			{
+				LAssert(!"Attachment failed to save.");
+				return false;
+			}
+		}
+	}
+	
+	return true;
+}
+
+bool LMail3Calendar::SetId(int64_t id)
+{
+	bool valid = Id >= 0;
+
+	if (!LMail3Thing::SetId(id))
+		return false;
+	
+	if (!valid)
+		SaveAttachments();
+	
+	return true;
 }
 
 bool LMail3Calendar::Serialize(LMail3Store::LStatement &s, bool Write)
@@ -144,6 +192,11 @@ bool LMail3Calendar::Serialize(LMail3Store::LStatement &s, bool Write)
 	if (Write)
 	{
 		StoreStatus = Store3Success;
+		if (Id >= 0 && !SaveAttachments())
+		{
+			StoreStatus = Store3Error;
+			return false;
+		}
 	}
 	else if (To.Get())
 	{
@@ -180,6 +233,9 @@ bool LMail3CalendarFile::CopyProps(LDataPropI &p)
 bool LMail3CalendarFile::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	int i = 0;
+
+	if (Write)
+		LAssert(ParentId >= 0);
 
 	SERIALIZE_INT64(Id, i++);
 	SERIALIZE_INT64(ParentId, i++);
@@ -279,12 +335,54 @@ Store3Status LMail3CalendarFile::Save(LDataI *Parent)
 			LAssert(!"Wrong object type!");
 			return Store3Error;
 		}
+		
+		if (Calendar->Attachments.IndexOf(this) < 0)
+			Calendar->Attachments.Insert(this);
+	}
+	
+	if (!Calendar)
+	{
+		LAssert(!"Must have parent calendar event.");
+		return Store3Error;
+	}
+	
+	ParentId = Calendar->Id;
+	if (ParentId < 0)
+	{
+		// Parent event hasn't got an ID yet... assuming that when it's
+		// saved, this object will get saved WITH it.
+		return Store3Delayed;
 	}
 
-	// FIXME: impl database write here..
-	LAssert(!"Impl db write");
+	LAutoPtr<LMail3Store::LStatement> s;
 
-	return Store3NotImpl;
+	if (Id >= 0)
+		s.Reset(new LMail3Store::LUpdate(Store, MAIL3_TBL_CALENDAR_FILES, Id));
+	else
+		s.Reset(new LMail3Store::LInsert(Store, MAIL3_TBL_CALENDAR_FILES));
+
+	if (!s || !s->IsOk())
+	{
+		LAssert(!"Query not valid.");
+		return Store3Error;
+	}
+
+	if (!Serialize(*s, true))
+	{
+		LAssert(!"Serialize failed");
+		return Store3Error;
+	}
+
+	if (!s->Exec())
+	{
+		LAssert(!"Query failed");
+		return Store3Error;
+	}
+
+	if (Id < 0)
+		Id = s->LastInsertId();
+
+	return Store3Success;
 }
 
 Store3Status LMail3CalendarFile::Delete(bool ToTrash)
@@ -302,9 +400,14 @@ Store3Status LMail3CalendarFile::Delete(bool ToTrash)
 		return Store3Error;
 	}
 
-	// FIXME: impl database delete here..
-	LAssert(!"Impl db delete");
+	auto Sql = LString::Fmt("delete from " MAIL3_TBL_CALENDAR_FILES " where Id=" LPrintfInt64, Id);
+	LMail3Store::LStatement s(Store, Sql);
+	if (!s.Exec())
+	{
+		LAssert(!"Delete query failed");
+		return Store3Error;
+	}
 
-	return Store3NotImpl;
+	return Store3Success;
 }
 

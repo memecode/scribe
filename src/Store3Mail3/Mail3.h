@@ -417,6 +417,12 @@ public:
 
 	bool Write(const char *Table, bool Insert);
 
+	virtual bool SetId(int64_t id)
+	{
+		Id = id;
+		return Id >= 0;
+	}
+
 	virtual const char *GetClass() { return "LMail3Obj"; }
 	virtual bool Serialize(LMail3Store::LStatement &s, bool Write) = 0;
 	virtual void SetStore(LMail3Store *s) { Store = s; }
@@ -740,13 +746,13 @@ class LMail3CalendarFile : public LDataI
 	LString Data;
 
 	LString SizeCache;
-
-public:
 	bool Dirty = false;
 
+public:
 	LMail3CalendarFile(LMail3Store *store);
 	const char *GetClass() override { return "LMail3CalendarFile"; }
 
+	bool IsDirty() { return Dirty || Id < 0 || ParentId < 0; }
 	bool CopyProps(LDataPropI &p) override;
 	bool Serialize(LMail3Store::LStatement &s, bool Write);
 
@@ -784,11 +790,14 @@ private:
 	const char *GetTable() override { return MAIL3_TBL_CALENDAR; }
 	DIterator<LDataPropI, LMail3CalendarFile, LMail3Store> Attachments;
 
+	bool SaveAttachments();
+
 public:
 	LMail3Calendar(LMail3Store *store);
 	~LMail3Calendar();
 
 	LDataStoreI *GetStore() override { return Store; }
+	bool SetId(int64_t id) override;
 	bool Serialize(LMail3Store::LStatement &s, bool Write) override;
 	const char *GetClass() override { return "LMail3Filter"; }
 	bool DbDelete() override;
