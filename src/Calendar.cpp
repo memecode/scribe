@@ -841,9 +841,15 @@ LDataI *Calendar::ImportAttachment(LString Path)
 
 	auto status = attachment->Save(GetObject());
 	if (status > Store3Error)
-		lst->Insert(attachment);
-	else
-		DeleteObj(attachment);
+	{
+		// Check attachment is in list...
+		if (lst->IndexOf(attachment) < 0)
+		{
+			LAssert(!"Save needs to add object to list...");
+			LgiTrace("%s:%i - save didn't add file to list.\n", _FL);
+		}
+	}
+	else DeleteObj(attachment);
 
 	return attachment;
 }
@@ -2976,7 +2982,9 @@ void CalendarUi::CheckConsistancy()
 	THREAD_UNSAFE();
 	auto St = CurrentStart();
 	auto En = CurrentEnd();
-	if (En < St)
+	if (St.IsValid() &&
+		En.IsValid() &&
+		En < St)
 	{
 		En = St;
 		En.AddMinutes(30);
@@ -3416,7 +3424,7 @@ void CalendarUi::OnLoad()
 	}
 	
 	auto dt = o->GetDate(FIELD_CAL_START_UTC);
-	if (dt)
+	if (dt && dt->IsValid())
 	{
 		LOG_DEBUG("%s:%i - Load.Start.UTC=%s\n", _FL, dt->Get().Get());
 
@@ -3433,7 +3441,7 @@ void CalendarUi::OnLoad()
 	}
 
 	dt = o->GetDate(FIELD_CAL_END_UTC);
-	if (dt)
+	if (dt && dt->IsValid())
 	{
 		LOG_DEBUG("%s:%i - Load.End.UTC=%s\n", _FL, dt->Get().Get());
 
@@ -3596,28 +3604,24 @@ void CalendarUi::OnSave()
 	*/
 	
 	LDateTime dt;
-	dt.SetDate(GetCtrlName(IDC_START_DATE));
-	dt.SetTime(AllDay ? "0:0:0" : GetCtrlName(IDC_START_TIME));
-	
+	if (dt.SetDate(GetCtrlName(IDC_START_DATE)))
+	{
+		dt.SetTime(AllDay ? "0:0:0" : GetCtrlName(IDC_START_TIME));
 		LOG_DEBUG("%s:%i - Start.Local=%s\n", _FL, dt.Get().Get());
-
-	dt.ToUtc(true);
-	
+		dt.ToUtc(true);
 		LOG_DEBUG("%s:%i - Start.UTC=%s\n", _FL, dt.Get().Get());
-	
-	o->SetDate(FIELD_CAL_START_UTC, &dt);
+		o->SetDate(FIELD_CAL_START_UTC, &dt);
+	}
 
 	dt.Empty();
-	dt.SetDate(GetCtrlName(IDC_END_DATE));
-	dt.SetTime(AllDay ? "11:59:59" : GetCtrlName(IDC_END_TIME));
-	
+	if (dt.SetDate(GetCtrlName(IDC_END_DATE)))
+	{
+		dt.SetTime(AllDay ? "11:59:59" : GetCtrlName(IDC_END_TIME));
 		LOG_DEBUG("%s:%i - End.Local=%s\n", _FL, dt.Get().Get());
-	
-	dt.ToUtc(true);
-	
+		dt.ToUtc(true);
 		LOG_DEBUG("%s:%i - End.UTC=%s\n", _FL, dt.Get().Get());
-	
-	o->SetDate(FIELD_CAL_END_UTC, &dt);
+		o->SetDate(FIELD_CAL_END_UTC, &dt);
+	}
 
 	o->SetInt(FIELD_CAL_RECUR, GetCtrlValue(IDC_REPEAT));
 

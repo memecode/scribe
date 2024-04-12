@@ -88,17 +88,14 @@ LDataI *WebdavStore::Create(int Type)
 	switch ((Store3ItemTypes)Type)
 	{
 		case MAGIC_CALENDAR:
-		{
 			return new WebdavCalendar(this, NULL);
-			break;
-		}
+		case MAGIC_CALENDAR_FILE:
+			return new WebdavCalendarFile(this);
 		case MAGIC_CONTACT:
-		{
 			return new WebdavContact(this, NULL);
-			break;
-		}
 		default:
 		{
+			LAssert(!"Impl type here");
 			LgiTrace("%s:%i - Unhandled type %x\n", _FL, Type);
 			break;
 		}

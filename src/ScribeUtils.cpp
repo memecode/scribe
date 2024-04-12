@@ -469,9 +469,7 @@ void HttpImageThread::DoJob(LThreadJob *j)
 
 		for (int i=0; i<1000; i++)
 		{
-			char Hash[256];
-			sprintf_s(Hash, sizeof(Hash), "%x_%i.%.*s", LHash<uint32_t, uchar>((uchar*)d + 1, -1, true), i++, (int)Len, Ext);
-
+			auto Hash = LString::Fmt("%x_%i.%.*s", LHash<uint32_t, uchar>((uchar*)d + 1, -1, true), i++, (int)Len, Ext);
 			if (!LMakePath(p, sizeof(p), Cache, Hash))
 			{
 				Job->Status = LDocumentEnv::LoadJob::JobErr_Path;

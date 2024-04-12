@@ -731,7 +731,7 @@ public:
 	Store3Status SetDate(int id, const LDateTime *i) override;
 };
 
-class LMail3CalendarFile : public LDataI
+class LMail3CalendarFile : public Store3CalendarFile<LDataI>
 {
 	friend class LMail3Calendar;
 
@@ -740,48 +740,20 @@ class LMail3CalendarFile : public LDataI
 	
 	int64 Id = -1;
 	int64 ParentId = -1;
-	LString FileName;
-	LString MimeType;
-	LDateTime DateModified;
-	LString Uri; // Either 'Uri' or 'Data' must be valid
-	LString Data; // Store the data inline
-
-	LString SizeCache;
-	bool Dirty = false;
 
 public:
 	LMail3CalendarFile(LMail3Store *store);
 	const char *GetClass() override { return "LMail3CalendarFile"; }
 
 	bool IsDirty() { return Dirty || Id < 0 || ParentId < 0; }
-	bool CopyProps(LDataPropI &p) override;
 	bool Serialize(LMail3Store::LStatement &s, bool Write);
 
-	// Impl LDataPropI
-	const char *GetStr(int id) override;
-	Store3Status SetStr(int id, const char *str) override;
-	const LDateTime *GetDate(int id) override;
-	Store3Status SetDate(int id, const LDateTime *i) override;
-
 	// Impl LDataI
-	uint32_t Type() override { return MAGIC_CALENDAR_FILE; }
 	bool IsOnDisk() override { return Id >= 0; }
 	bool IsOrphan() override { return Calendar == NULL; }
 	LDataStoreI *GetStore() override { return Store; }
-
-	LAutoStreamI GetStream(const char *file, int line) override;
-	uint64 Size() override;
 	Store3Status Save(LDataI *Parent = NULL) override;
 	Store3Status Delete(bool ToTrash = true) override;
-
-	// Stubs
-	int64 GetInt(int id) override { return 0; }
-	Store3Status SetInt(int id, int64 i) override { return Store3NotImpl; }
-	const LVariant *GetVar(int id) override { return NULL; }
-	Store3Status SetVar(int id, LVariant *i) override { return Store3NotImpl; }
-	LDataPropI *GetObj(int id) override { return NULL; }
-	Store3Status SetObj(int id, LDataPropI *i) override { return Store3NotImpl; }
-	LDataIt GetList(int id) override { EmptyVirtual(NULL); }
 };
 
 class LMail3Calendar : public Store3CalendarObj<LMail3Thing>

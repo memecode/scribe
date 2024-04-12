@@ -227,3 +227,41 @@ Store3Status WebdavCalendar::SetDate(int id, const LDateTime *i)
 	return Store3Success;
 }
 
+LDataIt WebdavCalendar::GetList(int id)
+{
+	switch (id)
+	{
+		case FIELD_CAL_ATTACHMENTS:
+			Attachments.State = Store3Loaded;
+			return &Attachments;
+	}
+
+	return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Store3Status WebdavCalendarFile::Save(LDataI *Parent)
+{
+	if (Parent)
+		Cal = dynamic_cast<WebdavCalendar*>(Parent);
+
+	if (!Cal)
+		return Store3Error;
+
+	if (Cal->Attachments.IndexOf(this) < 0)
+		Cal->Attachments.Insert(this);
+
+	return Store3Success;
+}
+
+Store3Status WebdavCalendarFile::Delete(bool ToTrash)
+{
+	if (!Cal)
+		return Store3Error;
+
+	if (Cal->Attachments.IndexOf(this) < 0)
+		return Store3Error;
+
+	Cal->Attachments.Delete(this);
+	return Store3Success;
+}

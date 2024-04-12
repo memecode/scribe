@@ -5,6 +5,137 @@
 #include "lgi/common/Json.h"
 
 template<typename Parent>
+class Store3CalendarFile : public Parent
+{
+protected:
+	LString FileName;
+	LString MimeType;
+	LDateTime DateModified;
+	LString Uri; // Either 'Uri' or 'Data' must be valid
+	LString Data; // Store the data inline
+
+	LString SizeCache;
+	bool Dirty = false;
+
+public:
+	bool IsDirty() { return Dirty; }
+	uint32_t Type() override { return MAGIC_CALENDAR_FILE; }
+
+	bool CopyProps(LDataPropI &p) override
+	{
+		SetStr(FIELD_NAME, p.GetStr(FIELD_NAME));
+		SetStr(FIELD_MIME_TYPE, p.GetStr(FIELD_MIME_TYPE));
+		SetDate(FIELD_DATE_MODIFIED, p.GetDate(FIELD_DATE_MODIFIED));
+		SetStr(FIELD_URI, p.GetStr(FIELD_URI));
+		SetStr(FIELD_ATTACHMENTS_DATA, p.GetStr(FIELD_ATTACHMENTS_DATA));
+		return true;
+	}
+	
+	// Impl LDataPropI
+	const char *GetStr(int id) override
+	{
+		switch (id)
+		{
+			case FIELD_NAME:
+				return FileName;
+			case FIELD_MIME_TYPE:
+				return MimeType;
+			case FIELD_URI:
+				return Uri;
+			case FIELD_ATTACHMENTS_DATA:
+				return Data;
+			case FIELD_SIZE:
+				SizeCache = LFormatSize(Data.Length());
+				return SizeCache;
+		}
+
+		return NULL;
+	}
+
+	Store3Status SetStr(int id, const char *str) override
+	{
+		switch (id)
+		{
+			case FIELD_NAME:
+				FileName = str;
+				break;
+			case FIELD_MIME_TYPE:
+				MimeType = str;
+				break;
+			case FIELD_URI:
+				Uri = str;
+				break;
+			case FIELD_ATTACHMENTS_DATA:
+				Data = str;
+				break;
+			default:
+				return Store3NotImpl;
+		}
+
+		Dirty = true;
+		return Store3Success;
+	}
+
+	const LDateTime *GetDate(int id) override
+	{
+		switch (id)
+		{
+			case FIELD_DATE_MODIFIED:
+				return &DateModified;
+		}
+
+		return NULL;
+	}
+
+	Store3Status SetDate(int id, const LDateTime *i) override
+	{
+		switch (id)
+		{
+			case FIELD_DATE_MODIFIED:
+				if (i)
+					DateModified = *i;
+				else
+					DateModified.Empty();
+				break;
+			default:
+				return Store3NotImpl;
+		}
+
+		Dirty = true;
+		return Store3Success;
+	}
+
+	// Impl LDataI
+	LAutoStreamI GetStream(const char *file, int line) override
+	{
+		LAutoStreamI s;
+		if (Data)
+			s.Reset(new LMemStream(Data.Get(), Data.Length(), false));
+		return s;
+	}
+
+	uint64 Size() override
+	{
+		return sizeof(this) +
+			FileName.Length() + 
+			MimeType.Length() +
+			sizeof(DateModified) +
+			Uri.Length() +
+			Data.Length();
+	}
+
+	// Stubs
+	int64 GetInt(int id) override { return 0; }
+	Store3Status SetInt(int id, int64 i) override { return Store3NotImpl; }
+	const LVariant *GetVar(int id) override { return NULL; }
+	Store3Status SetVar(int id, LVariant *i) override { return Store3NotImpl; }
+	LDataPropI *GetObj(int id) override { return NULL; }
+	Store3Status SetObj(int id, LDataPropI *i) override { return Store3NotImpl; }
+	LDataIt GetList(int id) override { EmptyVirtual(NULL); }
+};
+
+
+template<typename Parent>
 class Store3CalendarObj : public Parent
 {
 	LString ToCache;

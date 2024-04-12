@@ -218,8 +218,33 @@ public:
 	_(FIELD_CAL_NOTES, Notes) \
 	_(FIELD_CAL_STATUS, CalStatus)
 
+class WebdavCalendarFile : public Store3CalendarFile<LDataI>
+{
+	friend class WebdavCalendar;
+
+	WebdavStore *Store = NULL;
+	WebdavCalendar *Cal = NULL;
+
+public:
+	WebdavCalendarFile(WebdavStore *store) : Store(store)
+	{
+	}
+
+	const char *GetClass() override { return "WebdavCalendarFile"; }
+	bool IsDirty() { return Dirty; }
+
+	// Impl LDataI
+	bool IsOnDisk() override { return true; }
+	bool IsOrphan() override { return Cal == NULL; }
+	LDataStoreI *GetStore() override { return Store; }
+	Store3Status Save(LDataI *Parent = NULL) override;
+	Store3Status Delete(bool ToTrash = true) override;
+};
+
 class WebdavCalendar : public WebdavObj
 {
+	friend class WebdavCalendarFile;
+
 	LString vCal, Href;
 
 	#define _(f,v) LDateTime v;
@@ -231,6 +256,8 @@ class WebdavCalendar : public WebdavObj
 	#define _(f,v) LString v;
 	WebdavCalendarStrings()
 	#undef _
+
+	DIterator<LDataPropI, WebdavCalendarFile, WebdavStore> Attachments;
 
 public:
 	WebdavCalendar(WebdavStore *store, WebdavEvent *e);
@@ -255,6 +282,7 @@ public:
 	Store3Status SetInt(int id, int64 i) override;
 	const LDateTime *GetDate(int id) override;
 	Store3Status SetDate(int id, const LDateTime *i) override;
+	LDataIt GetList(int id) override;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -221,17 +221,6 @@ LMail3CalendarFile::LMail3CalendarFile(LMail3Store *store) :
 {
 }
 
-bool LMail3CalendarFile::CopyProps(LDataPropI &p)
-{
-	SetStr(FIELD_NAME, p.GetStr(FIELD_NAME));
-	SetStr(FIELD_MIME_TYPE, p.GetStr(FIELD_MIME_TYPE));
-	SetDate(FIELD_DATE_MODIFIED, p.GetDate(FIELD_DATE_MODIFIED));
-	SetStr(FIELD_URI, p.GetStr(FIELD_URI));
-	SetStr(FIELD_ATTACHMENTS_DATA, p.GetStr(FIELD_ATTACHMENTS_DATA));
-
-	return true;
-}
-
 bool LMail3CalendarFile::Serialize(LMail3Store::LStatement &s, bool Write)
 {
 	int i = 0;
@@ -251,97 +240,6 @@ bool LMail3CalendarFile::Serialize(LMail3Store::LStatement &s, bool Write)
 	return true;
 }
 
-const char *LMail3CalendarFile::GetStr(int id)
-{
-	switch (id)
-	{
-		case FIELD_NAME:
-			return FileName;
-		case FIELD_MIME_TYPE:
-			return MimeType;
-		case FIELD_URI:
-			return Uri;
-		case FIELD_ATTACHMENTS_DATA:
-			return Data;
-		case FIELD_SIZE:
-			SizeCache = LFormatSize(Data.Length());
-			return SizeCache;
-	}
-
-	return NULL;
-}
-
-Store3Status LMail3CalendarFile::SetStr(int id, const char *str)
-{
-	switch (id)
-	{
-		case FIELD_NAME:
-			FileName = str;
-			break;
-		case FIELD_MIME_TYPE:
-			MimeType = str;
-			break;
-		case FIELD_URI:
-			Uri = str;
-			break;
-		case FIELD_ATTACHMENTS_DATA:
-			Data = str;
-			break;
-		default:
-			return Store3NotImpl;
-	}
-
-	Dirty = true;
-	return Store3Success;
-}
-
-const LDateTime *LMail3CalendarFile::GetDate(int id)
-{
-	switch (id)
-	{
-		case FIELD_DATE_MODIFIED:
-			return &DateModified;
-	}
-
-	return NULL;
-}
-
-Store3Status LMail3CalendarFile::SetDate(int id, const LDateTime *i)
-{
-	switch (id)
-	{
-		case FIELD_DATE_MODIFIED:
-			if (i)
-				DateModified = *i;
-			else
-				DateModified.Empty();
-			break;
-		default:
-			return Store3NotImpl;
-	}
-
-	Dirty = true;
-	return Store3Success;
-}
-
-LAutoStreamI LMail3CalendarFile::GetStream(const char *file, int line)
-{
-	LAutoStreamI s;
-	if (Data)
-		s.Reset(new LMemStream(Data.Get(), Data.Length(), false));
-	return s;
-}
-
-uint64 LMail3CalendarFile::Size()
-{
-	return sizeof(this) +
-		FileName.Length() + 
-		MimeType.Length() +
-		sizeof(DateModified) +
-		Uri.Length() +
-		Data.Length();
-}
-
 Store3Status LMail3CalendarFile::Save(LDataI *Parent)
 {
 	if (Parent)
@@ -352,9 +250,6 @@ Store3Status LMail3CalendarFile::Save(LDataI *Parent)
 			LAssert(!"Wrong object type!");
 			return Store3Error;
 		}
-		
-		if (Calendar->Attachments.IndexOf(this) < 0)
-			Calendar->Attachments.Insert(this);
 	}
 	
 	if (!Calendar)
@@ -362,6 +257,9 @@ Store3Status LMail3CalendarFile::Save(LDataI *Parent)
 		LAssert(!"Must have parent calendar event.");
 		return Store3Error;
 	}
+
+	if (Calendar->Attachments.IndexOf(this) < 0)
+		Calendar->Attachments.Insert(this);
 	
 	ParentId = Calendar->Id;
 	if (ParentId < 0)
