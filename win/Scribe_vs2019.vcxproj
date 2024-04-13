@@ -376,7 +376,6 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SegmentTree.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SharedMemory.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SoftwareUpdate.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\TimeZone.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\Tnef.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Mime.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\HttpTools.cpp" />

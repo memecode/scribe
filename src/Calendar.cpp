@@ -938,8 +938,8 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 	if (BaseUtc.s > EndUtc)
 		return true;
 
-	LArray<LDateTime::LDstInfo> Dst;
-	LDateTime::GetDaylightSavingsInfo(Dst, BaseUtc.s, &EndUtc);
+	LArray<LDstInfo> Dst;
+	LTimeZone::GetDaylightSavingsInfo(Dst, BaseUtc.s, &EndUtc);
 	if (Dst.Length() < 2)
 	{
 		LgiTrace("%s:%i - GetDaylightSavingsInfo(%s, %s)\n", _FL, BaseUtc.s.Get().Get(), EndUtc.Get().Get());
@@ -949,7 +949,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 	Periods.Add(BaseUtc);
 
 	LDateTime BaseS = BaseUtc.s;
-	LDateTime::DstToLocal(Dst, BaseS);
+	LTimeZone::DstToLocal(Dst, BaseS);
 	auto BaseTz = BaseS.GetTimeZone();
 
 	int AllDay = false;
@@ -1037,7 +1037,7 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 			// Check against filters
 			LAssert(CurUtc.GetTimeZone() == 0);
 			LDateTime CurLocal = CurUtc;
-			LDateTime::DstToLocal(Dst, CurLocal);
+			LTimeZone::DstToLocal(Dst, CurLocal);
 				
 			// This fixes the current time when it's in a different daylight saves zone.
 			// Otherwise you get events one hour or whatever out of position after DST starts
@@ -1211,9 +1211,9 @@ bool Calendar::GetTimes(LDateTime StartLocal, LDateTime EndLocal, LArray<TimePer
 
 CalendarType Calendar::GetCalType()
 {
-	CalendarType Type = CalEvent;
-	GetField(FIELD_CAL_TYPE, (int&)Type);
-	return Type;
+	int Type = CalEvent;
+	GetField(FIELD_CAL_TYPE, Type);
+	return (CalendarType)Type;
 }
 
 void Calendar::SetCalType(CalendarType Type)
@@ -1716,28 +1716,32 @@ const char *Calendar::GetText(int i)
 				bool UseLocal = true;
 				tmp.SetTimeZone(0, false);
 
-				if (Tz.Get())
+				if (Tz)
 				{
 					bool HasPt = false, HasDigit = false;
-					char *e = Tz.Get();
-					while (strchr(" \t\r\n-.+", *e) || IsDigit(*e))
+					auto Parts = Tz.SplitDelimit(",", 1);
+					auto First = Parts[0];
+					char *e = First.Get();
+
+					while (e && (strchr(" \t\r\n-.+", *e) || IsDigit(*e)))
 					{
 						if (*e == '.') HasPt = true;
 						if (IsDigit(*e)) HasDigit = true;
 						e++;
 					}
+
 					if (HasDigit)
 					{
 						if (HasPt)
 						{
-							double TzHrs = Tz.Float();
+							double TzHrs = First.Float();
 							double i, f = modf(TzHrs, &i);
 							int Mins = (int) ((i * 60) + (f * 60));
 							tmp.AddMinutes(Mins);
 						}
 						else
 						{
-							int64 i = Tz.Int();
+							int64 i = First.Int();
 							int a = (int)ABS(i);
 							int Mins = (int) (((a / 100) * 60) + (a % 100));
 							tmp.AddMinutes(i < 0 ? -Mins : Mins);

@@ -211,9 +211,6 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\vCard-vCal.cpp">
       <Filter>Import/Export</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\TimeZone.cpp">
-      <Filter>Calendar</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\YearView.cpp">
       <Filter>Calendar</Filter>
     </ClCompile>

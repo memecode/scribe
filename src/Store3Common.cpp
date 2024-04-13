@@ -28,6 +28,29 @@ const char *Store3ItemTypeToMime(Store3ItemTypes type)
 	return NULL;
 }
 
+CalendarType ParseCalendarType(const char *type)
+{
+	if (type && ToLower(*type) == 'v')
+		type++;
+	#define _(name) if (!Stricmp(type, #name)) return Cal##name;
+	_(Event) _(Todo) _(Journal) _(Request) _(Reply)
+	#undef _
+	return CalTypeMax;
+}
+
+const char *ToString(CalendarType type)
+{
+	switch (type)
+	{
+		case CalEvent:   return "Event";
+		case CalTodo:    return "Todo";
+		case CalJournal: return "Journal";
+		case CalRequest: return "Request";
+		case CalReply:   return "Reply";
+		default:         return NULL;
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 LDataUserI::LDataUserI()
 {

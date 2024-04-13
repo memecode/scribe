@@ -1042,7 +1042,7 @@ void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)
 			SourceEventsDirty = true;
 		}
 
-		LDateTime::GetDaylightSavingsInfo(Dst, s, &e);
+		LTimeZone::GetDaylightSavingsInfo(Dst, s, &e);
 
 		LWindow *Wnd = GetWindow();
 		if (Wnd)
@@ -2043,7 +2043,7 @@ LDateTime *CalendarView::TimeAt(int x, int y, int SnapMinutes, LPoint *Cell)
 	return 0;
 }
 
-LDateTime::LDstInfo *CalendarView::GetDstForDate(LDateTime t)
+LDstInfo *CalendarView::GetDstForDate(LDateTime t)
 {
 	auto ts = t.Ts();
 

@@ -2040,12 +2040,10 @@ ContactUi::ContactUi(Contact *item) :
 				c->Sort(true);
 				c->Sub(GV_DOUBLE);
 
-				LTimeZone *Tz = LTimeZones;
+				auto Tz = LTimeZone::GetTimeZones();
 				while (Tz->Text)
 				{
-					char s[256];
-					sprintf_s(s, sizeof(s), "%.1f  %s", Tz->Offset, Tz->Text);
-					c->Insert(s);
+					c->Insert(LString::Fmt("%.1f  %s", Tz->Offset, Tz->Text));
 					Tz++;
 				}
 			}

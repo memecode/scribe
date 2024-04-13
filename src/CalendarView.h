@@ -76,8 +76,8 @@ protected:
 	int DayStart, DayEnd;
 
 	// DST info
-	LArray<LDateTime::LDstInfo> Dst;
-	LDateTime::LDstInfo *GetDstForDate(LDateTime t);
+	LArray<LDstInfo> Dst;
+	LDstInfo *GetDstForDate(LDateTime t);
 
 	// Layout data
 	LRect Title;
