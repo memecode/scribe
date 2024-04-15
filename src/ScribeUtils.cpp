@@ -473,7 +473,7 @@ void HttpImageThread::DoJob(LThreadJob *j)
 			if (!LMakePath(p, sizeof(p), Cache, Hash))
 			{
 				Job->Status = LDocumentEnv::LoadJob::JobErr_Path;
-				Job->Error.Printf("MakePath failed: '%s' + '%s'", Cache.Get(), Hash);
+				Job->Error.Printf("MakePath failed: '%s' + '%s'", Cache.Get(), Hash.Get());
 				return;
 			}
 			if (!LFileExists(p))

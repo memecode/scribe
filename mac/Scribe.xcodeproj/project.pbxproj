@@ -113,7 +113,6 @@
 		3477C3FC1CC22E690028B84B /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3FB1CC22E690028B84B /* Base64.cpp */; };
 		3477C3FF1CC22EF60028B84B /* MonthView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3FD1CC22EF60028B84B /* MonthView.cpp */; };
 		3477C4001CC22EF60028B84B /* YearView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3FE1CC22EF60028B84B /* YearView.cpp */; };
-		3477C4021CC22F340028B84B /* TimeZone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C4011CC22F340028B84B /* TimeZone.cpp */; };
 		3477C4041CC22F680028B84B /* ExeCheck.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C4031CC22F680028B84B /* ExeCheck.cpp */; };
 		3477C4091CC2301F0028B84B /* GdcTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C4081CC2301F0028B84B /* GdcTools.cpp */; };
 		3477C40B1CC230A30028B84B /* Tnef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C40A1CC230A30028B84B /* Tnef.cpp */; };
@@ -458,7 +457,6 @@
 		3477C3FB1CC22E690028B84B /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Base64.cpp; path = ../../../../Lgi/trunk/src/common/Net/Base64.cpp; sourceTree = "<group>"; };
 		3477C3FD1CC22EF60028B84B /* MonthView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MonthView.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/MonthView.cpp; sourceTree = "<group>"; };
 		3477C3FE1CC22EF60028B84B /* YearView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = YearView.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/YearView.cpp; sourceTree = "<group>"; };
-		3477C4011CC22F340028B84B /* TimeZone.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TimeZone.cpp; path = ../../../../Lgi/trunk/src/common/General/TimeZone.cpp; sourceTree = "<group>"; };
 		3477C4031CC22F680028B84B /* ExeCheck.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ExeCheck.cpp; path = ../../../../Lgi/trunk/src/common/General/ExeCheck.cpp; sourceTree = "<group>"; };
 		3477C4081CC2301F0028B84B /* GdcTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GdcTools.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Tools/GdcTools.cpp; sourceTree = "<group>"; };
 		3477C40A1CC230A30028B84B /* Tnef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Tnef.cpp; path = ../../../../Lgi/trunk/src/common/General/Tnef.cpp; sourceTree = "<group>"; };
@@ -903,7 +901,6 @@
 				3477C4611CC26AE00028B84B /* SoftwareUpdate.cpp */,
 				342BAE3A2588AFA8006EF16E /* TextConvert.cpp */,
 				3477C43D1CC234C80028B84B /* TimePopup.cpp */,
-				3477C4011CC22F340028B84B /* TimeZone.cpp */,
 				3477C40A1CC230A30028B84B /* Tnef.cpp */,
 				3477C43F1CC234E60028B84B /* XmlTreeUi.cpp */,
 				3477C3FE1CC22EF60028B84B /* YearView.cpp */,
@@ -1385,7 +1382,6 @@
 				3477C3F81CC227ED0028B84B /* Store3Common.cpp in Sources */,
 				345F314A1CC7A44C00656B8B /* Lzw.cpp in Sources */,
 				3477C3F21CC227ED0028B84B /* ScribeUtils.cpp in Sources */,
-				3477C4021CC22F340028B84B /* TimeZone.cpp in Sources */,
 				3477C41D1CC231890028B84B /* ScribeImap_Mail.cpp in Sources */,
 				3486E9E22A86E8CA009BDA7E /* UnitTests.cpp in Sources */,
 				3477C4001CC22EF60028B84B /* YearView.cpp in Sources */,
