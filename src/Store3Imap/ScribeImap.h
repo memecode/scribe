@@ -510,7 +510,7 @@ class ImapFolder : public LDataFolderI, public ImapFolderData
 	LArray<std::function<void(Store3Status)>> OnLoad;
 
 public:
-	ImapStore *Store;
+	ImapStore *Store = NULL;
 	Store3SystemFolder System = Store3SystemNone;
 	
 	/// The item type...

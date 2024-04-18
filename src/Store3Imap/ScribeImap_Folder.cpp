@@ -837,9 +837,8 @@ struct ImapFolderLoadThread : public LThread, public ImapFolderData
 		// here, so create a hash table of existing entries and don't create
 		// new ImapMail objects for them in the lower loop
 		LHashTbl<IntKey<uint32_t>, ImapMail*> Map;
-		for (unsigned i=0; i<Mail.Length(); i++)
+		for (auto m: Mail.a)
 		{
-			ImapMail *m = Mail.a[i];
 			LAssert(m->Uid != 0);
 			if (m->Uid)
 				Map.Add(m->Uid, m);
@@ -869,17 +868,25 @@ struct ImapFolderLoadThread : public LThread, public ImapFolderData
 				{
 					// Check the format of the msgid, old versions of Scribe used to
 					// leave new-lines in the text... this fixes that on the fly.
-					char *MsgId = it.value->GetAttr(ATTR_MSGID);
+					auto MsgId = it.value->GetAttr(ATTR_MSGID);
 					if (MsgId && strchr(MsgId, '\n'))
 					{
 						LAutoString a(TrimStr(MsgId, " \t\r\n"));
 						it.value->SetAttr(ATTR_MSGID, a);
 						f->SetDirty();
 					}
+
+					auto Flags = it.value->GetAttr(ATTR_FLAGS);
+					if (Flags)
+					{
+						ImapMailFlags f(Flags);
+						if (f.ImapDeleted)
+							continue;
+					}
 		    
 					// Load an email from the cache file if it's not already in the
 					// Mail array. Check there is no existing object:
-					ImapMail *m = Map.Find(ServerId);
+					auto m = Map.Find(ServerId);
 					if (!m)
 					{
 						// No? Well create one:
