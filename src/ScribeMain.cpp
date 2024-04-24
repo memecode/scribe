@@ -94,6 +94,7 @@ int LgiMain(OsAppArguments &AppArgs)
 		InitStrToDom();
 		if (App.GetOption("crtcheck"))
 			return 0;
+		LUri::UnitTests();
 
 		#if !defined(MAC) || defined(__GTK_H__)
 		LAutoPtr<LFont> f(new LEmojiFont());

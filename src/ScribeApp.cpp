@@ -3501,6 +3501,8 @@ void ScribeWnd::OnCommandLine()
 {
 	THREAD_UNSAFE();
 
+	LgiTrace("CmdLine: %S\n", GetCommandLineW());
+
 	// Check command line args
 	LString Str, File;
 
@@ -5697,10 +5699,8 @@ void ScribeWnd::OnUrl(const char *Url)
 	THREAD_UNSAFE();
 
 	LUri u(Url);
-	if (u.sProtocol && !_stricmp(u.sProtocol, "mailto"))
-	{
+	if (u.IsProtocol("mailto"))
 		CreateMail(0, Url, 0);
-	}
 }
 
 void ScribeWnd::OnReceiveFiles(LArray<const char*> &Files)
@@ -6844,27 +6844,27 @@ struct DefaultClient
 
 	struct FileType
 	{
-		char *Name;
-		char *Desc;
+		const char *Name;
+		const char *Desc;
 		int Icon;
 	};
 
 	static FileType FileTypes[];
 
-	bool Win7Install(bool Write)
+	bool WinInstall(bool Write)
 	{
 		// http://msdn.microsoft.com/en-us/library/windows/desktop/cc144154%28v=vs.85%29.aspx
 		LArray<int> Ver;
 		int Os = LGetOs(&Ver);
 		if
+		(
 			(
-				(
-					Os == LGI_OS_WIN32
-					||
-					Os == LGI_OS_WIN64
-					)
-				&&
-				Ver[0] >= 6)
+				Os == LGI_OS_WIN32
+				||
+				Os == LGI_OS_WIN64
+			)
+			&&
+			Ver[0] >= 6)
 		{
 			char Path[MAX_PATH_LEN];
 			auto Exe = LGetExeFile();
@@ -6903,13 +6903,13 @@ struct DefaultClient
 			LAutoPtr<LRegKey> as = CheckKey(Write, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail\\Scribe\\Capabilities\\FileAssociations");
 			if (!as)
 				return false;
-			if (!CheckString(Write, as, ".eml", "Scribe.Email") &&
-				!CheckString(Write, as, ".msg", "Scribe.Email") &&
-				!CheckString(Write, as, ".mbox", "Scribe.Folder") &&
-				!CheckString(Write, as, ".mbx", "Scribe.Folder") &&
-				!CheckString(Write, as, ".ics", "Scribe.Calendar") &&
-				!CheckString(Write, as, ".vcs", "Scribe.Calendar") &&
-				!CheckString(Write, as, ".vcf", "Scribe.Contact") &&
+			if (!CheckString(Write, as, ".eml",   "Scribe.Email")    &&
+				!CheckString(Write, as, ".msg",   "Scribe.Email")    &&
+				!CheckString(Write, as, ".mbox",  "Scribe.Folder")   &&
+				!CheckString(Write, as, ".mbx",   "Scribe.Folder")   &&
+				!CheckString(Write, as, ".ics",   "Scribe.Calendar") &&
+				!CheckString(Write, as, ".vcs",   "Scribe.Calendar") &&
+				!CheckString(Write, as, ".vcf",   "Scribe.Contact")  &&
 				!CheckString(Write, as, ".mail3", "Scribe.MailStore"))
 				return false;
 
@@ -6929,7 +6929,7 @@ struct DefaultClient
 		return true;
 	}
 
-	void Win7Uninstall()
+	void WinUninstall()
 	{
 		for (int i=0; FileTypes[i].Name; i++)
 		{
@@ -7055,13 +7055,13 @@ struct DefaultClient
 
 DefaultClient::FileType DefaultClient::FileTypes[] =
 {
-	{ "Scribe.Email", "Email", 2 },
-	{ "Scribe.Folder", "Mailbox", 0 },
-	{ "Scribe.Calendar", "Calendar Event", 6 },
-	{ "Scribe.Contact", "Contact", 4 },
-	{ "Scribe.MailStore", "Mail Store", 0 },
-	{ "Scribe.Mailto", "Mailto Protocol", 0 },
-	{ 0, 0 }
+	{ "Scribe.Email",		"Email",			2 },
+	{ "Scribe.Folder",		"Mailbox",			0 },
+	{ "Scribe.Calendar",	"Calendar Event",	6 },
+	{ "Scribe.Contact",		"Contact",			4 },
+	{ "Scribe.MailStore",	"Mail Store",		0 },
+	{ "Scribe.Mailto",		"Mailto Protocol",	0 },
+	{ NULL,					NULL,				0 }
 };
 #endif
 
@@ -9368,7 +9368,7 @@ void ScribeWnd::SetDefaultHandler()
 						&&
 						Def.InstallAsClient("HKLM", true)
 						&&
-						Def.Win7Install(true);
+						Def.WinInstall(true);
 	LRegKey::AssertOnError = OldAssert;
 	if (!RegistryOk)
 	{
