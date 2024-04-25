@@ -3519,7 +3519,8 @@ void ScribeWnd::OnCommandLine()
 		CreateMail = HasFile;
 
 	LString OpenArg;
-	if (LAppInst->GetOption("u", OpenArg))
+	if (LAppInst->GetOption("u", OpenArg) &&
+		OpenArg)
 	{
 		LUri u(OpenArg);
 		if (u.sProtocol)
@@ -3730,16 +3731,19 @@ void ScribeWnd::SetupAccounts()
 				a->InitMenus();
 
 				// Identity Menu Item
-				LVariant IdEmail = a->Identity.Email();
-				LVariant IdName = a->Identity.Name();
+				auto AccountName = a->Send.Name();
+				auto IdEmail = a->Identity.Email();
+				auto IdName = a->Identity.Name();
 				if (IdentityMenu &&
 					ValidStr(IdEmail.Str()))
 				{
-					char s[256];
+					LString s;
+					if (AccountName.Str())
+						s = LString::Fmt("%s: ", AccountName.Str());
 					if (IdName.Str())
-						sprintf_s(s, sizeof(s), "%s <%s>", IdName.Str(), IdEmail.Str());
+						s += LString::Fmt("%s <%s>", IdName.Str(), IdEmail.Str());
 					else
-						sprintf_s(s, sizeof(s), "<%s>", IdEmail.Str());
+						s += LString::Fmt("<%s>", IdEmail.Str());
 
 					a->SetMenuItem(IdentityMenu->AppendItem(s, IDM_IDENTITY_BASE+i+1, !a->Send.Disabled()));
 					if (a->Send.Disabled())
@@ -5504,7 +5508,7 @@ Thing *ScribeWnd::CreateItem(int Type, ScribeFolder *Folder, bool Ui)
 		case MAGIC_MAIL:
 		{
 			// create a new mail message
-			Mail *m = new Mail(this, Obj);
+			auto m = new Mail(this, Obj);
 			if (!m)
 			{
 				LgiTrace("%s:%i - Alloc failed.\n", _FL);
@@ -6379,20 +6383,19 @@ bool ScribeWnd::MailBounce(Mail *m)
 	THREAD_UNSAFE(false);
 	bool Status = false;
 
-	if (m)
+	if (!m)
+		return false;
+
+	if (auto NewMail = new Mail(this))
 	{
-		Mail *NewMail = new Mail(this);
-		if (NewMail)
+		if (NewMail->OnBounce(m, true))
 		{
-			if (NewMail->OnBounce(m, true))
-			{
-				NewMail->DoUI();
-				Status = true;
-			}
-			else
-			{
-				DeleteObj(NewMail);
-			}
+			NewMail->DoUI();
+			Status = true;
+		}
+		else
+		{
+			DeleteObj(NewMail);
 		}
 	}
 
@@ -6402,13 +6405,21 @@ bool ScribeWnd::MailBounce(Mail *m)
 Mail *ScribeWnd::CreateMail(Contact *c, const char *Email, const char *Name)
 {
 	THREAD_UNSAFE(NULL);
-	Mail *m = dynamic_cast<Mail*>(CreateItem(MAGIC_MAIL, NULL, false));
+	
+	auto thing = CreateItem(MAGIC_MAIL, NULL, false);
+	if (!thing)
+	{
+		LgiTrace("%s:%i - CreateItem failed.\n", _FL);
+		return NULL;
+	}
+
+	auto m = thing->IsMail();
 	if (m)
 	{
 		bool IsMailTo = false;
 		if (Email)
 		{
-			IsMailTo = _strnicmp(Email, "mailto:", 7) == 0;
+			IsMailTo = !Strnicmp(Email, "mailto:", 7) == 0;
 			if (IsMailTo)
 			{
 				Mailto mt(this, Email);
@@ -6416,18 +6427,13 @@ Mail *ScribeWnd::CreateMail(Contact *c, const char *Email, const char *Name)
 			}
 		}
 
-		MailUi *UI = dynamic_cast<MailUi*>(m->DoUI());
-		if (UI)
+		if (auto UI = dynamic_cast<MailUi*>(m->DoUI()))
 		{
 			if (c)
-			{
 				UI->AddRecipient(c);
-			}
 
 			if (Email && !IsMailTo)
-			{
 				UI->AddRecipient(Email, Name);
-			}
 		}
 	}
 
@@ -6437,36 +6443,33 @@ Mail *ScribeWnd::CreateMail(Contact *c, const char *Email, const char *Name)
 Mail *ScribeWnd::LookupMailRef(const char *MsgRef, bool TraceAllUids)
 {
 	THREAD_UNSAFE(NULL);
-	if (!MsgRef)
-		return 0;
 	
-	LAutoString p(NewStr(MsgRef));
-	char *RawUid = strrchr(p, '/');
-	if (RawUid)
+	if (!MsgRef)
+		return NULL;
+	
+	LString ref(MsgRef);
+	if (auto RawUid = strrchr(ref, '/'))
 	{
 		*RawUid++ = 0;
-		LUri u;
-		LString Uid = u.DecodeStr(RawUid);
+		
+		LUri u;		
+		auto Uid = u.DecodeStr(RawUid);
 		
 		// Try the mail message map first...
-		Mail *m = Mail::GetMailFromId(Uid);
+		auto m = Mail::GetMailFromId(Uid);
 		if (m)
 			return m;
 
 		// Ok, not found, so look in last known folder...
-		ScribeFolder *f = GetFolder(p);
-		if (f)
+		if (auto f = GetFolder(ref))
 		{
-			for (auto t : f->Items)
+			for (auto t: f->Items)
 			{
-				Mail *m = t->IsMail();
-				if (m)
+				if (auto m = t->IsMail())
 				{
 					auto s = m->GetMessageId();
-					if (s && !strcmp(s, Uid))
-					{
+					if (!Strcmp(s, Uid.Get()))
 						return m;
-					}
 					
 					if (TraceAllUids)
 						LgiTrace("\t%s\n", s);
@@ -6475,7 +6478,7 @@ Mail *ScribeWnd::LookupMailRef(const char *MsgRef, bool TraceAllUids)
 		}
 	}
 
-	return 0;
+	return NULL;
 }
 
 void ScribeWnd::OnBayesAnalyse(const char *Msg, const char *WhiteListEmail)
@@ -6503,8 +6506,8 @@ void ScribeWnd::OnBayesAnalyse(const char *Msg, const char *WhiteListEmail)
 bool ScribeWnd::OnBayesResult(const char *MailRef, double Rating)
 {
 	THREAD_UNSAFE(false);
-	Mail *m = LookupMailRef(MailRef);
-	if (m)
+
+	if (auto m = LookupMailRef(MailRef))
 		return OnBayesResult(m, Rating);
 	#ifdef _DEBUG
 	else
