@@ -3501,7 +3501,7 @@ void ScribeWnd::OnCommandLine()
 {
 	THREAD_UNSAFE();
 
-	LgiTrace("CmdLine: %S\n", GetCommandLineW());
+	//LgiTrace("CmdLine: %S\n", GetCommandLineW());
 
 	// Check command line args
 	LString Str, File;
