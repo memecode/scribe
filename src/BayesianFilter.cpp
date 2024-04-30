@@ -416,7 +416,7 @@ public:
 		if (Opts && Opts->GetFile())
 		{
 			LFile::Path p(Opts->GetFile());
-			p--;
+			p = p / "..";
 			OptPath = p.GetFull();
 			p += Name;
 			if (p.IsFile())

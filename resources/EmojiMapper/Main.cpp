@@ -1369,8 +1369,7 @@ public:
 			CodeFile.Write(Src, strlen(Src));
 		CodeFile.Close();
 				
-		OutPath--;
-		OutPath += "EmojiMap.png";
+		OutPath = (OutPath / ".." / "EmojiMap.png");
 
 		LFile ImgFile;
 		if (!ImgFile.Open(OutPath, O_WRITE))

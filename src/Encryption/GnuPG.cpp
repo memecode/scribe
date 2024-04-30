@@ -1541,8 +1541,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	
 			// 2) Encrypt/sign the file:
 			LString InFile(p);
-			p--;
-			p += "encrypted.gpg";
+			p = (p / ".." / "encrypted.gpg");
 			LString OutFile(p);
 			if (LFileExists(OutFile))
 			{

@@ -174,8 +174,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 			if (LIsRelativePath(Path))
 			{
 				p = Options->GetFile();
-				p--;
-				p += Path;
+				p = p / ".." / Path;
 			}
 			else p = Path;
 			auto Full = p.Absolute().GetFull();

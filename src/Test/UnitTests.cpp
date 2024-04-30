@@ -101,8 +101,7 @@ struct LoadMailStore1 : public ScribeUnitTest
 			s->UnLoadFolders();
 
 			LFile::Path p = folderPath;
-			p--;
-			FileDev->RemoveFolder(p, true);
+			FileDev->RemoveFolder(p / "..", true);
 		}
 		LAssert(GotCallback);
 	}
