@@ -167,7 +167,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 		auto &Folder = App->Folders[StoreIdx];
 		Folder.Name = StoreName;
 
-		if (Path)
+		if (ValidStr(Path))
 		{
 			// Mail3 folders on disk...
 			LFile::Path p;

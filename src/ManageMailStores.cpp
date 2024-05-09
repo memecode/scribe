@@ -206,6 +206,7 @@ void EditWebdav(LViewI *parent, LXmlTag *t, std::function<void(bool)> callback)
 			t->SetAttr(OPT_MailStoreCalendarUrl, dlg->GetCtrlName(IDC_CALENDAR_URL));
 			t->SetAttr(OPT_MailStoreUserName, dlg->GetCtrlName(IDC_USERNAME));
 			t->SetAttr(OPT_MailStorePassword, dlg->GetCtrlName(IDC_PASSWORD));
+			t->DelAttr(OPT_MailStoreLocation);
 			callback(true);
 		}
 		else callback(false);
