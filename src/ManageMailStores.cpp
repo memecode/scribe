@@ -215,8 +215,8 @@ void EditWebdav(LViewI *parent, LXmlTag *t, std::function<void(bool)> callback)
 
 class StoreItem : public LListItem
 {
-	ScribeWnd *App;
-	LListItemCheckBox *Disable;
+	ScribeWnd *App = NULL;
+	LListItemCheckBox *Disable = NULL;
 
 public:
 	LXmlTag Tag;
@@ -396,7 +396,6 @@ LMailStore *ManageMailStores::GetCurrentMailStore()
 		{
 			LMailStore &s = App->GetStorageFolders()[i];
 
-			printf("GetCur %s %s\n", p.Get(), s.Path.Get());
 			if (s.Path && s.Path.Equals(p))
 			{
 				if (s.Store)
@@ -420,6 +419,12 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 			if (n.Type == LNotifyItemSelect)
 			{
 				OnItemSelect();
+			}
+			else if (n.Type == LNotifyItemDoubleClick)
+			{
+				auto si = dynamic_cast<StoreItem*>(Lst->GetSelected());
+				if (si)
+					si->Edit();
 			}
 			break;
 		}
@@ -486,8 +491,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 				{
 					if (ok)
 					{
-						StoreItem *Si = new StoreItem(App);
-						if (Si)
+						if (auto Si = new StoreItem(App))
 						{
 							auto Rel = LMakeRelativePath(Opts, s->Name());
 					
@@ -502,7 +506,7 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 			}
 			else if (Cmd == IDM_WEBDAV_FOLDER)
 			{
-				StoreItem *Si = new StoreItem(App);
+				auto Si = new StoreItem(App);
 				if (!Si)
 					break;
 				
