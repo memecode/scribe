@@ -189,7 +189,7 @@ public:
 		return Buf;
 	}
 
-	int64 Peek(uchar *Ptr, ssize_t Size)
+	int64 Peek(uchar *Ptr, ssize_t Size) const override
 	{
 		LAssert(0);
 		return 0;

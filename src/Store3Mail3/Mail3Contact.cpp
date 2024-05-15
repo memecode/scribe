@@ -136,7 +136,7 @@ bool LMail3Contact::Serialize(LMail3Store::LStatement &s, bool Write)
 			else \
 			{ \
 				const char *v = s.GetStr(idx); \
-				/*LgiTrace("Read %i -> %i, %s\n", idx, id, v.Get());*/ \
+				/*LgiTrace("Read %i -> %i, %s\n", idx, id, v);*/ \
 				if (v) \
 					f.Add(id, new LString(v)); \
 			} \
@@ -168,7 +168,7 @@ bool LMail3Contact::Serialize(LMail3Store::LStatement &s, bool Write)
 
 const char *LMail3Contact::GetStr(int id)
 {
-	LString *s = f.Find(id);
+	auto s = f.Find(id);
 	return s ? s->Get() : NULL;
 }
 
