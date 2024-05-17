@@ -30,3 +30,4 @@ def findLibAndLink(name, hasMajorVer):
 
 findLibAndLink("libz_local", True)
 findLibAndLink("libpng", False)
+findLibAndLink("libjpeg", False)
