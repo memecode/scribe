@@ -28,7 +28,7 @@
 		34452C992AD4A2BF00AE820D /* libiconv.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C902AD4A28500AE820D /* libiconv.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34452C9A2AD4A2C700AE820D /* libchardet.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C8E2AD4A26B00AE820D /* libchardet.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34452C9B2AD4A2D700AE820D /* libbzip2.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C8A2AD4A23C00AE820D /* libbzip2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34452C9C2AD4A2E100AE820D /* libjpeg.8.2.2.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C882AD4A22F00AE820D /* libjpeg.8.2.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34452C9C2AD4A2E100AE820D /* libjpeg.9.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C882AD4A22F00AE820D /* libjpeg.9.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34452C9D2AD4A2EA00AE820D /* libpng16.16.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C862AD4A22000AE820D /* libpng16.16.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34452C9E2AD4A30300AE820D /* libaspell-dist-0.60.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3445E5731F1F40DF00D0A824 /* EmojiTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5721F1F40DF00D0A824 /* EmojiTools.cpp */; };
@@ -259,7 +259,7 @@
 				34A891E22B0C17B200D2930B /* libssl.3.dylib in Copy Files */,
 				34452C9E2AD4A30300AE820D /* libaspell-dist-0.60.dylib in Copy Files */,
 				34452C9D2AD4A2EA00AE820D /* libpng16.16.dylib in Copy Files */,
-				34452C9C2AD4A2E100AE820D /* libjpeg.8.2.2.dylib in Copy Files */,
+				34452C9C2AD4A2E100AE820D /* libjpeg.9.dylib in Copy Files */,
 				34452C9B2AD4A2D700AE820D /* libbzip2.dylib in Copy Files */,
 				34452C9A2AD4A2C700AE820D /* libchardet.dylib in Copy Files */,
 				34452C992AD4A2BF00AE820D /* libiconv.dylib in Copy Files */,
@@ -330,8 +330,8 @@
 		34417D88205FB69E00D2E80C /* Tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tables.h; path = ../../Utils/Tables/Tables.h; sourceTree = "<group>"; };
 		34417D8D205FD4A500D2E80C /* Ftp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Ftp.cpp; path = ../../../../Lgi/trunk/src/common/Net/Ftp.cpp; sourceTree = "<group>"; };
 		34417DBD205FD5B800D2E80C /* HorzRuleBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HorzRuleBlock.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp; sourceTree = "<group>"; };
-		34452C862AD4A22000AE820D /* libpng16.16.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng16.16.dylib; path = ../../../../../../opt/local/lib/libpng16.16.dylib; sourceTree = "<group>"; };
-		34452C882AD4A22F00AE820D /* libjpeg.8.2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjpeg.8.2.2.dylib; path = ../../../../../../opt/local/lib/libjpeg.8.2.2.dylib; sourceTree = "<group>"; };
+		34452C862AD4A22000AE820D /* libpng16.16.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng16.16.dylib; path = /opt/local/lib/libpng16.16.dylib; sourceTree = "<absolute>"; };
+		34452C882AD4A22F00AE820D /* libjpeg.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjpeg.9.dylib; path = /opt/local/libexec/jpeg/lib/libjpeg.9.dylib; sourceTree = "<absolute>"; };
 		34452C8A2AD4A23C00AE820D /* libbzip2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbzip2.dylib; path = "../../libs/build-release/bzip2-1.0.6/libbzip2.dylib"; sourceTree = "<group>"; };
 		34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libaspell-dist-0.60.dylib"; path = "../../libs/build-release/aspell-0.60.6.1/libaspell-dist-0.60.dylib"; sourceTree = "<group>"; };
 		34452C8E2AD4A26B00AE820D /* libchardet.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libchardet.dylib; path = "../../libs/build-release/libchardet/libchardet.dylib"; sourceTree = "<group>"; };
@@ -524,8 +524,8 @@
 		349AB0BD217B395B00573982 /* Png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Png.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Filters/Png.cpp; sourceTree = "<group>"; };
 		349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "scribe-mac-icon.icns"; path = "../../Resources/scribe-mac-icon.icns"; sourceTree = "<group>"; };
 		34A66680237968A200ED0212 /* FolderCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FolderCalendarSource.cpp; path = ../../src/FolderCalendarSource.cpp; sourceTree = "<group>"; };
-		34A891DD2B0C177100D2930B /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.3.dylib; path = ../../../../../../opt/local/libexec/openssl3/lib/libcrypto.3.dylib; sourceTree = "<group>"; };
-		34A891E02B0C178000D2930B /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.3.dylib; path = ../../../../../../opt/local/libexec/openssl3/lib/libssl.3.dylib; sourceTree = "<group>"; };
+		34A891DD2B0C177100D2930B /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.3.dylib; path = /opt/local/libexec/openssl3/lib/libcrypto.3.dylib; sourceTree = "<absolute>"; };
+		34A891E02B0C178000D2930B /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.3.dylib; path = /opt/local/libexec/openssl3/lib/libssl.3.dylib; sourceTree = "<absolute>"; };
 		34AB68E8275240B40045380B /* ScribeScripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeScripts.h; path = ../../Scripts/ScribeScripts.h; sourceTree = "<group>"; };
 		34C1BF71238CA23500658B99 /* calendar.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = calendar.html; path = ../../Help/calendar.html; sourceTree = "<group>"; };
 		34C1BF72238CA23500658B99 /* features.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = features.html; path = ../../Help/features.html; sourceTree = "<group>"; };
@@ -982,7 +982,7 @@
 				34452C8E2AD4A26B00AE820D /* libchardet.dylib */,
 				34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */,
 				34452C8A2AD4A23C00AE820D /* libbzip2.dylib */,
-				34452C882AD4A22F00AE820D /* libjpeg.8.2.2.dylib */,
+				34452C882AD4A22F00AE820D /* libjpeg.9.dylib */,
 				34452C862AD4A22000AE820D /* libpng16.16.dylib */,
 				34A891DD2B0C177100D2930B /* libcrypto.3.dylib */,
 				34A891E02B0C178000D2930B /* libssl.3.dylib */,
@@ -1588,8 +1588,9 @@
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
-					/opt/local/libexec/openssl3/include,
 					/opt/local/include,
+					/opt/local/libexec/openssl3/include,
+					/opt/local/libexec/jpeg/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1641,8 +1642,9 @@
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
-					/opt/local/libexec/openssl3/include,
 					/opt/local/include,
+					/opt/local/libexec/openssl3/include,
+					/opt/local/libexec/jpeg/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";

@@ -2740,7 +2740,7 @@ public:
 		return false;
 	}
 
-	const char *GetText(int Col = 0)
+	const char *GetText(int Col = 0) override
 	{
 		switch (Col)
 		{

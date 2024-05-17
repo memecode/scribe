@@ -735,6 +735,8 @@ public:
 					OnChange();
 					break;
 				}
+				default:
+					break;
 			}
 		}
 

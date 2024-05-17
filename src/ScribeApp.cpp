@@ -6419,7 +6419,7 @@ Mail *ScribeWnd::CreateMail(Contact *c, const char *Email, const char *Name)
 		bool IsMailTo = false;
 		if (Email)
 		{
-			IsMailTo = !Strnicmp(Email, "mailto:", 7) == 0;
+			IsMailTo = !Strnicmp(Email, "mailto:", 7);
 			if (IsMailTo)
 			{
 				Mailto mt(this, Email);

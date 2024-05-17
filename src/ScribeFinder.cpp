@@ -890,7 +890,7 @@ public:
 				// Setup new folder...
 				if (Folders.IdxCheck(++CurFolder))
 				{
-					if (Folder = Folders[CurFolder])
+					if ((Folder = Folders[CurFolder]))
 					{
 						CurFolderPath = Folder->GetPath();
 						CurItem = 0;

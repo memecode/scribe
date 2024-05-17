@@ -145,12 +145,12 @@ class LStringStream : public LStringPipe
 {
 	LStream *s;
 
-	ssize_t Read(void *Ptr, ssize_t Size, int Flags = 0)
+	ssize_t Read(void *Ptr, ssize_t Size, int Flags = 0) override
 	{
 		return s->Read(Ptr, Size, Flags);
 	}
 
-	ssize_t Write(const void *Ptr, ssize_t Size, int Flags = 0)
+	ssize_t Write(const void *Ptr, ssize_t Size, int Flags = 0) override
 	{
 		return s->Write(Ptr, Size, Flags);
 	}
@@ -162,13 +162,13 @@ public:
 		s->SetPos(0);
 	}
 
-	bool IsOpen() { return s->IsOpen(); }
-	int Close() { return s->Close(); }
+	bool IsOpen() override { return s->IsOpen(); }
+	int Close() override { return s->Close(); }
 	bool IsEmpty() { return s->GetSize() == 0; }
-	void Empty() { s->SetSize(0); }
-	int64 GetSize() { return s->GetSize(); }
+	void Empty() override { s->SetSize(0); }
+	int64 GetSize() override { return s->GetSize(); }
 
-	void *New(ssize_t AddBytes = 0)
+	void *New(ssize_t AddBytes = 0) override
 	{
 		char *Buf = 0;
 		auto Len = s->GetSize();
