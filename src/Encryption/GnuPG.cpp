@@ -924,7 +924,7 @@ struct MailUiGpgPriv
 		LString Msg;
 		Msg.Printf(LLoadString(IDS_GNUPG_PSW_PROMPT), Addr.Get());
 		
-		auto p = Parent->GetGView();
+		auto p = Parent->GetLView();
 		auto Dlg = new LInput(Parent, "", Msg, LLoadString(IDC_PASSWORD), true);
 		Dlg->DoModal([this, Dlg, Addr, Callback](auto dlg, auto ok)
 		{
