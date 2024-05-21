@@ -257,7 +257,6 @@ public:
 				{
 					if (ok)
 						SaveMapping(s->Name());
-					delete s;
 				});
 				break;
 			}
@@ -270,7 +269,6 @@ public:
 				{
 					if (id)
 						LoadMapping(dlg->Name());
-					delete dlg;
 				});
 				break;
 			}
@@ -329,7 +327,6 @@ void ImportCsv(ScribeWnd *App)
 	s->Type("All Files", LGI_ALL_FILES);
 	s->Open([App](auto s, auto status)
 	{
-		LAutoPtr<LFileSelect> mem(s);
 		if (!status || !LFileExists(s->Name()))
 			return;
 
@@ -569,7 +566,6 @@ void ExportCsv(ScribeWnd *App)
 							LgiMsg(App, LLoadString(IDS_EXPORT_MSG), AppName, MB_OK, Exported, Error?Error:(char*)"");
 						}
 					}
-					delete s;
 				});
 			}
 		}

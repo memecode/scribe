@@ -569,7 +569,6 @@ void ContactGroup::OnMouseClick(LMouse &m)
 									App->MailMerge(Recip, dlg->Name(), 0);
 								Recip.DeleteObjects();
 							}
-							delete dlg;
 						});
 						break;
 					}

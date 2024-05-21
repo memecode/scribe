@@ -161,7 +161,6 @@ int ScribeFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 					}
 					else LgiMsg(this, "Error: Invalid path.", AppName);
 				}
-				delete s;
 			});
 			break;
 		}
@@ -193,7 +192,6 @@ int ScribeFolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
 					else
 						LgiMsg(this, LLoadString(IDS_ERROR_FOLDERS_DONT_EXIST), AppName, MB_OK, dlg->Name());
 				}
-				delete dlg;
 			});
 			break;
 		}

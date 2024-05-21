@@ -3279,7 +3279,6 @@ int MailUi::HandleCmd(int Cmd)
 						}
 					}
 				}
-				delete dlg;
 			});
 			break;
 		}

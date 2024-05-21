@@ -88,7 +88,6 @@ public:
 								TotalEmail = Scan(t, s->Name());
 						}
 					}
-					delete s;
 				});
 				break;
 			}

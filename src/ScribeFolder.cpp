@@ -1041,7 +1041,6 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 			s->Name(DropName);
 			s->Save([this, ExportMimeType](auto s, auto ok)
 			{
-				LAutoPtr<LFileSelect> mem(s);
 				if (ok)
 				{
 					if (LFileExists(s->Name()))
@@ -1166,7 +1165,6 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 					App->MailMerge(Recip, dlg->Name(), 0);
 					Recip.DeleteObjects();
 				}
-				delete dlg;
 			});
 			break;
 		}

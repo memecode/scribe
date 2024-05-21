@@ -465,7 +465,6 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 				{
 					if (status)
 						SetCtrlName(IDC_DEST, dlg->Name());
-					delete dlg;
 				});
 				break;
 			}

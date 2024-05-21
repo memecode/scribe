@@ -463,7 +463,6 @@ public:
 				{
 					if (status)
 						SetCtrlName(IDC_DIR, s->Name());
-					delete s;
 				});
 				break;
 			}
@@ -1997,7 +1996,6 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Arg1 = s->Name();
 					OnNotify(Btn, LNotifyValueChanged);
 				}
-				delete s;
 			});
 			break;
 		}
@@ -2147,7 +2145,6 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Arg1 = s->Name();
 					OnNotify(Btn, LNotifyValueChanged);
 				}
-				delete s;
 			});
 			break;
 		}

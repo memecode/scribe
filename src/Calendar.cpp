@@ -2653,7 +2653,6 @@ public:
 		{
 			if (ok)
 				Save(sel->Name());
-			delete dlg;
 		});
 	}
 
@@ -3282,7 +3281,6 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 						attachLst->ResizeColumnsToContent();
 					}
 				}
-				delete dlg;
 			});
 			break;
 		}

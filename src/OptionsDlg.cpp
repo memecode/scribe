@@ -980,7 +980,6 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 					if (GetViewById(IDC_NEW_MAIL_SOUND, LogFile))
 						LogFile->Name(dlg->Name());
 				}
-				delete dlg;
 			});
 			break;
 		}

@@ -453,7 +453,6 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 						Lst->ResizeColumnsToContent();
 					}
 				}
-				delete dlg;
 			});
 			break;
 		}
@@ -500,7 +499,6 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 							Lst->ResizeColumnsToContent();
 						}
 					}
-					delete s;
 				});
 			}
 			else if (Cmd == IDM_WEBDAV_FOLDER)

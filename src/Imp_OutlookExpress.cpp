@@ -602,7 +602,6 @@ struct ImportOe : public LProgressDlg
 						DoFileSearch();
 						ProcessFiles();
 					}
-					delete s;
 				});
 			}
 		}

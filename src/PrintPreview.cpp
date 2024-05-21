@@ -223,7 +223,6 @@ int PrintPreview::OnNotify(LViewI *Ctrl, LNotification n)
 				{
 					if (ok)
 						GdcD->Save(s->Name(), d->Mem);
-					delete s;
 				});
 			}
 			else LgiMsg(this, "No image to save.", LLoadString(IDS_ERROR));

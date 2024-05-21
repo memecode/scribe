@@ -601,7 +601,6 @@ void Thing::ExportAll(	LViewI *Parent,
 		{
 			if (status)
 				ExportAllProcess(dlg, Parent, Sel, ExportMimeType, Callback);
-			delete dlg;
 		});
 	}
 	else
@@ -610,7 +609,6 @@ void Thing::ExportAll(	LViewI *Parent,
 		{
 			if (status)
 				ExportAllProcess(dlg, Parent, Sel, ExportMimeType, Callback);
-			delete dlg;
 		});
 	}
 }

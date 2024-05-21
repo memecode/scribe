@@ -790,7 +790,6 @@ void Attachment::OnSaveAs(LView *Parent)
 				{
 					if (status)
 						DoSave(dlg, Files);
-					delete dlg;
 				});
 			}
 			else
@@ -800,7 +799,6 @@ void Attachment::OnSaveAs(LView *Parent)
 				{
 					if (status)
 						DoSave(dlg, Files);
-					delete dlg;
 				});
 			}
 		}

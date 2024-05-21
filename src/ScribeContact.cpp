@@ -580,7 +580,6 @@ public:
 			{
 				if (status)
 					Load(dlg->Name());
-				delete dlg;
 			});
 		}
 		

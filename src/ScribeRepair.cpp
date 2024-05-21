@@ -731,10 +731,9 @@ void Scribe_Repair(ScribeWnd *Parent)
 {
 	auto Select = new LFileSelect(Parent);
 	Select->Type("Mail folders", "*.mail");
-	Select->Open([&](auto dlg, auto status)
+	Select->Open([Select](auto dlg, auto status)
 	{
 		// FIXME RepairFile Worker(Parent, Select.Name());
-		delete dlg;
 	});
 }
 

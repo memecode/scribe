@@ -126,7 +126,6 @@ int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
 						for (int i=0; i<dlg->Length(); i++)
 							InsertFile((*dlg)[i]);
 					}
-					delete dlg;
 				});
 			}
 			break;
@@ -160,7 +159,6 @@ int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
 								{
 									if (status)
 										SetCtrlName(IDC_DST, s->Name());
-									delete s;
 								});
 			}
 			else
