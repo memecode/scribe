@@ -3422,7 +3422,6 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 									
 									App->SaveOptions();
 								}
-								delete dlg;
 							});
 							break;
 						}
@@ -3449,7 +3448,6 @@ int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
 									
 									App->SaveOptions();
 								}
-								delete dialog;
 							});
 							break;
 						}

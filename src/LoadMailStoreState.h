@@ -229,8 +229,6 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 							{
 								// Upgrade complete, finish the iteration..
 								Iterate2(MailStore);
-
-								delete dlg;
 							});
 						return;
 					}
@@ -298,7 +296,6 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 				Dlg->DoModal([this, Dlg, FolderPsw, StoreName](auto dlg, auto id)
 					{
 						auto psw = Dlg->GetStr();
-						delete dlg;
 
 						if (id == IDOK)
 						{

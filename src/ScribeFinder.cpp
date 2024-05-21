@@ -1200,7 +1200,6 @@ int FindWnd::OnNotify(LViewI *Col, LNotification n)
 				{
 					if (id)
 						this->Folder->Name(Dlg->Get());
-					delete dlg;
 				});
 			}
 			break;

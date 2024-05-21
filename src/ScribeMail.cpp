@@ -6516,7 +6516,6 @@ void SetFolderCallback(LInput *Dlg, LViewI *EditCtrl, void *Param)
 	{
 		if (id)
 			EditCtrl->Name(Select->Get());
-		delete dlg;
 	});
 }
 
@@ -7826,7 +7825,6 @@ void Mail::OnProperties(int Tab)
 					SetDirty();
 					Update();
 				}
-				delete dlg;
 			});
 		}
 	}

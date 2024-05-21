@@ -103,7 +103,6 @@ public:
 						if (Out)
 							SetCtrlName(IDC_OUT_FOLDER, Out->GetPath());
 					}
-					delete dlg;
 				});
 				break;
 			}
@@ -199,6 +198,5 @@ void ImportEml(ScribeWnd *App)
 				LgiMsg(App, "%i email failed to import.", AppName, MB_OK, Errors);
 			}
 		}
-		delete dlg;
 	});
 }

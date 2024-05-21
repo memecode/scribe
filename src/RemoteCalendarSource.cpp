@@ -371,7 +371,6 @@ void RemoteCalendarSource::EditPath(LView *parent, CalendarView *cv)
 			if (cv)
 				cv->OnContentsChanged(this);
 		}
-		delete dlg;
 	});
 }
 

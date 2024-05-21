@@ -437,7 +437,6 @@ bool LScribeScript::BrowseFolder(LScriptArguments &Args)
 			}
 			else LgiTrace("%s:%i - No callback called '%s'\n", _FL, CallbackName.Get());
 		}
-		delete dlg;
 	});
 
 	return true;

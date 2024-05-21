@@ -178,9 +178,7 @@ void Import_NetscapeContacts(ScribeWnd *Parent)
 						}
 					}
 				}
-				delete dlg;
 			});
 		}
-		delete dlg;
 	});
 }

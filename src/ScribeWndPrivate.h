@@ -396,8 +396,6 @@ public:
 					delete dlg;
 					LAppInst->Exit(1);
 				}
-
-				delete dlg;
 			});
 	}
 

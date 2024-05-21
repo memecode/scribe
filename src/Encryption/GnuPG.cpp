@@ -938,7 +938,6 @@ struct MailUiGpgPriv
 				if (Callback)
 					Callback(p.Password);
 			}
-			delete dlg;
 		});
 	}
 };

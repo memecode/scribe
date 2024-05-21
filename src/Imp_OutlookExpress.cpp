@@ -653,8 +653,6 @@ struct ImportOe : public LProgressDlg
 										MAGIC_MAIL);
 		Dlg->DoModal([this, Dlg](auto dlg, auto id)
 		{
-			LAutoPtr<LDialog> mem(dlg);
-
 			if (!id)
 				return;
 

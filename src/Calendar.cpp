@@ -3200,7 +3200,6 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 			{
 				if (!ctrlId)
 					SetCtrlValue(IDC_REPEAT, false);
-				delete dlg;
 			});
 			break;
 		}
@@ -3215,7 +3214,6 @@ int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
 					Item->GetObject()->SetStr(FIELD_CAL_TIMEZONE, Dlg->GetStr());
 					Item->SetDirty();
 				}
-				delete dlg;
 			});
 			break;
 		}

@@ -958,7 +958,6 @@ void ListAddr::OnMouseClick(LMouse &m)
 							if (LListItem::GetList())
 								LListItem::GetList()->OnNotify(LListItem::GetList(), LNotifyItemChange);
 						}
-						delete dlg;
 					});
 					break;
 				}

@@ -445,8 +445,6 @@ void MailTree::OnCreateSubDirectory(ScribeFolder *Item)
 				Item->CreateSubFolder(Dlg->SubName, Type[Dlg->SubType]);
 			}
 		}
-
-		delete dlg;
 	});
 }
 
@@ -683,7 +681,6 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 							{
 								if (Res > 0)
 									FinishFolderOp(Res);
-								delete dlg;
 							});
 						}
 						else FinishFolderOp(Res);

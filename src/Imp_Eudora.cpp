@@ -173,6 +173,5 @@ void Import_EudoraAddressBook(ScribeWnd *App)
 	{
 		if (id && Dlg->SrcFiles[0])
 			ImportEudoraAddresss(App, App->GetFolder(Dlg->DestFolder), Dlg->SrcFiles[0]);
-		delete dlg;
 	});
 }

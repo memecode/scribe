@@ -1984,7 +1984,6 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Arg1 = Dlg->Get();
 					OnNotify(Btn, LNotifyValueChanged);
 				}
-				delete dlg;
 			});
 			break;
 		}
@@ -2162,7 +2161,6 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Arg1 = Dlg->Arg;
 					OnNotify(Btn, LNotifyValueChanged);
 				}
-				delete dlg;
 			});
 			break;
 		}
@@ -2176,7 +2174,6 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Arg1 = Dlg->Arg;
 					OnNotify(Btn, LNotifyValueChanged);
 				}
-				delete dlg;
 			});
 			break;
 		}
@@ -2190,7 +2187,6 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Arg1 = Dlg->Arg;
 					OnNotify(Btn, LNotifyValueChanged);
 				}
-				delete dlg;
 			});
 			break;
 		}
@@ -2204,7 +2200,6 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 					Arg1 = Dlg->Arg;
 					OnNotify(Btn, LNotifyValueChanged);
 				}
-				delete dlg;
 			});
 			break;
 		}

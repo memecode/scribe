@@ -100,11 +100,8 @@ void ScribePrintContext::OnBeginPrint(LPrintDC *pdc, std::function<void(int)> ca
 		auto Dlg = new PrintPreview(App, mail, pdc);
 		Dlg->DoModal([this, Dlg, callback, mail](auto dlg, auto id)
 		{
-			LAutoPtr<LDialog> mem(dlg);
 			if (!id)
-			{
 				PrintStatus(OnBeginPrintCancel);
-			}
 
 			PageRanges.Reset(new LPrintPageRanges(Dlg->GetPageRanges()));
 			HtmlImg = Dlg->ReleaseImage();

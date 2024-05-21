@@ -470,7 +470,6 @@ void Import_MozillaAddressBook(ScribeWnd *App)
 	{
 		if (id && Dlg->SrcFiles[0])
 			ImportMozillaAddresss(App, App->GetFolder(Dlg->DestFolder), Dlg->SrcFiles[0]);
-		delete dlg;
 	});
 }
 
@@ -601,7 +600,5 @@ void Import_MozillaMail(ScribeWnd *App)
 						MB_OK,
 						Dlg->DestFolder.Get());
 		}
-
-		delete dlg;
 	});
 }

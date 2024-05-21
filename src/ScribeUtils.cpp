@@ -1637,7 +1637,6 @@ void LHtmlMsg(std::function<void(int)> Callback, LViewI *Parent, const char *Htm
 	{
 		if (Callback)
 			Callback(id);
-		delete dlg;
 	});
 }
 

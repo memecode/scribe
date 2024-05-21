@@ -436,7 +436,6 @@ void ScribeAccount::InitUI(LView *Parent, int Tab, std::function<void(bool)> cal
 	{
 		if (callback)
 			callback(id);
-		delete dlg;
 	});
 }
 
@@ -479,7 +478,6 @@ int ScribeAccount::OnNotify(LViewI *Ctrl, LNotification &n)
 			{
 				if (id)
 					Ctrl->GetWindow()->SetCtrlName(IDC_FOLDER, Dlg->Get());
-				delete dlg;
 			});
 			break;
 		}

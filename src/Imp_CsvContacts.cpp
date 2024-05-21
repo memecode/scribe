@@ -289,7 +289,6 @@ public:
 								SetCtrlName(IDC_FOLDER, this->Folder->GetPath());
 						}
 					}
-					delete dlg;
 				});
 				break;
 			}
@@ -342,7 +341,6 @@ void ImportCsv(ScribeWnd *App)
 		Dlg->SetRecords(Dlg->Database->TableAt(0));
 		Dlg->DoModal([Dlg, App](auto dlg, auto id)
 		{
-			LAutoPtr<LDialog> mem(dlg);
 			if (!id)
 				return;
 
@@ -472,7 +470,6 @@ public:
 				{
 					if (id)
 						SetCtrlName(IDC_FOLDERS, Dlg->Get());
-					delete dlg;
 				});
 				break;
 			}
@@ -576,6 +573,5 @@ void ExportCsv(ScribeWnd *App)
 				});
 			}
 		}
-		delete dlg;
 	});
 }

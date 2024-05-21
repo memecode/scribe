@@ -669,7 +669,6 @@ public:
 				{
 					if (ctrlId)
 						this->Folder->LView::Name(Dlg->Get());
-					delete dlg;
 				});
 				break;
 			}
@@ -1140,7 +1139,6 @@ public:
 				{
 					if (ctrlId)
 						AddPath(Dlg->Path);
-					delete dlg;
 				});
 			}
 		}
@@ -1159,7 +1157,6 @@ public:
 				{
 					if (ctrlId)
 						SetCtrlName(IDC_FOLDER, Dlg->Get());
-					delete dlg;
 				});
 				break;
 			}
@@ -1293,7 +1290,6 @@ public:
 		{
 			if (ctrlId && Fs->Get())
 				AddPath(Fs->Get());
-			delete dlg;
 		});
 	}
 
@@ -1341,7 +1337,6 @@ public:
 						{
 							if (id)
 								SetCtrlName(IDC_FOLDER, Dlg->Path);
-							delete dlg;
 						});
 					}
 				}
@@ -2835,7 +2830,6 @@ void OutlookIO::ImportPersonalAddressBook(std::function<void(bool)> callback)
 	{
 		if (!ctrlId)
 		{
-			delete dlg;
 			if (callback)
 				callback(false);
 			return;
@@ -2986,7 +2980,6 @@ void OutlookIO::ImportPersonalAddressBook(std::function<void(bool)> callback)
 			LgiMsg(App, "Couldn't open the address book.", "Error", MB_OK);
 		}
 
-		delete dlg;
 		if (callback)
 			callback(Status);
 	});
@@ -3778,7 +3771,6 @@ bool MailMapiSource::Open(LSocketI *S, const char *RemoteHost, int Port, const c
 																&MsgStore);
 							OnMsgStore(Error);
 						}
-						delete dlg;
 					});
 				}
 			}

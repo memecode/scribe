@@ -75,7 +75,6 @@ int BayesDlg::OnNotify(LViewI *c, LNotification n)
 			{
 				if (ok)
 					SetCtrlName(IDC_SUSPECT_FOLDER, fd->Get());
-				delete dlg;
 			});
 			break;
 		}
@@ -86,7 +85,6 @@ int BayesDlg::OnNotify(LViewI *c, LNotification n)
 			{
 				if (ok)
 					SetCtrlName(IDC_SPAM_FOLDER, fd->Get());
-				delete dlg;
 			});
 			break;
 		}

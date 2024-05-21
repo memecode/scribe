@@ -106,7 +106,6 @@ int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
 							if (f)
 								InsertFile(f);
 						}
-						delete dlg;
 					});
 			}
 			else
@@ -176,7 +175,6 @@ int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
 						if (f && Dst)
 							Dst->Name(f);
 					}
-					delete dlg;
 				});
 			}
 			break;
@@ -328,7 +326,6 @@ void Import_UnixMBox(ScribeWnd *Parent)
 			task->SrcFiles = Dlg->SrcFiles;
 			task->Next();
 		}
-		delete dlg;
 	});
 }
 
@@ -356,6 +353,5 @@ void Export_UnixMBox(ScribeWnd *Parent)
 			task->IncSubFolders = Dlg->IncSubFolders;
 			task->Next();
 		}
-		delete dlg;
 	});
 }

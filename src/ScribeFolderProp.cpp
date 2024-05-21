@@ -360,6 +360,5 @@ void OpenFolderProperties(ScribeFolder *Parent, int Tab, std::function<void(bool
 	{
 		if (code && callback)
 			callback(Dlg->RePopulate);
-		delete dlg;
 	});
 }

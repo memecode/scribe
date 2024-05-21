@@ -929,7 +929,6 @@ void ScribeWnd::Construct1()
 					ScribeState = ScribeExiting;
 					LCloseApp();
 				}
-				delete dlg;
 			});
 		}
 	}
@@ -2071,7 +2070,6 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 					default:
 						break;
 				}
-				delete dlg;
 			});
 			return NULL;
 		}
@@ -2686,7 +2684,6 @@ bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 					Ctx.Call(CallbackName, Args);
 					Args.DeleteObjects();
 				}
-				delete dlg;
 			});
 
 			*Args.GetReturn() = true;
@@ -3988,7 +3985,6 @@ bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 					ScribeState = ScribeRunning;
 					Visible(true);
 				}
-				delete dlg;
 			});
 			return false; // At the very minimum the app has to wait for the user to respond.
 		}
@@ -4810,7 +4806,6 @@ void ScribeWnd::LoadFolders(std::function<void(bool)> Callback)
 				else if (Callback)
 					Callback(false);
 				delete FinishLoad;
-				delete dlg;
 			});
 		}
 		else
@@ -6030,7 +6025,6 @@ void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::fun
 	{
 		if (Callback)
 			Callback(id ? Inp->GetStr() : LString());
-		delete dlg;
 	});
 }
 
@@ -7303,7 +7297,6 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			auto Dlg = new ManageMailStores(this);
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
-				LAutoPtr<LDialog> mem(dlg);
 				if (id)
 				{
 					SaveOptions();
@@ -7353,8 +7346,6 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 					UnLoadFolders();
 					Dlg->StartProcess();
 				}
-				
-				delete dlg;
 			});
 			break;
 		}
@@ -7460,7 +7451,6 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 						if (mi) mi->Checked(i.CastInt32() != 0);
 					}
 				}
-				delete dlg;
 			});
 			break;
 		}
@@ -8087,7 +8077,6 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 						}
 					}
 				}
-				delete dlg;
 			});
 			break;
 		}
@@ -9402,7 +9391,6 @@ void ScribeWnd::SetDefaultHandler()
 					GetOptions()->SetValue(OPT_CheckDefaultEmail, v = (int) (!Dlg->DontWarn));
 					OnSetDefaultHandler(Error, OldAssert);
 				}
-				delete dlg;
 			});
 		}
 		else OnSetDefaultHandler(false, OldAssert);
@@ -10718,7 +10706,6 @@ Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, cons
 						if (Callback) Callback(false);
 					}
 				}
-				delete dlg;
 			});
 
 			return Store3Delayed;
@@ -10765,7 +10752,6 @@ Store3Status ScribeWnd::GetAccessLevel(LViewI *Parent, ScribePerm Required, cons
 						if (Callback) Callback(false);
 					}
 				}
-				delete dlg;
 			});
 
 			return Store3Delayed;
@@ -10982,7 +10968,6 @@ void ScribeWnd::Send(int Which, bool Quiet)
 					{
 						if (id == 1)
 							a->GetAccount()->InitUI(this, 1, NULL);
-						delete dlg;
 					});
 				}
 			}
@@ -11038,7 +11023,6 @@ void ScribeWnd::Receive(int Which)
 			{
 				if (id == 1)
 					i->InitUI(this, 2, NULL);
-				delete dlg;
 			});
 		}
 		else
@@ -11350,7 +11334,6 @@ void ScribeWnd::MailMerge(LArray<ListAddr*> &Contacts, const char *FileName, Mai
 							break;
 						}
 					}
-					delete dlg;
 				});
 			}
 			else

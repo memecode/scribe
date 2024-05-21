@@ -1025,7 +1025,6 @@ void ScribeFolder::DoContextMenu(LMouse &m)
 					// change the folders name...
 					OnRename(Dlg->Name);
 				}
-				delete dlg;
 			});
 			break;
 		}

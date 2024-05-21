@@ -1354,7 +1354,6 @@ void LMail3Store::Repair(LViewI *Parent, LDataPropI *Props, std::function<void(b
 				LExecute(DownloadUrl);
 				LExecute(base);
 			}
-			delete dlg;
 		});
 	
 		if (OnStatus)

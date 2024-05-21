@@ -496,8 +496,6 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 							Lst->ResizeColumnsToContent();
 						}
 					}
-
-					delete dlg;
 				});
 				break;
 			}
@@ -525,7 +523,6 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 					{
 						if (ctrlId)
 							SetCtrlName(IDC_FOLDER, s->Get());
-						delete dlg;
 					});
 				}
 				else LgiMsg(this, "Couldn't load mail3 store.", AppName);
@@ -901,6 +898,5 @@ void ExportScribe(ScribeWnd *App, LMailStore *Store)
 		{
 			new ScribeExportTask(Dlg);
 		}
-		delete dlg;
 	});
 }

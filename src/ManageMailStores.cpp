@@ -61,7 +61,6 @@ class SubFolderDlg : public LDialog, public LXmlTreeUi
 				if (GetViewById(OutputCtrl, e))
 					e->Name(Dlg->Get());
 			}
-			delete dlg;
 		});
 	}
 
@@ -210,7 +209,6 @@ void EditWebdav(LViewI *parent, LXmlTag *t, std::function<void(bool)> callback)
 			callback(true);
 		}
 		else callback(false);
-		delete dlg;
 	});
 }
 
@@ -551,7 +549,6 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 						if (!ms->Store->SetFormat(this, &Prog))
 							LgiMsg(this, "Set format failed.", AppName);
 					}
-					delete dlg;
 				});
 			}			
 			break;
@@ -593,7 +590,6 @@ int ManageMailStores::OnNotify(LViewI *c, LNotification n)
 			{
 				if (id)
 					SetCtrlName(IDC_START_IN, Dlg->Get());
-				delete dlg;
 			});
 			break;
 		}
