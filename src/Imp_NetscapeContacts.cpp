@@ -111,74 +111,74 @@ void Import_NetscapeContacts(ScribeWnd *Parent)
 	Select->Type("Netscape Contacts", "*.csv");
 	Select->Open([Parent](auto dlg, auto status)
 	{
-		if (status)
+		if (!status)
+			return;
+
+		LString Name = dlg->Name();
+		auto Dlg = new FolderDlg(Parent, Parent, MAGIC_CONTACT);
+		Dlg->DoModal([Parent, Dlg, Name](auto dlg, auto id)
 		{
-			LString Name = dlg->Name();
-			auto Dlg = new FolderDlg(Parent, Parent, MAGIC_CONTACT);
-			Dlg->DoModal([Parent, Dlg, Name](auto dlg, auto id)
+			if (!id)
+				return;
+
+			auto Contacts = Parent->GetFolder(Dlg->Get());
+			if (!Contacts)
+				return;
+
+			ImpRecordSet Rs;
+
+			// Pre populated the field names
+			Rs.Fields.Insert(NewStr("DisplayName"));
+			Rs.Fields.Insert(NewStr("Surname"));
+			Rs.Fields.Insert(NewStr("First"));
+			Rs.Fields.Insert(NewStr("Notes"));
+			Rs.Fields.Insert(NewStr("City"));
+			Rs.Fields.Insert(NewStr("State"));
+			Rs.Fields.Insert(NewStr("Email"));
+			Rs.Fields.Insert(NewStr("Title"));
+			Rs.Fields.Insert(NewStr("Unknown"));
+			Rs.Fields.Insert(NewStr("Address"));
+			Rs.Fields.Insert(NewStr("PostCode"));
+			Rs.Fields.Insert(NewStr("Country"));
+			Rs.Fields.Insert(NewStr("PhoneWork"));
+			Rs.Fields.Insert(NewStr("Fax"));
+			Rs.Fields.Insert(NewStr("PhoneHome"));
+			Rs.Fields.Insert(NewStr("Organization"));
+			Rs.Fields.Insert(NewStr("Nick"));
+			Rs.Fields.Insert(NewStr("Mobile"));
+			Rs.Fields.Insert(NewStr("Pager"));
+			Rs.Fields.Insert(NewStr("Unknown2"));
+
+			// read file
+			if (ReadCsv(Name, Rs, false) <= 0)
+				return;
+
+			for (auto r: Rs)
 			{
-				if (id)
+				Contact *c = new Contact(Parent);
+				if (c)
 				{
-					ScribeFolder *Contacts = Parent->GetFolder(Dlg->Get());
-					if (Contacts)
-					{
-						ImpRecordSet Rs;
+					c->App = Parent;
 
-						// Pre populated the field names
-						Rs.Fields.Insert(NewStr("DisplayName"));
-						Rs.Fields.Insert(NewStr("Surname"));
-						Rs.Fields.Insert(NewStr("First"));
-						Rs.Fields.Insert(NewStr("Notes"));
-						Rs.Fields.Insert(NewStr("City"));
-						Rs.Fields.Insert(NewStr("State"));
-						Rs.Fields.Insert(NewStr("Email"));
-						Rs.Fields.Insert(NewStr("Title"));
-						Rs.Fields.Insert(NewStr("Unknown"));
-						Rs.Fields.Insert(NewStr("Address"));
-						Rs.Fields.Insert(NewStr("PostCode"));
-						Rs.Fields.Insert(NewStr("Country"));
-						Rs.Fields.Insert(NewStr("PhoneWork"));
-						Rs.Fields.Insert(NewStr("Fax"));
-						Rs.Fields.Insert(NewStr("PhoneHome"));
-						Rs.Fields.Insert(NewStr("Organization"));
-						Rs.Fields.Insert(NewStr("Nick"));
-						Rs.Fields.Insert(NewStr("Mobile"));
-						Rs.Fields.Insert(NewStr("Pager"));
-						Rs.Fields.Insert(NewStr("Unknown2"));
+					CopyField(c, OPT_First, r, "First");
+					CopyField(c, OPT_Last, r, "Surname");
+					CopyField(c, OPT_Email, r, "Email");
+					CopyField(c, OPT_HomeStreet, r, "Address");
+					CopyField(c, OPT_HomeSuburb, r, "City");
+					CopyField(c, OPT_HomeState, r, "State");
+					CopyField(c, OPT_HomePostcode, r, "PostCode");
+					CopyField(c, OPT_HomeCountry, r, "Country");
+					CopyField(c, OPT_WorkPhone, r, "PhoneWork");
+					CopyField(c, OPT_HomePhone, r, "PhoneHome");
+					CopyField(c, OPT_HomeFax, r, "Fax");
+					CopyField(c, OPT_HomeMobile, r, "Mobile");
+					// CopyField(c, OPT_WebPage, r, "Web Page");
+					CopyField(c, OPT_Note, r, "Notes");
+					CopyField(c, OPT_Nick, r, "Nick");
 
-						// read file
-						if (ReadCsv(Name, Rs, false) > 0)
-						{
-							for (auto r: Rs)
-							{
-								Contact *c = new Contact(Parent);
-								if (c)
-								{
-									c->App = Parent;
-
-									CopyField(c, OPT_First, r, "First");
-									CopyField(c, OPT_Last, r, "Surname");
-									CopyField(c, OPT_Email, r, "Email");
-									CopyField(c, OPT_HomeStreet, r, "Address");
-									CopyField(c, OPT_HomeSuburb, r, "City");
-									CopyField(c, OPT_HomeState, r, "State");
-									CopyField(c, OPT_HomePostcode, r, "PostCode");
-									CopyField(c, OPT_HomeCountry, r, "Country");
-									CopyField(c, OPT_WorkPhone, r, "PhoneWork");
-									CopyField(c, OPT_HomePhone, r, "PhoneHome");
-									CopyField(c, OPT_HomeFax, r, "Fax");
-									CopyField(c, OPT_HomeMobile, r, "Mobile");
-									// CopyField(c, OPT_WebPage, r, "Web Page");
-									CopyField(c, OPT_Note, r, "Notes");
-									CopyField(c, OPT_Nick, r, "Nick");
-
-									c->Save(Contacts);
-								}
-							}
-						}
-					}
+					c->Save(Contacts);
 				}
-			});
-		}
+			}
+		});
 	});
 }
