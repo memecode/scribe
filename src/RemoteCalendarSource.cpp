@@ -9,6 +9,13 @@
 
 #include "Store3CalendarObj.h"
 
+#define DEBUG_REMOTE_CAL	1
+#if DEBUG_REMOTE_CAL
+#define LOG(...)			LgiTrace(__VA_ARGS__)
+#else
+#define LOG(...)
+#endif
+
 enum Msgs {
 	M_LOAD_URI = M_USER + 1000,
 	M_LOADED
@@ -37,7 +44,7 @@ struct RemoteCalendarSourcePriv :
 	public LEventTargetThread,
 	public LDataStoreI
 {
-	RemoteCalendarSource *Source;
+	RemoteCalendarSource *Source = NULL;
 	LString Uri;
 	LString Name;
 	bool Error = false;
@@ -140,6 +147,7 @@ struct RemoteCalendarSourcePriv :
 				LString err;
 				LStringPipe out;
 				auto r = LgiGetUri(this, &out, &err, Uri);
+				LOG("RemoteCalendarSource: LgiGetUri(%s)=%i\n", Uri.Get(), r);
 				if (r)
 				{
 					VCal imp;
@@ -150,17 +158,20 @@ struct RemoteCalendarSourcePriv :
 						{
 							if (Lock(_FL))
 							{
+								// LOG("RemoteCalendarSource: adding event...\n");
 								Events.Add(c);
 								Unlock();
 							}
 						}
 						else
 						{
+							LOG("RemoteCalendarSource: error importing calendar: %s\n", c->ErrMsg.Get());
 							c->DecRef();
 							break;
 						}
 					}
 
+					// LOG("RemoteCalendarSource: M_LOADED\n");
 					Post(M_LOADED);
 				}
 				break;
