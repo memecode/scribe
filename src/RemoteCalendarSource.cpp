@@ -37,6 +37,7 @@ public:
 	bool IsOrphan() override { return false; }
 	Store3Status Save(LDataI *Obj = NULL) override { return Store3NotImpl; }
 	Store3Status Delete(bool ToTrash = true) override { return Store3NotImpl; }
+	LDataIt GetList(int id) { return NULL; }
 	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
 };
 
@@ -165,7 +166,8 @@ struct RemoteCalendarSourcePriv :
 						}
 						else
 						{
-							LOG("RemoteCalendarSource: error importing calendar: %s\n", c->ErrMsg.Get());
+							// This should be the end of the stream...
+							// LOG("RemoteCalendarSource: error importing calendar: %s\n", c->ErrMsg.Get());
 							c->DecRef();
 							break;
 						}
