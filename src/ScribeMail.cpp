@@ -1745,12 +1745,17 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 
 		if (Commands.Toolbar)
 		{
-			if (ToPanel)
-				ToPanel->SetClosedSize(Commands.Toolbar->Y()-1);
-			if (FromPanel)
-				FromPanel->SetClosedSize(Commands.Toolbar->Y()-1);
-			if (ReplyToPanel)
-				ReplyToPanel->SetClosedSize(Commands.Toolbar->Y()-1);
+			auto sz = Commands.Toolbar->Y();
+			if (sz > 0)
+			{
+				if (ToPanel)
+					ToPanel->SetClosedSize(sz-1);
+				if (FromPanel)
+					FromPanel->SetClosedSize(sz-1);
+				if (ReplyToPanel)
+					ReplyToPanel->SetClosedSize(sz-1);
+			}
+			else LgiTrace("%s:%i - No size for commands toolbar?\n", _FL);
 		}
 
 		SetIcon("About64px.png");
