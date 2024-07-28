@@ -58,7 +58,6 @@ ScribeAccount::~ScribeAccount()
 bool ScribeAccount::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
 	ScribeDomType f = StrToDom(Name);
-	char k[128];
 	LOptionsFile *Opts = GetApp()->GetOptions();
 
 	switch (f)
@@ -82,13 +81,13 @@ bool ScribeAccount::GetVariant(const char *Name, LVariant &Value, const char *Ar
 			Value = (LDom*)Parent;
 			break;
 		case SdName:			// Type: String
-			return Opts->GetValue(Identity.OptionName(OPT_AccountName, k, sizeof(k)), Value);
+			return Opts->GetValue(Identity.OptionName(OPT_AccountName), Value);
 		case SdId:				// Type: String
-			return Opts->GetValue(Identity.OptionName(OPT_AccountUID, k, sizeof(k)), Value);
+			return Opts->GetValue(Identity.OptionName(OPT_AccountUID), Value);
 		case SdDisable:			// Type: Bool
-			return Opts->GetValue(Identity.OptionName(OPT_AccountDisabled, k, sizeof(k)), Value);
+			return Opts->GetValue(Identity.OptionName(OPT_AccountDisabled), Value);
 		case SdAccountExpanded: // Type: Bool
-			return Opts->GetValue(Identity.OptionName(OPT_AccountExpanded, k, sizeof(k)), Value);
+			return Opts->GetValue(Identity.OptionName(OPT_AccountExpanded), Value);
 		default:
 			return false;
 	}	
@@ -99,19 +98,18 @@ bool ScribeAccount::GetVariant(const char *Name, LVariant &Value, const char *Ar
 bool ScribeAccount::SetVariant(const char *Name, LVariant &Value, const char *Array)
 {
 	ScribeDomType f = StrToDom(Name);
-	char k[128];
 	LOptionsFile *Opts = GetApp()->GetOptions();
 
 	switch (f)
 	{
 		case SdName:			// Type: String
-			return Opts->SetValue(Identity.OptionName(OPT_AccountName, k, sizeof(k)), Value);
+			return Opts->SetValue(Identity.OptionName(OPT_AccountName), Value);
 		case SdId:				// Type: String
-			return Opts->SetValue(Identity.OptionName(OPT_AccountUID, k, sizeof(k)), Value);
+			return Opts->SetValue(Identity.OptionName(OPT_AccountUID), Value);
 		case SdDisable:			// Type: Bool
-			return Opts->SetValue(Identity.OptionName(OPT_AccountDisabled, k, sizeof(k)), Value);
+			return Opts->SetValue(Identity.OptionName(OPT_AccountDisabled), Value);
 		case SdAccountExpanded: // Type: Bool
-			return Opts->SetValue(Identity.OptionName(OPT_AccountExpanded, k, sizeof(k)), Value);
+			return Opts->SetValue(Identity.OptionName(OPT_AccountExpanded), Value);
 		default:
 			return false;
 	}	
@@ -145,13 +143,9 @@ bool ScribeAccount::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 bool ScribeAccount::IsValid()
 {
-	char Key[128];
-	Receive.OptionName(OPT_AccountUID, Key, sizeof(Key));
 	LVariant v;
-	if (Parent->GetOptions()->GetValue(Key, v))
-	{
+	if (Parent->GetOptions()->GetValue(Receive.OptionName(OPT_AccountUID), v))
 		return v.CastInt32() > 0;
-	}
 	return false;	
 }
 
@@ -159,8 +153,7 @@ bool ScribeAccount::Create()
 {
 	LVariant v;
 	bool Status = false;
-	char Key[128];
-	Receive.OptionName(0, Key, sizeof(Key));
+	auto Key = Receive.OptionName(NULL);
 	
 	// Check our tag exists
 	LXmlTag *Tag = Parent->GetOptions()->LockTag(Key, _FL);
@@ -285,9 +278,7 @@ void ScribeAccount::SetCheck(bool c)
 
 void ScribeAccount::CreateMaps()
 {
-	char Name[256] = "";
-	
-	Map(Send.OptionName(OPT_AccountName, Name, sizeof(Name)), IDC_ACCOUNT_NAME, GV_STRING);
+	Map(Send.OptionName(OPT_AccountName), IDC_ACCOUNT_NAME, GV_STRING);
 
 	Identity.CreateMaps();
 	Send.CreateMaps();
@@ -296,8 +287,7 @@ void ScribeAccount::CreateMaps()
 
 void ScribeAccount::ReIndex(int i)
 {
-	char Key[128];
-	Receive.OptionName(0, Key, sizeof(Key));
+	auto Key = Receive.OptionName(NULL);
 	EmptyMaps();
 
 	if (i >= 0)
@@ -375,25 +365,21 @@ void ScribeAccount::SerializeUi(LView *Wnd, bool Load)
 
 		// Special Fields
 		LEdit *Pop3Folder;
-
 		if (Wnd->GetViewById(IDC_FOLDER, Pop3Folder))
-		{
 			Pop3Folder->Enabled(false);
-		}
 
 		LPassword s, r;
-		char Buf[128];
 		if (Load)
 		{
 			LEdit *e;
 			bool HasPass;
 			
-			HasPass = s.Serialize(Parent->GetOptions(), Receive.OptionName(OPT_EncryptedSmtpPassword, Buf, sizeof(Buf)), false);
+			HasPass = s.Serialize(Parent->GetOptions(), Receive.OptionName(OPT_EncryptedSmtpPassword), false);
 			Wnd->SetCtrlValue(IDC_SMTP_AUTH, HasPass);
 			if (HasPass && Wnd->GetViewById(IDC_SMTP_PASSWORD, e))
 				e->SetEmptyText(LLoadString(IDS_PASSWORD_SAVED));
 
-			HasPass = r.Serialize(Parent->GetOptions(), Receive.OptionName(OPT_EncryptedPop3Password, Buf, sizeof(Buf)), false);
+			HasPass = r.Serialize(Parent->GetOptions(), Receive.OptionName(OPT_EncryptedPop3Password), false);
 			Wnd->SetCtrlValue(IDC_REMEMBER_PSW, HasPass);
     		Wnd->SetCtrlEnabled(IDC_REC_PASSWORD, HasPass);
 			if (HasPass && Wnd->GetViewById(IDC_REC_PASSWORD, e))
@@ -407,10 +393,10 @@ void ScribeAccount::SerializeUi(LView *Wnd, bool Load)
 				if (ValidStr(p))
 				{
 					r.Set(p);
-					r.Serialize(Parent->GetOptions(), Receive.OptionName(OPT_EncryptedPop3Password, Buf, sizeof(Buf)), true);
+					r.Serialize(Parent->GetOptions(), Receive.OptionName(OPT_EncryptedPop3Password), true);
 				}
 			}
-			else r.Delete(Parent->GetOptions(), Receive.OptionName(OPT_EncryptedPop3Password, Buf, sizeof(Buf)));
+			else r.Delete(Parent->GetOptions(), Receive.OptionName(OPT_EncryptedPop3Password));
 
 			if (Wnd->GetCtrlValue(IDC_SMTP_AUTH))
 			{
@@ -418,10 +404,10 @@ void ScribeAccount::SerializeUi(LView *Wnd, bool Load)
 				if (ValidStr(p))
 				{
 					s.Set(p);
-					s.Serialize(Parent->GetOptions(), Send.OptionName(OPT_EncryptedSmtpPassword, Buf, sizeof(Buf)), true);
+					s.Serialize(Parent->GetOptions(), Send.OptionName(OPT_EncryptedSmtpPassword), true);
 				}
 			}
-			else s.Delete(Parent->GetOptions(), Send.OptionName(OPT_EncryptedSmtpPassword, Buf, sizeof(Buf)));
+			else s.Delete(Parent->GetOptions(), Send.OptionName(OPT_EncryptedSmtpPassword));
 		}
 
 		// Normal Fields

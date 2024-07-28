@@ -1741,28 +1741,27 @@ LAutoString ConvertThreadIndex(char *ThreadIndex, int TruncateChars)
 	return a;
 }
 
-ScribeProtocol ProtocolStrToEnum(const char *str)
+ScribeProtocol ProtocolToEnum(const char *str)
 {
 	if (!str)
 		return ProtocolNone;
-
-	if (!_stricmp(str, PROTOCOL_POP3))
-		return ProtocolPop3;
-	if (!_stricmp(str, PROTOCOL_IMAP4_FETCH))
-		return ProtocolImapFetch;
-	if (!_stricmp(str, PROTOCOL_IMAP4))
-		return ProtocolImapFull;
-	if (!_stricmp(str, PROTOCOL_CALENDAR))
-		return ProtocolCalender;
-	if (!_stricmp(str, PROTOCOL_POP_OVER_HTTP))
-		return ProtocolPopOverHttp;
-	if (!_stricmp(str, PROTOCOL_MAPI))
-		return ProtocolMapi;
-	if (!_stricmp(str, PROTOCOL_SMTP))
-		return ProtocolSmtp;
-	
+	#define _(def, en) if (!Stricmp(str, def)) return en;
+	ScribeProtocolTypeMap()
+	#undef _	
 	LAssert(!"Invalid protocol");
 	return ProtocolNone;
+}
+
+const char *ToString(ScribeProtocol p)
+{
+	switch (p)
+	{
+		#define _(def, en) case en: return def;
+		ScribeProtocolTypeMap()
+		#undef _	
+	}
+
+	return NULL;
 }
 
 /////////////////////////////////////////////////////////////////

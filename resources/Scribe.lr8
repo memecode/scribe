@@ -329,6 +329,7 @@
 		<String Ref="529" Cid="1050" Define="IDC_DEFAULT" en="Default" ko="기본" uk="За замовчуванням" de="Standard" fr="Défaut" />
 		<String Ref="530" Cid="1092" Define="IDC_PUBLIC" en="Public" ko="공공" uk="Відкритий" de="Öffentlich" fr="Publique" />
 		<String Ref="531" Cid="1093" Define="IDC_PRIVATE" en="Private" ko="개인" uk="Особистий" de="Privat" fr="Privé" />
+		<String Ref="532" Cid="1068" Define="IDC_GOOGLE" />
 		<String Ref="534" Cid="-1" Define="IDC_STATIC" en="Signature &XML:" fr="Fichier signature:" it="File firma XML:" cs="XML podpis:" es="Firma XML:" de="XML-Signatur:" nl="Handtekening:" pt_br="Assinatura XML:" ru="Подпись XML:" pt="Assinatura XML:" pl="Sygnatura XML:" vi="Chữ ký XML:" zh_tw="XML 簽名檔:" ja="XML署名:" sr="XML potpis:" no="Signatur XML" lt="XML parašas:" fa="XMLامضاي" da="Signatur XML:" sv="XML-signatur:" lg="Sayini ya XML:" tr="XML İmza:" hu="Aláírás XML:" ko="서명 XML:" uk="Підпис XML:" />
 		<String Ref="535" Cid="535" Define="IDC_ID_TABLE" />
 		<String Ref="536" Cid="1165" Define="IDC_TABLE" />
@@ -1752,7 +1753,7 @@
 				</TableLayout>
 			</Tab>
 			<Tab ref="444">
-				<TableLayout pos="0,28,524,545" ref="500" cols="0.365,0.364,0.132,0.140" rows="0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059,0.059">
+				<TableLayout pos="0,28,524,545" ref="500" cols="0.365,0.364,0.132,0.140" rows="0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056,0.056">
 					<tr>
 						<td addr="0,0" valign="Center">
 							<StaticText pos="14,7,97,20" ref="501" />
@@ -1763,133 +1764,139 @@
 					</tr>
 					<tr>
 						<td addr="0,1" valign="Center">
-							<StaticText pos="14,35,97,48" ref="481" />
+							<StaticText pos="14,34,97,47" ref="481" />
 						</td>
 						<td addr="1,1">
-							<EditBox Pos="187,35,278,55" ref="493" />
+							<EditBox Pos="189,28,280,48" ref="493" />
 						</td>
 						<td addr="2,1" align="Max" valign="Center">
-							<StaticText pos="394,35,435,48" ref="1520" />
+							<StaticText pos="394,34,435,47" ref="1520" />
 						</td>
 						<td addr="3,1">
-							<EditBox Pos="446,35,508,55" Style="width: 7em;" ref="1521" />
+							<EditBox Pos="446,34,508,54" Style="width: 7em;" ref="1521" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,2" valign="Center">
-							<StaticText pos="7,66,62,79" ref="512" />
-						</td>
+						<td addr="0,2" />
 						<td addr="1,2" colspan="3">
-							<EditBox Pos="187,63,458,83" ref="494" />
+							<Button pos="196,63,251,76" ref="532" Style="height: 3em;" image="sign_in_with_google.png" toggle="0" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,3">
-							<CheckBox pos="21,98,111,111" ref="483" />
+						<td addr="0,3" valign="Center">
+							<StaticText pos="7,92,62,105" ref="512" />
 						</td>
 						<td addr="1,3" colspan="3">
-							<EditBox Pos="187,91,361,111" Pw="1" ref="484" />
+							<EditBox Pos="187,89,458,109" ref="494" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,4" colspan="4">
-							<CheckBox pos="14,126,377,139" ref="485" />
+						<td addr="0,4">
+							<CheckBox pos="7,119,97,132" ref="483" />
+						</td>
+						<td addr="1,4" colspan="3">
+							<EditBox Pos="187,116,361,136" Pw="1" ref="484" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,5" />
-						<td addr="1,5">
-							<CheckBox pos="187,154,260,167" ref="841" />
-						</td>
-						<td addr="2,5">
-							<EditBox Pos="378,147,435,167" Style="width: 3em;" ref="1275" />
-						</td>
-						<td addr="3,5">
-							<StaticText pos="446,154,508,167" ref="1276" />
+						<td addr="0,5" colspan="4">
+							<CheckBox pos="14,150,377,163" ref="485" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,6" />
 						<td addr="1,6">
-							<CheckBox pos="189,188,356,201" ref="1360" />
+							<CheckBox pos="187,177,260,190" ref="841" />
 						</td>
 						<td addr="2,6">
-							<EditBox Pos="387,181,435,201" Style="width: 3em;" ref="1361" />
+							<EditBox Pos="378,170,435,190" Style="width: 3em;" ref="1275" />
 						</td>
 						<td addr="3,6">
-							<StaticText pos="456,182,490,195" ref="1362" />
+							<StaticText pos="446,177,508,190" ref="1276" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,7" valign="Center">
-							<CheckBox pos="0,217,83,230" ref="489" />
+						<td addr="0,7" />
+						<td addr="1,7">
+							<CheckBox pos="189,209,356,222" ref="1360" />
 						</td>
-						<td addr="1,7" colspan="2">
-							<EditBox Pos="187,210,326,230" ref="1017" />
+						<td addr="2,7">
+							<EditBox Pos="387,202,435,222" Style="width: 3em;" ref="1361" />
 						</td>
 						<td addr="3,7">
-							<StaticText pos="456,210,504,223" ref="498" />
+							<StaticText pos="456,204,490,217" ref="1362" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,8" align="Max" valign="Center">
-							<StaticText pos="0,238,174,251" ref="496" />
+						<td addr="0,8" valign="Center">
+							<CheckBox pos="14,231,97,244" ref="489" />
 						</td>
 						<td addr="1,8" colspan="2">
-							<EditBox Pos="187,238,333,258" ref="513" />
+							<EditBox Pos="187,230,326,250" ref="1017" />
 						</td>
 						<td addr="3,8">
-							<StaticText pos="449,238,476,251" ref="491" />
+							<StaticText pos="456,231,504,244" ref="498" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,9" valign="Center">
-							<StaticText pos="0,273,97,286" ref="610" />
+						<td addr="0,9" align="Max" valign="Center">
+							<StaticText pos="0,258,174,271" ref="496" />
 						</td>
 						<td addr="1,9" colspan="2">
-							<EditBox Pos="187,266,333,286" ref="497" />
+							<EditBox Pos="187,258,333,278" ref="513" />
 						</td>
 						<td addr="3,9">
-							<Button pos="446,266,466,286" ref="492" toggle="0" />
+							<StaticText pos="449,258,476,271" ref="491" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,10" valign="Center">
-							<StaticText pos="0,301,153,314" ref="611" />
+							<StaticText pos="0,292,97,305" ref="610" />
 						</td>
-						<td addr="1,10" colspan="3">
-							<ComboBox pos="187,294,347,314" ref="878" />
+						<td addr="1,10" colspan="2">
+							<EditBox Pos="187,285,333,305" ref="497" />
+						</td>
+						<td addr="3,10">
+							<Button pos="446,285,466,305" ref="492" toggle="0" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,11" colspan="4">
-							<StaticText pos="0,329,174,342" ref="1075" />
+						<td addr="0,11" valign="Center">
+							<StaticText pos="0,319,153,332" ref="611" />
+						</td>
+						<td addr="1,11" colspan="3">
+							<ComboBox pos="187,312,347,332" ref="878" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,12" colspan="4">
-							<StaticText pos="0,357,363,370" ref="1076" />
+							<StaticText pos="0,346,174,359" ref="1075" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,13">
-							<StaticText pos="0,391,103,404" ref="1092" />
-						</td>
-						<td addr="1,13" colspan="3">
-							<ComboBox pos="187,378,340,398" ref="1089" />
+						<td addr="0,13" colspan="4">
+							<StaticText pos="0,373,363,386" ref="1076" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,14">
-							<StaticText pos="7,413,104,426" ref="1018" />
+							<StaticText pos="0,405,103,418" ref="1092" />
 						</td>
 						<td addr="1,14" colspan="3">
-							<ComboBox pos="187,413,340,433" ref="1090" />
+							<ComboBox pos="187,393,340,413" ref="1089" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,15" colspan="4">
-							<Group pos="0,435,419,462" ref="482">
+						<td addr="0,15">
+							<StaticText pos="7,427,104,440" ref="1018" />
+						</td>
+						<td addr="1,15" colspan="3">
+							<ComboBox pos="187,426,340,446" ref="1090" />
+						</td>
+					</tr>
+					<tr>
+						<td addr="0,16" colspan="4">
+							<Group pos="0,448,419,475" ref="482">
 								<RadioBox pos="35,14,104,27" ref="490" />
 								<RadioBox pos="119,14,237,27" ref="511" />
 								<RadioBox pos="245,14,405,27" ref="1091" />
@@ -1897,14 +1904,14 @@
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,16">
-							<StaticText pos="7,471,146,484" ref="1343" />
+						<td addr="0,17">
+							<StaticText pos="7,483,146,496" ref="1343" />
 						</td>
-						<td addr="1,16">
-							<CheckBox pos="196,476,216,489" ref="1237" />
+						<td addr="1,17">
+							<CheckBox pos="196,488,216,501" ref="1237" />
 						</td>
-						<td addr="2,16" />
-						<td addr="3,16" />
+						<td addr="2,17" />
+						<td addr="3,17" />
 					</tr>
 				</TableLayout>
 			</Tab>
@@ -2095,7 +2102,7 @@
 		</TableLayout>
 	</Dialog>
 	<Dialog pos="7,7,526,697" ref="588">
-		<TableLayout pos="7,7,517,650" ref="714" Style="padding: 4px;&#10;width: 600px;" cols="0.250,0.250,0.250,0.250" rows="0.195,0.071,0.058,0.064,0.071,0.051,0.057,0.059,0.081,0.064,0.058,0.058,0.058,0.058">
+		<TableLayout pos="7,7,517,650" ref="714" Style="padding: 4px;&#10;width: 600px;" cols="0.250,0.250,0.250,0.250" rows="0.194,0.071,0.058,0.064,0.071,0.051,0.057,0.059,0.081,0.064,0.058,0.058,0.058,0.058">
 			<tr>
 				<td addr="0,0" colspan="4">
 					<TableLayout pos="7,7,447,104" ref="850" cols="0.167,0.167,0.167,0.167,0.167,0.167" rows="0.333,0.333,0.333">
@@ -2268,7 +2275,7 @@
 					<StaticText pos="14,558,76,578" ref="1483" />
 				</td>
 				<td addr="1,12" colspan="2">
-					<ListView pos="124,554,370,588" ref="1507">
+					<ListView pos="123,553,369,587" ref="1507">
 						<Column ref="1629" width="66" />
 						<Column ref="1630" width="70" />
 						<Column ref="1631" width="86" />

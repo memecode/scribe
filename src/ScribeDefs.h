@@ -38,6 +38,7 @@
 #define	OPT_Pop3Protocol			"Receive.Protocol"		//(char*) one of the PROTOCOL_??? defs
 #define OPT_Pop3Server				"Receive.Server"		//(char*)
 #define OPT_Pop3Port				"Receive.Port"
+#define OPT_ReceiveService			"Receive.Service"		//(bool)
 #define OPT_Pop3Name				"Receive.Name"			//(char*)
 #define OPT_Pop3AutoReceive			"Receive.AutoReceive"	//(bool)
 #define OPT_Pop3CheckEvery			"Receive.CheckEvery"	//(char*)
@@ -273,26 +274,35 @@
 
 // Protocol names
 #define PROTOCOL_POP3				"POP3"
+#define PROTOCOL_POP_OVER_HTTP		"PopOverHttp"
 #define PROTOCOL_IMAP4_FETCH		"IMAP4(fetch)"
 #define PROTOCOL_IMAP4				"IMAP4(full)"
 #define PROTOCOL_CALENDAR			"Calendar"
-#define PROTOCOL_POP_OVER_HTTP		"PopOverHttp"
 #define PROTOCOL_MAPI				"MAPI"
 #define PROTOCOL_SMTP				"SMTP"
+#define PROTOCOL_GMAIL				"GMail"
+
+#define ScribeProtocolTypeMap() \
+	_(PROTOCOL_POP3, ProtocolPop3) \
+	_(PROTOCOL_POP_OVER_HTTP, ProtocolPopOverHttp) \
+	_(PROTOCOL_IMAP4_FETCH, ProtocolImapFetch) \
+	_(PROTOCOL_IMAP4, ProtocolImapFull) \
+	_(PROTOCOL_CALENDAR, ProtocolCalender) \
+	_(PROTOCOL_MAPI, ProtocolMapi) \
+	_(PROTOCOL_SMTP, ProtocolSmtp) \
+	_(PROTOCOL_GMAIL, ProtocolGoogle)
 
 enum ScribeProtocol
 {
 	ProtocolNone,
-	ProtocolPop3,
-	ProtocolPopOverHttp,
-	ProtocolImapFetch,
-	ProtocolImapFull,
-	ProtocolCalender,
-	ProtocolMapi,
-	ProtocolSmtp,
+	#define _(def, en) en,
+	ScribeProtocolTypeMap()
+	#undef _
+	ProtocolMax, // Always last
 };
 
-extern ScribeProtocol ProtocolStrToEnum(const char *str);
+extern ScribeProtocol ProtocolToEnum(const char *str);
+extern const char *ToString(ScribeProtocol p);
 
 enum SribeResourceType
 {

@@ -14,6 +14,7 @@
 #include "lgi/common/Charset.h"
 
 #define DefaultPortValue		LLoadString(IDS_DEFAULT)
+#define DEFAULT_GOOGLE_SERVER	"imap.gmail.com"
 
 void PopulateTypes(LCombo *c)
 {
@@ -27,29 +28,10 @@ void PopulateTypes(LCombo *c)
 		#ifdef WIN32
 		c->Insert(PROTOCOL_MAPI);
 		#endif
+		c->Insert(PROTOCOL_GMAIL);
 		
 		// Old order:
 		// Pop, Imap(fetch), Mapi, Cal, Http
-	}
-}
-
-void FillWithCharsets(LCombo *c, bool All)
-{
-	if (c)
-	{
-		c->Value(-1);
-		c->Sort(true);
-		c->Sub(GV_STRING);
-
-		for (LCharset *Cs = LGetCsInfo("us-ascii"); Cs->Charset; Cs++)
-		{
-			if (All ||
-				Cs->Type == CpMapped ||
-				Cs->Type == CpUtf8)
-			{
-				c->Insert(Cs->Charset);
-			}
-		}
 	}
 }
 
@@ -69,10 +51,10 @@ AccountDlg::AccountDlg(LView *p, ScribeWnd *app, ScribeAccount *a, int Tab) :
 			Rte->SetStylePrefix("Sig");
 
 		PopulateTypes(dynamic_cast<LCombo*>(FindControl(IDC_REC_TYPE)));
-		FillWithCharsets(dynamic_cast<LCombo*>(FindControl(IDC_SEND_CHARSET1)), false);
-		FillWithCharsets(dynamic_cast<LCombo*>(FindControl(IDC_SEND_CHARSET2)), false);
-		FillWithCharsets(dynamic_cast<LCombo*>(FindControl(IDC_REC_8BIT_CS)), true);
-		FillWithCharsets(dynamic_cast<LCombo*>(FindControl(IDC_REC_ASCII_CP)), true);
+		FillWithCharsets(IDC_SEND_CHARSET1, false);
+		FillWithCharsets(IDC_SEND_CHARSET2, false);
+		FillWithCharsets(IDC_REC_8BIT_CS, true);
+		FillWithCharsets(IDC_REC_ASCII_CP, true);
 
 		LCombo *c;
 		if (GetViewById(IDC_SEND_AUTH_TYPE, c))
@@ -125,6 +107,9 @@ AccountDlg::AccountDlg(LView *p, ScribeWnd *app, ScribeAccount *a, int Tab) :
 		    t->SetPourLargest(true);
 		    t->Sunken(true);
 		}
+
+		UseGoogle = !Stricmp(GetCtrlName(IDC_REC_TYPE), PROTOCOL_GMAIL);
+		OnUseGoogle();
 	}
 }
 
@@ -132,11 +117,30 @@ void AccountDlg::OnCreate()
 {
     LTabView *t;
     if (GetViewById(IDC_SIGNATURE_TAB, t))
-    {
         t->SetPourChildren(true);
-    }
 
     TabDialog::OnCreate();
+}
+
+void AccountDlg::FillWithCharsets(int id, bool All)
+{
+	LCombo *c;
+	if (!GetViewById(id, c))
+		return;
+
+	c->Value(-1);
+	c->Sort(true);
+	c->Sub(GV_STRING);
+
+	for (auto Cs = LGetCsInfo("us-ascii"); Cs->Charset; Cs++)
+	{
+		if (All ||
+			Cs->Type == CpMapped ||
+			Cs->Type == CpUtf8)
+		{
+			c->Insert(Cs->Charset);
+		}
+	}
 }
 
 void AccountDlg::UpdateDefaultPort(bool Send)
@@ -193,6 +197,23 @@ void AccountDlg::UpdateDefaultPort(bool Send)
 	}
 }
 
+void AccountDlg::OnUseGoogle()
+{
+	if (UseGoogle)
+	{
+		SetCtrlName(IDC_REC_SERVER, DEFAULT_GOOGLE_SERVER);
+		SetCtrlName(IDC_REC_PORT, NULL);
+		SetCtrlValue(IDC_RECEIVE_SSL, 2);
+		SetCtrlName(IDC_REC_TYPE, ToString(ProtocolGoogle));
+		SetCtrlValue(IDC_REMEMBER_PSW, false);
+		SetCtrlValue(IDC_RECEIVE_AUTH_TYPE, 4);
+	}
+
+	SetCtrlEnabled(IDC_REC_SERVER, !UseGoogle);
+	SetCtrlEnabled(IDC_REC_PORT, !UseGoogle);
+	SetCtrlEnabled(IDC_REMEMBER_PSW, !UseGoogle);
+}
+
 int AccountDlg::OnNotify(LViewI *c, LNotification n)
 {
 	if (!c) return 0;
@@ -202,6 +223,12 @@ int AccountDlg::OnNotify(LViewI *c, LNotification n)
 		default:
 		{
 			Account->OnNotify(c, n);
+			break;
+		}
+		case IDC_GOOGLE:
+		{
+			UseGoogle = true;
+			OnUseGoogle();
 			break;
 		}
 		case IDC_POP3_LEAVE:
@@ -280,6 +307,9 @@ int AccountDlg::OnNotify(LViewI *c, LNotification n)
 		}
 		case IDC_REC_TYPE:
 		{
+			UseGoogle = !Stricmp(c->Name(), PROTOCOL_GMAIL);
+			OnUseGoogle();
+
 			int64 Type = c->Value();
 			bool PopType = Type == 0 || Type == 1;
 			SetCtrlEnabled(IDC_POP3_LEAVE, PopType);

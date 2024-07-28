@@ -872,6 +872,7 @@
 #define IDC_PICK_FOLDER							1065
 #define IDC_WRAP								1066
 #define IDC_NO_SPAM_TRASH						1067
+#define IDC_GOOGLE								1068
 #define IDC_MSG									1069
 #define IDC_KEY									1070
 #define IDC_DONT_WARN							1071

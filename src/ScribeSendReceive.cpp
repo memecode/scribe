@@ -367,9 +367,9 @@ Accountlet::Accountlet(ScribeAccount *a) : PrivLock("Accountlet")
 	State = ThreadIdle;
 
 	// Update sig to new format...
-	char Buf[256];
+	auto opt = OptionName("AccSig");
 	LVariant Old;
-	if (GetApp()->GetOptions()->GetValue(OptionName("AccSig", Buf, sizeof(Buf)), Old))
+	if (GetApp()->GetOptions()->GetValue(opt, Old))
 	{
 		if (LFileExists(Old.Str()))
 		{
@@ -378,7 +378,7 @@ Accountlet::Accountlet(ScribeAccount *a) : PrivLock("Accountlet")
 				GetAccount()->Identity.TextSig(Xml);
 		}
 		
-		GetApp()->GetOptions()->DeleteValue(Buf);
+		GetApp()->GetOptions()->DeleteValue(opt);
 	}
 }
 
@@ -410,8 +410,8 @@ void Accountlet::OnBeforeDelete()
 
 bool Accountlet::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
-	char k[128];
-	bool mapped = Account->IsMapped(OptionName(Name, k, sizeof(k)));
+	auto k = OptionName(Name);
+	bool mapped = Account->IsMapped(k);
 	auto Opts = GetApp()->GetOptions();
 	Value.Empty();
 	if (mapped)
@@ -422,8 +422,8 @@ bool Accountlet::GetVariant(const char *Name, LVariant &Value, const char *Array
 
 bool Accountlet::SetVariant(const char *Name, LVariant &Value, const char *Array)
 {
-	char k[128];
-	bool mapped = Account->IsMapped(OptionName(Name, k, sizeof(k)));
+	auto k = OptionName(Name);
+	bool mapped = Account->IsMapped(k);
 	auto Opts = GetApp()->GetOptions();
 	if (mapped)
 		Opts->SetValue(k, Value);
@@ -433,8 +433,7 @@ bool Accountlet::SetVariant(const char *Name, LVariant &Value, const char *Array
 
 void Accountlet::StrOption(const char *Opt, LVariant &v, const char *Set)
 {
-	char Key[128];
-	OptionName(Opt, Key, sizeof(Key));
+	auto Key = OptionName(Opt);
 	if (Set)
 		GetApp()->GetOptions()->SetValue(Key, v = Set);
 	else
@@ -443,8 +442,7 @@ void Accountlet::StrOption(const char *Opt, LVariant &v, const char *Set)
 
 void Accountlet::IntOption(const char *Opt, LVariant &v, int Set)
 {
-	char Key[128];
-	OptionName(Opt, Key, sizeof(Key));
+	auto Key = OptionName(Opt);
 	if (Set >= 0)
 		GetApp()->GetOptions()->SetValue(Key, v = Set);
 	else
@@ -646,7 +644,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
 				LVariant Proto = GetAccount()->Receive.Protocol();
 				ScribeWnd *Wnd = GetAccount()->Parent;
 
-				ScribeProtocol Protocol = ProtocolStrToEnum(Proto.Str());
+				ScribeProtocol Protocol = ProtocolToEnum(Proto.Str());
 				#ifdef ImapSupport
 				LString HostName = Server().Str();
 				
@@ -664,12 +662,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
 					int OpenFlags = MakeOpenFlags(Account, false);
 					MailProtocolProgress *Prog[2] = { &Group, &Item };
 					LAutoPtr<ProtocolSettingStore> Store;
-					char StorePath[128];
-					if (OptionName(NULL, StorePath, sizeof(StorePath)))
-					{
-						Store.Reset(new ProtocolSettingStore(Wnd->GetOptions(), StorePath));
-					}
-					
+					Store.Reset(new ProtocolSettingStore(Wnd->GetOptions(), OptionName(NULL)));
 					
 					DataStore = OpenImap(HostName,
 										Receive->Port(),
@@ -798,22 +791,16 @@ bool Accountlet::IsCancelled()
 	return Thread ? Thread->IsCancelled() : false;
 }
 
-char *Accountlet::OptionName(const char *Opt, char *Dest, int DestLen)
+LString Accountlet::OptionName(const char *Opt)
 {
+	LString opt;
 	int Idx = Account->GetIndex();
 	LAssert(Idx >= 0);
 	if (Opt)
-	{
-		if (sprintf_s(Dest, DestLen, "Accounts.Account-%i.%s", Idx, Opt) < 0)
-			return NULL;
-	}
+		opt.Printf("Accounts.Account-%i.%s", Idx, Opt);
 	else
-	{
-		if (sprintf_s(Dest, DestLen, "Accounts.Account-%i", Idx) < 0)
-			return NULL;
-	}
-	
-	return Dest;
+		opt.Printf("Accounts.Account-%i", Idx);
+	return opt;
 }
 
 bool Accountlet::GetPassword(LPassword *p)
@@ -824,9 +811,7 @@ bool Accountlet::GetPassword(LPassword *p)
 		OptPassword &&
 		Lock())
 	{
-		char Name[128];
-		OptionName(OptPassword, Name, sizeof(Name));
-		Status = p->Serialize(Account->GetApp()->GetOptions(), Name, false);
+		Status = p->Serialize(Account->GetApp()->GetOptions(), OptionName(OptPassword), false);
 		Unlock();
 	}
 
@@ -838,16 +823,11 @@ void Accountlet::SetPassword(LPassword *p)
 	if (OptPassword &&
 		Lock())
 	{
-		char Name[128];
-		OptionName(OptPassword, Name, sizeof(Name));
+		auto Name = OptionName(OptPassword);
 		if (p)
-		{
 			p->Serialize(Account->GetApp()->GetOptions(), Name, true);
-		}
 		else
-		{
 			Account->GetApp()->GetOptions()->DeleteValue(Name);
-		}
 		Unlock();
 	}
 }
@@ -855,8 +835,7 @@ void Accountlet::SetPassword(LPassword *p)
 bool Accountlet::IsCheckDialup()
 {
 	LVariant CheckDialUp;
-	char Name[128];
-	Account->GetApp()->GetOptions()->GetValue(OptionName(OPT_CheckForDialUp, Name, sizeof(Name)), CheckDialUp);
+	Account->GetApp()->GetOptions()->GetValue(OptionName(OPT_CheckForDialUp), CheckDialUp);
 	return CheckDialUp.CastInt32() != 0;
 }
 
@@ -873,12 +852,11 @@ bool AccountIdentity::IsValid()
 
 void AccountIdentity::CreateMaps()
 {
-	char Name[128];
-	Account->Map(OptionName(OPT_AccIdentName, Name, sizeof(Name)), IDC_NAME, GV_STRING);
-	Account->Map(OptionName(OPT_AccIdentEmail, Name, sizeof(Name)), IDC_EMAIL, GV_STRING);
-	Account->Map(OptionName(OPT_AccIdentReply, Name, sizeof(Name)), IDC_REPLY_TO, GV_STRING);
-	Account->Map(OptionName(OPT_AccIdentTextSig, Name, sizeof(Name)), IDC_SIG, GV_STRING);
-	Account->Map(OptionName(OPT_AccIdentHtmlSig, Name, sizeof(Name)), IDC_SIG_HTML, GV_STRING);
+	Account->Map(OptionName(OPT_AccIdentName), IDC_NAME, GV_STRING);
+	Account->Map(OptionName(OPT_AccIdentEmail), IDC_EMAIL, GV_STRING);
+	Account->Map(OptionName(OPT_AccIdentReply), IDC_REPLY_TO, GV_STRING);
+	Account->Map(OptionName(OPT_AccIdentTextSig), IDC_SIG, GV_STRING);
+	Account->Map(OptionName(OPT_AccIdentHtmlSig), IDC_SIG_HTML, GV_STRING);
 }
 
 bool AccountIdentity::GetVariant(const char *Name, LVariant &Value, const char *Array)
@@ -945,17 +923,16 @@ bool SendAccountlet::SetVariant(const char *Name, LVariant &Value, const char *A
 void SendAccountlet::CreateMaps()
 {
 	// Fields
-	char Name[256] = "";
-	Account->Map(OptionName(OPT_SmtpServer, Name, sizeof(Name)), IDC_SMTP_SERVER, GV_STRING);
-	Account->Map(OptionName(OPT_SmtpPort, Name, sizeof(Name)), IDC_SMTP_PORT, GV_INT32);
-	Account->Map(OptionName(OPT_SmtpDomain, Name, sizeof(Name)), IDC_SMTP_DOMAIN, GV_STRING);
-	Account->Map(OptionName(OPT_SmtpName, Name, sizeof(Name)), IDC_SMTP_NAME, GV_STRING);
-	Account->Map(OptionName(OPT_SmtpAuth, Name, sizeof(Name)), IDC_SMTP_AUTH, GV_BOOL);
-	Account->Map(OptionName(OPT_SmtpAuthType, Name, sizeof(Name)), IDC_SEND_AUTH_TYPE, GV_INT32);
-	Account->Map(OptionName(OPT_SendCharset1, Name, sizeof(Name)), IDC_SEND_CHARSET1, GV_STRING);
-	Account->Map(OptionName(OPT_SendCharset2, Name, sizeof(Name)), IDC_SEND_CHARSET2, GV_STRING);
-	Account->Map(OptionName(OPT_OnlySendThroughThis, Name, sizeof(Name)), IDC_ONLY_SEND_THIS, GV_BOOL);
-	Account->Map(OptionName(OPT_SmtpSSL, Name, sizeof(Name)), IDC_SEND_SSL, GV_INT32);
+	Account->Map(OptionName(OPT_SmtpServer), IDC_SMTP_SERVER, GV_STRING);
+	Account->Map(OptionName(OPT_SmtpPort), IDC_SMTP_PORT, GV_INT32);
+	Account->Map(OptionName(OPT_SmtpDomain), IDC_SMTP_DOMAIN, GV_STRING);
+	Account->Map(OptionName(OPT_SmtpName), IDC_SMTP_NAME, GV_STRING);
+	Account->Map(OptionName(OPT_SmtpAuth), IDC_SMTP_AUTH, GV_BOOL);
+	Account->Map(OptionName(OPT_SmtpAuthType), IDC_SEND_AUTH_TYPE, GV_INT32);
+	Account->Map(OptionName(OPT_SendCharset1), IDC_SEND_CHARSET1, GV_STRING);
+	Account->Map(OptionName(OPT_SendCharset2), IDC_SEND_CHARSET2, GV_STRING);
+	Account->Map(OptionName(OPT_OnlySendThroughThis), IDC_ONLY_SEND_THIS, GV_BOOL);
+	Account->Map(OptionName(OPT_SmtpSSL), IDC_SEND_SSL, GV_INT32);
 }
 
 ScribeAccountletStatusIcon SendAccountlet::GetStatusIcon()
@@ -1385,17 +1362,14 @@ ReceiveAccountlet::ReceiveAccountlet(ScribeAccount *a) : Accountlet(a)
 	Items = 0;
 	IdTemp = 0;
 
-	char Key[128];
-	OptionName("Messages", Key, sizeof(Key));
-	Msgs.Reset(new MsgList(a->GetApp()->GetOptions(), Key));
-	OptionName("Spam", Key, sizeof(Key));
-	Spam.Reset(new MsgList(a->GetApp()->GetOptions(), Key));
+	Msgs.Reset(new MsgList(a->GetApp()->GetOptions(), OptionName("Messages")));
+	Spam.Reset(new MsgList(a->GetApp()->GetOptions(), OptionName("Spam")));
 
 	// Upgrade props
 	LVariant OldType = -1;
-	char Buf[128];
 	LOptionsFile *Options = GetApp()->GetOptions();
-	if (Options->GetValue(OptionName(OPT_Pop3Type, Buf, sizeof(Buf)), OldType))
+	auto typeOpt = OptionName(OPT_Pop3Type);
+	if (Options->GetValue(typeOpt, OldType))
 	{
 		// Old Account types: 
 		#define MAIL_SOURCE_POP3			0
@@ -1418,19 +1392,18 @@ ReceiveAccountlet::ReceiveAccountlet(ScribeAccount *a) : Accountlet(a)
 				Protocol(PROTOCOL_MAPI); break;
 		}
 		
-		Options->DeleteValue(Buf);
+		Options->DeleteValue(typeOpt);
 	}
 
-	char Name[256] = "";
 	LVariant Auto;
-	if (!Options->GetValue(OptionName(OPT_Pop3AutoReceive, Name, sizeof(Name)), Auto))
+	if (!Options->GetValue(OptionName(OPT_Pop3AutoReceive), Auto))
 	{
 		LVariant s;
-		Options->GetValue(OptionName(OPT_Pop3CheckEvery, Name, sizeof(Name)), s);
+		Options->GetValue(OptionName(OPT_Pop3CheckEvery), s);
 		if (s.Str())
 		{
 			int Timeout = atoi(s.Str());
-			Options->SetValue(OptionName(OPT_Pop3AutoReceive, Name, sizeof(Name)), s = (Timeout > 0));
+			Options->SetValue(OptionName(OPT_Pop3AutoReceive), s = (Timeout > 0));
 		}
 	}
 
@@ -1480,29 +1453,27 @@ ScribeAccountletStatusIcon ReceiveAccountlet::GetStatusIcon()
 
 void ReceiveAccountlet::CreateMaps()
 {
-	char Name[256] = "";
-
 	// Fields
-	Account->Map(OptionName(OPT_Pop3Protocol, Name, sizeof(Name)), IDC_REC_TYPE, GV_STRING);
-	Account->Map(OptionName(OPT_Pop3Server, Name, sizeof(Name)), IDC_REC_SERVER, GV_STRING);
-	Account->Map(OptionName(OPT_Pop3Port, Name, sizeof(Name)), IDC_REC_PORT, GV_INT32);
-	Account->Map(OptionName(OPT_Pop3Name, Name, sizeof(Name)), IDC_REC_NAME, GV_STRING);
-	Account->Map(OptionName(OPT_Pop3AutoReceive, Name, sizeof(Name)), IDC_CHECK_EVERY, GV_BOOL);
-	Account->Map(OptionName(OPT_Pop3CheckEvery, Name, sizeof(Name)), IDC_REC_CHECK, GV_STRING);
+	Account->Map(OptionName(OPT_Pop3Protocol),			IDC_REC_TYPE, GV_STRING);
+	Account->Map(OptionName(OPT_Pop3Server),			IDC_REC_SERVER, GV_STRING);
+	Account->Map(OptionName(OPT_Pop3Port),				IDC_REC_PORT, GV_INT32);
+	Account->Map(OptionName(OPT_Pop3Name),				IDC_REC_NAME, GV_STRING);
+	Account->Map(OptionName(OPT_Pop3AutoReceive),		IDC_CHECK_EVERY, GV_BOOL);
+	Account->Map(OptionName(OPT_Pop3CheckEvery),		IDC_REC_CHECK, GV_STRING);
 	
-	Account->Map(OptionName(OPT_Pop3LeaveOnServer, Name, sizeof(Name)), IDC_POP3_LEAVE, GV_BOOL);
-	Account->Map(OptionName(OPT_DeleteAfter, Name, sizeof(Name)), IDC_DELETE_AFTER, GV_BOOL);
-	Account->Map(OptionName(OPT_DeleteDays, Name, sizeof(Name)), IDC_DELETE_DAYS, GV_INT32);
-	Account->Map(OptionName(OPT_DeleteIfLarger, Name, sizeof(Name)), IDC_DELETE_LARGER, GV_BOOL);
-	Account->Map(OptionName(OPT_DeleteIfLargerSize, Name, sizeof(Name)), IDC_DELETE_SIZE, GV_INT32);
+	Account->Map(OptionName(OPT_Pop3LeaveOnServer),		IDC_POP3_LEAVE, GV_BOOL);
+	Account->Map(OptionName(OPT_DeleteAfter),			IDC_DELETE_AFTER, GV_BOOL);
+	Account->Map(OptionName(OPT_DeleteDays),			IDC_DELETE_DAYS, GV_INT32);
+	Account->Map(OptionName(OPT_DeleteIfLarger),		IDC_DELETE_LARGER, GV_BOOL);
+	Account->Map(OptionName(OPT_DeleteIfLargerSize),	IDC_DELETE_SIZE, GV_INT32);
 
-	Account->Map(OptionName(OPT_Pop3Folder, Name, sizeof(Name)), IDC_FOLDER, GV_STRING);
-	Account->Map(OptionName(OPT_MaxEmailSize, Name, sizeof(Name)), IDC_MAX_SIZE, GV_INT32);
-	Account->Map(OptionName(OPT_Receive8BitCs, Name, sizeof(Name)), IDC_REC_8BIT_CS, GV_STRING);
-	Account->Map(OptionName(OPT_ReceiveAsciiCs, Name, sizeof(Name)), IDC_REC_ASCII_CP, GV_STRING);
-	Account->Map(OptionName(OPT_ReceiveAuthType, Name, sizeof(Name)), IDC_RECEIVE_AUTH_TYPE, GV_INT32);
-	Account->Map(OptionName(OPT_Pop3SSL, Name, sizeof(Name)), IDC_RECEIVE_SSL, GV_INT32);
-	Account->Map(OptionName(OPT_ReceiveSecAuth, Name, sizeof(Name)), IDC_SEC_AUTH, GV_INT32);
+	Account->Map(OptionName(OPT_Pop3Folder),			IDC_FOLDER, GV_STRING);
+	Account->Map(OptionName(OPT_MaxEmailSize),			IDC_MAX_SIZE, GV_INT32);
+	Account->Map(OptionName(OPT_Receive8BitCs),			IDC_REC_8BIT_CS, GV_STRING);
+	Account->Map(OptionName(OPT_ReceiveAsciiCs),		IDC_REC_ASCII_CP, GV_STRING);
+	Account->Map(OptionName(OPT_ReceiveAuthType),		IDC_RECEIVE_AUTH_TYPE, GV_INT32);
+	Account->Map(OptionName(OPT_Pop3SSL),				IDC_RECEIVE_SSL, GV_INT32);
+	Account->Map(OptionName(OPT_ReceiveSecAuth),		IDC_SEC_AUTH, GV_INT32);
 }
 
 int ReceiveAccountlet::GetCheckTimeout()
@@ -1867,7 +1838,7 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 	Params.Thread = Thread;
 	Params.MaxSize = DownloadLimit() << 10;
 
-	auto MailSourceType = ProtocolStrToEnum(Protocol().Str());
+	auto MailSourceType = ProtocolToEnum(Protocol().Str());
 
 	LString Password;
 

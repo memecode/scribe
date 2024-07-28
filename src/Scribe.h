@@ -1817,7 +1817,7 @@ public:
 	void Kill();
 
 	// Data
-	char *OptionName(const char *Opt, char *Dest, int DestLen);
+	LString OptionName(const char *Opt);
 	void Delete();
 	LThread *GetThread() { return Thread; }
 	LMailStore *GetMailStore() { return MailStore; }
@@ -2036,7 +2036,7 @@ public:
 
 	// Receive options
 	AccStrOption(Protocol, OPT_Pop3Protocol);
-	ScribeProtocol ProtocolType() { return ProtocolStrToEnum(Protocol().Str()); }
+	ScribeProtocol ProtocolType() { return ProtocolToEnum(Protocol().Str()); }
 	AccStrOption(Server, OPT_Pop3Server);
 	AccIntOption(Port, OPT_Pop3Port);
 	AccStrOption(UserName, OPT_Pop3Name);

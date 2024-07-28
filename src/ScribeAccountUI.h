@@ -8,8 +8,11 @@ class AccountDlg : public TabDialog
 	LList *Plugins = NULL;
 	class LEdit *SendServer = NULL, *ReceiveServer = NULL;
 	class LEdit *SendPort = NULL, *ReceivePort = NULL;
+	bool UseGoogle = false;
 
 	void UpdateDefaultPort(bool Send);
+	void FillWithCharsets(int id, bool All);
+	void OnUseGoogle();
 
 public:
 	AccountDlg(LView *p, ScribeWnd *app, ScribeAccount *a, int Tab);

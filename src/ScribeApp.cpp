@@ -7877,7 +7877,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				if (!a->Receive.IsConfigured())
 					continue;
 				
-				auto Protocol = ProtocolStrToEnum(a->Receive.Protocol().Str());
+				auto Protocol = ProtocolToEnum(a->Receive.Protocol().Str());
 				if (Protocol == ProtocolPop3)
 				{
 					Account.Add(a);
