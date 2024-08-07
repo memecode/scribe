@@ -1539,9 +1539,14 @@ Store3Status BayesianFilter::IsSpam(double &Result, Mail *m, bool Analyse)
 	// Tokenise the mail...
 	Status = MakeMailWordList(m, t->Words);
 	if (Status == Store3Error)
+	{
+		LgiTrace("%s:%i - MakeMailWordList error!\n", _FL);
 	    return Status;
+	}
 	if (Status == Store3Delayed)
 	{
+		LgiTrace("%s:%i - MakeMailWordList delayed...\n", _FL);
+
 		// Not loaded yet, retry it later...
 		m->WhenLoaded(_FL, [this, Analyse, m](auto status)
 		{
@@ -1849,7 +1854,10 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 		{
 			LArray< LAutoPtr<BayesianThread::Test> > Results;
     		if (!d->GetThread()->GetResults(Results))
+			{
+				LgiTrace("%s:%i - M_SCRIBE_BAYES_RESULT: no results.\n", _FL);
     			break;
+			}
 
 			for (auto t: Results)
 			{
