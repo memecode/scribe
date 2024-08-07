@@ -1464,9 +1464,9 @@ void CalendarView::OnPaint(LSurface *pDC)
 						for (uint32_t i=0; i<Group.Length(); i++)
 						{
 							TimePeriod &t = *Group[i];
-							auto obj = t.c->GetObject();
+							// auto obj = t.c->GetObject();
 
-							auto allDay = obj ? obj->GetInt(FIELD_CAL_ALL_DAY) : false;
+							// auto allDay = obj ? obj->GetInt(FIELD_CAL_ALL_DAY) : false;
 							double StartH = (double) t.s.Hours() + ((double)t.s.Minutes() / 60), EndH;
 							if (t.e.IsSameDay(t.s) && t.e.Hours())
 								EndH = ((double)t.e.Hours()) + ((double)t.e.Minutes() / 60);

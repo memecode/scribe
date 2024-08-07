@@ -37,7 +37,7 @@ public:
 	bool IsOrphan() override { return false; }
 	Store3Status Save(LDataI *Obj = NULL) override { return Store3NotImpl; }
 	Store3Status Delete(bool ToTrash = true) override { return Store3NotImpl; }
-	LDataIt GetList(int id) { return NULL; }
+	LDataIt GetList(int id) override { return NULL; }
 	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
 };
 

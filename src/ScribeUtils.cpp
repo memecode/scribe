@@ -1758,7 +1758,9 @@ const char *ToString(ScribeProtocol p)
 	{
 		#define _(def, en) case en: return def;
 		ScribeProtocolTypeMap()
-		#undef _	
+		#undef _
+		default:
+			break;
 	}
 
 	return NULL;

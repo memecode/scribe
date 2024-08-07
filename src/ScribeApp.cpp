@@ -3094,7 +3094,7 @@ bool ScribeWnd::LoadOptions()
 						}
 						else
 						{
-							auto s = ScribeState;
+							// auto s = ScribeState;
 							ScribeState = ScribeExiting;
 							LCloseApp();
 							// Args have been passed on to running instance.

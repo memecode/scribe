@@ -1373,7 +1373,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 	{
 		case ACTION_MOVE_TO_FOLDER:
 		{
-			bool isRead = (m->GetFlags() | MAIL_READ) != 0;
+			// bool isRead = (m->GetFlags() | MAIL_READ) != 0;
 
 			auto Folder = App->GetFolder(Arg1);
 			if (Folder)
