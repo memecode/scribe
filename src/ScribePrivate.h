@@ -375,10 +375,10 @@ class ThingList :
 {
 	friend class Mail;
 
-	ScribeFolder *Container;
-	Mail *CurrentMail;
-	int BoldUnread;
-	ScribeWnd *App;
+	ScribeFolder *Container = NULL;
+	Mail *CurrentMail = NULL;
+	int BoldUnread = false;
+	ScribeWnd *App = NULL;
 
 public:
 	ThingList(ScribeWnd *wnd);

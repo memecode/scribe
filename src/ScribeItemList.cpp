@@ -75,9 +75,6 @@ ThingList::ThingList(ScribeWnd *wnd) :
 	LList(IDC_THING_LIST, 0, 0, 100, 100, "ThingList")
 {
 	App = wnd;
-	CurrentMail = 0;
-	Container = 0;
-	BoldUnread = false;
 
 	Sunken(false);
 	AskText(true);

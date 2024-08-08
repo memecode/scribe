@@ -56,8 +56,9 @@ int AddressList::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 				Status = DROPEFFECT_COPY;
 			}
 		}
-		else if (_stricmp(dd.Format, LGI_FileDropFormat) == 0)
+		else if (dd.IsFileDrop())
 		{
+			LAssert(!"Impl contact drop here...");
 		}
 	}
 

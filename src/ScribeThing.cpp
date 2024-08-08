@@ -690,11 +690,14 @@ bool Thing::GetData(LArray<LDragData> &Data)
 			App->GetMouse(m, true);
 
 			LString::Array Files;
+			Status = true;
 			for (auto t: Objs)
-				Status |= t->GetDropFiles(Files);
+				Status &= t->GetDropFiles(Files);
 
-			if (Status && CreateFileDrop(&dd, m, Files))
-				Status = true;
+			if (!Status)
+				LgiTrace("%s:%i - GetDropFiles failed.\n", _FL);
+			else
+				Status = CreateFileDrop(&dd, m, Files);
 		}
 		else if (dd.IsFormat(LGI_StreamDropFormat))
 		{
@@ -702,7 +705,7 @@ bool Thing::GetData(LArray<LDragData> &Data)
 			{
 				if (t->GetObject())
 				{
-					LAutoStreamI s = t->GetObject()->GetStream(_FL);
+					auto s = t->GetObject()->GetStream(_FL);
 					if (s)
 					{
 						s->SetPos(0);

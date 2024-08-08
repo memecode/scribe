@@ -6086,7 +6086,10 @@ char *Mail::GetDropFileName()
 bool Mail::GetDropFiles(LString::Array &Files)
 {
 	if (!GetDropFileName())
+	{
+		LgiTrace("%s:%i - GetDropFileName failed.\n", _FL);
 		return false;
+	}
 
 	if (!LFileExists(DropFileName))
 	{
@@ -6095,13 +6098,23 @@ bool Mail::GetDropFiles(LString::Array &Files)
 		{
 			F->SetSize(0);
 			if (!Export(AutoCast(F), sMimeMessage))
+			{
+				LgiTrace("%s:%i - Export failed.\n", _FL);
 				return false;
+			}
 		}
-		else return false;
+		else
+		{
+			LgiTrace("%s:%i - Failed to open '%s' for writing.\n", _FL, DropFileName.Get());
+			return false;
+		}
 	}
 
 	if (!LFileExists(DropFileName))
+	{
+		LgiTrace("%s:%i - Output file '%s' doesn't exist.\n", _FL, DropFileName.Get());
 		return false;
+	}
 
 	Files.Add(DropFileName.Get());
 	return true;

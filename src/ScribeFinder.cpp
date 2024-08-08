@@ -233,7 +233,7 @@ class ResultItem : public LListItem
 						free(Fmt);
 					}
 				}
-				else if (!_stricmp(LGI_FileDropFormat, dd.Format))
+				else if (dd.IsFileDrop())
 				{
 					LMouse m;
 					GetList()->GetMouse(m, true);
