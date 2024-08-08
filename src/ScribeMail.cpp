@@ -3513,33 +3513,28 @@ int MailUi::OnNotify(LViewI *Col, LNotification n)
 		}
 		case IDC_ENTRY:
 		{
-			if (Entry)
+			if (!Entry)
+				break;
+
+			if (ValidStr(Entry->Name()))
 			{
-				if (ValidStr(Entry->Name()))
-				{
-					if (!Browse)
-					{
-						Browse = new AddressBrowse(App, Entry, To, SetTo);
-					}
-				}
-				if (Browse)
-				{
-					Browse->OnNotify(Entry, n);
-				}
-				
-				if (n.Type == LNotifyReturnKey)
-				{
-					OnDataEntered();
-				}
+				if (!Browse)
+					Browse = new AddressBrowse(App, Entry, To, SetTo);
 			}
+
+			if (Browse)
+				Browse->OnNotify(Entry, n);
+			
+			if (n.Type == LNotifyReturnKey)
+				OnDataEntered();
 			break;
 		}
 		case IDC_SET_TO:
 		{
-			if (SetTo)
-			{
-				AddMode = (int)SetTo->Value();
-			}
+			if (!SetTo)
+				break;
+
+			AddMode = (int)SetTo->Value();
 			break;
 		}
 		case IDC_SEND:

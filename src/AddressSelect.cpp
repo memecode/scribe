@@ -300,24 +300,18 @@ PluginResults;
 class AddressBrowsePrivate
 {
 public:
-	AddressBrowse *Ad;
-	ScribeWnd *App;
-	LEdit *Target;
-	LList *Recip;
-	LViewI *SetTo;
+	AddressBrowse *Ad = NULL;
+	ScribeWnd *App = NULL;
+	LEdit *Target = NULL;
+	LList *Recip = NULL;
+	LViewI *SetTo = NULL;
 	LArray<BrowseItem*> Items;
 	LHashTbl<StrKey<char,false>, BrowseItem*> Has;
-	ssize_t WordStart, WordEnd;
+	ssize_t WordStart = 0, WordEnd = 0;
 
 	AddressBrowsePrivate(AddressBrowse *ad)
 	{
 		Ad = ad;
-		App = NULL;
-		Target = NULL;
-		Recip = NULL;
-		SetTo = NULL;
-		Recip = NULL;
-		WordStart = WordEnd = 0;
 	}
 
 	void Test(LString::Array &Txt, const char *First, const char *Last, LString::Array &Email, const char *Nick)
@@ -326,7 +320,7 @@ public:
 			return;
 
 		LAutoString TxtEmail;
-		int i, EmailIdx = -1;
+		ssize_t i, EmailIdx = -1;
 		for (i=0; i<(int)Txt.Length(); i++)
 		{
 			if (strchr(Txt[i], '@'))
@@ -338,17 +332,21 @@ public:
 		}
 
 		#define ScoreText(Str, Search, Complete, First, Nth) \
-			if (Str) { char *s = Search; \
-			if (s) { \
-			size_t Len = strlen(s); \
-			if (_stricmp(Str, s) == 0) Score += Complete; \
-			if (_strnicmp(Str, s, Len) == 0) Score += First; \
-			else if (stristr(Str, s)) Score += Nth; \
-			} }
+			if (Str) \
+			{ \
+				char *s = Search; \
+				if (s) \
+				{ \
+					size_t Len = strlen(s); \
+					if (_stricmp(Str, s) == 0) Score += Complete; \
+					if (_strnicmp(Str, s, Len) == 0) Score += First; \
+					else if (stristr(Str, s)) Score += Nth; \
+				} \
+			}
 
-		for (i=0; i<(int)Email.Length(); i++)
+		for (i=0; i<Email.Length(); i++)
 		{
-			char *Match = 0;
+			char *Match = NULL;
 			int Score = 0;
 			
 			if (Txt.Length() == 1)
@@ -404,9 +402,7 @@ public:
 				{
 					Items.Add(i = new BrowseItem(First, Last, Addr, Score));
 					if (i)
-					{
 						Has.Add(Addr, i);
-					}
 				}
 			}
 		}
@@ -417,7 +413,7 @@ public:
 		Items.DeleteObjects();
 		Has.Empty();
 			
-		char *Txt = 0;
+		char *Txt = NULL;
 		char *RawTxt = (char*)Target->Name();
 		if (RawTxt)
 		{
@@ -427,7 +423,7 @@ public:
 			Txt = RawTxt + BytePos;
 			if (Txt)
 			{
-				char *s = Txt;
+				auto s = Txt;
 
 				// Seek to the start of the name
 				while (Txt > RawTxt && !strchr(MailAddressDelimiters, Txt[-1]))
@@ -439,9 +435,7 @@ public:
 				// Seek to the end of the name
 				Txt = s;
 				while (Txt[0] && !strchr(MailAddressDelimiters, Txt[0]))
-				{
 					Txt = LSeekUtf8(Txt, 1);
-				}
 				WordEnd = Txt - RawTxt;
 
 				// Store the sub-string
@@ -474,7 +468,7 @@ public:
 		LHashTbl<StrKey<char,false>,Contact*> Contacts;
 		App->HashContacts(Contacts);
 
-		for (auto c : Contacts)
+		for (auto c: Contacts)
 		{
 			const char *First = 0, *Last = 0, *Nick = 0;
 			c.value->Get(OPT_First, First);
@@ -563,51 +557,56 @@ LString AddressBrowse::ToString(BrowseItem *Obj)
 
 void AddressBrowse::OnSelect(BrowseItem *a)
 {
-	if (a && a->Email)
+	if (!a || !a->Email)
+		return;
+
+	LStringPipe p;
+	const char *Cur = d->Target->Name();
+	if (Cur)
 	{
-		LStringPipe p;
-		const char *Cur = d->Target->Name();
-		if (Cur)
+		p.Push(Cur, d->WordStart);
+		p.Push(Cur + d->WordEnd);
+	}
+
+	d->Target->Name(p.NewLStr());
+	d->Target->SetCaret(d->WordStart);
+
+	if (d->Recip)
+	{
+		char FullName[300], *Name = 0;
+		if (a->First && a->Last)
+			sprintf_s(Name = FullName, sizeof(FullName), "%s %s", a->First.Get(), a->Last.Get());
+		else if (a->First)
+			Name = a->First;
+		else if (a->Last)
+			Name = a->Last;
+
+		if (Name || a->Email)
 		{
-			p.Push(Cur, d->WordStart);
-			p.Push(Cur + d->WordEnd);
-		}
-		char *New = p.NewStr();
-
-		d->Target->Name(New);
-		d->Target->SetCaret(d->WordStart);
-
-		if (d->Recip)
-		{
-			char FullName[300], *Name = 0;
-			if (a->First && a->Last)
-				sprintf_s(Name = FullName, sizeof(FullName), "%s %s", a->First.Get(), a->Last.Get());
-			else if (a->First)
-				Name = a->First;
-			else if (a->Last)
-				Name = a->Last;
-
-			if (Name || a->Email)
+			ListAddr *n = new ListAddr(d->App, a->Email, Name);
+			if (n)
 			{
-				ListAddr *n = new ListAddr(d->App, a->Email, Name);
-				if (n)
-				{
-					if (d->SetTo)
-						n->CC = (EmailAddressType) d->SetTo->Value();
-					d->Recip->Insert(n);
-				}
+				if (d->SetTo)
+					n->CC = (EmailAddressType) d->SetTo->Value();
+				d->Recip->Insert(n);
 			}
 		}
-
-		Visible(false);
-		DeleteArray(New);
 	}
+
+	Visible(false);
 }
 
 
 int AddressBrowse::OnNotify(LViewI *c, LNotification n)
 {
-	if (c == d->Target && n.Type == LNotifyValueChanged)
+	if
+	(
+		c == d->Target &&
+		(
+			n.Type == LNotifyValueChanged ||
+			n.Type == LNotifyDocChanged
+		)
+	)
 	{
 		d->Update();
 	}
