@@ -345,7 +345,7 @@ public:
 				} \
 			}
 
-		for (i=0; i<Email.Length(); i++)
+		for (i=0; i<(ssize_t)Email.Length(); i++)
 		{
 			char *Match = NULL;
 			int Score = 0;

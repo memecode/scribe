@@ -1534,13 +1534,16 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 						!TestFlag(GetItem()->GetFlags(), MAIL_BOUNCE);
 
 		LDisplayString Recip(LSysFont, LLoadString(IDS_RECIPIENTS));
-		LAutoPtr<LCheckBox> ReplyChk(new LCheckBox(IDC_USE_REPLY_TO, 21,
-													#ifdef MAC
-													1,
-													#else
-													6,
-													#endif
-													-1, -1, "Reply To"));
+		LAutoPtr<LCheckBox> ReplyChk(new LCheckBox(IDC_USE_REPLY_TO, "Reply To"));
+		auto pos = ReplyChk->GetPos();
+		pos.Offset(	21-pos.x1,
+					#ifdef MAC
+					1-pos.y1
+					#else
+					6-pos.y1
+					#endif
+					);
+		ReplyChk->SetPos(pos);
 		int ReplyChkPx = ReplyChk ? ReplyChk->X() : 0;
 		int RECIP_X = 20 + MAX(ReplyChkPx, Recip.X()) + 10;
 		int EditHeight = FontHeight + 6;
@@ -1610,13 +1613,16 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 			{
 				LCheckBox *Chk;
 				auto Label = LLoadString(IDS_ALWAYS_SHOW);
-				FromPanel->AddView(Chk = new LCheckBox(IDC_SHOW_FROM, ADD_X,
-														#ifdef MAC
-														1,
-														#else
-														6,
-														#endif
-														-1, -1, Label));
+				FromPanel->AddView(Chk = new LCheckBox(IDC_SHOW_FROM, Label));
+				auto pos = Chk->GetPos();
+				pos.Offset(	ADD_X,
+							#ifdef MAC
+							1
+							#else
+							6
+							#endif
+							);
+				Chk->SetPos(pos);
 				if (Chk) Chk->Value(AlwaysShowFrom.CastInt32());
 			}
 
