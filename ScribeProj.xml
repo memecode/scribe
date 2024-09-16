@@ -405,7 +405,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>./scribe</Debug>
 					<Release>./scribe</Release>
 				</Linux>
+				<Haiku>
+					<Debug>./scribe</Debug>
+					<Release>./scribe</Release>
+				</Haiku>
 			</Executable>
+			<CCrossCompiler />
+			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -472,9 +478,11 @@ z
 				</Linux>
 				<Haiku>
 					<Debug>be
-gnu</Debug>
+gnu
+network</Debug>
 					<Release>be
-gnu</Release>
+gnu
+network</Release>
 				</Haiku>
 				<All>
 					<Debug>chardet
@@ -510,6 +518,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
 					<Release>`pkg-config --cflags gtk+-3.0`</Release>
 				</Linux>
+				<Haiku />
 			</SystemIncludes>
 			<LibraryPaths>
 				<All>
@@ -519,6 +528,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>../libs/build-x64-release/libchardet
 ../libs/build-x64-release/bzip2-1.0.6</Release>
 				</All>
+				<Haiku />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
@@ -527,12 +537,16 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 				</Haiku>
 			</TargetName>
 			<Options>
-				<All />
 				<Linux>
 					<Debug>-Wno-format-truncation</Debug>
 					<Release>-Wno-format-truncation</Release>
 				</Linux>
+				<All />
+				<Haiku />
 			</Options>
+			<ApplicationIcon>
+				<Haiku>./resources/scribe.hvif</Haiku>
+			</ApplicationIcon>
 		</Build>
 		<Editor>
 			<TabSize>
@@ -547,13 +561,26 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
+			<CommentFile />
+			<CommentFunction />
 		</Editor>
 		<Advanced>
-			<PostBuildCommands />
+			<PostBuildCommands>
+				<Haiku />
+			</PostBuildCommands>
+			<OtherMakefileRules />
 		</Advanced>
 		<Debug>
-			<Arguments />
+			<Arguments>
+				<All />
+			</Arguments>
+			<Environment />
+			<DebugAdmin />
+			<InitialDir />
 		</Debug>
-		<Remote />
+		<Remote>
+			<RemoteUri />
+			<RemotePass />
+		</Remote>
 	</Settings>
 </Project>
