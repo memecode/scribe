@@ -1889,6 +1889,13 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 
 bool BayesianFilter::UnitTests(ScribeWnd *app)
 {
+	auto store = app->GetMailStoreForIdentity();
+	if (!store)
+	{
+		LgiTrace("%s:%i - no default mail store.\n", _FL);
+		return false;
+	}
+
 	BayesianFilter inst(app);
 	ScribeMailType prob, none;
 	auto spam = inst.BayesTypeFromPath("/Folders1/Spam");

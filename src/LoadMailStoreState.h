@@ -188,7 +188,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 				return ReturnWithEvent(false);
 
 			if (!Folder.Store)
-				Folder.Store = App->CreateDataStore(Full, CreateFoldersIfMissing.CastInt32() != 0);
+				Folder.Store.Reset(App->CreateDataStore(Full, CreateFoldersIfMissing.CastInt32() != 0));
 			if (!Folder.Store)
 			{
 				LgiTrace("%s:%i - Failed to create data store for '%s'\n", _FL, Full.Get());
@@ -200,27 +200,26 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 		else if (ContactUrl || CalUrl)
 		{
 			// Remove Webdav folders...
-			Folder.Store = new WebdavStore(App, App, StoreName);
+			Folder.Store.Reset(new WebdavStore(App, App, StoreName));
 		}
 		else
 		{
 			return ReturnWithEvent(false);
 		}
 
-		LDataStoreI *&Store = Folder.Store;
 		auto ex = MailStore->GetAsInt(OPT_MailStoreExpanded);
 		if (ex >= 0)
 			Folder.Expanded = ex != 0;
 
 		// Check if the mail store requires upgrading...
-		auto MsState = (Store3Status)Store->GetInt(FIELD_STATUS);
+		auto MsState = (Store3Status)Folder.Store->GetInt(FIELD_STATUS);
 		if (MsState == Store3UpgradeRequired)
 		{
 			LgiTrace("%s:%i - this=%p\n", _FL, this);
-			auto Details = Store->GetStr(FIELD_STATUS);
+			auto Details = Folder.Store->GetStr(FIELD_STATUS);
 			AskStoreUpgrade(Folder.Path.Get(),
 				ValidStr(Details) ? Details : "n/a",
-				[this, Store, MailStore](auto result)
+				[this, Store=Folder.Store.Get(), MailStore](auto result)
 				{
 					if (result == IDYES)
 					{
@@ -241,7 +240,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 		}
 		else if (MsState == Store3Error)
 		{
-			auto ErrMsg = Store->GetStr(FIELD_ERROR);
+			auto ErrMsg = Folder.Store->GetStr(FIELD_ERROR);
 			auto a = new LAlert(App,
 				AppName, ErrMsg ? ErrMsg : LLoadString(IDS_ERROR_FOLDERS_STATUS),
 				LLoadString(IDS_EDIT_MAIL_STORES),
@@ -345,7 +344,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 			Folder = App->GetFolder(FOLDER_FILTERS);
 			if (Folder)
 				Folder->LoadThings();
-			for (auto ms: App->Folders)
+			for (auto &ms: App->Folders)
 			{
 				if (!ms.Root)
 					continue;

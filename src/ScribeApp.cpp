@@ -1023,10 +1023,6 @@ void ScribeWnd::Construct2()
 	LFinishXWindowsStartup(this);
 	#endif
 
-	#ifdef _DEBUG
-	BayesianFilter::UnitTests(this);
-	#endif
-
 	ScribeState = ScribeConstructed;
 	OnCreate();
 }
@@ -1293,6 +1289,10 @@ void ScribeWnd::Construct3()
 			OnCommandLineEvent(IpcEvent);
 		}
 	
+		#ifdef _DEBUG
+		BayesianFilter::UnitTests(this);
+		#endif
+
 		ScribeState = ScribeRunning;
 	});
 }
@@ -4575,7 +4575,7 @@ LDataStoreI *ScribeWnd::CreateDataStore(const char *_Full, bool CreateIfMissing)
 	return NULL;
 }
 
-bool ScribeWnd::ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName)
+bool ScribeWnd::ProcessFolder(LDataStoreI *Store, int StoreIdx, char *StoreName)
 {
 	THREAD_UNSAFE(false);
 
@@ -4896,7 +4896,7 @@ bool ScribeWnd::UnLoadFolders()
 			}
 
 			DeleteObj(Folders[i].Root);
-			DeleteObj(Folders[i].Store);
+			Folders[i].Store.Reset();
 		}
 
 		if (MailStores)
@@ -8467,7 +8467,12 @@ int ScribeWnd::OnNotify(LViewI *Ctrl, LNotification n)
 void ScribeWnd::AddThingSrc(ScribeFolder *src)
 {
 	if (!d->ThingSources.HasItem(src))
-		d->ThingSources.Add(src);
+	{
+		if (src->GetObject())
+			d->ThingSources.Add(src);
+		else
+			LAssert(!"Not a valid source: no object");
+	}
 }
 
 void ScribeWnd::RemoveThingSrc(ScribeFolder *src)
@@ -8862,82 +8867,75 @@ LMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 
 ScribeFolder *ScribeWnd::GetFolder(const char *Name, LMailStore *s)
 {
-	ScribeFolder *Folder = 0;
+	if (!ValidStr(Name))
+		return NULL;
 
-	if (ValidStr(Name))
+	ScribeFolder *Folder = NULL;
+	LString Sep("/");
+	auto t = LString(Name).Split(Sep);
+	LString TmpName;
+
+	auto trimFirstSeg = [&]()
 	{
-		LString Sep("/");
-		auto t = LString(Name).Split(Sep);
-		LMailStore tmp;
-		LString TmpName;
+		TmpName = Sep.Join(t.Slice(1));
+		Name = TmpName;
+	};
 
-		if (t.Length() > 0)
+	if (t.Length() > 0)
+	{
+		if (!s)
 		{
+			s = GetMailStoreForPath(Name);
+			/*
 			if (!s)
 			{
-				s = GetMailStoreForPath(Name);
-				if (!s)
+				// IMAP folders?
+				for (auto a: Accounts)
 				{
-					// IMAP folders?
-					for (auto a: Accounts)
+					ScribeProtocol Proto = a->Receive.ProtocolType();
+					if (Proto == ProtocolImapFull)
 					{
-						ScribeProtocol Proto = a->Receive.ProtocolType();
-						if (Proto == ProtocolImapFull)
+						ScribeFolder *Root = a->Receive.GetRootFolder();
+						if (Root)
 						{
-							ScribeFolder *Root = a->Receive.GetRootFolder();
-							if (Root)
+							const char *RootStr = Root->GetText();
+							if (RootStr &&
+								a->Receive.GetDataStore() &&
+								!_stricmp(RootStr, t[0]))
 							{
-								const char *RootStr = Root->GetText();
-								if (RootStr &&
-									a->Receive.GetDataStore() &&
-									!_stricmp(RootStr, t[0]))
-								{
-									tmp.Root = Root;
-									tmp.Store = a->Receive.GetDataStore();
-									s = &tmp;
-									break;
-								}
+								tmp.Root = Root;
+								tmp.Store = a->Receive.GetDataStore();
+								s = &tmp;
+								break;
 							}
 						}
 					}
 				}
-				if (s)
-				{
-					if (*Name == '/') Name++;
-					Name = strchr(Name, '/');
-					if (!Name)
-						Name = "/";
-				}
 			}
-			else if (s->Root)
-			{
-				// Check if the store name is on the start of the folder
-				auto RootName = s->Root->GetName(true);
-				if (RootName.Equals(t[0]))
-				{
-					LString::Array a;
-					for (unsigned i=1; i<t.Length(); i++)
-					{
-						a.New() = t[i];
-					}
-					TmpName = Sep.Join(a);
-					Name = TmpName;
-				}
-			}
+			*/
+			if (s)
+				trimFirstSeg();
 		}
-
-		if (!s)
+		else if (s->Root)
 		{
-			s = GetDefaultMailStore();
+			// Check if the store name is on the start of the folder
+			auto RootName = s->Root->GetName(true);
+			if (RootName.Equals(t[0]))
+				trimFirstSeg();
 		}
+	}
 
-		if (s && Name)
-		{
-			if (_stricmp(Name, "/") == 0)
-				return s->Root;
-		
-			Folder = s->Root ? s->Root->GetSubFolder(Name) : 0;
-		}
+	if (!s)
+	{
+		s = GetDefaultMailStore();
+	}
+
+	if (s && Name)
+	{
+		if (_stricmp(Name, "/") == 0)
+			return s->Root;
+	
+		Folder = s->Root ? s->Root->GetSubFolder(Name) : 0;
 	}
 
 	return Folder;

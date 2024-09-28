@@ -1267,7 +1267,7 @@ bool ScribeFolder::LoadFolders()
 		Loaded.Add(c->GetObject(), c);
 	}
 
-	LDataFolderI *s;
+	LDataFolderI *s = NULL;
 	auto &Sub = FldObj->SubFolders();
 	for (unsigned sIdx = 0;
 			Sub.GetState() == Store3Loaded &&
@@ -1279,10 +1279,10 @@ bool ScribeFolder::LoadFolders()
 
 		if (!Loaded.Find(s))
 		{
-			ScribeFolder *n = new ScribeFolder;
-			if (n)
+			if (auto n = new ScribeFolder)
 			{
 				n->App = App;
+				LAssert(s);
 				n->SetObject(s, false, _FL);
 				Insert(n);
 

@@ -368,6 +368,7 @@ struct SocketIpc :
 			bool status = LProcessId() != RemotePid && Args.Length() > 0;
 			LString response;
 			response.Printf("%s:%s\n\n", OptStatus, status ? OptProcessed : OptIgnored);
+			
 			auto wr = c->Write(response.Get(), response.Length());
 			TRACE("%s:%i - Wrote %i status bytes.\n", _FL, (int)wr);
 			Connections.Delete(c);

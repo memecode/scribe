@@ -52,26 +52,21 @@ const char *ToString(CalendarType type)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-LDataUserI::LDataUserI()
-{
-	Object = NULL;
-}
-
 LDataUserI::~LDataUserI()
 {
 	if (Object)
 		Object->UserData = NULL;
 }
 
-LDataI *LDataUserI::GetObject()
-{
-	return Object;
-}
-
 bool LDataUserI::SetObject(LDataI *o, bool InDestuctor, const char *File, int Line)
 {
 	if (o == Object)
 		return true;
+
+	if (!o && ObjectLock)
+	{
+		LAssert(!"Object getting set to NULL.");
+	}
 
 	if (Object)
 	{

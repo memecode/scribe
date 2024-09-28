@@ -28,8 +28,8 @@
 		34452C992AD4A2BF00AE820D /* libiconv.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C902AD4A28500AE820D /* libiconv.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34452C9A2AD4A2C700AE820D /* libchardet.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C8E2AD4A26B00AE820D /* libchardet.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34452C9B2AD4A2D700AE820D /* libbzip2.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C8A2AD4A23C00AE820D /* libbzip2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34452C9C2AD4A2E100AE820D /* libjpeg.9.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C882AD4A22F00AE820D /* libjpeg.9.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		34452C9D2AD4A2EA00AE820D /* libpng16.16.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C862AD4A22000AE820D /* libpng16.16.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34452C9C2AD4A2E100AE820D /* libjpeg.1.58.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C882AD4A22F00AE820D /* libjpeg.1.58.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		34452C9D2AD4A2EA00AE820D /* libpng16.16.45.git.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C862AD4A22000AE820D /* libpng16.16.45.git.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		34452C9E2AD4A30300AE820D /* libaspell-dist-0.60.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3445E5731F1F40DF00D0A824 /* EmojiTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5721F1F40DF00D0A824 /* EmojiTools.cpp */; };
 		3445E5751F1F413200D0A824 /* EmojiMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5741F1F413200D0A824 /* EmojiMap.cpp */; };
@@ -258,8 +258,8 @@
 				34A891E32B0C17B900D2930B /* libcrypto.3.dylib in Copy Files */,
 				34A891E22B0C17B200D2930B /* libssl.3.dylib in Copy Files */,
 				34452C9E2AD4A30300AE820D /* libaspell-dist-0.60.dylib in Copy Files */,
-				34452C9D2AD4A2EA00AE820D /* libpng16.16.dylib in Copy Files */,
-				34452C9C2AD4A2E100AE820D /* libjpeg.9.dylib in Copy Files */,
+				34452C9D2AD4A2EA00AE820D /* libpng16.16.45.git.dylib in Copy Files */,
+				34452C9C2AD4A2E100AE820D /* libjpeg.1.58.dylib in Copy Files */,
 				34452C9B2AD4A2D700AE820D /* libbzip2.dylib in Copy Files */,
 				34452C9A2AD4A2C700AE820D /* libchardet.dylib in Copy Files */,
 				34452C992AD4A2BF00AE820D /* libiconv.dylib in Copy Files */,
@@ -330,13 +330,13 @@
 		34417D88205FB69E00D2E80C /* Tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tables.h; path = ../../Utils/Tables/Tables.h; sourceTree = "<group>"; };
 		34417D8D205FD4A500D2E80C /* Ftp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Ftp.cpp; path = ../../../../Lgi/trunk/src/common/Net/Ftp.cpp; sourceTree = "<group>"; };
 		34417DBD205FD5B800D2E80C /* HorzRuleBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HorzRuleBlock.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp; sourceTree = "<group>"; };
-		34452C862AD4A22000AE820D /* libpng16.16.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng16.16.dylib; path = /opt/local/lib/libpng16.16.dylib; sourceTree = "<absolute>"; };
-		34452C882AD4A22F00AE820D /* libjpeg.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjpeg.9.dylib; path = /opt/local/libexec/jpeg/lib/libjpeg.9.dylib; sourceTree = "<absolute>"; };
-		34452C8A2AD4A23C00AE820D /* libbzip2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbzip2.dylib; path = "../../libs/build-release/bzip2-1.0.6/libbzip2.dylib"; sourceTree = "<group>"; };
-		34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libaspell-dist-0.60.dylib"; path = "../../libs/build-release/aspell-0.60.6.1/libaspell-dist-0.60.dylib"; sourceTree = "<group>"; };
-		34452C8E2AD4A26B00AE820D /* libchardet.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libchardet.dylib; path = "../../libs/build-release/libchardet/libchardet.dylib"; sourceTree = "<group>"; };
-		34452C902AD4A28500AE820D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = "../../libs/build-release/libiconv-1.17/libiconv.dylib"; sourceTree = "<group>"; };
-		34452C922AD4A2A000AE820D /* libz.1.3.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.3.1.dylib; path = /opt/local/lib/libz.1.3.1.dylib; sourceTree = "<absolute>"; };
+		34452C862AD4A22000AE820D /* libpng16.16.45.git.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng16.16.45.git.dylib; path = "../../libs/build-release/lib/libpng16.16.45.git.dylib"; sourceTree = SOURCE_ROOT; };
+		34452C882AD4A22F00AE820D /* libjpeg.1.58.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjpeg.1.58.dylib; path = "../../libs/build-release/lib/libjpeg.1.58.dylib"; sourceTree = SOURCE_ROOT; };
+		34452C8A2AD4A23C00AE820D /* libbzip2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbzip2.dylib; path = "../../libs/build-release/lib/libbzip2.dylib"; sourceTree = SOURCE_ROOT; };
+		34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libaspell-dist-0.60.dylib"; path = "../../libs/build-release/lib/libaspell-dist-0.60.dylib"; sourceTree = SOURCE_ROOT; };
+		34452C8E2AD4A26B00AE820D /* libchardet.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libchardet.dylib; path = "../../libs/build-release/lib/libchardet.dylib"; sourceTree = SOURCE_ROOT; };
+		34452C902AD4A28500AE820D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = "../../libs/build-release/lib/libiconv.dylib"; sourceTree = SOURCE_ROOT; };
+		34452C922AD4A2A000AE820D /* libz.1.3.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.3.1.dylib; path = "../../libs/build-release/lib/libz.1.3.1.dylib"; sourceTree = SOURCE_ROOT; };
 		3445E5721F1F40DF00D0A824 /* EmojiTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmojiTools.cpp; path = ../../../../Lgi/trunk/src/common/Text/Emoji/EmojiTools.cpp; sourceTree = "<group>"; };
 		3445E5741F1F413200D0A824 /* EmojiMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmojiMap.cpp; path = ../../../../Lgi/trunk/src/common/Text/Emoji/EmojiMap.cpp; sourceTree = "<group>"; };
 		3445E5761F1F416500D0A824 /* SpellCheckMac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SpellCheckMac.mm; path = ../../../../lgi/trunk/src/mac/cocoa/SpellCheckMac.mm; sourceTree = "<group>"; };
@@ -982,8 +982,8 @@
 				34452C8E2AD4A26B00AE820D /* libchardet.dylib */,
 				34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */,
 				34452C8A2AD4A23C00AE820D /* libbzip2.dylib */,
-				34452C882AD4A22F00AE820D /* libjpeg.9.dylib */,
-				34452C862AD4A22000AE820D /* libpng16.16.dylib */,
+				34452C882AD4A22F00AE820D /* libjpeg.1.58.dylib */,
+				34452C862AD4A22000AE820D /* libpng16.16.45.git.dylib */,
 				34A891DD2B0C177100D2930B /* libcrypto.3.dylib */,
 				34A891E02B0C178000D2930B /* libssl.3.dylib */,
 				3477C5221CC315FC0028B84B /* Cocoa.framework */,
@@ -1582,9 +1582,7 @@
 					../src/Sqlite,
 					../resources,
 					../utils/Tables,
-					../../libs/libchardet/include,
-					../../libs/libchardet/src,
-					"../../libs/aspell-0.60.6.1/interfaces/cc",
+					"../../libs/build-release/include",
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,
@@ -1636,9 +1634,7 @@
 					../src/Sqlite,
 					../resources,
 					../utils/Tables,
-					../../libs/libchardet/include,
-					../../libs/libchardet/src,
-					"../../libs/aspell-0.60.6.1/interfaces/cc",
+					"../../libs/build-release/include",
 					../../../lgi/trunk/include,
 					../../../lgi/trunk/private/common,
 					../../../lgi/trunk/include/lgi/mac/cocoa,

@@ -66,7 +66,7 @@ def checkUniversal():
 			else:
 				print("checkUniversal ok:", lib, archs)
 
-findLibAndLink("libz_local", True)
+findLibAndLink("libz", True)
 findLibAndLink("libpng", False)
 findLibAndLink("libjpeg", False)
 

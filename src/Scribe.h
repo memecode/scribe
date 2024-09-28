@@ -2183,35 +2183,26 @@ public:
 class LMailStore
 {
 public:
-	bool Default, Expanded;
+	bool Default = false, Expanded = true;
 	LString Name;
 	LString Path;
-	LDataStoreI *Store;
-	ScribeFolder *Root;
-
-	LMailStore()
-	{
-		Expanded = true;
-		Default = false;
-		Store = NULL;
-		Root = NULL;
-	}
+	LAutoPtr<LDataStoreI> Store;
+	ScribeFolder *Root = NULL;
 
 	bool IsOk()
 	{
 		return	Store != NULL &&
-				Root != NULL;
+				Root  != NULL;
 	}
 
 	int Priority()
 	{
-		int Ver = Store ? (int)Store->GetInt(FIELD_VERSION) : 0;
-		return Ver;
+		return Store ? (int)Store->GetInt(FIELD_VERSION) : 0;
 	}
 
 	void Empty()
 	{
-		DeleteObj(Store);
+		Store.Reset();
 		Name.Empty();
 		Path.Empty();
 		Root = NULL;
@@ -2376,7 +2367,7 @@ protected:
 	bool			CleanFolders(ScribeFolder *f);
 	void			LoadFolders(std::function<void(bool)> Callback);
 	void			LoadMailStores(std::function<void(bool)> Callback);
-	bool			ProcessFolder(LDataStoreI *&Store, int StoreIdx, char *StoreName);
+	bool			ProcessFolder(LDataStoreI *Store, int StoreIdx, char *StoreName);
 	bool			UnLoadFolders();
 	void			AddFolderToMru(char *FileName);
 	void			AddContactsToMenu(LSubMenu *Menu);
