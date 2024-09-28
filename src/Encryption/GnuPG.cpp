@@ -976,15 +976,15 @@ MailUiGpg::MailUiGpg(ScribeWnd *App, MailUi *Ui, int ColX1, int ColX2, bool Writ
 			c->Position(LCss::PosAbsolute);
 			c->Left(Px(ColX2 - PANEL_BORDER_PX + 1));
 			c->Top(Px(ChkY - PANEL_BORDER_PX));
-			c->Add(d->Enc = new LCheckBox(IDC_ENCRYPT, 0, 0, -1, -1, LLoadString(IDS_GNUPG_ENCRYPT)));
+			c->Add(d->Enc = new LCheckBox(IDC_ENCRYPT, LLoadString(IDS_GNUPG_ENCRYPT)));
 			
 			c = d->Table->GetCell(x++, 0);
 			c->PaddingTop(Px(ChkY - PANEL_BORDER_PX));
-			c->Add(d->Sign = new LCheckBox(IDC_SIGN, 0, 0, -1, -1, LLoadString(IDS_GNUPG_SIGN)));
+			c->Add(d->Sign = new LCheckBox(IDC_SIGN, LLoadString(IDS_GNUPG_SIGN)));
 			
 			c = d->Table->GetCell(x++, 0);
 			c->PaddingTop(Px(ChkY - PANEL_BORDER_PX));
-			c->Add(d->Attach = new LCheckBox(IDC_ATTACH_PUB_KEY, 0, 0, -1, -1, LLoadString(IDS_GNUPG_ATTACH_PUB_KEY)));
+			c->Add(d->Attach = new LCheckBox(IDC_ATTACH_PUB_KEY, LLoadString(IDS_GNUPG_ATTACH_PUB_KEY)));
 		}
 		else
 		{
