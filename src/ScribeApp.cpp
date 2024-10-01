@@ -5467,7 +5467,7 @@ Thing *ScribeWnd::CreateItem(int Type, ScribeFolder *Folder, bool Ui)
 
 	auto FolderStore = Folder && Folder->GetObject() ? Folder->GetObject()->GetStore() : NULL;
 	auto DefaultStore = GetDefaultMailStore();
-	auto Store = FolderStore ? FolderStore : (DefaultStore ? DefaultStore->Store : NULL);
+	LDataStoreI *Store = FolderStore ? FolderStore : (DefaultStore ? DefaultStore->Store.Get() : NULL);
 	if (!Store)
 	{
 		LAssert(!"no store");
