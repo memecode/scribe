@@ -415,7 +415,7 @@ public:
 
 // this is the tree view on the left hand side
 // it contains all the ThingContainers
-class MailTree : public LTree, public LDragDropTarget
+class MailTree : public LTree
 {
 protected:
 	ScribeWnd *App;
@@ -423,7 +423,6 @@ protected:
 	int8 LastWasRoot;
 
 	ThingList *Things() { return App->GetMailList(); }
-	void OnCreate();
 	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState);
 	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState);
 

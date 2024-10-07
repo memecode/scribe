@@ -20,7 +20,7 @@
 
 static char Ws[] = " \t\r\n";
 
-#include "chardet/chardet.h"
+#include "chardet.h"
 
 LString DetectCharset(LString s)
 {

@@ -43,11 +43,6 @@ MailTree::~MailTree()
 {
 }
 
-void MailTree::OnCreate()
-{
-	SetWindow(this);	
-}
-
 ssize_t MailTree::Sizeof()
 {
 	LAssert(0);
