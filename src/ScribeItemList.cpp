@@ -481,11 +481,6 @@ void ThingList::OnColumnDrag(int Col, LMouse &m)
 	}
 }
 
-void ThingList::OnCreate()
-{
-	SetWindow(this);
-}
-
 bool ThingList::OnColumnReindex(LItemColumn *Col, int OldIndex, int NewIndex)
 {
 	return Container->ReindexField(OldIndex, NewIndex);

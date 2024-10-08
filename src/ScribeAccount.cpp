@@ -26,12 +26,11 @@ class ScribeAccountPrivate
 {
 public:
 	// Data
-	int Index;
-	LMenuItem *IdentityItem;
+	size_t Index;
+	LMenuItem *IdentityItem = NULL;
 	
-	ScribeAccountPrivate(ScribeWnd *App, int i)
+	ScribeAccountPrivate(ScribeWnd *App, size_t i)
 	{
-		IdentityItem = 0;
 		Index = i;
 	}
 };
@@ -248,7 +247,7 @@ void ScribeAccount::SetDefaults()
 	}
 }
 
-void ScribeAccount::SetIndex(int i)
+void ScribeAccount::SetIndex(size_t i)
 {
 	d->Index = i;
 }
@@ -285,32 +284,54 @@ void ScribeAccount::CreateMaps()
 	Receive.CreateMaps();
 }
 
-void ScribeAccount::ReIndex(int i)
+bool ScribeAccount::ReIndex(ssize_t i)
 {
-	auto Key = Receive.OptionName(NULL);
-	EmptyMaps();
+	if (d->Index == i)
+	{
+		// Same as existing index... no-op
+		return true;
+	}
 
+	auto Opts = GetApp()->GetOptions();
+	auto OldKey = Receive.OptionName(NULL);
+	auto NewKey = Receive.OptionName(NULL, i);
+	if (Opts->LockTag(NewKey, _FL))
+	{
+		Opts->Unlock();
+
+		// The new key already exists... this will cause namespace clashes
+		// Rename the destination FIRST and then re-index this account.
+		LAssert(!"Dest index already exists.");
+		return false;
+	}
+
+	EmptyMaps();
 	if (i >= 0)
 	{
-		LXmlTag *Tag = GetApp()->GetOptions()->LockTag(Key, _FL);
+		LString oldName = Receive.Name().Str();
+
+		auto Tag = Opts->LockTag(OldKey, _FL);
 		if (Tag)
 		{
-			sprintf_s(Key, sizeof(Key), "Account-%i", i);
-			Tag->SetTag(Key);
+			NewKey.Printf("Account-" LPrintfSizeT, i);
+			Tag->SetTag(NewKey);
 			d->Index = i;
+			// LgiTrace("%s:%i - reindex %p(%s->%s) to %s\n", _FL, this, oldName.Get(), Receive.Name().Str(), NewKey.Get());
 			
-			GetApp()->GetOptions()->Unlock();
+			Opts->Unlock();
 		}
 
 		CreateMaps();
 	}
 	else
 	{
-		GetApp()->GetOptions()->DeleteTag(Key);
+		GetApp()->GetOptions()->DeleteTag(OldKey);
 	}
+
+	return true;
 }
 
-int ScribeAccount::GetIndex()
+ssize_t ScribeAccount::GetIndex()
 {
 	LAssert(d != NULL);
 	return d ? d->Index : -1;

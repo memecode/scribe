@@ -3641,7 +3641,7 @@ ScribeAccount *ScribeWnd::GetCurrentAccount()
 		LAssert(!"No current identity?");
 		
 		// Find a valid account to be the identity...
-		for (auto a : Accounts)
+		for (auto a: Accounts)
 		{
 			if (!a->Send.Disabled() &&
 				a->Identity.IsValid())
@@ -3680,13 +3680,14 @@ void ScribeWnd::SetupAccounts()
 	LAssert(ReceiveMenu && PreviewMenu);
 	#endif
 
-	if (SendMenu) SendMenu->Empty();
-	if (ReceiveMenu) ReceiveMenu->Empty();
-	if (PreviewMenu) PreviewMenu->Empty();
+	if (SendMenu)
+		SendMenu->Empty();
+	if (ReceiveMenu)
+		ReceiveMenu->Empty();
+	if (PreviewMenu)
+		PreviewMenu->Empty();
 	if (IdentityMenu)
-	{
 		IdentityMenu->Empty();
-	}
 
 	static bool Startup = true;
 
@@ -3694,15 +3695,11 @@ void ScribeWnd::SetupAccounts()
 	LArray<ScribeAccount*> Enabled;
 	for (i=0; true; i++)
 	{
-		// char *s = 0;
-
-		ScribeAccount *a = Startup ? new ScribeAccount(this, i) : Accounts[i];
+		auto a = Startup ? new ScribeAccount(this, i) : Accounts[i];
 		if (a)
 		{
 			if (i == 0)
-			{
 				a->Create();
-			}
 			
 			a->Register(this);
 
@@ -7402,7 +7399,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 							if (a->Receive.Disabled())
 								a->Receive.Disconnect();
 							else
-								Receive(a->GetIndex());
+								Receive((int)a->GetIndex());
 						}
 					}
 
@@ -7851,7 +7848,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 					#if LOG_RECEIVE_ALL				
 					LgiTrace("%s:%i - %i/%s will connect.\n", _FL, a->GetIndex(), desc.Get());
 					#endif
-					Receive(a->GetIndex());
+					Receive((int) a->GetIndex());
 				}
 				i++;
 			}
@@ -8675,16 +8672,14 @@ int ScribeWnd::GetFolderType(ScribeFolder *f)
 
 ScribeFolder *ScribeWnd::GetCurrentFolder()
 {
-	if (Tree)
-	{
-		auto *Item = Tree->Selection();
-		if (Item)
-		{
-			return dynamic_cast<ScribeFolder*>(Item);
-		}
-	}
+	if (!Tree)
+		return NULL;
 
-	return 0;
+	auto *Item = Tree->Selection();
+	if (!Item)
+		return NULL;
+
+	return dynamic_cast<ScribeFolder*>(Item);
 }
 
 bool ScribeWnd::GetSystemPath(int Folder, LVariant &Path)
@@ -8712,7 +8707,7 @@ LMailStore *ScribeWnd::GetMailStoreForIdentity(const char *IdEmail)
 		return NULL;
 	
 	ScribeAccount *a = NULL;
-	for (auto Acc : Accounts)
+	for (auto Acc: Accounts)
 	{
 		LVariant e = Acc->Identity.Email();
 		if (e.Str() && !_stricmp(e.Str(), IdEmail))
@@ -8724,7 +8719,7 @@ LMailStore *ScribeWnd::GetMailStoreForIdentity(const char *IdEmail)
 	if (!a)
 		return NULL;
 
-	LVariant DestPath = a->Receive.DestinationFolder();
+	auto DestPath = a->Receive.DestinationFolder();
 	if (!DestPath.Str())
 		return NULL;
 	
@@ -8755,8 +8750,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 		if (ValidStr(FolderName.Str()) &&
 			strlen(FolderName.Str()) > 0)
 		{
-			ScribeFolder *c = GetFolder(FolderName.Str(), Store);
-			if (c)
+			if (auto c = GetFolder(FolderName.Str(), Store))
 			{
 				return c;
 			}
@@ -8769,7 +8763,6 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 	}
 	else if (!Quiet)
 	{
-		// LgiTrace("%s:%i - No option '%s'\n", _FL, KeyName);
 		NoOption = true;
 	}
 
@@ -8786,7 +8779,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 		case FOLDER_GROUPS:
 		case FOLDER_SPAM:
 		{
-			ScribeFolder *c = GetFolder(DefaultFolderNames[Id], Store);
+			auto c = GetFolder(DefaultFolderNames[Id], Store);
 			if (!c)
 			{
 				// if (!Quiet)

@@ -188,7 +188,7 @@ extern LSubMenu *BuildMarkMenu(	LSubMenu *MarkMenu,
 								bool All = false,
 								bool Select = false);
 
-class AddressList : public LList, public LDragDropTarget
+class AddressList : public LList
 {
 	ScribeWnd *App;
 	
@@ -370,8 +370,7 @@ public:
 // this is the list pane that displays the
 // contents of a ScribeFolder
 class ThingList :
-	public LList,
-	public LDragDropTarget
+	public LList
 {
 	friend class Mail;
 
@@ -403,7 +402,6 @@ public:
 	bool OnKey(LKey &k);
 	void OnColumnDrag(int Col, LMouse &m);
 	bool OnColumnReindex(LItemColumn *Col, int OldIndex, int NewIndex);
-	void OnCreate();
 
 	List<Thing> PlaceHolders;
 	void DeletePlaceHolders();
@@ -633,6 +631,7 @@ class OptionsDlg : public TabDialog, public LXmlTreeUi
 	int SinkHnd;
 	ScribeAccountItem *LastRecord;
 
+	void ReindexAccounts();
 	void UpdateDefaultSendAccounts();
 	void UpdateFontDescription();
 	bool PasswordCtrlValue(int CtrlId, char *Option, bool ToWindow);

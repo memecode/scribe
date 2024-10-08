@@ -791,15 +791,15 @@ bool Accountlet::IsCancelled()
 	return Thread ? Thread->IsCancelled() : false;
 }
 
-LString Accountlet::OptionName(const char *Opt)
+LString Accountlet::OptionName(const char *Opt, ssize_t Index)
 {
 	LString opt;
-	int Idx = Account->GetIndex();
+	auto Idx = Index >= 0 ? Index : Account->GetIndex();
 	LAssert(Idx >= 0);
 	if (Opt)
-		opt.Printf("Accounts.Account-%i.%s", Idx, Opt);
+		opt.Printf("Accounts.Account-" LPrintfSSizeT ".%s", Idx, Opt);
 	else
-		opt.Printf("Accounts.Account-%i", Idx);
+		opt.Printf("Accounts.Account-" LPrintfSSizeT, Idx);
 	return opt;
 }
 
@@ -974,7 +974,7 @@ bool SendAccountlet::InitMenus()
 				strcat(Name+strlen(Name), "\tCtrl-S");
 			}
 
-			SendItem = GetApp()->SendMenu->AppendItem(Name, IDM_SEND_FROM+Account->GetIndex(), true);
+			SendItem = GetApp()->SendMenu->AppendItem(Name, IDM_SEND_FROM+(int)Account->GetIndex(), true);
 		}
 
 		return true;
@@ -1520,20 +1520,20 @@ bool ReceiveAccountlet::InitMenus()
 		// Add preview menuitem
 		if (GetApp()->PreviewMenu)
 		{
-			PreviewItem = GetApp()->PreviewMenu->AppendItem(Name, IDM_PREVIEW_FROM+Account->GetIndex(), !Disabled());
+			PreviewItem = GetApp()->PreviewMenu->AppendItem(Name, IDM_PREVIEW_FROM+(int)Account->GetIndex(), !Disabled());
 		}
 
 		// Add shortcut
 		if (Account->GetIndex() < 9)
 		{
 			size_t Len = strlen(Name);
-			sprintf_s(Name+Len, sizeof(Name)-Len, "\tCtrl+%i", Account->GetIndex()+1);
+			sprintf_s(Name+Len, sizeof(Name)-Len, "\tCtrl+" LPrintfSSizeT, Account->GetIndex()+1);
 		}
 
 		// Add receive menuitem
 		if (GetApp()->ReceiveMenu)
 		{
-			ReceiveItem = GetApp()->ReceiveMenu->AppendItem(Name, IDM_RECEIVE_FROM+Account->GetIndex(), !Disabled());
+			ReceiveItem = GetApp()->ReceiveMenu->AppendItem(Name, IDM_RECEIVE_FROM+(int)Account->GetIndex(), !Disabled());
 		}
 
 		return true;

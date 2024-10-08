@@ -822,7 +822,6 @@
 #define IDC_START_IN							1015
 #define IDC_SET_START_IN						1016
 #define IDM_LAYOUT4								1017
-#define IDC_DOWN								1018
 #define IDM_REFRESH								1019
 #define IDS_ERROR_REG_WRITE						1020
 #define IDS_ERROR_NEED_INSTALL					1021
@@ -1108,7 +1107,6 @@
 #define IDS_GNUPG_PSW_PROMPT					1473
 #define IDC_V1									1481
 #define IDC_V2									1482
-#define IDC_UP									1483
 #define IDS_GROWL_SUPPORT						1485
 #define IDS_GROWL								1486
 #define IDC_MSG_DEL_ACTION						1487

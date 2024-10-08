@@ -322,7 +322,7 @@ public:
 	}
 };
 
-class ResultList : public LList, public LDragDropSource
+class ResultList : public LList
 {
 	friend int FindCompare(LListItem *a, LListItem *b, NativeInt Data);
 

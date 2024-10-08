@@ -78,6 +78,7 @@ public:
 class AccountItem : public LListItem
 {
 	OptionsDlg *Dlg;
+	LVariant Cache;
 
 public:
 	ScribeAccount *Account;
@@ -153,42 +154,27 @@ public:
 
 const char *AccountItem::GetText(int i)
 {
-	if (Account)
+	if (!Account)
+		return "#noAccount";
+
+	switch (i)
 	{
-		switch (i)
-		{
-			case 0:
+		case 0:
+			Cache = Account->Receive.Name();
+			if (!Cache.Str())
 			{
-				static char Buf[64];
-				LVariant Text = Account->Receive.Name();
-				if (!Text.Str())
-				{
-					Text = Account->Receive.Server();
-					if (!Text.Str())
-					{
-						Text = Account->Send.Server();
-					}
-				}
-				if (Text.Str())
-				{
-					strcpy_s(Buf, sizeof(Buf), Text.Str());
-					return Buf;
-				}
-				break;
+				Cache = Account->Receive.Server();
+				if (!Cache.Str())
+					Cache = Account->Send.Server();
 			}
-			case 1:
-			{
-				return Account->Send.Server().Str() ? (char*)"yes" : 0;
-				break;
-			}
-			case 2:
-			{
-				return Account->Receive.Server().Str() ? (char*)"yes" : 0;
-				break;
-			}
-		}
+			return Cache.Str();
+		case 1:
+			return Account->Send.Server().Str() ? "yes" : NULL;
+		case 2:
+			return Account->Receive.Server().Str() ? "yes" : NULL;
 	}
-	return 0;
+
+	return NULL;
 }
 
 int LangCompare(LLanguage *a, LLanguage *b, NativeInt d)
@@ -262,25 +248,35 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) : TabDialog(IDC_TAB, IDC_LAUNCH_HELP)
 
 	MoveToCenter();
 
-	LList *ACtrl;
-	if (GetViewById(IDC_ACCOUNTS, ACtrl))
+	LList *AccountLst;
+	if (GetViewById(IDC_ACCOUNTS, AccountLst))
 	{
-		for (auto a : *App->GetAccounts())
+		for (auto a: *App->GetAccounts())
 		{
-			AccountItem *i = new AccountItem(this, a);
-			if (i)
+			if (auto i = new AccountItem(this, a))
 			{
-				ACtrl->Insert(i);
-				if (ACtrl->Length() == 1)
-				{
+				AccountLst->Insert(i);
+				if (AccountLst->Length() == 1)
 					i->Select(true);
-				}
 			}
 		}
 
 		LNotification note(LNotifyItemInsert);
-		OnNotify(ACtrl, note);
-		ACtrl->Sort(AccountCmp);
+		OnNotify(AccountLst, note);
+		AccountLst->Sort(AccountCmp);
+
+		LArray<AccountItem*> all;
+		AccountLst->GetAll(all);
+		for (int i=0; i<all.Length(); i++)
+		{
+			auto item = all[i];
+			auto acc = item->GetAccount();
+			LgiTrace("load[%i] acc=%p(%s) item=%p\n",
+				i, acc, acc->Receive.Name().Str(), item);
+		}
+
+		// Enable re-ordering via drag
+		AccountLst->SetDragItem(LItemContainer::ITEM_DRAG_REORDER);
 	}
 
 	// Identity tab
@@ -346,7 +342,7 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) : TabDialog(IDC_TAB, IDC_LAUNCH_HELP)
 	if (GetViewById(IDC_ADVANCED, Ct))
 	{
 		Ct->SetPourLargest(true);
-		LControlTree::Item *ci = Ct->Find(OPT_LogFormat);
+		auto ci = Ct->Find(OPT_LogFormat);
 		if (ci)
 		{
 			LAutoPtr<LControlTree::Item::EnumArr> Enum(new LControlTree::Item::EnumArr);
@@ -686,6 +682,62 @@ void OptionsDlg::WriteNativeText(LFile &f, char *t)
 	#endif
 }
 
+void OptionsDlg::ReindexAccounts()
+{
+	App->GetAccountSettingsAccess(this, ScribeWriteAccess, [this](auto Allow)
+	{
+		if (!Allow)
+			return;
+
+		LList *AccountLst;
+		List<AccountItem> a;
+		if (!GetViewById(IDC_ACCOUNTS, AccountLst) ||
+			!AccountLst->GetAll(a))
+			return;
+
+		LHashTbl<IntKey<ssize_t>, ScribeAccount*> map;
+		for (auto item: a)
+			map.Add(item->GetAccount()->GetIndex(), item->GetAccount());
+
+		ssize_t tmpIndex = map.Length() + 10;
+
+		for (size_t i=0; i<a.Length(); i++)
+		{
+			if (auto Acc = a[i]->GetAccount())
+			{
+				if (Acc->GetIndex() == i)
+					continue;
+
+				if (auto target = map.Find(i))
+				{
+					// Move account at the target index to a temporary index
+					// LgiTrace("moving account %i to %i (%s)\n", (int)target->GetIndex(), (int)tmpIndex, target->Receive.Name().Str());
+					target->ReIndex(tmpIndex++);
+				}
+
+				Acc->ReIndex(i);
+			}
+			else LAssert(!"no account object?");
+		}
+
+		// Rename any tmp value ones back to their proper locations...
+		for (size_t i=0; i<a.Length(); i++)
+		{
+			auto item = a[i];
+			if (auto acc = item->GetAccount())
+			{
+				if (i != acc->GetIndex())
+					acc->ReIndex(i);
+
+				/*
+				LgiTrace("after[%i] = %i %s\n",
+					(int)i, (int)acc->GetIndex(), acc->Receive.Name().Str());
+				*/
+			}
+		}
+	});
+}
+
 int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 {
 	if (!Ctrl) return 0;
@@ -804,10 +856,36 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 		}
 		case IDC_ACCOUNTS:
 		{
-			if (n.Type == LNotifyItemInsert ||
-				n.Type == LNotifyItemDelete)
+			switch (n.Type)
 			{
-				UpdateDefaultSendAccounts();
+				case LNotifyItemInsert:
+				case LNotifyItemDelete:
+				{
+					UpdateDefaultSendAccounts();
+					break;
+				}
+				case LNotifyContainerReorder:
+				{
+					/*
+					LList *AccountLst;
+					if (GetViewById(IDC_ACCOUNTS, AccountLst))
+					{
+						LArray<AccountItem*> all;
+						AccountLst->GetAll(all);
+						for (int i=0; i<all.Length(); i++)
+						{
+							auto item = all[i];
+							auto acc = item->GetAccount();
+							LgiTrace("reindex[%i] acc=%p(%s) item=%p\n",
+								i, acc, acc->Receive.Name().Str(), item);
+						}
+					}
+					*/
+
+					// Save the reordered list indexes into the accounts themselves:
+					ReindexAccounts();
+					break;
+				}
 			}
 			break;
 		}
@@ -858,7 +936,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 					// For all selected
 					for (auto i: Sel)
 					{
-						ScribeAccount *a = i->GetAccount();
+						auto a = i->GetAccount();
 						if (a->IsOnline())
 						{
 							LgiMsg(	this,
@@ -878,62 +956,8 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
 						}
 					}
 
-					{
-						// Reindex remaining items so their are no gaps
-						int i=0;
-						for (auto a: *AList)
-						{
-							a->ReIndex(i++);
-						}
-					}
+					ReindexAccounts();
 				}
-			});
-			break;
-		}
-		case IDC_UP:
-		case IDC_DOWN:
-		{
-			App->GetAccountSettingsAccess(this, ScribeWriteAccess, [this, Ctrl](auto Allow)
-			{
-				if (!Allow)
-					return;
-
-				List<AccountItem> a;
-				LList *ACtrl;
-				if (!GetViewById(IDC_ACCOUNTS, ACtrl) || !ACtrl->GetAll(a))
-					return;
-
-				AccountItem *Sel = NULL;
-				for (int i=0; i<a.Length(); i++)
-				{
-					if (a[i]->Select())
-					{
-						Sel = a[i];
-						break;
-					}
-				}
-			
-				if (!Sel)
-					return;
-				
-				bool IsUp = Ctrl->GetId() == IDC_UP;
-				int Idx = ACtrl->IndexOf(Sel);
-				int NewIdx = IsUp ? Idx - 1 : Idx + 1;
-				if (NewIdx < 0)
-					return;
-				ACtrl->Remove(Sel);
-				ACtrl->Insert(Sel, NewIdx);
-				Sel->Select(true);
-
-				ACtrl->GetAll(a);
-				for (int i=0; i<a.Length(); i++)
-				{
-					ScribeAccount *Acc = a[i]->GetAccount();
-					if (Acc)
-						Acc->Identity.Sort(i+1);
-				}
-			
-				ACtrl->Sort(AccountCmp);
 			});
 			break;
 		}

@@ -1817,7 +1817,7 @@ public:
 	void Kill();
 
 	// Data
-	LString OptionName(const char *Opt);
+	LString OptionName(const char *Opt, ssize_t Index = -1);
 	void Delete();
 	LThread *GetThread() { return Thread; }
 	LMailStore *GetMailStore() { return MailStore; }
@@ -2102,7 +2102,7 @@ protected:
 	ScribeWnd *Parent;
 	
 	ScribeFolder *&GetRoot();
-	void SetIndex(int i);
+	void SetIndex(size_t i);
 
 public:
 	// Data
@@ -2124,7 +2124,7 @@ public:
 
 	// Properties
 	ScribeWnd *GetApp() { return Parent; }
-	int GetIndex();
+	ssize_t GetIndex();
 	bool IsOnline();
 	void SetCheck(bool c);
 	LMenuItem *GetMenuItem();
@@ -2149,7 +2149,7 @@ public:
 
 	// Worker
 	void OnPulse(char *s = NULL, int s_len = 0);
-	void ReIndex(int i);
+	bool ReIndex(ssize_t i);
 	void CreateMaps();
 
 	// LDom interface
