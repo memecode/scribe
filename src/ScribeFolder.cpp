@@ -2705,7 +2705,7 @@ void ScribeFolder::OnUpdateUnRead(int Offset, bool ScanItems)
 
 		if (OldUnRead != GetUnRead())
 		{
-			for (LTreeItem *i = GetParent(); i; i = i->GetParent())
+			for (auto i = GetParent(); i; i = i->GetParent())
 			{
 				ScribeFolder *tc = dynamic_cast<ScribeFolder*>(i);
 				if (tc && tc->GetParent())

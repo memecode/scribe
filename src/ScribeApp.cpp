@@ -5102,7 +5102,7 @@ ScribeWnd::LayoutMode ScribeWnd::GetEffectiveLayoutMode()
 	GetOptions()->GetValue(OPT_LayoutMode, Mode);
 	ScribeFolder *Cur = GetCurrentFolder();
 	
-	if (Cur && Cur->IsRoot())
+	if (Cur && !Cur->IsItem())
 	{
 		Mode = FoldersAndList;
 	}

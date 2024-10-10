@@ -421,9 +421,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 ./src/Sqlite
 ./resources
 ./utils/Tables
-../libs/aspell-0.60.6.1/interfaces/cc
-../libs/libchardet/src
-../libs/libchardet/include
+../libs/build-x64-debug/include
 ../../lgi/trunk/include
 ../../lgi/trunk/private/common
 </Debug>
@@ -432,9 +430,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 ./src/Sqlite
 ./resources
 ./utils/Tables
-../libs/aspell-0.60.6.1/interfaces/cc
-../libs/libchardet/src
-../libs/libchardet/include
+../libs/build-x64-release/include
 ../../lgi/trunk/include
 ../../lgi/trunk/private/common
 </Release>
@@ -518,7 +514,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
 					<Release>`pkg-config --cflags gtk+-3.0`</Release>
 				</Linux>
-				<Haiku />
 			</SystemIncludes>
 			<LibraryPaths>
 				<All>
@@ -528,13 +523,14 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>../libs/build-x64-release/libchardet
 ../libs/build-x64-release/bzip2-1.0.6</Release>
 				</All>
-				<Haiku />
+				<Linux />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
 					<Debug>scribe</Debug>
 					<Release>scribe</Release>
 				</Haiku>
+				<Linux />
 			</TargetName>
 			<Options>
 				<Linux>
@@ -542,7 +538,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>-Wno-format-truncation</Release>
 				</Linux>
 				<All />
-				<Haiku />
 			</Options>
 			<ApplicationIcon>
 				<Haiku>./resources/scribe.hvif</Haiku>
@@ -566,7 +561,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 		</Editor>
 		<Advanced>
 			<PostBuildCommands>
-				<Haiku />
+				<Linux />
 			</PostBuildCommands>
 			<OtherMakefileRules />
 		</Advanced>
