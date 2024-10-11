@@ -287,7 +287,7 @@ FolderDlg::FolderDlg(	LViewI *parent,
 				LMailStore *Def = d->App->GetDefaultMailStore();
 				if (Def)
 				{
-					Root = Def->Root;
+					Root = Def->GetRoot();
 					while (Root->GetPrev())
 					{
 						Root = dynamic_cast<ScribeFolder*>(Root->GetPrev());

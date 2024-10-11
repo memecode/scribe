@@ -598,7 +598,7 @@ ScribeExportTask::ScribeExportTask(ScribeExportDlg *dlg) :
 
 	// Work out the folders we need to operate on:
 	if (Params.AllFolders)
-		CollectPaths(SrcStore->Root, InputPaths);
+		CollectPaths(SrcStore->GetRoot(), InputPaths);
 	else
 		InputPaths = Params.SrcPaths;
 	SetRange(InputPaths.Length());

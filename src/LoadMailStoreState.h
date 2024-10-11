@@ -346,9 +346,9 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 				Folder->LoadThings();
 			for (auto &ms: App->Folders)
 			{
-				if (!ms.Root)
+				if (!ms.GetRoot())
 					continue;
-				for (auto c = ms.Root->GetChildFolder(); c; c = c->GetNextFolder())
+				for (auto c = ms.GetRoot()->GetChildFolder(); c; c = c->GetNextFolder())
 				{
 					if (c->GetItemType() == MAGIC_CONTACT ||
 						c->GetItemType() == MAGIC_FILTER)

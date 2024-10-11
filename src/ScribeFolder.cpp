@@ -161,7 +161,10 @@ ScribeFolder::ScribeFolder()
 
 ScribeFolder::~ScribeFolder()
 {
-	bool IsRoot = !GetParent();
+	bool isRoot = IsRoot();
+
+	if (BeforeDelete)
+		BeforeDelete();		
 
 	if (CurState != FldState_Idle)
 	{
@@ -221,7 +224,7 @@ ScribeFolder::~ScribeFolder()
 
 	ScribeFolder *f = GetChildFolder();
 	DeleteObj(f);
-	if (!IsRoot)
+	if (!isRoot)
 	{
 		f = GetNextFolder();
 		DeleteObj(f);

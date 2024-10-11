@@ -7972,16 +7972,16 @@ void Mail::DeleteAsSpam(LView *View)
 			if (GetFolder()->GetObject()->GetInt(FIELD_STORE_TYPE) == Store3Imap)
 			{
 				Ms = App->GetDefaultMailStore();
-				if (Ms && Ms->Root)
+				if (Ms && Ms->GetRoot())
 				{
-					Spam = Ms->Root->GetSubFolder(SpamLeaf);
+					Spam = Ms->GetRoot()->GetSubFolder(SpamLeaf);
 					if (!Spam)
-						Spam = Ms->Root->CreateSubFolder(SpamLeaf, MAGIC_MAIL);
+						Spam = Ms->GetRoot()->CreateSubFolder(SpamLeaf, MAGIC_MAIL);
 				}
 			}
 			else LgiMsg(View, "Error: Couldn't get mail store for '%s'.", AppName, MB_OK, FolderPath.Get());
 		}
-		else Spam = Ms->Root->CreateSubFolder("Spam", MAGIC_MAIL);
+		else Spam = Ms->GetRoot()->CreateSubFolder("Spam", MAGIC_MAIL);
 	}
 
 	if (Spam && Spam != GetFolder())

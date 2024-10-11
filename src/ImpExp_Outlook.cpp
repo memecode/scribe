@@ -883,9 +883,10 @@ public:
 			case IDOK:
 			{
 				LArray<LTreeItem*> p;
-				for (LTreeItem *s = Tree ? Tree->Selection() : 0; s; s = s->GetParent())
+				for (LTreeNode *s = Tree ? Tree->Selection() : 0; s; s = s->GetParent())
 				{
-					p.AddAt(0, s);
+					if (auto item = s->IsItem())
+						p.AddAt(0, item);
 				}
 				LStringPipe n;
 				for (unsigned i=1; i<p.Length(); i++)

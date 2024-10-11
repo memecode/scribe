@@ -1219,8 +1219,8 @@ bool BayesianFilter::BuildSpamDb()
 	// Recurse over the folders
 	for (auto &s: App->GetStorageFolders())
 	{
-		if (s.Root)
-			AddFolderToSpamDb(s.Root);
+		if (s.GetRoot())
+			AddFolderToSpamDb(s.GetRoot());
 	}
 		
 	for (auto a : *App->GetAccounts())

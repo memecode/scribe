@@ -2796,9 +2796,9 @@ bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 				auto Ms = GetMailStoreForPath(name);
 				if (!Ms)
 					return NULL;
-				if (!Ms->Root)
+				if (!Ms->GetRoot())
 					return NULL;
-				auto obj = Ms->Root->GetObject();
+				auto obj = Ms->GetRoot()->GetObject();
 				return dynamic_cast<LDataFolderI*>(obj);
 			};
 
@@ -2881,10 +2881,6 @@ int OptionsFileCmp(OptionsInfo *a, OptionsInfo *b)
 
 OptionsInfo::OptionsInfo()
 {
-	Score = 0;
-	Mod = 0;
-	Leaf = NULL;
-	Usual = false;
 }
 	
 OptionsInfo &OptionsInfo::operator =(char *p)
@@ -4589,16 +4585,17 @@ bool ScribeWnd::ProcessFolder(LDataStoreI *Store, int StoreIdx, char *StoreName)
 	}
 
 	// get root item
-	LDataFolderI *Root = Store->GetRoot();
+	auto Root = Store->GetRoot();
 	if (!Root)
 		return false;
 
-	ScribeFolder *&Mailbox = Folders[StoreIdx].Root;
-	Mailbox = new ScribeFolder;
-	if (Mailbox)
+	auto &MailStore = Folders[StoreIdx];
+	auto Folder = new ScribeFolder;
+	if (Folder)
 	{
-		Mailbox->App = this;
-		Mailbox->SetObject(Root, false, _FL);
+		MailStore.SetRoot(Folder);
+		Folder->App = this;
+		Folder->SetObject(Root, false, _FL);
 
 		Root->SetStr(FIELD_FOLDER_NAME, StoreName);
 		Root->SetInt(FIELD_FOLDER_TYPE, MAGIC_NONE);
@@ -4618,12 +4615,12 @@ bool ScribeWnd::ProcessFolder(LDataStoreI *Store, int StoreIdx, char *StoreName)
 	#endif
 
 	// Insert the root object and then...
-	Tree->Insert(Mailbox);
+	Tree->Insert(Folder);
 
 	// Recursively load the rest of the tree
 	{
 		// LProfile p("Loadfolders");
-		Mailbox->LoadFolders();
+		Folder->LoadFolders();
 	}
 				
 	// This forces a re-pour to re-order the folders according to their
@@ -4633,7 +4630,7 @@ bool ScribeWnd::ProcessFolder(LDataStoreI *Store, int StoreIdx, char *StoreName)
 	if (ScribeState != ScribeExiting)
 	{
 		// Show the tree
-		Mailbox->Expanded(Folders[StoreIdx].Expanded);
+		Folder->Expanded(Folders[StoreIdx].Expanded);
 
 		// Checks the folders for a number of required objects
 		// and creates them if required
@@ -4877,9 +4874,9 @@ bool ScribeWnd::UnLoadFolders()
 		for (size_t i=0; i<Folders.Length(); i++)
 		{
 			// Save the expanded state...
-			if (Folders[i].Root)
+			if (Folders[i].GetRoot())
 			{
-				bool Expanded = Folders[i].Root->Expanded();
+				bool Expanded = Folders[i].GetRoot()->Expanded();
 
 				for (auto ms: MailStores->Children)
 				{
@@ -4892,7 +4889,7 @@ bool ScribeWnd::UnLoadFolders()
 				}
 			}
 
-			DeleteObj(Folders[i].Root);
+			Folders[i].DeleteRoot();
 			Folders[i].Store.Reset();
 		}
 
@@ -7718,12 +7715,13 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_REFRESH:
 		{
-			ScribeFolder *f = GetCurrentFolder();
+			auto f = GetCurrentFolder();
 			if (!f)
 				break;
 			
-			const char *s = DomToStr(SdRefresh);
-			f->GetFldObj()->OnCommand(s);
+			auto s = DomToStr(SdRefresh);
+			if (auto obj = f->GetFldObj())
+				obj->OnCommand(s);
 			break;
 		}
 
@@ -8046,7 +8044,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 										LString p = SpamPath.Str();
 										LString::Array a = p.SplitDelimit("/");
 									
-										Spam = RelevantStore->Root;
+										Spam = RelevantStore->GetRoot();
 										for (unsigned i=1; i<a.Length(); i++)
 										{
 											ScribeFolder *c = Spam->GetSubFolder(a[i]);
@@ -8846,7 +8844,7 @@ LMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 		{
 			if (Folders[i].IsOk())
 			{
-				const char *RootStr = Folders[i].Root->GetText();
+				const char *RootStr = Folders[i].GetRoot()->GetText();
 				if (RootStr && !_stricmp(RootStr, First))
 				{
 					return &Folders[i];
@@ -8909,10 +8907,10 @@ ScribeFolder *ScribeWnd::GetFolder(const char *Name, LMailStore *s)
 			if (s)
 				trimFirstSeg();
 		}
-		else if (s->Root)
+		else if (s->GetRoot())
 		{
 			// Check if the store name is on the start of the folder
-			auto RootName = s->Root->GetName(true);
+			auto RootName = s->GetRoot()->GetName(true);
 			if (RootName.Equals(t[0]))
 				trimFirstSeg();
 		}
@@ -8926,9 +8924,9 @@ ScribeFolder *ScribeWnd::GetFolder(const char *Name, LMailStore *s)
 	if (s && Name)
 	{
 		if (_stricmp(Name, "/") == 0)
-			return s->Root;
+			return s->GetRoot();
 	
-		Folder = s->Root ? s->Root->GetSubFolder(Name) : 0;
+		Folder = s->GetRoot() ? s->GetRoot()->GetSubFolder(Name) : NULL;
 	}
 
 	return Folder;
@@ -9197,7 +9195,7 @@ bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 		if (_strnicmp(p, "/IMAP ", 6) != 0)
 		{
 			LAssert(DefaultFolderTypes[Id] != MAGIC_NONE);
-			Folder = s->Root->CreateSubFolder(*p=='/'?p+1:p, DefaultFolderTypes[Id]);
+			Folder = s->GetRoot()->CreateSubFolder(*p=='/'?p+1:p, DefaultFolderTypes[Id]);
 		}
 	}
 	
@@ -10821,7 +10819,7 @@ void ScribeWnd::OnAfterConnect(ScribeAccount *Account, bool Receive)
 	}
 }
 
-void ScribeWnd::Send(int Which, bool Quiet)
+void ScribeWnd::Send(ssize_t Which, bool Quiet)
 {
 	THREAD_UNSAFE();
 
@@ -10970,7 +10968,7 @@ void ScribeWnd::Send(int Which, bool Quiet)
 	}
 }
 
-void ScribeWnd::Receive(int Which)
+void ScribeWnd::Receive(ssize_t Which)
 {
 	THREAD_UNSAFE();
 
@@ -11162,7 +11160,7 @@ bool ScribeWnd::LaunchHelp(const char *File)
 	return false;
 }
 
-void ScribeWnd::Preview(int Which)
+void ScribeWnd::Preview(ssize_t Which)
 {
 	THREAD_UNSAFE();
 
@@ -12368,3 +12366,56 @@ void ScribeWnd::OnScriptCompileError(const char *Source, Filter *f)
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+ScribeFolder *LMailStore::GetRoot() const
+{
+	return Root;
+}
+
+void LMailStore::SetRoot(ScribeFolder *f)
+{
+	if ((Root = f))
+	{
+		// Something is deleting the ScribeFolder object that root points to outside of the
+		// DeleteRoot function. I want to catch that case and make sure there is no dangling
+		// pointer here to cause a crash.
+		Root->BeforeDelete = [this]()
+		{
+			LAssert(InRootDelete);
+			if (!InRootDelete)
+				Root = NULL;
+		};
+	}
+}
+
+void LMailStore::DeleteRoot()
+{
+	InRootDelete = true;
+	DeleteObj(Root);
+	InRootDelete = false;
+}
+
+bool LMailStore::IsOk() const
+{
+	return	Store != NULL &&
+			Root  != NULL;
+}
+
+int LMailStore::Priority()
+{
+	return Store ? (int)Store->GetInt(FIELD_VERSION) : 0;
+}
+
+void LMailStore::Empty()
+{
+	Store.Reset();
+	Name.Empty();
+	Path.Empty();
+	Root = NULL;
+}
+
+LMailStore &LMailStore::operator =(LMailStore &a)
+{
+	LAssert(0);
+	return *this;
+}

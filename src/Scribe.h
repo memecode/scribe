@@ -1265,6 +1265,7 @@ protected:
 
 public:
 	List<Thing> Items;
+	std::function<void()> BeforeDelete;
 
 	ScribeFolder();
 	~ScribeFolder();
@@ -2182,46 +2183,31 @@ public:
 
 class LMailStore
 {
+	bool InRootDelete = false;
+	ScribeFolder *Root = NULL;
+
 public:
 	bool Default = false, Expanded = true;
 	LString Name;
 	LString Path;
 	LAutoPtr<LDataStoreI> Store;
-	ScribeFolder *Root = NULL;
 
-	bool IsOk()
-	{
-		return	Store != NULL &&
-				Root  != NULL;
-	}
-
-	int Priority()
-	{
-		return Store ? (int)Store->GetInt(FIELD_VERSION) : 0;
-	}
-
-	void Empty()
-	{
-		Store.Reset();
-		Name.Empty();
-		Path.Empty();
-		Root = NULL;
-	}
-
-	LMailStore &operator =(LMailStore &a)
-	{
-		LAssert(0);
-		return *this;
-	}
+	ScribeFolder *GetRoot() const;
+	void SetRoot(ScribeFolder *f);
+	void DeleteRoot();
+	bool IsOk() const;
+	int Priority();
+	void Empty();
+	LMailStore &operator =(LMailStore &a);
 };
 
 struct OptionsInfo
 {
 	LString File;
-	char *Leaf;
-	int Score;
-	uint64 Mod;
-	bool Usual;
+	char *Leaf = NULL;
+	int Score = 0;
+	uint64 Mod = 0;
+	bool Usual = false;
 	
 	OptionsInfo();
 	
@@ -2423,9 +2409,9 @@ public:
 	Mail			*LookupMailRef(const char *MsgRef, bool TraceAllUids = false);
 	bool			CreateFolders(LAutoString &FileName);
 	bool			CompactFolders(LMailStore &Store, bool Interactive = true);
-	void			Send(int Which = -1, bool Quiet = false);
-	void			Receive(int Which);
-	void			Preview(int Which);
+	void			Send(ssize_t Which = -1, bool Quiet = false);
+	void			Receive(ssize_t Which);
+	void			Preview(ssize_t Which);
 	void			OnBeforeConnect(ScribeAccount *Account, bool Receive);
 	void			OnAfterConnect(ScribeAccount *Account, bool Receive);
     bool			NeedsCapability(const char *Name, const char *Param = NULL) override;
