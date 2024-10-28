@@ -126,8 +126,6 @@
 		<Node File="../../lgi/trunk/include/lgi/common/SoftwareUpdate.h" Type="3" Platforms="15" />
 		<Node File="../../lgi/trunk/src/common/Text/TextConvert.cpp" Type="2" Platforms="15" />
 		<Node File="../../lgi/trunk/include/lgi/common/TextConvert.h" Type="3" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/Text/TextView4.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/include/lgi/common/TextView4.h" Type="3" Platforms="15" />
 		<Node File="../../lgi/trunk/src/common/Text/XmlTreeUi.cpp" Type="2" Platforms="15" />
 	</Node>
 	<Node Name="Resource Files" Type="1" Open="0" Platforms="7" Id="12">
