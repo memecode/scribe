@@ -17,7 +17,7 @@ public:
 	~ManageMailStores();
 
 	void OnItemSelect();
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 };
 
 

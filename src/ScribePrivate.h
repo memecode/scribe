@@ -156,7 +156,7 @@ public:
 	void OnLoad();
 	void OnSave();
 	void OnDestroy();
-	int OnNotify(LViewI *Col, LNotification n);
+	int OnNotify(LViewI *Col, LNotification &n) override;
 	LMessage::Result OnEvent(LMessage *Msg);
 	void OnPulse();
 };
@@ -334,7 +334,7 @@ public:
 	bool AddRecipient(AddressDescriptor *Addr);
 	bool AddCalendarEvent(bool AddPopupReminder);
 
-	int OnNotify(LViewI *Col, LNotification n);
+	int OnNotify(LViewI *Col, LNotification &n) override;
 	void OnSysKey(int a, int b);
 	void OnDirty(bool Dirty);
 	void OnDataEntered();
@@ -465,7 +465,7 @@ public:
 	LImageList *GetIcons();
 
 	// Events
-	int OnNotify(LViewI *Col, LNotification n);
+	int OnNotify(LViewI *Col, LNotification &n) override;
 	LMessage::Result OnEvent(LMessage *Msg);
 	int OnCommand(int Cmd, int Event, OsView Window);
 };
@@ -582,7 +582,7 @@ public:
 
 	CreateSubFolderDlg(LView *parent, int defaulttype = 0, bool *enable = NULL, char *default_name = NULL);
 
-	int OnNotify(LViewI *Ctrl, LNotification n);
+	int OnNotify(LViewI *Ctrl, LNotification &n) override;
 };
 
 class LanguageDlg : public LDialog
@@ -596,7 +596,7 @@ public:
 	LanguageDlg(ScribeWnd *app);
 	~LanguageDlg();
 	
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 };
 
 class FolderNameDlg : public LDialog
@@ -610,7 +610,7 @@ public:
 	~FolderNameDlg();
 
 	void OnCreate();
-	int OnNotify(LViewI *Ctrl, LNotification n);
+	int OnNotify(LViewI *Ctrl, LNotification &n) override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -643,7 +643,7 @@ public:
 
 	void OnCreate();
 	void OnAccountEnable(ScribeAccount *Acc, bool Enable);
-	int OnNotify(LViewI *Ctrl, LNotification n);
+	int OnNotify(LViewI *Ctrl, LNotification &n) override;
 	LMessage::Result OnEvent(LMessage *m);
 };
 
@@ -666,7 +666,7 @@ public:
 	SecurityDlg(ScribeWnd *app);
 	~SecurityDlg();
 
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 };
 
 // Bayesian filtering setup
@@ -678,7 +678,7 @@ public:
 	BayesDlg(ScribeWnd *app);
 	~BayesDlg();
 
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////

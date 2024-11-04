@@ -9,7 +9,7 @@ public:
 	PrintPreview(ScribeWnd *App, Mail *m, LPrintDC *pDC);
 	~PrintPreview();
 	
-	int OnNotify(LViewI *Ctrl, LNotification n);
+	int OnNotify(LViewI *Ctrl, LNotification &n) override;
 	void OnPosChange();
 	LSurface *GetImage();
 	LAutoPtr<LMemDC> ReleaseImage();

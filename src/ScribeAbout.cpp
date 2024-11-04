@@ -59,7 +59,7 @@ public:
 		LWindow::OnPosChange();
 	}
 
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		if (c->GetId() == IDOK)
 		{

@@ -15,7 +15,7 @@ public:
 
 	void AddThings(List<Mail> *NewThings);
 
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 };
 
 #endif

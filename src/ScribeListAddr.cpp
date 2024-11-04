@@ -956,7 +956,7 @@ void ListAddr::OnMouseClick(LMouse &m)
 							Update();
 
 							if (LListItem::GetList())
-								LListItem::GetList()->OnNotify(LListItem::GetList(), LNotifyItemChange);
+								LListItem::GetList()->OnNotify(LListItem::GetList(), LNotification(LNotifyItemChange));
 						}
 					});
 					break;

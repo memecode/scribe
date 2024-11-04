@@ -571,7 +571,7 @@ public:
 		return LView::OnEvent(Msg);
 	}
 	
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		if (Ctrl->GetId() == 100)
 		{
@@ -673,7 +673,7 @@ public:
 		LListItem::SetText(s, i);
 		auto Lst = GetList();
 		Lst->ResizeColumnsToContent();
-		Lst->OnNotify(Lst, LNotifyItemChange);
+		Lst->OnNotify(Lst, LNotification(LNotifyItemChange));
 		return true;
 	}
 
@@ -715,7 +715,7 @@ public:
 		Insert(new LFieldItem);
 	}
 
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		if (Ctrl->GetId() == GetId())
 		{
@@ -2274,7 +2274,7 @@ LMessage::Result ContactUi::OnEvent(LMessage *Msg)
 	return ThingUi::OnEvent(Msg);
 }
 
-int ContactUi::OnNotify(LViewI *Ctrl, LNotification n)
+int ContactUi::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	THREAD_UNSAFE(0);
 

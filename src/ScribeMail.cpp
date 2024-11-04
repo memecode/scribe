@@ -947,7 +947,7 @@ public:
 		LWideBorder(pDC, r, DefaultRaisedEdge);
 	}
 
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		switch (c->GetId())
 		{
@@ -3341,7 +3341,7 @@ bool MailUi::AddCalendarEvent(bool AddPopupReminder)
 }
 
 
-int MailUi::OnNotify(LViewI *Col, LNotification n)
+int MailUi::OnNotify(LViewI *Col, LNotification &n)
 {
 	THREAD_UNSAFE(0);
 
@@ -7779,7 +7779,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *Ctr, LNotification n)
+	int OnNotify(LViewI *Ctr, LNotification &n) override
 	{
 		switch (Ctr->GetId())
 		{
@@ -9837,7 +9837,7 @@ LAutoString Mail::GetCharSet()
 	}
 */
 
-int Mail::OnNotify(LViewI *Ctrl, LNotification n)
+int Mail::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

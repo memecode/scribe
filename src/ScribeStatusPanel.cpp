@@ -431,7 +431,7 @@ void AccountStatusPanel::_Unlock()
 	App->Unlock();
 }
 
-int AccountStatusPanel::OnNotify(LViewI *Ctrl, LNotification n)
+int AccountStatusPanel::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

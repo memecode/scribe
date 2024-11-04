@@ -244,7 +244,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		switch (c->GetId())
 		{
@@ -456,7 +456,7 @@ public:
 		DeleteArray(Folder);
 	}
 
-	int OnNotify(LViewI *v, LNotification n)
+	int OnNotify(LViewI *v, LNotification &n) override
 	{
 		switch (v->GetId())
 		{

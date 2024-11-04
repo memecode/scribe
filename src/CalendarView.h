@@ -160,7 +160,7 @@ public:
 	bool OnKey(LKey &k) override;
 	void OnCreate() override;
 	void OnPulse() override;
-	int OnNotify(LViewI *v, LNotification n) override;
+	int OnNotify(LViewI *v, LNotification &n) override;
 	bool OnLayout(LViewLayoutInfo &Inf) override;
 	LMessage::Result OnEvent(LMessage *Msg) override;
 };
@@ -188,7 +188,7 @@ public:
 	bool OnKey(LKey &k);
 	int OnCommand(int Cmd, int Event, OsView WndHandle);
 	LMessage::Result OnEvent(LMessage *m);
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 	static void OnOptionsChange();
 };
 

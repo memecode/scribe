@@ -71,7 +71,7 @@ public:
 	// Window
 	void OnPaint(LSurface *pDC);
 	void OnPulse();
-	int OnNotify(LViewI *Ctrl, LNotification n);
+	int OnNotify(LViewI *Ctrl, LNotification &n) override;
 };
 
 #endif

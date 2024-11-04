@@ -25,7 +25,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		switch (Ctrl->GetId())
 		{
@@ -94,7 +94,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		switch (Ctrl->GetId())
 		{
@@ -406,7 +406,7 @@ LMailStore *ManageMailStores::GetCurrentMailStore()
 	return 0;
 }
 
-int ManageMailStores::OnNotify(LViewI *c, LNotification n)
+int ManageMailStores::OnNotify(LViewI *c, LNotification &n)
 {
 	if (!Lst)
 		return 0;

@@ -447,7 +447,7 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 		SetCtrlEnabled(IDC_DEL_SRC_FOLDER, !GetCtrlValue(IDC_ALL));
 	}
 
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		switch (c->GetId())
 		{

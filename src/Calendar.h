@@ -203,7 +203,7 @@ public:
 	
 	Calendar *GetCal() { return Item; }
 	int OnCommand(int Cmd, int Event, OsView Window);
-	int OnNotify(LViewI *Ctrl, LNotification n);
+	int OnNotify(LViewI *Ctrl, LNotification &n) override;
 	void OnPosChange();
 	LMessage::Result OnEvent(LMessage *Msg);
 

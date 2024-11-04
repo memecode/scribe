@@ -598,7 +598,7 @@ void AddressBrowse::OnSelect(BrowseItem *a)
 }
 
 
-int AddressBrowse::OnNotify(LViewI *c, LNotification n)
+int AddressBrowse::OnNotify(LViewI *c, LNotification &n)
 {
 	if
 	(

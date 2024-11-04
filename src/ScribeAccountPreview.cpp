@@ -373,7 +373,7 @@ void ScribeAccountPreview::SetSort(int s)
 	}
 }
 
-int ScribeAccountPreview::OnNotify(LViewI *Ctrl, LNotification n)
+int ScribeAccountPreview::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

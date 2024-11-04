@@ -10,7 +10,7 @@ public:
 	LAutoString FolderFile;
 
 	ScribeFolderDlg(ScribeWnd *app);
-	int OnNotify(LViewI *Ctrl, LNotification n);
+	int OnNotify(LViewI *Ctrl, LNotification &n) override;
 };
 
 #endif

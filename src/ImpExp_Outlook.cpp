@@ -453,7 +453,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		if (Ctrl->GetId() == 101)
 		{
@@ -655,7 +655,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		switch (Ctrl->GetId())
 		{
@@ -876,7 +876,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		switch (c->GetId())
 		{
@@ -994,7 +994,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *v, LNotification n)
+	int OnNotify(LViewI *v, LNotification &n) override
 	{
 		bool Ok = false;
 
@@ -1145,7 +1145,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *v, LNotification n)
+	int OnNotify(LViewI *v, LNotification &n) override
 	{
 		bool Ok = false;
 
@@ -1322,7 +1322,7 @@ public:
 		return ChildFolder;
 	}
 
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		switch (c->GetId())
 		{

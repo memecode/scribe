@@ -741,7 +741,7 @@ bool CalendarView::OnLayout(LViewLayoutInfo &Inf)
 	return true;
 }
 
-int CalendarView::OnNotify(LViewI *v, LNotification n)
+int CalendarView::OnNotify(LViewI *v, LNotification &n)
 {
 	switch (v->GetId())
 	{
@@ -3319,7 +3319,7 @@ LString CalendarViewWnd::UnusedKey()
 	return Key;
 }
 
-int CalendarViewWnd::OnNotify(LViewI *c, LNotification n)
+int CalendarViewWnd::OnNotify(LViewI *c, LNotification &n)
 {
 	static bool Processing = false;
 	if (Processing)

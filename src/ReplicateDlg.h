@@ -39,7 +39,7 @@ public:
 	~ReplicateDlg();
 
 	void OnFolderChange();
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 	bool StartProcess();
 };
 

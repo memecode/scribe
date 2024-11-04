@@ -2322,7 +2322,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *Wnd, LNotification n)
+	int OnNotify(LViewI *Wnd, LNotification &n)
 	{
 		/*
 		LgiTrace("OnNotify %s, %i\n", Wnd->GetClass(), Flags);
@@ -2534,7 +2534,7 @@ public:
 		v->SendNotify(LNotifyTableLayoutRefresh);
 	}
 	
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		if (!AcceptNotify)
 			return 0;
@@ -3053,7 +3053,7 @@ void CalendarUi::UpdateRelative()
 	UpdateEndRelative();
 }
 
-int CalendarUi::OnNotify(LViewI *Ctrl, LNotification n)
+int CalendarUi::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	THREAD_UNSAFE(0);
 

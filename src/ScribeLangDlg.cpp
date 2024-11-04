@@ -205,7 +205,7 @@ LanguageDlg::~LanguageDlg()
 	DeleteObj(d);
 }
 
-int LanguageDlg::OnNotify(LViewI *c, LNotification n)
+int LanguageDlg::OnNotify(LViewI *c, LNotification &n)
 {
 	switch (c->GetId())
 	{

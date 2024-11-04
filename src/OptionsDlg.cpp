@@ -72,7 +72,7 @@ class UtfEditor : public LWindow
 public:
 	UtfEditor(ScribeWnd *app, const char *txtopt, const char *htmlopt, const char *desc);
 	void OnPosChange();
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 };
 
 class AccountItem : public LListItem
@@ -204,7 +204,7 @@ public:
 		}
 	}
 	
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		switch (Ctrl->GetId())
 		{
@@ -738,7 +738,7 @@ void OptionsDlg::ReindexAccounts()
 	});
 }
 
-int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification n)
+int OptionsDlg::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	if (!Ctrl) return 0;
 
@@ -1269,7 +1269,7 @@ void UtfEditor::OnPosChange()
 	}
 }
 
-int UtfEditor::OnNotify(LViewI *c, LNotification n)
+int UtfEditor::OnNotify(LViewI *c, LNotification &n)
 {
 	switch (c->GetId())
 	{

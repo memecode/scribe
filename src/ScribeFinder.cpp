@@ -999,7 +999,7 @@ public:
 	FindWnd(ScribeWnd *app, ScribeFolder *folder);
 	~FindWnd();
 
-	int OnNotify(LViewI *Col, LNotification n);
+	int OnNotify(LViewI *Col, LNotification &n) override;
 	LMessage::Result OnEvent(LMessage *m);
 
 	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new);
@@ -1187,7 +1187,7 @@ void FindWnd::OnSearch(bool Searching)
 	}
 }
 
-int FindWnd::OnNotify(LViewI *Col, LNotification n)
+int FindWnd::OnNotify(LViewI *Col, LNotification &n)
 {
 	switch (Col->GetId())
 	{

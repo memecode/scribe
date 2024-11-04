@@ -85,7 +85,7 @@ void ImportExportDlg::InsertFile(const char *f)
 	Src->Insert(n);
 }
 
-int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification n)
+int ImportExportDlg::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	if (!Src || !Dst)
 		return 0;

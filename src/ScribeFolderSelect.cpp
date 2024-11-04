@@ -320,7 +320,7 @@ char *FolderDlg::Get()
 	return d->Path;
 }
 
-int FolderDlg::OnNotify(LViewI *Ctrl, LNotification n)
+int FolderDlg::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

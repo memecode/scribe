@@ -941,7 +941,7 @@ void LPreviewPanel::OnPulse()
 	}
 }
 
-int LPreviewPanel::OnNotify(LViewI *v, LNotification n)
+int LPreviewPanel::OnNotify(LViewI *v, LNotification &n)
 {
 	switch (v->GetId())
 	{

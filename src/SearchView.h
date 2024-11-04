@@ -19,7 +19,7 @@ public:
 
 	const char *GetClass() { return "LSearchView"; }
 	void OnPaint(LSurface *pDC);
-	int OnNotify(LViewI *c, LNotification n);
+	int OnNotify(LViewI *c, LNotification &n) override;
 	bool TestThing(Thing *Thing);
 	void Focus(bool Foc);
 	void OnFolder();

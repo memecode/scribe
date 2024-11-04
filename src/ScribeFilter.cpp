@@ -274,7 +274,7 @@ public:
 		MsgIds.DeleteArrays();
 	}
 	
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		switch (c->GetId())
 		{
@@ -387,7 +387,7 @@ public:
 		DeleteArray(Arg);
 	}
 	
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		switch (c->GetId())
 		{
@@ -451,7 +451,7 @@ public:
 		DeleteArray(Arg);
 	}
 
-	int OnNotify(LViewI *c, LNotification n)
+	int OnNotify(LViewI *c, LNotification &n) override
 	{
 		switch (c->GetId())
 		{
@@ -1034,7 +1034,7 @@ void FilterAction::OnIconClick(int icon)
 	LListItem::GetList()->SendNotify(n);
 }
 
-int FilterAction::OnNotify(LViewI *c, LNotification n)
+int FilterAction::OnNotify(LViewI *c, LNotification &n)
 {
 	switch (c->GetId())
 	{
@@ -1981,7 +1981,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				if (id)
 				{
 					Arg1 = Dlg->Get();
-					OnNotify(Btn, LNotifyValueChanged);
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
 				}
 			});
 			break;
@@ -1994,7 +1994,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				if (status)
 				{
 					Arg1 = s->Name();
-					OnNotify(Btn, LNotifyValueChanged);
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
 				}
 			});
 			break;
@@ -2033,7 +2033,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				}
 			}
 
-			OnNotify(Btn, LNotifyValueChanged);
+			OnNotify(Btn, LNotification(LNotifyValueChanged));
 			break;
 		}
 		case ACTION_OPEN:
@@ -2075,7 +2075,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				}
 			}
 
-			OnNotify(Btn, LNotifyValueChanged);
+			OnNotify(Btn, LNotification(LNotifyValueChanged));
 			break;
 		}
 		case ACTION_MARK:
@@ -2091,7 +2091,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 			if (Result == IDM_UNMARK)
 			{
 				Arg1 = "False";
-				OnNotify(Btn, LNotifyValueChanged);
+				OnNotify(Btn, LNotification(LNotifyValueChanged));
 			}
 			else if (Result >= IDM_MARK_BASE)
 			{
@@ -2102,7 +2102,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 						G32(MarkColours32[Result-IDM_MARK_BASE]),
 						B32(MarkColours32[Result-IDM_MARK_BASE]));
 				Arg1 = s;
-				OnNotify(Btn, LNotifyValueChanged);
+				OnNotify(Btn, LNotification(LNotifyValueChanged));
 			}
 			break;
 		}
@@ -2143,7 +2143,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				if (ok)
 				{
 					Arg1 = s->Name();
-					OnNotify(Btn, LNotifyValueChanged);
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
 				}
 			});
 			break;
@@ -2156,7 +2156,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				if (id)
 				{
 					Arg1 = Dlg->Arg;
-					OnNotify(Btn, LNotifyValueChanged);
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
 				}
 			});
 			break;
@@ -2169,7 +2169,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				if (id)
 				{
 					Arg1 = Dlg->Arg;
-					OnNotify(Btn, LNotifyValueChanged);
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
 				}
 			});
 			break;
@@ -2182,7 +2182,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				if (id)
 				{
 					Arg1 = Dlg->Arg;
-					OnNotify(Btn, LNotifyValueChanged);
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
 				}
 			});
 			break;
@@ -2195,7 +2195,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				if (id)
 				{
 					Arg1 = Dlg->Arg;
-					OnNotify(Btn, LNotifyValueChanged);
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
 				}
 			});
 			break;
@@ -2253,7 +2253,7 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 				if (Result >= 0 && Result < (int)Cs.Length())
 				{
 					Arg1 = Cs[Result]->Charset;
-					OnNotify(Btn, LNotifyValueChanged);
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
 				}
 			}
 			break;
@@ -3871,7 +3871,7 @@ void FilterUi::DeleteAction()
 	}
 }
 
-int FilterUi::OnNotify(LViewI *Col, LNotification n)
+int FilterUi::OnNotify(LViewI *Col, LNotification &n)
 {
 	THREAD_UNSAFE(0);
 

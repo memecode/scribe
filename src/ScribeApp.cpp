@@ -3883,7 +3883,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		switch (Ctrl->GetId())
 		{
@@ -8416,7 +8416,7 @@ void ScribeWnd::OnDelete()
 	}
 }
 
-int ScribeWnd::OnNotify(LViewI *Ctrl, LNotification n)
+int ScribeWnd::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{
@@ -9301,7 +9301,7 @@ public:
 		MoveToCenter();
 	}
 
-	int OnNotify(LViewI *Ctrl, LNotification n)
+	int OnNotify(LViewI *Ctrl, LNotification &n) override
 	{
 		switch (Ctrl->GetId())
 		{

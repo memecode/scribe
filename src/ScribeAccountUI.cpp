@@ -214,7 +214,7 @@ void AccountDlg::OnUseGoogle()
 	SetCtrlEnabled(IDC_REMEMBER_PSW, !UseGoogle);
 }
 
-int AccountDlg::OnNotify(LViewI *c, LNotification n)
+int AccountDlg::OnNotify(LViewI *c, LNotification &n)
 {
 	if (!c) return 0;
 	

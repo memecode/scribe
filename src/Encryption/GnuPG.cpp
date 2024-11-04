@@ -1102,7 +1102,7 @@ void MailUiGpg::OnRecipientChange()
 // This gets all the events from MailUi::OnNotify as well as any events
 // from MailUiGpg's child controls.
 // \returns non-zero if further processing in MailUi::OnNotify should be blocked.
-int MailUiGpg::OnNotify(LViewI *Ctrl, LNotification n)
+int MailUiGpg::OnNotify(LViewI *Ctrl, LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{
