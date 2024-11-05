@@ -160,7 +160,7 @@ public:
 	bool OnKey(LKey &k) override;
 	void OnCreate() override;
 	void OnPulse() override;
-	int OnNotify(LViewI *v, LNotification n) override;
+	int OnNotify(LViewI *v, const LNotification &n) override;
 	bool OnLayout(LViewLayoutInfo &Inf) override;
 	LMessage::Result OnEvent(LMessage *Msg) override;
 };

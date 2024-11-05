@@ -1034,7 +1034,7 @@ void FilterAction::OnIconClick(int icon)
 	LListItem::GetList()->SendNotify(n);
 }
 
-int FilterAction::OnNotify(LViewI *c, LNotification n)
+int FilterAction::OnNotify(LViewI *c, const LNotification &n)
 {
 	switch (c->GetId())
 	{

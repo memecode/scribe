@@ -1123,7 +1123,7 @@ public:
 	bool OnForward(Mail *m, bool MarkOriginal, int WithAttachments = -1);
 	bool OnBounce(Mail *m, bool MarkOriginal, int WithAttachments = -1);
 	void OnReceipt(Mail *m);
-	int OnNotify(LViewI *Ctrl, LNotification n) override;
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 
 	// Printing
 	void OnPrintHeaders(ScribePrintContext &Context) override;
@@ -1459,7 +1459,7 @@ public:
 	bool Select() override;
 	void Select(bool b) override;
 	void OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c) override;
-	int OnNotify(LViewI *c, LNotification n) override;
+	int OnNotify(LViewI *c, const LNotification &n) override;
 	void OnMouseClick(LMouse &m) override;
 	void OnIconClick(int icon);
 
@@ -2593,7 +2593,7 @@ public:
 	// ---------------------------------------------------------------------
 	// Events
 	void			OnDelete();
-	int				OnNotify(LViewI *Ctrl, LNotification n) override;
+	int				OnNotify(LViewI *Ctrl, const LNotification &n) override;
 	void			OnPaint(LSurface *pDC) override;
     LMessage::Result OnEvent(LMessage *Msg) override;
 	int				OnCommand(int Cmd, int Event, OsView Handle) override;

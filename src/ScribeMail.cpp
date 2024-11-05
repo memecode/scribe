@@ -9837,7 +9837,7 @@ LAutoString Mail::GetCharSet()
 	}
 */
 
-int Mail::OnNotify(LViewI *Ctrl, LNotification n)
+int Mail::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

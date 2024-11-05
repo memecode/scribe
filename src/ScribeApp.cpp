@@ -8416,7 +8416,7 @@ void ScribeWnd::OnDelete()
 	}
 }
 
-int ScribeWnd::OnNotify(LViewI *Ctrl, LNotification n)
+int ScribeWnd::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{
