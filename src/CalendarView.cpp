@@ -741,7 +741,7 @@ bool CalendarView::OnLayout(LViewLayoutInfo &Inf)
 	return true;
 }
 
-int CalendarView::OnNotify(LViewI *v, LNotification &n)
+int CalendarView::OnNotify(LViewI *v, const LNotification &n)
 {
 	switch (v->GetId())
 	{
