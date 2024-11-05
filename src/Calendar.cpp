@@ -2322,7 +2322,7 @@ public:
 		}
 	}
 
-	int OnNotify(LViewI *Wnd, LNotification &n)
+	int OnNotify(LViewI *Wnd, const LNotification &n) override
 	{
 		/*
 		LgiTrace("OnNotify %s, %i\n", Wnd->GetClass(), Flags);
