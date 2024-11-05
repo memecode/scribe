@@ -129,7 +129,7 @@ class GroupUi :
 public:
 	GroupUi(ContactGroup *item);
 	~GroupUi();
-	int OnNotify(LViewI *c, LNotification &n) override;
+	int OnNotify(LViewI *c, const LNotification &n) override;
 
 	void ResolveAll();
 	void OnDirty(bool Dirty) {}
@@ -817,7 +817,7 @@ void GroupUi::OnSave()
 	Item->Update();
 }
 
-int GroupUi::OnNotify(LViewI *c, LNotification &n)
+int GroupUi::OnNotify(LViewI *c, const LNotification &n)
 {
 	THREAD_UNSAFE(0);
 

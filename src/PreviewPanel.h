@@ -21,7 +21,7 @@ public:
 	void OnPulse();
 	void OnPaint(LSurface *pDC);
 	void OnPosChange();
-	int OnNotify(LViewI *v, LNotification &n) override;
+	int OnNotify(LViewI *v, const LNotification &n) override;
 	void OnInstall(CapsHash *Caps, bool Status);
     void OnCloseInstaller();
     LMessage::Param OnEvent(LMessage *Msg);

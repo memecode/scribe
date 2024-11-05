@@ -166,7 +166,7 @@ void PrintPreview::OnPosChange()
     }
 }
 
-int PrintPreview::OnNotify(LViewI *Ctrl, LNotification &n)
+int PrintPreview::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

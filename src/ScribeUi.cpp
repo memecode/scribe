@@ -58,7 +58,7 @@ CreateSubFolderDlg::CreateSubFolderDlg(LView *parent, int defaulttype, bool *Ena
 	}
 }
 
-int CreateSubFolderDlg::OnNotify(LViewI *Ctrl, LNotification &n)
+int CreateSubFolderDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{
@@ -113,7 +113,7 @@ void FolderNameDlg::OnCreate()
 	}
 }
 
-int FolderNameDlg::OnNotify(LViewI *Ctrl, LNotification &n)
+int FolderNameDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

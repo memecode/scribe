@@ -14,7 +14,7 @@ public:
 
 	LString ToString(BrowseItem *Obj);
 	void OnSelect(BrowseItem *Obj);
-	int OnNotify(LViewI *c, LNotification &n) override;
+	int OnNotify(LViewI *c, const LNotification &n) override;
 };
 
 

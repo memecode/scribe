@@ -297,7 +297,7 @@ public:
 	bool IsOk();
 	bool Load(LView *dlg);
 	bool Save();
-	void OnNotify(LViewI *c, LNotification &n);
+	void OnNotify(LViewI *c, const LNotification &n);
 };
 
 
@@ -2146,7 +2146,7 @@ public:
 	void InitUI(LView *Parent, int Tab, std::function<void(bool)> callback);
 	bool InitMenus();
 	void SerializeUi(LView *Wnd, bool Load);
-	int OnNotify(LViewI *Ctrl, LNotification &n);
+	int OnNotify(LViewI *Ctrl, const LNotification &n);
 
 	// Worker
 	void OnPulse(char *s = NULL, int s_len = 0);

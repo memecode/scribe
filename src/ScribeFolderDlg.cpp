@@ -117,7 +117,7 @@ ScribeFolderDlg::ScribeFolderDlg(ScribeWnd *app)
 	MoveToCenter();
 }
 
-int ScribeFolderDlg::OnNotify(LViewI *Ctrl, LNotification &n)
+int ScribeFolderDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

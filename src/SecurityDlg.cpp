@@ -95,7 +95,7 @@ SecurityDlg::~SecurityDlg()
 	DeleteObj(d);
 }
 
-int SecurityDlg::OnNotify(LViewI *c, LNotification &n)
+int SecurityDlg::OnNotify(LViewI *c, const LNotification &n)
 {
 	d->Pwd->OnNotify(c, n);
 

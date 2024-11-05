@@ -131,7 +131,7 @@ void LSearchView::OnPaint(LSurface *pDC)
 	pDC->Rectangle();
 }
 
-int LSearchView::OnNotify(LViewI *c, LNotification &n)
+int LSearchView::OnNotify(LViewI *c, const LNotification &n)
 {
 	bool Update = false;
 

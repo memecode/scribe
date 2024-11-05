@@ -75,7 +75,7 @@ public:
 	bool Pour(LRegion &r);
 	void OnPaint(LSurface *pDC);
 	void OnCreate();
-	int OnNotify(LViewI *Ctrl, LNotification &n) override;
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 	void DoCommand(int Cmd, std::function<void(int)> callback);
 	LMessage::Result OnEvent(LMessage *Msg);
 

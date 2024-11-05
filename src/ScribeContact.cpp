@@ -571,7 +571,7 @@ public:
 		return LView::OnEvent(Msg);
 	}
 	
-	int OnNotify(LViewI *Ctrl, LNotification &n) override
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override
 	{
 		if (Ctrl->GetId() == 100)
 		{
@@ -715,7 +715,7 @@ public:
 		Insert(new LFieldItem);
 	}
 
-	int OnNotify(LViewI *Ctrl, LNotification &n) override
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override
 	{
 		if (Ctrl->GetId() == GetId())
 		{

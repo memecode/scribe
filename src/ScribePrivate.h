@@ -582,7 +582,7 @@ public:
 
 	CreateSubFolderDlg(LView *parent, int defaulttype = 0, bool *enable = NULL, char *default_name = NULL);
 
-	int OnNotify(LViewI *Ctrl, LNotification &n) override;
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 };
 
 class LanguageDlg : public LDialog
@@ -596,7 +596,7 @@ public:
 	LanguageDlg(ScribeWnd *app);
 	~LanguageDlg();
 	
-	int OnNotify(LViewI *c, LNotification &n) override;
+	int OnNotify(LViewI *c, const LNotification &n) override;
 };
 
 class FolderNameDlg : public LDialog
@@ -610,7 +610,7 @@ public:
 	~FolderNameDlg();
 
 	void OnCreate();
-	int OnNotify(LViewI *Ctrl, LNotification &n) override;
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -643,7 +643,7 @@ public:
 
 	void OnCreate();
 	void OnAccountEnable(ScribeAccount *Acc, bool Enable);
-	int OnNotify(LViewI *Ctrl, LNotification &n) override;
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 	LMessage::Result OnEvent(LMessage *m);
 };
 
@@ -666,7 +666,7 @@ public:
 	SecurityDlg(ScribeWnd *app);
 	~SecurityDlg();
 
-	int OnNotify(LViewI *c, LNotification &n) override;
+	int OnNotify(LViewI *c, const LNotification &n) override;
 };
 
 // Bayesian filtering setup
@@ -678,7 +678,7 @@ public:
 	BayesDlg(ScribeWnd *app);
 	~BayesDlg();
 
-	int OnNotify(LViewI *c, LNotification &n) override;
+	int OnNotify(LViewI *c, const LNotification &n) override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////

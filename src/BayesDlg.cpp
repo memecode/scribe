@@ -59,7 +59,7 @@ BayesDlg::~BayesDlg()
 	DeleteObj(d);
 }
 
-int BayesDlg::OnNotify(LViewI *c, LNotification &n)
+int BayesDlg::OnNotify(LViewI *c, const LNotification &n)
 {
 	switch (c->GetId())
 	{

@@ -171,7 +171,7 @@ void ScribePageSetup::Serialize(bool Write)
 	}
 }
 
-int ScribePageSetup::OnNotify(LViewI *Ctrl, LNotification &n)
+int ScribePageSetup::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

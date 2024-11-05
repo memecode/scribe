@@ -2534,7 +2534,7 @@ public:
 		v->SendNotify(LNotifyTableLayoutRefresh);
 	}
 	
-	int OnNotify(LViewI *Ctrl, LNotification &n) override
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override
 	{
 		if (!AcceptNotify)
 			return 0;
@@ -3053,7 +3053,7 @@ void CalendarUi::UpdateRelative()
 	UpdateEndRelative();
 }
 
-int CalendarUi::OnNotify(LViewI *Ctrl, LNotification &n)
+int CalendarUi::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	THREAD_UNSAFE(0);
 

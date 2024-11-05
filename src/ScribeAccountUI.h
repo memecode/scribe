@@ -16,7 +16,7 @@ class AccountDlg : public TabDialog
 
 public:
 	AccountDlg(LView *p, ScribeWnd *app, ScribeAccount *a, int Tab);
-	int OnNotify(LViewI *c, LNotification &n) override;
+	int OnNotify(LViewI *c, const LNotification &n) override;
 	void OnCreate();
 };
 

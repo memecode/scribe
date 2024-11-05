@@ -188,7 +188,7 @@ public:
 	bool OnKey(LKey &k);
 	int OnCommand(int Cmd, int Event, OsView WndHandle);
 	LMessage::Result OnEvent(LMessage *m);
-	int OnNotify(LViewI *c, LNotification &n) override;
+	int OnNotify(LViewI *c, const LNotification &n) override;
 	static void OnOptionsChange();
 };
 

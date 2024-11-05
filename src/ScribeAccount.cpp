@@ -446,7 +446,7 @@ void ScribeAccount::InitUI(LView *Parent, int Tab, std::function<void(bool)> cal
 	});
 }
 
-int ScribeAccount::OnNotify(LViewI *Ctrl, LNotification &n)
+int ScribeAccount::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	LWindow *Wnd = Ctrl->GetWindow();
 	

@@ -45,7 +45,7 @@ public:
 	ScribeAccountPreview(ScribeWnd *app, LArray<ScribeAccount*> &Lst);
 	~ScribeAccountPreview();
 
-	int OnNotify(LViewI *Ctrl, LNotification &n) override;
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 	void OnPulse();
 	void OnPaint(LSurface *pDC);
 };

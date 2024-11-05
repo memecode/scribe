@@ -18,7 +18,7 @@ class ScribePageSetup : public LDialog
 public:
 	ScribePageSetup(LView *parent, class LOptionsFile *options);
 	void Serialize(bool Write);
-	int OnNotify(LViewI *Ctrl, LNotification &n) override;
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 };
 
 #endif

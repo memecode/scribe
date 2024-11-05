@@ -1398,7 +1398,7 @@ void ReplicateDlg::OnFolderChange()
 	SetCtrlEnabled(IDOK, GetCtrlValue(IDC_SRC) != GetCtrlValue(IDC_DST));
 }
 
-int ReplicateDlg::OnNotify(LViewI *c, LNotification &n)
+int ReplicateDlg::OnNotify(LViewI *c, const LNotification &n)
 {
 	switch (c->GetId())
 	{

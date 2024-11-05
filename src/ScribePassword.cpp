@@ -106,7 +106,7 @@ bool ScribePassword::Save()
 	return Status;
 }
 
-void ScribePassword::OnNotify(LViewI *c, LNotification &n)
+void ScribePassword::OnNotify(LViewI *c, const LNotification &n)
 {
 	if (c->GetId() == d->CtrlEnable && IsOk())
 	{
