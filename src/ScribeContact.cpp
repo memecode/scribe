@@ -2274,7 +2274,7 @@ LMessage::Result ContactUi::OnEvent(LMessage *Msg)
 	return ThingUi::OnEvent(Msg);
 }
 
-int ContactUi::OnNotify(LViewI *Ctrl, LNotification &n)
+int ContactUi::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	THREAD_UNSAFE(0);
 

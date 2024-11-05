@@ -156,7 +156,7 @@ public:
 	void OnLoad();
 	void OnSave();
 	void OnDestroy();
-	int OnNotify(LViewI *Col, LNotification &n) override;
+	int OnNotify(LViewI *Col, const LNotification &n) override;
 	LMessage::Result OnEvent(LMessage *Msg);
 	void OnPulse();
 };
@@ -334,7 +334,7 @@ public:
 	bool AddRecipient(AddressDescriptor *Addr);
 	bool AddCalendarEvent(bool AddPopupReminder);
 
-	int OnNotify(LViewI *Col, LNotification &n) override;
+	int OnNotify(LViewI *Col, const LNotification &n) override;
 	void OnSysKey(int a, int b);
 	void OnDirty(bool Dirty);
 	void OnDataEntered();
@@ -465,7 +465,7 @@ public:
 	LImageList *GetIcons();
 
 	// Events
-	int OnNotify(LViewI *Col, LNotification &n) override;
+	int OnNotify(LViewI *Col, const LNotification &n) override;
 	LMessage::Result OnEvent(LMessage *Msg);
 	int OnCommand(int Cmd, int Event, OsView Window);
 };

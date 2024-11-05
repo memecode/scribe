@@ -3341,7 +3341,7 @@ bool MailUi::AddCalendarEvent(bool AddPopupReminder)
 }
 
 
-int MailUi::OnNotify(LViewI *Col, LNotification &n)
+int MailUi::OnNotify(LViewI *Col, const LNotification &n)
 {
 	THREAD_UNSAFE(0);
 
@@ -9837,7 +9837,7 @@ LAutoString Mail::GetCharSet()
 	}
 */
 
-int Mail::OnNotify(LViewI *Ctrl, LNotification &n)
+int Mail::OnNotify(LViewI *Ctrl, const LNotification &n)
 {
 	switch (Ctrl->GetId())
 	{

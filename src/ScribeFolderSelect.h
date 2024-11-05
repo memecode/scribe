@@ -19,7 +19,7 @@ public:
 	char *Get();
 
 	/// DoModal returns TRUE on select, FALSE on cancel
-	int OnNotify(LViewI *Ctrl, LNotification &n) override;
+	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 };
 
 #endif

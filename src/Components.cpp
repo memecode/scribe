@@ -217,7 +217,7 @@ bool MissingCapsBar::Pour(LRegion &r)
     return true;
 }
 
-int MissingCapsBar::OnNotify(LViewI *c, LNotification &n)
+int MissingCapsBar::OnNotify(LViewI *c, const LNotification &n)
 {
 	if (c->GetId() == IDOK)
 	{

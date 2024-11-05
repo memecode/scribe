@@ -93,7 +93,7 @@ public:
     void OnPosChange();
     void OnPaint(LSurface *pDC);
     bool Pour(LRegion &r);
-    int OnNotify(LViewI *c, LNotification &n) override;
+    int OnNotify(LViewI *c, const LNotification &n) override;
     void OnPulse();
 	LMessage::Param OnEvent(LMessage *Msg);
 };

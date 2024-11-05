@@ -1034,7 +1034,7 @@ void FilterAction::OnIconClick(int icon)
 	LListItem::GetList()->SendNotify(n);
 }
 
-int FilterAction::OnNotify(LViewI *c, LNotification &n)
+int FilterAction::OnNotify(LViewI *c, const LNotification &n)
 {
 	switch (c->GetId())
 	{
@@ -3871,7 +3871,7 @@ void FilterUi::DeleteAction()
 	}
 }
 
-int FilterUi::OnNotify(LViewI *Col, LNotification &n)
+int FilterUi::OnNotify(LViewI *Col, const LNotification &n)
 {
 	THREAD_UNSAFE(0);
 

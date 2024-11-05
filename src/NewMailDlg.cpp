@@ -128,7 +128,7 @@ void LNewMailDlg::AddThings(List<Mail> *NewThings)
 	}
 }
 
-int LNewMailDlg::OnNotify(LViewI *c, LNotification &n)
+int LNewMailDlg::OnNotify(LViewI *c, const LNotification &n)
 {
 	switch (c->GetId())
 	{
