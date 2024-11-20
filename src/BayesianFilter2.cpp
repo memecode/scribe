@@ -201,10 +201,7 @@ public:
 			{
 				Train t;
 				if (Training.Length())
-				{
-					t = Training.Last();
-					Training.PopLast();
-				}
+					t = Training.PopLast();
 
 				Unlock();
 

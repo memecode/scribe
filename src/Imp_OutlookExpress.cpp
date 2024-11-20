@@ -689,8 +689,7 @@ struct ImportOe : public LProgressDlg
 	{
 		if (FileArr.Length())
 		{
-			auto FileName = FileArr.Last();
-			FileArr.PopLast();
+			auto FileName = FileArr.PopLast();
 
 			if (v5)
 			{
