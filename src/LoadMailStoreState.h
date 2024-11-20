@@ -307,7 +307,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 							{
 								// Clear the folder and don't increment the StoreIdx...
 								Folder.Empty();
-								App->Folders.PopLast();
+								App->Folders.Length(App->Folders.Length()-1);
 								ReturnWithEvent(false);
 								return;
 							}
