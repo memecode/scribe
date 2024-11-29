@@ -364,11 +364,14 @@ void MailTree::OnItemSelect(LTreeItem *Item)
 		{
 		    if (App->GetItemList())
 		        App->GetItemList()->RemoveAll();
-			App->SetListPane(new DynamicHtml(App, "title.html"));
+
+			LAutoPtr<LView> v(new DynamicHtml(App, "title.html"));
+			App->SetListPane(v);
 		}
 		else
 		{
-			App->SetListPane(new ThingList(App));
+			LAutoPtr<LView> v(new ThingList(App));
+			App->SetListPane(v);
 		}
 	}
 

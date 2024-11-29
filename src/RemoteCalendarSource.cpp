@@ -148,7 +148,7 @@ struct RemoteCalendarSourcePriv :
 				LString err;
 				LStringPipe out;
 				auto r = LgiGetUri(this, &out, &err, Uri);
-				LOG("RemoteCalendarSource: LgiGetUri(%s)=%i\n", Uri.Get(), r);
+				// LOG("RemoteCalendarSource: LgiGetUri(%s)=%i\n", Uri.Get(), r);
 				if (r)
 				{
 					VCal imp;

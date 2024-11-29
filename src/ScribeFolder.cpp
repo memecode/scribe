@@ -163,6 +163,7 @@ ScribeFolder::~ScribeFolder()
 {
 	bool isRoot = IsRoot();
 
+	OnItemType(false);
 	if (BeforeDelete)
 		BeforeDelete();		
 
@@ -1238,7 +1239,7 @@ bool ScribeFolder::IsInTrash()
 }
 
 /// This just adds certain folder types as a group ware source at the app level
-void ScribeFolder::OnItemType()
+void ScribeFolder::OnItemType(bool load)
 {
 	switch (GetItemType())
 	{
@@ -1246,7 +1247,20 @@ void ScribeFolder::OnItemType()
 		case MAGIC_FILTER:
 		case MAGIC_CALENDAR:
 		case MAGIC_GROUP:
-			App->AddThingSrc(this);
+			if (load)
+			{
+				App->AddThingSrc(this);
+
+				// This is mainly to debug when LDataFolderI objects get deleted before
+				// the matching ScribeFolder gets deleted. This can cause problems in 
+				ObjectLock = true;
+				// LgiTrace("%s:%i - AddThingSrc %p=%s\n", _FL, this, GetPath().Get());
+			}
+			else
+			{
+				ObjectLock = false;
+				App->RemoveThingSrc(this);
+			}
 			break;
 		default:
 			break;
@@ -1294,7 +1308,7 @@ bool ScribeFolder::LoadFolders()
 				SetWillDirty(true);
 
 				n->LoadFolders();
-				n->OnItemType();
+				n->OnItemType(true);
 			}
 
 			#if 0
@@ -2838,41 +2852,39 @@ ScribeFolder *ScribeFolder::GetSubFolder(const char *Path)
 
 ScribeFolder *ScribeFolder::CreateSubFolder(const char *Name, int Type)
 {
-	ScribeFolder *NewFolder = 0;
-	auto ThisObj = dynamic_cast<LDataFolderI*>(GetObject());
-	if (Name && ThisObj && ThisObj->GetStore())
+	auto thisFolder = dynamic_cast<LDataFolderI*>(GetObject());
+	if (!Name || !thisFolder || !thisFolder->GetStore())
+		return nullptr;
+
+	ScribeFolder *NewFolder = nullptr;
+	if (auto Fld = GetObject()->GetStore()->Create(MAGIC_FOLDER))
 	{
-		LDataI *Fld = GetObject()->GetStore()->Create(MAGIC_FOLDER);
-		if (Fld)
+		if (auto folderObj = dynamic_cast<LDataFolderI*>(Fld))
 		{
-			LDataFolderI *Obj = dynamic_cast<LDataFolderI*>(Fld);
-			if (Obj)
+			if (NewFolder = new ScribeFolder)
 			{
-				NewFolder = new ScribeFolder;
-				if (NewFolder)
+				NewFolder->App = App;
+				NewFolder->SetObject(folderObj, false, _FL);
+
+				// Set name and type
+				NewFolder->SetName(Name, true);
+				NewFolder->GetObject()->SetInt(FIELD_FOLDER_TYPE, Type);
+
+				thisFolder->SubFolders();
+				if (NewFolder->GetObject()->Save(thisFolder))
 				{
-					NewFolder->App = App;
-					NewFolder->SetObject(Obj, false, _FL);
-
-					// Set name and type
-					NewFolder->SetName(Name, true);
-					NewFolder->GetObject()->SetInt(FIELD_FOLDER_TYPE, Type);
-
-					ThisObj->SubFolders();
-					if (NewFolder->GetObject()->Save(ThisObj))
-					{
-						Insert(NewFolder);
-						NewFolder->SetDefaultFields();
-						NewFolder->OnItemType();
-					}
-					else
-					{
-						DeleteObj(NewFolder);
-					}
+					Insert(NewFolder);
+					NewFolder->SetDefaultFields();
+					NewFolder->OnItemType(true);
+				}
+				else
+				{
+					DeleteObj(NewFolder);
 				}
 			}
 		}
 	}
+
 	return NewFolder;
 }
 

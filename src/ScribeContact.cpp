@@ -44,7 +44,7 @@ bool ConvertImageToContactSize(LAutoPtr<LSurface> &Img, int Px, LSurface *Raw)
 		return false;
 	}
 		
-	if (!Img.Reset(new LMemDC(Px, Px, Raw->GetColourSpace())))
+	if (!Img.Reset(new LMemDC(_FL, Px, Px, Raw->GetColourSpace())))
 	{
 		LAssert(!"Failed to create image?");
 		return false;
@@ -246,7 +246,7 @@ public:
 		{
 			LCssTools Tools(this);
 			LColour Base = Tools.GetBack();
-			LMemDC Mem(c.X(), c.Y(), System32BitColourSpace);
+			LMemDC Mem(_FL, c.X(), c.Y(), System32BitColourSpace);
 			Mem.Colour(0, 32);
 			Mem.Rectangle();
 			LRect r(0, 0, X()-1, Y()-1);

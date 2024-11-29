@@ -60,6 +60,8 @@ LDataUserI::~LDataUserI()
 
 bool LDataUserI::SetObject(LDataI *o, bool InDestuctor, const char *File, int Line)
 {
+	LAssert(File && Line);
+
 	if (o == Object)
 		return true;
 
@@ -78,7 +80,7 @@ bool LDataUserI::SetObject(LDataI *o, bool InDestuctor, const char *File, int Li
 
 	Object = o;
 	if (File)
-		SetterRef.Printf("%s:%i", File, Line);
+		SetterRef.Printf("%s:%i = %p", File, Line, o);
 	else
 		SetterRef.Empty();
 

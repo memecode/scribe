@@ -413,7 +413,7 @@ public:
 						int Nx = (int)(Img->X() / Scale + 0.001);
 						int Ny = (int)(Img->Y() / Scale + 0.001);
 						
-						LAutoPtr<LSurface> ResizedImg(new LMemDC(Nx, Ny, Img->GetColourSpace()));
+						LAutoPtr<LSurface> ResizedImg(new LMemDC(_FL, Nx, Ny, Img->GetColourSpace()));
 						if (ResizedImg)
 						{
 							if (ResampleDC(ResizedImg, Img))
@@ -1032,7 +1032,7 @@ BuildMarkMenu(	LSubMenu *MarkMenu,
 	int SelectedIndex = -1;
 
 	// Build image list
-	LImageList *ImgLst = new LImageList(16, 16);
+	LImageList *ImgLst = new LImageList(_FL, 16, 16);
 	if (ImgLst &&
 		ImgLst->Create(16 * CountOf(MarkColours32), 16, System32BitColourSpace))
 	{

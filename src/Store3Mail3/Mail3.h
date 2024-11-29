@@ -405,13 +405,14 @@ protected:
 	bool Check(int r, char *sql);
 
 public:
-	LMail3Store *Store;
-	int64 Id;
-	int64 ParentId;
+	constexpr static int64 INVALID_ID = -1;
+
+	LMail3Store *Store = nullptr;
+	int64 Id = INVALID_ID;
+	int64 ParentId = INVALID_ID;
 
 	LMail3Obj(LMail3Store *store)
 	{
-		Id = ParentId = -1;
 		Store = store;
 	}
 
@@ -466,22 +467,22 @@ class LMail3Folder : public LDataFolderI, public LMail3Obj
 {
 public:
 	LVariant Name;
-	int Unread;
-	int Open;
-	int ItemType;
-	int Sort; // Which field to sort contents on
-	int Threaded;
-	int SiblingIndex; // The index of this folder when sorting amongst other sibling folders
+	int Unread = 0;
+	int Open = true;
+	int ItemType = MAGIC_MAIL;
+	int Sort = 0; // Which field to sort contents on
+	int Threaded = false;
+	int SiblingIndex = -1; // The index of this folder when sorting amongst other sibling folders
 	union {
-		int AccessPerms;
+		int AccessPerms = 0;
 		struct {
 			int16_t ReadPerm;
 			int16_t WritePerm;
 		};
 	};
-	Store3SystemFolder System;
+	Store3SystemFolder System = Store3SystemNone;
 
-	LMail3Folder *Parent;
+	LMail3Folder *Parent = nullptr;
 	DIterator<LDataFolderI, LMail3Folder, LMail3Store> Sub;
 	DIterator<LDataI, LMail3Thing, LMail3Store> Items;
 	DIterator<LDataPropI, Store3Field, LMail3Store> Flds;

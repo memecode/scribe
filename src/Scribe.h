@@ -1331,7 +1331,7 @@ public:
 	void SetLoadOnDemand();
 	void SortSubfolders();
 	void DoContextMenu(LMouse &m);
-	void OnItemType();
+	void OnItemType(bool load);
 	bool IsInTrash();
 	bool SortItems();
 	
@@ -2342,6 +2342,9 @@ protected:
 	MailTree		*Tree = NULL;
 	class LPreviewPanel	*PreviewPanel = NULL;
 	class AccountStatusPanel *StatusPanel = NULL;
+	LAutoPtr<LView>	ListPane; // temporary holding spot for a content view.
+							  // 'SetLayout' is responsible for attaching it to a view hierarchy.
+							  // If it does so then this should be released, cause the tree owns it.
 
 	// Security
 	ScribePerm		CurrentAuthLevel = PermRequireNone;
@@ -2427,7 +2430,7 @@ public:
 	void			BuildDynMenus();
 	LDocView		*CreateTextControl(int Id, const char *MimeType, bool Editor, Mail *m = NULL);
 	void			SetLastDrop() { LastDrop = LCurrentTime(); }
-	void			SetListPane(LView *v);
+	void			SetListPane(LAutoPtr<LView> listPane);
 	void			SetLayout(LayoutMode Mode = OptionsLayout);
 	bool			IsMyEmail(const char *Email);
 	bool			SetItemPreview(LView *v);

@@ -61,7 +61,7 @@ struct PrintPreviewPriv
 		if (!Mem || Mem->X() < Width || Mem->Y() < Size.y)
 		{
 			Zoom->SetSurface(NULL, true);
-			if (!Mem.Reset(new LMemDC(Width, Size.y, System24BitColourSpace)))
+			if (!Mem.Reset(new LMemDC(_FL, Width, Size.y, System24BitColourSpace)))
 			{
 				LgiTrace("%s:%i - Can't create memory bitmap context (%ix%i).\n", _FL, Width, Size.y);
 				return false;

@@ -247,8 +247,6 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 				LLoadString(IDS_OK));			
 			a->DoModal([this](auto dlg, auto code)
 				{
-					delete dlg;
-
 					if (code == 1)
 					{
 						App->PostEvent(M_COMMAND, IDM_MANAGE_MAIL_STORES);

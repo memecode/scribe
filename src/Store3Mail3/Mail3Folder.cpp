@@ -50,17 +50,6 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 LMail3Folder::LMail3Folder(LMail3Store *store) : LMail3Obj(store)
 {
-	Id = -1;
-	ParentId = -1;
-	Parent = 0;
-	Unread = 0;
-	AccessPerms = 0;
-	SiblingIndex = -1;
-	Sort = 0;
-	Open = true;
-	Threaded = false;
-	ItemType = MAGIC_MAIL;
-	System = Store3SystemNone;
 }
 
 LMail3Folder::~LMail3Folder()

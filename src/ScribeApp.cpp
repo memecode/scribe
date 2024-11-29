@@ -1339,6 +1339,7 @@ ScribeWnd::~ScribeWnd()
 	DeleteObj(d->PreviewFont);
 	DeleteObj(d->SubSplit);
 	DeleteObj(Splitter);
+	ListPane.Reset();
 	MailList = NULL;
 
 	CmdSend.ToolButton = NULL;
@@ -2349,7 +2350,7 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 			LStringPipe p;
 			
 			// Iterate through the mail stores
-			for (auto m: Folders)
+			for (auto &m: Folders)
 			{
 				if (!m.Store)
 					continue;
@@ -2559,7 +2560,7 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		{
 			if (!Value.SetList())
 				return false;
-			for (auto Ms : Folders)
+			for (auto &Ms : Folders)
 				Value.Add(new LVariant(Ms.Path));
 			break;
 		}
@@ -4829,8 +4830,7 @@ bool ScribeWnd::UnLoadFolders()
 
 	if (MailList)
 	{
-		ScribeFolder *Container = MailList->GetContainer();
-		if (Container)
+		if (auto Container = MailList->GetContainer())
 		{
 			// save folder settings
 			Container->SerializeFieldWidths();
@@ -4869,7 +4869,7 @@ bool ScribeWnd::UnLoadFolders()
 	if (GetOptions())
 	{
 		// Unload local folders...
-		LXmlTag *MailStores = GetOptions()->LockTag(OPT_MailStores, _FL);
+		auto MailStores = GetOptions()->LockTag(OPT_MailStores, _FL);
 
 		for (size_t i=0; i<Folders.Length(); i++)
 		{
@@ -4880,7 +4880,7 @@ bool ScribeWnd::UnLoadFolders()
 
 				for (auto ms: MailStores->Children)
 				{
-					char *StoreName = ms->GetAttr(OPT_MailStoreName);
+					auto StoreName = ms->GetAttr(OPT_MailStoreName);
 					if (Folders[i].Name.Equals(StoreName))
 					{
 						ms->SetAttr(OPT_MailStoreExpanded, Expanded);
@@ -5039,12 +5039,14 @@ LToolBar *ScribeWnd::LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LIma
 	return Tools;
 }
 
-void ScribeWnd::SetListPane(LView *v)
+void ScribeWnd::SetListPane(LAutoPtr<LView> listPane)
 {
 	THREAD_UNSAFE();
 
-	ThingList *ThingLst = dynamic_cast<ThingList*>(v);
-	DynamicHtml *Html = dynamic_cast<DynamicHtml*>(v);
+	ListPane = listPane;
+
+	auto ThingLst = dynamic_cast<ThingList*>(ListPane.Get());
+	auto Html     = dynamic_cast<DynamicHtml*>(ListPane.Get());
 	if (!ThingLst)
 	{
 		DeleteObj(SearchView);
@@ -5052,17 +5054,19 @@ void ScribeWnd::SetListPane(LView *v)
 			MailList->RemoveAll();
 	}
 
-	v->Sunken(SUNKEN_CTRL);
-	if ((MailList = ThingLst))
+	ListPane->Sunken(SUNKEN_CTRL);
+
+	// Set either 'MailList' or 'TitlePage'
+	if (ThingLst)
 	{
+		MailList = ThingLst;
 		DeleteObj(TitlePage);
 		if (GetCtrlValue(IDM_ITEM_FILTER))
-		{
 			OnCommand(IDM_ITEM_FILTER, 0, NULL);
-		}
 	}
 	else
 	{
+		DeleteObj(MailList);
 		TitlePage = Html;
 	}
 	
@@ -5099,12 +5103,13 @@ ScribeWnd::LayoutMode ScribeWnd::GetEffectiveLayoutMode()
 	GetOptions()->GetValue(OPT_LayoutMode, Mode);
 	ScribeFolder *Cur = GetCurrentFolder();
 	
-	if (Cur && !Cur->IsItem())
+	if (Cur &&
+		Cur->IsItem() &&
+		Cur->IsItem()->IsRoot())
 	{
 		Mode = FoldersAndList;
 	}
-
-	if (Mode.CastInt32() == 0)
+	else if (Mode.CastInt32() == 0)
 	{
 		Mode = FoldersListAndPreview;
 	}	
@@ -5130,6 +5135,7 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 	bool JustPreviewPane =	(Mode == FoldersAndList && d->LastLayout == FoldersListAndPreview) ||
 							(Mode == FoldersListAndPreview && d->LastLayout == FoldersAndList);
 
+	// If 'Content' gets attached to a view, then 'ListPane' should be released.
 	LView *Content = NULL;
 	if (TitlePage)
 		Content = TitlePage;
@@ -5157,7 +5163,8 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 				int Idx = 0;
 				if (SearchView)
 					d->SubSplit->SetViewAt(Idx++, SearchView);				
-				d->SubSplit->SetViewAt(Idx++, Content);
+				if (d->SubSplit->SetViewAt(Idx++, Content))
+					ListPane.Release(); // Something else now owns the list pane...
 				d->SubSplit->SetViewAt(Idx++, PreviewPanel);
 				break;
 			}
@@ -5178,12 +5185,14 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 					int Idx = 0;
 					if (SearchView)
 						d->SubSplit->SetViewAt(Idx++, SearchView);				
-					d->SubSplit->SetViewAt(Idx++, Content);
+					if (d->SubSplit->SetViewAt(Idx++, Content))
+						ListPane.Release(); // Something else now owns the list pane...
 				}
 				else
 				{
 					d->SubSplit->Detach();
-					Splitter->SetViewAt(1, Content);
+					if (Splitter->SetViewAt(1, Content))
+						ListPane.Release(); // Something else now owns the list pane...
 				}
 				break;
 			}
@@ -5210,7 +5219,8 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 				int Idx = 0;
 				if (SearchView)
 					d->SubSplit->SetViewAt(Idx++, SearchView);
-				d->SubSplit->SetViewAt(Idx++, Content);
+				if (d->SubSplit->SetViewAt(Idx++, Content))
+					ListPane.Release(); // Something else now owns the list pane...
 				d->SubSplit->SetViewAt(Idx++, PreviewPanel);
 
 				DeleteObj(d->SearchSplit);
@@ -5231,11 +5241,13 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 					d->SubSplit->SetViewAt(1, d->SearchSplit);
 					d->SearchSplit->SetVertical(true);
 					d->SearchSplit->SetViewAt(0, SearchView);
-					d->SearchSplit->SetViewAt(1, Content);
+					if (d->SearchSplit->SetViewAt(1, Content))
+						ListPane.Release(); // Something else now owns the list pane...
 				}
 				else
 				{
-					d->SubSplit->SetViewAt(1, Content);
+					if (d->SubSplit->SetViewAt(1, Content))
+						ListPane.Release(); // Something else now owns the list pane...
 					DeleteObj(d->SearchSplit);
 				}
 				break;
@@ -5250,12 +5262,14 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 					d->SubSplit->SetVertical(true);
 					Splitter->SetViewAt(1, d->SubSplit);
 					d->SubSplit->SetViewAt(0, SearchView);
-					d->SubSplit->SetViewAt(1, Content);
+					if (d->SubSplit->SetViewAt(1, Content))
+						ListPane.Release(); // Something else now owns the list pane...
 				}
 				else
 				{
 					d->SubSplit->Detach();
-					Splitter->SetViewAt(1, Content);
+					if (Splitter->SetViewAt(1, Content))
+						ListPane.Release(); // Something else now owns the list pane...
 				}
 				DeleteObj(d->SearchSplit);
 				break;
@@ -8478,14 +8492,26 @@ void ScribeWnd::RemoveThingSrc(ScribeFolder *src)
 LArray<ScribeFolder*> ScribeWnd::GetThingSources(Store3ItemTypes Type)
 {
 	LArray<ScribeFolder*> a;
+	LArray<ScribeFolder*> del;
+
 	for (auto f: d->ThingSources)
 	{
-		if (f->GetItemType() == Type &&
+		if (!f->GetObject())
+		{
+			LAssert(!"missing object?");
+			del.Add(f);
+		}
+		else if (f->GetItemType() == Type &&
 			!f->IsInTrash())
 		{
 			a.Add(f);
 		}
 	}
+
+	// Clean up folders that we can't use
+	for (auto f: del)
+		d->ThingSources.Delete(f);
+
 	return a;
 }
 
