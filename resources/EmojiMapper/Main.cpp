@@ -233,7 +233,7 @@ public:
 				LAutoPtr<LSurface> Resize;
 				if (Img)
 				{
-					LMemDC *r = new LMemDC(ICON_SIZE, ICON_SIZE, Img->GetColourSpace());
+					LMemDC *r = new LMemDC(_FL, ICON_SIZE, ICON_SIZE, Img->GetColourSpace());
 					if (r)
 					{
 						LRect rc = Img->Bounds();
@@ -740,12 +740,12 @@ struct IconThread : public LThread
 					if (Ch > 0)
 					{
 						LMemStream Str(Buf, BLen, false);
-						LAutoPtr<LSurface> Img(new LMemDC);
+						LAutoPtr<LSurface> Img(new LMemDC(_FL));
 						if (Png->ReadImage(Img, &Str) == LFilter::IoSuccess)
 						{
 							if (Img->GetColourSpace() != System32BitColourSpace)
 							{
-								LAutoPtr<LSurface> Img32(new LMemDC(Img->X(), Img->Y(), System32BitColourSpace));
+								LAutoPtr<LSurface> Img32(new LMemDC(_FL, Img->X(), Img->Y(), System32BitColourSpace));
 								if (Img32)
 								{
 									Img32->Op(GDC_ALPHA);
@@ -756,7 +756,7 @@ struct IconThread : public LThread
 							
 							if (Img->Y() > OUTPUT_ICON_SIZE)
 							{
-								LAutoPtr<LSurface> Resize(new LMemDC(OUTPUT_ICON_SIZE, OUTPUT_ICON_SIZE, System32BitColourSpace));
+								LAutoPtr<LSurface> Resize(new LMemDC(_FL, OUTPUT_ICON_SIZE, OUTPUT_ICON_SIZE, System32BitColourSpace));
 								if (Resize)
 								{
 									ResampleDC(Resize, Img);
@@ -1009,7 +1009,7 @@ public:
     void OnPaint(LSurface *pScreen)
     {
 		LRect c = GetClient();
-		LMemDC Mem(c.X(), c.Y(), System32BitColourSpace);
+		LMemDC Mem(_FL, c.X(), c.Y(), System32BitColourSpace);
 		Mem.Colour(L_MED);
 		Mem.Rectangle();
 		LSurface *pDC = &Mem;
@@ -1233,7 +1233,7 @@ public:
 		}
 
 		int Rows = (int) ((m.Length() + 15) / 16);
-		LMemDC Icons(OUTPUT_ICON_SIZE * 16, OUTPUT_ICON_SIZE * Rows, System32BitColourSpace);
+		LMemDC Icons(_FL, OUTPUT_ICON_SIZE * 16, OUTPUT_ICON_SIZE * Rows, System32BitColourSpace);
 		Icons.Set(0, 32);
 		Icons.Rectangle();
 		
@@ -1299,7 +1299,7 @@ public:
 					}
 				}
 
-				LMemDC Resized(OUTPUT_ICON_SIZE, OUTPUT_ICON_SIZE, System32BitColourSpace);
+				LMemDC Resized(_FL, OUTPUT_ICON_SIZE, OUTPUT_ICON_SIZE, System32BitColourSpace);
 				if (a.Img->X() != OUTPUT_ICON_SIZE ||
 					a.Img->Y() != OUTPUT_ICON_SIZE)
 				{

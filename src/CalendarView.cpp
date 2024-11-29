@@ -1200,7 +1200,7 @@ void CalendarView::DrawSelectionBox(LSurface *pDC, LRect &r)
 void CalendarView::OnPaint(LSurface *pDC)
 {
 	#ifndef MAC // Mac is double buffered anyway
-	LDoubleBuffer Buf(_FL, pDC);
+	LDoubleBuffer Buf(pDC);
 	#endif
 	
 	LColour InMonth(L_WORKSPACE);
