@@ -35,7 +35,7 @@ public:
 		}
 	}
 
-	bool OnViewKey(LView *v, LKey &k)
+	bool OnViewKey(LView *v, LKey &k) override
 	{
 		if (k.CtrlCmd() && ToLower(k.c16) == 'w')
 		{
@@ -46,7 +46,7 @@ public:
 		return false;
 	}
 	
-	void OnPosChange()
+	void OnPosChange() override
 	{
 		LRect c = GetClient();
 		
@@ -90,7 +90,7 @@ public:
 		return Status;
 	}
 
-	bool OnNavigate(LDocView *Parent, const char *Uri)
+	bool OnNavigate(LDocView *Parent, const char *Uri) override
 	{
 		if (Uri &&
 			_strnicmp(Uri, "mailto:", 7) == 0)

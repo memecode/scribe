@@ -61,7 +61,7 @@ public:
 	MailUiGpg(ScribeWnd *App, MailUi *Ui, int ColX1, int ColX2, bool WritingEmail);
 	~MailUiGpg();
 	
-	const char *GetClass() { return "MailUiGpg"; }
+	const char *GetClass() override { return "MailUiGpg"; }
 
 	// Actions
 	void SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, std::function<void(int)> callback);
@@ -72,14 +72,14 @@ public:
 	void OnRecipientChange();
 	
 	// View Events
-	bool Pour(LRegion &r);
-	void OnPaint(LSurface *pDC);
-	void OnCreate();
+	bool Pour(LRegion &r) override;
+	void OnPaint(LSurface *pDC) override;
+	void OnCreate() override;
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 	void DoCommand(int Cmd, std::function<void(int)> callback);
-	LMessage::Result OnEvent(LMessage *Msg);
+	LMessage::Result OnEvent(LMessage *Msg) override;
 
-	int OnCommand(int Cmd, int Event, OsView Wnd)
+	int OnCommand(int Cmd, int Event, OsView Wnd) override
 	{
 		LAssert(!"Call DoCommand...");
 		return 0;

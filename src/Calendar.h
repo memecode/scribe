@@ -187,7 +187,7 @@ class CalendarUi :
 	bool NotifyOn = false;
 	bool FirstLayout = true;
 
-	bool OnViewKey(LView *v, LKey &k);	
+	bool OnViewKey(LView *v, LKey &k) override;	
 	void CheckConsistancy();
 	LDateTime CurrentStart();
 	LDateTime CurrentEnd();
@@ -199,16 +199,16 @@ public:
 	CalendarUi(Calendar *item);
 	~CalendarUi();
 
-	const char *GetClass() { return "CalendarUi"; }
+	const char *GetClass() override { return "CalendarUi"; }
 	
 	Calendar *GetCal() { return Item; }
-	int OnCommand(int Cmd, int Event, OsView Window);
+	int OnCommand(int Cmd, int Event, OsView Window) override;
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
-	void OnPosChange();
-	LMessage::Result OnEvent(LMessage *Msg);
+	void OnPosChange() override;
+	LMessage::Result OnEvent(LMessage *Msg) override;
 
-	void OnLoad();
-	void OnSave();
+	void OnLoad() override;
+	void OnSave() override;
 };
 
 class CalendarSource : public LListItem

@@ -11,17 +11,17 @@ class LSearchView : public LLayout, public ThingFilter, public LResourceLoad
 	LArray<uint32_t> Colours;
 	LString::Array Keywords;
 
-	void OnCreate();
-	void OnPosChange();
+	void OnCreate() override;
+	void OnPosChange() override;
 
 public:
 	LSearchView(ScribeWnd *app);
 
-	const char *GetClass() { return "LSearchView"; }
-	void OnPaint(LSurface *pDC);
+	const char *GetClass() override { return "LSearchView"; }
+	void OnPaint(LSurface *pDC) override;
 	int OnNotify(LViewI *c, const LNotification &n) override;
-	bool TestThing(Thing *Thing);
-	void Focus(bool Foc);
+	bool TestThing(Thing *Thing) override;
+	void Focus(bool Foc) override;
 	void OnFolder();
 };
 

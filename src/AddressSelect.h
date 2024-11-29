@@ -12,8 +12,8 @@ public:
 	AddressBrowse(ScribeWnd *app, LView *target, LList *recip, LViewI *setto);
 	~AddressBrowse();
 
-	LString ToString(BrowseItem *Obj);
-	void OnSelect(BrowseItem *Obj);
+	LString ToString(BrowseItem *Obj) override;
+	void OnSelect(BrowseItem *Obj) override;
 	int OnNotify(LViewI *c, const LNotification &n) override;
 };
 

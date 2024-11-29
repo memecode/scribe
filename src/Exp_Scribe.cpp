@@ -421,21 +421,21 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 		}
 	}
 
-	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new)
+	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new) override
 	{
 	}
 
-	bool OnDelete(LDataFolderI *parent, LArray<LDataI*> &items)
+	bool OnDelete(LDataFolderI *parent, LArray<LDataI*> &items) override
 	{
 		return true;
 	}
 	
-	bool OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items)
+	bool OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items) override
 	{
 		return true;
 	}
 
-	bool OnChange(LArray<LDataI*> &items, int FieldHint)
+	bool OnChange(LArray<LDataI*> &items, int FieldHint) override
 	{
 		return true;
 	}

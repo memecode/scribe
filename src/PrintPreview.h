@@ -10,11 +10,11 @@ public:
 	~PrintPreview();
 	
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
-	void OnPosChange();
+	void OnPosChange() override;
 	LSurface *GetImage();
 	LAutoPtr<LMemDC> ReleaseImage();
 	LString GetPageRanges();
-	void OnPulse();
+	void OnPulse() override;
 };
 
 #endif

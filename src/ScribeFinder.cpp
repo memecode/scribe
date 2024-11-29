@@ -1000,13 +1000,13 @@ public:
 	~FindWnd();
 
 	int OnNotify(LViewI *Col, const LNotification &n) override;
-	LMessage::Result OnEvent(LMessage *m);
+	LMessage::Result OnEvent(LMessage *m) override;
 
-	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new);
-	bool OnDelete(LDataFolderI *parent, LArray<LDataI*> &items);
-	bool OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items);
-	bool OnChange(LArray<LDataI*> &items, int FieldHint);
-	void OnPulse();
+	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new) override;
+	bool OnDelete(LDataFolderI *parent, LArray<LDataI*> &items) override;
+	bool OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items) override;
+	bool OnChange(LArray<LDataI*> &items, int FieldHint) override;
+	void OnPulse() override;
 };
 
 

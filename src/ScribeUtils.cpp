@@ -1600,7 +1600,7 @@ public:
 		MoveSameScreen(Parent);
 	}
 
-	void OnPosChange()
+	void OnPosChange() override
 	{
 		if (Tbl)
 			Tbl->SetPos(GetClient());

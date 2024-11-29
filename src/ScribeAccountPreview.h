@@ -46,8 +46,8 @@ public:
 	~ScribeAccountPreview();
 
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
-	void OnPulse();
-	void OnPaint(LSurface *pDC);
+	void OnPulse() override;
+	void OnPaint(LSurface *pDC) override;
 };
 
 #endif

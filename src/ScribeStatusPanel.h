@@ -52,7 +52,7 @@ class AccountStatusPanel :
 
 	// Methods
 	int AccountStatus(Accountlet *Acc);
-	int CalcWidth();
+	int CalcWidth() override;
 	bool _Lock();
 	void _Unlock();
 
@@ -66,11 +66,11 @@ public:
 	void Empty();
 	LXmlTag *GetOptions();
 	void SetDataRate(int Percent);
-	void OnPosChange();
+	void OnPosChange() override;
 
 	// Window
-	void OnPaint(LSurface *pDC);
-	void OnPulse();
+	void OnPaint(LSurface *pDC) override;
+	void OnPulse() override;
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 };
 

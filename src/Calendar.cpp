@@ -2282,9 +2282,9 @@ public:
 	}
 	
 	void SetType(DropType type) { Type = type; }
-	const char *GetClass() { return "LEditDropDown"; }
+	const char *GetClass() override { return "LEditDropDown"; }
 	
-	void OnMouseClick(LMouse &m)
+	void OnMouseClick(LMouse &m) override
 	{
 		LEdit::OnMouseClick(m);
 		
@@ -2294,7 +2294,7 @@ public:
 		}
 	}
 	
-	void OnFocus(bool f)
+	void OnFocus(bool f) override
 	{
 		if (f)
 		{
@@ -2343,7 +2343,7 @@ public:
 		return 0;
 	}
 
-	void OnChildrenChanged(LViewI *Wnd, bool Attaching)
+	void OnChildrenChanged(LViewI *Wnd, bool Attaching) override
 	{
 		if (Wnd == (LViewI*)Popup.Get() && !Attaching)
 		{

@@ -132,11 +132,11 @@ public:
 	int OnNotify(LViewI *c, const LNotification &n) override;
 
 	void ResolveAll();
-	void OnDirty(bool Dirty) {}
-	void OnLoad();
-	void OnSave();
-	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState);
-	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState);
+	void OnDirty(bool Dirty) override {}
+	void OnLoad() override;
+	void OnSave() override;
+	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState) override;
+	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState) override;
 	void Add(char *Email);
 };
 

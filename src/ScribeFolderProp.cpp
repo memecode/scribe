@@ -117,12 +117,12 @@ public:
 	    LAssert(Loop == false);
 	}
 	
-	void OnCreate()
+	void OnCreate() override
 	{
 		PostEvent(M_INIT_DONE);
 	}
 	
-	bool OnRequestClose(bool OsClose)
+	bool OnRequestClose(bool OsClose) override
 	{
 	    if (Loop)
 	    {
@@ -342,7 +342,7 @@ public:
 		Loop = false;
 	}
 
-    LMessage::Param OnEvent(LMessage *Msg)
+    LMessage::Param OnEvent(LMessage *Msg) override
     {
         if (Msg->Msg() == M_INIT_DONE)
             Run();

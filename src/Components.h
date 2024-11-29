@@ -89,13 +89,13 @@ public:
 
 	void Empty();
 	void SetMsg(const char *m);
-    void OnCreate();
-    void OnPosChange();
-    void OnPaint(LSurface *pDC);
-    bool Pour(LRegion &r);
+    void OnCreate() override;
+    void OnPosChange() override;
+    void OnPaint(LSurface *pDC) override;
+    bool Pour(LRegion &r) override;
     int OnNotify(LViewI *c, const LNotification &n) override;
-    void OnPulse();
-	LMessage::Param OnEvent(LMessage *Msg);
+    void OnPulse() override;
+	LMessage::Param OnEvent(LMessage *Msg) override;
 };
 
 /// This class is the behind the scenes code to install functionality on

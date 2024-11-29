@@ -941,7 +941,7 @@ public:
 		}
 	}
 
-	void OnPaint(LSurface *pDC)
+	void OnPaint(LSurface *pDC) override
 	{
 		LRect r(GetClient());
 		LWideBorder(pDC, r, DefaultRaisedEdge);
@@ -7769,7 +7769,7 @@ public:
 		}
 	}
 	
-	void OnPosChange()
+	void OnPosChange() override
 	{
 		if (Table)
 		{

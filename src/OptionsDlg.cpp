@@ -71,7 +71,7 @@ class UtfEditor : public LWindow
 
 public:
 	UtfEditor(ScribeWnd *app, const char *txtopt, const char *htmlopt, const char *desc);
-	void OnPosChange();
+	void OnPosChange() override;
 	int OnNotify(LViewI *c, const LNotification &n) override;
 };
 
@@ -858,6 +858,8 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		{
 			switch (n.Type)
 			{
+				default:
+					break;
 				case LNotifyItemInsert:
 				case LNotifyItemDelete:
 				{

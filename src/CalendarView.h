@@ -185,9 +185,9 @@ public:
 	LString LoadString(int id);
 	LString UnusedKey();
 	
-	bool OnKey(LKey &k);
-	int OnCommand(int Cmd, int Event, OsView WndHandle);
-	LMessage::Result OnEvent(LMessage *m);
+	bool OnKey(LKey &k) override;
+	int OnCommand(int Cmd, int Event, OsView WndHandle) override;
+	LMessage::Result OnEvent(LMessage *m) override;
 	int OnNotify(LViewI *c, const LNotification &n) override;
 	static void OnOptionsChange();
 };

@@ -153,12 +153,12 @@ public:
 	ContactUi(Contact *item);
 	~ContactUi();
 
-	void OnLoad();
-	void OnSave();
-	void OnDestroy();
+	void OnLoad() override;
+	void OnSave() override;
+	void OnDestroy() override;
 	int OnNotify(LViewI *Col, const LNotification &n) override;
-	LMessage::Result OnEvent(LMessage *Msg);
-	void OnPulse();
+	LMessage::Result OnEvent(LMessage *Msg) override;
+	void OnPulse() override;
 };
 
 /////////////////////////////////////////////////////////////
@@ -309,51 +309,51 @@ protected:
 	// Methods
 	bool SeekMsg(int Delta);
 
-	bool NeedsCapability(const char *Name, const char *Param = NULL);
-	bool SetDoc(LDocView *v, const char *MimeType);
-	void OnInstall(LCapabilityTarget::CapsHash *Caps, bool Status);
-	void OnCloseInstaller();
+	bool NeedsCapability(const char *Name, const char *Param = NULL) override;
+	bool SetDoc(LDocView *v, const char *MimeType) override;
+	void OnInstall(LCapabilityTarget::CapsHash *Caps, bool Status) override;
+	void OnCloseInstaller() override;
 	void SetCmdAfterResize(int Cmd);
-	void OnChildrenChanged(LViewI *Wnd, bool Attaching);
+	void OnChildrenChanged(LViewI *Wnd, bool Attaching) override;
 
 public:
 	MailUi(Mail *item, MailContainer *Container = NULL);
 	~MailUi();
 
-	const char *GetClass() { return "MailUi"; }
+	const char *GetClass() override { return "MailUi"; }
 	Mail *GetItem();
 	void SetItem(Mail *m);
-	LDocView *GetDoc(const char *MimeType);
+	LDocView *GetDoc(const char *MimeType) override;
 
-	bool SetDirty(bool d, bool ui = true);
-	void OnLoad();
-	AttachmentList *GetAttachments() { return Attachments; }
+	bool SetDirty(bool d, bool ui = true) override;
+	void OnLoad() override;
+	AttachmentList *GetAttachments() override { return Attachments; }
 	void SerializeText(bool FromCtrl);
 	bool AddRecipient(Contact *c);
 	bool AddRecipient(const char *Email, const char *Name);
-	bool AddRecipient(AddressDescriptor *Addr);
+	bool AddRecipient(AddressDescriptor *Addr) override;
 	bool AddCalendarEvent(bool AddPopupReminder);
 
 	int OnNotify(LViewI *Col, const LNotification &n) override;
 	void OnSysKey(int a, int b);
-	void OnDirty(bool Dirty);
+	void OnDirty(bool Dirty) override;
 	void OnDataEntered();
-	void OnSave();
+	void OnSave() override;
 
-	void OnPaint(LSurface *pDC);
-	void OnPulse();
-	LMessage::Result OnEvent(LMessage *Msg);
-	void OnPosChange();
-	int OnCommand(int Cmd, int Event, OsView Window);
+	void OnPaint(LSurface *pDC) override;
+	void OnPulse() override;
+	LMessage::Result OnEvent(LMessage *Msg) override;
+	void OnPosChange() override;
+	int OnCommand(int Cmd, int Event, OsView Window) override;
 	void AttachFile(const char *File);
 	int HandleCmd(int Cmd);
-	void OnReceiveFiles(LArray<const char*> &Files);
-	bool OnViewKey(LView *v, LKey &k);
+	void OnReceiveFiles(LArray<const char*> &Files) override;
+	bool OnViewKey(LView *v, LKey &k) override;
 	void OnAttachmentsChange();
-	void OnChange();
+	void OnChange() override;
 	bool IsWorking(int Set = -1);
-	bool OnRequestClose(bool OsClose);
-	bool CallMethod(const char *Name, LScriptArguments &Arg);
+	bool OnRequestClose(bool OsClose) override;
+	bool CallMethod(const char *Name, LScriptArguments &Arg) override;
 };
 
 class AttachmentList : public LList
@@ -450,9 +450,9 @@ protected:
 	struct FilterUiPriv *d;
 	Filter *Item;
 
-	void OnLoad();
-	void OnSave();
-	bool OnViewKey(LView *v, LKey &k);
+	void OnLoad() override;
+	void OnSave() override;
+	bool OnViewKey(LView *v, LKey &k) override;
 	void ReorderAction(int offset);
 	void DeleteAction();
 
@@ -466,8 +466,8 @@ public:
 
 	// Events
 	int OnNotify(LViewI *Col, const LNotification &n) override;
-	LMessage::Result OnEvent(LMessage *Msg);
-	int OnCommand(int Cmd, int Event, OsView Window);
+	LMessage::Result OnEvent(LMessage *Msg) override;
+	int OnCommand(int Cmd, int Event, OsView Window) override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -609,7 +609,7 @@ public:
 	FolderNameDlg(LView *parent, const char *Old = "");
 	~FolderNameDlg();
 
-	void OnCreate();
+	void OnCreate() override;
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
 };
 
@@ -641,10 +641,10 @@ public:
 	OptionsDlg(ScribeWnd *window);
 	~OptionsDlg();
 
-	void OnCreate();
+	void OnCreate() override;
 	void OnAccountEnable(ScribeAccount *Acc, bool Enable);
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
-	LMessage::Result OnEvent(LMessage *m);
+	LMessage::Result OnEvent(LMessage *m) override;
 };
 
 class ScribeThread : public LThread

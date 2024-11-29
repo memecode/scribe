@@ -349,7 +349,7 @@ public:
 		return CompressedImg;
 	}
 
-	bool OnKey(LKey &k)
+	bool OnKey(LKey &k) override
 	{
 		switch (k.vkey)
 		{
@@ -387,7 +387,7 @@ public:
 		return false;
 	}
 
-	void OnMouseClick(LMouse &m)
+	void OnMouseClick(LMouse &m) override
 	{
 		if (m.Down())
 			Focus(true);
@@ -403,12 +403,12 @@ public:
 		Invalidate();
 	}
 	
-	void OnCreate()
+	void OnCreate() override
 	{
 		SetWindow(this);
 	}
 	
-	bool OnLayout(LViewLayoutInfo &Inf)
+	bool OnLayout(LViewLayoutInfo &Inf) override
 	{
 		if (!Inf.Width.Min)
 			Inf.Width.Min = Inf.Width.Max = 160;
@@ -418,7 +418,7 @@ public:
 		return true;
 	}
 	
-	void OnPaint(LSurface *pDC)
+	void OnPaint(LSurface *pDC) override
 	{
 		LRegion rgn(GetClient());
 		if (Img)
@@ -551,7 +551,7 @@ public:
 		return true;
 	}
 
-	LMessage::Param OnEvent(LMessage *Msg)
+	LMessage::Param OnEvent(LMessage *Msg) override
 	{
 		if (Msg->Msg() == M_IMAGE_LOADED)
 		{
@@ -586,7 +586,7 @@ public:
 		return 0;
 	}
 
-	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
+	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState) override
 	{
 		if (Formats.HasFormat(LGI_FileDropFormat))
 			Formats.SupportsFileDrops();
@@ -601,7 +601,7 @@ public:
 		return Formats.GetSupported().Length() ? DROPEFFECT_COPY : DROPEFFECT_NONE;
 	}
 	
-	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
+	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState) override
 	{
 		for (unsigned i=0; i<Data.Length(); i++)
 		{
@@ -742,19 +742,19 @@ public:
 		return LList::OnNotify(Ctrl, n);
 	}
 
-	bool NameW(const char16 *n)
+	bool NameW(const char16 *n) override
 	{
 		LAutoString a(WideToUtf8(n));
 		return Name(a);
 	}
 
-	const char16 *NameW()
+	const char16 *NameW() override
 	{
 		w.Reset(Utf8ToWide(Name()));
 		return w;
 	}
 
-	bool Name(const char *n)
+	bool Name(const char *n) override
 	{
 		Empty();
 
@@ -773,7 +773,7 @@ public:
 		return true;
 	}
 
-	const char *Name()
+	const char *Name() override
 	{
 		LJson j;
 		LArray<LFieldItem*> items;
