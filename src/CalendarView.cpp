@@ -2981,13 +2981,6 @@ CalendarViewWnd::CalendarViewWnd(ScribeFolder *folder)
 {
 	CalendarViewWindows.Add(this);
 	App = folder ? folder->App : 0;
-	Cv = 0;
-	Split = 0;
-	Todo = 0;
-	HorBox = NULL;
-	VerBox = NULL;
-	CalLst = NULL;
-	MonthV = NULL;
 	Name("Calendar View");
 
 	if (!SerializeState(App->GetOptions(), OPT_CalendarViewPos, true))

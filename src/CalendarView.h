@@ -167,17 +167,16 @@ public:
 
 class CalendarViewWnd : public LWindow
 {
-	ScribeWnd *App;
-	CalendarView *Cv;
-	LSplitter *Split;
-	LList *Todo;
-	class LMonthView *MonthV;
-	LBox *HorBox, *VerBox;
+	ScribeWnd *App = nullptr;
+	CalendarView *Cv = nullptr;
+	LList *Todo = nullptr;
+	class LMonthView *MonthV = nullptr;
+	LBox *HorBox = nullptr, *VerBox = nullptr;
 
 	void OptionsChange();
 
 public:
-	LList *CalLst;
+	LList *CalLst = nullptr;
 
 	CalendarViewWnd(ScribeFolder *folder);
 	~CalendarViewWnd();
