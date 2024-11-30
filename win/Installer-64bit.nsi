@@ -14,7 +14,7 @@
 
 !system "copy ..\..\libs\aspell-0.60.6.1\win32\dist\x64Release19\aspell-dist-0.60.dll scribe-setup" = 0
 
-!system "copy ..\..\libs\build-x64\libjpeg-9a\Release\libjpeg9a_19x64.dll scribe-setup" = 0
+!system "copy ..\..\libs\build-x64\libjpeg\Release\libjpeg9a_19x64.dll scribe-setup" = 0
 !system "copy ..\..\libs\build-x64\libpng\Release\libpng16_19x64.dll scribe-setup" = 0
 !system "copy ..\..\libs\build-x64\libpng\zlib_dir\Release\zlib_19x64.dll scribe-setup" = 0
 !system "copy ..\..\libs\build-x64\libchardet\Release\chardet19x64.dll scribe-setup" = 0

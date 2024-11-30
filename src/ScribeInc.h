@@ -2,7 +2,7 @@
 #define __SCRIBE_INC_H
 
 // Version
-#define ScribeVer					"3.10"
+#define ScribeVer					"3.11"
 
 #define ImapSupport
 #define FilterSupport
