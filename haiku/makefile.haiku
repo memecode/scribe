@@ -34,17 +34,15 @@ ifeq ($(Build),Debug)
 		-llgi$(Tag) \
 		-L../../lgi/trunk/$(BuildDir)
 	Inc =  \
-		-I../libs/aspell-0.60.6.1/interfaces/cc \
-		-I../../lgi/trunk/include/lgi/haiku \
-		-I../libs/libchardet/src \
-		-I../../lgi/trunk/include \
-		-I./src/Store3Webdav \
-		-I./src \
+		-I./utils/Tables \
 		-I./resources \
 		-I./src/Sqlite \
-		-I./utils/Tables \
+		-I../../lgi/trunk/include/lgi/haiku \
+		-I./src \
+		-I../../lgi/trunk/include \
+		-I./src/Store3Webdav \
 		-I../../lgi/trunk/private/common \
-		-I../libs/libchardet/include
+		-I../libs/build-x64-debug/include
 else
 	CFlags += -s -Os
 	CppFlags += -s -Os
@@ -60,21 +58,30 @@ else
 		-llgi$(Tag) \
 		-L../../lgi/trunk/$(BuildDir)
 	Inc =  \
-		-I../libs/aspell-0.60.6.1/interfaces/cc \
+		-I./src/Sqlite \
+		-I./utils/Tables \
+		-I./resources \
 		-I../../lgi/trunk/include/lgi/haiku \
-		-I../libs/libchardet/src \
+		-I../libs/build-x64-release/include \
+		-I./src \
 		-I../../lgi/trunk/include \
 		-I./src/Store3Webdav \
-		-I./src \
-		-I./resources \
-		-I./utils/Tables \
-		-I./src/Sqlite \
-		-I../../lgi/trunk/private/common \
-		-I../libs/libchardet/include
+		-I../../lgi/trunk/private/common
 endif
 
 # Dependencies
-Source =	src/Store3Webdav/WebdavThread.cpp \
+Source =	src/ScribeUi.cpp \
+			src/BayesDlg.cpp \
+			src/Calendar.cpp \
+			src/Imp_Eml.cpp \
+			src/Imp_Beos.cpp \
+			../../lgi/trunk/src/common/Text/Homoglyphs/HomoglyphsTable.cpp \
+			../../lgi/trunk/src/common/Text/Homoglyphs/Homoglyphs.cpp \
+			../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp \
+			../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp \
+			../../lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp \
+			../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp \
+			src/Store3Webdav/WebdavThread.cpp \
 			src/Store3Webdav/WebdavContact.cpp \
 			src/Store3Webdav/WebdavCalendar.cpp \
 			src/Store3Webdav/WebdavFolder.cpp \
@@ -98,7 +105,6 @@ Source =	src/Store3Webdav/WebdavThread.cpp \
 			../../lgi/trunk/src/common/Widgets/TimePopup.cpp \
 			../../lgi/trunk/src/common/Db/Db-Csv.cpp \
 			../../lgi/trunk/src/common/Text/XmlTreeUi.cpp \
-			../../lgi/trunk/src/common/Text/TextView4.cpp \
 			../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			../../lgi/trunk/src/common/Widgets/DatePopup.cpp \
 			../../lgi/trunk/src/common/Net/Ftp.cpp \
@@ -116,9 +122,9 @@ Source =	src/Store3Webdav/WebdavThread.cpp \
 			../../lgi/trunk/src/common/General/Tnef.cpp \
 			../../lgi/trunk/src/common/Net/Http.cpp \
 			../../lgi/trunk/src/common/General/TimeZone.cpp \
-			../../lgi/trunk/src/common/Gdc2/Filters/Lzw.cpp \
-			../../lgi/trunk/src/common/Gdc2/Filters/Jpeg.cpp \
 			../../lgi/trunk/src/common/Gdc2/Filters/Png.cpp \
+			../../lgi/trunk/src/common/Gdc2/Filters/Jpeg.cpp \
+			../../lgi/trunk/src/common/Gdc2/Filters/Lzw.cpp \
 			../../lgi/trunk/src/common/Gdc2/Filters/Gif.cpp \
 			src/Test/UnitTests.cpp \
 			src/Store3Common.cpp \
@@ -182,8 +188,8 @@ Source =	src/Store3Webdav/WebdavThread.cpp \
 			../../lgi/trunk/src/common/Coding/ScriptLibrary.cpp \
 			../../lgi/trunk/src/common/Coding/ScriptCompiler.cpp \
 			../../lgi/trunk/src/common/Widgets/ControlTree.cpp \
-			../../lgi/trunk/src/common/Widgets/ColourSelect.cpp \
 			../../lgi/trunk/src/common/Text/SpellCheckAspell.cpp \
+			../../lgi/trunk/src/common/Widgets/ColourSelect.cpp \
 			../../lgi/trunk/src/common/Widgets/Editor/TextBlock.cpp \
 			../../lgi/trunk/src/common/General/SoftwareUpdate.cpp \
 			../../lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp \
@@ -193,17 +199,6 @@ Source =	src/Store3Webdav/WebdavThread.cpp \
 			../../lgi/trunk/src/common/General/SharedMemory.cpp \
 			../../lgi/trunk/src/common/General/SegmentTree.cpp \
 			../../lgi/trunk/src/common/Gdc2/DrawListSurface.cpp \
-			src/ScribeUi.cpp \
-			src/BayesDlg.cpp \
-			src/Calendar.cpp \
-			src/Imp_Eml.cpp \
-			src/Imp_Beos.cpp \
-			../../lgi/trunk/src/common/Text/Homoglyphs/HomoglyphsTable.cpp \
-			../../lgi/trunk/src/common/Text/Homoglyphs/Homoglyphs.cpp \
-			../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp \
-			../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp \
-			../../lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp \
-			../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp \
 			src/Store3Webdav/WebdavStore.cpp \
 			src/FolderCalendarSource.cpp \
 			src/Store3Mail3/Mail3Store.cpp \
@@ -281,6 +276,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so $(Objects)
 	../../lgi/trunk/include/lgi/common/ColourSpace.h \
 	../../lgi/trunk/include/lgi/common/Com.h \
 	../../lgi/trunk/include/lgi/common/Combo.h \
+	../../lgi/trunk/include/lgi/common/CommsBus.h \
 	../../lgi/trunk/include/lgi/common/Containers.h \
 	../../lgi/trunk/include/lgi/common/Core.h \
 	../../lgi/trunk/include/lgi/common/Css.h \
@@ -366,6 +362,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so $(Objects)
 	../../lgi/trunk/include/lgi/common/RegKey.h \
 	../../lgi/trunk/include/lgi/common/Res.h \
 	../../lgi/trunk/include/lgi/common/Rops.h \
+	../../lgi/trunk/include/lgi/common/Roster.h \
 	../../lgi/trunk/include/lgi/common/ScrollBar.h \
 	../../lgi/trunk/include/lgi/common/SkinEngine.h \
 	../../lgi/trunk/include/lgi/common/Slider.h \
@@ -386,6 +383,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so $(Objects)
 	../../lgi/trunk/include/lgi/common/TextLabel.h \
 	../../lgi/trunk/include/lgi/common/TextLog.h \
 	../../lgi/trunk/include/lgi/common/TextView3.h \
+	../../lgi/trunk/include/lgi/common/TextView4.h \
 	../../lgi/trunk/include/lgi/common/Thread.h \
 	../../lgi/trunk/include/lgi/common/ThreadEvent.h \
 	../../lgi/trunk/include/lgi/common/TimeZoneInfo.h \
@@ -484,6 +482,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Lgi/ViewCommon.cpp \
 	../../lgi/trunk/src/common/Lgi/WindowCommon.cpp \
 	../../lgi/trunk/src/common/Net/Base64.cpp \
+	../../lgi/trunk/src/common/Net/CommsBus.cpp \
 	../../lgi/trunk/src/common/Net/MDStringToDigest.cpp \
 	../../lgi/trunk/src/common/Net/Net.cpp \
 	../../lgi/trunk/src/common/Net/Uri.cpp \
@@ -494,6 +493,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Text/String.cpp \
 	../../lgi/trunk/src/common/Text/TextConvert.cpp \
 	../../lgi/trunk/src/common/Text/TextView3.cpp \
+	../../lgi/trunk/src/common/Text/TextView4.cpp \
 	../../lgi/trunk/src/common/Text/Token.cpp \
 	../../lgi/trunk/src/common/Text/Unicode.cpp \
 	../../lgi/trunk/src/common/Text/Utf8.cpp \
@@ -538,6 +538,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi$(Tag).so $(Objects)
 	../../lgi/trunk/src/haiku/View.cpp \
 	../../lgi/trunk/src/haiku/Widgets.cpp \
 	../../lgi/trunk/src/haiku/Window.cpp \
+	../../lgi/trunk/src/posix/Roster.cpp \
 	../../lgi/trunk/src/posix/SubProcess.cpp
 	export Build=$(Build); \
 	$(MAKE) -C ../../lgi/trunk -f ./haiku/Makefile.haiku

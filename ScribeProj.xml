@@ -512,6 +512,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
 					<Release>`pkg-config --cflags gtk+-3.0`</Release>
 				</Linux>
+				<Haiku />
 			</SystemIncludes>
 			<LibraryPaths>
 				<All>
@@ -521,14 +522,13 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>../libs/build-x64-release/libchardet
 ../libs/build-x64-release/bzip2-1.0.6</Release>
 				</All>
-				<Linux />
+				<Haiku />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
 					<Debug>scribe</Debug>
 					<Release>scribe</Release>
 				</Haiku>
-				<Linux />
 			</TargetName>
 			<Options>
 				<Linux>
@@ -536,6 +536,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>-Wno-format-truncation</Release>
 				</Linux>
 				<All />
+				<Haiku />
 			</Options>
 			<ApplicationIcon>
 				<Haiku>./resources/scribe.hvif</Haiku>
@@ -559,7 +560,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 		</Editor>
 		<Advanced>
 			<PostBuildCommands>
-				<Linux />
+				<Haiku />
 			</PostBuildCommands>
 			<OtherMakefileRules />
 		</Advanced>
