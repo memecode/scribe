@@ -14,13 +14,6 @@
 		<Node File="./src/Encryption/GnuPG.cpp" Type="2" Platforms="15" />
 		<Node File="./src/Encryption/GnuPG.h" Type="3" Platforms="15" />
 	</Node>
-	<Node Name="Gdc2" Type="1" Open="0" Platforms="7" Id="2">
-		<Node File="../../lgi/trunk/src/common/Gdc2/Filters/Gif.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/include/lgi/common/Jpeg.h" Type="3" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/Gdc2/Filters/Jpeg.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/Gdc2/Filters/Lzw.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/Gdc2/Filters/Png.cpp" Type="2" Platforms="15" />
-	</Node>
 	<Node Name="General" Type="1" Open="0" Platforms="7" Id="3">
 		<Node Name="BTree" Type="1" Platforms="15" Open="0" Id="4">
 			<Node File="../libs/Btree/btree.c" Type="2" Platforms="15" />
