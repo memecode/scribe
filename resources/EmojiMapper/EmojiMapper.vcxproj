@@ -110,7 +110,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>cmph-2.0\src;burtleburtle;..\..\..\..\Lgi\trunk\include;..\..\..\..\Lgi\trunk\include\lgi\win;..\..\..\..\..\CodeLib\libpng;..\..\..\..\..\CodeLib\libpng\build64;..\..\..\..\..\CodeLib\zlib\build;..\..\..\..\..\CodeLib\zlib;c:\Program Files\OpenSSL-Win64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>cmph-2.0\src;burtleburtle;..\..\..\..\Lgi\trunk\include;..\..\..\..\Lgi\trunk\include\lgi\win;..\..\..\..\..\CodeLib\zlib\build;..\..\..\..\..\CodeLib\zlib;c:\Program Files\OpenSSL-Win64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -150,7 +150,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>cmph-2.0\src;burtleburtle;..\..\..\..\Lgi\trunk\include;..\..\..\..\Lgi\trunk\include\lgi\win;..\..\..\..\..\CodeLib\libpng;..\..\..\..\..\CodeLib\libpng\build64;..\..\..\..\..\CodeLib\zlib\build;..\..\..\..\..\CodeLib\zlib;c:\Program Files\OpenSSL-Win64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>cmph-2.0\src;burtleburtle;..\..\..\..\Lgi\trunk\include;..\..\..\..\Lgi\trunk\include\lgi\win;..\..\..\..\..\CodeLib\zlib\build;..\..\..\..\..\CodeLib\zlib;c:\Program Files\OpenSSL-Win64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -170,7 +170,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Png.cpp" />
     <ClCompile Include="..\..\..\..\Lgi\trunk\src\common\Gdc2\Tools\GdcTools.cpp" />
     <ClCompile Include="..\..\..\..\Lgi\trunk\src\common\Net\Http.cpp" />
     <ClCompile Include="..\..\..\..\Lgi\trunk\src\common\Net\OpenSSLSocket.cpp" />

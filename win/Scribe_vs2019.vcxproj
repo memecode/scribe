@@ -179,7 +179,7 @@ copy Code\Resource.res $(OutDir)
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\build-x64\libpng;..\..\libs\build-x64\libpng\zlib_dir;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;..\..\..\..\codelib\libpng;..\..\..\..\codelib\libjpeg-9a;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -248,7 +248,7 @@ copy Code\Resource.res $(OutDir)
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\build-x64\libpng;..\..\libs\build-x64\libpng\zlib_dir;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;..\..\..\..\codelib\libpng;..\..\..\..\codelib\libjpeg-9a;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -324,7 +324,7 @@ copy Code\Resource.res $(OutDir)
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\build-x64\libpng;..\..\libs\build-x64\libpng\zlib_dir;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;..\..\..\..\codelib\libpng;..\..\..\..\codelib\libjpeg-9a;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -365,11 +365,6 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptVM.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Db\Db-Csv.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Db\DbTable.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Gif.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Jpeg.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Lzw.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Png.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Tiff.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Font\EmojiFont.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\DrawListSurface.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Tools\GdcTools.cpp" />

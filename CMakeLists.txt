@@ -55,11 +55,6 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Coding/ScriptVM.cpp
     ${LGI_DIR}/src/common/Db/Db-Csv.cpp
     ${LGI_DIR}/src/common/Db/DbTable.cpp
-    ${LGI_DIR}/src/common/Gdc2/Filters/Gif.cpp
-    ${LGI_DIR}/src/common/Gdc2/Filters/Jpeg.cpp
-    ${LGI_DIR}/src/common/Gdc2/Filters/Lzw.cpp
-    ${LGI_DIR}/src/common/Gdc2/Filters/Png.cpp
-    ${LGI_DIR}/src/common/Gdc2/Filters/Tiff.cpp
     ${LGI_DIR}/src/common/Gdc2/Font/EmojiFont.cpp
     ${LGI_DIR}/src/common/Gdc2/DrawListSurface.cpp
     ${LGI_DIR}/src/common/Gdc2/Tools/GdcTools.cpp

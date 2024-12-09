@@ -82,9 +82,6 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Tools\GdcTools.cpp">
       <Filter>Lgi</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Gif.cpp">
-      <Filter>Lgi</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Graph.cpp">
       <Filter>Lgi</Filter>
     </ClCompile>
@@ -121,9 +118,6 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\OAuth2.cpp">
       <Filter>Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Png.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEdit.cpp">
       <Filter>RichTextEdit</Filter>
     </ClCompile>
@@ -132,12 +126,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Storage\3\Store3.cpp">
       <Filter>Store3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Jpeg.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Lzw.cpp">
-      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\Btree\config.c">
       <Filter>BTree</Filter>
@@ -189,9 +177,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextConvert.cpp">
       <Filter>Mail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Tiff.cpp">
-      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\Tnef.cpp">
       <Filter>Lgi</Filter>
@@ -1030,9 +1015,6 @@
     </Filter>
     <Filter Include="Network">
       <UniqueIdentifier>{9f3b229f-b2f8-4bbb-897c-f048d35571d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Graphics">
-      <UniqueIdentifier>{2c79f6d5-53c2-454d-b897-0a6779024c02}</UniqueIdentifier>
     </Filter>
     <Filter Include="Store3\Mail3">
       <UniqueIdentifier>{8139c7b4-9593-48c3-98af-a0db78c410aa}</UniqueIdentifier>

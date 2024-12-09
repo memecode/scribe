@@ -19,9 +19,6 @@
     <ClCompile Include="..\..\..\..\Lgi\trunk\src\common\Lgi\LgiMain.cpp">
       <Filter>Source Files\Lgi</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Lgi\trunk\src\common\Gdc2\Filters\Png.cpp">
-      <Filter>Source Files\Lgi</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Lgi\trunk\src\common\Net\Http.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
