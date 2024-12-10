@@ -66,10 +66,6 @@ def checkUniversal():
 			else:
 				print("checkUniversal ok:", lib, archs)
 
-findLibAndLink("libz", True)
-findLibAndLink("libpng", False)
-findLibAndLink("libjpeg", False)
-
 rewriteLibPath("libssl.3.dylib")
 rewriteLibPath("libcrypto.3.dylib")
 
