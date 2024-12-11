@@ -179,7 +179,7 @@ copy Code\Resource.res $(OutDir)
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib\build;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -248,7 +248,7 @@ copy Code\Resource.res $(OutDir)
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib\build;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -324,7 +324,7 @@ copy Code\Resource.res $(OutDir)
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib\build;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>

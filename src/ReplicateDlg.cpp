@@ -1121,7 +1121,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 				strcpy_s(Path, sizeof(Path), Acc.Uri.sPath);
 			}
 
-			char *Ext = LGetExtension(Path);
+			auto Ext = LGetExtension(Path);
 			if (LDirExists(Path))
 			{
 				if (Ext && !_stricmp(Ext, "mail3"))

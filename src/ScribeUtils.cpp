@@ -462,7 +462,7 @@ void HttpImageThread::DoJob(LThreadJob *j)
 	LString CachedFile = UriMap.Find(Job->Uri);
 	if (!CachedFile)
 	{
-		char *Ext = LGetExtension(++d);
+		auto Ext = LGetExtension(++d);
 		auto Qm = Ext ? strchr(Ext, '?') : NULL;
 		auto Len = Qm ? Qm - Ext : Strlen(Ext);
 		char p[MAX_PATH_LEN];

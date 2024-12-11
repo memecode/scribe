@@ -1116,7 +1116,7 @@ void ScribeWnd::Construct3()
 					if (Dir.IsDir())
 						continue;
 
-					char *Ext = LGetExtension(Dir.GetName());
+					auto Ext = LGetExtension(Dir.GetName());
 					if (!Ext || _stricmp(Ext, "script") != 0)
 						continue;
 
@@ -2957,7 +2957,7 @@ bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, LSystemPath Path
 		)
 		{
 			LResolveShortcut(p, p, sizeof(p));
-			char *Ext = LGetExtension(Dir.GetName());
+			auto Ext = LGetExtension(Dir.GetName());
 			if (stristr(Dir.GetName(), OptionsFileName) != NULL &&
 				Ext &&				
 				(!_stricmp(Ext, "xml") || !_stricmp(Ext, "bak")))
@@ -3368,7 +3368,7 @@ bool ScribeWnd::SaveOptions()
 		// Backup options file
 		char Backup[MAX_PATH_LEN];
 		strcpy_s(Backup, sizeof(Backup), d->Options->GetFile());
-		auto Ext = LGetExtension(Backup);
+		auto Ext = (char*)LGetExtension(Backup);
 		if (Ext)
 		{
 			*--Ext = 0;
@@ -8527,7 +8527,7 @@ bool ScribeWnd::CreateFolders(LAutoString &FileName)
 
 	if (FileName)
 	{
-		char *Ext = LGetExtension(FileName);
+		auto Ext = LGetExtension(FileName);
 		if (!Ext)
 		{
 			char File[300];

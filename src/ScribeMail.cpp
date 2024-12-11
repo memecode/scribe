@@ -3898,7 +3898,7 @@ LMessage::Result MailUi::OnEvent(LMessage *Msg)
 						if (_stricmp(Mt, "image/jpeg"))
 						{
 							auto Name = Match->GetName();
-							char *Ext = LGetExtension(Name);
+							auto Ext = (char*)LGetExtension(Name);
 							if (Ext)
 								*Ext = 0;
 							LString NewName = Name;

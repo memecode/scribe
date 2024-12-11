@@ -441,7 +441,7 @@ int ManageMailStores::OnNotify(LViewI *c, const LNotification &n)
 					{
 						char b[MAX_PATH_LEN];
 						strcpy_s(b, sizeof(b), dlg->Name());
-						char *n = LGetExtension(b);
+						auto n = (char*)LGetExtension(b);
 						if (n && !_stricmp(n, "sqlite"))
 						{
 							n = strrchr(b, DIR_CHAR);
