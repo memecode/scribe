@@ -633,7 +633,8 @@ class ImapLogSocket : public T
 	MailProtocolProgress *Prog;
 
 public:
-	ImapLogSocket(char *file, LCapabilityClient *caps, LStreamI *logger, MailProtocolProgress *prog) : T(logger, caps)
+	ImapLogSocket(char *file, LCapabilityClient *caps, LStreamI *logger, MailProtocolProgress *prog) :
+		T(dynamic_cast<LStream*>(logger), caps)
 	{
 		Prog = prog;
 		
