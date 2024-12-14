@@ -62,8 +62,7 @@ public:
 
 class ScribeWndPrivate :
 	public LBrowser::LBrowserEvents,
-	public LVmCallback,
-	public LHtmlStaticInst
+	public LVmCallback
 {
 	LOptionsFile::PortableType InstallMode = LOptionsFile::UnknownMode;
 
@@ -98,6 +97,7 @@ public:
 	bool			FakeIpcEvent = false; // No options filename so do a fake OnCommandLineEvent(IpcEvent) after startup.
 	LAutoPtr<class LTrayIcon> TrayIcon;
 	int				FontSizeAdjust = 0;
+	class LHtmlStaticInst *htmlStatic;
 
 	// These are for the LDataEventsI callbacks to store source context
 	// Mainly for debugging where various events came from.
@@ -164,40 +164,8 @@ public:
 		}
 	} TextControlFactory;
 
-	ScribeWndPrivate(ScribeWnd *app) :
-		App(app),
-		TextControlFactory(app),
-		TrayIcon(new LTrayIcon(app))
-	{
-		NoContact = new NoContactType(app);
-		NoContact->DecRef(); // 2->1
-		AppWndHnd = LEventSinkMap::Dispatch.AddSink(App);
-
-#ifdef WIN32
-		ClipboardFormat = RegisterClipboardFormat(
-#ifdef UNICODE
-			L"Scribe.Item"
-#else
-			"Scribe.Item"
-#endif
-		);
-#endif
-
-		LScribeScript::Inst = new LScribeScript(App);
-		if (Engine.Reset(new LScriptEngine(App, LScribeScript::Inst, this)))
-			Engine->SetConsole(LScribeScript::Inst->GetLog());
-	}
-
-	~ScribeWndPrivate()
-	{
-		// Why do we need this? ~LView will take care of it?
-		// LEventSinkMap::Dispatch.RemoveSink(App);
-		Options.Reset();
-		Scripts.DeleteObjects();
-		DeleteObj(ImageLoader);
-		Engine.Reset();
-		DeleteObj(LScribeScript::Inst);
-	}
+	ScribeWndPrivate(ScribeWnd *app);
+	~ScribeWndPrivate();
 
 	const char *GetClass() override { return "ScribeWndPrivate"; }
 

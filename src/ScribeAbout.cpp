@@ -6,6 +6,7 @@
 #include "lgi/common/Button.h"
 #include "resdefs.h"
 #include "lgi/common/LgiRes.h"
+#include "DynamicHtml.h"
 
 class ScribeAboutWnd : public LWindow, public LDefaultDocumentEnv
 {

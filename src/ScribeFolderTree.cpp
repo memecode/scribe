@@ -20,6 +20,7 @@
 #include "OutlookDropSupport.cpp"
 #endif
 #include "lgi/common/LgiRes.h"
+#include "DynamicHtml.h"
 
 //////////////////////////////////////////////////////////////////////////////
 int FolderSorter(ScribeFolder *a, ScribeFolder *b, int d)

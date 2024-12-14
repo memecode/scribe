@@ -14,7 +14,6 @@
 #define __SCRIBE_PRIVATE__
 
 #include "lgi/common/XmlTreeUi.h"
-#include "lgi/common/Html.h"
 #include "lgi/common/CheckBox.h"
 #include "lgi/common/TabView.h"
 #include "lgi/common/RadioGroup.h"
@@ -679,19 +678,6 @@ public:
 	~BayesDlg();
 
 	int OnNotify(LViewI *c, const LNotification &n) override;
-};
-
-////////////////////////////////////////////////////////////////////////////////////
-class DynamicHtml : public Html1::LHtml, public LDefaultDocumentEnv
-{
-	class DynamicHtmlPrivate *d;
-
-public:
-	DynamicHtml(ScribeWnd *app, const char *file);
-	~DynamicHtml();
-
-	LString OnDynamicContent(LDocView *Parent, const char *Code) override;
-	bool OnNavigate(LDocView *Parent, const char *Uri) override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////

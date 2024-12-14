@@ -6,6 +6,8 @@
 #include "lgi/common/Slider.h"
 #include "lgi/common/FileSelect.h"
 
+#include "DynamicHtml.h"
+
 #define DEFAULT_PAGE_SIZE			1000
 
 struct PrintPreviewPriv

@@ -67,6 +67,7 @@
 #include "Store3Webdav/WebdavStore.h"
 #include "resdefs.h"
 #include "ScribeIpc.h"
+#include "DynamicHtml.h"
 
 #define DEBUG_STORE_EVENTS			0
 #if DEBUG_STORE_EVENTS
@@ -954,7 +955,7 @@ void ScribeWnd::Construct2()
 				if (Inst.Exists())
 				{
 					CurRes->SetThemeFolder(Inst);
-					d->Static->OnSystemColourChange();
+					d->htmlStatic->Static->OnSystemColourChange();
 					break;
 				}
 			}
@@ -12444,4 +12445,41 @@ LMailStore &LMailStore::operator =(LMailStore &a)
 {
 	LAssert(0);
 	return *this;
+}
+
+ScribeWndPrivate::ScribeWndPrivate(ScribeWnd *app) :
+	App(app),
+	TextControlFactory(app),
+	TrayIcon(new LTrayIcon(app))
+{
+	htmlStatic = new LHtmlStaticInst;
+	NoContact = new NoContactType(app);
+	NoContact->DecRef(); // 2->1
+	AppWndHnd = LEventSinkMap::Dispatch.AddSink(App);
+
+#ifdef WIN32
+	ClipboardFormat = RegisterClipboardFormat(
+#ifdef UNICODE
+		L"Scribe.Item"
+#else
+		"Scribe.Item"
+#endif
+	);
+#endif
+
+	LScribeScript::Inst = new LScribeScript(App);
+	if (Engine.Reset(new LScriptEngine(App, LScribeScript::Inst, this)))
+		Engine->SetConsole(LScribeScript::Inst->GetLog());
+}
+
+ScribeWndPrivate::~ScribeWndPrivate()
+{
+	// Why do we need this? ~LView will take care of it?
+	// LEventSinkMap::Dispatch.RemoveSink(App);
+	Options.Reset();
+	Scripts.DeleteObjects();
+	DeleteObj(ImageLoader);
+	Engine.Reset();
+	DeleteObj(LScribeScript::Inst);
+	DeleteObj(htmlStatic);
 }

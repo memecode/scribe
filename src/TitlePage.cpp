@@ -1,6 +1,7 @@
 #include "lgi/common/Lgi.h"
 #include "Scribe.h"
 #include "ScribeListAddr.h"
+#include "DynamicHtml.h"
 
 class DynamicHtmlPrivate
 {
