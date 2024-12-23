@@ -16,8 +16,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aspell-dist-0.60", "..\..\l
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bzip2-1.0.6", "..\..\libs\bzip2-1.0.6\windows\bzip2-1.0.6-vs2019.vcxproj", "{E5575141-C1A2-4997-BADB-7584CF546E1F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libntlm", "..\..\..\Lgi\trunk\src\common\Net\libntlm-0.4.2\build-win32\libntlm_vs2019.vcxproj", "{F97AAACA-BF41-46B8-B534-A1639589A1A3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -67,12 +65,6 @@ Global
 		{E5575141-C1A2-4997-BADB-7584CF546E1F}.Release|x64.Build.0 = Release|x64
 		{E5575141-C1A2-4997-BADB-7584CF546E1F}.ReleaseNoOptimize|x64.ActiveCfg = Release|x64
 		{E5575141-C1A2-4997-BADB-7584CF546E1F}.ReleaseNoOptimize|x64.Build.0 = Release|x64
-		{F97AAACA-BF41-46B8-B534-A1639589A1A3}.Debug|x64.ActiveCfg = Debug|x64
-		{F97AAACA-BF41-46B8-B534-A1639589A1A3}.Debug|x64.Build.0 = Debug|x64
-		{F97AAACA-BF41-46B8-B534-A1639589A1A3}.Release|x64.ActiveCfg = Release|x64
-		{F97AAACA-BF41-46B8-B534-A1639589A1A3}.Release|x64.Build.0 = Release|x64
-		{F97AAACA-BF41-46B8-B534-A1639589A1A3}.ReleaseNoOptimize|x64.ActiveCfg = ReleaseNoOptimize|x64
-		{F97AAACA-BF41-46B8-B534-A1639589A1A3}.ReleaseNoOptimize|x64.Build.0 = ReleaseNoOptimize|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

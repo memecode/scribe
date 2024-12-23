@@ -179,7 +179,7 @@ copy Code\Resource.res $(OutDir)
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib\build;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\lgi\deps\build-x64\include;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -248,7 +248,7 @@ copy Code\Resource.res $(OutDir)
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib\build;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\lgi\deps\build-x64\include;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -324,7 +324,7 @@ copy Code\Resource.res $(OutDir)
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\..\codelib\zlib\build;..\..\..\..\codelib\zlib;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\lgi\deps\build-x64\include;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -709,9 +709,6 @@ copy Resource.res ..\win\$(OutDir)</Command>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Lgi\trunk\win\Lgi_vs2019.vcxproj">
       <Project>{95df9ca4-6d37-4a85-a648-80c2712e0da1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\lgi\trunk\src\common\Net\libntlm-0.4.2\build-win32\libntlm_vs2019.vcxproj">
-      <Project>{f97aaaca-bf41-46b8-b534-a1639589a1a3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Lgi\trunk\utils\Updater\Updater_vs2019.vcxproj">
       <Project>{11e9238b-921e-44e5-a3d2-61c5bfa7cc6c}</Project>
