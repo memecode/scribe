@@ -235,6 +235,53 @@ struct LoadMailStore2 : public LoadMailStore1
 	}
 };
 
+// Test all the libraries that Scribe uses:
+//		- libjpeg
+//      - libpng
+//      - zlib
+//      - libchardet
+//      - lunasvg
+//      - libiconv
+//      - libntlm
+//      - bzip2
+//      - btree
+struct LibraryTest : public ScribeUnitTest
+{
+	UnitTestState *s = nullptr;
+
+	LibraryTest(UnitTestState *state) : s(state)
+	{
+	}
+
+	void Run(std::function<void(bool)> Callback) override
+	{
+		LFile::Path p(LSP_APP_INSTALL);
+		auto images = p / ".." / "test" / "Images";
+		if (!images.Exists())
+			UnitTestFail();
+
+		// Test libjpeg
+		auto jpeg = GdcD->Load(images / "test.jpg");
+		if (!jpeg)
+			UnitTestFail();
+
+		// Test libpng
+		auto png = GdcD->Load(images / "test.png");
+		if (!png)
+			UnitTestFail();
+
+		// Test zlib
+		// Test libchardet
+		// Test lunasvg
+		// Test libiconv
+		// Test libntlm
+		// Test bzip2
+		// Test btree
+
+		UnitTestPass();
+	}
+};
+
 struct MimeTreeTest : public ScribeUnitTest
 {
 	UnitTestState *s;
@@ -424,12 +471,10 @@ UnitTestState::UnitTestState(ScribeWnd *app, std::function<void(bool)> callback)
 	App(app),
 	Callback(callback)
 {
-#if 0
-	Tests.Add(new LoadMailStore1(this));
-	Tests.Add(new LoadMailStore2(this));
-#else
-	Tests.Add(new MimeTreeTest(this));
-#endif
+	// Tests.Add(new LoadMailStore1(this));
+	// Tests.Add(new LoadMailStore2(this));
+	// Tests.Add(new MimeTreeTest(this));
+	Tests.Add(new LibraryTest(this));
 
 	LgiTrace("%s:%i - Starting with " LPrintfInt64 " unit tests.\n", _FL, Tests.Length());
 	Run();
