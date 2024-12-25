@@ -1,12 +1,15 @@
-#ifdef _DEBUG
+﻿#ifdef _DEBUG
+
+#include "lgi/common/Lgi.h"
+#include "lgi/common/SpellCheck.h"
+#include "lgi/common/RichTextEdit.h"
+#include "lgi/common/ZlibWrapper.h"
 
 #include "Scribe.h"
-#include "lgi/common/SpellCheck.h"
+#include "resdefs.h"
+#include "ScribeUtils.h"
 #include "Encryption/GnuPG.h"
 #include "Store3Mail3/Mail3.h"
-#include "lgi/common/RichTextEdit.h"
-
-#include "resdefs.h"
 #include "LoadMailStoreState.h"
 
 #define UnitTestFail()	{ if (Callback) Callback(false); return; }
@@ -245,7 +248,7 @@ struct LoadMailStore2 : public LoadMailStore1
 //      - libntlm
 //      - bzip2
 //      - btree
-struct LibraryTest : public ScribeUnitTest
+struct LibraryTest : public ScribeUnitTest, public LDom
 {
 	UnitTestState *s = nullptr;
 
@@ -253,10 +256,24 @@ struct LibraryTest : public ScribeUnitTest
 	{
 	}
 
+	const char *GetClass() override { return "LibraryTest"; }
+
+	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL) override
+	{
+		if (!Stricmp(Name, "SizeRequest"))
+		{
+			Value = "-1,64";
+			return true;
+		}
+
+		return false;
+	}
+
 	void Run(std::function<void(bool)> Callback) override
 	{
 		LFile::Path p(LSP_APP_INSTALL);
-		auto images = p / ".." / "test" / "Images";
+		auto testFolder = p / ".." / "test";
+		auto images = testFolder / "Images";
 		if (!images.Exists())
 			UnitTestFail();
 
@@ -270,10 +287,45 @@ struct LibraryTest : public ScribeUnitTest
 		if (!png)
 			UnitTestFail();
 
-		// Test zlib
-		// Test libchardet
 		// Test lunasvg
+		auto svg = GdcD->Load(images / "test.svg", false, this);
+		if (!svg)
+			UnitTestFail();
+
+		// Test zlib
+		Zlib zlib;
+		LZlibFile zFile(&zlib);
+		LString compressedFile = testFolder / "type_check.z";
+		auto inputData = LReadFile(testFolder / "type_check.py");
+		if (!zFile.Open(compressedFile, O_WRITE ))
+			UnitTestFail();
+		auto wr = zFile.Write(inputData.Get(), inputData.Length());
+		zFile.Close();
+		if (!zFile.Open(compressedFile, O_READ ))
+			UnitTestFail();
+		auto outputData = zFile.Read();
+		if (outputData != inputData)
+			UnitTestFail();
+		zFile.Close();
+		FileDev->Delete(compressedFile);
+
+		// Test libchardet
+		uint8_t shiftJISBytes[] = { 0x82, 0xB1, 0x82, 0xF1,
+									0x82, 0xC9, 0x82, 0xbf,
+									0x82, 0xcd };
+		LString shiftJIS((char*)shiftJISBytes, sizeof(shiftJISBytes));
+		auto cs = DetectCharset(shiftJIS);
+		if (!cs.Equals("Shift_JIS"))
+			UnitTestFail();
+
 		// Test libiconv
+		auto w = (char16*)LNewConvertCp(LGI_WideCharset, shiftJISBytes, "shift_jis", sizeof(shiftJISBytes));
+		if (!w)
+			UnitTestFail();
+		auto match = L"こんにちは";
+		if (Stricmp(w, match))
+			UnitTestFail();
+
 		// Test libntlm
 		// Test bzip2
 		// Test btree
