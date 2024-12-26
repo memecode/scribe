@@ -1,4 +1,4 @@
-﻿#ifdef _DEBUG
+#ifdef _DEBUG
 
 #include "lgi/common/Lgi.h"
 #include "lgi/common/SpellCheck.h"
@@ -295,7 +295,7 @@ struct LibraryTest : public ScribeUnitTest, public LDom
 		// Test zlib
 		Zlib zlib;
 		LZlibFile zFile(&zlib);
-		LString compressedFile = testFolder / "type_check.z";
+		LString compressedFile = (testFolder / "type_check.z").GetFull();
 		auto inputData = LReadFile(testFolder / "type_check.py");
 		if (!zFile.Open(compressedFile, O_WRITE ))
 			UnitTestFail();
