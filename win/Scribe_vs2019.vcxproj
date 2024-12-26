@@ -587,6 +587,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\..\libs\Btree\hashtable.h" />
     <ClInclude Include="..\..\libs\Btree\offsetlist.h" />
     <ClInclude Include="..\src\BayesianFilter.h" />
+    <ClInclude Include="..\src\BZip2File.h" />
     <ClInclude Include="..\src\Calendar.h" />
     <ClInclude Include="..\src\CalendarView.h" />
     <ClInclude Include="..\src\Components.h" />
