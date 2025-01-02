@@ -284,11 +284,14 @@ public:
 
 	void Edit()
 	{
-		EditWebdav(GetList(), &Tag, [this](auto status)
+		if (IsWebdav())
 		{
-			if (status)
-				Update();
-		});
+			EditWebdav(GetList(), &Tag, [this](auto status)
+			{
+				if (status)
+					Update();
+			});
+		}
 	}
 
 	void OnMouseClick(LMouse &m)
@@ -320,7 +323,7 @@ public:
 						Edit();
 					else
 						EditLabel(Col);
-					break;
+					return;
 				}
 			}
 		}
@@ -331,7 +334,6 @@ public:
 
 ManageMailStores::ManageMailStores(ScribeWnd *app)
 {
-	Lst = 0;
 	SetParent(App = app);
 	if (LoadFromResource(IDD_MANAGE_FOLDERS))
 	{
@@ -421,9 +423,16 @@ int ManageMailStores::OnNotify(LViewI *c, const LNotification &n)
 			}
 			else if (n.Type == LNotifyItemDoubleClick)
 			{
-				auto si = dynamic_cast<StoreItem*>(Lst->GetSelected());
-				if (si)
+				auto ms = n.GetMouseEvent();
+				auto col = Lst->ColumnAtX(ms.x);
+				if (col == 0)
+				{
+					// noop: name col
+				}
+				else if (auto si = dynamic_cast<StoreItem*>(Lst->GetSelected()))
+				{
 					si->Edit();
+				}
 			}
 			break;
 		}
@@ -521,8 +530,7 @@ int ManageMailStores::OnNotify(LViewI *c, const LNotification &n)
 		}
 		case IDC_COMPACT_MS:
 		{
-			LMailStore *ms = GetCurrentMailStore();
-			if (ms)
+			if (auto ms = GetCurrentMailStore())
 			{
 				App->CompactFolders(*ms);
 			}
@@ -534,8 +542,7 @@ int ManageMailStores::OnNotify(LViewI *c, const LNotification &n)
 		}
 		case IDC_CONVERT_MS:
 		{
-			LMailStore *ms = GetCurrentMailStore();
-			if (ms)
+			if (auto ms = GetCurrentMailStore())
 			{
 				auto Dlg = new FmtDlg(this, (int)ms->Store->GetInt(FIELD_FORMAT));
 				Dlg->DoModal([this, Dlg, ms](auto dlg, auto id)
@@ -553,8 +560,7 @@ int ManageMailStores::OnNotify(LViewI *c, const LNotification &n)
 		}
 		case IDC_REPAIR_MS:
 		{
-			LMailStore *ms = GetCurrentMailStore();
-			if (ms)
+			if (auto ms = GetCurrentMailStore())
 			{
 				auto Prog = new Store3Progress(App, true);
 				ms->Store->Repair(this, Prog, [this, Prog](auto status)
@@ -594,6 +600,7 @@ int ManageMailStores::OnNotify(LViewI *c, const LNotification &n)
 		case IDOK:
 		{
 			Convert(&Options, this, false);
+			// Fall through
 		}
 		case IDCANCEL:
 		{

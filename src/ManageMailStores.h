@@ -6,7 +6,7 @@
 class ManageMailStores : public LDialog, public LXmlTreeUi
 {
 	ScribeWnd *App;
-	class LList *Lst;
+	class LList *Lst = nullptr;
 	
 	LMailStore *GetCurrentMailStore();
 
