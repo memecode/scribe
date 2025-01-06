@@ -24,29 +24,47 @@ print("    scribeLibs:", scribeLibs)
 code = os.path.abspath(os.path.join(scribe, ".."))
 print("    code:      ", code)
 codeLib = os.path.abspath(os.path.join(code, "../codelib"))
-libpng = os.path.join(codeLib, "libpng")
-zlib = os.path.join(codeLib, "zlib")
-libjpeg = os.path.join(codeLib, "libjpeg-9a")
 openssl = os.path.join(codeLib, "openssl")
 print("    codeLib:   ", codeLib)
 lgi = os.path.abspath(os.path.join(code, "lgi/trunk"))
 print("    lgi:       ", lgi)
+lgiDeps = os.path.abspath(os.path.join(code, "lgi/deps"))
+print("    lgiDeps:   ", lgiDeps)
 
 def PackageSearch(name):
-	p = subprocess.run(["apt-cache","search",name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-	for line in p.stdout.decode().split("\n"):
-		parts = line.split()
-		if parts[0] == name:
-			print("requiredPackage:", line)
-			return True
+	global isLinux
+	if isLinux:
+		p = subprocess.run(["apt-cache","search",name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		for line in p.stdout.decode().split("\n"):
+			parts = line.split()
+			if parts[0] == name:
+				print("requiredPackage:", line)
+				return True
+	else:
+		print("Warning: can't check for package", name)
 	return False
 
 def PackageInstalled(names):
-	for name in names:
-		p = subprocess.run(["dpkg","-l",name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-		if p.returncode == 0:
-			return True
-	return False
+	global isLinux
+	if isLinux:
+		for name in names:
+			p = subprocess.run(["dpkg","-l",name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+			if p.returncode:
+				return False
+	else:
+		for name in names:
+			if name == "mercurial":
+				exe = "hg"
+			else:
+				exe = name
+			try:
+				p = subprocess.run([exe, "--version"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+				if p.returncode:
+					return False
+			except:
+				return False
+
+	return True
 
 requiredPackages = [
 	["cmake"],
@@ -85,7 +103,7 @@ def Clone(repo, folder):
 			sys.exit(1)
 		print("    ...cloned ok")
 	else:
-		print("   ", folder, "alread exists.")
+		print("   ", folder, "already exists.")
 
 def Download(url, folder):
 	p = url.split("/")
@@ -180,13 +198,21 @@ if len(sys.argv) > 1 and sys.argv[1].lower() == "clean":
 print("\nChecking repos:")
 Clone("https://phab.mallen.id.au/diffusion/15/scribelibs/", scribeLibs)
 Clone("https://phab.mallen.id.au/source/lgi/", lgi)
-Clone("https://phab.mallen.id.au/source/libpng/", libpng)
-Clone("https://phab.mallen.id.au/diffusion/10/zlib/", zlib)
-Clone("https://phab.mallen.id.au/diffusion/11/libjpeg/", libjpeg)
 Openssl("git://git.openssl.org/openssl.git", openssl)
 
-print("\nBuilding dependencies:")
-if os.path.exists(os.path.join(scribeLibs, "build-x64-release")):
+print("\nBuilding lgi dependencies:")
+if os.path.exists(lgiDeps):
+	print("    Seems to be already built.")
+else:
+	args = [sys.executable, "build.py"]
+	p = subprocess.run(args, cwd=os.path.join(lgi, "deps"))
+
+print("\nBuilding scribe dependencies:")
+if isWin:
+	buildFolderName = "build-x64"
+else:
+	buildFolderName = "build-x64-release"
+if os.path.exists(os.path.join(scribeLibs, buildFolderName)):
 	print("    Seems to be already built.")
 else:
 	args = [sys.executable, "build.py"]
