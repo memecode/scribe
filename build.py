@@ -137,7 +137,7 @@ def Openssl(repo, folder):
 			print("    Cloning openssl...")
 			p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=codeLib)
 			if p.returncode:
-				print("Error: failed to clone openssl")
+				print("Error: failed to clone openssl:", p.stdout.decode())
 				sys.exit(1)
 			
 			print("     Configuring...")
@@ -198,7 +198,7 @@ if len(sys.argv) > 1 and sys.argv[1].lower() == "clean":
 print("\nChecking repos:")
 Clone("https://phab.mallen.id.au/diffusion/15/scribelibs/", scribeLibs)
 Clone("https://phab.mallen.id.au/source/lgi/", lgi)
-Openssl("git://git.openssl.org/openssl.git", openssl)
+Openssl("https://github.com/openssl/openssl.git", openssl)
 
 print("\nBuilding lgi dependencies:")
 if os.path.exists(lgiDeps):
@@ -208,7 +208,9 @@ else:
 	p = subprocess.run(args, cwd=os.path.join(lgi, "deps"))
 
 print("\nBuilding scribe dependencies:")
-if isWin:
+if isMac:
+	buildFolderName = "build-release"
+elif isWin:
 	buildFolderName = "build-x64"
 else:
 	buildFolderName = "build-x64-release"

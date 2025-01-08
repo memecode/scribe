@@ -203,6 +203,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3407A3822D2F1E9100A4729A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3477C4FB1CC3021B0028B84B;
+			remoteInfo = sqlite;
+		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
@@ -1095,6 +1102,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				3407A3832D2F1E9100A4729A /* PBXTargetDependency */,
 				34749B5B278B06B900C8197E /* PBXTargetDependency */,
 				3474FC5C226DE08D0064E0AD /* PBXTargetDependency */,
 			);
@@ -1376,6 +1384,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3407A3832D2F1E9100A4729A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = sqlite;
+			targetProxy = 3407A3822D2F1E9100A4729A /* PBXContainerItemProxy */;
+		};
 		34749B5B278B06B900C8197E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = LgiCocoa;
