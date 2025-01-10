@@ -2417,7 +2417,7 @@ void ReceiveAccountlet::OnPulse(char *s, int s_len)
 			{
 				SecondsTillOnline = -1;
 
-				if ((!IsCheckDialup() || HaveNetConnection()) &&
+				if ((!IsCheckDialup() || LHaveNetConnection()) &&
 					!Offline.CastInt32())
 				{
 					Connect(0, false);
