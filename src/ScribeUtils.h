@@ -189,13 +189,7 @@ public:
 		return Buf;
 	}
 
-	int64 Peek(uchar *Ptr, ssize_t Size) const override
-	{
-		LAssert(0);
-		return 0;
-	}
-
-	int64 Peek(LStreamI *Ptr, ssize_t Size)
+	LString Peek(ssize_t bytes, bool start = true) const override
 	{
 		LAssert(0);
 		return 0;
