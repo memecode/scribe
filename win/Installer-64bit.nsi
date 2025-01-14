@@ -10,18 +10,23 @@
 !system "del /Q scribe-setup\*.*"
 
 !system "copy .\x64ReleaseNoOptimize19\Scribe.exe scribe-setup" = 0
-!system "copy .\x64Release19\ScribeMapi.dll scribe-setup" = 0
+!system "copy .\x64Release19\ScribeMapi.dll scribe-setup"       = 0
 
-!system "copy ..\..\libs\aspell-0.60.6.1\win32\dist\x64Release19\aspell-dist-0.60.dll scribe-setup" = 0
+; Scribe specific deps
+!system "copy ..\..\libs\build-x64\lib\aspell-dist-0.60.dll scribe-setup" = 0
+!system "copy ..\..\libs\build-x64\lib\chardet19x64.dll scribe-setup"     = 0
+!system "copy ..\..\libs\build-x64\lib\btree.dll scribe-setup"            = 0
+!system "copy ..\..\libs\build-x64\lib\bzip2.dll scribe-setup"            = 0
 
-!system "copy ..\..\libs\build-x64\libjpeg\Release\libjpeg9a_19x64.dll scribe-setup" = 0
-!system "copy ..\..\libs\build-x64\libpng\Release\libpng16_19x64.dll scribe-setup" = 0
-!system "copy ..\..\libs\build-x64\libpng\zlib_dir\Release\zlib_19x64.dll scribe-setup" = 0
-!system "copy ..\..\libs\build-x64\libchardet\Release\chardet19x64.dll scribe-setup" = 0
+; Lgi deps
+!system "copy ..\..\..\lgi\deps\build-x64\lib\jpeg62.dll scribe-setup"   = 0
+!system "copy ..\..\..\lgi\deps\build-x64\lib\libpng16.dll scribe-setup" = 0
+!system "copy ..\..\..\lgi\deps\build-x64\lib\zlib.dll scribe-setup"     = 0
+!system "copy ..\..\..\lgi\deps\build-x64\lib\libiconv.dll scribe-setup" = 0
+!system "copy ..\..\..\lgi\deps\build-x64\lib\libntlm.dll scribe-setup"  = 0
 
-!system "copy ..\..\..\Lgi\trunk\lib\Lgi19x64nop.dll scribe-setup" = 0
-!system "copy ..\..\..\Lgi\trunk\lib\libntlm19x64nop.dll scribe-setup" = 0
-!system "copy ..\..\..\Lgi\trunk\utils\Updater\x64Release19\Updater.exe scribe-setup" = 0
+!system "copy ..\..\..\lgi\trunk\lib\Lgi19x64nop.dll scribe-setup" = 0
+!system "copy ..\..\..\lgi\trunk\utils\Updater\x64Release19\Updater.exe scribe-setup" = 0
 
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.exe'
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.dll'
@@ -69,16 +74,8 @@ Section ""
 	Delete $INSTDIR\Lgi*.dll
 
 	; Program files
-	File .\scribe-setup\Scribe.exe
-	File .\scribe-setup\Updater.exe
-	File .\scribe-setup\ScribeMapi.dll
-	File .\scribe-setup\aspell-dist-0.60.dll
-	File .\scribe-setup\Lgi19x64nop.dll
-	File .\scribe-setup\libntlm19x64nop.dll
-	File .\scribe-setup\libjpeg9a_19x64.dll
-	File .\scribe-setup\libpng16_19x64.dll
-	File .\scribe-setup\zlib_19x64.dll
-	File .\scribe-setup\chardet19x64.dll
+	File .\scribe-setup\*.exe
+	File .\scribe-setup\*.dll
 
 	; Resources
 	CreateDirectory $INSTDIR\Resources
