@@ -10526,16 +10526,11 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 					}
 					else if (Tag->IsTag("cursor"))
 					{
-						int Size = (int)p.GetSize();
-						char *Buf = new char[Size+1];
+						auto Buf = p.Peek(p.GetSize());
 						if (Buf)
 						{
-							p.Peek((uchar*)Buf, Size);
-							Buf[Size] = 0;
 							RemoveReturns(Buf);
-
 							Cursor = LCharLen(Buf, "utf-8");
-							DeleteArray(Buf);
 						}
 					}
 
