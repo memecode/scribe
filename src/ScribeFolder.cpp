@@ -2861,7 +2861,7 @@ ScribeFolder *ScribeFolder::CreateSubFolder(const char *Name, int Type)
 	{
 		if (auto folderObj = dynamic_cast<LDataFolderI*>(Fld))
 		{
-			if (NewFolder = new ScribeFolder)
+			if ((NewFolder = new ScribeFolder))
 			{
 				NewFolder->App = App;
 				NewFolder->SetObject(folderObj, false, _FL);
