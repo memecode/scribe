@@ -4,7 +4,7 @@
 !include LogicLib.nsh
 ; !include WinVer.nsh
 
-!system '"C:\Program Files\Python311\python.exe" ..\Utils\Store\check-build.py' = 0
+!system '"C:\Program Files\Python312\python.exe" ..\Utils\Store\check-build.py' = 0
 
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"
@@ -67,11 +67,8 @@ Section ""
 	SetOutPath $INSTDIR
 
 	; Clean out old files
-	Delete $INSTDIR\libjpeg12x64.dll
-	Delete $INSTDIR\libntlm12x64nop.dll
-	Delete $INSTDIR\libpng12x64.dll
-	Delete $INSTDIR\zlib12x64.dll
-	Delete $INSTDIR\Lgi*.dll
+	Delete $INSTDIR\*.dll
+	Delete $INSTDIR\*.exe
 
 	; Program files
 	File .\scribe-setup\*.exe

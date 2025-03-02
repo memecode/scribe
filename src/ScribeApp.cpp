@@ -1097,17 +1097,17 @@ void ScribeWnd::Construct3()
 
 			#if RUN_STARTUP_SCRIPTS
 			// Run scripts in './Scripts' folder
-			char s[MAX_PATH_LEN];
-			LMakePath(s, sizeof(s), ScribeResourcePath(),
-				"scripts");
-			if (!LDirExists(s))
-				LMakePath(s, sizeof(s), LGetSystemPath(LSP_APP_INSTALL),
-					#if defined(WINDOWS)
-					"..\\"
-					#endif
-					"scripts");
-			if (!LDirExists(s))
+			LFile::Path s(ScribeResourcePath());
+			s = s / ".." / "Scripts";
+			if (!s.Exists())
+			{
+				LgiTrace("%s:%i - scripts at '%s' doesn't exist.\n", _FL, s.GetFull().Get());
+				s = LFile::Path(LSP_APP_INSTALL) / "Scripts";
+			}
+			if (!s.Exists())
+			{
 				LgiTrace("%s:%i - Error: the scripts folder '%s' doesn't exist.\n", _FL, s);
+			}
 			else
 			{
 				bool ErrorDsp = false;
@@ -1121,14 +1121,11 @@ void ScribeWnd::Construct3()
 					if (!Ext || _stricmp(Ext, "script") != 0)
 						continue;
 
-					Dir.Path(s, sizeof(s));
-
 					LStringPipe Log;
-					auto Source = LReadFile(s);
+					auto Source = LReadFile(Dir.FullPath());
 					if (Source)
 					{
-						LScript *Cur = new LScript;
-						if (Cur)
+						if (auto Cur = new LScript)
 						{
 							char Msg[256];
 							d->CurrentScripts.Add(Cur);
