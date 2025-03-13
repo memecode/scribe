@@ -3630,10 +3630,10 @@ ScribeAccount *ScribeWnd::GetCurrentAccount()
 
 	auto Idx = GetCurrentIdentity();
 	ScribeAccount *a = (Idx >= 0 && Idx < (ssize_t)Accounts.Length()) ? Accounts.ItemAt(Idx) : NULL;
-	bool ValidId = a != NULL && a->IsValid();
+	bool ValidId = a && a->IsValid();
 	if (!ValidId)
 	{
-		LAssert(!"No current identity?");
+		LgiTrace("%s:%i - No current identity: accounts.len=%i\n", _FL, (int)Accounts.Length());
 		
 		// Find a valid account to be the identity...
 		for (auto a: Accounts)
