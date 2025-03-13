@@ -6,6 +6,12 @@
 
 extern bool HasMailStore(LXmlTag *MailStores, char *Name);
 
+#if 0
+#define LMS_LOG(...)	printf(__VA_ARGS__)
+#else
+#define LMS_LOG(...)
+#endif
+
 struct LoadMailStoreState : public LView::ViewEventTarget
 {
 	typedef std::function<void(bool)> BoolCb;
@@ -19,6 +25,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 	int StoreIdx = 0;
 	bool OptionsDirty = false;
 	bool Status = false;
+	bool InOnStatusCallback = false;
 	std::function<bool(bool)> ReturnWithEvent;
 	std::function<bool(bool)> ReturnOnDialog;
 	std::function<void(const char *folderPath,const char *details,IntCb callback)> AskStoreUpgrade;
@@ -61,6 +68,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 	
 	~LoadMailStoreState()
 	{
+		LMS_LOG("~LoadMailStoreState()..\n");
 		if (MailStores)
 		{
 			Options->Unlock();
@@ -75,6 +83,12 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 
 	bool OnStatus(bool b)
 	{
+		// Don't allow this to be called twice...
+		if (InOnStatusCallback)
+			return b;
+		InOnStatusCallback = true;
+
+		LMS_LOG("LoadMailStoreState::OnStatus(%i)\n", b);
 		if (MailStores)
 		{
 			Options->Unlock();
@@ -85,7 +99,10 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 			App->SaveOptions();
 
 		if (Callback)
-			Callback(b);
+		{
+			auto cb = std::move(Callback);
+			cb(b);
+		}
 
 		delete this;
 
@@ -96,6 +113,7 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 	{
 		if (Msg->Msg() == M_LOAD_NEXT_MAIL_STORE)
 		{
+			LMS_LOG("LoadMailStoreState::OnEvent()..\n");
 			if (!MailStores)
 				OnStatus(false);
 			else
@@ -113,6 +131,8 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 	// ReturnWithEvent to trigger the next iteration...
 	bool Iterate()
 	{
+		LMS_LOG("LoadMailStoreState::Iterate()..\n");
+
 		// No more work, so do the completion step:
 		if (Que.Length() == 0)
 			return PostIterate();
