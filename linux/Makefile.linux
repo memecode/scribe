@@ -555,8 +555,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/linux/Lgi/View.cpp \
 	../../lgi/trunk/src/linux/Lgi/Window.cpp \
 	../../lgi/trunk/src/posix/Roster.cpp \
-	../../lgi/trunk/src/posix/SubProcess.cpp \
-	../../../../../usr/include/libayatana-appindicator3-0.1/libayatana-appindicator/app-indicator.h
+	../../lgi/trunk/src/posix/SubProcess.cpp
 	export Build=$(Build); \
 	$(MAKE) -C ../../lgi/trunk -f ./linux/Makefile.linux
 

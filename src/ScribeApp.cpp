@@ -1098,15 +1098,15 @@ void ScribeWnd::Construct3()
 			#if RUN_STARTUP_SCRIPTS
 			// Run scripts in './Scripts' folder
 			LFile::Path s(ScribeResourcePath());
-			s = s / ".." / "Scripts";
+			s = s / ".." / "scripts";
 			if (!s.Exists())
 			{
 				LgiTrace("%s:%i - scripts at '%s' doesn't exist.\n", _FL, s.GetFull().Get());
-				s = LFile::Path(LSP_APP_INSTALL) / "Scripts";
+				s = LFile::Path(LSP_APP_INSTALL) / "scripts";
 			}
 			if (!s.Exists())
 			{
-				LgiTrace("%s:%i - Error: the scripts folder '%s' doesn't exist.\n", _FL, s);
+				LgiTrace("%s:%i - Error: the scripts folder '%s' doesn't exist.\n", _FL, s.GetFull().Get());
 			}
 			else
 			{
