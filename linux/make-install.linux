@@ -2,17 +2,17 @@
 
 set -e
 
-CODELIB=../../../../codelib
-if [ ! -d $CODELIB ] 
-then
-    echo "Error: codelib doesn't exist." 
-    exit -1
-fi
-
 LGI=../../../lgi/trunk
 if [ ! -d $LGI ] 
 then
     echo "Error: lgi doesn't exist." 
+    exit -1
+fi
+
+LGI_DEPS=../../../lgi/deps/build-x64-release/lib
+if [ ! -d $LGI_DEPS ] 
+then
+    echo "Error: codelib doesn't exist." 
     exit -1
 fi
 
@@ -30,7 +30,14 @@ then
     exit -1
 fi
 
-DEPLOY=$CODELIB/appimagetool-x86_64.AppImage
+LIBS=../../libs/build-x64-release/lib
+if [ ! -d $LIBS ] 
+then
+    echo "Error: libs doesn't exist." 
+    exit -1
+fi
+
+DEPLOY=./appimagetool-x86_64.AppImage
 if [ ! -f $DEPLOY ] 
 then
     echo "Error: appimagetool doesn't exist." 
@@ -45,10 +52,14 @@ LIBDIR=$APPDIR/usr/lib
 RESDIR=$APPDIR/usr/share/applications
 BUILD=Release
 TAG=
+
 LGI_SO="$LGI/$BUILD/liblgi-gtk3$TAG.so"
-ASPELL_SO="../../libs/aspell-0.60.6.1/linux/$BUILD/libaspell-dist-060$TAG.so"
-CHARDET_SO="../../libs/build-x64-release/libchardet/libchardet.so"
-BZIP_SO="../../libs/build-x64-release/bzip2-1.0.6/libbzip2.so"
+ASPELL_SO="$LIBS/libaspell-dist-0.60$TAG.so"
+CHARDET_SO="$LIBS/libchardet.so"
+BZIP_SO="$LIBS/libbzip2.so"
+LIBPNG="$LGI_DEPS/libpng16.so.16.45.git"
+ZLIB="$LGI_DEPS/libz.so.1.4.1.1"
+LIBJPEG="$LGI_DEPS/libjpeg.so.62.4.0"
 
 rm -rf $APPDIR
 
@@ -67,6 +78,9 @@ cp $LGI_SO     $LIBDIR
 cp $ASPELL_SO  $LIBDIR
 cp $CHARDET_SO $LIBDIR
 cp $BZIP_SO    $LIBDIR
+cp $LIBPNG     $LIBDIR
+cp $ZLIB       $LIBDIR
+cp $LIBJPEG    $LIBDIR
 
 echo "Copy resources..."
 chmod 700 $RES/AppRun

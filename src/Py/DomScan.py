@@ -82,7 +82,7 @@ for s in src:
 			
 	else:
 	
-		IsGVariantcpp = s.find("GVariant.cpp") >= 0
+		IsVariantcpp = s.find("Variant.cpp") >= 0
 		Debug = False # s.find("ScribeSendReceive.cpp") >= 0
 		if Debug:
 			print(s)
@@ -93,7 +93,7 @@ for s in src:
 			
 			if l.find("::GetVariant(") > 0:
 
-				parts = re.split(' |::|\(', l)
+				parts = re.split(r' |::|\(', l)
 				if len(parts) > 3 and parts[0] == "bool":
 					obj = ObjectNameFromLine(parts)
 					
@@ -111,7 +111,7 @@ for s in src:
 
 			elif l.find("::CallMethod(") > 0:
 
-				parts = re.split(' |::|\(', l)
+				parts = re.split(r' |::|\(', l)
 				if len(parts) > 3 and parts[0] == "bool":
 					obj = ObjectNameFromLine(parts)
 					def_methods = True
@@ -130,7 +130,7 @@ for s in src:
 						if depth == 0:
 							obj = None
 					elif l.find("_stricmp") >= 0:
-						parts = re.split('\(|\)|,', l.strip())
+						parts = re.split(r'\(|\)|,', l.strip())
 						fld = None
 						for p in parts:
 							p = p.strip()
@@ -197,9 +197,9 @@ for s in src:
 								else:
 									print("Error: no object for class:", obj)
 				
-				elif IsGVariantcpp and l.find("Define(") >= 0:
+				elif IsVariantcpp and l.find("Define(") >= 0:
 					
-					parts = re.split('\t|\(\"|\", |\)', l.strip())
+					parts = re.split(r'\t|\(\"|\", |\)', l.strip())
 					if len(parts) == 4 and parts[0] == "Define":
 						lgi_props[parts[2]] = parts[1]
 						# print("lgi_prop:", parts[2], "=", parts[1])
