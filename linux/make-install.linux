@@ -41,6 +41,7 @@ DEPLOY=./appimagetool-x86_64.AppImage
 if [ ! -f $DEPLOY ] 
 then
     echo "Error: appimagetool doesn't exist." 
+    echo "Download: https://github.com/AppImage/appimagetool/releases/tag/continuous"
     exit -1
 fi
 
@@ -53,13 +54,19 @@ RESDIR=$APPDIR/usr/share/applications
 BUILD=Release
 TAG=
 
-LGI_SO="$LGI/$BUILD/liblgi-gtk3$TAG.so"
+# scribe libs:
 ASPELL_SO="$LIBS/libaspell-dist-0.60$TAG.so"
-CHARDET_SO="$LIBS/libchardet.so"
 BZIP_SO="$LIBS/libbzip2.so"
-LIBPNG="$LGI_DEPS/libpng16.so.16.45.git"
-ZLIB="$LGI_DEPS/libz.so.1.4.1.1"
-LIBJPEG="$LGI_DEPS/libjpeg.so.62.4.0"
+CHARDET_SO="$LIBS/libchardet.so"
+BTREE_SO="$LIBS/libbtree.so"
+
+# lgi libs:
+LGI_SO="$LGI/$BUILD/liblgi-gtk3$TAG.so"
+LIBPNG="$LGI_DEPS/libpng*.so*"
+ZLIB="$LGI_DEPS/libz*.so*"
+LIBJPEG="$LGI_DEPS/libjpeg*.so*"
+LIBNTLM="$LGI_DEPS/libntlm.so"
+ICONV="$LGI_DEPS/libiconv.so"
 
 rm -rf $APPDIR
 
@@ -73,14 +80,22 @@ python3 ../src/Py/DomScan.py > $RESDIR/Dom.txt
 
 echo "Copying binaries..."
 cp ../scribe $BINDIR
-cp $LGI/src/linux/CrashHandler/crash-handler $BINDIR
-cp $LGI_SO     $LIBDIR
+
 cp $ASPELL_SO  $LIBDIR
 cp $CHARDET_SO $LIBDIR
 cp $BZIP_SO    $LIBDIR
-cp $LIBPNG     $LIBDIR
-cp $ZLIB       $LIBDIR
-cp $LIBJPEG    $LIBDIR
+cp $BTREE_SO   $LIBDIR
+
+cp $LGI/src/linux/CrashHandler/crash-handler $BINDIR
+cp $LGI_SO     $LIBDIR
+cp -av --preserve=links $LIBPNG     $LIBDIR
+cp -av --preserve=links $ZLIB       $LIBDIR
+cp -av --preserve=links $LIBJPEG    $LIBDIR
+cp $LIBNTLM    $LIBDIR
+cp $ICONV      $LIBDIR
+
+chmod 755 $BINDIR/*
+chmod 755 $LIBDIR/*
 
 echo "Copy resources..."
 chmod 700 $RES/AppRun

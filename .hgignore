@@ -13,6 +13,7 @@ linux/Debug
 linux/Release
 linux/*.idx
 linux/ScribeOptions_*.bak
+linux/scribe-linux-*
 
 src\Resource.res
 
