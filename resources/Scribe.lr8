@@ -1067,8 +1067,8 @@
 		<String Ref="363" Cid="363" Define="IDS_FIND" en="Find" fr="Trouver" cs="Najít" de="Suchen" nl="Vinden" es="Buscar" pt_br="Localizar" ru="Найти" ja="検索" pt="Procurar" pl="Znajdź" vi="Tìm kiếm" zh_tw="尋找" sr="Nadji" no="Finn" lt="Ieškoti" fa="جستجو" sv="Sök" lg="Noonya" tr="Ara" hu="Keres" ko="찾기" uk="Знайти" />
 		<String Ref="364" Cid="364" Define="IDS_NO_ITEMS" en="No Items" fr="Pas d&apos;objet" cs="Žádné položky" de="Keine Einträge" nl="Geen items" es="No hay elementos" pt_br="Sem itens" pt="Sem itens" pl="Brak elementów" vi="Không có mục nào" zh_tw="沒有物件" ja="アイテム無し" sr="Nema objekata" no="Ingen elementer" lt="Trūksta objektų arba elementų." fa="هیچ چیز" da="Ingen elementer" sv="Inga poster" lg="Tewali bintu" tr="Kayıt yok" hu="Nincs elem" ru="Нет элементов" ko="아이템 없음" uk="Немає елементів" />
 		<String Ref="365" Cid="365" Define="IDS_RECEIVE_ALL_ACCOUNTS" en="Receive All Accounts" fr="Recevoir tout les comptes" cs="Přijmout ze všech účtů" de="Von allen E-Mail-Konten empfangen" nl="A&lle accounts ontvangen" es="Recibir todas las cuentas" pt_br="Receber de todas as contas" pt="Receber todas as contas" pl="Odbierz ze wszystkich kont" vi="Nhận thư của tất cả tài khoản" zh_tw="接收所有帳號" ja="全てのアカウントを受信" sr="Primi za sve naloge" no="Hent fra alle kontoer" lt="Parsiųsti visų paskyrų laiškus " fa="نامه های همه حسابها را دریافت کن" da="Hent fra alle kontoer" sv="&Hämta från alla konton" lg="Ttikula ku Akawunta zonna" tr="Tüm Hesapları Yükle" hu="Minden fiók fogadása" ru="Получить для всех учетных записей" ko="모든 계정 수신" uk="Отримати для всіх облікових записів" />
-		<String Ref="367" Cid="367" Define="IDS_PREVIEW_ON_SERVER" en="&Preview Mail on Server\tCtrl+P" fr="&Prévisualiser les mails sur le serveur\tCtrl+P" it="Ante&prima posta sul server\tCtrl+P" cs="Náhled z&práv na serveru\tCtrl+P" de="E-Mail-Konto &Vorschau auf Server\tCtrl+P" nl="Berichten overzicht op de &server\tCtrl+P" es="&Vista Previa\tCtrl+P" pt_br="&Visualizar email no servidor\tCtrl+P" ru="Просмотр почты на сервере" pt="&Ver e-mail no servidor\tCtrl+P" pl="&Podgląd wiadomości na serwerze\tCtrl+P" vi="Duyệt thư trên máy chủ\tCtrl+P" zh_tw="於伺服器預覽郵件(&P)\tCtrl+P" ja="サーバ上のメールをプレビュー(&P)\tCtrl+P" sr="&Pregledaj poruke na serveru\tCtrl+P" no="&Forhåndsvis epost på tjener\tCtrl+P" lt="Peržiūrėti laiškus &serveryje\tCtrl+P" fa="نامه هارا روی سرور پیش نمایش بده\tCtrl+P" da="&Forhåndsvis epost på serveren\tCtrl+P" sv="&Förhandsgranska e-post på servern\tCtrl+P" lg="Labirawo obubaka nga bwebuli ku Saa&va\tCtrl+P" tr="&Sunucudan Önizleme Yap\tCtrl+P" hu="Levelek előnézete a kiszolgálón\tCtrl+P" ko="&서버에 있는 메일 미리보기\tCtrl+P" uk="Попередній перегляд пошти на сервері" />
-		<String Ref="368" Cid="368" Define="IDS_RECEIVE_MAIL" en="Receive &Mail\tCtrl+M" fr="Recevoir &Courrier\tCtrl+M" it="Scarica posta\tCtrl+M" cs="Přij&mout zprávy\tCtrl+M" de="E-&Mail empfangen\tCtrl-M" nl="Berichten &ontvangen\tCtrl+M" es="Recibir &Correo\tCtrl+M" pt_br="Receber &email\tCtrl+M" ru="Получить почту" pt="Receber &mensagens\tCtrl+M" pl="Odbierz &wiadomości\tCtrl+M" vi="&Nhận thư\tCtrl+M" zh_tw="接收郵件(&M)\tCtrl+M" ja="メール受信(&M)\tCtrl+M" sr="Pri&mi poštu\tCtrl+M" no="Motta epost\tCtrl+M" lt="Parsiųs&ti\tCtrl+M" fa="نامه ها را دریافت کن\tCtrl+M" da="Modtag epost\tCtrl+M" sv="&Ta emot e-post\tCtrl+M" lg="Ttikula Ebb&aluwa\tCtrl+M" tr="E-postaları Yükle\tCtrl+M" hu="Üzenetek fogadása\tCtrl+M" ko="수신 &메일\tCtrl+M" uk="Отримати пошту" />
+		<String Ref="367" Cid="367" Define="IDS_PREVIEW_ON_SERVER" en="&Preview Mail on Server" fr="&Prévisualiser les mails sur le serveur" it="Ante&prima posta sul server" cs="Náhled z&práv na serveru" de="E-Mail-Konto &Vorschau auf Server" nl="Berichten overzicht op de &server" es="&Vista Previa" pt_br="&Visualizar email no servidor" ru="Просмотр почты на сервере" pt="&Ver e-mail no servidor" pl="&Podgląd wiadomości na serwerze" vi="Duyệt thư trên máy chủ" zh_tw="於伺服器預覽郵件(&P)" ja="サーバ上のメールをプレビュー(&P)" sr="&Pregledaj poruke na serveru" no="&Forhåndsvis epost på tjener" lt="Peržiūrėti laiškus &serveryje" fa="نامه هارا روی سرور پیش نمایش بده" da="&Forhåndsvis epost på serveren" sv="&Förhandsgranska e-post på servern" lg="Labirawo obubaka nga bwebuli ku Saa&va" tr="&Sunucudan Önizleme Yap" hu="Levelek előnézete a kiszolgálón" ko="&서버에 있는 메일 미리보기" uk="Попередній перегляд пошти на сервері" />
+		<String Ref="368" Cid="368" Define="IDS_RECEIVE_MAIL" en="Receive &Mail" fr="Recevoir &Courrier" it="Scarica posta" cs="Přij&mout zprávy" de="E-&Mail empfangen" nl="Berichten &ontvangen" es="Recibir &Correo" pt_br="Receber &email" ru="Получить почту" pt="Receber &mensagens" pl="Odbierz &wiadomości" vi="&Nhận thư" zh_tw="接收郵件(&M)" ja="メール受信(&M)" sr="Pri&mi poštu" no="Motta epost" lt="Parsiųs&ti" fa="نامه ها را دریافت کن" da="Modtag epost" sv="&Ta emot e-post" lg="Ttikula Ebb&aluwa" tr="E-postaları Yükle" hu="Üzenetek fogadása" ko="수신 &메일" uk="Отримати пошту" />
 		<String Ref="366" Cid="366" Define="IDS_NO_ITEMS_IN_FOLDER" en="No Items in &apos;/Templates&apos; folder" fr="Pas d&apos;objet dans &apos;/Dossier modèles&apos;" it="Cartella bozze vuota" cs="Složka /Šablony je prázdná" de="Keine Einträge im &apos;/Vorlagen&apos; Ordner" nl="Geen items in map &apos;/Sjablonen&apos;" es="No hay elementos en la carpeta &apos;/Templates&apos; " pt_br="Sem items na pasta &apos;/Templates&apos;" pt="Sem items na pasta &apos;/Modelos&apos;" pl="Brak elementów w folderze &apos;/Szablony&apos;" vi="Không có mục nào trong danh mục &apos;/Mẫu&apos;" zh_tw="沒有物件於 &apos;/範本&apos; 資料夾" ja="テンプレートフォルダ中にはアイテムはありません。" sr="Nema objekata u &apos;/Templates&apos; omotnici" no="Ingen elementer i &apos;/Templates&apos; katalogen" lt="Šablonų aplankas tuščias" fa="نیست&apos;/Templates&apos;هیچ چیزی در پوشه" da="Ingen elementer i &apos;/Templates&apos; katalogen" sv="Inga poster i &apos;/Mallar&apos;-mappen" lg="Temuli failo mu kabada ya &apos;/Templates&apos;" tr=" &apos;/Templates&apos; klasörü boş" hu="Nincs elem a &apos;/Sablon&apos; mappában" ru="Нет элементов в папке &apos;/Templates&apos;" ko=" &apos;/템플릿&apos; 폴더에 항목 없음" uk="Немає елементів в теці  &apos;/Templates&apos;" />
 		<String Ref="369" Cid="369" Define="IDS_NO_TEMPLATES" en="No /Templates folder" fr="Pas de brouillons" it="Cartella bozze non trovata" cs="Složka /Šablony neexistuje" de="Kein &apos;/Vorlagen&apos; Ordner" nl="Geen map /Sjablonen" es="No hay carpeta de /Drafts" pt_br="Não existe a pasta /Rascunhos" pt="Não existe a pasta /Rascunhos" pl="Brak folderu /Szablony" vi="Không có danh mục /Phác thảo" zh_tw="無 /草稿資料夾" ja="下書きフォルダはありません" sr="Nema /Drafts omotnice" no="Ingen /Drafts mappe" lt="Dar nėra/Juodraščių (Drafts) aplanke " fa="وجود ندارد/Templatesپوشه " da="Ingen /Drafts mappe" sv="Det finns ingen /Mallar-mapp" lg="Tewali kabada ya butiba" tr=" /Taslak klasörü yok" hu="Nincs /Sablon mappa" ru="Нет папки шаблонов" ko="/템플릿 폴더 없음" uk="Відсутня тека шаблонів" />
 		<String Ref="372" Cid="372" Define="IDS_EXIT" en="Exit" fr="Sortir" it="Esci" cs="Konec" de="Beenden" nl="Afsluiten" es="Salir" pt_br="Sair" pt="Sair" pl="Wyjdź" vi="Thoát" zh_tw="離開" ja="終了" sr="Izadji" no="Avslutt" lt="Išeiti" fa="خروج" da="Afslut" sv="Avsluta" lg="Fuluma" tr="Çıkış" hu="Kilép" ru="Выход" ko="나가기" uk="Вихід" />
@@ -4686,9 +4686,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4696,23 +4710,9 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>
@@ -5228,7 +5228,7 @@
 	<menu Name="ID_EVENT_MENU">
 		<string-group Name="&lt;untitled&gt;">
 			<String Ref="1198" en="&File" fr="&Fichier" cs="&Soubor" es="&Archivo" de="&Datei" nl="&Bestand" pt_br="&Arquivo" ru="Файл" ja="ファイル(&F)" pt="&Ficheiro" pl="Plik" vi="&Tập tin" zh_tw="檔案(&F)" sr="&Fajl" no="&Fil" lt="&Duomenys ir nuostatos" fa="فایل" id="&Catatan" da="&Fil" sv="&Arkiv" tr="&Dosya" hu="&Fájl" ko="파일" uk="Файл" />
-			<String Ref="1016" Cid="113" Define="IDM_SAVE" en="Save\tCtrl+S" fr="Enregistrer\tCtrl+S" it="Salva" cs="Uložit" es="Guardar" de="Speichern" nl="Opslaan" pt_br="Salvar" ru="Сохранить" ja="保存" pt="Gravar" pl="Zapisz\tCtrl+S" vi="Lưu" zh_tw="儲存" sr="Snimi" no="Lagre" lt="Įrašyti" fa="ذخيره کن" id="Menyimpan" da="Gem" sv="Spara" lg="Ttereka" tr="Kaydet" hu="Ment" ko="저장\tCtrl+S" uk="Зберегти" />
+			<String Ref="1016" Cid="113" Define="IDM_SAVE" en="Save" fr="Enregistrer" it="Salva" cs="Uložit" es="Guardar" de="Speichern" nl="Opslaan" pt_br="Salvar" ru="Сохранить" ja="保存" pt="Gravar" pl="Zapisz" vi="Lưu" zh_tw="儲存" sr="Snimi" no="Lagre" lt="Įrašyti" fa="ذخيره کن" id="Menyimpan" da="Gem" sv="Spara" lg="Ttereka" tr="Kaydet" hu="Ment" ko="저장" uk="Зберегти" />
 			<String Ref="1015" Cid="659" Define="IDM_SAVEAS" en="Save &As" fr="Enregistrer &Sous" it="Salva &come" cs="Uložit j&ako" es="&Guardar como" de="Speichern &Unter" nl="Opslaan &als" pt_br="Salvar &como" ru="Сохранить как..." ja="名前をつけて保存(&A)" pt="Gravar &como" pl="Zapisz &jako" vi="Lưu với tên khác" zh_tw="另存(&A)" sr="Snimi k&ao" no="Lagre &som" lt="Į&rašyti taip..." fa="...ذخيره کن به نام" da="Gem &som" sv="Spara so&m..." lg="Tterek&a nga" tr="Farklı kaydet" hu="Mentés másként" ko="다른이름으로  &저장" uk="Зберегти як" />
 			<String Ref="1014" Cid="41165" Define="IDM_EXPORT" en="Export" pl="Eksportuj" ko="내보내기" uk="Експорт" fr="Exporter" />
 			<String Ref="985" Cid="758" Define="IDM_DELETE" en="&Delete" fr="&Supprimer" it="&Elimina" cs="&Smazat" es="&Eliminar" de="&Löschen" nl="&Verwijderen" pt_br="&Excluir" ru="Удалить" ja="削除(&D)" pt="&Apagar" pl="&Usuń" vi="&Xóa" zh_tw="刪除(&D)" sr="&Briši" no="Sl&ett" lt="&Pašalinti" fa="پاک کردن" id="&Hapus" da="Sl&et" sv="&Ta bort" tr="Sil" hu="&Törlés" ko="&삭제" uk="Видалити" />
@@ -5236,7 +5236,7 @@
 			<String Ref="935" Cid="697" Define="IDM_HELP" en="&Help" fr="&Aide" it="&Aiuto" cs="Nápo&věda" es="&Ayuda" de="&Hilfe" pt_br="Aj&uda" ru="Помощь" nl="&Hulp" ja="ヘルプ(&H)" pt="Aj&uda" pl="Pomoc" vi="&Giúp " zh_tw="說明(&H)" sr="&Pomoć" no="&Hjelp" lt="Pa&galba" fa="راهنما" id="&Bantuan" da="&Hjælp" sv="&Hjälp" tr="&Yardım" hu="Súgó" ko="&도움말" uk="Допомога" />
 		</string-group>
 		<submenu Ref="1198">
-			<menuitem Ref="1016" />
+			<menuitem Ref="1016" Shortcut="Ctrl+S" />
 			<menuitem Ref="1015" />
 			<menuitem Ref="1014" />
 			<menuitem Sep="1" />

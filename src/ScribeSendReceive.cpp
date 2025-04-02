@@ -968,13 +968,14 @@ bool SendAccountlet::InitMenus()
 		if (GetApp()->SendMenu)
 		{
 			LVariant Default;
+			const char *ShortCut = nullptr;
 			GetApp()->GetOptions()->GetValue(OPT_DefaultSendAccount, Default);
 			if (Default.CastInt32() == Account->GetIndex())
 			{
-				strcat(Name+strlen(Name), "\tCtrl-S");
+				ShortCut = "Ctrl+S";
 			}
 
-			SendItem = GetApp()->SendMenu->AppendItem(Name, IDM_SEND_FROM+(int)Account->GetIndex(), true);
+			SendItem = GetApp()->SendMenu->AppendItem(Name, IDM_SEND_FROM+(int)Account->GetIndex(), true, -1, ShortCut);
 		}
 
 		return true;
@@ -1524,16 +1525,16 @@ bool ReceiveAccountlet::InitMenus()
 		}
 
 		// Add shortcut
+		LString ShortCut;
 		if (Account->GetIndex() < 9)
 		{
-			size_t Len = strlen(Name);
-			sprintf_s(Name+Len, sizeof(Name)-Len, "\tCtrl+" LPrintfSSizeT, Account->GetIndex()+1);
+			ShortCut.Printf("Ctrl+" LPrintfSSizeT, Account->GetIndex()+1);
 		}
 
 		// Add receive menuitem
 		if (GetApp()->ReceiveMenu)
 		{
-			ReceiveItem = GetApp()->ReceiveMenu->AppendItem(Name, IDM_RECEIVE_FROM+(int)Account->GetIndex(), !Disabled());
+			ReceiveItem = GetApp()->ReceiveMenu->AppendItem(Name, IDM_RECEIVE_FROM+(int)Account->GetIndex(), !Disabled(), -1, ShortCut);
 		}
 
 		return true;
