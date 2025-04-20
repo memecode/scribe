@@ -47,9 +47,7 @@ inline
 #endif
 #endif
 static size_t
-hash (str, len)
-     register const char *str;
-     register size_t len;
+hash (register const char *str, register size_t len)
 {
   static unsigned char asso_values[] =
     {
@@ -100,9 +98,7 @@ __attribute__ ((__gnu_inline__))
 #endif
 #endif
 struct MailFlagMap *
-in_word_set (str, len)
-     register const char *str;
-     register size_t len;
+in_word_set(register const char *str, register size_t len)
 {
   static struct MailFlagMap wordlist[] =
     {
