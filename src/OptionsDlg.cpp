@@ -59,18 +59,18 @@ static int AccountCmp(LListItem *a, LListItem *b, NativeInt Data)
 	return a->Compare(b);
 }
 
-class UtfEditor : public LWindow
+class UtfEditor : public LDialog
 {
-	ScribeWnd *App;
-	LTabView *Tabs;
-	LTabPage *TabText, *TabHtml;
-	LButton *Ok, *Cancel;
-	LTextView3 *Txt;
-	LRichTextEdit *Html;
-	const char *TextOpt, *HtmlOpt;
+	ScribeWnd *App = nullptr;
+	LTabView *Tabs = nullptr;
+	LTabPage *TabText = nullptr, *TabHtml = nullptr;
+	LButton *Ok = nullptr, *Cancel = nullptr;
+	LTextView3 *Txt = nullptr;
+	LRichTextEdit *Html = nullptr;
+	const char *TextOpt = nullptr, *HtmlOpt = nullptr;
 
 public:
-	UtfEditor(ScribeWnd *app, const char *txtopt, const char *htmlopt, const char *desc);
+	UtfEditor(ScribeWnd *app, LWindow *parent, const char *txtopt, const char *htmlopt, const char *desc);
 	void OnPosChange() override;
 	int OnNotify(LViewI *c, const LNotification &n) override;
 };
@@ -832,7 +832,11 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		}
 		case IDC_EDIT_REPLY:
 		{
-			new UtfEditor(App, OPT_TextReplyFormat, OPT_HtmlReplyFormat, LLoadString(IDS_REPLY));
+			if (auto dlg = new UtfEditor(App, this,
+										OPT_TextReplyFormat,
+										OPT_HtmlReplyFormat,
+										LLoadString(IDS_REPLY)))
+				dlg->DoModal(nullptr);
 			break;
 		}
 		case IDC_RESET_REPLY:
@@ -844,7 +848,11 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		}
 		case IDC_EDIT_FORWARD:
 		{
-			new UtfEditor(App, OPT_TextForwardFormat, OPT_HtmlForwardFormat, LLoadString(IDS_FORWARD));
+			if (auto dlg = new UtfEditor(App, this,
+										OPT_TextForwardFormat,
+										OPT_HtmlForwardFormat,
+										LLoadString(IDS_FORWARD)))
+				dlg->DoModal(nullptr);
 			break;
 		}
 		case IDC_RESET_FORWARD:
@@ -1204,53 +1212,44 @@ LMessage::Result OptionsDlg::OnEvent(LMessage *m)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-UtfEditor::UtfEditor(ScribeWnd *app, const char *txtopt, const char *htmlopt, const char *desc)
+UtfEditor::UtfEditor(ScribeWnd *app, LWindow *parent,
+	const char *txtopt, const char *htmlopt, const char *desc)
 {
-	Txt = NULL;
-	Html = NULL;
-	TabText = TabHtml = 0;
-
 	LRect r(0, 0, 600, 500);
 	SetPos(r);
 	MoveToCenter();
+	SetParent(parent);
 	App = app;
 	TextOpt = txtopt;
 	HtmlOpt = htmlopt;
-	Cancel = Ok = 0;
-	if (Attach(0))
+
+	Children.Insert(new LTextLabel(-1, 5, 5, -1, -1, desc));
+	Children.Insert(Tabs = new LTabView(200, 0, 30, 300, 300));
+	if (Tabs)
 	{
-		Children.Insert(new LTextLabel(-1, 5, 5, -1, -1, desc));
-		Children.Insert(Tabs = new LTabView(200, 0, 30, 300, 300));
-		if (Tabs)
+		Tabs->SetPourLargest(false);
+		Tabs->SetPourChildren(true);
+		if ((TabText = Tabs->Append("Text")))
 		{
-			Tabs->SetPourLargest(false);
-			Tabs->SetPourChildren(true);
-			if ((TabText = Tabs->Append("Text")))
-			{
-				TabText->Append(Txt = new LTextView3(IDC_TEXT_VIEW, 0, 0, 100, 100));
-				Txt->SetPourLargest(true);
-				Txt->Sunken(true);
-			}
-			if ((TabHtml = Tabs->Append("Html")))
-			{
-				TabHtml->Append(Html = new LRichTextEdit(IDC_HTML_VIEW, 0, 0, 100, 100));
-				Html->SetPourLargest(true);
-				Html->Sunken(true);
-			}
+			TabText->Append(Txt = new LTextView3(IDC_TEXT_VIEW, 0, 0, 100, 100));
+			Txt->SetPourLargest(true);
+			Txt->Sunken(true);
 		}
-		Children.Insert(Ok = new LButton(IDOK, 5, 5, 75, 20, LLoadString(IDS_OK)));
-		Children.Insert(Cancel = new LButton(IDCANCEL, 75, 5, 75, 20, LLoadString(IDS_CANCEL)));
-
-		LVariant s;
-		if (Txt && App->GetOptions()->GetValue(TextOpt, s))
-			Txt->Name(s.Str());
-		if (Html && App->GetOptions()->GetValue(HtmlOpt, s))
-			Html->Name(s.Str());
-
-		AttachChildren();
-		OnPosChange();
-		Visible(true);
+		if ((TabHtml = Tabs->Append("Html")))
+		{
+			TabHtml->Append(Html = new LRichTextEdit(IDC_HTML_VIEW, 0, 0, 100, 100));
+			Html->SetPourLargest(true);
+			Html->Sunken(true);
+		}
 	}
+	Children.Insert(Ok = new LButton(IDOK, 5, 5, 75, 20, LLoadString(IDS_OK)));
+	Children.Insert(Cancel = new LButton(IDCANCEL, 75, 5, 75, 20, LLoadString(IDS_CANCEL)));
+
+	LVariant s;
+	if (Txt && App->GetOptions()->GetValue(TextOpt, s))
+		Txt->Name(s.Str());
+	if (Html && App->GetOptions()->GetValue(HtmlOpt, s))
+		Html->Name(s.Str());
 }
 
 void UtfEditor::OnPosChange()
