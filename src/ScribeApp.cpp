@@ -1397,7 +1397,8 @@ void ScribeWnd::LoadImageResources()
 		if (p)
 			Folders.Add(p);
 	}
-	Folders.Add(ScribeResourcePath());
+	auto resPath = ScribeResourcePath();
+	Folders.Add(resPath);
 
 	for (auto p: Folders)
 	{
@@ -1424,6 +1425,7 @@ void ScribeWnd::LoadImageResources()
 
 	ToolbarImgs.Reset(LLoadImageList(GetResourceFile(ResToolbarFile)));
     auto IconsFile = GetResourceFile(ResIconsFile);
+	LAssert(IconsFile);
 	ImageList.Reset(LLoadImageList(IconsFile));
 	if (!ImageList)
 		LgiTrace("%s:%i - Failed to load toolbar image ('%s')\n", _FL, IconsFile.Get());
@@ -7881,7 +7883,8 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 
 			for (auto a: Accounts)
 			{
-				if (!a->Receive.IsConfigured())
+				if (!a->Receive.IsConfigured() ||
+					a->Receive.Disabled())
 					continue;
 				
 				auto Protocol = ProtocolToEnum(a->Receive.Protocol().Str());
