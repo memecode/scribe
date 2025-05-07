@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34063DA52DCBF8C8007CB2C2 /* Tnef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */; };
 		340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 34749B44278B042500C8197E /* LgiCocoa.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		340FA6A9237E7E2D0043D1F2 /* EmojiMap.png in Resources */ = {isa = PBXBuildFile; fileRef = 340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */; };
 		340FAAEA23888A570017BC62 /* WebdavContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 340FAADC23888A570017BC62 /* WebdavContact.cpp */; };
@@ -108,7 +109,6 @@
 		3477C4001CC22EF60028B84B /* YearView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3FE1CC22EF60028B84B /* YearView.cpp */; };
 		3477C4041CC22F680028B84B /* ExeCheck.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C4031CC22F680028B84B /* ExeCheck.cpp */; };
 		3477C4091CC2301F0028B84B /* GdcTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C4081CC2301F0028B84B /* GdcTools.cpp */; };
-		3477C40B1CC230A30028B84B /* Tnef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C40A1CC230A30028B84B /* Tnef.cpp */; };
 		3477C40D1CC230C30028B84B /* Mail.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C40C1CC230C30028B84B /* Mail.cpp */; };
 		3477C40F1CC231190028B84B /* Imp_OutlookExpress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C40E1CC231190028B84B /* Imp_OutlookExpress.cpp */; };
 		3477C4111CC231470028B84B /* OpenSSLSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C4101CC231470028B84B /* OpenSSLSocket.cpp */; };
@@ -308,6 +308,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tnef.cpp; sourceTree = "<group>"; };
 		340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EmojiMap.png; path = ../../Resources/EmojiMap.png; sourceTree = "<group>"; };
 		340FAADC23888A570017BC62 /* WebdavContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavContact.cpp; path = ../../src/Store3Webdav/WebdavContact.cpp; sourceTree = "<group>"; };
 		34161495238484F700A65477 /* WebdavFolder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavFolder.cpp; path = ../../src/Store3Webdav/WebdavFolder.cpp; sourceTree = "<group>"; };
@@ -447,7 +448,6 @@
 		3477C3FE1CC22EF60028B84B /* YearView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = YearView.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/YearView.cpp; sourceTree = "<group>"; };
 		3477C4031CC22F680028B84B /* ExeCheck.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ExeCheck.cpp; path = ../../../../Lgi/trunk/src/common/General/ExeCheck.cpp; sourceTree = "<group>"; };
 		3477C4081CC2301F0028B84B /* GdcTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GdcTools.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Tools/GdcTools.cpp; sourceTree = "<group>"; };
-		3477C40A1CC230A30028B84B /* Tnef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Tnef.cpp; path = ../../../../Lgi/trunk/src/common/General/Tnef.cpp; sourceTree = "<group>"; };
 		3477C40C1CC230C30028B84B /* Mail.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mail.cpp; path = ../../../../Lgi/trunk/src/common/Net/Mail.cpp; sourceTree = "<group>"; };
 		3477C40E1CC231190028B84B /* Imp_OutlookExpress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Imp_OutlookExpress.cpp; path = ../../src/Imp_OutlookExpress.cpp; sourceTree = "<group>"; };
 		3477C4101CC231470028B84B /* OpenSSLSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OpenSSLSocket.cpp; path = ../../../../Lgi/trunk/src/common/Net/OpenSSLSocket.cpp; sourceTree = "<group>"; };
@@ -859,6 +859,7 @@
 		3477C2241CBEFD940028B84B /* Lgi */ = {
 			isa = PBXGroup;
 			children = (
+				34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */,
 				3477C3FB1CC22E690028B84B /* Base64.cpp */,
 				3477C4E81CC27D870028B84B /* Browser.cpp */,
 				3477C44F1CC262670028B84B /* ColourSelect.cpp */,
@@ -888,7 +889,6 @@
 				3477C4611CC26AE00028B84B /* SoftwareUpdate.cpp */,
 				342BAE3A2588AFA8006EF16E /* TextConvert.cpp */,
 				3477C43D1CC234C80028B84B /* TimePopup.cpp */,
-				3477C40A1CC230A30028B84B /* Tnef.cpp */,
 				3477C43F1CC234E60028B84B /* XmlTreeUi.cpp */,
 				3477C3FE1CC22EF60028B84B /* YearView.cpp */,
 			);
@@ -1353,7 +1353,6 @@
 				3445E58A1F1F42BA00D0A824 /* ObjectInspector.cpp in Sources */,
 				3416149A238484F800A65477 /* WebdavFolder.cpp in Sources */,
 				3477C4471CC235810028B84B /* HtmlCommon.cpp in Sources */,
-				3477C40B1CC230A30028B84B /* Tnef.cpp in Sources */,
 				3477C3E41CC227ED0028B84B /* ScribeItemList.cpp in Sources */,
 				3477C3E61CC227ED0028B84B /* ScribeListAddr.cpp in Sources */,
 				3477C3F81CC227ED0028B84B /* Store3Common.cpp in Sources */,
@@ -1361,6 +1360,7 @@
 				3477C41D1CC231890028B84B /* ScribeImap_Mail.cpp in Sources */,
 				3486E9E22A86E8CA009BDA7E /* UnitTests.cpp in Sources */,
 				3477C4001CC22EF60028B84B /* YearView.cpp in Sources */,
+				34063DA52DCBF8C8007CB2C2 /* Tnef.cpp in Sources */,
 				3477C3EC1CC227ED0028B84B /* ScribeRepair.cpp in Sources */,
 				3416149C238484F800A65477 /* WebdavThread.cpp in Sources */,
 				34918095222F1C6F00944FC4 /* OAuth2.cpp in Sources */,

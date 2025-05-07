@@ -304,59 +304,6 @@ void ScribeAccountPreview::GetMsgs(List<AccountMessage> &All)
 	}
 }
 
-int MsgCompare(LListItem *A, LListItem *B, NativeInt SortCol)
-{
-	int Status = 0;
-	AccountMessage *a = dynamic_cast<AccountMessage*>(A);
-	AccountMessage *b = dynamic_cast<AccountMessage*>(B);
-	if (a && b)
-	{
-		int Col = abs((int)SortCol)-1;
-		switch (Col)
-		{
-			case 0: // Size
-			{
-				Status = (int) (a->Size - b->Size);
-				break;
-			}
-			case 1: // From
-			{
-				if (a->From && b->From)
-				{
-					Status = _stricmp(a->From, b->From);
-				}
-				break;
-			}
-			case 2: // To
-			{
-				const char *sa = A->GetText(Col);
-				const char *sb = B->GetText(Col);
-				if (sa && sb)
-				{
-					Status = _stricmp(sa, sb);
-				}
-				break;
-			}
-			case 3: // Subject
-			{
-				if (a->Subject && b->Subject)
-				{
-					Status = _stricmp(a->Subject, b->Subject);
-				}
-				break;
-			}
-			case 4: // Date
-			{
-				Status = a->Date.Compare(&b->Date);
-				break;
-			}
-		}
-
-		if (SortCol < 0) Status = -Status;
-	}
-	return Status;
-}
-
 void ScribeAccountPreview::SetSort(int s)
 {
 	if (d->SortCol != s)
@@ -368,7 +315,56 @@ void ScribeAccountPreview::SetSort(int s)
 			int Col = abs(d->SortCol)-1;
 			int Ascend = d->SortCol > 0;
 			d->Lst->SetSortingMark(Col, !Ascend);
-			d->Lst->Sort<NativeInt>(MsgCompare, d->SortCol);
+			d->Lst->Sort(
+				[this](auto A, auto B)
+				{
+					int Status = 0;
+					auto a = dynamic_cast<AccountMessage*>(A);
+					auto b = dynamic_cast<AccountMessage*>(B);
+					if (a && b)
+					{
+						auto Col = abs(d->SortCol) - 1;
+						switch (Col)
+						{
+							case 0: // Size
+							{
+								Status = (int) (a->Size - b->Size);
+								break;
+							}
+							case 1: // From
+							{
+								Status = _stricmp(	a->From ? a->From : "",
+													b->From ? b->From : "");
+								break;
+							}
+							case 3: // Subject
+							{
+								Status = _stricmp(	a->Subject ? a->Subject : "",
+													b->Subject ? b->Subject : "");
+													
+								printf("cmp '%s' '%s' = %i\n", a->Subject.Get(), b->Subject.Get(), Status);
+								break;
+							}
+							case 4: // Date
+							{
+								Status = a->Date.Compare(&b->Date);
+								break;
+							}
+							default:
+							{
+								auto sa = A->GetText(Col);
+								auto sb = B->GetText(Col);
+								Status = _stricmp(sa ? sa : "", sb ? sb : "");
+								break;
+							}
+						}
+
+						if (d->SortCol < 0)
+							Status = -Status;
+					}
+					return Status;
+				}
+			);
 		}
 	}
 }
