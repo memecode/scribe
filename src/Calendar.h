@@ -421,6 +421,7 @@ class CalendarTodoItem : public LListItem
 
 	void SetTodo(Calendar *todo);
 	void OnColumnNotify(int Col, int64 Data);
+	int Compare(LListItem *To, ssize_t Field) override;
 
 public:
 	CalendarTodoItem(ScribeWnd *app, Calendar *todo = NULL);

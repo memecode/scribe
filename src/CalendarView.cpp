@@ -182,36 +182,31 @@ CalendarTodoItem::~CalendarTodoItem()
 	}
 }
 
-int TodoCompare(LListItem *la, LListItem *lb, NativeInt d)
+int CalendarTodoItem::Compare(LListItem *To, ssize_t Field)
 {
 	int Status = 0;
-	CalendarTodoItem *a = dynamic_cast<CalendarTodoItem*>(la);
-	CalendarTodoItem *b = dynamic_cast<CalendarTodoItem*>(lb);
-	if (a && b)
+	if (auto b = dynamic_cast<CalendarTodoItem*>(To))
 	{
-		int Col = abs((int)d) - 1;
-		int Mul = d >= 0 ? 1 : -1;
-
-		bool Atodo = a->Todo != 0;
+		bool Atodo = Todo != 0;
 		bool Btodo = b->Todo != 0;
 		if (Atodo ^ Btodo)
 		{
 			Status = Btodo - Atodo;
 		}
-		else if (a->Todo && b->Todo)
+		else if (Todo && b->Todo)
 		{
-			switch (Col)
+			switch (Field)
 			{
 				case 0:
 				{
 					// Completed
 					int Acomplete = 0;
 					int Bcomplete = 0;
-					a->Todo->GetField(FIELD_CAL_COMPLETED, Acomplete);
+					Todo->GetField(FIELD_CAL_COMPLETED, Acomplete);
 					b->Todo->GetField(FIELD_CAL_COMPLETED, Bcomplete);
 					if (Acomplete != Bcomplete)
 					{
-						Status = Mul * (Acomplete - Bcomplete);
+						Status = Acomplete - Bcomplete;
 					}
 					else
 					{
@@ -225,12 +220,9 @@ int TodoCompare(LListItem *la, LListItem *lb, NativeInt d)
 					BySubject:
 					const char *Asub = 0;
 					const char *Bsub = 0;
-					a->Todo->GetField(FIELD_CAL_SUBJECT, Asub);
+					Todo->GetField(FIELD_CAL_SUBJECT, Asub);
 					b->Todo->GetField(FIELD_CAL_SUBJECT, Bsub);
-					if (Asub && Bsub)
-					{
-						Status = Mul * _stricmp(Asub, Bsub);
-					}
+					Status = Stricmp(Asub, Bsub);
 					break;
 				}
 				case 2:
@@ -239,17 +231,17 @@ int TodoCompare(LListItem *la, LListItem *lb, NativeInt d)
 					ByDueDate:
 					LDateTime Adate;
 					LDateTime Bdate;
-					a->Todo->GetField(FIELD_CAL_START_UTC, Adate);
+					Todo->GetField(FIELD_CAL_START_UTC, Adate);
 					b->Todo->GetField(FIELD_CAL_START_UTC, Bdate);
 					bool Ad = Adate.Year() != 0;
 					bool Bd = Bdate.Year() != 0;
 					if (Ad ^ Bd)
 					{
-						Status = Mul * (Bd - Ad);
+						Status = Bd - Ad;
 					}
 					else if (Ad && Bd)
 					{
-						Status = Mul * Adate.Compare(&Bdate);
+						Status = Adate.Compare(&Bdate);
 					}
 					else
 					{
@@ -267,7 +259,9 @@ void CalendarTodoItem::Resort()
 {
 	if (GetList())
 	{
-		int Sort = 1;
+		int Col = -1;
+		bool Ascend = true;
+
 		for (int i=0; i<GetList()->GetColumns(); i++)
 		{
 			auto c = GetList()->ColumnAt(i);
@@ -275,18 +269,23 @@ void CalendarTodoItem::Resort()
 			{
 				if (c->UpArrow())
 				{
-					Sort = -(i + 1);
+					Col = i;
+					Ascend = false;
 					break;
 				}
 				else if (c->DownArrow())
 				{
-					Sort = i + 1;
+					Col = i;
+					Ascend = true;
 					break;
 				}
 			}
 		}
 
-		GetList()->Sort<NativeInt>(TodoCompare, Sort);
+		GetList()->Sort([this, Col, Ascend](auto a, auto b)
+			{
+				return a->Compare(b, Col) * (Ascend ? 1 : -1);
+			});
 	}
 }
 
@@ -3495,24 +3494,23 @@ int CalendarViewWnd::OnNotify(LViewI *c, const LNotification &n)
 				LMouse m;
 				if (Todo->GetColumnClickInfo(Col, m))
 				{
-					int Sort = 0;
+					bool Ascend = true;
 
 					for (int i=0; i<Todo->GetColumns(); i++)
 					{
-						LItemColumn *c = Todo->ColumnAt(i);
-						if (c)
+						if (auto c = Todo->ColumnAt(i))
 						{
 							if (i == Col)
 							{
 								if (c->DownArrow())
 								{
 									c->UpArrow(true);
-									Sort = -(i + 1);
+									Ascend = true;
 								}
 								else
 								{
 									c->DownArrow(true);
-									Sort = i + 1;
+									Ascend = false;
 								}
 							}
 							else
@@ -3523,7 +3521,10 @@ int CalendarViewWnd::OnNotify(LViewI *c, const LNotification &n)
 						}
 					}
 
-					Todo->Sort<NativeInt>(TodoCompare, Sort);
+					Todo->Sort([this, Col, Ascend](auto a, auto b)
+						{
+							return a->Compare(b, Col) * (Ascend ? 1 : -1);
+						});
 				}
 			}
 			break;
