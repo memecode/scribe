@@ -48,6 +48,7 @@
 #include "lgi/common/Map.h"
 #include "lgi/common/Charset.h"
 #include "lgi/common/RefCount.h"
+#include "lgi/common/PopupNotification.h"
 
 #include "ScribePrivate.h"
 #include "PreviewPanel.h"
@@ -7895,8 +7896,10 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				}
 			}
 			
-			if (Account.Length() == 1)
+			if (Account.Length() > 0)
 				OpenPopView(this, Account);
+			else
+				LPopupNotification::Message(this, "No suitable accounts to preview.");
 
 			break;
 		}

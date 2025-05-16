@@ -333,16 +333,12 @@ void ScribeAccountPreview::SetSort(int s)
 							}
 							case 1: // From
 							{
-								Status = _stricmp(	a->From ? a->From : "",
-													b->From ? b->From : "");
+								Status = Stricmp(a->From.Get(), b->From.Get());
 								break;
 							}
 							case 3: // Subject
 							{
-								Status = _stricmp(	a->Subject ? a->Subject : "",
-													b->Subject ? b->Subject : "");
-													
-								printf("cmp '%s' '%s' = %i\n", a->Subject.Get(), b->Subject.Get(), Status);
+								Status = Stricmp(a->Subject.Get(), b->Subject.Get());
 								break;
 							}
 							case 4: // Date
@@ -352,9 +348,7 @@ void ScribeAccountPreview::SetSort(int s)
 							}
 							default:
 							{
-								auto sa = A->GetText(Col);
-								auto sb = B->GetText(Col);
-								Status = _stricmp(sa ? sa : "", sb ? sb : "");
+								Status = Stricmp(A->GetText(Col), B->GetText(Col));
 								break;
 							}
 						}
