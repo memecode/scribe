@@ -24,7 +24,7 @@ struct GpgDecryptResponse
 
 class GpgConnector
 {
-	struct GpgConnectorPriv *d;
+	class GpgConnectorPriv *d;
 
 public:
 	static bool IsInstalled();

@@ -65,8 +65,6 @@ Mime hierarchy:
 
 */
 #include "lgi/common/Lgi.h"
-#include "Scribe.h"
-#include "GnuPG.h"
 #include "lgi/common/TextLabel.h"
 #include "lgi/common/Button.h"
 #include "lgi/common/CheckBox.h"
@@ -74,11 +72,15 @@ Mime hierarchy:
 #include "lgi/common/Css.h"
 #include "lgi/common/ThreadEvent.h"
 #include "lgi/common/SubProcess.h"
+#include "lgi/common/LgiRes.h"
+#include "lgi/common/CssTools.h"
+#include "lgi/common/EventTargetThread.h"
+
+#include "Scribe.h"
+#include "GnuPG.h"
 #include "ScribeListAddr.h"
 #include "Store3Common.h"
-#include "lgi/common/LgiRes.h"
 #include "resdefs.h"
-#include "lgi/common/CssTools.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////
 enum Ctrls
@@ -117,18 +119,14 @@ struct GpgJob
 {
 	enum JobType
 	{
-		JobGetKeys,
+		JobGetKeys = M_USER,
 		JobCheckSig,
 		JobDecrypt,
-	} Type;	
-	LViewI *Owner;
-	
-	GpgJob(JobType t)
-	{
-		Type = t;
-		Owner = NULL;
-	}
+	};	
 
+	// Dispatch handle of view
+	int OwnerId = 0;
+	
 	// Get keys:
 	LAutoPtr<LString::Array> Emails;
 
@@ -162,43 +160,17 @@ struct LTempFile : public LFile
 	}
 };
 
-struct GpgConnectorPriv : public LThread, public LMutex
+class GpgConnectorPriv : public LEventTargetThread
 {
-	LThreadEvent Event;
-
 private:
-	bool Loop;
 	KeyArr Keys;
-	LArray<GpgJob*> Work;
-	uint64 KeysTs;
+	uint64 KeysTs = 0;
 
 public:	
-	GpgConnectorPriv() :
-		LThread("GpgConnectorPrivThread"),
-		LMutex("GpgConnectorPrivMutex")
+	GpgConnectorPriv() : LEventTargetThread("GpgConnectorPriv")
 	{
-		Loop = true;
-		KeysTs = 0;
-		Run();
 	}
 	
-	~GpgConnectorPriv()	
-	{
-		Loop = false;
-		Event.Signal();
-		while (!IsExited())
-			LSleep(1);
-	}
-
-	void AddWork(GpgJob *j)
-	{
-		if (Lock(_FL))
-		{
-			Work.Add(j);
-			Unlock();
-		}
-	}
-
 private:
 	LString RunGpg(const char *Args)
 	{
@@ -323,7 +295,7 @@ private:
 		return SrcSz == Copied;
 	}
 	
-	void CheckSignature(LViewI *Owner, LAutoStreamI UserMsg, LMessage::Param UserVal)
+	void CheckSignature(int OwnerId, LAutoStreamI UserMsg, LMessage::Param UserVal)
 	{
 		LString Msg;
 		int64 Sz = 0;
@@ -523,7 +495,7 @@ private:
 		}
 		
 	OnSigCheckError:
-		Owner->PostEvent(M_GNUPG_SIG_CHECK, (LMessage::Param) Resp.Release());
+		PostObject(OwnerId, M_GNUPG_SIG_CHECK, Resp);
 	}
 
 	void Decrypt(GpgJob *j)
@@ -612,76 +584,61 @@ private:
 			FileDev->Delete(InPath, NULL, false);
 		}
 		
-		j->Owner->PostEvent(M_GNUPG_DECRYPT, (LMessage::Param) Resp.Release());
+		PostObject(j->OwnerId, M_GNUPG_DECRYPT, Resp);
 	}
 	
-	int Main()
+	LMessage::Result OnEvent(LMessage *Msg) override
 	{
-		LThreadEvent::WaitStatus s;
-		while ((s = Event.Wait()) == LThreadEvent::WaitSignaled)
+		switch (Msg->Msg())
 		{
-			if (!Loop) break;
-			
-			LAutoPtr<GpgJob> j;
-			if (Lock(_FL))
+			case GpgJob::JobGetKeys:
 			{
-				if (Work.Length())
-				{
-					j.Reset(Work[0]);
-					Work.DeleteAt(0, true);
-				}
-				Unlock();
-			}
-			if (j)
-			{
-				switch (j->Type)
-				{
-					case GpgJob::JobGetKeys:
-					{
-						if (Keys.Length() == 0)
-							GetKeys();
-						
-						LHashTbl<ConstStrKey<char,false>,bool> Map;
-						for (unsigned i=0; i<j->Emails->Length(); i++)
-						{
-							Map.Add((*j->Emails)[i], true);
-						}
-						
-						KeyArrAuto Inf(new KeyArr);
-						for (unsigned i=0; i<Keys.Length(); i++)
-						{
-							GpgConnector::KeyInfo &in = Keys[i];
-							if (!Map.Find(in.Email))
-								continue;
+				auto j = Msg->AutoA<GpgJob>();
 
-							// Make an explicit copy here, because we are passing the data back to the
-							// calling thread, and LString's aren't thread safe.					
-							GpgConnector::KeyInfo &out = Inf->New();
-							out.Email = in.Email.Get();
-							out.Name = in.Name.Get();
-							out.KeyId = in.KeyId.Get();
-							out.Flags = in.Flags;
-						}
+				if (Keys.Length() == 0)
+					GetKeys();
 						
-						j->Owner->PostEvent(M_GNUPG_KEY_INFO, 0, (LMessage::Param)Inf.Release());
-						break;
-					}
-					case GpgJob::JobCheckSig:
-					{
-						CheckSignature(j->Owner, j->Msg, j->UserValue);
-						break;
-					}
-					case GpgJob::JobDecrypt:
-					{
-						Decrypt(j);
-						break;
-					}
-					default:
-					{
-						LAssert(!"Invalid type.");
-						break;
-					}
+				LHashTbl<ConstStrKey<char,false>,bool> Map;
+				for (unsigned i=0; i<j->Emails->Length(); i++)
+				{
+					Map.Add((*j->Emails)[i], true);
 				}
+						
+				KeyArrAuto Inf(new KeyArr);
+				for (unsigned i=0; i<Keys.Length(); i++)
+				{
+					GpgConnector::KeyInfo &in = Keys[i];
+					if (!Map.Find(in.Email))
+						continue;
+
+					// Make an explicit copy here, because we are passing the data back to the
+					// calling thread, and LString's aren't thread safe.					
+					GpgConnector::KeyInfo &out = Inf->New();
+					out.Email = in.Email.Get();
+					out.Name = in.Name.Get();
+					out.KeyId = in.KeyId.Get();
+					out.Flags = in.Flags;
+				}
+						
+				PostObject(j->OwnerId, M_GNUPG_KEY_INFO, Inf);
+				break;
+			}
+			case GpgJob::JobCheckSig:
+			{
+				auto j = Msg->AutoA<GpgJob>();
+				CheckSignature(j->OwnerId, j->Msg, j->UserValue);
+				break;
+			}
+			case GpgJob::JobDecrypt:
+			{
+				auto j = Msg->AutoA<GpgJob>();
+				Decrypt(j);
+				break;
+			}
+			default:
+			{
+				LAssert(!"Invalid type.");
+				break;
 			}
 		}
 		
@@ -736,88 +693,59 @@ GpgConnector::~GpgConnector()
 
 bool GpgConnector::GetKeyInfo(LViewI *Target, LString::Array &Emails)
 {
-	if (!Target
-		#if LGI_VIEW_HANDLE
-		|| !Target->Handle()
-		#endif
-		)
+	if (!Target)
 	{
 		LAssert(!"Invalid target.");
 		return false;
 	}
-	if (!d->Lock(_FL))
+
+	LAutoPtr<GpgJob> j(new GpgJob);
+	if (!j)
 		return false;
 
-	GpgJob *j = new GpgJob(GpgJob::JobGetKeys);
-	if (j)
-	{
-		j->Emails.Reset(new LString::Array(Emails));
-		j->Owner = Target;
-		d->AddWork(j);
-	}
-	
-	d->Unlock();
-
-	return d->Event.Signal();
+	j->Emails.Reset(new LString::Array(Emails));
+	j->OwnerId = Target->AddDispatch();
+		
+	return d->PostObject(d->GetHandle(), GpgJob::JobGetKeys, j);
 }
 
 bool GpgConnector::CheckSignature(LViewI *Target, LAutoStreamI Rfc822Msg, LMessage::Param UserVal)
 {
-	if (!Target
-		#if LGI_VIEW_HANDLE
-		|| !Target->Handle()
-		#endif
-		)
+	if (!Target)
 	{
 		LAssert(!"Invalid target.");
 		return false;
 	}
-	if (!d->Lock(_FL))
+
+	LAutoPtr<GpgJob> j(new GpgJob);
+	if (!j)
 		return false;
 
-	GpgJob *j = new GpgJob(GpgJob::JobCheckSig);
-	if (j)
-	{
-		j->Owner = Target;
-		j->Msg = Rfc822Msg;
-		j->UserValue = UserVal;
+	j->OwnerId = Target->AddDispatch();
+	j->Msg = Rfc822Msg;
+	j->UserValue = UserVal;
 
-		d->AddWork(j);
-	}
-	
-	d->Unlock();
-
-	return d->Event.Signal();
+	return d->PostObject(d->GetHandle(), GpgJob::JobCheckSig, j);
 }
 
 bool GpgConnector::Decrypt(LViewI *Target, LAutoStreamI Data, LString Password, LMessage::Param UserVal)
 {
-	if (!Target
-		#if LGI_VIEW_HANDLE
-		|| !Target->Handle()
-		#endif
-		)
+	if (!Target)
 	{
 		LAssert(!"Invalid target.");
 		return false;
 	}
-	if (!d->Lock(_FL))
+
+	LAutoPtr<GpgJob> j(new GpgJob);
+	if (!j)
 		return false;
 
-	GpgJob *j = new GpgJob(GpgJob::JobDecrypt);
-	if (j)
-	{
-		j->Owner = Target;
-		j->Msg = Data;
-		j->Password = Password;
-		j->UserValue = UserVal;
+	j->OwnerId = Target->AddDispatch();
+	j->Msg = Data;
+	j->Password = Password;
+	j->UserValue = UserVal;
 
-		d->AddWork(j);
-	}
-	
-	d->Unlock();
-
-	return d->Event.Signal();
+	return d->PostObject(d->GetHandle(), GpgJob::JobDecrypt, j);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1771,8 +1699,9 @@ LMessage::Result MailUiGpg::OnEvent(LMessage *Msg)
 	{
 		case M_GNUPG_KEY_INFO:
 		{
-			d->Inf.Reset( (KeyArr*) Msg->B() );
-			AddressList *AddrLst = d->GetAddrLst();
+			d->Inf = Msg->AutoA<KeyArr>();
+
+			auto AddrLst = d->GetAddrLst();
 			if (d->Inf && AddrLst)
 			{
 				int NoKey = 0;
@@ -1819,7 +1748,7 @@ LMessage::Result MailUiGpg::OnEvent(LMessage *Msg)
 		case M_GNUPG_SIG_CHECK:
 		{
 			Mail *m = d->Ui ? d->Ui->GetItem() : NULL;
-			LAutoPtr<GpgSigCheckResponse> Resp((GpgSigCheckResponse*)Msg->A());
+			auto Resp = Msg->AutoA<GpgSigCheckResponse>();
 			
 			if (!Resp || m != (Mail*)Resp->UserValue)
 			{
@@ -1850,7 +1779,7 @@ LMessage::Result MailUiGpg::OnEvent(LMessage *Msg)
 		}
 		case M_GNUPG_DECRYPT:
 		{
-			LAutoPtr<GpgDecryptResponse> Resp((GpgDecryptResponse*)Msg->A());
+			auto Resp = Msg->AutoA<GpgDecryptResponse>();
 			if (!Resp)
 			{
 				d->SetError(LLoadString(IDS_GNUPG_ERR_INVALID_DECRYPTION));
@@ -1867,7 +1796,7 @@ LMessage::Result MailUiGpg::OnEvent(LMessage *Msg)
 				break;
 			}
 			
-			Mail *m = d->Ui->GetItem();
+			auto m = d->Ui->GetItem();
 			if (!m || m != (Mail*)Resp->UserValue)
 			{
 				d->SetError("Incorrect mail object after decryption.");
@@ -1875,7 +1804,7 @@ LMessage::Result MailUiGpg::OnEvent(LMessage *Msg)
 			}
 
 			d->SetSuccess(LLoadString(IDS_GNUPG_DECRYPT_OK));
-			LDataI *Obj = m->GetObject();
+			auto Obj = m->GetObject();
 			if (!Obj)
 			{
 				d->SetError(LLoadString(IDS_GNUPG_ERR_NOMSG));
