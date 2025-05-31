@@ -308,7 +308,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tnef.cpp; sourceTree = "<group>"; };
+		34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Tnef.cpp; path = ../../../../lgi/trunk/src/common/General/Tnef.cpp; sourceTree = "<group>"; };
 		340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EmojiMap.png; path = ../../Resources/EmojiMap.png; sourceTree = "<group>"; };
 		340FAADC23888A570017BC62 /* WebdavContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavContact.cpp; path = ../../src/Store3Webdav/WebdavContact.cpp; sourceTree = "<group>"; };
 		34161495238484F700A65477 /* WebdavFolder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavFolder.cpp; path = ../../src/Store3Webdav/WebdavFolder.cpp; sourceTree = "<group>"; };
