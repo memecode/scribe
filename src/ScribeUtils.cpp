@@ -567,10 +567,17 @@ char *ScribeTempPath()
 
 	if (Tmp[0] == 0)
 	{
+		#if LINUX
+		if (LGetSystemPath(LSP_APP_ROOT, Tmp, sizeof(Tmp)))
+		{
+			LMakePath(Tmp, sizeof(Tmp), Tmp, "tmp");
+		}
+		#else
 		if (LGetSystemPath(LSP_TEMP, Tmp, sizeof(Tmp)))
 		{
 			LMakePath(Tmp, sizeof(Tmp), Tmp, "Scribe");
 		}
+		#endif
 		else
 		{
 			LgiTrace("%s:%i - LgiGetSystemPath(LSP_TEMP) failed.\n", _FL);
@@ -587,6 +594,8 @@ char *ScribeTempPath()
 			return NULL;
 		}
 	}
+
+	printf("Scribe tmp '%s'\n", Tmp);
 
 	return Tmp;
 }

@@ -845,6 +845,10 @@ void ScribeWnd::Construct1()
 	LoadOptions();
 	ScribeOptionsDefaults(d->Options);
 
+	#ifdef LINUX
+	LSetSystemPath(LSP_TEMP, ScribeTempPath());
+	#endif
+
 	LVariant GlyphSub;
 	if (GetOptions()->GetValue(OPT_GlyphSub, GlyphSub))
 	{
