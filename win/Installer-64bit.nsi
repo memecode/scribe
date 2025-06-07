@@ -37,6 +37,7 @@
 !system "python ..\Utils\Store\store.py .\x64ReleaseNoOptimize19\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
 !system "python ..\Utils\Store\store.py .\x64Release19\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0
 !system "python ..\Utils\Store\store.py ..\..\..\Lgi\trunk\lib\Lgi19x64nop.pdb Lgi ${__DATE__} ${__TIME__}" = 0
+!system "python ..\Utils\Store\check-dlls.py" = 0
 
 ;--------------------------------
 SetCompressor lzma
