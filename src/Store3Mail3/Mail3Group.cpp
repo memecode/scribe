@@ -111,3 +111,4 @@ Store3Status LMail3Group::SetDate(int id, const LDateTime *i)
 
 	return Store3Success;
 }
+

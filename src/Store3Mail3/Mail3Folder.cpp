@@ -576,6 +576,8 @@ const char *LMail3Folder::GetStr(int id)
 	{
 		case FIELD_FOLDER_NAME:
 			return Name.Str();
+		case FIELD_FOLDER_PATH:
+			return nullptr;
 	}
 
 	LAssert(0);

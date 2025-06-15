@@ -228,6 +228,12 @@ Store3Status LMapiContact::SetDate(int id, const LDateTime *i)
 
 LDataPropI *LMapiContact::GetObj(int id)
 {
+	switch (id)
+	{
+		case FIELD_PARENT:
+			return Parent;
+	}
+
 	return NULL;
 }
 

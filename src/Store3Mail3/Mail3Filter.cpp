@@ -212,4 +212,3 @@ Store3Status LMail3Filter::SetDate(int id, const LDateTime *i)
 
 	return Store3NotImpl;
 }
-

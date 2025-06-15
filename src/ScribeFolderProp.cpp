@@ -44,21 +44,6 @@ public:
 	}
 };
 
-int FolderInfo_Compare(LListItem *a, LListItem *b, NativeInt Data)
-{
-	auto A = dynamic_cast<LFolderInfo*>(a);
-	auto B = dynamic_cast<LFolderInfo*>(b);
-	if (A && B)
-	{
-		if (A->size != B->size)
-			return (int) ((int64)B->size - (int64)A->size);
-
-		return Stricmp(A->GetText(0), B->GetText(0));
-	}
-
-	return 0;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 class FolderPropertiesDlg : public LDialog
 {
@@ -250,6 +235,23 @@ public:
 		}
 	}
 
+	void SortUsage()
+	{
+		Usage->Sort([](auto a, auto b)
+			{
+				auto A = dynamic_cast<LFolderInfo*>(a);
+				auto B = dynamic_cast<LFolderInfo*>(b);
+				if (!A || !B)
+					return 0;
+
+				if (A->size != B->size)
+					return (int) ((int64)B->size - (int64)A->size);
+
+				return Stricmp(A->GetText(0), B->GetText(0));
+			});
+		Usage->ResizeColumnsToContent();
+	}
+
 	void Finished()
 	{
 		SetPulse();
@@ -271,8 +273,7 @@ public:
 		    }
 
 		    // sort the items
-		    Usage->Sort(FolderInfo_Compare);
-		    Usage->ResizeColumnsToContent();
+			SortUsage();
 	    }
 
 		// other props
@@ -338,33 +339,36 @@ public:
 				info->size += fSize;
 
 			auto &subs = f->SubFolders();
-			for (auto s = subs.First(); s; s = subs.Next())
+			if (subs.GetState() == Store3Loaded)
 			{
-				auto name = s->GetStr(FIELD_IMAP_PATH);
-				if (!name)
-					s->GetStr(FIELD_FOLDER_NAME);
+				for (auto s = subs.First(); s; s = subs.Next())
+				{
+					auto name = s->GetStr(FIELD_FOLDER_PATH);
+					if (!name)
+						s->GetStr(FIELD_FOLDER_NAME);
 
-				if (isRoot)
-				{
-					// Create a list item for the top level sub-folder:
-					if (auto i = new LFolderInfo)
+					if (isRoot)
 					{
-						i->folder = s;
-						i->OnChange();
-						infoMap.Add(s, i);
-						LgiTrace("Adding child %p: '%s' with info %p\n", s, name, i);
-						Usage->Insert(i);
+						// Create a list item for the top level sub-folder:
+						if (auto i = new LFolderInfo)
+						{
+							i->folder = s;
+							i->OnChange();
+							infoMap.Add(s, i);
+							LgiTrace("Adding child %p: '%s' with info %p\n", s, name, i);
+							Usage->Insert(i);
+						}
 					}
-				}
-				else if (info)
-				{
-					// Child of direct sub-folder..
-					infoMap.Add(s, info);
-					LgiTrace("Adding sub %p: '%s' with info %p\n", s, name, info);
-				}
-				else LAssert(!"no info map");
+					else if (info)
+					{
+						// Child of direct sub-folder..
+						infoMap.Add(s, info);
+						LgiTrace("Adding sub %p: '%s' with info %p\n", s, name, info);
+					}
+					else LAssert(!"no info map");
 					
-				inFolders.Add(s);
+					inFolders.Add(s);
+				}
 			}
 
 			auto &children = f->Children();
@@ -416,10 +420,11 @@ public:
 			p.key->Update();
 		}
 
-		if (LCurrentTime() - resortTs >= 2000)
+		auto now = LCurrentTime();
+		if (now - resortTs >= 2000)
 		{
-			Usage->Sort(FolderInfo_Compare);
-		    Usage->ResizeColumnsToContent();
+			resortTs = now;
+			SortUsage();
 		}
 	}
 };

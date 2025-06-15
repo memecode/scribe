@@ -408,6 +408,7 @@ public:
 	constexpr static int64 INVALID_ID = -1;
 
 	LMail3Store *Store = nullptr;
+	LMail3Folder *Parent = nullptr;
 	int64 Id = INVALID_ID;
 	int64 ParentId = INVALID_ID;
 
@@ -441,8 +442,6 @@ protected:
 	virtual void OnSave() {};
 
 public:
-	LMail3Folder *Parent = NULL;
-
 	LMail3Thing(LMail3Store *store = NULL) : LMail3Obj(store)
 	{
 	}
@@ -458,9 +457,9 @@ public:
 	LDataStoreI *GetStore() { return Store; }
 	LAutoStreamI GetStream(const char *file, int line) { LAssert(0); return LAutoStreamI(0); }
 	bool Serialize(LMail3Store::LStatement &s, bool Write) { LAssert(0); return false; }
-
 	Store3Status Save(LDataI *Folder = NULL);
 	virtual bool DbDelete() { LAssert(0); return false; }
+	LDataPropI *GetObj(int id) override;
 };
 
 class LMail3Folder : public LDataFolderI, public LMail3Obj
@@ -482,7 +481,6 @@ public:
 	};
 	Store3SystemFolder System = Store3SystemNone;
 
-	LMail3Folder *Parent = nullptr;
 	DIterator<LDataFolderI, LMail3Folder, LMail3Store> Sub;
 	DIterator<LDataI, LMail3Thing, LMail3Store> Items;
 	DIterator<LDataPropI, Store3Field, LMail3Store> Flds;

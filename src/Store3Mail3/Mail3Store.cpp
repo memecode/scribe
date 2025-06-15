@@ -120,6 +120,17 @@ Store3Status LMail3Thing::Save(LDataI *Folder)
 	return Status ? Store3Success : Store3Error;
 }
 
+LDataPropI *LMail3Thing::GetObj(int id)
+{
+	switch (id)
+	{
+		case FIELD_PARENT:
+			return Parent;
+	}
+	LAssert(0);
+	return nullptr;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 GMail3Idx Mail3Indexes[] =
 {

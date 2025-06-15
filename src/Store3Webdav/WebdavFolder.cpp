@@ -42,6 +42,8 @@ const char *WebdavFolder::GetStr(int id)
 	{
 		case FIELD_FOLDER_NAME:
 			return Name;
+		case FIELD_FOLDER_PATH:
+			return Name;
 		default:
 			LAssert(!"Not impl.");
 			break;

@@ -148,6 +148,8 @@ const char *LMapiFolder::GetStr(int id)
 	{
 		case FIELD_FOLDER_NAME:
 			return Name;
+		case FIELD_FOLDER_PATH:
+			return nullptr;
 		default:
 			LAssert(0);
 			break;
@@ -249,6 +251,12 @@ Store3Status LMapiFolder::SetDate(int id, const LDateTime *i)
 
 LDataPropI *LMapiFolder::GetObj(int id)
 {
+	switch (id)
+	{
+		case FIELD_PARENT:
+			return Parent;
+	}
+	
 	LAssert(0);
 	return NULL;
 }

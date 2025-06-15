@@ -230,6 +230,12 @@ Store3Status LMapiCalendar::SetDate(int id, const LDateTime *i)
 
 LDataPropI *LMapiCalendar::GetObj(int id)
 {
+	switch (id)
+	{
+		case FIELD_PARENT:
+			return Parent;
+	}
+
 	LAssert(0);
 	return NULL;
 }

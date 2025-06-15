@@ -1929,7 +1929,7 @@ const char *ImapFolder::GetStr(int id)
 			char *d = strrchr(Local, DIR_CHAR);
 			return d ? d + 1 : (char*)"Error";
 		}
-		case FIELD_IMAP_PATH:
+		case FIELD_FOLDER_PATH:
 		{
 			return Remote;
 		}
@@ -2161,6 +2161,12 @@ Store3Status ImapFolder::SetDate(int id, const LDateTime *i)
 
 LDataPropI *ImapFolder::GetObj(int id)
 {
+	switch (id)
+	{
+		case FIELD_PARENT:
+			return _Parent;
+	}
+
 	LAssert(0);
 	return NULL;
 }
