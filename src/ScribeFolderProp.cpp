@@ -13,59 +13,76 @@
 #include <time.h>
 #include <stdarg.h>
 
-#include "Scribe.h"
+#include "lgi/common/Lgi.h"
 #include "lgi/common/TextLabel.h"
 #include "lgi/common/ProgressDlg.h"
-#include "resdefs.h"
 #include "lgi/common/TabView.h"
 #include "lgi/common/LgiRes.h"
+
+#include "Scribe.h"
+#include "resdefs.h"
+#include "Store3Imap/ScribeImap.h"
 
 //////////////////////////////////////////////////////////////////////////////
 class LFolderInfo : public LListItem
 {
 public:
-	ScribeFolder *Folder;
-	uint64 Size;
+	enum Col {
+		ColName,
+		ColSize,
+	};
+
+	LDataFolderI *folder = nullptr;
+	uint64 size = 0;
+
+	void OnChange()
+	{
+		if (folder)
+			SetText(folder->GetStr(FIELD_FOLDER_NAME), ColName);
+		SetText(LFormatSize(size), ColSize);
+	}
 };
 
 int FolderInfo_Compare(LListItem *a, LListItem *b, NativeInt Data)
 {
-	LFolderInfo *A = dynamic_cast<LFolderInfo*>(a);
-	LFolderInfo *B = dynamic_cast<LFolderInfo*>(b);
+	auto A = dynamic_cast<LFolderInfo*>(a);
+	auto B = dynamic_cast<LFolderInfo*>(b);
 	if (A && B)
 	{
-		return (int) ((int64)B->Size - (int64)A->Size);
+		if (A->size != B->size)
+			return (int) ((int64)B->size - (int64)A->size);
+
+		return Stricmp(A->GetText(0), B->GetText(0));
 	}
 
 	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
-#define M_INIT_DONE         (M_USER + 1000)
-
 class FolderPropertiesDlg : public LDialog
 {
 	// Data
-	ScribeFolder *Folder;
+	ScribeFolder *Folder = nullptr;
 
 	// Controls
-	LTabView *Tab;
-	// LTabPage *DetailTab;
-	LList *Usage;
-	LView *Txt;
+	LTabView *Tab = nullptr;
+	LList *Usage = nullptr;
+	LView *Txt = nullptr;
 
 	// Scanning portion..
-	bool Loop;
+	Counter c;
+	LArray<LDataFolderI*> inFolders;
+	LArray<LDataI*> inData;
+	uint64_t resortTs = 0;
+	LHashTbl<PtrKey<LDataFolderI*>,LFolderInfo*> infoMap;
+	LFolderInfo *rootInfo = nullptr;
 
 public:
-	bool RePopulate;
+	bool RePopulate = false;
+	constexpr static int TIMESLICE = 300; // ms
 
 	FolderPropertiesDlg(ScribeFolder *folder, int InitialTab)
 	{
-		RePopulate = false;
-		Loop = true;
-		Txt = 0;
-
 		Folder = folder;
 		if (!Folder)
 		{
@@ -86,6 +103,9 @@ public:
 
 		auto Path = Folder->GetPath();
 		SetCtrlName(IDC_PATH, Path);
+
+		auto bayesType = folder->App->BayesTypeFromPath(Path);
+		SetCtrlName(ID_BAYES_TYPE, ToString(bayesType));
 
 		ScribePerm p = Folder->GetFolderPerms(ScribeReadAccess);
 		if (p == PermRequireAdmin)
@@ -110,27 +130,20 @@ public:
 			SetCtrlEnabled(IDC_FPW_ADMIN, false);
 		}
 		SetCtrlValue(IDC_FOLDER_WRITE, p);
-	}
 
-	~FolderPropertiesDlg()
-	{
-	    LAssert(Loop == false);
-	}
-	
-	void OnCreate() override
-	{
-		PostEvent(M_INIT_DONE);
-	}
-	
-	bool OnRequestClose(bool OsClose) override
-	{
-	    if (Loop)
-	    {
-	        Loop = false;
-	        return false;
-	    }
-	    
-	    return true;
+		if (auto f = Folder->GetFldObj())
+		{
+			inFolders.Add(f);
+
+			if (rootInfo = new LFolderInfo)
+			{
+				rootInfo->SetText(".");
+				infoMap.Add(f, rootInfo);
+				Usage->Insert(rootInfo);
+			}
+		}
+
+		SetPulse(TIMESLICE);
 	}
 
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override
@@ -169,10 +182,7 @@ public:
 			}
 			case IDCANCEL:
 			{
-	            if (Loop)
-	                Loop = false;
-                else
-    				EndModal(0);
+    			EndModal(0);
 				break;
 			}
 		}
@@ -180,24 +190,25 @@ public:
 		return 0;
 	}
 
-	void AddMimeSeg(LDataPropI *Ptr, Counter &c, uint64 Size)
+	void AddMimeSeg(LDataPropI *Ptr, Counter &c, uint64 &Size)
 	{
 		// Add this one...
-		LDataI *Seg = dynamic_cast<LDataI*>(Ptr);
-		if (Seg)
+		auto Seg = dynamic_cast<LDataI*>(Ptr);
+		if (!Seg)
 		{
-			c.Inc(Seg->Type());
-			Size += Seg->Size();
+			LAssert(!"wrong obj");
+			return;
+		}
 
-			// Add the children...
-			LDataIt Children = Seg->GetList(FIELD_MIME_SEG);
-			if (Children)
-			{
-				for (LDataPropI *Child = Children->First(); Child; Child = Children->Next())
-				{
-					AddMimeSeg(Child, c, Size);
-				}
-			}
+		c.Inc(Seg->Type());
+		Size += Seg->Size();
+
+		// Add the children...
+		LDataIt Children = Seg->GetList(FIELD_MIME_SEG);
+		if (Children)
+		{
+			for (LDataPropI *Child = Children->First(); Child; Child = Children->Next())
+				AddMimeSeg(Child, c, Size);
 		}
 	}
 
@@ -207,7 +218,7 @@ public:
 		c.Inc(f->Type());
 		
 		LDataIterator<LDataI*> &fc = f->Children();
-		for (unsigned i=0; Loop && i<fc.Length(); i++)
+		for (unsigned i=0; i<fc.Length(); i++)
 		{
 			LDataI *t = fc[i];
 			if (t)
@@ -225,63 +236,24 @@ public:
 		c.Add(1, Size);
 
 		#ifdef _DEBUG
-		char s[256];
-		memset(s, '\t', depth);
-		s[depth] = 0;
-		LgiTrace("%sCounting %s (size=%i)\n", s, f->GetStr(FIELD_FOLDER_NAME), Size);
+			char s[256];
+			memset(s, '\t', depth);
+			s[depth] = 0;
+			LgiTrace("%sCounting %s (size=%i)\n", s, f->GetStr(FIELD_FOLDER_NAME), Size);
 		#endif
 
-		for (unsigned n=0; Loop && n<f->SubFolders().Length(); n++)
+		for (unsigned n=0; n<f->SubFolders().Length(); n++)
 		{
-			LDataFolderI *s = f->SubFolders()[n];
-			Count(s, c, depth + 1);
+			if (auto s = f->SubFolders()[n])
+				Count(s, c, depth + 1);
 		}
 	}
 
-	void Run()
+	void Finished()
 	{
-		Counter c;
+		SetPulse();
 
-		// Do count
-		LDataFolderI *f = Folder->GetFldObj();
-		c.Inc(f->Type());
-		c.Add(1, f->Size());
-		
-		LDataIterator<LDataI*> &Children = f->Children();
-		for (unsigned i=0; Loop && i<Children.Length(); i++)
-		{
-			LDataI *t = Children[i];
-			c.Inc(t->Type());
-			c.Add(1, t->Size());
-		}
-		
-		for (ScribeFolder *Child = Folder->GetChildFolder();
-		    Loop && Child;
-		    Child = Child->GetNextFolder())
-		{
-			uint64 Old = c.GetTypeCount(1);
-
-			Count(Child->GetFldObj(), c);
-
-			if (Usage)
-			{
-				LFolderInfo *i = new LFolderInfo;
-				if (i)
-				{
-					i->Folder = Child;
-					i->Size = c.GetTypeCount(1) - Old;
-
-					char Size[32];
-					LFormatSize(Size, sizeof(Size), i->Size);
-					
-					i->SetText(Child->GetText(), 0);
-					i->SetText(Size, 1);
-
-					Usage->Insert(i);
-				}
-			}
-		}
-
+		/*
 	    int64 Used = c.GetTypeCount(1); // 64 bytes in the header
 
 	    // post count tallying
@@ -338,18 +310,130 @@ public:
 			Txt->Name(Msg);
 			Txt->SendNotify(LNotifyTableLayoutRefresh);
 		}
-		
-		Loop = false;
+		*/
 	}
 
-    LMessage::Param OnEvent(LMessage *Msg) override
-    {
-        if (Msg->Msg() == M_INIT_DONE)
-            Run();
+	void OnPulse()
+	{
+		auto startTs = LCurrentTime();
+		#define IN_TIMESLICE() ((LCurrentTime() - startTs) < (TIMESLICE * 0.8))
 
-        return LDialog::OnEvent(Msg);        
-    }
+		if (inFolders.Length() == 0 &&
+			inData.Length() == 0)
+			return Finished();
 
+		LHashTbl<PtrKey<LFolderInfo*>,bool> dirty;
+
+		auto rootFolder = Folder->GetFldObj();
+		LDataFolderI *f;
+		while (	IN_TIMESLICE() &&
+				(f = inFolders.PopFirst()))
+		{
+			bool isRoot = rootFolder == f;
+			auto info = infoMap.Find(f);
+
+			c.Inc(f->Type());
+			auto fSize = f->Size();
+			c.Add(1, fSize);
+			if (info)
+				info->size += fSize;
+
+			auto &subs = f->SubFolders();
+			for (auto s = subs.First(); s; s = subs.Next())
+			{
+				auto name = s->GetStr(FIELD_IMAP_PATH);
+				if (!name)
+					s->GetStr(FIELD_FOLDER_NAME);
+
+				if (isRoot)
+				{
+					// Create a list item for the top level sub-folder:
+					if (auto i = new LFolderInfo)
+					{
+						i->folder = s;
+						i->OnChange();
+						infoMap.Add(s, i);
+						LgiTrace("Adding child %p: '%s' with info %p\n", s, name, i);
+						Usage->Insert(i);
+					}
+				}
+				else if (info)
+				{
+					// Child of direct sub-folder..
+					infoMap.Add(s, info);
+					LgiTrace("Adding sub %p: '%s' with info %p\n", s, name, info);
+				}
+				else LAssert(!"no info map");
+					
+				inFolders.Add(s);
+			}
+
+			auto &children = f->Children();
+			if (children.GetState() == Store3Loaded)
+			{
+				for (auto c = children.First(); c; c = children.Next())
+					inData.Add(c);
+			}
+			else
+			{
+				if (auto imapFld = dynamic_cast<ImapFolder*>(f))
+				{
+					imapFld->WhenLoaded([this, f](auto status)
+						{
+							auto &children = f->Children();
+							for (auto c = children.First(); c; c = children.Next())
+								inData.Add(c);
+						});
+				}
+				else LAssert(!"what type of folder isn't loaded?");
+			}
+		}
+
+		LDataI *d;
+		while (IN_TIMESLICE() &&
+			(d = inData.PopFirst()))
+		{
+			auto dSize = d->Size();
+			auto folder = dynamic_cast<LDataFolderI*>(d->GetObj(FIELD_PARENT));
+			LAssert(folder);
+			bool isRoot = rootFolder == folder;
+			auto info = isRoot ? rootInfo : infoMap.Find(folder);
+
+			if (d->Type() == MAGIC_MAIL)
+				if (auto seg = d->GetObj(FIELD_MIME_SEG))
+					AddMimeSeg(seg, c, dSize);
+
+			c.Inc(d->Type());
+			c.Add(1, dSize);
+
+			// LgiTrace("child obj of %s, isroot=%i, info=%p\n", folder->GetStr(FIELD_IMAP_PATH), isRoot, info);
+			info->size += dSize;
+			dirty.Add(info, true);
+		}
+
+		for (auto p: dirty)
+		{
+			p.key->OnChange();
+			p.key->Update();
+		}
+
+		if (LCurrentTime() - resortTs >= 2000)
+		{
+			Usage->Sort(FolderInfo_Compare);
+		    Usage->ResizeColumnsToContent();
+		}
+
+
+		/*
+		for (ScribeFolder *Child = Folder->GetChildFolder();
+		    Loop && Child;
+		    Child = Child->GetNextFolder())
+		{
+			uint64 Old = c.GetTypeCount(1);
+			Count(Child->GetFldObj(), c);
+		}
+		*/
+	}
 };
 
 //////////////////////////////////////////////////////////////////////////////

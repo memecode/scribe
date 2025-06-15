@@ -267,6 +267,24 @@ void ScribeAccount::SetMenuItem(LMenuItem *i)
 	d->IdentityItem = i;
 }
 
+ScribeFolder *ScribeAccount::GetFolder(LString path)
+{
+	if (!Receive.Root)
+		return nullptr;
+
+	// Find the child at 'path'
+	auto parts = path.SplitDelimit("/");
+	auto f = Receive.Root;
+	while (parts.Length())
+	{
+		f = f->FindChild(parts.PopFirst());
+		if (!f)
+			return nullptr;
+	}
+
+	return f;
+}
+
 void ScribeAccount::SetCheck(bool c)
 {
 	if (d->IdentityItem)

@@ -940,7 +940,7 @@ bool BuildSpamDB::Process()
 		if (f)
 		{
 			auto Path = f->GetPath();
-			ScribeMailType Type = Filter->BayesTypeFromPath(Path);
+			auto Type = Filter->BayesTypeFromPath(Path);
 
 			if (Debug)
 				Debug->Print("%s:%i - add folder '%s', Type=%i\n", _FL, Path.Get(), Type);
@@ -1575,19 +1575,39 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 	if (!Path)
 		return BayesMailUnknown;
 
-	auto spam = App->GetFolder(FOLDER_SPAM);
-	auto folder = App->GetFolder(Path);
-	if (spam && folder)
+	LArray<ScribeFolder*> spamFolders;
+	spamFolders.Add(App->GetFolder(FOLDER_SPAM));	
+	for (ScribeAccount *a: *App->GetAccounts())
 	{
-		if (folder == spam)
+		auto opt = a->Receive.OptionName(OPT_ReceiveSubFolders);
+		if (auto tag = App->GetOptions()->LockTag(opt, _FL))
+		{
+			if (auto spamPath = tag->GetAttr(OPT_SpamFolder))
+			{
+				if (auto f = a->GetFolder(spamPath))
+				{
+					spamFolders.Add(f);
+				}
+			}
+			App->GetOptions()->Unlock();
+		}
+	}
+	
+	auto folder = App->GetFolder(Path);
+	if (spamFolders.Length() && folder)
+	{
+		if (spamFolders.HasItem(folder))
 			return BayesMailSpam;
 
 		// If folder is a child of the spam folder, it's NOT ham but "unknown".
 		// Typically a staging ground for "possible" spam. So it should not contribute to
-		// bayes word counts.
+		// Bayes word counts.
 		for (auto p = folder->GetParent(); p; p = p->GetParent())
-			if (p == spam)
+		{
+			auto ParentFolder = dynamic_cast<ScribeFolder*>(p);
+			if (ParentFolder && spamFolders.HasItem(ParentFolder))
 				return BayesMailUnknown;
+		}
 	}
 	else
 	{
@@ -1639,8 +1659,7 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(Mail *m)
 
 	if (m)
 	{
-		ScribeFolder *f = m->GetFolder();
-		if (f)
+		if (auto f = m->GetFolder())
 			Status = BayesTypeFromPath(f->GetPath());
 	}
 

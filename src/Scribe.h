@@ -1281,6 +1281,7 @@ public:
 	ScribeFolder *GetFolder() override { return dynamic_cast<ScribeFolder*>(LTreeItem::GetParent()); }
 	ScribeFolder *GetChildFolder() { return dynamic_cast<ScribeFolder*>(LTreeItem::GetChild()); }
 	ScribeFolder *GetNextFolder() { return dynamic_cast<ScribeFolder*>(LTreeItem::GetNext()); }
+	ScribeFolder *FindChild(const char *name);
 	void SetFolder(ScribeFolder *f, std::function<void(Store3Status)> callback) override;
 	ScribeFolder *IsFolder() { return this; }
 	Store3Status CopyTo(ScribeFolder *NewParent, int NewIndex = -1);
@@ -2097,6 +2098,7 @@ class ScribeAccount :
 	friend class Accountlet;
 	friend class SendAccountlet;
 	friend class ReceiveAccountlet;
+	friend class AccountDlg;
 
 protected:
 	class ScribeAccountPrivate *d;
@@ -2135,6 +2137,7 @@ public:
 		Send.OnEndSession();
 		Receive.OnEndSession();
 	}
+	ScribeFolder *GetFolder(LString path);
 
 	// Commands
 	void Stop();

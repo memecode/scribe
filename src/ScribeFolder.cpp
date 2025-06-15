@@ -499,6 +499,16 @@ Store3Status ScribeFolder::CopyTo(ScribeFolder *NewParent, int NewIndex)
 	return Copied;
 }
 
+ScribeFolder *ScribeFolder::FindChild(const char *name)
+{
+	if (!name)
+		return nullptr;
+	for (auto c = GetChildFolder(); c; c = c->GetNextFolder())
+		if (c->GetName(true).Equals(name))
+			return c;
+	return nullptr;
+}
+
 void ScribeFolder::SetFolder(ScribeFolder *newParent, std::function<void(Store3Status)> callback)
 {
 	LDataI *obj = NULL;

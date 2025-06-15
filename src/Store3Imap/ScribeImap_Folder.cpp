@@ -1929,6 +1929,10 @@ const char *ImapFolder::GetStr(int id)
 			char *d = strrchr(Local, DIR_CHAR);
 			return d ? d + 1 : (char*)"Error";
 		}
+		case FIELD_IMAP_PATH:
+		{
+			return Remote;
+		}
 	}
 
 	LAssert(0);

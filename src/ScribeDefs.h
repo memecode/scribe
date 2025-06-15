@@ -667,6 +667,7 @@ enum ScribeMailType
 	BayesMailHam,
 	BayesMailSpam
 };
+extern const char *ToString(ScribeMailType t);
 
 enum ScribeDeleteAction
 {

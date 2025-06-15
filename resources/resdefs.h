@@ -1000,6 +1000,7 @@
 #define IDC_INCOMING							1194
 #define IDM_MENU_1195							1195
 #define IDC_DEST								1196
+#define ID_BAYES_TYPE							1197
 #define IDC_HAS_GROUPS							1198
 #define IDC_CAL_URL								1199
 #define IDC_SPAM_FLD							1200

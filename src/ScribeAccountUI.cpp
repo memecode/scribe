@@ -374,7 +374,21 @@ int AccountDlg::OnNotify(LViewI *c, const LNotification &n)
 						&subFolderOpts,
 						[this](auto Parent, auto App, auto Limit, auto cb)
 						{
-							// FIXME: impl selector of folder
+							if (ScribeFolder *Root = Account->GetRoot())
+							{
+								if (auto Dlg = new FolderDlg(Parent, App, Limit, Root))
+									Dlg->DoModal([this, Dlg, cb](auto dlg, auto id)
+									{
+										if (id)
+										{
+											// Strip off the namespace of this account:
+											LString path = Dlg->Get();
+											auto parts = path.LStrip("/").SplitDelimit("/", 1);
+											cb(parts.Last());
+										}
+									});
+							}
+							// else probably not an error.. just folders aren't loaded or not IMAP
 						}
 					)
 			)
