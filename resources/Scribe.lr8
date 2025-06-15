@@ -988,7 +988,7 @@
 		<String Ref="230" Cid="706" Define="IDS_TEXT" en="Text" fr="Texte" it="Testo" de="Nachricht" nl="Bericht" es="Texto" pt_br="Texto" ru="Текст" ja="テキスト" pt="Texto" pl="Tekst" vi="Văn bản" zh_tw="文字" sr="Tekst" no="Tekst" lt="Tekstas" fa="متن" id="Naskah" da="Tekst" lg="Ebiwandiiko" tr="Yazı" hu="Szöveg" ko="문자" uk="Текст" />
 		<String Ref="231" Cid="707" Define="IDS_ATTACHMENTS" en="Attachments" fr="Pièces jointes" it="Allegati" cs="Přílohy" es="Archivos" de="Anhänge" nl="Bijlagen" pt_br="Anexos" ru="Вложения" ja="添付ファイル" pt="Anexos" pl="Załączniki" vi="Đính kèm" zh_tw="附件" sr="Dodaci" no="Vedlegg" lt="Priedai" fa="پيوست ها" da="Tillæg" sv="Bifogade filer" lg="Failo Emperekeze" tr="Ekler" hu="Csatolmányok" ko="첨부파일" uk="Вкладення" />
 		<String Ref="232" Cid="708" Define="IDS_INTERNETHEADER" en="Internet Header" fr="En-tête Internet" it="Titolo" cs="Hlavička" es="Encabezamiento Internet" de="Header" nl="Internet koptekst" pt_br="Cabeçalho de Internet" ja="メールヘッダ" pt="Cabeçalho" pl="Szczegóły" vi="Mã Internet" zh_tw="網路檔頭" sr="Internet zaglavlje" no="Internet hode" lt="Išsami antraštė" da="Internet hoved" fa="سرخط اينترنتي" sv="E-posthuvud" lg="Emiwaatwa gy&apos;ekitimba emikulu" tr="İnternet Başlığı (header)" hu="Internet fejléc" ru="Заголовки Интернет" ko="인터넷 헤더" uk="Інтернет заголовки " />
-		<String Ref="233" Cid="709" Define="IDS_FOLDER_PROPERTIES_DLG" en="Mail: %i\n   Contacts: %i\n   Folders: %i\n   Size: %s" fr="Dossier %s\n\n   Courriel: %i\n   Contacts: %i\n   Dossiers: %i\n   Taille: %s" it="Cartella %s\n\n   email: %i\n   Contatti: %i\n   Cartelle: %i\n   Dimensione: %s" cs="Složka: %s\n\n   Zpráv: %i\n   Kontaktů: %i\n   Složek: %i\n   Velikost: %s" es="Carpeta %s\n\n   Email: %i\n   Contactos: %i\n   Carpetas: %i\n   Tamaño: %s" de="%s Ordner\n\n   E-Mails: %i\n   Kontakte: %i\n   Ordner: %i\n   Grösse: %s" nl="%sMap\n\n  Epost: %i\n  Contactpersonen: %i\n   Mappen: %i\n   Grootte: %s" pt_br="Pasta %s\n\n   Email: %i\n   Contatos: %i\n   Pastas: %i\n   Tamanho: %s" pt="Pasta %s\n\n   e-mail: %i\n   Contactos: %i\n   Pastas: %i\n   Tamanho: %s" pl="%s Folder\n\n   E-mail: %i\n   Kontakty: %i\n   Foldery: %i\n   Rozmiar: %s" vi="%s Danh mục\n\n   Thư: %i\n   Liên hệ: %i\n   Danh mục: %i\n   Kích thước: %s" zh_tw="%s 資料夾\n\n   郵件: %i\n   聯絡人: %i\n   資料夾: %i\n   大小: %s" ja="%s フォルダ\n\n   メール: %i\n   コンタクト: %i\n   フォルダ: %i\n   サイズ: %s" sr="%s Omotnica\n\n   E-mail: %i\n   Kontakti: %i\n   Omotnice: %i\n   Veličina: %s" no="%s Mappe\n\n   Epost: %i\n   Kontakter: %i\n   Mapper: %i\n   Størrelse: %s" lt="„%s“ aplankas\n\n   Laiškai: %i\n   Adresai: %i\n   Rinkmenos: %i\n   Dydis: %s" fa="%s پوشه\n\n   نامه: %i\n   دوستان: %i\n   پوشه ها: %i\n   اندازه: %s" da="%s Mappe\n\n   Epost: %i\n   Kontakter: %i\n   Mapper: %i\n   Størrelse: %s" sv="%s Mapp\n\n   E-post: %i\n   Kontakter: %i\n   Mappar: %i\n   Storlek: %s" lg="%s Kabada\n\n   Emeilo: %i\n   Endagiriro: %i\n   Zi-Kabada: %i\n   Obunene: %s" tr="%s Klasör\n\n   E-posta: %i\n   İrtibatlar: %i\n   Klasörler: %i\n   Boyut: %s" hu="%s Mappa\n\n Levél: %i\n Kapcsolat: %i\n Mappa %i\n Méret: %i" ru="%s Папка\n\n  Сообщения: %i\n   Контакты: %i\n   Папки: %i\n   Размер: %s" ko="%s 폴더\n\n   메일: %i\n   연락처: %i\n   폴더: %i\n   크기: %s" uk="%s Тека\n\n   Пошта: %i\n   Контакти: %i\n   Теки: %i\n   Розмір: %s" />
+		<String Ref="233" Cid="709" Define="IDS_FOLDER_PROPERTIES_DLG" en="Mail: %i\nContacts: %i\nFolders: %i\nSize: %s" fr="Dossier %s\n\n   Courriel: %i\n   Contacts: %i\n   Dossiers: %i\n   Taille: %s" it="Cartella %s\n\n   email: %i\n   Contatti: %i\n   Cartelle: %i\n   Dimensione: %s" cs="Složka: %s\n\n   Zpráv: %i\n   Kontaktů: %i\n   Složek: %i\n   Velikost: %s" es="Carpeta %s\n\n   Email: %i\n   Contactos: %i\n   Carpetas: %i\n   Tamaño: %s" de="%s Ordner\n\n   E-Mails: %i\n   Kontakte: %i\n   Ordner: %i\n   Grösse: %s" nl="%sMap\n\n  Epost: %i\n  Contactpersonen: %i\n   Mappen: %i\n   Grootte: %s" pt_br="Pasta %s\n\n   Email: %i\n   Contatos: %i\n   Pastas: %i\n   Tamanho: %s" pt="Pasta %s\n\n   e-mail: %i\n   Contactos: %i\n   Pastas: %i\n   Tamanho: %s" pl="%s Folder\n\n   E-mail: %i\n   Kontakty: %i\n   Foldery: %i\n   Rozmiar: %s" vi="%s Danh mục\n\n   Thư: %i\n   Liên hệ: %i\n   Danh mục: %i\n   Kích thước: %s" zh_tw="%s 資料夾\n\n   郵件: %i\n   聯絡人: %i\n   資料夾: %i\n   大小: %s" ja="%s フォルダ\n\n   メール: %i\n   コンタクト: %i\n   フォルダ: %i\n   サイズ: %s" sr="%s Omotnica\n\n   E-mail: %i\n   Kontakti: %i\n   Omotnice: %i\n   Veličina: %s" no="%s Mappe\n\n   Epost: %i\n   Kontakter: %i\n   Mapper: %i\n   Størrelse: %s" lt="„%s“ aplankas\n\n   Laiškai: %i\n   Adresai: %i\n   Rinkmenos: %i\n   Dydis: %s" fa="%s پوشه\n\n   نامه: %i\n   دوستان: %i\n   پوشه ها: %i\n   اندازه: %s" da="%s Mappe\n\n   Epost: %i\n   Kontakter: %i\n   Mapper: %i\n   Størrelse: %s" sv="%s Mapp\n\n   E-post: %i\n   Kontakter: %i\n   Mappar: %i\n   Storlek: %s" lg="%s Kabada\n\n   Emeilo: %i\n   Endagiriro: %i\n   Zi-Kabada: %i\n   Obunene: %s" tr="%s Klasör\n\n   E-posta: %i\n   İrtibatlar: %i\n   Klasörler: %i\n   Boyut: %s" hu="%s Mappa\n\n Levél: %i\n Kapcsolat: %i\n Mappa %i\n Méret: %i" ru="%s Папка\n\n  Сообщения: %i\n   Контакты: %i\n   Папки: %i\n   Размер: %s" ko="%s 폴더\n\n   메일: %i\n   연락처: %i\n   폴더: %i\n   크기: %s" uk="%s Тека\n\n   Пошта: %i\n   Контакти: %i\n   Теки: %i\n   Розмір: %s" />
 		<String Ref="234" Cid="728" Define="IDS_DELETE_FOLDER_DLG" en="Do you want to delete the &apos;%s&apos; folder?" fr="Voulez vous supprimer le dossier &apos;%s&apos;?" it="Vuoi veramente cancellare la cartella &apos;%s&apos;?" cs="Opravdu chcete odstranit složku &apos;%s&apos;?" es="¿Desea eliminar la carpeta &apos;%s&apos;?" de="Möchten Sie den Ordner &apos;%s&apos; löschen?" nl="Wilt u de map &apos;%s&apos; verwijderen?" pt_br="Deseja excluir a pasta &apos;%s&apos;?" ru="Хотите удалить папку  &apos;%s&apos;?" pt="Deseja apagar a pasta &apos;%s&apos;?" pl="Czy na pewno chcesz usunąć folder &apos;%s&apos;?" vi="Bạn có muốn xóa danh mục &apos;%s&apos; không?" zh_tw="你要刪除此 &apos;%s&apos; 資料夾?" ja="&apos;%s&apos; フォルダを削除しますか？" sr="Da li želite da izbrišete &apos;%s&apos; omotnicu?" no="Vil du slette mappen &apos;%s&apos;?" lt="Ar tikrai norite pašalinti „%s“ aplanką?" fa="را پاک کنید؟%s آيا مي خواهيد پوشه" da="Vil du slette mappen &apos;%s&apos;?" sv="Vill du ta bort mappen &apos;%s&apos;?" lg="Oyagala okujjawo kabada ya &apos;%s&apos;?" tr="Silinecek klasör &apos;%s&apos; onaylıyormusunuz?" hu="Törölni akarod ezt a mappát: &apos;%s&apos; ?" ko=" &apos;%s&apos; 폴더를 삭제하시겠습니까?" uk="Бажаєте видалити теку  &apos;%s&apos;?" />
 		<String Ref="236" Cid="523" Define="IDS_COMPACT_TESTING_DLG" en="Do you want to compact your folders?" fr="Voulez-vous compacter vos dossier?" it="Vuoi compattare le Cartelle?" cs="Zkomprimovat soubor se zprávami?" es="¿Desea comprimir sus carpetas?" de="Möchten Sie die Ordner komprimieren?" nl="Wilt u uw mappen comprimeren?" pt_br="Deseja compactar suas pastas?" ru="Хотите сжать Ваши папки?" pt="Deseja compactar as pastas?" pl="Czy chcesz kompaktować foldery?" vi="Bạn có muốn thu gọn danh mục không?" zh_tw="你想要壓縮你的資料夾?" ja="フォルダを圧縮しますか？" sr="Da li bi želeli da sabijete svoje omotnice?" no="Vil du komprimere mappene dine?" lt="Ar tikrai norite suspausti duomenis aplanke(uose)?" fa="آيا مي خواهيد پوشه ها را فشرده کنيد؟" da="Vil du komprimere dine mapper?" sv="Vill du komprimera alla mappar?" lg="Oyagala okukkatira kabada zo?" tr="Klasörlerinizi sıkıştırmak istiyormusunuz?" hu="Tömöríteni akarja a mappákat?" ko="이 폴더를 압축하시겠습니까?" uk="Бажаєте стиснути теки?" />
 		<String Ref="237" Cid="524" Define="IDS_FOLDER_COMPACT_ERR_DLG" en="An error occured compacting the mail folders." fr="Une erreur s&apos;est produite durant le compactage." it="Errore nella compattazione" cs="Při komprimaci složek došlo k chybě." es="Ocurrió un error comprimiendo las carpetas de correo." de="Ein Fehler trat bei der Komprimierung des Mail-Ordners auf." nl="Er is een fout ontstaan bij het comprimeren van de postmappen." pt_br="Um erro ocorreu ao compactar as pastasde correio." pt="Ocorreu um erro ao compactar as pastas de correio." pl="Wystąpił błąd podczas kompaktowania folderów." vi="Lỗi xảy ra khi thu gọn danh mục thư." zh_tw="一個錯誤產生於已壓縮中的郵件資料夾." ja="メールフ" sr="Pojavila se greška tokom sabijanja e-mail omotnica." no="En feil oppsto ved komprimering av mapper." lt="Nepavyko suspausti el. pašto duomenų." fa="در هنگام فشرده سازي پوشه ها خطارخ داد" da="En fejl er opstået ved komprimering af mapperne." sv="Ett fel uppstod då mapparna komprimerades." lg="Waliwo ekisobye mu kukkatira kabada z&apos;obubaka." tr="Klasörleri sıkıştırırken hata oluştu." hu="Hiba lépett fel a mappák tömörítése során." ru="При сжатии папок произошла ошибка." ko="메일 폴더 압축도중 오류가 발생하였습니다." uk="При стисканні тек виникла помилка." />
@@ -4713,9 +4713,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4723,23 +4737,9 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>

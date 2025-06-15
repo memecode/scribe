@@ -30,6 +30,7 @@ public:
 	enum Col {
 		ColName,
 		ColSize,
+		ColPercent,
 	};
 
 	LDataFolderI *folder = nullptr;
@@ -253,21 +254,20 @@ public:
 	{
 		SetPulse();
 
-		/*
 	    int64 Used = c.GetTypeCount(1); // 64 bytes in the header
 
 	    // post count tallying
-	    if (Loop && Usage)
+	    if (Usage)
 	    {
 		    // set the percent
-		    for (auto it = Usage->begin(); Loop && it != Usage->end(); it++)
+		    for (auto item: *Usage)
 		    {
-		    	LFolderInfo *i = dynamic_cast<LFolderInfo*>(*it);
+		    	LFolderInfo *i = dynamic_cast<LFolderInfo*>(item);
 		    	if (!i) continue;
 				
 			    char Str[32];
-			    sprintf_s(Str, sizeof(Str), "%.1f", (double)(int64)i->Size * 100 / Used );
-			    i->SetText(Str, 2);
+			    sprintf_s(Str, sizeof(Str), "%.1f", (double)(int64)i->size * 100 / Used );
+			    i->SetText(Str, LFolderInfo::ColPercent);
 		    }
 
 		    // sort the items
@@ -287,7 +287,7 @@ public:
 				(int) c.GetTypeCount(MAGIC_FOLDER),
 				MsgSize.Get());
 
-		if (Loop && !Folder->GetParent())
+		if (!Folder->GetParent())
 		{
 			LMailStore *Ms = Folder->App->GetDefaultMailStore();
 			if (Ms)
@@ -310,7 +310,6 @@ public:
 			Txt->Name(Msg);
 			Txt->SendNotify(LNotifyTableLayoutRefresh);
 		}
-		*/
 	}
 
 	void OnPulse()
@@ -422,17 +421,6 @@ public:
 			Usage->Sort(FolderInfo_Compare);
 		    Usage->ResizeColumnsToContent();
 		}
-
-
-		/*
-		for (ScribeFolder *Child = Folder->GetChildFolder();
-		    Loop && Child;
-		    Child = Child->GetNextFolder())
-		{
-			uint64 Old = c.GetTypeCount(1);
-			Count(Child->GetFldObj(), c);
-		}
-		*/
 	}
 };
 
