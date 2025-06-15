@@ -199,15 +199,13 @@ public:
 class TabDialog : public LDialog
 {
     int TabCtrlId;
-    int HelpBtnId;
-
-	void IdealSize(LButton *b);
+    int BtnTblId;
 
 public:
-    TabDialog(int tabCtrlId, int helpBtnId)
+    TabDialog(int tabCtrlId, int btnTblId)
     {
         TabCtrlId = tabCtrlId;
-        HelpBtnId = helpBtnId;
+        BtnTblId = btnTblId;
     }
     
     void OnCreate();

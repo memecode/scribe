@@ -9,6 +9,7 @@ class AccountDlg : public TabDialog
 	class LEdit *SendServer = NULL, *ReceiveServer = NULL;
 	class LEdit *SendPort = NULL, *ReceivePort = NULL;
 	bool UseGoogle = false;
+	LXmlTag subFolderOpts;
 
 	void UpdateDefaultPort(bool Send);
 	void FillWithCharsets(int id, bool All);

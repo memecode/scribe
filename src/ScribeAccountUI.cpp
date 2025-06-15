@@ -1,8 +1,4 @@
-#include "Scribe.h"
-#include "ScribePrivate.h"
-#include "ScribeAccountUI.h"
-#include "resdefs.h"
-
+#include "lgi/common/Lgi.h"
 #include "lgi/common/ListItemCheckBox.h"
 #include "lgi/common/Combo.h"
 #include "lgi/common/Edit.h"
@@ -12,6 +8,12 @@
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/RichTextEdit.h"
 #include "lgi/common/Charset.h"
+
+#include "Scribe.h"
+#include "ScribePrivate.h"
+#include "ScribeAccountUI.h"
+#include "resdefs.h"
+#include "SubFolderDlg.h"
 
 #define DefaultPortValue		LLoadString(IDS_DEFAULT)
 #define DEFAULT_GOOGLE_SERVER	"imap.gmail.com"
@@ -36,7 +38,7 @@ void PopulateTypes(LCombo *c)
 }
 
 AccountDlg::AccountDlg(LView *p, ScribeWnd *app, ScribeAccount *a, int Tab) :
-    TabDialog(IDC_TAB, IDC_LAUNCH_HELP)
+    TabDialog(IDC_TAB, ID_BTN_TBL)
 {
 	SetParent(p);
 	App = app;
@@ -91,10 +93,10 @@ AccountDlg::AccountDlg(LView *p, ScribeWnd *app, ScribeAccount *a, int Tab) :
 		SetCtrlValue(IDC_TAB, Tab);
 		SetCtrlEnabled(IDC_REC_CHECK, GetCtrlValue(IDC_CHECK_EVERY) != 0);
 
-		LViewI *v = FindControl(IDC_POP3_LEAVE);
-		if (v) OnNotify(v, note);
-		v = FindControl(IDC_REC_TYPE);
-		if (v) OnNotify(v, note);
+		if (auto v = FindControl(IDC_POP3_LEAVE))
+			OnNotify(v, note);
+		if (auto v = FindControl(IDC_REC_TYPE))
+			OnNotify(v, note);
 		
 		LLayout *t;
 		if (GetViewById(IDC_SIG, t))
@@ -341,6 +343,57 @@ int AccountDlg::OnNotify(LViewI *c, const LNotification &n)
 		case IDC_SEND_SSL:
 		{
 			UpdateDefaultPort(true);
+			break;
+		}
+		case ID_SUB_FOLDERS:
+		{
+			LString optName = Account->Receive.OptionName(OPT_ReceiveSubFolders);
+			auto options = App->GetOptions();
+			auto locked = options->LockTag(optName, _FL);
+			if (!locked)
+			{
+				options->CreateTag(optName);
+				locked = options->LockTag(optName, _FL);
+			}
+
+			if (!locked)
+			{
+				LAssert(!"failed to create/lock the option");
+				break;
+			}
+
+			subFolderOpts.Copy(*locked, true);
+			options->Unlock();
+
+			if
+			(
+				auto dlg = new SubFolderDlg
+					(
+						this,
+						App,
+						&subFolderOpts,
+						[this](auto Parent, auto App, auto Limit, auto cb)
+						{
+							// FIXME: impl selector of folder
+						}
+					)
+			)
+				dlg->DoModal([this, optName](auto dlg, auto ctrl)
+					{
+						if (ctrl != IDOK)
+							return;
+
+						for (auto &a: subFolderOpts.Attr)
+							LgiTrace("sub %s=%s\n", a.GetName(), a.GetValue());
+
+						// If user selected ok, copy 'subFolderOpts' back into the options:
+						auto options = App->GetOptions();
+						if (auto locked = options->LockTag(optName, _FL))
+						{
+							locked->Copy(subFolderOpts, true);
+							options->Unlock();
+						}
+					});
 			break;
 		}
 		case IDOK:

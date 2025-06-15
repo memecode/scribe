@@ -322,7 +322,7 @@
 #define IDS_SAVE								515
 #define IDS_EMAIL								516
 #define IDS_REPLY								517
-#define IDS_REPLYALL							518
+#define ID_BTN_TBL								518
 #define IDS_FORWARD								519
 #define IDC_SIG_HTML							520
 #define IDS_TO									521
@@ -822,6 +822,7 @@
 #define IDC_START_IN							1015
 #define IDC_SET_START_IN						1016
 #define IDM_LAYOUT4								1017
+#define IDS_REPLYALL							1018
 #define IDM_REFRESH								1019
 #define IDS_ERROR_REG_WRITE						1020
 #define IDS_ERROR_NEED_INSTALL					1021
@@ -1177,6 +1178,7 @@
 #define IDS_GNUPG_ERR_INVALID_DECRYPTION		1607
 #define IDS_GNUPG_CHECK_MSG						1608
 #define IDS_SHOW_SCRIPT_DEBUGGER				1609
+#define ID_SUB_FOLDERS							1612
 #define IDC_ACC_LOG								1613
 #define IDC_1615								1615
 #define IDC_1616								1616

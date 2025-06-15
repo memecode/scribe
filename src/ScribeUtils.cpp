@@ -1663,69 +1663,29 @@ void TabDialog::OnCreate()
 	OnPosChange();
 }
 
-void TabDialog::IdealSize(LButton *b)
-{
-	LViewLayoutInfo Inf;
-	if (b->OnLayout(Inf))
-	{
-		b->OnLayout(Inf);
-	}
-	else if (b->GetWindow())
-	{
-		auto s = b->GetWindow()->GetDpiScale();
-		LDisplayString ds(b->GetFont(), b->Name());
-		Inf.Width.Max = (int32)(ds.X() + (s.x * LButton::Overhead.x));
-		Inf.Height.Max = (int32)(ds.Y() + (s.y * LButton::Overhead.y));
-	}
-	else
-	{
-		LAssert(!"No way to set ideal size.");
-		return;
-	}
-	
-	LRect p = b->GetPos();
-	p.SetSize(Inf.Width.Max, Inf.Height.Max);
-	b->SetPos(p);
-}
-
 void TabDialog::OnPosChange()
 {
-	LButton *Ok = 0, *Cancel = 0, *Help = 0;
-	LViewI *Tab = 0;
+	LTabView *Tab = nullptr;
+	LTableLayout *Btns = nullptr;
 
-	if (GetViewById(TabCtrlId, Tab) &&
-		GetViewById(IDOK, Ok) &&
-		GetViewById(IDCANCEL, Cancel))
-	{
-		GetViewById(HelpBtnId, Help);
+	if (!GetViewById(TabCtrlId, Tab) ||
+		!GetViewById(BtnTblId, Btns))
+		return;
 
-		LRect r = GetClient();
-		r.Inset(LTableLayout::CellSpacing, LTableLayout::CellSpacing);
+	LRect r = GetClient();
+	r.Inset(LTableLayout::CellSpacing, LTableLayout::CellSpacing);
 		
-		IdealSize(Ok);
-		IdealSize(Cancel);
+	// Layout button row and bottom align.
+	LRect btnRow = r;
+	Btns->SetPos(btnRow);
+	LRect used = Btns->GetUsedArea();
+	btnRow.y1 = btnRow.y2 - used.Y() + 1;
+	Btns->SetPos(btnRow);
 
-		LRect t = r;
-		t.y2 -= LTableLayout::CellSpacing + Ok->Y();
-		Tab->SetPos(t);
-		
-		if (Help)
-		{
-			IdealSize(Help);
-
-			LRect h = Help->GetPos();
-			h.Offset(r.x1 - h.x1, r.y2 - h.Y() + 1 - h.y1);
-			Help->SetPos(h);
-		}
-
-		LRect c = Cancel->GetPos();
-		c.Offset(r.x2 - c.X() + 1 - c.x1, r.y2 - c.Y() + 1 - c.y1);
-		Cancel->SetPos(c);
-
-		LRect o = Ok->GetPos();
-		o.Offset(c.x1 - LTableLayout::CellSpacing - o.X() + 1 - o.x1, r.y2 - o.Y() + 1 - o.y1);
-		Ok->SetPos(o);
-	}
+	// Remaining space is for the tab view..
+	LRect tabRow = r;
+	tabRow.y2 = btnRow.y1 - LTableLayout::CellSpacing;
+	Tab->SetPos(tabRow);
 }
 
 LAutoString ConvertThreadIndex(char *ThreadIndex, int TruncateChars)

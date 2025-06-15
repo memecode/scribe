@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources Offset="1">
 	<string-group Name="_Dialog Symbols_">
-		<String Ref="1" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خیلی خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="2" Cid="-1" Define="IDC_STATIC" />
 		<String Ref="3" Cid="881" Define="IDC_LOGIN" en="Login" lt="Prisijungti" vi="Đăng nhập" cs="Přihlášení" es="Usuario" tr="Bağlan" sv="Logga in" hu="Belép" ru="Вход" ko="로그인" uk="Увійти" />
 		<String Ref="4" Cid="651" Define="IDC_USER_PASS" />
@@ -69,7 +68,6 @@
 		<String Ref="88" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" pt="Cancelar" ja="キャンセル" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="89" Cid="1002" Define="IDC_NAME" />
 		<String Ref="90" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
-		<String Ref="91" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="92" Cid="1556" Define="IDC_BTNS_TABLE" />
 		<String Ref="93" Cid="1011" Define="IDC_QUOTE_STR" />
 		<String Ref="94" Cid="-1" Define="IDC_STATIC" en="Reply format:" pt_br="Modelo de resposta:" nl="Beantwoord:" cs="Formát odpovědi:" ru="Формат ответа:" ja="返信:" pt="Responder:" pl="Format odpowiedzi:" it="Risposte:" vi="Trả lời:" zh_tw="回覆:" sr="Format odgovora:" es="Formato al Responder:" no="Svarformat:" lt="Atsakymo šablonas:" fa="قالب جواب ها" de="Antwort-Format:" da="Svarformat:" sv="Svarsformat:" lg="Ebbago ly&apos;Okudamu:" tr="Yanıt formatı:" hu="Válasz formátum:" ko="회신 형식:" uk="Формат відповіді:" fr="Format de réponse:" />
@@ -316,8 +314,7 @@
 		<String Ref="511" Cid="906" Define="IDS_1082" en="Via STARTTLS" lt="„STARTTLS“ būdu" cs="Pomocí STARTTLS" de="Mit STARTTLS" tr="STARTTLS ile" ru="Через STARTTLS" pl="STARTTLS" ko="STARTTLS를 통해" uk="Через STARTTLS" />
 		<String Ref="512" Cid="-1" Define="IDC_STATIC" en="User name:" fr="Nom d&apos;usager:" it="Nome utente:" cs="Jméno uživatele:" es="Nombre de Usuario:" de="Benutzername:" nl="Gebruikersnaam:" pt_br="Nome de usuário:" ru="Пользователь:" pt="Utilizador:" pl="Nazwa użytkownika:" vi="Tên người dùng:" zh_tw="用戶名稱:" ja="ユーザ名:" sr="Korisničko ime:" no="Brukernavn:" lt="Naudotojo vardas:" fa="نام کاربري" da="Brugernavn:" sv="Användarnamn:" lg="Erinnya ly&apos;Omukozesa:" tr="Kullanıcı adı:" hu="Felhasználó név:" ko="사용자 이름:" uk="Користувач:" />
 		<String Ref="513" Cid="342" Define="IDC_MAX_SIZE" />
-		<String Ref="518" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
-		<String Ref="519" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Відмінити" />
+		<String Ref="518" Cid="518" Define="ID_BTN_TBL" />
 		<String Ref="520" Cid="520" Define="IDC_SIG_HTML" />
 		<String Ref="521" Cid="1004" Define="IDC_EMAIL" />
 		<String Ref="522" Cid="511" Define="IDC_BAYES_MODE" />
@@ -330,6 +327,7 @@
 		<String Ref="530" Cid="1092" Define="IDC_PUBLIC" en="Public" ko="공공" uk="Відкритий" de="Öffentlich" fr="Publique" />
 		<String Ref="531" Cid="1093" Define="IDC_PRIVATE" en="Private" ko="개인" uk="Особистий" de="Privat" fr="Privé" />
 		<String Ref="532" Cid="1068" Define="IDC_GOOGLE" />
+		<String Ref="533" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خیلی خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="534" Cid="-1" Define="IDC_STATIC" en="Signature &XML:" fr="Fichier signature:" it="File firma XML:" cs="XML podpis:" es="Firma XML:" de="XML-Signatur:" nl="Handtekening:" pt_br="Assinatura XML:" ru="Подпись XML:" pt="Assinatura XML:" pl="Sygnatura XML:" vi="Chữ ký XML:" zh_tw="XML 簽名檔:" ja="XML署名:" sr="XML potpis:" no="Signatur XML" lt="XML parašas:" fa="XMLامضاي" da="Signatur XML:" sv="XML-signatur:" lg="Sayini ya XML:" tr="XML İmza:" hu="Aláírás XML:" ko="서명 XML:" uk="Підпис XML:" />
 		<String Ref="535" Cid="535" Define="IDC_ID_TABLE" />
 		<String Ref="536" Cid="1165" Define="IDC_TABLE" />
@@ -598,8 +596,7 @@
 		<String Ref="964" Cid="1076" Define="IDC_SOCKS5_USER" />
 		<String Ref="965" Cid="831" Define="IDC_PREVIEW_SECONDS" />
 		<String Ref="969" Cid="969" Define="IDC_969" />
-		<String Ref="970" Cid="970" Define="IDC_LAUNCH_HELP" en="Help" pt="Ajuda" nl="Hulp" pl="Pomoc" cs="Nápověda" no="Hjelp" lt="Žinynas" fa="کمک" de="Hilfe" sr="Pomoć" da="Hjælp" ja="ヘルプ" vi="Giúp đỡ" sv="Hjälp" es="Ayuda" pt_br="Ajuda" lg="Obuyambi" tr="Yardım" hu="Súgó" ru="Помошь" ko="도움말" uk="Допомога" fr="Aide" />
-		<String Ref="971" Cid="970" Define="IDC_LAUNCH_HELP" en="Help" pt="Ajuda" nl="Hulp" pl="Pomoc" cs="Nápověda" no="Hjelp" lt="Žinynas" fa="کمک" de="Hilfe" sr="Pomoć" da="Hjælp" vi="Giúp đỡ" sv="Hjälp" es="Ayuda" pt_br="Ajuda" lg="Obuyambi" tr="Yardım" hu="Súgó" ru="Помощь" ko="도움말" uk="Допомога" fr="Aide" />
+		<String Ref="971" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="972" Cid="972" Define="IDD_LANG" en="Scribe" de="Scribe Sprachauswahl" vi="Ngôn ngữ" es="Idiomas de Scribe" />
 		<String Ref="973" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="975" Cid="973" Define="IDC_LANG" />
@@ -875,6 +872,7 @@
 		<String Ref="1481" Cid="1481" Define="IDC_V1" en="v1" />
 		<String Ref="1482" Cid="1482" Define="IDC_V2" en="v2" />
 		<String Ref="1483" Cid="-1" Define="IDC_STATIC" en="Attachments:" />
+		<String Ref="1484" Cid="970" Define="IDC_LAUNCH_HELP" en="Help" pt="Ajuda" nl="Hulp" pl="Pomoc" cs="Nápověda" no="Hjelp" lt="Žinynas" fa="کمک" de="Hilfe" sr="Pomoć" da="Hjælp" ja="ヘルプ" vi="Giúp đỡ" sv="Hjälp" es="Ayuda" pt_br="Ajuda" lg="Obuyambi" tr="Yardım" hu="Súgó" ru="Помошь" ko="도움말" uk="Допомога" fr="Aide" />
 		<String Ref="1485" Cid="1485" Define="IDS_GROWL_SUPPORT" en="Growl notification support" ko="Growl 알림 지원" uk="Підтримка повідомлень Growl" de="Unterstützung von Growl-Benachrichtigungen" fr="Prise en charge des notifications Growl" />
 		<String Ref="1486" Cid="1486" Define="IDS_GROWL" en="Use growl:" ko="Growl 사용" uk="Використовувати growl:" de="Verwende Growl:" fr="Utilisez le grognement:" />
 		<String Ref="1487" Cid="1165" Define="IDC_TABLE" />
@@ -890,6 +888,7 @@
 		<String Ref="1498" Cid="-1" Define="IDC_STATIC" en="Mobile:" it="Cellulare:" cs="Mobil:" es="Tlf. Móvil:" de="Mobil:" nl="Mobiel:" pt_br="Celular:" ja="携帯電話" pt="Telemóvel:" pl="Komórkowy:" vi="Di động" zh_tw="手機:" sr="Mobilni:" no="Mobil:" lt="Mobilus tel.:" fa="تلفن همراه:" da="Mobil:" sv="Mobil:" lg="Akasimu:" tr="Mobil:" hu="Mobil:" ru="Мобильный:" ko="휴대폰:" uk="Стільниковий:" fr="Portable:" />
 		<String Ref="1499" Cid="1102" Define="IDC_WORK_MOBILE" />
 		<String Ref="1500" Cid="1201" Define="IDC_SET_SPAM" en="..." />
+		<String Ref="1502" Cid="518" Define="ID_BTN_TBL" />
 		<String Ref="1503" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="1504" Cid="855" Define="IDS_780" en="Destination Field" cs="Cílové pole" pt="Campo de destino" nl="Bestemming" pl="Folder docelowy" vi="Trường mô tả" zh_tw="目的範圍" ja="保存先のフィールド" sr="Odredišno polje" es="Campo de Destino" no="Mottaksfelt" lt="Į kurį lauką importuoti" fa="کادر مقصد" de="Ziel-Feld" da="Modtagelsesfelt" sv="Mottagarfält" pt_br="Campo de Destino" lg="Omuwatwa webiraga" tr="Hedef Alan" hu="Cél mező" ru="Поле назначения" ko="대상 필드" uk="Поле призначення" fr="Champ destination" />
 		<String Ref="1505" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="삭제" uk="Скасувати" />
@@ -947,7 +946,9 @@
 		<String Ref="1579" Cid="957" Define="IDC_EFFICIENCY" en="#" />
 		<String Ref="1609" Cid="1609" Define="IDS_SHOW_SCRIPT_DEBUGGER" en="Show Script Debugger" fr="Afficher script débogueur" />
 		<String Ref="1611" Cid="-1" Define="IDC_STATIC" en="Drag items to re-order." fr="Ordre de tri:" />
+		<String Ref="1612" Cid="1612" Define="ID_SUB_FOLDERS" en="Sub Folders" />
 		<String Ref="1613" Cid="1613" Define="IDC_ACC_LOG" />
+		<String Ref="1614" Cid="970" Define="IDC_LAUNCH_HELP" en="Help" pt="Ajuda" nl="Hulp" pl="Pomoc" cs="Nápověda" no="Hjelp" lt="Žinynas" fa="کمک" de="Hilfe" sr="Pomoć" da="Hjælp" vi="Giúp đỡ" sv="Hjälp" es="Ayuda" pt_br="Ajuda" lg="Obuyambi" tr="Yardım" hu="Súgó" ru="Помощь" ko="도움말" uk="Допомога" fr="Aide" />
 		<String Ref="1615" Cid="1615" Define="IDC_1615" en="Send" fr="Envoyer" />
 		<String Ref="1616" Cid="1616" Define="IDC_1616" en="Receive" fr="Recevoir" />
 		<String Ref="1617" Cid="1617" Define="IDS_SHOW_SIZE_IN_KIB" en="Show sizes in KiB only:" fr="Afficher taille en KiO seulement:" />
@@ -963,6 +964,8 @@
 		<String Ref="1632" Cid="1632" Define="IDC_1632" en="Size" />
 		<String Ref="1633" Cid="2" Define="IDCANCEL" en="Cancel" ko="취소" uk="Скасувати" de="Abbrechen" fr="Annuler" />
 		<String Ref="1634" Cid="1124" Define="IDC_SAVE" en="Save" ko="저장" uk="Зберегти" de="Speichern" fr="Enregistrer" />
+		<String Ref="1635" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
+		<String Ref="1636" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Відмінити" />
 	</string-group>
 	<string-group Name="General">
 		<String Ref="19" Cid="2000" Define="IDS_MBOX_SELECT_FOLDER" en="Select the input MBOX files and then a folder to import to:" fr="Sélectionner un dossier à importer au format unix MBOX" cs="Vyberte vstupní MBOX soubory a složku do které budou soubory importovány:" nl="Kies een map voor het importeren van het Unix MBOX formaat:" es="Seleccione una carpeta para importar del formato de unix MBOX:" pt_br="Selecione a pasta para importar o formato MBOX do Unix:" pt="Selecione a pasta para importar do formato MBOX do unix:" pl="Wybierz pliki wejściowe MBOX a następnie folder, do którego importować:" vi="Chọn danh mục để nhập từ định dạng MBOX" zh_tw="選擇資料夾以便匯入unix MBOX 格式:" ja="Unix MBOXフォーマットのフォルダからインポートするフォルダを選択してください" sr="Izaberite omotnicu iz koje uvozite unix MBOX format" no="Velg MBOX fil som skal leses, og så en mappe som det skal importeres til." lt="Pasirinkite MBOX rinkmeną, o vėliau ir aplanką importavimui:" fa="را انتخاب کنید unix MBOX formatپوشه مورد نظر برای وارد کردن" de="Wählen Sie die MBOX Datei und dann den Ordner in den importiert werden soll:" da="Vælg MBOX fil som skal læses, og så en mappe som den skal importeres til." sv="Välj MBOX-fil som skall läsas, samt en mapp att importera till:" lg="Londawo Etterekero, era ne Kabada ey&apos;okuttikuliramu ebiragirizidwa:" tr="Kaynak MBOX dosyasını ve içe aktarılacak klasörü seçiniz:" hu="Válassza ki a bejövő MBOX fájlt majd a mappát, ahova importálni akarja:" ru="Выберите входящие MBOX файлы и потом папку сохранения:" ko="입력 MBOX파일과 폴더를 선택한 후 다음 위치로 불러옵니다:" uk="Визначення" />
@@ -974,7 +977,7 @@
 		<String Ref="220" Cid="1005" Define="IDS_SEND" en="Send" fr="Envoyer" it="Invia" cs="Odeslat" es="Enviar Correo" de="Senden" nl="Verzenden" pt_br="Enviar" ru="Отправить" ja="送信" pt="Enviar" pl="Wyślij" vi="Gửi" zh_tw="傳送" sr="Pošalji" lt="Išsiųsti" fa="بفرست" id="Kirim" sv="Sänd" lg="Sindika" tr="Gönder" hu="Küldés" ko="전송" uk="Відправити" />
 		<String Ref="221" Cid="515" Define="IDS_SAVE" en="Save" fr="Enregistrer" it="Salva" cs="Uložit" es="Guardar" de="Speichern" nl="Opslaan" pt_br="Salvar" ru="Сохранить" ja="保存" pt="Gravar" pl="Zapisz" vi="Lưu" zh_tw="儲存" sr="Snimi" no="Lagre" lt="Įrašyti" fa="ذخيره کن" id="Menyimpan" da="Gem" sv="Spara" lg="Ttereka" tr="Kaydet" hu="Ment" ko="저장" uk="Зберегти" />
 		<String Ref="222" Cid="517" Define="IDS_REPLY" en="Reply" fr="Répondre" it="Rispondi" cs="Odpovědět" es="Responder" de="Anworten" nl="Beantwoorden" pt_br="Responder" ru="Ответ" ja="返信" pt="Responder" pl="Odpowiedz" vi="Trả lời" zh_tw="回覆" sr="Odgovori" no="Svar" lt="Atsakyti" fa="جواب بده" id="Jawab" da="Svar" sv="Svara" lg="Damu" tr="Yanıtla" hu="Válasz" ko="회신" uk="Відповісти" />
-		<String Ref="223" Cid="518" Define="IDS_REPLYALL" en="Reply All" fr="Répondre à tous" it="Rispondi a tutti" cs="Odpovědět všem" es="Responder Todos" de="Allen Anworten" nl="Allen beantwoorden" pt_br="Respoder para todos" ru="Ответ всем" ja="全員へ返信" pt="Responder a todos" pl="Odpowiedz wszystkim" vi="Trả lời tất cả" zh_tw="回覆所有" sr="Odgovori na sve" no="Svar alle" lt="Atsakyti visiems" fa="به همه جواب بده" id="Jawab Semua" da="Svar til alle" sv="Svara alla" lg="Damu bonna" tr="Tümünü Yanıtla" hu="Válasz mindenkinek" ko="전체 회신" uk="Відповісти всім" />
+		<String Ref="223" Cid="1018" Define="IDS_REPLYALL" en="Reply All" fr="Répondre à tous" it="Rispondi a tutti" cs="Odpovědět všem" es="Responder Todos" de="Allen Anworten" nl="Allen beantwoorden" pt_br="Respoder para todos" ru="Ответ всем" ja="全員へ返信" pt="Responder a todos" pl="Odpowiedz wszystkim" vi="Trả lời tất cả" zh_tw="回覆所有" sr="Odgovori na sve" no="Svar alle" lt="Atsakyti visiems" fa="به همه جواب بده" id="Jawab Semua" da="Svar til alle" sv="Svara alla" lg="Damu bonna" tr="Tümünü Yanıtla" hu="Válasz mindenkinek" ko="전체 회신" uk="Відповісти всім" />
 		<String Ref="224" Cid="519" Define="IDS_FORWARD" en="Forward" fr="Rediriger" it="Inoltra" cs="Poslat dál" es="Reenviar" de="Weiterleiten" nl="Doorsturen" pt_br="Encaminhar" ru="Переслать" ja="転送" pt="Encaminhar" pl="Prześlij dalej" vi="Chuyển tiếp" zh_tw="轉信" sr="Prosledi" no="Videresend" lt="Persiųsti" fa="به ديگران بفرست" id="Sampaikan" da="Videresend" sv="Vidare- befordra" lg="Wereza" tr="Yönlendir" hu="Továbbít" ko="전달" uk="Переслати" />
 		<String Ref="225" Cid="538" Define="IDS_REMOVE" en="Remove" fr="Enlever" it="Elimina" cs="Odstranit" es="Suprimir" de="Entfernen" nl="Verwijder" pt_br="Remover" ru="Удалить:" pt="Remover" pl="Usuń" vi="Gỡ bỏ" zh_tw="移除:" ja="削除" sr="Skloni" no="Fjern" lt="Pašalinti" fa="پاک کن" id="Menghilangkan" da="Fjærn" sv="Ta bort" lg="Jjawo" tr="Sil" hu="Eltávolít" ko="제거" uk="Видалити" />
 		<String Ref="227" Cid="521" Define="IDS_TO" en="To" fr="À" it="A" cs="Komu" es="Para" de="An" nl="Aan" pt_br="Para" ru="Кому:" pt="Para" pl="Do" vi="Người nhận" ja="宛先" sr="Kome" no="Til" lt="Gavėjas" fa="به" id="Penerima" da="Til" sv="Till" lg="Eri" tr="Kime" hu="Címzett" ko="받는사람" uk="Кому:" />
@@ -1599,16 +1602,16 @@
 }
 
 </style>
-	<Dialog pos="7,7,575,634" ref="441">
-		<TabView pos="7,7,552,559" ref="442">
+	<Dialog pos="7,7,561,640" ref="441">
+		<TabView pos="7,7,545,559" ref="442">
 			<Tab ref="445">
-				<TableLayout pos="14,28,454,545" ref="535" cols="0.500,0.500" rows="0.056,0.058,0.052,0.056,0.056,0.056,0.052,0.614">
+				<TableLayout pos="14,28,510,545" ref="535" cols="0.500,0.500" rows="0.056,0.058,0.052,0.056,0.056,0.056,0.052,0.614">
 					<tr>
 						<td addr="0,0">
 							<StaticText pos="7,0,153,20" ref="1232" />
 						</td>
 						<td addr="1,0">
-							<EditBox Pos="214,0,346,19" ref="476" />
+							<EditBox Pos="242,0,374,19" ref="476" />
 						</td>
 					</tr>
 					<tr>
@@ -1621,7 +1624,7 @@
 							<StaticText pos="0,57,48,70" ref="473" />
 						</td>
 						<td addr="1,2">
-							<EditBox Pos="214,57,346,76" ref="488" />
+							<EditBox Pos="242,57,374,76" ref="488" />
 						</td>
 					</tr>
 					<tr>
@@ -1629,7 +1632,7 @@
 							<StaticText pos="0,83,83,96" ref="461" />
 						</td>
 						<td addr="1,3">
-							<EditBox Pos="214,83,346,102" ref="521" />
+							<EditBox Pos="242,83,374,102" ref="521" />
 						</td>
 					</tr>
 					<tr>
@@ -1637,7 +1640,7 @@
 							<StaticText pos="0,111,104,124" ref="594" />
 						</td>
 						<td addr="1,4">
-							<EditBox Pos="214,111,346,130" ref="523" />
+							<EditBox Pos="242,111,374,130" ref="523" />
 						</td>
 					</tr>
 					<tr>
@@ -1914,9 +1917,23 @@
 				</TableLayout>
 			</Tab>
 		</TabView>
-		<Button Pos="7,567,69,587" toggle="0" ref="971" />
-		<Button Pos="399,567,468,587" toggle="0" ref="518" />
-		<Button Pos="476,567,552,587" toggle="0" ref="519" />
+		<TableLayout pos="7,567,552,608" ref="1502" CellStyle="width: auto;" cols="0.200,0.200,0.200,0.200,0.200" rows="1.000">
+			<tr>
+				<td addr="0,0">
+					<Button Pos="0,0,62,20" toggle="0" ref="1614" />
+				</td>
+				<td addr="1,0">
+					<Button Pos="106,0,182,20" image="" toggle="0" ref="1612" />
+				</td>
+				<td addr="2,0" style="width: auto;" />
+				<td addr="3,0">
+					<Button Pos="318,0,387,20" toggle="0" ref="1635" />
+				</td>
+				<td addr="4,0">
+					<Button Pos="424,0,500,20" toggle="0" ref="1636" />
+				</td>
+			</tr>
+		</TableLayout>
 	</Dialog>
 	<Dialog pos="7,7,363,459" ref="80">
 		<TableLayout pos="7,7,342,76" ref="1187" cols="0.333,0.333,0.333" rows="0.500,0.500">
@@ -4271,7 +4288,7 @@
 			</tr>
 		</TableLayout>
 	</Dialog>
-	<Dialog pos="7,7,489,617" ref="787">
+	<Dialog pos="7,7,478,621" ref="787">
 		<TabView pos="7,7,461,531" ref="788">
 			<Tab ref="789">
 				<TableLayout pos="14,28,412,97" ref="889" cols="0.500,0.500" rows="1.000">
@@ -4717,9 +4734,20 @@
 				</ControlTree>
 			</Tab>
 		</TabView>
-		<Button Pos="7,539,69,559" toggle="0" ref="970" />
-		<Button Pos="301,539,377,559" toggle="0" ref="1" />
-		<Button Pos="385,539,461,559" toggle="0" ref="91" />
+		<TableLayout pos="7,539,461,587" ref="518" CellStyle="width: auto;" cols="0.250,0.250,0.250,0.250" rows="1.000">
+			<tr>
+				<td addr="0,0">
+					<Button Pos="0,0,62,20" toggle="0" ref="1484" />
+				</td>
+				<td addr="1,0" style="width: auto;" />
+				<td addr="2,0">
+					<Button Pos="220,0,296,20" toggle="0" ref="533" />
+				</td>
+				<td addr="3,0">
+					<Button Pos="330,0,406,20" toggle="0" ref="971" />
+				</td>
+			</tr>
+		</TableLayout>
 	</Dialog>
 	<Dialog pos="7,7,1107,220" ref="401">
 		<TableLayout pos="322,7,706,181" ref="900" cols="0.236,0.764" rows="0.167,0.167,0.167,0.167,0.167,0.167">

@@ -229,7 +229,8 @@ public:
 	LString::Array Dictionaries;
 };
 
-OptionsDlg::OptionsDlg(ScribeWnd *window) : TabDialog(IDC_TAB, IDC_LAUNCH_HELP)
+OptionsDlg::OptionsDlg(ScribeWnd *window) :
+	TabDialog(IDC_TAB, ID_BTN_TBL)
 {
 	d = new OptionsDlgPrivate;
 	UiLang = 0;

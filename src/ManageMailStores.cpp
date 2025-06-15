@@ -1,13 +1,15 @@
 #include "lgi/common/Lgi.h"
-#include "Scribe.h"
-#include "Store3Mail3/Mail3.h"
-#include "ManageMailStores.h"
 #include "lgi/common/List.h"
 #include "lgi/common/ListItemCheckBox.h"
 #include "lgi/common/Edit.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/FileSelect.h"
+
+#include "Scribe.h"
 #include "resdefs.h"
+#include "Store3Mail3/Mail3.h"
+#include "ManageMailStores.h"
+#include "SubFolderDlg.h"
 
 class FmtDlg : public LDialog
 {
@@ -39,102 +41,6 @@ public:
 				EndModal(Ctrl->GetId() == IDOK);
 				break;
 			}
-		}
-
-		return 0;
-	}
-};
-
-////////////////////////////////////////////////////////////////////////////////////////
-class SubFolderDlg : public LDialog, public LXmlTreeUi
-{
-	ScribeWnd *App;
-
-	void FolderSelector(int OutputCtrl, int Limit)
-	{
-		auto Dlg = new FolderDlg(this, App, Limit);
-		Dlg->DoModal([this, Dlg, OutputCtrl](auto dlg, auto id)
-		{
-			if (id)
-			{
-				LEdit *e;
-				if (GetViewById(OutputCtrl, e))
-					e->Name(Dlg->Get());
-			}
-		});
-	}
-
-public:
-	SubFolderDlg(LView *parent, ScribeWnd *app)
-	{
-		App = app;
-		SetParent(parent);
-
-		if (App->GetOptions() && LoadFromResource(IDD_SUB_FOLDERS))
-		{
-			Map(OPT_Inbox, IDC_INBOX, GV_STRING);
-			Map(OPT_Outbox, IDC_OUTBOX, GV_STRING);
-			Map(OPT_Sent, IDC_SENT, GV_STRING);
-			Map(OPT_Trash, IDC_TRASH, GV_STRING);
-			Map(OPT_Contacts, IDC_CONTACT_FLD, GV_STRING);
-			Map(OPT_Templates, IDC_TEMPLATES, GV_STRING);
-			Map(OPT_Calendar, IDC_CALENDER, GV_STRING);
-			Map(OPT_Filters, IDC_FILTERS_FLD, GV_STRING);
-			Map(OPT_Groups, IDC_GROUPS_FLD, GV_STRING);
-			Map(OPT_SpamFolder, IDC_SPAM_FLD, GV_STRING);
-			
-			Map(OPT_HasTemplates, IDC_HAS_TEMPLATES, GV_BOOL);
-			Map(OPT_HasGroups, IDC_HAS_GROUPS, GV_BOOL);
-			Map(OPT_HasCalendar, IDC_HAS_CAL_EVENTS, GV_BOOL);
-			Map(OPT_HasFilters, IDC_HAS_FILTERS, GV_BOOL);
-			Map(OPT_HasSpam, IDC_HAS_SPAM, GV_BOOL);
-			
-			Convert(App->GetOptions(), this, true);
-			MoveToCenter();
-		}
-	}
-
-	int OnNotify(LViewI *Ctrl, const LNotification &n) override
-	{
-		switch (Ctrl->GetId())
-		{
-			case IDOK:
-				Convert(App->GetOptions(), this, false);
-				EndModal(1);
-				break;
-			case IDCANCEL:
-				EndModal(0);
-				break;
-			case IDC_SET_INBOX:
-				FolderSelector(IDC_INBOX, MAGIC_MAIL);
-				break;
-			case IDC_SET_OUTBOX:
-				FolderSelector(IDC_OUTBOX, MAGIC_MAIL);
-				break;
-			case IDC_SET_SENT:
-				FolderSelector(IDC_SENT, MAGIC_MAIL);
-				break;
-			case IDC_SET_TRASH:
-				FolderSelector(IDC_TRASH, MAGIC_ANY);
-				break;
-			case IDC_SET_CONTACTS:
-				FolderSelector(IDC_CONTACT_FLD, MAGIC_CONTACT);
-				break;
-			case IDC_SET_TEMPLATES:
-				FolderSelector(IDC_TEMPLATES, MAGIC_MAIL);
-				break;
-			case IDC_SET_CALENDER:
-				FolderSelector(IDC_CALENDER, MAGIC_CALENDAR);
-				break;
-			case IDC_SET_FILTERS:
-				FolderSelector(IDC_FILTERS_FLD, MAGIC_FILTER);
-				break;
-			case IDC_SET_GROUPS:
-				FolderSelector(IDC_GROUPS_FLD, MAGIC_GROUP);
-				break;
-			case IDC_SET_SPAM:
-				FolderSelector(IDC_SPAM_FLD, MAGIC_MAIL);
-				break;
 		}
 
 		return 0;
@@ -583,18 +489,32 @@ int ManageMailStores::OnNotify(LViewI *c, const LNotification &n)
 		}
 		case IDC_SUB_FOLDERS:
 		{
-			auto Dlg = new SubFolderDlg(this, App);
-			Dlg->DoModal(NULL);
+			if (auto Dlg = new SubFolderDlg
+					(
+						this,
+						App,
+						App->GetOptions(),
+						[this](auto Parent, auto App, auto Limit, auto cb)
+						{
+							if (auto Dlg = new FolderDlg(Parent, App, Limit))
+								Dlg->DoModal([this, Dlg, cb](auto dlg, auto id)
+								{
+									if (id)
+										cb(Dlg->Get());
+								});
+						}
+					))
+				Dlg->DoModal(NULL);
 			break;
 		}
 		case IDC_SET_START_IN:
 		{
-			auto Dlg = new FolderDlg(this, App);
-			Dlg->DoModal([this, Dlg](auto dlg, auto id)
-			{
-				if (id)
-					SetCtrlName(IDC_START_IN, Dlg->Get());
-			});
+			if (auto Dlg = new FolderDlg(this, App))
+				Dlg->DoModal([this, Dlg](auto dlg, auto id)
+				{
+					if (id)
+						SetCtrlName(IDC_START_IN, Dlg->Get());
+				});
 			break;
 		}
 		case IDOK:
