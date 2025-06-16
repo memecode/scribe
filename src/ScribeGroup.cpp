@@ -1,10 +1,12 @@
-#include "Scribe.h"
+#include "lgi/common/Lgi.h"
 #include "lgi/common/TextView3.h"
-#include "resdefs.h"
-#include "ScribeListAddr.h"
 #include "lgi/common/DisplayString.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/FileSelect.h"
+
+#include "Scribe.h"
+#include "resdefs.h"
+#include "ScribeListAddr.h"
 #include "AddressSelect.h"
 
 ItemFieldDef GroupFieldDefs[] = {
@@ -1053,16 +1055,17 @@ void LAddressEdit::PourStyle(size_t Start, ssize_t Length)
 	{
 		const char *Delim = " \t\r\n,;";
 
-		LUnrolledList<LStyle> Old, New;
-		Old.Swap(Style);
+		LTextView3::LStyle empty;
+		LUnrolledList<LStyle> OldStyles(empty), NewStyles(empty);
+		OldStyles.Swap(Style);
 
-		for (auto i : Map)
+		for (auto i: Map)
 		{
 			i.value->Referenced = false;
 		}
 
 		LHashTbl<IntKey<ssize_t>,LStyle*> Hash;
-		for (auto &i : Old)
+		for (auto &i: OldStyles)
 		{
 			LAssert(i.Data.Type != GV_NULL);
 			Hash.Add(i.Start, &i);
@@ -1081,7 +1084,7 @@ void LAddressEdit::PourStyle(size_t Start, ssize_t Length)
 			{
 				// Insert new style
 				LAssert(App != NULL);
-				auto &s = New.New().Construct(this, STYLE_ADDRESS);
+				auto &s = NewStyles.New().Construct(this, STYLE_ADDRESS);
 				s.Start = Start;
 				s.Len = Len;
 			}
@@ -1090,7 +1093,7 @@ void LAddressEdit::PourStyle(size_t Start, ssize_t Length)
 		// Match the old and new lists, merging unchanged entries from
 		// the old list and taking changed entries from the new list.
 		AddressMeta *m;
-		for (auto &n : New)
+		for (auto &n: NewStyles)
 		{
 			// Find matching old entry
 			LString s(Text + n.Start, n.Len);
@@ -1140,13 +1143,13 @@ void LAddressEdit::PourStyle(size_t Start, ssize_t Length)
 		}
 
 		#ifdef _DEBUG
-		for (auto &s : New)
+		for (auto &s: NewStyles)
 		{
 			LAssert(s.Data.Type != GV_NULL);
 		}
 		#endif
 
-		Style.Swap(New);
+		Style.Swap(NewStyles);
 
 		// Update
 		LRect r(0, Y()-20, 100, Y());

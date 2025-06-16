@@ -58,7 +58,7 @@ class FolderPropertiesDlg : public LDialog
 	// Scanning portion..
 	Counter c;
 	LArray<LDataFolderI*> inFolders;
-	LArray<LDataI*> inData;
+	LUnrolledList<LDataI*> inData;
 	uint64_t resortTs = 0;
 	LHashTbl<PtrKey<LDataFolderI*>,LFolderInfo*> infoMap;
 	LFolderInfo *rootInfo = nullptr;
@@ -67,7 +67,8 @@ public:
 	bool RePopulate = false;
 	constexpr static int TIMESLICE = 300; // ms
 
-	FolderPropertiesDlg(ScribeFolder *folder, int InitialTab)
+	FolderPropertiesDlg(ScribeFolder *folder, int InitialTab) :
+		inData(nullptr)
 	{
 		Folder = folder;
 		if (!Folder)
