@@ -50,6 +50,8 @@ public:
     /// Impl
     void OnEvent(LMessage *Msg);
     
+    /// The user changed the settings via the dialog
+    void OnSettingsChange();
     
     //////////////////////////////////////////////////
     static bool UnitTests(ScribeWnd *app);

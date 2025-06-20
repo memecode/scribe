@@ -16,6 +16,8 @@
 #define STORE_SIZE				16
 #define WORD_INTEREST_CENTER	0.5
 
+#define DEBUG_LOG(...)			if (DebugLog) { LgiTrace(__VA_ARGS__); }
+
 static const char HamWordsFile[]  = "hamwords.idx";
 static const char SpamWordsFile[] = "spamwords.idx";
 static const char WhiteListFile[] = "whitelist.idx";
@@ -799,7 +801,7 @@ public:
 	ScribeWnd *App;
 	BayesianFilter *Filter;
 	LAutoPtr<LProgressDlg> Prog;
-	LAutoPtr<LFile> Debug;
+	bool DebugLog = false;
 
 	// Processing part 1... load the folders:
 	LArray<ScribeFolder*> Folders;
@@ -848,23 +850,23 @@ public:
 	}
 };
 
-class BayesianFilterPriv : public LMutex
+class BayesianFilterPriv
 {
 	LAutoPtr<BayesianThread> Thread;
 
 public:
     ScribeWnd *App;
-	uint64_t Ts;
-
+	uint64_t Ts = 0;
 	uint64_t WorkStartTs = 0;
+	int DebugLog = -1;
+
 	LArray<BayesEvent> Work;
 	LAutoPtr<LProgressDlg> Prog;
 	LAutoPtr<BuildSpamDB> Build;
 
-    BayesianFilterPriv(ScribeWnd *app) :
-		LMutex("BayesianFilterPriv")
+
+    BayesianFilterPriv(ScribeWnd *app)
     {
-		Ts = 0;
         App = app;
     }
 
@@ -884,24 +886,12 @@ public:
 BuildSpamDB::BuildSpamDB(ScribeWnd *app) : App(app), Filter(app)
 {
 	App->OnFolderTask(Filter->d->GetThread(), true);
+	DebugLog = Filter->d->DebugLog;
 
 	b.Reset(new BayesianThread::Build(true));
 	if (Prog.Reset(new LProgressDlg(App)))
 		Prog->SetDescription("Scanning folders...");
 
-	LVariant i;
-	if (App->GetOptions()->GetValue(OPT_BayesDebug, i))
-	{
-		if (Debug.Reset(new LFile))
-		{
-			char s[MAX_PATH_LEN];
-			LMakePath(s, sizeof(s), LGetExePath(), "Bayes.txt");
-			if (Debug->Open(s, O_WRITE))
-				Debug->SetSize(0);
-			else
-				LgiTrace("%s:%i - Couldn't open '%s'\n", _FL, s);
-		}
-	}
 }
 
 BuildSpamDB::~BuildSpamDB()
@@ -942,8 +932,7 @@ bool BuildSpamDB::Process()
 			auto Path = f->GetPath();
 			auto Type = Filter->BayesTypeFromPath(Path);
 
-			if (Debug)
-				Debug->Print("%s:%i - add folder '%s', Type=%i\n", _FL, Path.Get(), Type);
+			DEBUG_LOG("%s:%i - add folder '%s', Type=%i\n", _FL, Path.Get(), Type)
 
 			auto Parent = f->GetParent();
 
@@ -952,7 +941,7 @@ bool BuildSpamDB::Process()
 				FolderLoads++;
 				f->WhenLoaded(_FL, [this, f, Type, Path](auto status)
 				{
-					LgiTrace("%s:%i - Scanning '%s' got %i items, FolderLoads=%i\n", _FL, Path.Get(), (int)f->Items.Length(), FolderLoads);
+					DEBUG_LOG("%s:%i - Scanning '%s' got %i items, FolderLoads=%i\n", _FL, Path.Get(), (int)f->Items.Length(), FolderLoads);
 					for (auto i: f->Items)
 					{
 						auto m = i->IsMail();
@@ -1031,6 +1020,7 @@ void BuildSpamDB::ProcessMail(Mail *m, ScribeMailType Type)
 	if (LoadState != Store3Loaded)
 	{
 		LAssert(!"Should only be called on loaded email...");
+		DEBUG_LOG("%s:%i - error LoadState=%i\n", _FL, LoadState);
 		return;
 	}
 
@@ -1046,6 +1036,7 @@ void BuildSpamDB::ProcessMail(Mail *m, ScribeMailType Type)
 	if (Status != Store3Success)
 	{
 		LAssert(!"MakeMailWordList failed.");
+		DEBUG_LOG("%s:%i - MakeMailWordList failed\n", _FL);
 		return;
 	}
 
@@ -1119,8 +1110,6 @@ bool HashSerialize(LHashTbl<StrKeyPool<char>,uint32_t> &h, char *file, bool writ
 			{
 				f.SetSize(0);
 
-				// char *key;
-				// for (int i=h.First(&key); i; i=h.Next(&key))
 				for (auto i : h)
 				{
 					fld->Value = (uint32_t)i.value;
@@ -1168,6 +1157,17 @@ BayesianFilter::~BayesianFilter()
     DeleteObj(d);
 }
 
+void BayesianFilter::OnSettingsChange()
+{
+	LVariant i;
+	if (App &&
+		App->GetOptions() &&
+		App->GetOptions()->GetValue(OPT_BayesDebug, i))
+	{
+		d->DebugLog = i.CastInt32() > 0;
+	}
+}
+
 void BayesianFilter::AddFolderToSpamDb(ScribeFolder *f)
 {
 	if (d->IsCancelled())
@@ -1177,20 +1177,6 @@ void BayesianFilter::AddFolderToSpamDb(ScribeFolder *f)
 	for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
 		AddFolderToSpamDb(c);
 }
-
-/*
-static size_t FolderCount(ScribeFolder *f)
-{
-	ssize_t len = f->Length();
-	auto items = f->GetItems();
-	auto n = MAX(len, items);
-
-	for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
-		n += FolderCount(c);	
-	
-	return n;
-}
-*/
 
 void BayesianFilter::BuildStats()
 {
@@ -1257,7 +1243,7 @@ bool IsUriChar(int32 ch)
 }
 
 typedef LHashTbl<ConstStrKey<char,false>,bool> TokenMap;
-void TokeniseText(const char *Source, bool *Lut, LString::Array &Blocks, TokenMap *Ignore = NULL)
+void TokeniseText(bool DebugLog, const char *Source, bool *Lut, LString::Array &Blocks, TokenMap *Ignore = NULL)
 {
 	if (!Source || !Lut)
 		return;
@@ -1369,7 +1355,7 @@ void TokeniseText(const char *Source, bool *Lut, LString::Array &Blocks, TokenMa
 		else
 		{
 			if (ch)
-				LgiTrace("%s:%i - Invalid utf-8, aborting parse...\n", _FL);
+				DEBUG_LOG("%s:%i - Invalid utf-8, aborting parse...\n", _FL)
 			break;
 		}
 
@@ -1415,10 +1401,10 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 		{
 			auto s = a->Identity.Name();
 			if (ValidStr(s.Str()))
-				TokeniseText(s.Str(), Lut, Temp);
+				TokeniseText(d->DebugLog, s.Str(), Lut, Temp);
 			s = a->Identity.Email();
 			if (ValidStr(s.Str()))
-				TokeniseText(s.Str(), Email, Temp);
+				TokeniseText(d->DebugLog, s.Str(), Email, Temp);
 		}
 		ProcessWords(LString("").Join(Temp), [&Ignore](auto w)
 		{
@@ -1426,9 +1412,9 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 		});
 		
 		// process various parts of the email
-		TokeniseText(m->GetSubject(), Lut, Blocks, &Ignore);
-		TokeniseText(m->GetFromStr(FIELD_EMAIL), Email, Blocks, &Ignore);
-		TokeniseText(m->GetFromStr(FIELD_NAME), Lut, Blocks, &Ignore);
+		TokeniseText(d->DebugLog, m->GetSubject(), Lut, Blocks, &Ignore);
+		TokeniseText(d->DebugLog, m->GetFromStr(FIELD_EMAIL), Email, Blocks, &Ignore);
+		TokeniseText(d->DebugLog, m->GetFromStr(FIELD_NAME), Lut, Blocks, &Ignore);
 		LVariant Body;
 
 		Store3State Loaded = (Store3State)m->GetObject()->GetInt(FIELD_LOADED);
@@ -1448,7 +1434,7 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 		if (Req)
 		{
 			// auto id = m->GetMessageId();
-			TokeniseText(Body.Str(), Lut, Blocks, &Ignore);
+			TokeniseText(d->DebugLog, Body.Str(), Lut, Blocks, &Ignore);
 		}
 		else
 		{
@@ -1691,15 +1677,22 @@ bool BayesianFilter::RemoveFromWhitelist(const char *Email)
 
 Store3Status BayesianFilter::OnBayesianMailEvent(Mail *m, ScribeMailType OldType, ScribeMailType NewType)
 {
+	auto DebugLog = d->DebugLog;
 	if (!m)
+	{
+		DEBUG_LOG("%s:%i - invalid param null m\n", _FL);
 	    return Store3Error;
+	}
 
 	auto flags = m->GetFlags();
 
 	if (NewType == BayesMailHam)
 	{
 		if (TestFlag(flags, MAIL_HAM_DB))
+		{
+			DEBUG_LOG("%s:%i - %s: '%s' already ham\n", _FL, __FUNCTION__, m->GetSubject());
 			return Store3Success;
+		}
 		if (!TestFlag(flags, MAIL_BAYES_HAM|MAIL_BAYES_SPAM))
 			flags |= MAIL_BAYES_HAM;
 	}
@@ -1707,7 +1700,10 @@ Store3Status BayesianFilter::OnBayesianMailEvent(Mail *m, ScribeMailType OldType
 	if (NewType == BayesMailSpam)
 	{
 		if (TestFlag(flags, MAIL_SPAM_DB))
+		{
+			DEBUG_LOG("%s:%i - %s: '%s' already spam\n", _FL, __FUNCTION__, m->GetSubject());
 			return Store3Success;
+		}
 		if (!TestFlag(flags, MAIL_BAYES_HAM|MAIL_BAYES_SPAM))
 			flags |= MAIL_BAYES_SPAM;
 	}
@@ -1734,8 +1730,10 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 	{
 		case M_SCRIBE_IDLE:
 		{
-			// LProfile prof("M_SCRIBE_IDLE", 15);
+			if (d->DebugLog < 0)
+				OnSettingsChange();
 
+			auto DebugLog = d->DebugLog;
 			if (d->Build)
 			{
 				if (d->Build->Process())
@@ -1806,7 +1804,6 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 					continue;
 				}
 
-				// prof.Add("change");
 				LAutoPtr<BayesianThread::Change> c(new BayesianThread::Change);
 
 				c->Str = job.m->GetFromStr(FIELD_EMAIL);
@@ -1820,9 +1817,15 @@ void BayesianFilter::OnEvent(LMessage *Msg)
 				auto flags = job.m->GetFlags();
 				flags &= ~(MAIL_BAYES_SPAM|MAIL_BAYES_HAM);
 				if (job.NewType == BayesMailHam)
+				{
 					flags |= MAIL_BAYES_HAM;
+					DEBUG_LOG("%s:%i - mail '%s' is ham\n", _FL, job.m->GetSubject());
+				}
 				else if (job.NewType == BayesMailSpam)
+				{
 					flags |= MAIL_BAYES_SPAM;
+					DEBUG_LOG("%s:%i - mail '%s' is spam\n", _FL, job.m->GetSubject());
+				}
 				job.m->SetFlags(flags);
 
 				job.m->DecRef();

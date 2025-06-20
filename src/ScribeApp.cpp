@@ -8042,55 +8042,55 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			auto Dlg = new BayesDlg(this);
 			Dlg->DoModal([this, Dlg](auto dlg, auto id)
 			{
-				if (id)
+				if (!id)
+					return;
+
+				OnSettingsChange();
+
+				LVariant i;
+				if (!GetOptions()->GetValue(OPT_BayesFilterMode, i))
+					return;
+
+				ScribeBayesianFilterMode m = ((ScribeBayesianFilterMode)i.CastInt32());
+				if (m != BayesOff)
 				{
-					LVariant i;
-					if (GetOptions()->GetValue(OPT_BayesFilterMode, i))
-					{
-						ScribeBayesianFilterMode m = ((ScribeBayesianFilterMode)i.CastInt32());
-						if (m != BayesOff)
-						{
-							LVariant SpamPath, ProbablyPath;
-							GetOptions()->GetValue(OPT_SpamFolder, SpamPath);
-							GetOptions()->GetValue(OPT_BayesMoveTo, ProbablyPath);
+					LVariant SpamPath, ProbablyPath;
+					GetOptions()->GetValue(OPT_SpamFolder, SpamPath);
+					GetOptions()->GetValue(OPT_BayesMoveTo, ProbablyPath);
 											
-							if (m == BayesFilter)
+					if (m == BayesFilter)
+					{
+						auto Spam = GetFolder(SpamPath.Str());
+						if (!Spam)
+						{							
+							if (auto RelevantStore = GetMailStoreForPath(SpamPath.Str()))
 							{
-								ScribeFolder *Spam = GetFolder(SpamPath.Str());
-								if (!Spam)
-								{
-							
-									LMailStore *RelevantStore = GetMailStoreForPath(SpamPath.Str());
-									if (RelevantStore)
-									{
-										LString p = SpamPath.Str();
-										LString::Array a = p.SplitDelimit("/");
+								LString p = SpamPath.Str();
+								auto a = p.SplitDelimit("/");
 									
-										Spam = RelevantStore->GetRoot();
-										for (unsigned i=1; i<a.Length(); i++)
-										{
-											ScribeFolder *c = Spam->GetSubFolder(a[i]);
-											if (!c)
-												c = Spam->CreateSubFolder(a[i], MAGIC_MAIL);
-											Spam = c;
-										}
-									}
+								Spam = RelevantStore->GetRoot();
+								for (unsigned i=1; i<a.Length(); i++)
+								{
+									auto c = Spam->GetSubFolder(a[i]);
+									if (!c)
+										c = Spam->CreateSubFolder(a[i], MAGIC_MAIL);
+									Spam = c;
 								}
+							}
+						}
 							
-								if (Spam)
-								{
-									LVariant v;
-									GetOptions()->SetValue(OPT_HasSpam, v = 1);
-								}
-							}
-							else if (m == BayesTrain)
-							{
-								ScribeFolder *Probably = GetFolder(ProbablyPath.Str());
-								if (!Probably)
-								{
-									LgiMsg(this, "Couldn't find the folder '%s'", AppName, MB_OK, ProbablyPath.Str());
-								}
-							}
+						if (Spam)
+						{
+							LVariant v;
+							GetOptions()->SetValue(OPT_HasSpam, v = 1);
+						}
+					}
+					else if (m == BayesTrain)
+					{
+						auto Probably = GetFolder(ProbablyPath.Str());
+						if (!Probably)
+						{
+							LgiMsg(this, "Couldn't find the folder '%s'", AppName, MB_OK, ProbablyPath.Str());
 						}
 					}
 				}

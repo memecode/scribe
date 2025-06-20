@@ -587,7 +587,7 @@
 		<String Ref="949" Cid="823" Define="IDC_BAYES_THRESHOLD" />
 		<String Ref="950" Cid="1185" Define="IDC_BAYES_INCREMENTAL" en="&Incrementally update word lists." lt="Atnaujinti papildant šlamšto filtro žodžių sąrašą" cs="Postupně aktualizovat seznamy slov" sv="Uppdatera ordlistor inkrementellt." de="Erkannte Worte automatisch zu Wortlisten hinzufügen" tr="Kelime listelerini artarak güncelle." hu="Szólista növekményes frissítése." ru="Дополнять список слов" pl="Aktualizuj listę słów przyrostowo." ko="단어 목록 점차적 업데이트." uk="Поетапно оновлювати списки слів." fr="Mise à jour &Incrementale des listes de mots." />
 		<String Ref="951" Cid="-1" Define="IDC_STATIC" en="Repeats on:" uk="Повторювати у:" de="Am:" fr="Répéter le:" />
-		<String Ref="952" Cid="1186" Define="IDC_BAYES_DEBUG" en="De&bug: Log actions to &apos;bayes.txt&apos;" lt="Derinimas: Rašyti filtravimo veiksmų žurnalą į  &apos;bayes.txt&apos;" cs="Ladění: Záznam činností do &apos;bayes.txt&apos;" sv="Felsökning: Logga aktivitet till &apos;bayes.txt&apos;" de="Fehlersuche: Durchgeführte Aktionen in &apos;bayes.txt&apos; protokollieren" tr="Debug: Kütük kayıt dosyası &apos;bayes.txt&apos;" hu="Hibakeresés: művelet naplózása a &apos;bayes.txt&apos;-be" ru="Отладка: записывать действия в &apos;bayes.txt&apos;" pl="Debug: Raportuj działania do pliku &apos;bayes.txt&apos;" ko="디버그:로그 확동을 &apos;bayes.txt&apos;로" uk="Налагодження: записувати дії в &apos;bayes.txt&apos;" fr="Dé&bogage: consigner les actions dans &apos;bayes.txt&apos;" />
+		<String Ref="952" Cid="1186" Define="IDC_BAYES_DEBUG" en="De&bug: Log actions to console" lt="Derinimas: Rašyti filtravimo veiksmų žurnalą į  &apos;bayes.txt&apos;" cs="Ladění: Záznam činností do &apos;bayes.txt&apos;" sv="Felsökning: Logga aktivitet till &apos;bayes.txt&apos;" de="Fehlersuche: Durchgeführte Aktionen in &apos;bayes.txt&apos; protokollieren" tr="Debug: Kütük kayıt dosyası &apos;bayes.txt&apos;" hu="Hibakeresés: művelet naplózása a &apos;bayes.txt&apos;-be" ru="Отладка: записывать действия в &apos;bayes.txt&apos;" pl="Debug: Raportuj działania do pliku &apos;bayes.txt&apos;" ko="디버그:로그 확동을 &apos;bayes.txt&apos;로" uk="Налагодження: записувати дії в &apos;bayes.txt&apos;" fr="Dé&bogage: consigner les actions dans &apos;bayes.txt&apos;" />
 		<String Ref="953" Cid="1202" Define="IDC_SPAM_FOLDER" />
 		<String Ref="954" Cid="1203" Define="IDC_SET_SPAM_FOLDER" en="..." />
 		<String Ref="955" Cid="941" Define="IDC_EVERY" />
@@ -4713,23 +4713,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4737,9 +4723,23 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>
