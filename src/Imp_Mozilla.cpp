@@ -6,7 +6,7 @@
 #include "lgi/common/TextFile.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/FileSelect.h"
-#include "v3.6.14/sqlite3.h"
+#include "v3.50.1/sqlite3.h"
 
 void ToRecord(LMap<int, int> &r, char *Str)
 {

@@ -158,6 +158,7 @@
 		3477C5231CC315FC0028B84B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3477C5221CC315FC0028B84B /* Cocoa.framework */; };
 		347CF82723F64FD00028F610 /* flags.png in Resources */ = {isa = PBXBuildFile; fileRef = 347CF82623F64FD00028F610 /* flags.png */; };
 		3486E9E22A86E8CA009BDA7E /* UnitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */; };
+		348EBFEF2E07670300BFEBE0 /* libsqlite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 348EBFEC2E0766E400BFEBE0 /* libsqlite.a */; };
 		34918095222F1C6F00944FC4 /* OAuth2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34918094222F1C6F00944FC4 /* OAuth2.cpp */; };
 		3497D54F2399D288009FCC14 /* Add Senders To Contacts.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5482399D260009FCC14 /* Add Senders To Contacts.script */; };
 		3497D5502399D288009FCC14 /* Delete Attachments.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5472399D260009FCC14 /* Delete Attachments.script */; };
@@ -195,7 +196,6 @@
 		34DD329923153AF000FA2B35 /* About.html in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329523153AF000FA2B35 /* About.html */; };
 		34DD329A23153AF000FA2B35 /* Title.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329623153AF000FA2B35 /* Title.png */; };
 		34DD329C23153B2300FA2B35 /* About64px.png in Resources */ = {isa = PBXBuildFile; fileRef = 34DD329B23153B2300FA2B35 /* About64px.png */; };
-		34E7C48029DE2D6C00C4DEB1 /* libsqlite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D0512629DE2AC100BF0C5A /* libsqlite.a */; };
 		34EE8BB52748A6EC00F12915 /* HomoglyphsTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */; };
 		34EE8BB62748A6EC00F12915 /* Homoglyphs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */; };
 		34FB966F237D07740039423C /* WebdavStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB9661237D07740039423C /* WebdavStore.cpp */; };
@@ -203,13 +203,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3407A3822D2F1E9100A4729A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 3477C4FB1CC3021B0028B84B;
-			remoteInfo = sqlite;
-		};
 		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
@@ -238,11 +231,18 @@
 			remoteGlobalIDString = 3477C4A71CC2792F0028B84B;
 			remoteInfo = Btree;
 		};
-		34D0512529DE2AC100BF0C5A /* PBXContainerItemProxy */ = {
+		348EBFEB2E0766E400BFEBE0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
+			containerPortal = 348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 3477C4FC1CC3021B0028B84B;
+			remoteInfo = sqlite;
+		};
+		348EBFED2E0766F600BFEBE0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3477C4FB1CC3021B0028B84B;
 			remoteInfo = sqlite;
 		};
 /* End PBXContainerItemProxy section */
@@ -496,12 +496,12 @@
 		3477C4E81CC27D870028B84B /* Browser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Browser.cpp; path = ../../../../Lgi/trunk/src/common/Lgi/Browser.cpp; sourceTree = "<group>"; };
 		3477C4EA1CC27DC90028B84B /* Password.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Password.cpp; path = ../../../../Lgi/trunk/src/common/General/Password.cpp; sourceTree = "<group>"; };
 		3477C4EE1CC27F500028B84B /* ZoomView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ZoomView.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/ZoomView.cpp; sourceTree = "<group>"; };
-		3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = sqlite.xcodeproj; path = ../src/Sqlite/v3.41.2/sqlite.xcodeproj; sourceTree = SOURCE_ROOT; };
 		3477C51F1CC311A00028B84B /* Scribe.lr8 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = Scribe.lr8; path = ../../Resources/Scribe.lr8; sourceTree = "<group>"; };
 		3477C5221CC315FC0028B84B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /Users/matthew/Code/Lgi/trunk/src/mac/cocoa/../../../../../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		347CF82623F64FD00028F610 /* flags.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = flags.png; path = ../../Resources/flags.png; sourceTree = "<group>"; };
 		3481AAAA25DC8C820032ACB7 /* FileTransferProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileTransferProgress.h; path = ../../../../Lgi/trunk/include/lgi/common/FileTransferProgress.h; sourceTree = "<group>"; };
 		3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UnitTests.cpp; path = ../../src/Test/UnitTests.cpp; sourceTree = "<group>"; };
+		348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = sqlite.xcodeproj; path = ../src/Sqlite/v3.50.1/sqlite.xcodeproj; sourceTree = "<group>"; };
 		34918093222F1C5F00944FC4 /* OAuth2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OAuth2.h; path = ../../../../Lgi/trunk/include/lgi/common/OAuth2.h; sourceTree = "<group>"; };
 		34918094222F1C6F00944FC4 /* OAuth2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OAuth2.cpp; path = ../../../../Lgi/trunk/src/common/Net/OAuth2.cpp; sourceTree = "<group>"; };
 		3497D5462399D260009FCC14 /* Mail Filters Menu.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Mail Filters Menu.script"; path = "../../Scripts/Mail Filters Menu.script"; sourceTree = "<group>"; };
@@ -553,8 +553,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				348EBFEF2E07670300BFEBE0 /* libsqlite.a in Frameworks */,
 				34A891E12B0C178000D2930B /* libssl.3.dylib in Frameworks */,
-				34E7C48029DE2D6C00C4DEB1 /* libsqlite.a in Frameworks */,
 				3477C5231CC315FC0028B84B /* Cocoa.framework in Frameworks */,
 				34749B5F278B08B200C8197E /* LgiCocoa.framework in Frameworks */,
 				3474FC5F226DE0960064E0AD /* libBtree.a in Frameworks */,
@@ -982,6 +982,14 @@
 			name = Tests;
 			sourceTree = "<group>";
 		};
+		348EBFE82E0766E400BFEBE0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				348EBFEC2E0766E400BFEBE0 /* libsqlite.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		3497D5382399D246009FCC14 /* Scripts */ = {
 			isa = PBXGroup;
 			children = (
@@ -1050,20 +1058,12 @@
 			name = Help;
 			sourceTree = "<group>";
 		};
-		34D0512229DE2AC100BF0C5A /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				34D0512629DE2AC100BF0C5A /* libsqlite.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		34DED72923AC319E0049E01F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */,
 				34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */,
 				3477C4DF1CC27C9F0028B84B /* Btree.xcodeproj */,
-				3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1102,7 +1102,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				3407A3832D2F1E9100A4729A /* PBXTargetDependency */,
+				348EBFEE2E0766F600BFEBE0 /* PBXTargetDependency */,
 				34749B5B278B06B900C8197E /* PBXTargetDependency */,
 				3474FC5C226DE08D0064E0AD /* PBXTargetDependency */,
 			);
@@ -1156,8 +1156,8 @@
 					ProjectRef = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
 				},
 				{
-					ProductGroup = 34D0512229DE2AC100BF0C5A /* Products */;
-					ProjectRef = 3477C50B1CC3026F0028B84B /* sqlite.xcodeproj */;
+					ProductGroup = 348EBFE82E0766E400BFEBE0 /* Products */;
+					ProjectRef = 348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -1182,11 +1182,11 @@
 			remoteRef = 3474FC4D226DCCDD0064E0AD /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34D0512629DE2AC100BF0C5A /* libsqlite.a */ = {
+		348EBFEC2E0766E400BFEBE0 /* libsqlite.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libsqlite.a;
-			remoteRef = 34D0512529DE2AC100BF0C5A /* PBXContainerItemProxy */;
+			remoteRef = 348EBFEB2E0766E400BFEBE0 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1384,11 +1384,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3407A3832D2F1E9100A4729A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = sqlite;
-			targetProxy = 3407A3822D2F1E9100A4729A /* PBXContainerItemProxy */;
-		};
 		34749B5B278B06B900C8197E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = LgiCocoa;
@@ -1398,6 +1393,11 @@
 			isa = PBXTargetDependency;
 			name = Btree;
 			targetProxy = 3474FC5B226DE08D0064E0AD /* PBXContainerItemProxy */;
+		};
+		348EBFEE2E0766F600BFEBE0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = sqlite;
+			targetProxy = 348EBFED2E0766F600BFEBE0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
