@@ -322,9 +322,9 @@
 			</Node>
 			<Node Name="Mail3" Type="1" Platforms="7" Open="0" Id="41">
 				<Node Name="Sqlite" Type="1" Platforms="7" Open="1" Id="42">
-					<Node File="./src/Sqlite/v3.6.14/sqlite3.c" Type="2" Platforms="15" />
-					<Node File="./src/Sqlite/v3.6.14/sqlite3.h" Type="3" Platforms="15" />
-					<Node File="./src/Sqlite/v3.6.14/sqlite3ext.h" Type="3" Platforms="15" />
+					<Node File="./src/Sqlite/v3.50.1/sqlite3ext.h" Type="3" Platforms="15" />
+					<Node File="./src/Sqlite/v3.50.1/sqlite3.c" Type="2" Platforms="15" />
+					<Node File="./src/Sqlite/v3.50.1/sqlite3.h" Type="3" Platforms="15" />
 				</Node>
 				<Node File="./src/Store3Mail3/Mail3.h" Type="3" Platforms="15" />
 				<Node File="./src/Store3Mail3/Mail3Attachment.cpp" Type="2" Platforms="15" />

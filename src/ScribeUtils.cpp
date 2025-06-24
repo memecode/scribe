@@ -570,6 +570,7 @@ char *ScribeTempPath()
 		#if LINUX
 		if (LGetSystemPath(LSP_APP_ROOT, Tmp, sizeof(Tmp)))
 		{
+			// Make a temp folder under the user's home
 			LMakePath(Tmp, sizeof(Tmp), Tmp, "tmp");
 		}
 		#else
@@ -594,8 +595,6 @@ char *ScribeTempPath()
 			return NULL;
 		}
 	}
-
-	printf("Scribe tmp '%s'\n", Tmp);
 
 	return Tmp;
 }
