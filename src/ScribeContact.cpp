@@ -317,7 +317,7 @@ class LContactImage :
 		
 		int Main()
 		{
-			Status = LgiGetUri(this, &Data, &Error, Uri, NULL, NULL);
+			Status = LGetUri(this, &Data, &Error, Uri, NULL, NULL);
 			Ci->PostEvent(M_IMAGE_LOADED);
 			return 0;
 		}

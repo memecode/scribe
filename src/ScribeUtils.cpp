@@ -493,7 +493,7 @@ void HttpImageThread::DoJob(LThreadJob *j)
 		if (f.Open(CachedFile, O_READWRITE))
 		{
 			LUri Prox(Proxy);			
-			bool r = LgiGetUri(this, &f, &Job->Error, Job->Uri, InHeaders, Proxy ? &Prox : NULL);
+			bool r = LGetUri(this, &f, &Job->Error, Job->Uri, InHeaders, Proxy ? &Prox : NULL);
 			f.Close();
 			if (!r)
 			{
@@ -2044,7 +2044,7 @@ ScriptDownloadContentThread::ScriptDownloadContentThread(ScribeWnd *app, LString
 
 int ScriptDownloadContentThread::Main()
 {
-	Result = LgiGetUri(this, &Out, &Err, Uri);
+	Result = LGetUri(this, &Out, &Err, Uri);
 	return false;
 }
 

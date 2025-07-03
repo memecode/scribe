@@ -366,7 +366,7 @@ private:
 				if (r)
 				{
 					Busy = true;
-					r->Status = LgiGetUri(this, &r->Data, &r->Error, r->Src, NULL, &Proxy);
+					r->Status = LGetUri(this, &r->Data, &r->Error, r->Src, NULL, &Proxy);
 					Events->OnRequestFinished(r);
 					Busy = false;
 				}
