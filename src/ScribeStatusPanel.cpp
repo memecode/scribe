@@ -854,11 +854,6 @@ void AccountStatusPanel::Empty()
 	}
 }
 
-int AccountItemCmp(LListItem *a, LListItem *b, NativeInt Data)
-{
-	return a->Compare(b);
-}
-
 void AccountStatusPanel::OnAccountListChange()
 {
 	if (Lst)
@@ -873,7 +868,10 @@ void AccountStatusPanel::OnAccountListChange()
 			for (auto a: *Accounts)
 				Lst->Insert(new AccountStatusItem(this, a, ImgLst));
 			
-			Lst->Sort(AccountItemCmp);
+			Lst->Sort([](auto *a, auto *b)
+				{
+					return a->Compare(b);
+				});
 
 			auto All = Lst->begin();
 			if (*All && !Lst->GetSelected())

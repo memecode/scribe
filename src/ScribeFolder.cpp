@@ -2636,7 +2636,6 @@ Prof.Add(SortMsg);
 		else
 		{
 			// Sort..
-			// if (!SortItems())
 			Items.Sort(ThingCompare, (NativeInt)this);
 		}
 	}

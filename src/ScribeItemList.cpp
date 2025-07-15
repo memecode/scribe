@@ -21,10 +21,6 @@
 int _Dir = 0;
 int _Field = 0;
 
-int ListCompare(LListItem *a, LListItem *b, NativeInt Data)
-{
-	return _Dir * a->Compare(b, _Field);
-}
 int ArrCompare(Thing **a, Thing **b)
 {
 	return _Dir * (*a)->Compare(*b, _Field);
@@ -274,20 +270,6 @@ void ThingList::OnColumnClick(int Col, LMouse &m)
 	}
 }
 
-int ItemIndexer(LListItem *a, LListItem *b, NativeInt Data)
-{
-	Thing *ta = (Thing*)a->_UserPtr;
-	Thing *tb = (Thing*)b->_UserPtr;
-
-	Mail *A = ta->IsMail();
-	Mail *B = tb->IsMail();
-	if (A && B && A->Container && B->Container)
-	{
-		return A->Container->Index - B->Container->Index;
-	}
-	return 0;
-}
-
 template <class T> extern
 int TrashCompare(T *a, T *b, NativeInt Data);
 
@@ -328,16 +310,49 @@ void ThingList::ReSort()
 				Root[i]->Pour(i, 0, 0, i<(int)Root.Length()-1, &Params);
 			}
 
-			Sort(ItemIndexer);
+			Sort([this](auto *a, auto *b)
+				{
+					auto ta = (Thing*)a->_UserPtr;
+					auto tb = (Thing*)b->_UserPtr;
+
+					auto A = ta->IsMail();
+					auto B = tb->IsMail();
+					if (A && B && A->Container && B->Container)
+					{
+						return A->Container->Index - B->Container->Index;
+					}
+					return 0;
+				});
 		}
 	}
 	else if (Container->GetItemType() == MAGIC_ANY)
 	{
-		Sort(TrashCompare<LListItem>, (NativeInt) Container);
+		Sort([this, f=Container](auto *pa, auto *pb)
+			{
+				auto a = dynamic_cast<Thing*>(pa);
+				auto b = dynamic_cast<Thing*>(pb);
+				if (!a || !b)
+					return 0;
+
+				auto type = a->Type() - b->Type();
+				if (type)
+					return type;
+
+				auto col = f->GetSortCol();
+				auto defs = a->GetDefaultFields();
+				if (!defs || !defs[col])
+					return 0;
+
+				return (f->GetSortAscend() ? 1 : -1) * a->Compare(b, defs[col]);
+
+			});
 	}
 	else
 	{
-		Sort(ListCompare, (NativeInt) this);
+		Sort([this](auto *a, auto *b)
+			{
+				return _Dir * a->Compare(b, _Field);
+			});
 	}
 
 	#if 0

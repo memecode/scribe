@@ -54,11 +54,6 @@ public:
 	}
 };
 
-int StringItemSort(LListItem *a, LListItem *b, NativeInt d)
-{
-	return Stricmp(a->GetText((int)d), b->GetText((int)d));
-}
-
 LXmlTag *FindLangTag(LXmlTag *t)
 {
 	if (t->IsTag("string"))
@@ -190,7 +185,10 @@ LanguageDlg::LanguageDlg(ScribeWnd *app)
 				}
 			}
 			
-			d->Lst->Sort<NativeInt>(StringItemSort, 1);
+			d->Lst->Sort([this](auto *a, auto *b)
+				{
+					return Stricmp(a->GetText(1), b->GetText(1));
+				});
 			d->Lst->ResizeColumnsToContent();
 		}
 		else printf("%s:%i - error\n", _FL);
