@@ -939,7 +939,6 @@ public:
 	static void Thread(List<Mail> &In, LArray<MContainer*> &Out);
 };
 
-extern int ListItemCompare(LListItem *a, LListItem *b, NativeInt Data);
 extern int ContainerIndexer(Thing *a, Thing *b, NativeInt Data);
 extern int GetFolderVersion(const char *Path);
 extern bool CreateMailHeaders(ScribeWnd *App, LStream &Out, LDataI *Mail, MailProtocol *Protocol);

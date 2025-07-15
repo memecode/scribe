@@ -2201,12 +2201,6 @@ int TrashCompare(T *pa, T *pb, NativeInt Data)
 
 template int TrashCompare<LListItem>(LListItem *pa, LListItem *pb, NativeInt Data);
 
-int ListItemCompare(LListItem *a, LListItem *b, NativeInt Data)
-{
-	ScribeFolder *f = (ScribeFolder*)Data;
-	return (f->GetSortAscend() ? 1 : -1) * a->Compare(b, f->GetSortField());
-}
-
 int ThingCompare(Thing *a, Thing *b, NativeInt Data)
 {
 	ScribeFolder *f = (ScribeFolder*)Data;

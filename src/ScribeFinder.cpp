@@ -29,9 +29,6 @@ enum FindMsgs {
 	M_END_SEARCH = M_USER + 0x400
 };
 
-//////////////////////////////////////////////////////////////////////////////
-int FindCompare(LListItem *a, LListItem *b, NativeInt Data);
-
 //////////////////////////////////////////////////////////////////////////////////
 #include "LMarkColourSelect.h"
 
@@ -384,7 +381,51 @@ public:
 	{
 		Col = col;
 		Ascend = ascend != 0;
-		Sort(FindCompare, (NativeInt) this);
+		Sort([this](auto *a, auto *b)
+			{
+				auto t1 = dynamic_cast<ResultItem*>(a);
+				auto t2 = dynamic_cast<ResultItem*>(b);
+				if (t1 && t2)
+				{
+					// do specific compare on mail items..
+					auto m1 = t1->T->IsMail();
+					auto m2 = t2->T->IsMail();
+					int Mul = Ascend ? 1 : -1;
+					if (m1 && m2)
+					{
+						switch (Col)
+						{
+							case 2:
+							{
+								// size
+								return Mul * (int)(m1->TotalSizeof() - m2->TotalSizeof());
+								break;
+							}
+							case 3:
+							{
+								// date
+								int Sort = 0;
+								auto d1 = m1->GetDateSent();
+								auto d2 = m2->GetDateSent();
+								if (d1 && d2)
+								{
+									if (*d1 < *d2)
+										Sort = -1;
+									if (*d1 > *d2)
+										Sort = 1;
+									return Mul * Sort;
+								}
+								break;
+							}
+						}
+					}
+
+					// default back to a string compare
+					return Mul * Stricmp(a->GetText(Col), b->GetText(Col));
+				}
+
+				return 0;
+			});
 		SetSortingMark(Col, !Ascend);
 	}
 
@@ -400,60 +441,6 @@ public:
 		}
 	}
 };
-
-int FindCompare(LListItem *a, LListItem *b, NativeInt Data)
-{
-	ResultList *List = (ResultList*) Data;
-	ResultItem *t1 = dynamic_cast<ResultItem*>(a);
-	ResultItem *t2 = dynamic_cast<ResultItem*>(b);
-
-	if (List && t1 && t2)
-	{
-		// do specific compare on mail items..
-		Mail *m1 = t1->T->IsMail();
-		Mail *m2 = t2->T->IsMail();
-		int Mul = (List->Ascend) ? 1 : -1;
-		if (m1 && m2)
-		{
-			switch (List->Col)
-			{
-				case 2:
-				{
-					// size
-					return Mul * (int)(m1->TotalSizeof() - m2->TotalSizeof());
-					break;
-				}
-				case 3:
-				{
-					// date
-					int Sort = 0;
-					auto d1 = m1->GetDateSent();
-					auto d2 = m2->GetDateSent();
-					if (d1 && d2)
-					{
-						if (*d1 < *d2)
-							Sort = -1;
-						if (*d1 > *d2)
-							Sort = 1;
-						return Mul * Sort;
-					}
-					break;
-				}
-			}
-		}
-
-		// default back to a string compare
-		const char *A = a->GetText(List->Col);
-		const char *B = b->GetText(List->Col);
-
-		if (A && B)
-		{
-			return Mul * _stricmp(A, B);
-		}
-	}
-
-	return 0;
-}
 
 ///////////////////////////////////////////////////////////////////////
 class FindTask

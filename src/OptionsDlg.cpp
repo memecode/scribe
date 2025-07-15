@@ -54,11 +54,6 @@ static char AutoInBrackets[] = "(auto)";
 
 #endif
 
-static int AccountCmp(LListItem *a, LListItem *b, NativeInt Data)
-{
-	return a->Compare(b);
-}
-
 class UtfEditor : public LDialog
 {
 	ScribeWnd *App = nullptr;
@@ -264,7 +259,10 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 
 		LNotification note(LNotifyItemInsert);
 		OnNotify(AccountLst, note);
-		AccountLst->Sort(AccountCmp);
+		AccountLst->Sort([](auto *a, auto *b)
+			{
+				return a->Compare(b);
+			});
 
 		LArray<AccountItem*> all;
 		AccountLst->GetAll(all);
