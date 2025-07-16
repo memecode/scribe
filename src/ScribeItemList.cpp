@@ -334,7 +334,7 @@ void ThingList::ReSort()
 				if (!a || !b)
 					return 0;
 
-				auto type = a->Type() - b->Type();
+				int type = (int) (a->Type() - b->Type());
 				if (type)
 					return type;
 
