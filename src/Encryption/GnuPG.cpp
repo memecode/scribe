@@ -102,9 +102,18 @@ static LColour cTxt						(L_TEXT);
 static const char *GpgInstall =			"https://www.gnupg.org/download/index.en.html";
 static const char *GpgBin =				"gpg" LGI_EXECUTABLE_EXT;
 static LString GpgBinPath;
-#define SECONDS							* 1000
-#define MINUTES							* 60
-#define GPG_KEY_STALE_TIMEOUT			(10 MINUTES)
+
+// These are all in milliseconds
+#define SECONDS(s)						((s) * 1000)
+#define MINUTES(m)						((m) * SECONDS(60))
+#define GPG_KEY_STALE_TIMEOUT			MINUTES(10)
+
+// This turns on Scribe asking the user for the password and 
+// attempting to send it to the gpg process via stdin. Support
+// for this seems to have been removed, so this switches that
+// off. Gpg seems to ask the user for the password externally
+// now.
+#define PASS_PASSWORD_ARG				0
 
 #define DecryptStatus(val) \
 	{ \
@@ -164,7 +173,7 @@ class GpgConnectorPriv : public LEventTargetThread
 {
 private:
 	KeyArr Keys;
-	uint64 KeysTs = 0;
+	uint64_t KeysTs = 0;
 
 public:	
 	GpgConnectorPriv() : LEventTargetThread("GpgConnectorPriv")
@@ -197,53 +206,78 @@ private:
 	void ParseKeys(KeyArr &k, LString &str)
 	{
 		bool GotDash = false;
-		LString::Array a = str.Split(EOL_SEQUENCE);
-		LString KeyId;
-		for (unsigned i=0; i<a.Length(); i++)
+		auto lines = str.Split(EOL_SEQUENCE);
+		LString KeyId, Type;
+		for (unsigned i=0; i<lines.Length(); i++)
 		{
-			LString &Ln = a[i];
-			if (GotDash)
-			{
-				LString::Array b = Ln.SplitDelimit(" \t/");
-				if (b.Length() > 0)
-				{
-					if (b[0].Equals("sec") ||
-						b[0].Equals("pub"))
-					{
-						if (b.Length() == 4)
-							KeyId = b[2];
-					}
-					else if (b[0].Equals("uid"))
-					{
-						LString Nm = Ln(21, -1).Strip();
-						LAutoString Name, Addr;
-						DecodeAddrName(Nm, Name, Addr, NULL);
-						if (ValidStr(Name) && ValidStr(Addr))
-						{
-							GpgConnector::KeyInfo &Cur = k.New();
-							Cur.KeyId = KeyId;
-							Cur.Name = Name;
-							Cur.Email = Addr;
-						}
-						else LgiTrace("%s:%i - Error parsing '%s'\n", _FL, Nm.Get());
-					}
-				}
-			}
-			else if (stristr(Ln, "--------"))
+			auto &ln = lines[i];
+			auto *next = i < lines.Length() - 1 ? &lines[i+1] : nullptr;
+
+			if (ln.Find("-----") >= 0)
 			{
 				GotDash = true;
+			}
+			else if (GotDash)
+			{
+				auto parts = ln.SplitDelimit(" \t/");
+				if (parts.Length() > 0)
+				{
+					if (parts[0].Equals("sec") ||
+						parts[0].Equals("pub"))
+					{
+						Type = parts[1];
+						if (parts.Length() == 4)
+							KeyId = parts[2];
+						else if (next && (*next)(0) == ' ')
+							KeyId = next->Strip();							
+					}
+					else if (parts[0].Equals("uid"))
+					{
+						LArray<char*> vars;
+						for (auto &p: parts)
+						{
+							if (p(0) == '[')
+								vars.Add(p);
+						}
+
+						LString s;
+						if (vars.Length())
+						{
+							auto last = vars.Last();
+							auto pos = ln.Find(last);
+							LAssert(pos > 0);
+							s = ln(pos + Strlen(last), -1).Strip();
+						}
+						else
+						{
+							s = ln(4, -1).Strip();
+						}
+
+						LAutoString Name, Addr;
+						DecodeAddrName(s, Name, Addr, NULL);
+						if (ValidStr(Name) && ValidStr(Addr))
+						{
+							GpgConnector::KeyInfo &info = k.New();
+							info.keyId = KeyId;
+							info.name = Name;
+							info.email = Addr;
+							info.type = Type;
+						}
+						else LgiTrace("%s:%i - Error parsing '%s'\n", _FL, s.Get());
+					}
+				}
 			}
 		}
 	}
 
 	bool GetKeys()
 	{
-		uint64 Now = LCurrentTime();
+		auto Now = LCurrentTime();
 		if (Now - KeysTs > GPG_KEY_STALE_TIMEOUT)
 		{
-			KeysTs = Now;		
+			KeysTs = Now;
 
-			LString s = RunGpg("-k");
+			auto s = RunGpg("-k");
 			if (s)
 				ParseKeys(Keys, s);
 			
@@ -256,17 +290,17 @@ private:
 				LHashTbl<ConstStrKey<char>, GpgConnector::KeyInfo*> Hash;
 				for (auto &k: Keys)
 				{					
-					if (k.Email)
-						Hash.Add(k.Email, &k);
+					if (k.email)
+						Hash.Add(k.email, &k);
 					else
 						LgiTrace("%s:%i - No email for key?\n", _FL);
 				}
 
 				for (unsigned i=0; i<Priv.Length(); i++)
 				{
-					GpgConnector::KeyInfo *k = Hash.Find(Priv[i].Email);
+					GpgConnector::KeyInfo *k = Hash.Find(Priv[i].email);
 					if (k)
-						k->Flags |= GPG_HAS_PRIV_KEY;
+						k->flags |= GPG_HAS_PRIV_KEY;
 				}
 			}
 		}
@@ -597,27 +631,22 @@ private:
 
 				if (Keys.Length() == 0)
 					GetKeys();
-						
+				
 				LHashTbl<ConstStrKey<char,false>,bool> Map;
 				for (unsigned i=0; i<j->Emails->Length(); i++)
 				{
 					Map.Add((*j->Emails)[i], true);
 				}
-						
+				
 				KeyArrAuto Inf(new KeyArr);
-				for (unsigned i=0; i<Keys.Length(); i++)
+				for (auto &k: Keys)
 				{
-					GpgConnector::KeyInfo &in = Keys[i];
-					if (!Map.Find(in.Email))
+					if (!Map.Find(k.email))
 						continue;
 
 					// Make an explicit copy here, because we are passing the data back to the
 					// calling thread, and LString's aren't thread safe.					
-					GpgConnector::KeyInfo &out = Inf->New();
-					out.Email = in.Email.Get();
-					out.Name = in.Name.Get();
-					out.KeyId = in.KeyId.Get();
-					out.Flags = in.Flags;
+					Inf->New().Copy(k);
 				}
 						
 				PostObject(j->OwnerId, M_GNUPG_KEY_INFO, Inf);
@@ -759,22 +788,25 @@ struct MailUiGpgPriv
 	};
 
 	// Objs
-	ScribeWnd *App;
-	MailUi *Ui;
+	ScribeWnd *App = nullptr;
+	MailUi *Ui = nullptr;
 	
 	// UI
-	LCheckBox *Enc;
-	LCheckBox *Sign;
-	LCheckBox *Attach;
-	LTextLabel *Msg;
+	LCheckBox *Enc = nullptr;
+	LCheckBox *Sign = nullptr;
+	LCheckBox *Attach = nullptr;
+	LTextLabel *Msg = nullptr;
 	KeyArrAuto Inf;
-	LTableLayout *Table;
-	LButton *Decrypt, *Install;
+	LTableLayout *Table = nullptr;
+	LButton *Decrypt = nullptr, *Install = nullptr;
 	
+	bool willEncrypt() { return Enc ? Enc->Value() != 0 : false; }
+	bool willSign() { return Sign ? Sign->Value() != 0 : false; }
+
 	// Options
-	bool WritingEmail;
-	bool Encrypted;
-	bool Signed;
+	bool WritingEmail = false;
+	bool Encrypted = false;
+	bool Signed = false;
 	
 	// Passwords
 	LArray<UserPassword> Psw;
@@ -783,18 +815,7 @@ struct MailUiGpgPriv
 	{
 		App = app;
 		Ui = ui;
-		
-		Enc = NULL;
-		Sign = NULL;
-		Attach = NULL;
-		Msg = NULL;
-		Table = NULL;
-		Decrypt = NULL;
-		Install = NULL;
-		
 		WritingEmail = writingEmail;
-		Encrypted = false;
-		Signed = false;
 	}
 
 	AddressList *GetAddrLst()
@@ -831,10 +852,10 @@ struct MailUiGpgPriv
 		Table->OnNotify(Msg, note);
 	}
 
-	void SetError(const char *Str) { Set(Str, cError); }
-	void SetWarning(const char *Str) { Set(Str, cWarn); }
-	void SetStatus(const char *Str) { Set(Str, cTxt); }
-	void SetSuccess(const char *Str) { Set(Str, cGood); }
+	void SetError(const char *Str)   { Set(Str, cError); }
+	void SetWarning(const char *Str) { Set(Str, cWarn);  }
+	void SetStatus(const char *Str)  { Set(Str, cTxt);   }
+	void SetSuccess(const char *Str) { Set(Str, cGood);  }
 	
 	void GetPassword(LViewI *Parent, LString Addr, std::function<void(LString)> Callback)
 	{
@@ -868,9 +889,23 @@ struct MailUiGpgPriv
 			}
 		});
 	}
+
+	Store3Addr GetFrom()
+	{
+		auto m = Ui->GetItem();
+		auto obj = m ? m->GetObject() : nullptr;
+		auto store = obj ? obj->GetStore() : nullptr;
+		Store3Addr addr(store);
+
+		LCombo *cbo;
+		if (Ui && Ui->GetViewById(IDC_FROM, cbo))
+			DecodeAddrName(cbo->Name(), addr.Name, addr.Addr, nullptr);
+
+		return addr;
+	}
 };
 	
-LCss::Len Px(int px)
+static LCss::Len Px(int px)
 {
 	return LCss::Len(LCss::LenPx, (float)px);
 }
@@ -968,50 +1003,48 @@ void MailUiGpg::OnRecipientChange()
 	if (!d->WritingEmail || !d->Enc || !d->Sign)
 		return; // Don't care...
 	
-	AddressList *AddrLst = d->GetAddrLst();
+	auto AddrLst = d->GetAddrLst();
 	if (!AddrLst)
 	{
 		d->SetError("No AddressList.");
 		return;
 	}
 
-	GpgConnector *Gpg = d->App->GetGpgConnector();
+	auto Gpg = d->App->GetGpgConnector();
 	if (!Gpg)
 	{
 		d->NotInstalled();
 		return;
 	}
 
-	List<ListAddr> a;
-	if (!AddrLst->GetAll(a))
+	List<ListAddr> recipients;
+	if (!AddrLst->GetAll(recipients))
 	{
 		d->SetStatus(LLoadString(IDS_GNUPG_ERR_NO_RECIP));
 		return;
 	}
 
-	if (d->Enc->Value() ||
-		d->Sign->Value())
+	if (d->willEncrypt() || d->willSign())
 	{
-		// Do we have public keys for each of the recipients?
 		d->SetWarning(LLoadString(IDS_GNUPG_CHECKING));
 		
 		LString::Array Emails;
-		for (auto i: a)
+		if (!d->Sign->Value())
 		{
-			if (i->sAddr)
-				Emails.New() = i->sAddr;
+			// Encrypting: Do we have public keys for each of the recipients?
+			for (auto i: recipients)
+			{
+				if (i->sAddr)
+					Emails.New() = i->sAddr;
+			}
 		}
 		
-		LCombo *cbo;
-		if (d->Ui->GetViewById(IDC_FROM, cbo))
-		{
-			const char *Frm = cbo->Name();
-			LAutoString Name, Email;
-			DecodeAddrName(Frm, Name, Email, NULL);
-			if (Email)
-				Emails.New() = Email;
-		}
+		// Encrypting+signing: Do we have a private key for the sender?
+		auto from = d->GetFrom();
+		if (from.Addr)
+			Emails.New() = from.Addr;
 		
+		// Get the GpgConnector to do the work:
 		Gpg->GetKeyInfo(this, Emails);
 	}
 	else
@@ -1019,7 +1052,7 @@ void MailUiGpg::OnRecipientChange()
 		d->SetStatus(LLoadString(IDS_GNUPG_ERR_NO_SIGN_ENC));
 
 		// Revert list items to no colour...
-		for (auto i: a)
+		for (auto i: recipients)
 		{
 			i->SetInt(FIELD_COLOUR, cDefaultListItemColour);
 			i->Update();
@@ -1292,7 +1325,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	d->Ui->OnDataEntered();
 	d->Ui->OnSave();
 	
-	LDataI *Root = dynamic_cast<LDataI*>(m->GetObject()->GetObj(FIELD_MIME_SEG));
+	auto Root = dynamic_cast<LDataI*>(m->GetObject()->GetObj(FIELD_MIME_SEG));
 	if (!Root)
 	{
 		d->SetError(LLoadString(IDS_GNUPG_ERR_NO_ROOT));
@@ -1313,9 +1346,9 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 		for (unsigned i=0; i<d->Inf->Length(); i++)
 		{
 			GpgConnector::KeyInfo &ki = (*d->Inf)[i];
-			if (!_stricmp(ki.Email, FromEmail))
+			if (!_stricmp(ki.email, FromEmail))
 			{
-				PrivKeyId = ki.KeyId;
+				PrivKeyId = ki.keyId;
 				break;
 			}
 		}
@@ -1339,8 +1372,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 			DecryptStatus(1);
 		}
 
-		Attachment *a = new Attachment(m->App);
-		if (a)
+		if (auto a = new Attachment(m->App))
 		{
 			LAutoStreamI Data(new LMemStream(PubKey, PubKey.Length()));
 			if (Data)
@@ -1365,7 +1397,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 
 
 	// Re-write the MIME hierarchy to have the message and attachments encrypted
-	
+#if PASS_PASSWORD_ARG
 	// 1) Get the password
 	d->GetPassword(d->Ui, FromEmail.Get(),
 		[this, callback, InputRoot=Root, uSign, uEncrypt, m, PrivKeyId](auto Psw)
@@ -1377,6 +1409,10 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 				d->SetStatus(LLoadString(IDS_GNUPG_ERR_SIGN_ENC_CANCEL));
 				DecryptStatus(1);
 			}
+#else
+			auto InputRoot = Root;
+			auto LocalRoot = Root;
+#endif
 	
 			// 1) Export the message to a file:
 			const char *BaseName = "encrypted.asc";
@@ -1475,8 +1511,12 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 				FileDev->Delete(OutFile, NULL, false);
 			}
 	
-			LString Args, s;
-			Args.Printf("--batch --passphrase-fd 0 -u 0x%s",
+			LString Args, s, passFd = "";
+#if PASS_PASSWORD_ARG
+			passFd = " --passphrase-fd 0";
+#endif
+			Args.Printf("--batch%s -u 0x%s",
+				passFd.Get(),
 				PrivKeyId.Get());
 	
 			if (uEncrypt)
@@ -1513,6 +1553,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 				DecryptStatus(1);
 			}
 	
+#if PASS_PASSWORD_ARG
 			LString PswStr;
 			PswStr.Printf("%s\n", Psw.Get());
 			ssize_t w = Proc.Write(PswStr.Get(), PswStr.Length());
@@ -1521,7 +1562,8 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 				d->SetError(LLoadString(IDS_GNUPG_ERR_WRITE));
 				DecryptStatus(1);
 			}
-	
+#endif	
+
 			ssize_t r = Proc.Read(Buf, sizeof(Buf)-1);
 			Buf[MAX(r, 0)] = 0;
 			int Result = Proc.Wait();
@@ -1632,7 +1674,9 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 			d->App->OnChange(ChangeArr, 0);
 	
 			DecryptStatus(0);
+#if PASS_PASSWORD_ARG
 		});
+#endif
 }
 
 void MailUiGpg::DoCommand(
@@ -1658,7 +1702,7 @@ void MailUiGpg::DoCommand(
 				DecryptStatus(0);
 			}
 			
-			if (!d->Enc->Value() && !d->Sign->Value())
+			if (!d->willEncrypt() && !d->willSign())
 			{
 				DecryptStatus(0); // No need to sign &| encrypt, but do the normal processing
 			}
@@ -1670,8 +1714,8 @@ void MailUiGpg::DoCommand(
 				DecryptStatus(1); // Don't do normal processing of the cmd
 			}
 
-			SignEncrypt(d->Sign->Value() != 0,
-						d->Enc->Value() != 0,
+			SignEncrypt(d->willSign(),
+						d->willEncrypt(),
 						d->Attach->Value() != 0,
 						[this, m](auto status)
 						{
@@ -1700,49 +1744,72 @@ LMessage::Result MailUiGpg::OnEvent(LMessage *Msg)
 		case M_GNUPG_KEY_INFO:
 		{
 			d->Inf = Msg->AutoA<KeyArr>();
+			if (!d->Inf)
+			{
+				d->SetError("Missing param.");
+				break;
+			}
 
 			auto AddrLst = d->GetAddrLst();
-			if (d->Inf && AddrLst)
+			if (!AddrLst)
 			{
-				int NoKey = 0;
-				
-				List<ListAddr> a;
-				if (AddrLst->GetAll(a))
-				{
-					LHashTbl<ConstStrKey<char,false>, GpgConnector::KeyInfo*> Map;
-					for (unsigned i=0; i<d->Inf->Length(); i++)
-					{
-						GpgConnector::KeyInfo *ki = &(*d->Inf)[i];
-						Map.Add(ki->Email, ki);
-					}
-					
-					for (auto i: a)
-					{
-						// Check if this recipient has a key...
-						GpgConnector::KeyInfo *ki = (i->sAddr) ? Map.Find(i->sAddr) : NULL;
-						i->SetInt(FIELD_COLOUR, ki ? cDefaultListItemColour : cError.c32());
-						i->Update();
-						if (!ki)
-							NoKey++;
-					}
-				}
-				
-				if (NoKey > 0)
-					d->SetError(LLoadString(IDS_GNUPG_ERR_ONE_OR_MORE));
-				else if (d->Enc && d->Sign)
-				{
-					if (d->Enc->Value() && d->Sign->Value())
-						d->SetSuccess(LLoadString(IDS_GNUPG_ENCRYPTED_AND_SIGNED));
-					else if (d->Enc->Value())
-						d->SetSuccess(LLoadString(IDS_GNUPG_ENCRYPTED));
-					else if (d->Sign->Value())
-						d->SetSuccess(LLoadString(IDS_GNUPG_SIGNED));
-					else
-						LAssert(0);						
-				}
-				else LAssert(0);
+				d->SetError("No address list.");
+				break;
 			}
-			else d->SetError("Parameter error.");
+
+			auto from = d->GetFrom();
+			int recipientsWithoutKey = 0;
+			
+			List<ListAddr> recipients;
+			if (d->willEncrypt() && AddrLst->GetAll(recipients))
+			{
+				LHashTbl<ConstStrKey<char,false>, GpgConnector::KeyInfo*> Map;
+				for (unsigned i=0; i<d->Inf->Length(); i++)
+				{
+					auto *ki = &(*d->Inf)[i];
+					Map.Add(ki->email, ki);
+				}
+				
+				for (auto r: recipients)
+				{
+					// Check if this recipient has a key...
+					auto *ki = (r->sAddr) ? Map.Find(r->sAddr) : NULL;
+					r->SetInt(FIELD_COLOUR, ki ? cDefaultListItemColour : cError.c32());
+					r->Update();
+					if (!ki)
+						recipientsWithoutKey++;
+				}
+			}
+
+			// Check for a private key for the sender...
+			bool hasPrivate = false;
+			if (from.Addr)
+			{
+				for (auto &i: *d->Inf)
+				{
+					if (from.Addr.Equals(i.email))
+					{
+						if (i.flags & GPG_HAS_PRIV_KEY)
+							hasPrivate = true;
+					}
+				}
+			}
+			
+			if (!hasPrivate)
+				d->SetError(LString::Fmt("No private key for '%s'", from.Addr.Get()));
+			else if (recipientsWithoutKey > 0)
+				d->SetError(LLoadString(IDS_GNUPG_ERR_ONE_OR_MORE));
+			else
+			{
+				if (d->willEncrypt() && d->willSign())
+					d->SetSuccess(LLoadString(IDS_GNUPG_ENCRYPTED_AND_SIGNED));
+				else if (d->willEncrypt())
+					d->SetSuccess(LLoadString(IDS_GNUPG_ENCRYPTED));
+				else if (d->willSign())
+					d->SetSuccess(LLoadString(IDS_GNUPG_SIGNED));
+				else
+					LAssert(0);
+			}
 			break;
 		}
 		case M_GNUPG_SIG_CHECK:

@@ -1778,13 +1778,11 @@ MailUi::~MailUi()
 	DeleteObj(TextView);
 
 	if (Attachments)
-	{
 		Attachments->RemoveAll();
-	}
-	LOptionsFile *Options = (GetItem() && App) ? App->GetOptions() : 0;
-	if (Options)
+	
+	if (auto Options = GetItem() && App ? App->GetOptions() : nullptr)
 	{
-		LRect p = GetPos();
+		auto p = GetPos();
 		if (p.x1 >= 0 &&
 			p.y1 >= 0)
 		{
@@ -1793,12 +1791,11 @@ MailUi::~MailUi()
 		}
 	}
 
-	Tab = 0;
+	Tab = nullptr;
 	if (GetItem())
-	{
 		GetItem()->Ui = NULL;
-	}
-	else LgiTrace("%s:%i - Error: no item to clear UI ptr?\n", _FL);
+	else
+		LgiTrace("%s:%i - Error: no item to clear UI ptr?\n", _FL);
 
 	// We delete the LView here because objects
 	// need to have their virtual tables intact

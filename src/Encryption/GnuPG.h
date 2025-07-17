@@ -35,10 +35,23 @@ public:
 	struct KeyInfo
 	{
 		// One or more of GpgFlags
-		int Flags;
-		LString KeyId;
-		LString Name;
-		LString Email;
+		int flags;
+		LString keyId;
+		LString type;
+		LString name;
+		LString email;
+
+		// Makes a full copy of the object, particularly so that it can be 
+		// passed across thread boundaries.
+		KeyInfo &Copy(const KeyInfo &in)
+		{
+			email = in.email.Get();
+			name  = in.name.Get();
+			keyId = in.keyId.Get();
+			type  = in.type.Get();
+			flags = in.flags;
+			return *this;
+		}
 	};
 
 	/// This will respond by sending the target a M_GNUPG_KEY_INFO message
