@@ -10902,18 +10902,18 @@ void ScribeWnd::Send(ssize_t Which, bool Quiet)
 
 	for (i=0; i<Outboxes.Length(); i++)
 	{
-		ScribeFolder *OutBox = Outboxes[i];
+		auto OutBox = Outboxes[i];
 		for (auto t: OutBox->Items)
 		{
-			Mail *m = t->IsMail();
+			auto m = t->IsMail();
 			if (!m)
 				continue;
 
-			uint32_t Flags = m->GetFlags();
+			auto Flags = m->GetFlags();
 			if (!TestFlag(Flags, MAIL_SENT) &&
 				TestFlag(Flags, MAIL_READY_TO_SEND))
 			{
-				LDataIt To = m->GetObject()->GetList(FIELD_TO);
+				auto To = m->GetObject()->GetList(FIELD_TO);
 				if (To && To->Length())
 				{
 					LAutoPtr<ScribeEnvelope> Out(new ScribeEnvelope);
@@ -10921,7 +10921,13 @@ void ScribeWnd::Send(ssize_t Which, bool Quiet)
 					{
 						if (m->OnBeforeSend(Out))
 						{
-							SendAccountlet *Send = 0;
+							#if 0
+								LFile tmp(LFile::Path(ScribeTempPath()) / "mime.txt", O_WRITE);
+								tmp.Write(Out->Rfc822);
+								tmp.Close();
+							#endif
+
+							SendAccountlet *Send = nullptr;
 							for (auto a: Acc)
 							{
 								LVariant Ie = a->GetAccount()->Identity.Email();

@@ -897,7 +897,7 @@ bool ThingUi::OnViewKey(LView *v, LKey &k)
 	return Status;
 }
 
-bool ThingUi::SetDirty(bool d, bool ui)
+bool ThingUi::SetDirty(bool d, DirtyOptions opts)
 {
 	THREAD_UNSAFE(false);
 
@@ -917,10 +917,11 @@ bool ThingUi::SetDirty(bool d, bool ui)
 		}
 		else
 		{
-			int Result = ui ? LgiMsg(this, LLoadString(IDS_SAVE_ITEM), AppName, MB_YESNOCANCEL) : IDYES;
+			int Result = opts == WithUi ? LgiMsg(this, LLoadString(IDS_SAVE_ITEM), AppName, MB_YESNOCANCEL) : IDYES;
 			if (Result == IDYES)
 			{
-				OnSave();
+				if (opts != NoSave)
+					OnSave();
 				_Dirty = false;
 				OnDirty(_Dirty);
 			}

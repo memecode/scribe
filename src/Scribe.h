@@ -620,7 +620,12 @@ public:
 	ThingUi(Thing *item, const char *name);
 	~ThingUi();
 
-	virtual bool SetDirty(bool d, bool ui = true);
+	enum DirtyOptions {		
+		NoUi,
+		WithUi,
+		NoSave, // Don't resave and no Ui
+	};
+	virtual bool SetDirty(bool d, DirtyOptions ui = WithUi);
 	bool IsDirty() { return _Dirty; }
 	bool OnRequestClose(bool OsShuttingDown);
 	bool OnViewKey(LView *v, LKey &k);

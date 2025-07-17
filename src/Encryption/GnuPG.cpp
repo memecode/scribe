@@ -92,7 +92,7 @@ enum Ctrls
 	IDC_INSTALL
 };
 
-static LColour cGood					(0, 204, 0);
+static LColour cGood					(0, 180, 0);
 static LColour cWarn					(255, 154, 0);
 static LColour cError					(255, 0, 0);
 static LColour cTxt						(L_TEXT);
@@ -107,13 +107,6 @@ static LString GpgBinPath;
 #define SECONDS(s)						((s) * 1000)
 #define MINUTES(m)						((m) * SECONDS(60))
 #define GPG_KEY_STALE_TIMEOUT			MINUTES(10)
-
-// This turns on Scribe asking the user for the password and 
-// attempting to send it to the gpg process via stdin. Support
-// for this seems to have been removed, so this switches that
-// off. Gpg seems to ask the user for the password externally
-// now.
-#define PASS_PASSWORD_ARG				0
 
 #define DecryptStatus(val) \
 	{ \
@@ -142,9 +135,6 @@ struct GpgJob
 	// Check sig:
 	LAutoStreamI Msg;
 	LMessage::Param UserValue;
-	
-	// Decrypt
-	LString Password;
 };
 
 struct LTempFile : public LFile
@@ -565,7 +555,7 @@ private:
 		else
 		{
 			LString Args;
-			Args.Printf("--batch --passphrase-fd 0 --output \"%s\" --decrypt \"%s\"",
+			Args.Printf("--batch --output \"%s\" --decrypt \"%s\"",
 						OutPath.GetFull().Get(),
 						InPath.GetFull().Get());
 			LSubProcess Proc(GpgBinPath, Args);
@@ -584,41 +574,28 @@ private:
 					Buf[MAX(r, 0)] = 0;
 				}
 
-				LString PswStr;
-				PswStr.Printf("%s\n", j->Password.Get());
-				ssize_t w = Proc.Write(PswStr.Get(), PswStr.Length());
-				if (w < 0)
+				ssize_t r = Proc.Read(Buf, sizeof(Buf)-1);
+				Buf[MAX(r, 0)] = 0;
+				int Result = Proc.Wait();
+				LFile *f;
+				if (Result)
 				{
-					ssize_t r = Proc.Read(Buf, sizeof(Buf)-1);
-					Buf[MAX(r, 0)] = 0;
-
-					Resp->Error = Buf[0] ? Buf : "Can't write to the GnuPG sub-process.";
+					if (Buf[0])
+						Resp->Error = Buf[0];
+					else
+						Resp->Error.Printf("GnuPG encryption process failed with code: %i", Result);
+				}
+				else if
+				(
+					!Resp->Data.Reset(f = new LTempFile(OutPath)) ||
+					!f->IsOpen())
+				{
+					Resp->Data.Reset();
+					Resp->Error.Printf("Decrypt failed: Can't open '%s' for reading.", OutPath.GetFull().Get());
 				}
 				else
 				{
-					ssize_t r = Proc.Read(Buf, sizeof(Buf)-1);
-					Buf[MAX(r, 0)] = 0;
-					int Result = Proc.Wait();
-					LFile *f;
-					if (Result)
-					{
-						if (Buf[0])
-							Resp->Error = Buf[0];
-						else
-							Resp->Error.Printf("GnuPG encryption process failed with code: %i", Result);
-					}
-					else if
-					(
-						!Resp->Data.Reset(f = new LTempFile(OutPath)) ||
-						!f->IsOpen())
-					{
-						Resp->Data.Reset();
-						Resp->Error.Printf("Decrypt failed: Can't open '%s' for reading.", OutPath.GetFull().Get());
-					}
-					else
-					{
-						// Success?
-					}
+					// Success?
 				}
 			}
 		}
@@ -769,7 +746,7 @@ bool GpgConnector::CheckSignature(LViewI *Target, LAutoStreamI Rfc822Msg, LMessa
 	return d->PostObject(d->GetHandle(), GpgJob::JobCheckSig, j);
 }
 
-bool GpgConnector::Decrypt(LViewI *Target, LAutoStreamI Data, LString Password, LMessage::Param UserVal)
+bool GpgConnector::Decrypt(LViewI *Target, LAutoStreamI Data, LMessage::Param UserVal)
 {
 	if (!Target)
 	{
@@ -783,7 +760,6 @@ bool GpgConnector::Decrypt(LViewI *Target, LAutoStreamI Data, LString Password, 
 
 	j->OwnerId = Target->AddDispatch();
 	j->Msg = Data;
-	j->Password = Password;
 	j->UserValue = UserVal;
 
 	return d->PostObject(d->GetHandle(), GpgJob::JobDecrypt, j);
@@ -1132,21 +1108,42 @@ int MailUiGpg::OnNotify(LViewI *Ctrl, const LNotification &n)
 	return 0;
 }
 
-void DeleteChildSegments(LDataPropI *d)
+void InternalLogSegments(LStream &log, LDataPropI *seg, unsigned idx, int depth = 1)
 {
-	LDataIt It = d->GetList(FIELD_MIME_SEG);
+	auto indent = LString(" ") * (depth * 2);
+	auto iter = seg->GetList(FIELD_MIME_SEG);
+	auto mt = seg->GetStr(FIELD_MIME_TYPE);
+	log.Print("%s[%i]=%p mt=%s\n", indent.Get(), idx, seg, mt);
+	for (unsigned i=0; i<iter->Length(); i++)
+	{
+		auto c = (*iter)[i];
+		InternalLogSegments(log, c, i, depth + 1);
+	}
+}
+
+void LogSegments(LStream &log, const char *desc, LDataPropI *seg)
+{
+	log.Print("%s:\n", desc);
+	InternalLogSegments(log, seg, 0);
+	log.Print("\n");
+}
+
+void DeleteChildSegments(LStream &log, LDataPropI *d)
+{
+	auto It = d->GetList(FIELD_MIME_SEG);
 	for (unsigned i=0; i<It->Length(); )
 	{
-		LDataPropI *c = (*It)[i];
+		auto c = (*It)[i];
 		
-		DeleteChildSegments(c);
+		DeleteChildSegments(log, c);
 		
-		LDataI *cdi = dynamic_cast<LDataI*>(c);
-		if (cdi)
+		if (auto cdi = dynamic_cast<LDataI*>(c))
 		{
 			// This deletes the on disk representation.
-			cdi->Delete();
-			
+			LString mt = cdi->GetStr(FIELD_MIME_TYPE);
+			auto result = cdi->Delete();
+			log.Print("[%i] delete: %p = %i, mt=%s\n", i, cdi, result, mt.Get());
+
 			// This removes the object from the segment tree and 
 			// frees the memory
 			delete cdi;
@@ -1236,7 +1233,7 @@ bool MailUiGpg::ReadFile(LArray<char> &Data, const char *Path)
 void MailUiGpg::Decrypt(std::function<void(int)> callback)
 {
 	// Get the connector...
-	GpgConnector *Conn = d->App->GetGpgConnector();
+	auto Conn = d->App->GetGpgConnector();
 	if (!Conn)
 	{
 		d->NotInstalled();
@@ -1244,13 +1241,13 @@ void MailUiGpg::Decrypt(std::function<void(int)> callback)
 	}
 
 	// Find the right attachment...
-	Mail *m = d->Ui->GetItem();
+	auto m = d->Ui->GetItem();
 	if (!m)
 	{
 		d->SetError(LLoadString(IDS_GNUPG_ERR_NO_MAIL));
 		DecryptStatus(1);
 	}
-	LDataPropI *Root = m->GetObject()->GetObj(FIELD_MIME_SEG);
+	auto Root = m->GetObject()->GetObj(FIELD_MIME_SEG);
 	if (!Root)
 	{
 		d->SetError(LLoadString(IDS_GNUPG_ERR_NO_ROOT));
@@ -1314,34 +1311,27 @@ void MailUiGpg::Decrypt(std::function<void(int)> callback)
 		DecryptStatus(1);
 	}
 	
-	d->GetPassword(d->Ui, ToEmail[0], [this, callback, EncryptedObj, Conn, m](auto Pass)
+	// Send the file to by decrypted...
+	LAutoStreamI Data = EncryptedObj->GetStream(_FL);
+	if (!Data)
 	{
-		if (!Pass)
-		{
-			d->SetWarning(LLoadString(IDS_GNUPG_DECRYPT_CANCEL));
-			DecryptStatus(1);
-		}
-	
-		// Send the file to by decrypted...
-		LAutoStreamI Data = EncryptedObj->GetStream(_FL);
-		if (!Data)
-		{
-			d->SetError(LLoadString(IDS_GNUPG_ERR_NO_DATA));
-			DecryptStatus(1);
-		}
+		d->SetError(LLoadString(IDS_GNUPG_ERR_NO_DATA));
+		DecryptStatus(1);
+	}
 
-		if (!Conn->Decrypt(this, Data, Pass, (LMessage::Param) m))
-		{
-			d->SetError(LLoadString(IDS_GNUPG_ERR_DECRYPT_FAIL));
-			DecryptStatus(1);
-		}
+	if (!Conn->Decrypt(this, Data, (LMessage::Param) m))
+	{
+		d->SetError(LLoadString(IDS_GNUPG_ERR_DECRYPT_FAIL));
+		DecryptStatus(1);
+	}
 
-		DecryptStatus(0);
-	});
+	DecryptStatus(0);
 }
 
-void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, std::function<void(int)> callback)
+void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, std::function<void(int err)> callback)
 {
+	LFile log(LFile::Path(ScribeTempPath()) / "gpg.log", O_WRITE);
+
 	// Save the message normally
 	Mail *m = d->Ui->GetItem();
 	bool IsInPublicFolder = m->GetFolder() && m->GetFolder()->IsPublicFolders();
@@ -1426,291 +1416,258 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	}
 
 	// Re-write the MIME hierarchy to have the message and attachments encrypted
-#if PASS_PASSWORD_ARG
-	// 1) Get the password
-	d->GetPassword(d->Ui, FromEmail.Get(),
-		[this, callback, InputRoot=Root, uSign, uEncrypt, m, PrivKeyId](auto Psw)
-		{
-			LDataI *LocalRoot = InputRoot;
 
-			if (!Psw)
-			{
-				d->SetStatus(LLoadString(IDS_GNUPG_ERR_SIGN_ENC_CANCEL));
-				DecryptStatus(1);
-			}
-#else
-			auto InputRoot = Root;
-			auto LocalRoot = Root;
-#endif
+	// 1) Export the message to a file:
+	const char *BaseName = "encrypted.asc";
+	LFile::Path p = ScribeTempPath();
+	p += BaseName;
+	LFile f;
+	if (!f.Open(p, O_READWRITE))
+	{
+		d->SetError(LLoadString(IDS_GNUPG_ERR_TEMP_WRITE));
+		DecryptStatus(1);
+	}	
+	f.SetSize(0);
+	f.SetPos(0);
+	LMime Mime(ScribeTempPath());
+	Store3ToLMime(&Mime, Root);
 	
-			// 1) Export the message to a file:
-			const char *BaseName = "encrypted.asc";
-			LFile::Path p = ScribeTempPath();
-			p += BaseName;
-			LFile f;
-			if (!f.Open(p, O_READWRITE))
-			{
-				d->SetError(LLoadString(IDS_GNUPG_ERR_TEMP_WRITE));
-				DecryptStatus(1);
-			}	
-			f.SetSize(0);
-			f.SetPos(0);
-			LMime Mime(ScribeTempPath());
-			Store3ToLMime(&Mime, LocalRoot);
-	
-			if (!Mime.LGetBoundary())
-			{
-				// No boundary... so set it and propagate the change back
-				char b[64];
-				CreateMimeBoundary(b, sizeof(b));
-				Mime.SetBoundary(b);
-				LocalRoot->SetStr(FIELD_INTERNET_HEADER, Mime.GetHeaders());
+	if (!Mime.LGetBoundary())
+	{
+		// No boundary... so set it and propagate the change back
+		char b[64];
+		CreateMimeBoundary(b, sizeof(b));
+		Mime.SetBoundary(b);
+		Root->SetStr(FIELD_INTERNET_HEADER, Mime.GetHeaders());
 		
-				// If we don't do this then LMime will create it again later
-				// when we actually go to send the message, but it will be
-				// different then and the signing will fail.
-			}	
+		// If we don't do this then LMime will create it again later
+		// when we actually go to send the message, but it will be
+		// different then and the signing will fail.
+	}	
 	
-			if (!Mime.Text.Encode.Push(&f))
-			{
-				d->SetError(LLoadString(IDS_GNUPG_ERR_EXPORT_TEMP));
-				DecryptStatus(1);
-			}
+	if (!Mime.Text.Encode.Push(&f))
+	{
+		d->SetError(LLoadString(IDS_GNUPG_ERR_EXPORT_TEMP));
+		DecryptStatus(1);
+	}
 	
-			#if 1
-			if (uSign)
-			{
-				// Remove any white space from the end of the file... this is
-				// to make sure the signing process is standardized. See
-				// https://www.ietf.org/rfc/rfc3156.txt
-				// Part 5: OpenPGP signed data
-				// This is probably not very efficient but it's usually only the
-				// 2 bytes: "\r\n"
-				int64 Size, Pos;
-				while ( (Size = f.GetSize()) > 0)
-				{
-					Pos = f.SetPos(Size-1);
-					if (Pos != Size - 1)
-						break;
+	if (uSign)
+	{
+		// Remove any white space from the end of the file... this is
+		// to make sure the signing process is standardized. See
+		// https://www.ietf.org/rfc/rfc3156.txt
+		// Part 5: OpenPGP signed data
+		// This is probably not very efficient but it's usually only the
+		// 2 bytes: "\r\n"
+		int64 Size, Pos;
+		while ( (Size = f.GetSize()) > 0)
+		{
+			Pos = f.SetPos(Size-1);
+			if (Pos != Size - 1)
+				break;
 			
-					char c;
-					ssize_t Rd = f.Read(&c, 1);
-					if (Rd == 1 &&
-						strchr(LWhiteSpace, c))
-					{
-						f.SetSize(Size - 1);
-					}
-					else break;
-				}		
-			}
-			#endif
-	
-			f.Close();
-	
-			if (!uEncrypt)
+			char c;
+			ssize_t Rd = f.Read(&c, 1);
+			if (Rd == 1 &&
+				strchr(LWhiteSpace, c))
 			{
-				// Just signing... move MIME tree into child node
-				LDataI *NewRoot = LocalRoot->GetStore()->Create(MAGIC_ATTACHMENT);
-				if (!NewRoot)
-				{
-					d->SetError(LLoadString(IDS_GNUPG_ERR_NEW_ATTACH_FAIL));
-					DecryptStatus(1);
-				}
-		
-				// Copy over the root node headers
-				NewRoot->SetStr(FIELD_INTERNET_HEADER, LocalRoot->GetStr(FIELD_INTERNET_HEADER));
-		
-				// Reparent the old root to the new root, and then attach that to the message...
-				if (!LocalRoot->Save(NewRoot) ||
-					!m->GetObject()->SetObj(FIELD_MIME_SEG, NewRoot))
-				{
-					d->SetError(LLoadString(IDS_GNUPG_ERR_REPARENT));
-					DecryptStatus(1);
-				}
-		
-				LocalRoot = NewRoot;
+				f.SetSize(Size - 1);
 			}
+			else break;
+		}		
+	}
 	
-			// 2) Encrypt/sign the file:
-			LString InFile(p);
-			p = (p / ".." / "encrypted.gpg");
-			LString OutFile(p);
-			if (LFileExists(OutFile))
+	f.Close();
+	
+	if (!uEncrypt)
+	{
+		// Just signing... move MIME tree into child node
+		auto NewRoot = Root->GetStore()->Create(MAGIC_ATTACHMENT);
+		if (!NewRoot)
+		{
+			d->SetError(LLoadString(IDS_GNUPG_ERR_NEW_ATTACH_FAIL));
+			DecryptStatus(1);
+		}
+		
+		// Copy over the root node headers
+		NewRoot->SetStr(FIELD_INTERNET_HEADER, Root->GetStr(FIELD_INTERNET_HEADER));
+		
+		// Re-parent the old root to the new root, and then attach that to the message...
+		if (!Root->Save(NewRoot) ||
+			!m->GetObject()->SetObj(FIELD_MIME_SEG, NewRoot))
+		{
+			d->SetError(LLoadString(IDS_GNUPG_ERR_REPARENT));
+			DecryptStatus(1);
+		}
+		
+		Root = NewRoot;
+	}
+	
+	// 2) Encrypt/sign the file:
+	LString InFile(p);
+	p = (p / ".." / "encrypted.gpg");
+	LString OutFile(p);
+	if (LFileExists(OutFile))
+	{
+		FileDev->Delete(OutFile, NULL, false);
+	}
+	
+	LStringPipe args;
+	args.Print("--batch -u 0x%s", PrivKeyId.Get());
+	
+	if (uEncrypt)
+	{
+		LDataIt To = m->GetTo();
+		for (auto Recip = To->First(); Recip; Recip = To->Next())
+		{
+			auto Email = Recip->GetStr(FIELD_EMAIL);
+			LAssert(Email != NULL);
+			if (Email)
 			{
-				FileDev->Delete(OutFile, NULL, false);
+				args.Print(" --recipient %s", Email);
 			}
-	
-			LString Args, s, passFd = "";
-#if PASS_PASSWORD_ARG
-			passFd = " --passphrase-fd 0";
-#endif
-			Args.Printf("--batch%s -u 0x%s",
-				passFd.Get(),
-				PrivKeyId.Get());
-	
-			if (uEncrypt)
+			else
 			{
-				LDataIt To = m->GetTo();
-				for (LDataPropI *Recip = To->First(); Recip; Recip = To->Next())
-				{
-					auto Email = Recip->GetStr(FIELD_EMAIL);
-					LAssert(Email != NULL);
-					if (Email)
-					{
-						s.Printf(" --recipient %s", Email);
-						Args += s;
-					}
-					else
-					{
-						d->SetError(LLoadString(IDS_GNUPG_ERR_RECIP_NO_EMAIL));
-						DecryptStatus(1);
-					}
-				}
+				d->SetError(LLoadString(IDS_GNUPG_ERR_RECIP_NO_EMAIL));
+				DecryptStatus(1);
 			}
+		}
+	}
 	
-			s.Printf(" --armor -o \"%s\" %s \"%s\"",
+	args.Print(	" --armor -o \"%s\" %s \"%s\"",
 				OutFile.Get(),
 				uSign && uEncrypt ? "-se" : (uSign ? "--detach-sign" : "-e"),
 				InFile.Get());
-			Args += s;
 		
-			LSubProcess Proc(GpgBinPath, Args);
-			if (!Proc.Start(true, true))
-			{
-				d->SetError(LLoadString(IDS_GNUPG_ERR_CANT_START));
-				DecryptStatus(1);
-			}
+	LSubProcess Proc(GpgBinPath, args.NewLStr());
+	if (!Proc.Start(true, true))
+	{
+		d->SetError(LLoadString(IDS_GNUPG_ERR_CANT_START));
+		DecryptStatus(1);
+	}
 	
-#if PASS_PASSWORD_ARG
-			LString PswStr;
-			PswStr.Printf("%s\n", Psw.Get());
-			ssize_t w = Proc.Write(PswStr.Get(), PswStr.Length());
-			if (w < 0)
-			{
-				d->SetError(LLoadString(IDS_GNUPG_ERR_WRITE));
-				DecryptStatus(1);
-			}
-#endif	
+	LStringPipe out;
+	Proc.Communicate(&out);
+	auto gpgOut = out.NewLStr();
 
-			LStringPipe out;
-			Proc.Communicate(&out);
-			auto gpgOut = out.NewLStr();
+	int Result = Proc.GetExitValue();
+	if (Result)
+	{
+		d->SetError(gpgOut ? gpgOut : LLoadString(IDS_GNUPG_ERR_ENCRYPT_FAIL));
+		DecryptStatus(1);
+	}
+	
+	// 3) Import the encrypted message and replace contents of MIME tree.
+	LArray<char> InData, OutData;
+	if (!ReadFile(OutData, OutFile))
+		DecryptStatus(1);
 
-			int Result = Proc.GetExitValue();
-			if (Result)
-			{
-				d->SetError(gpgOut ? gpgOut : LLoadString(IDS_GNUPG_ERR_ENCRYPT_FAIL));
-				DecryptStatus(1);
-			}
+	#ifdef _DEBUG
+		LgiTrace("Gpg finished: InFile='%s', OutFile='%s'\n", InFile.Get(), OutFile.Get());
+	#else
+		// Clean up temporary files...
+		FileDev->Delete(InFile, NULL, false);
+		FileDev->Delete(OutFile, NULL, false);
+	#endif
 	
-			// 3) Import the encrypted message and replace contents of MIME tree.
-			LArray<char> InData, OutData;
-			if (!ReadFile(OutData, OutFile))
-				DecryptStatus(1);
+	if (uEncrypt)
+	{
+		// Clear out all existing attachments...
+		DeleteChildSegments(log, Root);
+	}
+	
+	LogSegments(log, "post delete", Root);
 
-			#ifdef _DEBUG
-				LgiTrace("Gpg finished: InFile='%s', OutFile='%s'\n", InFile.Get(), OutFile.Get());
-			#else
-				// Clean up temporary files...
-				FileDev->Delete(InFile, NULL, false);
-				FileDev->Delete(OutFile, NULL, false);
-			#endif
+	// Setup the root MIME node to have the right type and fields...
+	LAutoStreamI Data;
 	
-			if (uEncrypt)
-			{
-				// Clear out all existing attachments...
-				DeleteChildSegments(LocalRoot);
-			}
-	
-			// Setup the root MIME node to have the right type and fields...
-			LAutoStreamI Data;
-	
-			{
-				// By using a LMime object we preserve the existing headers in the MIME
-				// segment while still being able to change the MIME type and charset.
-				LMime Tmp;
-				Tmp.SetHeaders(LocalRoot->GetStr(FIELD_INTERNET_HEADER));
-				Tmp.SetMimeType(uSign ? sMultipartSigned : sMultipartEncrypted);
-				Tmp.SetCharset("utf-8");
-				Tmp.SetSub(	"Content-Type",
-							"protocol",
-							uEncrypt ? sApplicationPgpEncrypted : sApplicationPgpSignature);
-				LocalRoot->SetStr(FIELD_INTERNET_HEADER, Tmp.GetHeaders());
+	{
+		// By using a LMime object we preserve the existing headers in the MIME
+		// segment while still being able to change the MIME type and charset.
+		LMime Tmp;
+		Tmp.SetHeaders(Root->GetStr(FIELD_INTERNET_HEADER));
+		Tmp.SetMimeType(uSign ? sMultipartSigned : sMultipartEncrypted);
+		Tmp.SetCharset("utf-8");
+		Tmp.SetSub(	"Content-Type",
+					"protocol",
+					uEncrypt ? sApplicationPgpEncrypted : sApplicationPgpSignature);
+		Root->SetStr(FIELD_INTERNET_HEADER, Tmp.GetHeaders());
 		
-				// Set a body message
-				const char *BodyMsg = "This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)\n";
-				Data.Reset(new LMemStream(BodyMsg, strlen(BodyMsg)));
-				LocalRoot->SetStream(Data);
+		// Set a body message
+		const char *BodyMsg = "This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)\n";
+		Data.Reset(new LMemStream(BodyMsg, strlen(BodyMsg)));
+		Root->SetStream(Data);		
+		Root->Save();
+	}
+
+	LogSegments(log, "saved", Root);
+
+	if (uEncrypt)
+	{
+		// Attach some app info...
+		auto AppInfo = Root->GetStore()->Create(MAGIC_ATTACHMENT);
+		if (!AppInfo)
+		{
+			d->SetError(LLoadString(IDS_GNUPG_ERR_NEW_ATTACH_FAIL));
+			DecryptStatus(1);
+		}		
+		AppInfo->SetStr(FIELD_MIME_TYPE, sApplicationPgpEncrypted);
+		const char *AppInfoMsg = "Version: 1\n";
+		Data.Reset(new LMemStream(AppInfoMsg, strlen(AppInfoMsg)));
+		AppInfo->SetStream(Data);
+		AppInfo->Save(Root);
+	}
+
+	{
+		// Attach the new data to the email...
+		auto File = Root->GetStore()->Create(MAGIC_ATTACHMENT);
+		if (!File)
+		{
+			d->SetError(LLoadString(IDS_GNUPG_ERR_NEW_ATTACH_FAIL));
+			DecryptStatus(1);
+		}
 		
-				LocalRoot->Save();
-			}
+		if (uEncrypt)
+		{
+			// Attach the encrypted data here...
+			LMime Tmp;
+			Tmp.SetMimeType(sAppOctetStream);
+			Tmp.SetFileName(BaseName);
+			Tmp.Set("Content-Disposition", "inline");
+			Tmp.SetSub("Content-Disposition", "filename", BaseName);
+			File->SetStr(FIELD_INTERNET_HEADER, Tmp.GetHeaders());
 
-			if (uEncrypt)
-			{
-				// Attach some app info...
-				LDataI *AppInfo = LocalRoot->GetStore()->Create(MAGIC_ATTACHMENT);
-				if (!AppInfo)
-				{
-					d->SetError(LLoadString(IDS_GNUPG_ERR_NEW_ATTACH_FAIL));
-					DecryptStatus(1);
-				}		
-				AppInfo->SetStr(FIELD_MIME_TYPE, sApplicationPgpEncrypted);
-				const char *AppInfoMsg = "Version: 1\n";
-				Data.Reset(new LMemStream(AppInfoMsg, strlen(AppInfoMsg)));
-				AppInfo->SetStream(Data);
-				AppInfo->Save(LocalRoot);
-			}
+		}
+		else // uSign
+		{
+			// Set up the signature attachment
+			LMime Tmp;
+			Tmp.SetMimeType(sApplicationPgpSignature);
+			Tmp.SetFileName(BaseName);
+			Tmp.Set("Content-Description", "OpenPGP digital signature");
+			Tmp.Set("Content-Disposition", "attachment");
+			Tmp.SetSub("Content-Disposition", "filename", BaseName);
+			File->SetStr(FIELD_INTERNET_HEADER, Tmp.GetHeaders());
+		}
 
-			{
-				// Attach the new data to the email...
-				auto File = LocalRoot->GetStore()->Create(MAGIC_ATTACHMENT);
-				if (!File)
-				{
-					d->SetError(LLoadString(IDS_GNUPG_ERR_NEW_ATTACH_FAIL));
-					DecryptStatus(1);
-				}
-		
-				if (uEncrypt)
-				{
-					// Attach the encrypted data here...
-					LMime Tmp;
-					Tmp.SetMimeType(sAppOctetStream);
-					Tmp.SetFileName(BaseName);
-					Tmp.Set("Content-Disposition", "inline");
-					Tmp.SetSub("Content-Disposition", "filename", BaseName);
-					File->SetStr(FIELD_INTERNET_HEADER, Tmp.GetHeaders());
+		Data.Reset(new LMemStream(&OutData[0], OutData.Length()));
+		File->SetStream(Data);
+		File->Save(Root);
+	}
 
-				}
-				else // uSign
-				{
-					// Set up the signature attachment
-					LMime Tmp;
-					Tmp.SetMimeType(sApplicationPgpSignature);
-					Tmp.SetFileName(BaseName);
-					Tmp.Set("Content-Description", "OpenPGP digital signature");
-					Tmp.Set("Content-Disposition", "attachment");
-					Tmp.SetSub("Content-Disposition", "filename", BaseName);
-					File->SetStr(FIELD_INTERNET_HEADER, Tmp.GetHeaders());
-				}
+	LogSegments(log, "file output", Root);
 
-				Data.Reset(new LMemStream(&OutData[0], OutData.Length()));
-				File->SetStream(Data);
-		
-				File->Save(LocalRoot);
-			}
-
-			d->Ui->SetDirty(false, false);
+	// All items are already saved... don't resave
+	// Otherwise new text/html body will be attached to the message before
+	// being sent. Which is bad mkay?
+	d->Ui->SetDirty(false, ThingUi::NoSave);
 	
-			// Tell the UI that the object has changed...
-			LArray<LDataI*> ChangeArr { m->GetObject() };
-			d->App->SetContext(_FL);
-			d->App->OnChange(ChangeArr, 0);
+	// Tell the UI that the object has changed...
+	LArray<LDataI*> ChangeArr { m->GetObject() };
+	d->App->SetContext(_FL);
+	d->App->OnChange(ChangeArr, 0);
 	
-			DecryptStatus(0);
-#if PASS_PASSWORD_ARG
-		});
-#endif
-
+	DecryptStatus(0);
 }
 
 void MailUiGpg::DoCommand(
@@ -1751,9 +1708,9 @@ void MailUiGpg::DoCommand(
 			SignEncrypt(d->willSign(),
 						d->willEncrypt(),
 						d->Attach->Value() != 0,
-						[this, m](auto status)
+						[this, m](auto error)
 						{
-							if (!status)
+							if (!error)
 							{
 								// Send the email..
 								m->Send(true);

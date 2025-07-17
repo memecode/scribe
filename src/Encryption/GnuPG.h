@@ -61,7 +61,7 @@ public:
 	bool CheckSignature(LViewI *Target, LAutoStreamI Rfc822Msg, LMessage::Param UserVal);
 	
 	/// This will respond by sending the target a M_GNUPG_DECRYPT message
-	bool Decrypt(LViewI *Target, LAutoStreamI Data, LString Password, LMessage::Param UserVal);
+	bool Decrypt(LViewI *Target, LAutoStreamI Data, LMessage::Param UserVal);
 };
 
 class MailUiGpg : public LView

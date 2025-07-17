@@ -489,10 +489,10 @@ bool Store3ToLMime(LMime *Out, LDataPropI *InInterface)
 			}
 		}
 
-		LDataIt Sub = In->GetList(FIELD_MIME_SEG);
-		for (LDataPropI *Child = Sub->First(); Child; Child = Sub->Next())
+		auto  Sub = In->GetList(FIELD_MIME_SEG);
+		for (auto Child = Sub->First(); Child; Child = Sub->Next())
 		{
-			LMime *NewSeg = Out->NewChild();
+			auto NewSeg = Out->NewChild();
 			if (NewSeg)
 			{
 				if (Store3ToLMime(NewSeg, Child))
@@ -518,7 +518,7 @@ bool Store3ToLMime(LMime *Out, LDataPropI *InInterface)
 
 bool LMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly)
 {
-	LDataI *DataOut = dynamic_cast<LDataI*>(Out);
+	auto DataOut = dynamic_cast<LDataI*>(Out);
 	if (!DataOut || !In)
 	{
 		LAssert(0);
@@ -553,7 +553,7 @@ bool LMimeToStore3(LDataPropI *Out, LMime *In, bool InMemOnly)
 		if (!cOut)
 			return false;
 		
-		LMime *cIn = (*In)[i];
+		auto cIn = (*In)[i];
 		if (!LMimeToStore3(cOut, cIn))
 			return false;
 		

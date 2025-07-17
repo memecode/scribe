@@ -1830,16 +1830,15 @@ void MailUi::SetItem(Mail *m)
 	}
 }
 
-bool MailUi::SetDirty(bool Dirty, bool Ui)
+bool MailUi::SetDirty(bool Dirty, DirtyOptions opts)
 {
 	THREAD_UNSAFE(false);
 
-	bool b = ThingUi::SetDirty(Dirty, Ui);
+	bool b = ThingUi::SetDirty(Dirty, opts);
 	
-	if (MetaFieldsDirty && !Dirty)
+	if (MetaFieldsDirty && !Dirty && opts != ThingUi::NoSave)
 	{
-		Mail *m = GetItem();
-		if (m)
+		if (auto m = GetItem())
 		{
 			LColourSelect *Colour;
 			if (GetViewById(IDC_COLOUR, Colour))
@@ -3145,7 +3144,7 @@ int MailUi::HandleCmd(int Cmd)
 
 			OnDataEntered();
 			OnSave();
-			SetDirty(false, false);
+			SetDirty(false, NoUi);
 			GetItem()->Send(true);
 			Quit();
 			return 0;
@@ -3206,7 +3205,7 @@ int MailUi::HandleCmd(int Cmd)
 		case IDM_SAVE:
 		{
 			OnDataEntered();
-			SetDirty(false, false);
+			SetDirty(false, NoUi);
 			break;
 		}
 		case IDM_SAVE_CLOSE:
@@ -3219,7 +3218,7 @@ int MailUi::HandleCmd(int Cmd)
 			}
 
 			OnDataEntered();
-			SetDirty(false, false);
+			SetDirty(false, NoUi);
 			// fall thru
 		}
 		case IDM_CLOSE:
@@ -3308,11 +3307,12 @@ int MailUi::OnCommand(int Cmd, int Event, OsView From)
 
 	if (GpgUi)
 	{
-		GpgUi->DoCommand(Cmd, [this, Cmd](auto r)
-		{
-			if (!r)
-				HandleCmd(Cmd);
-		});
+		GpgUi->DoCommand(Cmd,
+			[this, Cmd](auto r)
+			{
+				if (!r)
+					HandleCmd(Cmd);
+			});
 	}
 	else
 	{
@@ -5048,10 +5048,9 @@ void Mail::PrepSend()
 	SetFlags((OldFlags | MAIL_READY_TO_SEND) & ~MAIL_SENT); // we want to send now...
 
 	// Check we're in the Outbox
-	ScribeFolder *OutBox = App->GetFolder(FOLDER_OUTBOX, GetObject());
-	if (OutBox)
+	if (auto OutBox = App->GetFolder(FOLDER_OUTBOX, GetObject()))
 	{
-		ScribeFolder *f = GetFolder();
+		auto f = GetFolder();
 		if (!f || f != OutBox)
 		{
 			LArray<Thing*> Items;
@@ -5070,7 +5069,7 @@ bool Mail::Send(bool Now)
 	{
 		for (unsigned i=0; AllowSend && i<Callbacks.Length(); i++)
 		{
-			LScriptCallback &c = *Callbacks[i];
+			auto &c = *Callbacks[i];
 			if (c.Func)
 			{
 				LVirtualMachine Vm;
@@ -6391,7 +6390,8 @@ LArray<Attachment*> Mail::GetAttachments()
 
 	for (auto a: Attachments)
 	{
-		if (a->GetObject()->UserData != a)
+		if (!a->GetObject() ||
+			a->GetObject()->UserData != a)
 			LAssert(!"Wut?");
 		else
 			result.Add(a);

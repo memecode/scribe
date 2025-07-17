@@ -324,7 +324,7 @@ public:
 	void SetItem(Mail *m);
 	LDocView *GetDoc(const char *MimeType) override;
 
-	bool SetDirty(bool d, bool ui = true) override;
+	bool SetDirty(bool d, DirtyOptions opts = WithUi) override;
 	void OnLoad() override;
 	AttachmentList *GetAttachments() override { return Attachments; }
 	void SerializeText(bool FromCtrl);
