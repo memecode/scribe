@@ -298,7 +298,7 @@ private:
 		return Keys.Length() > 0;
 	}
 	
-	bool Save(const char *Path, LString &s)
+	bool Save(const char *Path, LString s)
 	{
 		LFile f;
 		if (!f.Open(Path, O_WRITE))
@@ -1553,7 +1553,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	int Result = Proc.GetExitValue();
 	if (Result)
 	{
-		d->SetError(gpgOut ? gpgOut : LLoadString(IDS_GNUPG_ERR_ENCRYPT_FAIL));
+		d->SetError(gpgOut ? gpgOut.Get() : LLoadString(IDS_GNUPG_ERR_ENCRYPT_FAIL));
 		DecryptStatus(1);
 	}
 	
