@@ -132,7 +132,7 @@ LDataPropI *LMail3Thing::GetObj(int id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-GMail3Idx Mail3Indexes[] =
+LMail3Idx Mail3Indexes[] =
 {
 	{"MailFolderIdx", MAIL3_TBL_MAIL, "ParentId"},
 	{"MailSegMailIdx", MAIL3_TBL_MAILSEGS, "MailId"},

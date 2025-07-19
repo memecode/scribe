@@ -567,6 +567,8 @@ bool LMail3Mail::SetStream(LAutoStreamI stream)
 	if (!stream)
 		return false;
 
+	CHECK_READONLY(Store3NoPermissions)
+	
 	DeleteObj(Seg);
 
 	// MIME parse the stream and store it to segments.
@@ -1078,6 +1080,8 @@ bool LMail3Mail::ParseHeaders()
 
 Store3Status LMail3Mail::SetStr(int id, const char *str)
 {
+	CHECK_READONLY(Store3NoPermissions)
+	
 	switch (id)
 	{
 		case FIELD_SUBJECT:
@@ -1088,32 +1092,34 @@ Store3Status LMail3Mail::SetStr(int id, const char *str)
 		{
 			TextCache.Reset();
 			LArray<LMail3Attachment*> Results;
-			if (FindSegs("text/plain", Results, str != 0))
+			if (!FindSegs("text/plain", Results, str != 0))
+				break;
+
+			for (auto r: Results)
 			{
-				for (unsigned i=0; i<Results.Length(); i++)
+				if (!r->GetStr(FIELD_NAME))
 				{
-					if (!Results[i]->GetStr(FIELD_NAME))
-					{
-					    LAutoStreamI s(str ? new LMemStream((char*)str, strlen(str)) : 0);
-						Results[i]->SetStream(s);
-						break;
-					}
+					LAutoStreamI s(str ? new LMemStream((char*)str, strlen(str)) : nullptr);
+					r->SetStream(s);
+					break;
 				}
 			}
 			break;
 		}
 		case FIELD_CHARSET:
 		{
+			LgiTrace("%s:%i - FIELD_CHARSET set\n", _FL);
+
 			LArray<LMail3Attachment*> Results;
-			if (FindSegs("text/plain", Results, str != 0))
+			if (!FindSegs("text/plain", Results, str != 0))
+				break;
+
+			for (auto r: Results)
 			{
-				for (unsigned i=0; i<Results.Length(); i++)
+				if (!r->GetStr(FIELD_NAME))
 				{
-					if (!Results[i]->GetStr(FIELD_NAME))
-					{
-						Results[i]->SetStr(FIELD_CHARSET, str);
-						break;
-					}
+					r->SetStr(FIELD_CHARSET, str);
+					break;
 				}
 			}
 			break;
@@ -1249,8 +1255,18 @@ int64 LMail3Mail::GetInt(int id)
 
 Store3Status LMail3Mail::SetInt(int id, int64 i)
 {
+	CHECK_READONLY(Store3NoPermissions)
+	
 	switch (id)
 	{
+		case FIELD_READONLY:
+		{
+			readOnly = i != 0;
+			
+			if (Seg)
+				Seg->SetInt(id, i);
+			break;
+		}
 		case FIELD_LOADED:
 			return Store3Success;
 		case FIELD_PRIORITY:
@@ -1290,6 +1306,8 @@ const LDateTime *LMail3Mail::GetDate(int id)
 
 Store3Status LMail3Mail::SetDate(int id, const LDateTime *t)
 {
+	CHECK_READONLY(Store3NoPermissions)
+	
 	switch (id)
 	{
 		case FIELD_DATE_RECEIVED:
@@ -1346,6 +1364,8 @@ LDataPropI *LMail3Mail::GetObj(int id)
 
 Store3Status LMail3Mail::SetObj(int id, LDataPropI *i)
 {
+	CHECK_READONLY(Store3NoPermissions)
+	
 	switch (id)
 	{
 		case FIELD_MIME_SEG:

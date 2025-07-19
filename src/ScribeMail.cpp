@@ -7152,11 +7152,9 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 	// First check the email from address...
 	if (!ValidStr(GetFrom()->GetStr(FIELD_EMAIL)))
 	{
-		auto Options = App->GetOptions();
-		if (Options)
+		if (auto Options = App->GetOptions())
 		{
-			auto Ident = App->GetAccounts()->ItemAt(App->GetCurrentIdentity());
-			if (Ident)
+			if (auto Ident = App->GetAccounts()->ItemAt(App->GetCurrentIdentity()))
 			{
 				auto v = Ident->Identity.Email();
 				GetFrom()->SetStr(FIELD_EMAIL, v.Str());
@@ -7217,6 +7215,8 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 	Buf.SetPos(0);
 	Buf.Read(Out->Rfc822.Get(), Sz);
 	Out->Rfc822.Get()[Sz] = 0;
+
+	LgiTrace("Out->Rfc822.Get()=%s\n", Out->Rfc822.Get());
 
 	return true;
 }
@@ -10386,7 +10386,7 @@ bool CreateMailHeaders(ScribeWnd *App, LStream &Out, LDataI *Mail, MailProtocol 
 	}
 
 	// From:
-	LDataPropI *From = Mail->GetObj(FIELD_FROM);
+	auto From = Mail->GetObj(FIELD_FROM);
 	if (From && From->GetStr(FIELD_EMAIL))
 	{
 		Out.Print("From: ");

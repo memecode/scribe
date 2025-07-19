@@ -101,6 +101,14 @@ static LColour cTxt						(L_TEXT);
 
 static const char *GpgInstall =			"https://www.gnupg.org/download/index.en.html";
 static const char *GpgBin =				"gpg" LGI_EXECUTABLE_EXT;
+struct OutFileNames {
+	const char *in;
+	const char *out;
+} 	GpgOut = { "gpg-out.txt", "gpg-out.gpg" };
+struct CheckFileNames {
+	const char *msg;
+	const char *sig;
+}	GpgIn = { "gpg-msg.gpg", "gpg-sig.txt" };
 static LString GpgBinPath;
 
 // These are all in milliseconds
@@ -449,8 +457,8 @@ private:
 			
 			// Save them to files:
 			LFile::Path TextPath = ScribeTempPath(), SigPath = ScribeTempPath();
-			TextPath += "signed.txt";
-			SigPath += "signature.txt";
+			TextPath += GpgIn.msg;
+			SigPath  += GpgIn.sig;
 			if (!Save(TextPath, SignedText.RStrip()) ||
 				!Save(SigPath, Signature.RStrip()))
 			{
@@ -519,10 +527,15 @@ private:
 				Resp->Error = LLoadString(IDS_GNUPG_ERR_NO_OUTPUT);
 			}
 
-			#ifndef _DEBUG
-			// Clean up temporary files...
-			FileDev->Delete(TextPath, NULL, false);
-			FileDev->Delete(SigPath, NULL, false);
+			#ifdef _DEBUG
+				LgiTrace("%s:%i check sig files: txt='%s' sig='%s'\n",
+					_FL,
+					TextPath.GetFull().Get(),
+					SigPath.GetFull().Get());
+			#else
+				// Clean up temporary files...
+				FileDev->Delete(TextPath, NULL, false);
+				FileDev->Delete(SigPath, NULL, false);
 			#endif
 		}
 		else
@@ -667,20 +680,20 @@ private:
 bool GpgConnector::IsInstalled()
 {
 	#ifdef WINNATIVE
-	char *Str = NULL;
-	errno_t Err = _dupenv_s(&Str, NULL, "PATH");
-	if (Err)
-	{
-		LgiTrace("%s:%i - _dupenv_s failed with %i\n", _FL, Err);
-		return false;
-	}
-	LString Path = Str;
-	free(Str);
+		char *Str = NULL;
+		errno_t Err = _dupenv_s(&Str, NULL, "PATH");
+		if (Err)
+		{
+			LgiTrace("%s:%i - _dupenv_s failed with %i\n", _FL, Err);
+			return false;
+		}
+		LString Path = Str;
+		free(Str);
 	#else
-	LString Path = getenv("PATH");
-	#ifdef MAC
-	Path += LGI_PATH_SEPARATOR"/opt/local/bin";
-	#endif
+		LString Path = getenv("PATH");
+		#ifdef MAC
+			Path += LGI_PATH_SEPARATOR"/opt/local/bin";
+		#endif
 	#endif
 	LString::Array Parts = Path.Split(LGI_PATH_SEPARATOR);
 	for (unsigned i = 0; i < Parts.Length(); i++)
@@ -1113,7 +1126,11 @@ void InternalLogSegments(LStream &log, LDataPropI *seg, unsigned idx, int depth 
 	auto indent = LString(" ") * (depth * 2);
 	auto iter = seg->GetList(FIELD_MIME_SEG);
 	auto mt = seg->GetStr(FIELD_MIME_TYPE);
-	log.Print("%s[%i]=%p mt=%s\n", indent.Get(), idx, seg, mt);
+	auto cs = seg->GetStr(FIELD_CHARSET);
+	LString headers = seg->GetStr(FIELD_INTERNET_HEADER);
+	log.Print("%s[%i]=%p mt=%s cs=%s\n", indent.Get(), idx, seg, mt, cs);
+	for (auto ln: headers.SplitDelimit("\n"))
+		log.Print("%s        %s\n", indent.Get(), ln.Get());
 	for (unsigned i=0; i<iter->Length(); i++)
 	{
 		auto c = (*iter)[i];
@@ -1418,7 +1435,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	// Re-write the MIME hierarchy to have the message and attachments encrypted
 
 	// 1) Export the message to a file:
-	const char *BaseName = "encrypted.asc";
+	const char *BaseName = GpgOut.in;
 	LFile::Path p = ScribeTempPath();
 	p += BaseName;
 	LFile f;
@@ -1505,11 +1522,16 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	
 	// 2) Encrypt/sign the file:
 	LString InFile(p);
-	p = (p / ".." / "encrypted.gpg");
+	p = (p / ".." / GpgOut.out);
 	LString OutFile(p);
 	if (LFileExists(OutFile))
 	{
-		FileDev->Delete(OutFile, NULL, false);
+		LError err;
+		if (!FileDev->Delete(OutFile, &err, false))
+		{
+			d->SetError(err.ToString());
+			DecryptStatus(1);
+		}
 	}
 	
 	LStringPipe args;
@@ -1661,6 +1683,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	// Otherwise new text/html body will be attached to the message before
 	// being sent. Which is bad mkay?
 	d->Ui->SetDirty(false, ThingUi::NoSave);
+	Root->SetInt(FIELD_READONLY, true);
 	
 	// Tell the UI that the object has changed...
 	LArray<LDataI*> ChangeArr { m->GetObject() };

@@ -1103,7 +1103,11 @@ void ScribeWnd::Construct3()
 			#if RUN_STARTUP_SCRIPTS
 			// Run scripts in './Scripts' folder
 			LFile::Path s(ScribeResourcePath());
-			s = s / ".." / "scripts";
+			s = s /
+				#ifndef MAC
+				".." /
+				#endif
+				"scripts";
 			if (!s.Exists())
 			{
 				LgiTrace("%s:%i - scripts at '%s' doesn't exist.\n", _FL, s.GetFull().Get());

@@ -486,6 +486,8 @@ Store3Status LMail3Folder::FreeChildren()
 
 Store3Status LMail3Folder::DeleteAllChildren()
 {
+	CHECK_READONLY(Store3NoPermissions)
+
 	Store3Status Status = Store3Error;
 	TableTypes Tbls(ItemType);
 
@@ -586,6 +588,8 @@ const char *LMail3Folder::GetStr(int id)
 
 Store3Status LMail3Folder::SetStr(int id, const char *str)
 {
+	CHECK_READONLY(Store3NoPermissions)
+	
 	switch (id)
 	{
 		case FIELD_FOLDER_NAME:
@@ -633,8 +637,23 @@ int64 LMail3Folder::GetInt(int id)
 
 Store3Status LMail3Folder::SetInt(int id, int64 i)
 {
+	CHECK_READONLY(Store3NoPermissions)
+
 	switch (id)
 	{
+		case FIELD_READONLY:
+		{
+			readOnly = i != 0;
+			
+			auto &sub = SubFolders();
+			for (unsigned i=0; sub.GetState() == Store3Loaded && i<sub.Length(); i++)
+				sub[i]->SetInt(id, i);
+				
+			auto &children = Children();
+			for (unsigned i=0; children.GetState() == Store3Loaded && i<children.Length(); i++)
+				children[i]->SetInt(id, i);
+			break;
+		}
 		case FIELD_SORT:
 			Sort = (int)i; return Store3Success;
 		case FIELD_FOLDER_OPEN:

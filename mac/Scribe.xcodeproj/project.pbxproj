@@ -267,7 +267,7 @@
 		3497D54E2399D27A009FCC14 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = Scripts;
+			dstPath = scripts;
 			dstSubfolderSpec = 7;
 			files = (
 				34AB68F6275240BC0045380B /* ScribeScripts.h in Copy Files */,
@@ -859,22 +859,16 @@
 		3477C2241CBEFD940028B84B /* Lgi */ = {
 			isa = PBXGroup;
 			children = (
-				34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */,
 				3477C3FB1CC22E690028B84B /* Base64.cpp */,
 				3477C4E81CC27D870028B84B /* Browser.cpp */,
 				3477C44F1CC262670028B84B /* ColourSelect.cpp */,
-				3445E57C1F1F426300D0A824 /* Controls */,
 				3477C44D1CC2624B0028B84B /* ControlTree.cpp */,
-				34EE8BA02748A0F100F12915 /* ControlTree.h */,
 				341A787F2699058600872FEB /* DatePopup.cpp */,
 				3477C4331CC233CF0028B84B /* Db-Csv.cpp */,
 				3477C4661CC26BF30028B84B /* DrawListSurface.cpp */,
-				3445E56E1F1F40CF00D0A824 /* Emoji */,
-				34F6152127E55CA700FE5B0C /* EventTargetThread.h */,
 				3477C4031CC22F680028B84B /* ExeCheck.cpp */,
 				3477C4411CC235490028B84B /* FilterUi.cpp */,
 				3477C4081CC2301F0028B84B /* GdcTools.cpp */,
-				349AB0BB217B391200573982 /* Graphics */,
 				3477C4601CC26AE00028B84B /* Growl.cpp */,
 				3477C4351CC234200028B84B /* Http.cpp */,
 				3477C4641CC26BBF0028B84B /* HttpTools.cpp */,
@@ -882,15 +876,21 @@
 				3477C45C1CC26AAB0028B84B /* Mime.cpp */,
 				3477C3FD1CC22EF60028B84B /* MonthView.cpp */,
 				3477C4101CC231470028B84B /* OpenSSLSocket.cpp */,
-				34EE8BAE2748A26800F12915 /* OpenSSLSocket.h */,
 				3477C44B1CC235C60028B84B /* OptionsFile.cpp */,
 				3477C4EA1CC27DC90028B84B /* Password.cpp */,
 				3477C45A1CC263560028B84B /* SharedMemory.cpp */,
 				3477C4611CC26AE00028B84B /* SoftwareUpdate.cpp */,
 				342BAE3A2588AFA8006EF16E /* TextConvert.cpp */,
 				3477C43D1CC234C80028B84B /* TimePopup.cpp */,
+				34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */,
 				3477C43F1CC234E60028B84B /* XmlTreeUi.cpp */,
 				3477C3FE1CC22EF60028B84B /* YearView.cpp */,
+				34EE8BA02748A0F100F12915 /* ControlTree.h */,
+				34F6152127E55CA700FE5B0C /* EventTargetThread.h */,
+				34EE8BAE2748A26800F12915 /* OpenSSLSocket.h */,
+				3445E57C1F1F426300D0A824 /* Controls */,
+				3445E56E1F1F40CF00D0A824 /* Emoji */,
+				349AB0BB217B391200573982 /* Graphics */,
 			);
 			name = Lgi;
 			sourceTree = "<group>";
@@ -934,29 +934,29 @@
 		3477C51E1CC3118E0028B84B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				34DB5ADC2ACD8DE100321094 /* PostBuildStep.py */,
-				345C53CF23F163D30035E9CA /* Scribe.entitlements */,
-				3477C22C1CBEFD940028B84B /* Info.plist */,
 				34364F8824CCE9FF00272F13 /* Themes */,
-				347CF82623F64FD00028F610 /* flags.png */,
-				34C9A80A23C9615200129861 /* NoFace80.png */,
-				34C9A7FC23C9615200129861 /* NoFace160.png */,
-				3497D5382399D246009FCC14 /* Scripts */,
-				340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */,
-				34DD329B23153B2300FA2B35 /* About64px.png */,
+				345C53CF23F163D30035E9CA /* Scribe.entitlements */,
 				34DD329523153AF000FA2B35 /* About.html */,
-				34DD329623153AF000FA2B35 /* Title.png */,
-				34DD329423153AF000FA2B35 /* Title.html */,
-				346E1A4A231293570019B4AA /* tray_error.png */,
-				346E1A4C231293570019B4AA /* tray_mail.png */,
-				346E1A4B231293570019B4AA /* tray_small.png */,
 				346E1A45231292C60019B4AA /* PreviewContact.html */,
 				346E1A46231292C60019B4AA /* PreviewGroup.html */,
 				346E1A44231292C60019B4AA /* PreviewMail.html */,
+				34DD329423153AF000FA2B35 /* Title.html */,
 				349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */,
-				345F314B1CC7A46B00656B8B /* xgate-icons-32.png */,
-				345F31451CC7A3B400656B8B /* Icons-16.png */,
 				3477C51F1CC311A00028B84B /* Scribe.lr8 */,
+				3477C22C1CBEFD940028B84B /* Info.plist */,
+				34DD329B23153B2300FA2B35 /* About64px.png */,
+				340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */,
+				347CF82623F64FD00028F610 /* flags.png */,
+				345F31451CC7A3B400656B8B /* Icons-16.png */,
+				34C9A80A23C9615200129861 /* NoFace80.png */,
+				34C9A7FC23C9615200129861 /* NoFace160.png */,
+				34DD329623153AF000FA2B35 /* Title.png */,
+				346E1A4A231293570019B4AA /* tray_error.png */,
+				346E1A4C231293570019B4AA /* tray_mail.png */,
+				346E1A4B231293570019B4AA /* tray_small.png */,
+				345F314B1CC7A46B00656B8B /* xgate-icons-32.png */,
+				34DB5ADC2ACD8DE100321094 /* PostBuildStep.py */,
+				3497D5382399D246009FCC14 /* Scripts */,
 			);
 			name = Resources;
 			sourceTree = "<group>";

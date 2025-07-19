@@ -36,7 +36,7 @@ struct LMail3Def
 	const char *Type;
 };
 
-struct GMail3Idx
+struct LMail3Idx
 {
 	const char *IdxName;
 	const char *Table;
@@ -174,6 +174,15 @@ extern LMail3Def TblCalendarFiles[];
 		} \
 	}
 	
+#define CHECK_READONLY(ret) \
+	{ \
+		if (readOnly) \
+		{ \
+			LAssert(!"Can't modify read only object"); \
+			return ret; \
+		} \
+	}
+	
 struct LMail3StoreMsg
 {
 	enum Type
@@ -205,7 +214,7 @@ class LMail3Store : public LDataStoreI
 	LString DbFile;
 	class LMail3Folder *Root;
 	LHashTbl<ConstStrKey<char,false>, LMail3Def*> Fields;
-	LHashTbl<StrKey<char,false>, GMail3Idx*> Indexes;
+	LHashTbl<StrKey<char,false>, LMail3Idx*> Indexes;
 	Store3Status OpenStatus;
 	LHashTbl<ConstStrKey<char,true>, Store3Status> TableStatus;
 	LString ErrorMsg;
@@ -411,6 +420,7 @@ public:
 	LMail3Folder *Parent = nullptr;
 	int64 Id = INVALID_ID;
 	int64 ParentId = INVALID_ID;
+	bool readOnly = false;
 
 	LMail3Obj(LMail3Store *store)
 	{
@@ -430,7 +440,7 @@ public:
 	virtual void SetStore(LMail3Store *s) { Store = s; }
 };
 
-class LMail3Thing : public LDataI, public LMail3Obj 
+class LMail3Thing : public LDataI, public LMail3Obj
 {
 	friend class LMail3Store;
 	LMail3Thing &operator =(LMail3Thing &p) = delete;
@@ -448,16 +458,16 @@ public:
 
 	~LMail3Thing();
 
-	const char *GetClass() { return "LMail3Thing"; }
-	bool IsOnDisk() { return Id > 0; }
-	bool IsOrphan() { return Store == NULL || Parent == NULL; }
-	uint64 Size() { return sizeof(*this); }
-	uint32_t Type() { LAssert(0); return 0; }
-	Store3Status Delete(bool ToTrash);
-	LDataStoreI *GetStore() { return Store; }
-	LAutoStreamI GetStream(const char *file, int line) { LAssert(0); return LAutoStreamI(0); }
-	bool Serialize(LMail3Store::LStatement &s, bool Write) { LAssert(0); return false; }
-	Store3Status Save(LDataI *Folder = NULL);
+	const char *GetClass() override { return "LMail3Thing"; }
+	bool IsOnDisk() override { return Id > 0; }
+	bool IsOrphan() override { return Store == NULL || Parent == NULL; }
+	uint64 Size() override { return sizeof(*this); }
+	uint32_t Type() override { LAssert(0); return 0; }
+	Store3Status Delete(bool ToTrash) override;
+	LDataStoreI *GetStore() override { return Store; }
+	LAutoStreamI GetStream(const char *file, int line) override { LAssert(0); return LAutoStreamI(0); }
+	bool Serialize(LMail3Store::LStatement &s, bool Write) override { LAssert(0); return false; }
+	Store3Status Save(LDataI *Folder = NULL) override;
 	virtual bool DbDelete() { LAssert(0); return false; }
 	LDataPropI *GetObj(int id) override;
 };
@@ -536,6 +546,9 @@ class LMail3Attachment : public Store3Attachment<LMail3Store, LMail3Mail, LMail3
 	/// of LMail3Attachment objects. This flag is set for those temporary
 	/// nodes.
 	bool InMemoryOnly;
+
+	/// Read only flag, same as LMail3Obj
+	bool readOnly = false;
 
 public:
 	LMail3Attachment(LMail3Store *store);

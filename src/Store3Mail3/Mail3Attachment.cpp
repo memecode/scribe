@@ -251,9 +251,11 @@ char *LMail3Attachment::GetHeaders()
 
 bool LMail3Attachment::ParseHeaders()
 {
+	Charset.Empty();
+	Name.Empty();
+	
 	auto Ct = LGetHeaderField(Headers, "Content-Type");
-	char *Colon = Ct ? strchr(Ct, ';') : 0;
-	if (Colon)
+	if (char *Colon = Ct ? strchr(Ct, ';') : nullptr)
 	{
 		while (Colon > Ct.Get() && strchr(" \t\r\n", Colon[-1])) Colon--;
 
@@ -404,17 +406,6 @@ const char *LMail3Attachment::GetStr(int id)
 	{
 		case FIELD_CHARSET:
 		{
-		    if (!Charset)
-		    {
-			    // Maybe a parent segment has a charset?
-			    for (LMail3Attachment *p = GetParent(); p; p = p->GetParent())
-			    {
-			        auto Cs = p->GetStr(FIELD_CHARSET);
-			        if (Cs)
-			            return Cs;
-			    }
-			}
-
 			return Charset;
 		}
 		case FIELD_NAME:
@@ -482,6 +473,8 @@ const char *LMail3Attachment::GetStr(int id)
 
 Store3Status LMail3Attachment::SetStr(int id, const char *str)
 {
+	CHECK_READONLY(Store3NoPermissions)
+	
 	switch (id)
 	{
 		case FIELD_INTERNET_HEADER:
@@ -535,6 +528,20 @@ int64 LMail3Attachment::GetInt(int id)
 
 Store3Status LMail3Attachment::SetInt(int id, int64 i)
 {
+	CHECK_READONLY(Store3NoPermissions)
+	
+	switch (id)
+	{
+		case FIELD_READONLY:
+		{
+			readOnly = i != 0;
+			
+			for (auto c: Children.a)
+				c->SetInt(id, i);
+			return Store3Success;
+		}
+	}
+
 	LAssert(!"Unknown id.");
 	return Store3Error;
 }
@@ -571,6 +578,8 @@ LAutoStreamI LMail3Attachment::GetStream(const char *file, int line)
 
 bool LMail3Attachment::SetStream(LAutoStreamI s)
 {
+	CHECK_READONLY(false)
+	
 	Import = s;
 	Dirty = true;
 	BlobSize = Import ? Import->GetSize() : 0;
