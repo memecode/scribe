@@ -1876,7 +1876,7 @@ public:
 	AccStrOption(TextSig, OPT_AccIdentTextSig);
 	AccStrOption(HtmlSig, OPT_AccIdentHtmlSig);
 
-	AccIntOption(Sort, OPT_AccountSort);
+	// AccIntOption(Sort, OPT_AccountSort);
 
 	int UseSSL(int Set = -1) { return 0; }
 	void Main(AccountletThread *Thread) {}
@@ -2123,6 +2123,7 @@ public:
 	~ScribeAccount();
 
 	const char *GetClass() override { return "ScribeAccount"; }
+	int Compare(ScribeAccount *b);
 
 	// Lifespan
 	bool IsValid();

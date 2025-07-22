@@ -626,7 +626,7 @@ class OptionsDlg : public TabDialog, public LXmlTreeUi
 	LFontType EditorFont;
 	LFontType HtmlFont;
 	List<LLanguage> Langs;
-	LCombo *UiLang;
+	LCombo *UiLang = nullptr;
 	int SinkHnd;
 	ScribeAccountItem *LastRecord;
 

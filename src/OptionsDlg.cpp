@@ -76,8 +76,8 @@ class AccountItem : public LListItem
 	LVariant Cache;
 
 public:
-	ScribeAccount *Account;
-	LListItemCheckBox *Disable;
+	ScribeAccount *Account = nullptr;
+	LListItemCheckBox *Disable = nullptr;
 
 	AccountItem(OptionsDlg *d, ScribeAccount *a)
 	{
@@ -132,18 +132,14 @@ public:
 	
 	int Compare(LListItem *To, ssize_t Field = 0)
 	{
-		AccountItem *ToItem = dynamic_cast<AccountItem*>(To);
-		if (!ToItem)
+		auto bItem = dynamic_cast<AccountItem*>(To);
+		if (!bItem || !bItem->GetAccount())
 		{
-			printf("%s:%i - Not the right object.\n", _FL);
+			LAssert(!"Not the right object.");
 			return 0;
 		}
-			
-		int a = Account->Identity.Sort();
-		int b = ToItem->Account->Identity.Sort();
-		// printf("%s:%i - %p = %i, %p = %i\n", _FL, Account, a, ToItem->Account, b);
-		
-		return a - b;
+		auto b = bItem->GetAccount();
+		return Account->Compare(b);
 	}
  };
 
@@ -228,7 +224,6 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 	TabDialog(IDC_TAB, ID_BTN_TBL)
 {
 	d = new OptionsDlgPrivate;
-	UiLang = 0;
 	SetParent(App = window);
 	SinkHnd = LEventSinkMap::Dispatch.AddSink(this);
 
@@ -270,8 +265,8 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 		{
 			auto item = all[i];
 			auto acc = item->GetAccount();
-			LgiTrace("load[%i] acc=%p(%s) item=%p\n",
-				i, acc, acc->Receive.Name().Str(), item);
+			LgiTrace("load[%i] acc=%p(%s) index=%i\n",
+				i, acc, acc->Receive.Name().Str(), (int)acc->GetIndex());
 		}
 
 		// Enable re-ordering via drag
@@ -683,58 +678,71 @@ void OptionsDlg::WriteNativeText(LFile &f, char *t)
 
 void OptionsDlg::ReindexAccounts()
 {
-	App->GetAccountSettingsAccess(this, ScribeWriteAccess, [this](auto Allow)
-	{
-		if (!Allow)
-			return;
-
-		LList *AccountLst;
-		List<AccountItem> a;
-		if (!GetViewById(IDC_ACCOUNTS, AccountLst) ||
-			!AccountLst->GetAll(a))
-			return;
-
-		LHashTbl<IntKey<ssize_t>, ScribeAccount*> map;
-		for (auto item: a)
-			map.Add(item->GetAccount()->GetIndex(), item->GetAccount());
-
-		ssize_t tmpIndex = map.Length() + 10;
-
-		for (size_t i=0; i<a.Length(); i++)
+	App->GetAccountSettingsAccess(this,
+		ScribeWriteAccess,
+		[this](auto Allow)
 		{
-			if (auto Acc = a[i]->GetAccount())
-			{
-				if (Acc->GetIndex() == i)
-					continue;
+			if (!Allow)
+				return;
 
-				if (auto target = map.Find(i))
+			LList *AccountLst;
+			List<AccountItem> a;
+			if (!GetViewById(IDC_ACCOUNTS, AccountLst) ||
+				!AccountLst->GetAll(a))
+				return;
+
+			LHashTbl<IntKey<ssize_t>, ScribeAccount*> map;
+			ssize_t maxIndex = 0;
+			for (auto item: a)
+			{
+				auto i = item->GetAccount()->GetIndex();
+				LAssert(i >= 0);
+				maxIndex = MAX(i, maxIndex);
+				map.Add(i, item->GetAccount());
+			}
+
+			ssize_t tmpIndex = maxIndex + 10;
+			LVariant name, email;
+
+			for (size_t i=0; i<a.Length(); i++)
+			{
+				if (auto acc = a[i]->GetAccount())
 				{
-					// Move account at the target index to a temporary index
-					// LgiTrace("moving account %i to %i (%s)\n", (int)target->GetIndex(), (int)tmpIndex, target->Receive.Name().Str());
-					target->ReIndex(tmpIndex++);
-				}
+					auto sName = (name = acc->Send.Name()).Str();
+					auto sEmail = (email = acc->Identity.Email()).Str();
+					auto idx = acc->GetIndex();
+					if (idx == i)
+						continue;
 
-				Acc->ReIndex(i);
-			}
-			else LAssert(!"no account object?");
-		}
+					if (auto target = map.Find(i))
+					{
+						// Move account at the target index to a temporary index
+						LgiTrace("tmp: account %i to %i (%s/%s)\n", (int)target->GetIndex(), (int)tmpIndex, sName, sEmail);
+						target->ReIndex(tmpIndex++);
+					}
 
-		// Rename any tmp value ones back to their proper locations...
-		for (size_t i=0; i<a.Length(); i++)
-		{
-			auto item = a[i];
-			if (auto acc = item->GetAccount())
-			{
-				if (i != acc->GetIndex())
 					acc->ReIndex(i);
-
-				/*
-				LgiTrace("after[%i] = %i %s\n",
-					(int)i, (int)acc->GetIndex(), acc->Receive.Name().Str());
-				*/
+				}
+				else LAssert(!"no account object?");
 			}
-		}
-	});
+
+			// Rename any tmp value ones back to their proper locations...
+			for (size_t i=0; i<a.Length(); i++)
+			{
+				auto item = a[i];
+				if (auto acc = item->GetAccount())
+				{
+					auto sName = (name = acc->Send.Name()).Str();
+					auto sEmail = (email = acc->Identity.Email()).Str();
+					auto idx = acc->GetIndex();
+					if (i != idx)
+					{
+						LgiTrace("restore: account %i to %i (%s/%s)\n", (int)idx, (int)i, sName, sEmail);
+						acc->ReIndex(i);
+					}
+				}
+			}
+		});
 }
 
 int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
@@ -875,22 +883,6 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 				}
 				case LNotifyContainerReorder:
 				{
-					/*
-					LList *AccountLst;
-					if (GetViewById(IDC_ACCOUNTS, AccountLst))
-					{
-						LArray<AccountItem*> all;
-						AccountLst->GetAll(all);
-						for (int i=0; i<all.Length(); i++)
-						{
-							auto item = all[i];
-							auto acc = item->GetAccount();
-							LgiTrace("reindex[%i] acc=%p(%s) item=%p\n",
-								i, acc, acc->Receive.Name().Str(), item);
-						}
-					}
-					*/
-
 					// Save the reordered list indexes into the accounts themselves:
 					ReindexAccounts();
 					break;

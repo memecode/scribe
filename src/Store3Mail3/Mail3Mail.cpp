@@ -567,7 +567,7 @@ bool LMail3Mail::SetStream(LAutoStreamI stream)
 	if (!stream)
 		return false;
 
-	CHECK_READONLY(Store3NoPermissions)
+	CHECK_READONLY(false)
 	
 	DeleteObj(Seg);
 
@@ -581,7 +581,7 @@ bool LMail3Mail::SetStream(LAutoStreamI stream)
 			// This stops the objects being written to disk.
 			// Which would mean we have multiple copies of the same
 			// data on disk. This setting also propagates down the
-			// tree automatically as GMimeToStore3 saves new child
+			// tree automatically as LMimeToStore3 saves new child
 			// notes to their parents.
 			Seg->SetInMemoryOnly(true);
 			Seg->AttachTo(this);

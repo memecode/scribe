@@ -7081,7 +7081,7 @@ DefaultClient::FileType DefaultClient::FileTypes[] =
 
 static int AccountCmp(ScribeAccount *a, ScribeAccount *b, int Data)
 {
-	return a->Identity.Sort() - b->Identity.Sort();
+	return a->Compare(b);
 }
 
 class ScribePasteState : public LProgressDlg

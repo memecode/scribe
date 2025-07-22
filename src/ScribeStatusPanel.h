@@ -11,10 +11,10 @@ class AccountStatusItem : public LListItem
 	char Buf[32];
 
 public:
-	AccountStatusPanel *Panel;
-	ScribeAccount *Account;
-	LImageList *ImgLst;
-	int State;
+	AccountStatusPanel *Panel = nullptr;
+	ScribeAccount *Account = nullptr;
+	LImageList *ImgLst = nullptr;
+	int State = 0;
 
 	AccountStatusItem(AccountStatusPanel *panel, ScribeAccount *account, LImageList *imglst);
 	~AccountStatusItem();

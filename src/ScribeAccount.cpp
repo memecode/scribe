@@ -54,6 +54,13 @@ ScribeAccount::~ScribeAccount()
 	DeleteObj(d);
 }
 
+int ScribeAccount::Compare(ScribeAccount *acc)
+{
+	auto a = GetIndex();
+	auto b = acc->GetIndex();
+	return (int) (a - b);
+}
+
 bool ScribeAccount::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
 	ScribeDomType f = StrToDom(Name);

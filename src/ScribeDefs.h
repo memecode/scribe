@@ -20,7 +20,8 @@
 #define OPT_AccIdentTextSig			"Identity.Sig"
 #define OPT_AccIdentHtmlSig			"Identity.HtmlSig"
 #define OPT_OnlySendThroughThis		"Identity.OnlySendThis"
-#define OPT_AccountSort				"Identity.Sort"
+// This is now handled by ScribeAccount::GetIndex()
+// #define OPT_AccountSort				"Identity.Sort"
 
 #define OPT_SmtpServer				"Send.Server"		//(char*)
 #define OPT_SmtpPort				"Send.Port"			//(int)

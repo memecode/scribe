@@ -176,13 +176,13 @@ const char *AccountStatusItem::GetText(int Col)
 
 int AccountStatusItem::Compare(LListItem *To, ssize_t Field)
 {
-	int ASort = Account->Identity.Sort();
-	AccountStatusItem *b = dynamic_cast<AccountStatusItem*>(To);
-	if (!b)
+	auto b = dynamic_cast<AccountStatusItem*>(To);
+	if (!b || !Account || !b->Account)
+	{
+		LAssert(!"invalid data");
 		return 0;
-		
-	int BSort = b->Account->Identity.Sort();
-	return ASort - BSort;
+	}		
+	return Account->Compare(b->Account);
 }
 
 void AccountStatusItem::OnPaintColumn(LItem::ItemPaintCtx &Ctx, int i, LItemColumn *c)
