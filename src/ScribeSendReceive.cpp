@@ -1002,7 +1002,12 @@ void SendAccountlet::Main(AccountletThread *Thread)
 	bool MissingConfig = false;
 	LStringPipe Err;
 
-	if (GetApp())
+	if (!GetApp())
+	{
+		err.Set(LErrorInvalidParam, "no app.");
+		Thread->SetState(ThreadError);
+	}
+	else
 	{
 		LVariant v;
 		GetApp()->GetOptions()->GetValue(OPT_DebugTrace, v);
@@ -1326,10 +1331,6 @@ if (DebugTrace) LgiTrace("Send(%i) %s:%i\n", Account->GetIndex(), _FL);
 		}
 
 if (DebugTrace) LgiTrace("Send(%i) exit\n", Account->GetIndex());
-	}
-	else
-	{
-		Thread->SetState(ThreadError);
 	}
 
 	char *e = 0;
@@ -1815,9 +1816,9 @@ bool ReceiveAccountlet::OnIdle()
 
 void ReceiveAccountlet::Main(AccountletThread *Thread)
 {
-	bool Status = false;
 	LVariant v;
 
+	err.Empty();
 	LastOnline = LCurrentTime();
 	#define TimeDelta() ((int) (LCurrentTime() - LastOnline))
 	SecondsTillOnline = -1;
@@ -1874,7 +1875,7 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 			}
 			default:
 			{
-				LAssert(!"Unsupported protocol.");
+				err.Set(LErrorNotSupported, "Unsupported protocol.");
 				return;
 			}
 		}
@@ -1882,486 +1883,471 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 
 if (DebugTrace) LgiTrace("Receive(%i) protocol=%i client=%p, time=%i\n", Account->GetIndex(), MailSourceType, Client, TimeDelta());
 
-	if (Source)
+	if (!Source)
 	{
-		auto HttpProxy = GetApp()->GetHttpProxy();
-		if (HttpProxy)
-		{
-			LUri Host(HttpProxy);
-			if (Host.sHost)
-				Source->SetProxy(Host.sHost, Host.Port?Host.Port:80);
-		}
-	
-		// Setup logging
-		Source->Logger = this;
-		Source->Items = &Group;
-		Source->Transfer = &Item;
+		err.Set(LErrorNoMem, "alloc source failed.");
+		Thread->SetState(ThreadError);
+		Actions.Length(0);
+		return;
+	}
 
-		auto OpenFlags = MakeOpenFlags(Account, false);
-		auto NeedsPassword = !ValidStr(Password) && ValidStr(User.Str());
-		if (NeedsPassword)
-		{
-			if (TempPsw)
-				Password = TempPsw;
-			else if (!SecureAuth())
-				LAssert(!"Need to ask user for password BEFORE we're in the worker thread.");
-		}
+	auto HttpProxy = GetApp()->GetHttpProxy();
+	if (HttpProxy)
+	{
+		LUri Host(HttpProxy);
+		if (Host.sHost)
+			Source->SetProxy(Host.sHost, Host.Port?Host.Port:80);
+	}
+	
+	// Setup logging
+	Source->Logger = this;
+	Source->Items = &Group;
+	Source->Transfer = &Item;
+
+	auto OpenFlags = MakeOpenFlags(Account, false);
+	auto NeedsPassword = !ValidStr(Password) && ValidStr(User.Str());
+	if (NeedsPassword)
+	{
+		if (TempPsw)
+			Password = TempPsw;
+		else if (!SecureAuth())
+			LAssert(!"Need to ask user for password BEFORE we're in the worker thread.");
+	}
 
 if (DebugTrace) LgiTrace("Receive(%i) opening connection..., time=%i\n", Account->GetIndex(), TimeDelta());
-		Thread->SetState(ThreadConnecting);
+	Thread->SetState(ThreadConnecting);
 
-		LHashTbl<StrKey<char>,bool> Uids;
-		ReceiveAccountlet *Receive = dynamic_cast<ReceiveAccountlet*>(Thread->Acc);
+	LHashTbl<StrKey<char>,bool> Uids;
+	ReceiveAccountlet *Receive = dynamic_cast<ReceiveAccountlet*>(Thread->Acc);
 
-		if (!RecHotFolder.Str() && !SecureAuth() && !ValidStr(Password))
-		{
-			Status = true;
-		}
-		else if (!Source->Open(	CreateSocket(false, GetAccount(), false),
-								RemoteHost.Str(),
-								RemotePort,
-								User.Str(),
-								Password,
-								SettingStore,
-								OpenFlags))
-		{
-			Thread->SetState(ThreadError);
-		}
-		else
-		{
+	if (!RecHotFolder.Str() && !SecureAuth() && !ValidStr(Password))
+	{
+		// Status = true;
+	}
+	else if (!Source->Open(	CreateSocket(false, GetAccount(), false),
+							RemoteHost.Str(),
+							RemotePort,
+							User.Str(),
+							Password,
+							SettingStore,
+							OpenFlags))
+	{
+		err.Set(LErrorIoFailed, "connection failed.");
+		Thread->SetState(ThreadError);
+	}
+	else
+	{
 if (DebugTrace) LgiTrace("Receive(%i) connected, time=%i\n", Account->GetIndex(), TimeDelta());
-			SecondsTillOnline = -1;
+		SecondsTillOnline = -1;
 
-			// Get all the messages..
-			Thread->SetState(ThreadTransfer);
-			auto Msgs = Source->GetMessages();
-			if (Msgs)
+		// Get all the messages..
+		Thread->SetState(ThreadTransfer);
+		auto Msgs = Source->GetMessages();
+		if (Msgs)
+		{
+			bool LeaveOnServer = Receive->LeaveOnServer() != 0;
+			bool DeleteAfter = Receive->DeleteAfter() != 0;
+			int DeleteDays = Receive->DeleteDays();
+			bool GetUids = LeaveOnServer;
+			bool HasGetHeaders = false;
+
+			if (DeleteDays < 1)
 			{
-				bool LeaveOnServer = Receive->LeaveOnServer() != 0;
-				bool DeleteAfter = Receive->DeleteAfter() != 0;
-				int DeleteDays = Receive->DeleteDays();
-				bool GetUids = LeaveOnServer;
-				bool HasGetHeaders = false;
+				Receive->DeleteDays(DeleteDays = 1);
+			}
 
-				if (DeleteDays < 1)
+			for (int i=0; i<Msgs; i++)
+			{
+				if (auto t = new MailTransferEvent)
 				{
-					Receive->DeleteDays(DeleteDays = 1);
-				}
+					t->Rfc822Msg.Reset(new LTempStream(ScribeTempPath()));
+					t->Index = i;
 
-				for (int i=0; i<Msgs; i++)
-				{
-					MailTransferEvent *t = new MailTransferEvent;
-					if (t)
+					if (Actions.Length())
 					{
-						t->Rfc822Msg.Reset(new LTempStream(ScribeTempPath()));
-						t->Index = i;
-
-						if (Actions.Length())
-						{
-							t->Action = (unsigned)i < Actions.Length() ? Actions[i] : MailNoop;
-							t->Explicit = true;
-						}
-						else if (Receive->Items)
-						{
-							t->Action = MailHeaders;
-							GetUids = true;
-						}
-						else
-						{
-							t->Action = LeaveOnServer ? MailDownload : MailDownloadAndDelete;
-						}
-
-						switch (t->Action)
-						{
-							default:
-								break;
-							case MailHeaders:
-							{
-								HasGetHeaders = true;
-								// fall thru
-							}
-							case MailDownloadAndDelete:
-							case MailDownload:
-							case MailUpload:
-							{
-								Group.Range++;
-								break;
-							}
-						}
-
-						Thread->Files.Insert(t);
+						t->Action = (unsigned)i < Actions.Length() ? Actions[i] : MailNoop;
+						t->Explicit = true;
 					}
+					else if (Receive->Items)
+					{
+						t->Action = MailHeaders;
+						GetUids = true;
+					}
+					else
+					{
+						t->Action = LeaveOnServer ? MailDownload : MailDownloadAndDelete;
+					}
+
+					switch (t->Action)
+					{
+						default:
+							break;
+						case MailHeaders:
+						{
+							HasGetHeaders = true;
+							// fall thru
+						}
+						case MailDownloadAndDelete:
+						case MailDownload:
+						case MailUpload:
+						{
+							Group.Range++;
+							break;
+						}
+					}
+
+					Thread->Files.Insert(t);
 				}
+			}
 
 if (DebugTrace) LgiTrace("Receive(%i) got %i actions, time=%i\n", Account->GetIndex(), Thread->Files.Length(), TimeDelta());
 
-				if (HasGetHeaders || DeleteIfLargerThan)
+			if (HasGetHeaders || DeleteIfLargerThan)
+			{
+				LArray<int64_t> Sizes;
+				if (Source->GetSizes(Sizes))
 				{
-					LArray<int64_t> Sizes;
-					if (Source->GetSizes(Sizes))
-					{
-						unsigned i = 0;
-						for (auto t: Thread->Files)
-						{
-							if (i >= Sizes.Length())
-								break;
-
-							t->Size = Sizes[i];
-
-							if (t->Action == MailHeaders)
-							{
-								t->Msg = new AccountMessage(Account);
-								if (t->Msg)
-								{
-									t->Msg->Size = t->Size;
-								}
-							}
-							i++;
-						}
-					}
-				}
-
-				// Getting the UID's of the messages on the server
-				if (GetUids || Receive->Msgs->Length() > 0)
-				{
-if (DebugTrace) LgiTrace("Receive(%i) getting UID's, time=%i\n", Account->GetIndex(), TimeDelta());
-					LString::Array UidLst;
-					Source->GetUidList(UidLst);
-					for (auto u: UidLst)
-						Uids.Add(u, true);
-
-					// Assign all the ID strings to the transfer events
-					LDateTime Now;
-					Now.SetNow();
+					unsigned i = 0;
 					for (auto t: Thread->Files)
 					{
-						auto k = UidLst[0];
-						if (k)
-						{
-							UidLst.DeleteAt(0, true);
-							t->Uid = k;
-if (DebugTrace) LgiTrace("\tUid[%i]='%s' (time=%i)\n", t->Index, t->Uid.Get(), TimeDelta());
-						}
-						else break;
+						if (i >= Sizes.Length())
+							break;
 
-						if (!t->Explicit && DeleteAfter)
+						t->Size = Sizes[i];
+
+						if (t->Action == MailHeaders)
 						{
-							// Check how long the message has been on the server.
-							LDateTime MsgDate;
-							if (Receive->Msgs->GetDate(t->Uid, &MsgDate))
+							t->Msg = new AccountMessage(Account);
+							if (t->Msg)
 							{
-								LDateTime Days = Now - MsgDate;
-								if (Days.Day() > DeleteDays)
-								{
-									if (t->Action == MailDownload)
-										t->Action = MailDownloadAndDelete;
-								}
+								t->Msg->Size = t->Size;
+							}
+						}
+						i++;
+					}
+				}
+			}
+
+			// Getting the UID's of the messages on the server
+			if (GetUids || Receive->Msgs->Length() > 0)
+			{
+if (DebugTrace) LgiTrace("Receive(%i) getting UID's, time=%i\n", Account->GetIndex(), TimeDelta());
+				LString::Array UidLst;
+				Source->GetUidList(UidLst);
+				for (auto u: UidLst)
+					Uids.Add(u, true);
+
+				// Assign all the ID strings to the transfer events
+				LDateTime Now;
+				Now.SetNow();
+				for (auto t: Thread->Files)
+				{
+					auto k = UidLst[0];
+					if (k)
+					{
+						UidLst.DeleteAt(0, true);
+						t->Uid = k;
+if (DebugTrace) LgiTrace("\tUid[%i]='%s' (time=%i)\n", t->Index, t->Uid.Get(), TimeDelta());
+					}
+					else break;
+
+					if (!t->Explicit && DeleteAfter)
+					{
+						// Check how long the message has been on the server.
+						LDateTime MsgDate;
+						if (Receive->Msgs->GetDate(t->Uid, &MsgDate))
+						{
+							LDateTime Days = Now - MsgDate;
+							if (Days.Day() > DeleteDays)
+							{
+								if (t->Action == MailDownload)
+									t->Action = MailDownloadAndDelete;
 							}
 						}
 					}
 				}
+			}
 
 if (DebugTrace) LgiTrace("Receive(%i) starting main action loop, time=%i\n", Account->GetIndex(), TimeDelta());
 				
-				Group.Start = LCurrentTime();
-				bool Error = false;
-				LArray<MailTransaction*> Trans;
-				char NotLoaded[256];
-				sprintf_s(	NotLoaded, sizeof(NotLoaded),
-							"%s: %s",
-							LLoadString(FIELD_SUBJECT),
-							LLoadString(IDS_NOT_LOADED));	
+			Group.Start = LCurrentTime();
+			bool Error = false;
+			LArray<MailTransaction*> Trans;
+			char NotLoaded[256];
+			sprintf_s(	NotLoaded, sizeof(NotLoaded),
+						"%s: %s",
+						LLoadString(FIELD_SUBJECT),
+						LLoadString(IDS_NOT_LOADED));	
 
-				for (auto it = Thread->Files.rbegin();
-					it != Thread->Files.end() && !Thread->IsCancelled();
-					it--)
-				{
-					MailTransferEvent *t = *it;
-					if (!t)
-						continue;
+			for (auto it = Thread->Files.rbegin();
+				it != Thread->Files.end() && !Thread->IsCancelled();
+				it--)
+			{
+				MailTransferEvent *t = *it;
+				if (!t)
+					continue;
 						
-					bool Ok = false;
-					switch (t->Action)
+				bool Ok = false;
+				switch (t->Action)
+				{
+					case MailDownload:
+					case MailDownloadAndDelete:
 					{
-						case MailDownload:
-						case MailDownloadAndDelete:
+						if (!t->Explicit &&
+							t->Uid &&
+							Receive->Msgs->Find(t->Uid))
 						{
-							if (!t->Explicit &&
-								t->Uid &&
-								Receive->Msgs->Find(t->Uid))
-							{
-								// Already got it...
-// if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Already got msg\n", Account->GetIndex(), t->Index);
-								Status = true;
-								Group.Value++;
+							// Already got it...
+							Group.Value++;
 
-								if (DeleteIfLargerThan > 0 &&
-									t->Size > 0 &&
-									t->Size > DeleteIfLargerThan)
-								{
-									t->Action = MailDelete;
-								}
+							if (DeleteIfLargerThan > 0 &&
+								t->Size > 0 &&
+								t->Size > DeleteIfLargerThan)
+							{
+								t->Action = MailDelete;
+							}
+							continue;
+						}
+						else
+						{
+							if (t->Uid && Receive->IsSpamId(t->Uid))
+							{
+								// Delete the spam
+								t->Action = MailDelete;
+								Group.Value++;
 								continue;
 							}
 							else
 							{
-								if (t->Uid && Receive->IsSpamId(t->Uid))
+								// Download it
+								MailTransaction *Get = new MailTransaction;
+								if (Get)
 								{
-									// Delete the spam
-									t->Action = MailDelete;
-									Status = true;
-									Group.Value++;
-									continue;
-								}
-								else
-								{
-									// Download it
-									MailTransaction *Get = new MailTransaction;
-									if (Get)
-									{
-										if (t->Explicit)
-											Get->Flags |= MAIL_EXPLICIT;
+									if (t->Explicit)
+										Get->Flags |= MAIL_EXPLICIT;
 
-										Get->Index = t->Index;
-										Get->Stream = t->Rfc822Msg;
-										Trans.Add(Get);
-										continue;										
-									}
-								}
-								Group.Value++;
-							}
-							break;
-						}
-						case MailHeaders:
-						{
-if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Getting headers..., time=%i\n", Account->GetIndex(), t->Index, TimeDelta());
-							auto Headers = Source->GetHeaders(t->Index);
-if (DebugTrace) LgiTrace("Receive(%i) Item(%i) headers=%p, time=%i\n", Account->GetIndex(), t->Index, Headers.Get(), TimeDelta());
-
-                            if (!Headers)
-								Headers = NotLoaded;
-							
-							if (Headers)
-							{
-								if (!t->Msg)
-									t->Msg = new AccountMessage(Account);
-								if (t->Msg)
-								{
-									t->Msg->Index = t->Index;
-									t->Msg->ServerUid = t->Uid;
-									t->Msg->From = LDecodeRfc2047(LGetHeaderField(Headers, "From"));
-									t->Msg->Subject = LDecodeRfc2047(LGetHeaderField(Headers, "Subject")).Replace("\n");
-									
-									auto date = LGetHeaderField(Headers, "Date");
-									if (date)
-										t->Msg->Date.Decode(date);
-									
-									t->Msg->Attachments = LGetHeaderField(Headers, "Content-Type").Find("multipart/mixed") >= 0;
-									if (IsSpamId(t->Uid))
-									{
-										t->Msg->Download->Value(false);
-										t->Msg->Delete->Value(true);
-										t->Msg->New = false;
-									}
-									else
-									{
-										t->Msg->New = !HasMsg(t->Uid);
-									}
-									
-									Ok = true;
+									Get->Index = t->Index;
+									Get->Stream = t->Rfc822Msg;
+									Trans.Add(Get);
+									continue;										
 								}
 							}
-
 							Group.Value++;
-							break;
 						}
-						default:
-						{
-							continue;
-						}
-					}
-
-					if (Ok)
-					{
-						Status = true;
-						t->Account = this;
-						t->Status = MailReceivedWaiting;							
-						GetApp()->OnMailTransferEvent(t);
-					}
-					else
-					{
-if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Error, time=%i\n", Account->GetIndex(), t->Index, TimeDelta());
-						Error = true;
 						break;
 					}
-				}
-
-				if (Trans.Length() > 0)
-				{
-					MailCallbacks Callbacks;
-					ZeroObj(Callbacks);
-					Callbacks.CallbackData = &Params;
-					Callbacks.OnSrc = ReceiveCallback;
-					Callbacks.OnReceive = AfterReceived;
-
-					Error = !Source->Receive(Trans, &Callbacks);
-
-					for (unsigned i=0; i<Trans.Length(); i++)
+					case MailHeaders:
 					{
-						MailTransaction *Tran = Trans[i];
-						MailTransferEvent *t = Thread->Files[Tran->Index];
-						if (t)
-						{
-							/*
-							LgiTrace("%s:%i - Trans[%i]: No 't' ptr for idx=%i files.len=%i.\n",
-								_FL,
-								i,
-								Tran->Index,
-								(int)Thread->Files.Length());
-							*/
-						}
-						else
-						{
-							if (Tran->Oversize)
-							{
-								// Ignore
-								t->Action = MailNoop;
-								t->Status = MailReceivedOk;
-								Status = true;
-							}
-							else if (Tran->Status)
-							{
-								if (t->Status == MailReceivedNone)
-								{
-if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Posting WM_SCRIBE_THREAD_ITEM, time=%i\n", Account->GetIndex(), t->Index, TimeDelta());
-									Status = true;
+if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Getting headers..., time=%i\n", Account->GetIndex(), t->Index, TimeDelta());
+						auto Headers = Source->GetHeaders(t->Index);
+if (DebugTrace) LgiTrace("Receive(%i) Item(%i) headers=%p, time=%i\n", Account->GetIndex(), t->Index, Headers.Get(), TimeDelta());
 
-									if (!TestFlag(Tran->Flags, MAIL_POSTED_TO_GUI))
-									{
-										// Ask the gui thread to load the mail in
-										t->Status = MailReceivedWaiting;
-										GetApp()->OnMailTransferEvent(t);
-									}
+                        if (!Headers)
+							Headers = NotLoaded;
+							
+						if (Headers)
+						{
+							if (!t->Msg)
+								t->Msg = new AccountMessage(Account);
+							if (t->Msg)
+							{
+								t->Msg->Index = t->Index;
+								t->Msg->ServerUid = t->Uid;
+								t->Msg->From = LDecodeRfc2047(LGetHeaderField(Headers, "From"));
+								t->Msg->Subject = LDecodeRfc2047(LGetHeaderField(Headers, "Subject")).Replace("\n");
+									
+								auto date = LGetHeaderField(Headers, "Date");
+								if (date)
+									t->Msg->Date.Decode(date);
+									
+								t->Msg->Attachments = LGetHeaderField(Headers, "Content-Type").Find("multipart/mixed") >= 0;
+								if (IsSpamId(t->Uid))
+								{
+									t->Msg->Download->Value(false);
+									t->Msg->Delete->Value(true);
+									t->Msg->New = false;
 								}
 								else
 								{
-									Status = true;
+									t->Msg->New = !HasMsg(t->Uid);
 								}
-							}
-							else
-							{
-								LgiTrace("%s:%i - Error: Bad Status on download %i of %i.\n", _FL, i, Trans.Length());
-								// Don't delete a mail that failed to download
-								t->Action = MailNoop;
+									
+								Ok = true;
 							}
 						}
+
+						Group.Value++;
+						break;
 					}
-					Trans.DeleteObjects();
+					default:
+					{
+						continue;
+					}
 				}
 
-				// Done... wait for main thread to finish processing
-if (DebugTrace) LgiTrace("Receive(%i) Waiting for main thread, time=%i\n", Account->GetIndex(), TimeDelta());
-				Thread->SetState(ThreadWaiting);
-
-				// Wait for the main thread to finish with all the items we sent over
-				if (!WaitForTransfers(Thread->Files))
-					Error = true;
-
-				if (Error)
+				if (Ok)
 				{
-					LgiTrace("%s:%i - Error receiving mail.\n", _FL);
+					t->Account = this;
+					t->Status = MailReceivedWaiting;							
+					GetApp()->OnMailTransferEvent(t);
 				}
 				else
 				{
-					// Do delete's
-if (DebugTrace) LgiTrace("Receive(%i) Delete phase, time=%i\n", Account->GetIndex(), TimeDelta());
+if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Error, time=%i\n", Account->GetIndex(), t->Index, TimeDelta());
+					Error = true;
+					break;
+				}
+			}
 
-					Group.Empty();
+			if (Trans.Length() > 0)
+			{
+				MailCallbacks Callbacks;
+				ZeroObj(Callbacks);
+				Callbacks.CallbackData = &Params;
+				Callbacks.OnSrc = ReceiveCallback;
+				Callbacks.OnReceive = AfterReceived;
+
+				Error = !Source->Receive(Trans, &Callbacks);
+
+				for (unsigned i=0; i<Trans.Length(); i++)
+				{
+					MailTransaction *Tran = Trans[i];
+					MailTransferEvent *t = Thread->Files[Tran->Index];
+					if (t)
 					{
-						for (auto d: Thread->Files)
-						{
-							if (d->Action == MailDelete ||
-								d->Action == MailDownloadAndDelete)
-							{
-								Group.Range++;
-							}
-						}
+						/*
+						LgiTrace("%s:%i - Trans[%i]: No 't' ptr for idx=%i files.len=%i.\n",
+							_FL,
+							i,
+							Tran->Index,
+							(int)Thread->Files.Length());
+						*/
 					}
-					
-					Group.Start = LCurrentTime();
-					Thread->SetState(ThreadDeleting);
-					for (auto It = Thread->Files.rbegin();
-						It != Thread->Files.end() && Thread->GetState() == ThreadDeleting;
-						It--)
+					else
 					{
-						MailTransferEvent *d = *It;
-
-						if (d->Action == MailDelete ||
-							d->Action == MailDownloadAndDelete)
+						if (Tran->Oversize)
 						{
-if (DebugTrace) LgiTrace("Receive(%i) Delete(%i) Deleting, time=%i\n", Account->GetIndex(), d->Index, TimeDelta());
-
-							if (Source->Delete(d->Index))
+							// Ignore
+							t->Action = MailNoop;
+							t->Status = MailReceivedOk;
+						}
+						else if (Tran->Status)
+						{
+							if (t->Status == MailReceivedNone)
 							{
-								Status = true;
-								if (d->Uid)
+if (DebugTrace) LgiTrace("Receive(%i) Item(%i) Posting WM_SCRIBE_THREAD_ITEM, time=%i\n", Account->GetIndex(), t->Index, TimeDelta());
+								if (!TestFlag(Tran->Flags, MAIL_POSTED_TO_GUI))
 								{
-									Uids.Delete(d->Uid);
+									// Ask the gui thread to load the mail in
+									t->Status = MailReceivedWaiting;
+									GetApp()->OnMailTransferEvent(t);
 								}
 							}
-							Group.Value++;
+						}
+						else
+						{
+							LgiTrace("%s:%i - Error: Bad Status on download %i of %i.\n", _FL, i, Trans.Length());
+							// Don't delete a mail that failed to download
+							t->Action = MailNoop;
 						}
 					}
 				}
+				Trans.DeleteObjects();
+			}
 
-				WaitForTransfers(Thread->Files);
-				Thread->Files.DeleteObjects();
-				Group.Empty();
+			// Done... wait for main thread to finish processing
+if (DebugTrace) LgiTrace("Receive(%i) Waiting for main thread, time=%i\n", Account->GetIndex(), TimeDelta());
+			Thread->SetState(ThreadWaiting);
+
+			// Wait for the main thread to finish with all the items we sent over
+			if (!WaitForTransfers(Thread->Files))
+				Error = true;
+
+			if (Error)
+			{
+				LgiTrace("%s:%i - Error receiving mail.\n", _FL);
 			}
 			else
 			{
-				Receive->RemoveAllMsgs();
-				Status = true;
-			}
+				// Do delete's
+if (DebugTrace) LgiTrace("Receive(%i) Delete phase, time=%i\n", Account->GetIndex(), TimeDelta());
 
-			// Clear out the UID's
-			if (Uids.Length() && Receive->Msgs)
-			{
-				// ssize_t UidsLen = Uids.Length();
-				// ssize_t AllMsgIdsLen = Receive->Msgs->Length();
-
-				auto MsgKeys = Receive->Msgs->CopyKeys();
-				for (auto &k : MsgKeys)
+				Group.Empty();
 				{
-					if (!Uids.Find(k))
-						RemoveMsg(k);
+					for (auto d: Thread->Files)
+					{
+						if (d->Action == MailDelete ||
+							d->Action == MailDownloadAndDelete)
+						{
+							Group.Range++;
+						}
+					}
 				}
-
-				if (Spam)
+					
+				Group.Start = LCurrentTime();
+				Thread->SetState(ThreadDeleting);
+				for (auto It = Thread->Files.rbegin();
+					It != Thread->Files.end() && Thread->GetState() == ThreadDeleting;
+					It--)
 				{
-					auto SpamKeys = Spam->CopyKeys();
-					for (auto &s : SpamKeys)
-	 				{
-						if (!Uids.Find(s))
-							Spam->Delete(s);
+					MailTransferEvent *d = *It;
+
+					if (d->Action == MailDelete ||
+						d->Action == MailDownloadAndDelete)
+					{
+if (DebugTrace) LgiTrace("Receive(%i) Delete(%i) Deleting, time=%i\n", Account->GetIndex(), d->Index, TimeDelta());
+
+						if (Source->Delete(d->Index))
+						{
+							if (d->Uid)
+								Uids.Delete(d->Uid);
+						}
+						Group.Value++;
 					}
 				}
 			}
 
-if (DebugTrace) LgiTrace("Receive(%i) Closing the connection, time=%i\n", Account->GetIndex(), TimeDelta());
-			// Close the connection.
-			Source->Close();
+			WaitForTransfers(Thread->Files);
+			Thread->Files.DeleteObjects();
+			Group.Empty();
+		}
+		else
+		{
+			Receive->RemoveAllMsgs();
 		}
 
-		DeleteObj(Source);
-	}
-	else
-	{
-		Thread->SetState(ThreadError);
+		// Clear out the UID's
+		if (Uids.Length() && Receive->Msgs)
+		{
+			// ssize_t UidsLen = Uids.Length();
+			// ssize_t AllMsgIdsLen = Receive->Msgs->Length();
+
+			auto MsgKeys = Receive->Msgs->CopyKeys();
+			for (auto &k : MsgKeys)
+			{
+				if (!Uids.Find(k))
+					RemoveMsg(k);
+			}
+
+			if (Spam)
+			{
+				auto SpamKeys = Spam->CopyKeys();
+				for (auto &s : SpamKeys)
+	 			{
+					if (!Uids.Find(s))
+						Spam->Delete(s);
+				}
+			}
+		}
+
+if (DebugTrace) LgiTrace("Receive(%i) Closing the connection, time=%i\n", Account->GetIndex(), TimeDelta());
+		// Close the connection.
+		Source->Close();
 	}
 
+	DeleteObj(Source);
+
 	// Clean up, notify the app
-	ConnectionStatus = Status;
 	Actions.Length(0);
 
 if (DebugTrace) LgiTrace("Receive(%i) Exit, time=%i\n", Account->GetIndex(), TimeDelta());

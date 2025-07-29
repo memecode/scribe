@@ -1743,7 +1743,7 @@ protected:
 	// Data
 	ScribeAccount *Account = NULL;
 	LAutoPtr<AccountThread> Thread;
-	bool ConnectionStatus = true;
+	LError err;
 	MailProtocol *Client = NULL;
 	uint64 LastOnline = 0;
 	LString TempPsw;
@@ -1794,7 +1794,7 @@ public:
 	bool			Lock();
 	void			Unlock();
 	virtual bool	IsConfigured() 	{ return false; }
-	bool			GetStatus()		{ return ConnectionStatus; }
+	bool			GetStatus()		{ return !err; }
 	uint64			GetLastOnline()	{ return LastOnline; }
 	ScribeAccount*	GetAccount() 	{ return Account; }
 	bool			IsCancelled();

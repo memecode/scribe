@@ -34,21 +34,21 @@ class AccountStatusPanel :
 	friend class AccountStatusItem;
 
 	// Data
-	LImageList *ImgLst;
-	List<ScribeAccount> *Accounts;
-	size_t PrevAccounts;
-	ScribeAccount *Current;
-	AccountStatusItem *CurStatusItem;
+	LImageList *ImgLst = nullptr;
+	List<ScribeAccount> *Accounts = nullptr;
+	size_t PrevAccounts = 0;
+	ScribeAccount *Current = nullptr;
+	AccountStatusItem *CurStatusItem = nullptr;
 
 	// Controls
-	LViewI *AccountTbl;
-	LList *Lst;
+	LViewI *AccountTbl = nullptr;
+	LList *Lst = nullptr;
 
-	LTableLayout *ProgressTbl;
-	LProgressView *Total;
-	LProgressView *Sub;
+	LTableLayout *ProgressTbl = nullptr;
+	LProgressView *Total = nullptr;
+	LProgressView *Sub = nullptr;
 
-	class LTabView *Log;
+	class LTabView *Log = nullptr;
 
 	// Methods
 	int AccountStatus(Accountlet *Acc);

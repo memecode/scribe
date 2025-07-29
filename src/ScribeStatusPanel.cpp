@@ -333,16 +333,8 @@ AccountStatusPanel::AccountStatusPanel(ScribeWnd *app, LImageList *imglst) :
 	ScribePanel(app, LLoadString(IDS_STATUS), 20, false)
 {
 	App = app;
-	Accounts = (App) ? App->GetAccounts() : 0;
+	Accounts = App ? App->GetAccounts() : nullptr;
 	ImgLst = imglst;
-	PrevAccounts = 0;
-	Current = 0;
-	Lst = 0;
-	Total = 0;
-	Sub = 0;
-	AccountTbl = 0;
-	ProgressTbl = 0;
-	CurStatusItem = NULL;
 
 	Alignment(GV_EDGE_BOTTOM);
 
@@ -353,7 +345,7 @@ AccountStatusPanel::AccountStatusPanel(ScribeWnd *app, LImageList *imglst) :
 		Open(Op.CastInt32() != 0);
 	}
 
-	LRect *Bounds = ImgLst ? ImgLst->GetBounds() : 0;
+	LRect *Bounds = ImgLst ? ImgLst->GetBounds() : nullptr;
 	LString n;
 	LRect p;
 	if (Bounds && LoadFromResource(IDD_STATUS, this, &p, &n))
@@ -445,25 +437,19 @@ int AccountStatusPanel::OnNotify(LViewI *Ctrl, const LNotification &n)
 
 				if (_Lock())
 				{
-					Accountlet *AccLet = 0;
+					Accountlet *AccLet = nullptr;
 					if (Current)
 					{
 						if (Current->Receive.IsOnline())
-						{
 							AccLet = &Current->Receive;
-						}
 						else if (Current->Send.IsOnline())
-						{
 							AccLet = &Current->Send;
-						}
 					}
 
 					_Unlock();
 
 					if (AccLet)
-					{
 						AccLet->Disconnect();
-					}
 				}
 
 				Stopping = false;
@@ -731,7 +717,18 @@ void AccountStatusPanel::OnAccountSelect(AccountStatusItem *Item)
 
 int AccountStatusPanel::AccountStatus(Accountlet *a)
 {
-	return a ? a->GetStatusIcon() : STATUS_ERROR;
+	if (!a)
+	{
+		LAssert(!"should always have an account ptr?");
+		return STATUS_ERROR;
+	}
+	
+	auto ico = a->GetStatusIcon();
+	if (ico == STATUS_ERROR)
+	{
+		int asd=0;
+	}
+	return ico;
 }
 
 int AccountStatusPanel::CalcWidth()
