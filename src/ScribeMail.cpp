@@ -7216,7 +7216,7 @@ bool Mail::OnBeforeSend(ScribeEnvelope *Out)
 	Buf.Read(Out->Rfc822.Get(), Sz);
 	Out->Rfc822.Get()[Sz] = 0;
 
-	LgiTrace("Out->Rfc822.Get()=%s\n", Out->Rfc822.Get());
+	// LgiTrace("Out->Rfc822.Get()=%s\n", Out->Rfc822.Get());
 
 	return true;
 }
