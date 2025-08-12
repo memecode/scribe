@@ -142,6 +142,7 @@ LMail3Idx Mail3Indexes[] =
 LMail3Store::LMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool Create) :
 	TableStatus(0, Store3Error)
 {
+	threadId = LCurrentThreadId();
 	Format = Mail3v1;
 	Folder = Mail3Folder;
 	Callback = callback;
@@ -188,6 +189,12 @@ LMail3Store::~LMail3Store()
 {
 	CloseDb();
 	DeleteObj(Root);
+}
+
+bool LMail3Store::InThread() const
+{
+	auto cur = LCurrentThreadId();
+	return cur == threadId;
 }
 
 LMail3Folder *LMail3Store::GetSystemFolder(int Type)
@@ -1970,7 +1977,8 @@ LProfile Prof("LMail3Obj::Write");
 LMail3Store::LStatement::LStatement(LMail3Store *store, const char *sql)
 {
 	Store = store;
-	s = 0;
+	s = nullptr;
+	LAssert(Store->InThread());
 
 	#if MAIL3_TRACK_OBJS
 	LMail3Store::SqliteObjs &_d = Store->All.New();

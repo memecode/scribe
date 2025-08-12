@@ -1260,9 +1260,6 @@ void ScribeWnd::Construct3()
 	// Recursively load folder tree
 	LoadFolders([this](auto status)
 	{
-		// Redo it for the templates... now that load folders has completed.
-		BuildDynMenus();
-
 		if (ScribeState == ScribeExiting)
 			return;
 

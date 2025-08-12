@@ -220,6 +220,7 @@ class LMail3Store : public LDataStoreI
 	LString ErrorMsg;
 	LString StatusMsg;
 	LString TempPath;
+	OsThreadId threadId;
 
 	std::function<void(bool)> CompactOnStatus;
 	std::function<void(bool)> RepairOnStatus;
@@ -267,10 +268,10 @@ public:
 		{
 			return
 				#ifndef __llvm__
-				this != 0 &&
+				this != nullptr &&
 				#endif
-				Store != 0 &&
-				s != 0;
+				Store != nullptr &&
+				s != nullptr;
 		}
 		bool Prepare(const char *Sql);
 		bool Row();
@@ -362,6 +363,7 @@ public:
 	~LMail3Store();
 		
 	const char *GetClass() override { return "LMail3Store"; }
+	bool InThread() const;
 
 	int64 GetFolderId(char *Path);
 	LDataEventsI *GetEvents() override { return Callback; }

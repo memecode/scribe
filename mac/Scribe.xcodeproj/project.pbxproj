@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		34063DA52DCBF8C8007CB2C2 /* Tnef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */; };
+		340AE3822E2CA79E009F705F /* libpng16.16.45.git.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 340AE37E2E2CA781009F705F /* libpng16.16.45.git.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		340AE3832E2CA7A3009F705F /* libjpeg.62.4.0.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 340AE37F2E2CA781009F705F /* libjpeg.62.4.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 34749B44278B042500C8197E /* LgiCocoa.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		340FA6A9237E7E2D0043D1F2 /* EmojiMap.png in Resources */ = {isa = PBXBuildFile; fileRef = 340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */; };
 		340FAAEA23888A570017BC62 /* WebdavContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 340FAADC23888A570017BC62 /* WebdavContact.cpp */; };
@@ -254,6 +256,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				340AE3832E2CA7A3009F705F /* libjpeg.62.4.0.dylib in Copy Files */,
+				340AE3822E2CA79E009F705F /* libpng16.16.45.git.dylib in Copy Files */,
 				34A891E32B0C17B900D2930B /* libcrypto.3.dylib in Copy Files */,
 				34A891E22B0C17B200D2930B /* libssl.3.dylib in Copy Files */,
 				34452C9E2AD4A30300AE820D /* libaspell-dist-0.60.dylib in Copy Files */,
@@ -309,6 +313,10 @@
 
 /* Begin PBXFileReference section */
 		34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Tnef.cpp; path = ../../../../lgi/trunk/src/common/General/Tnef.cpp; sourceTree = "<group>"; };
+		340AE37E2E2CA781009F705F /* libpng16.16.45.git.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng16.16.45.git.dylib; path = "../../../lgi/deps/build-release/lib/libpng16.16.45.git.dylib"; sourceTree = "<group>"; };
+		340AE37F2E2CA781009F705F /* libjpeg.62.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjpeg.62.4.0.dylib; path = "../../../lgi/deps/build-release/lib/libjpeg.62.4.0.dylib"; sourceTree = "<group>"; };
+		340AE3842E2CA7BF009F705F /* libz.1.4.1.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.4.1.1.dylib; path = "../../../lgi/deps/build-release/lib/libz.1.4.1.1.dylib"; sourceTree = "<group>"; };
+		340AE3862E2CBC87009F705F /* LoadMailStoreState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoadMailStoreState.h; path = ../../src/LoadMailStoreState.h; sourceTree = "<group>"; };
 		340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EmojiMap.png; path = ../../Resources/EmojiMap.png; sourceTree = "<group>"; };
 		340FAADC23888A570017BC62 /* WebdavContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavContact.cpp; path = ../../src/Store3Webdav/WebdavContact.cpp; sourceTree = "<group>"; };
 		34161495238484F700A65477 /* WebdavFolder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavFolder.cpp; path = ../../src/Store3Webdav/WebdavFolder.cpp; sourceTree = "<group>"; };
@@ -898,6 +906,7 @@
 		3477C35F1CC226370028B84B /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				340AE3862E2CBC87009F705F /* LoadMailStoreState.h */,
 				34723EA62A8EE5D200EC80E8 /* ScribeIpc.cpp */,
 				34723EB62A8EE5D200EC80E8 /* ScribeIpc.h */,
 				3477C3631CC227ED0028B84B /* AddressSelect.cpp */,
@@ -964,6 +973,9 @@
 		3477C5211CC315EB0028B84B /* Link */ = {
 			isa = PBXGroup;
 			children = (
+				340AE3842E2CA7BF009F705F /* libz.1.4.1.1.dylib */,
+				340AE37F2E2CA781009F705F /* libjpeg.62.4.0.dylib */,
+				340AE37E2E2CA781009F705F /* libpng16.16.45.git.dylib */,
 				34452C8E2AD4A26B00AE820D /* libchardet.dylib */,
 				34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */,
 				34452C8A2AD4A23C00AE820D /* libbzip2.dylib */,
