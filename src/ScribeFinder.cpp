@@ -214,15 +214,14 @@ class ResultItem : public LListItem
 			{
 				LDragData &dd = Data[di];
 				
-				if (!_stricmp(ScribeThingList, dd.Format))
+				if (dd.IsFormat(ScribeThingList))
 				{
-					ScribeClipboardFmt *Fmt = ScribeClipboardFmt::Alloc(false, Objs.Length());
-					if (Fmt)
+					if (auto Fmt = ScribeClipboardFmt::Alloc(false, Objs.Length()))
 					{
 						int n = 0;
 						for (auto i: Objs)
 						{
-							ResultItem *Ri = dynamic_cast<ResultItem*>(i);
+							auto Ri = dynamic_cast<ResultItem*>(i);
 							if (Ri && Ri->T)
 								Fmt->ThingAt(n++, Ri->T);
 						}

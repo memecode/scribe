@@ -91,8 +91,40 @@ int ThingList::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
 
 int ThingList::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 {
-	int Status = DROPEFFECT_NONE;
+	if (!Container)
+		return DROPEFFECT_NONE;
 
+	// Check if this item ALREADY belongs to this container...
+	for (auto &dd: Data)
+	{
+		if (dd.IsFormat(ScribeThingList) &&
+			dd.Data.Length() > 0)
+		{
+			auto &v = dd.Data[0];
+			if (v.Type == GV_BINARY &&
+				ScribeClipboardFmt::IsThing(v.Value.Binary.Data, v.Value.Binary.Length))
+			{
+				auto fmt = (ScribeClipboardFmt*) v.Value.Binary.Data;
+				for (uint32_t i=0; i<fmt->Length(); i++)
+				{
+					if (auto t = fmt->ThingAt(i))
+					{
+						if (auto f = t->GetFolder())
+						{
+							if (f == Container)
+							{
+								// Dropping item on the same container it's already in is a Noop:
+								return DROPEFFECT_NONE;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Handle dropped file:
+	int Status = DROPEFFECT_NONE;
 	for (auto &dd: Data)
 	{
 		if (Container && dd.IsFileDrop())
