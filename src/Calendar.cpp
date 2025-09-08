@@ -21,6 +21,7 @@
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/Json.h"
 #include "lgi/common/FileSelect.h"
+#include "lgi/common/StringLayout.h"
 
 #include "CalendarView.h"
 #include "PrintContext.h"
@@ -1271,71 +1272,91 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 
 	LColour Grey(192, 192, 192);
 	auto View = GetView();
-	if (View && View->Selection.HasItem(this))
+	auto inSelection = View && View->Selection.HasItem(this);
+	LColour fore, back, text(L_TEXT);
+	if (inSelection)
 	{
 		// selected
-		LColour f = L_FOCUS_SEL_FORE;
-		LColour b = L_FOCUS_SEL_BACK;
+		fore = LColour(L_FOCUS_SEL_FORE);
+		back = LColour(L_FOCUS_SEL_BACK);
 		if (Delayed)
 		{
-			f = f.Mix(Grey);
-			b = b.Mix(Grey);
+			fore = fore.Mix(Grey);
+			back = back.Mix(Grey);
 		}
 
-		pDC->Colour(f);
+		pDC->Colour(fore);
 		pDC->Box(&p);
 		p.Inset(1, 1);
-		pDC->Colour(b);
-		Font->Colour(f, b);
+		pDC->Colour(back);
+		Font->Colour(fore, back);
 	}
 	else
 	{
-		LColour Text(0x80, 0x80, 0x80);
-		LColour Ws(L_WORKSPACE);
 		auto Base = GetColour();
+		auto foreDist = ABS(Base.GetGray()-LColour(L_FOCUS_SEL_FORE).GetGray());
+		auto backDist = ABS(Base.GetGray()-LColour(L_TEXT).GetGray());
+		if (foreDist > backDist)
+			text = L_FOCUS_SEL_FORE;
+		else
+			text = L_TEXT;
+		LColour Ws(L_WORKSPACE);
 		auto Qtr = Ws.Mix(Base, 0.1f);
 		auto Half = Ws.Mix(Base, 0.4f);
 
 		// not selected
-		LColour f, b;
-
 		if (Period && Now < Period->s)
 		{
 			// future entry (full colour)
-			f = Base;
-			b = Half;
+			fore = Base;
+			back = Half;
 		}
 		else
 		{
 			// historical entry (half strength colour)
-			f = Half;
-			b = Qtr;
+			fore = Half;
+			back = Qtr;
 		}
 
 		if (Delayed)
 		{
-			f = f.Mix(Grey);
-			b = b.Mix(Grey);
+			fore = fore.Mix(Grey);
+			back = back.Mix(Grey);
 		}
 
-		pDC->Colour(f);
+		pDC->Colour(fore);
 		pDC->Box(&p);
 		p.Inset(1, 1);
-		pDC->Colour(b);
-		Font->Colour(Text, b);
+		pDC->Colour(back);
+		Font->Colour(text, back);
 	}
 
 	pDC->Rectangle(&p);
 	p.Inset((int)SX(1), (int)SY(1));
 
 	Font->Transparent(false);
-	LDisplayString ds(Font, Title);
-	float Ht = p.Y() > 0 ? (float)ds.Y() / p.Y() : 1.0f;
-	if (Ht < 0.75f)
-		p.Inset((int)SX(3), (int)SY(3));
-	else if (Ht < 0.95f)
-		p.Inset((int)SX(1), (int)SY(1));
-	ds.Draw(pDC, p.x1, p.y1, &p);
+
+	LPoint pad((int)SX(3), (int)SY(3));
+	LFontCache fntCache(Font);
+	LCss textStyle;
+	textStyle.Color(text);
+	LStringLayout layout(&fntCache);
+	layout.SetWrap(true);
+	layout.Add(Title, &textStyle);
+	if (layout.DoLayout(p.X()-pad.x))
+	{
+		layout.Paint(pDC, pad + p.TopLeft(), back, p, true, inSelection);
+	}
+	else
+	{
+		LDisplayString ds(Font, Title);
+		float Ht = p.Y() > 0 ? (float)ds.Y() / p.Y() : 1.0f;
+		if (Ht < 0.75f)
+			p.Inset(pad.x, pad.y);
+		else if (Ht < 0.95f)
+			p.Inset((int)SX(1), (int)SY(1));
+		ds.Draw(pDC, p.x1, p.y1, &p);
+	}
 
 	ViewPos.Union(Pos);
 }
