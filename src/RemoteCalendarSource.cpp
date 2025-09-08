@@ -29,13 +29,18 @@ public:
 	RemoteCalEvent(LDataStoreI *s)
 	{
 		store = s;
+		readOnly = true;
 	}
 
 	const char *GetClass() override { return "RemoteCalEvent"; }
 	LDataStoreI *GetStore() override { return store; }
 	bool IsOnDisk() override { return false; }
 	bool IsOrphan() override { return false; }
-	Store3Status Save(LDataI *Obj = NULL) override { return Store3NotImpl; }
+	Store3Status Save(LDataI *Obj = NULL) override
+	{
+		LAssert(!"remote calendar events are read-only");
+		return Store3NotImpl;
+	}
 	Store3Status Delete(bool ToTrash = true) override { return Store3NotImpl; }
 	LDataIt GetList(int id) override { return NULL; }
 	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
@@ -48,6 +53,7 @@ struct RemoteCalendarSourcePriv :
 	RemoteCalendarSource *Source = NULL;
 	LString Uri;
 	LString Name;
+	LString errMsg;
 	bool Error = false;
 	bool Loaded = false;
 
@@ -85,6 +91,19 @@ struct RemoteCalendarSourcePriv :
 		if (Type == MAGIC_CALENDAR)
 			return new RemoteCalEvent(this);
 		return NULL;
+	}
+
+	const char *GetStr(int id) override
+	{
+		switch (id)
+		{
+		case FIELD_ERROR:
+			return errMsg;
+		default:
+			break;
+		}
+
+		return nullptr;
 	}
 
 	LDataFolderI *GetRoot(bool create = false) override
@@ -145,11 +164,8 @@ struct RemoteCalendarSourcePriv :
 		{
 			case M_LOAD_URI:
 			{
-				LString err;
 				LStringPipe out;
-				auto r = LGetUri(this, &out, &err, Uri);
-				// LOG("RemoteCalendarSource: LgiGetUri(%s)=%i\n", Uri.Get(), r);
-				if (r)
+				if (auto r = LGetUri(this, &out, &errMsg, Uri))
 				{
 					VCal imp;
 					while (true)
@@ -157,17 +173,14 @@ struct RemoteCalendarSourcePriv :
 						auto c = new Calendar(Source->GetApp(), Create(MAGIC_CALENDAR));
 						if (imp.Import(c->GetObject(), &out))
 						{
-							if (Lock(_FL))
-							{
-								// LOG("RemoteCalendarSource: adding event...\n");
-								Events.Add(c);
-								Unlock();
-							}
+							c->SetWillDirty(false);
+
+							Auto lck(this, _FL);
+							Events.Add(c);
 						}
 						else
 						{
 							// This should be the end of the stream...
-							// LOG("RemoteCalendarSource: error importing calendar: %s\n", c->ErrMsg.Get());
 							c->DecRef();
 							break;
 						}

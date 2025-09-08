@@ -91,6 +91,7 @@ int LgiMain(OsAppArguments &AppArgs)
 			return -1;
 		}
 
+		LHeaderUnitTests();
 		InitStrToDom();
 		if (App.GetOption("crtcheck"))
 			return 0;

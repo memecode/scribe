@@ -589,6 +589,7 @@ bool FilterCondition::Test(Filter *F, Mail *m, LStream *Log, LStream *errLog)
 		{
 			bool Status = false;
 			ItemFieldDef *f = NULL;
+
 			if (Source.Equals("mail.*"))
 			{
 				ItemFieldDef *Start = MailFieldDefs;
@@ -804,10 +805,12 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log, LStream *
 					case OP_CONTAINS:
 					{
 						if (IsVal && IsStr)
-						{
 							m = stristr(sVar, sVal) != 0;
-							if (Log) Log->Print("\t\t\t'%s' contains '%s' = %i\n", VarLog.Get(), sVal, m);
-						}
+						else
+							m = false;
+						
+						if (Log)
+							Log->Print("\t\t\t'%s' contains '%s' = %i\n", VarLog.Get(), sVal, m);
 						break;
 					}
 					case OP_STARTS_WITH:
@@ -3118,7 +3121,7 @@ bool Filter::EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log, LStream
 		}
 		else if (n->IsTag(ELEMENT_CONDITION))
 		{
-			FilterCondition *c = new FilterCondition;
+			LAutoPtr<FilterCondition> c(new FilterCondition);
 			if (c)
 			{
 				if (!c->Set(n))
@@ -3128,14 +3131,11 @@ bool Filter::EvaluateTree(LXmlTag *n, Mail *m, bool &Stop, LStream *Log, LStream
 				else
 				{
 					Status = c->Test(this, m, Log, errLog);
-					if (c->Not) Status = !Status;
+					if (c->Not)
+						Status = !Status;
 					if (Log)
-					{
 						Log->Print("\tResult=%i (not=%i)\n", Status, c->Not);
-					}
 				}
-
-				DeleteObj(c);
 			}
 		}
 		else LAssert(0);

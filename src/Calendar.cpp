@@ -3327,7 +3327,7 @@ void CalendarUi::OnLoad()
 
 	// Sanity check
 	if (!Item) { LAssert(!"No item."); return; }
-	LDataI *o = Item->GetObject();
+	auto o = Item->GetObject();
 	if (!o) { LAssert(!"No object."); return; }
 	
 	// Copy object values into UI
@@ -3337,6 +3337,10 @@ void CalendarUi::OnLoad()
 	SetCtrlName(IDC_LOCATION, o->GetStr(FIELD_CAL_LOCATION));
 	SetCtrlName(IDC_DESCRIPTION, o->GetStr(FIELD_CAL_NOTES));
 	SetCtrlValue(IDC_ALL_DAY, AllDay = o->GetInt(FIELD_CAL_ALL_DAY));
+
+	auto ro = o->GetInt(FIELD_READONLY);
+	if (ro >= 0)
+		SetCtrlEnabled(IDC_SAVE, !ro);
 
 	if (d->Guests)
 	{
@@ -3492,6 +3496,8 @@ void CalendarUi::OnLoad()
 			attachLst->ResizeColumnsToContent();
 		}
 	}
+
+
 
 	UpdateRelative();
 }

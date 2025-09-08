@@ -5691,7 +5691,7 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 
 			LAutoString s(InetGetHeaderField(GetInternetHeader(), Array));
 			if (s)
-				Value = s;
+				Value.OwnStr(s.Release());
 			else
 				Value.Empty();
 			break;

@@ -174,6 +174,7 @@ protected:
 	LString Notes;			// FIELD_CAL_NOTES
 
 	LColour Colour;			// FIELD_COLOUR
+	bool readOnly = false;	// FIELD_READONLY
 
 public:
 	uint32_t Type() override { return MAGIC_CALENDAR; }
@@ -359,6 +360,8 @@ public:
 				return AllDay;
 			case FIELD_STATUS:
 				return StoreStatus;
+			case FIELD_READONLY:
+				return readOnly;
 		}
 
 		LAssert(0);
