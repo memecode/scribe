@@ -282,7 +282,7 @@ public:
 		int Status;
 		LString Src;
 		LMemQueue Data;
-		LString Error;
+		LError Error;
 		
 		Request() : Data(1024)
 		{
