@@ -1343,9 +1343,11 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 	LStringLayout layout(&fntCache);
 	layout.SetWrap(true);
 	layout.Add(Title, &textStyle);
-	if (layout.DoLayout(p.X()-pad.x))
+	if (layout.DoLayout(p.X() - pad.x))
 	{
+		pDC->ClipRgn(&p);
 		layout.Paint(pDC, pad + p.TopLeft(), back, p, true, inSelection);
+		pDC->ClipRgn(nullptr);
 	}
 	else
 	{
