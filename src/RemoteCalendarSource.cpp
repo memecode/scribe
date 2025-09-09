@@ -6,6 +6,7 @@
 #include "lgi/common/EventTargetThread.h"
 #include "lgi/common/Http.h"
 #include "lgi/common/vCard-vCal.h"
+#include "lgi/common/PopupNotification.h"
 
 #include "Store3CalendarObj.h"
 
@@ -18,7 +19,8 @@
 
 enum Msgs {
 	M_LOAD_URI = M_USER + 1000,
-	M_LOADED
+	M_LOADED,
+	M_ERROR,
 };
 
 class RemoteCalEvent : public Store3CalendarObj<LDataI>
@@ -46,14 +48,17 @@ public:
 	LAutoStreamI GetStream(const char *file, int line) override { return LAutoStreamI(); }
 };
 
-struct RemoteCalendarSourcePriv :
+class RemoteCalendarSourcePriv :
 	public LEventTargetThread,
 	public LDataStoreI
 {
+	LString errCache;
+
+public:
 	RemoteCalendarSource *Source = NULL;
-	LString Uri;
 	LString Name;
-	LString errMsg;
+	LString Uri;
+	LError err;
 	bool Error = false;
 	bool Loaded = false;
 
@@ -98,7 +103,7 @@ struct RemoteCalendarSourcePriv :
 		switch (id)
 		{
 		case FIELD_ERROR:
-			return errMsg;
+			return errCache = err.ToString();
 		default:
 			break;
 		}
@@ -165,7 +170,7 @@ struct RemoteCalendarSourcePriv :
 			case M_LOAD_URI:
 			{
 				LStringPipe out;
-				if (auto r = LGetUri(this, &out, &errMsg, Uri))
+				if (auto r = LGetUri(this, &out, &err, Uri))
 				{
 					VCal imp;
 					while (true)
@@ -186,8 +191,14 @@ struct RemoteCalendarSourcePriv :
 						}
 					}
 
-					// LOG("RemoteCalendarSource: M_LOADED\n");
 					Post(M_LOADED);
+				}
+				else
+				{
+					if (!err)
+						err.Set(LErrorFuncFailed,
+								LString::Fmt("Failed to load calendar URI '%s'", Uri.Get()));
+					Post(M_ERROR);
 				}
 				break;
 			}
@@ -518,6 +529,11 @@ LMessage::Result RemoteCalendarSource::OnEvent(LMessage *Msg)
 		case M_LOADED:
 		{
 			OnChange(false);
+			break;
+		}
+		case M_ERROR:
+		{
+			LPopupNotification::Message(App, d->err.ToString());
 			break;
 		}
 	}

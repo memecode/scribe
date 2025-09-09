@@ -42,12 +42,12 @@
 			<Node File="..\..\lgi\trunk\include\lgi\common\WordStore.h" Type="3" Platforms="15" />
 			<Node File=".\src\GBTreeWordStore.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node File=".\src\HtmlToText.cpp" Type="2" Platforms="15" />
-		<Node File="..\..\lgi\trunk\src\common\General\SegmentTree.cpp" Type="2" Platforms="15" />
-		<Node File="..\..\lgi\trunk\src\common\General\SharedMemory.cpp" Type="2" Platforms="15" />
-		<Node File="..\..\lgi\trunk\include\lgi\common\SharedMemory.h" Type="3" Platforms="15" />
-		<Node File="..\..\lgi\trunk\src\common\General\TimeZone.cpp" Type="2" Platforms="15" />
-		<Node File="..\..\lgi\trunk\src\common\General\Tnef.cpp" Type="2" Platforms="15" />
+		<Node File="./src/HtmlToText.cpp" Type="2" Platforms="15" />
+		<Node File="../../lgi/trunk/src/common/General/SegmentTree.cpp" Type="2" Platforms="15" />
+		<Node File="../../lgi/trunk/src/common/General/SharedMemory.cpp" Type="2" Platforms="15" />
+		<Node File="../../lgi/trunk/include/lgi/common/SharedMemory.h" Type="3" Platforms="15" />
+		<Node File="../../lgi/trunk/src/common/General/TimeZone.cpp" Type="2" Platforms="15" />
+		<Node File="../../lgi/trunk/src/common/General/Tnef.cpp" Type="2" Platforms="15" />
 	</Node>
 	<Node Name="Help Files" Type="1" Open="0" Platforms="7" Id="5">
 		<Node File="./help/calendar.html" Type="3" Platforms="7" />
@@ -67,15 +67,16 @@
 		<Node File="./help/ui.html" Type="3" Platforms="7" />
 	</Node>
 	<Node Name="INet" Type="1" Open="0" Platforms="7" Id="6">
+		<Node File="../../lgi/trunk/src/common/Net/Http.cpp" Type="2" Platforms="15" />
+		<Node File="../../lgi/trunk/include/lgi/common/Http.h" Type="3" Platforms="15" />
 		<Node File="../../lgi/trunk/src/common/Net/HttpTools.cpp" Type="2" Platforms="15" />
 		<Node File="../../lgi/trunk/include/lgi/common/HttpTools.h" Type="3" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/Net/Http.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/src/common/Net/OAuth2.cpp" Type="2" Platforms="15" />
-		<Node File="../../lgi/trunk/include/lgi/common/OAuth2.h" Type="3" Platforms="15" />
 		<Node File="../../lgi/trunk/src/common/Net/Mail.cpp" Type="2" Platforms="15" />
 		<Node File="../../lgi/trunk/include/lgi/common/Mail.h" Type="3" Platforms="15" />
 		<Node File="../../lgi/trunk/src/common/Net/MailHttp.cpp" Type="2" Platforms="15" />
 		<Node File="../../lgi/trunk/src/common/Net/MailImap.cpp" Type="2" Platforms="15" />
+		<Node File="../../lgi/trunk/src/common/Net/OAuth2.cpp" Type="2" Platforms="15" />
+		<Node File="../../lgi/trunk/include/lgi/common/OAuth2.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Installer Scripts" Type="1" Platforms="15" Open="0" Id="43">
 		<Node File="./src/Py/DomScan.py" Type="8" Platforms="15" />

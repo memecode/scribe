@@ -297,7 +297,7 @@ class LContactImage :
 	public:
 		bool Status;
 		LMemStream Data;
-		LString Error;
+		LError Error;
 	
 		UriLoader(LContactImage *ci, LString uri) :
 			LThread("LContactImage"),

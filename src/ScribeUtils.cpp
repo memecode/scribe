@@ -455,7 +455,7 @@ void HttpImageThread::DoJob(LThreadJob *j)
 	if (!d)
 	{
 		Job->Status = LDocumentEnv::LoadJob::JobErr_Uri;
-		Job->Error.Printf("No '/' in uri '%s'", Job->Uri.Get());
+		Job->Error.Set(LErrorFuncFailed, LString::Fmt("No '/' in uri '%s'", Job->Uri.Get()));
 		return;
 	}
 
@@ -473,7 +473,7 @@ void HttpImageThread::DoJob(LThreadJob *j)
 			if (!LMakePath(p, sizeof(p), Cache, Hash))
 			{
 				Job->Status = LDocumentEnv::LoadJob::JobErr_Path;
-				Job->Error.Printf("MakePath failed: '%s' + '%s'", Cache.Get(), Hash.Get());
+				Job->Error.Set(LErrorFuncFailed, LString::Fmt("MakePath failed: '%s' + '%s'", Cache.Get(), Hash.Get()));
 				return;
 			}
 			if (!LFileExists(p))
@@ -522,7 +522,8 @@ void HttpImageThread::DoJob(LThreadJob *j)
 			else
 			{
 				char *d = strrchr(CachedFile, DIR_CHAR);
-				Job->Error.Printf("%s:%i - LoadDC(%s) failed [%s].", _FL, d?d+1:CachedFile.Get(), Job->Uri.Get());
+				Job->Error.Set(LErrorFuncFailed,
+							LString::Fmt("%s:%i - LoadDC(%s) failed [%s].", _FL, d?d+1:CachedFile.Get(), Job->Uri.Get()));
 				FileDev->Delete(CachedFile, NULL, false);
 				Job->Status = LDocumentEnv::LoadJob::JobErr_ImageFilter;
 			}
@@ -541,7 +542,8 @@ void HttpImageThread::DoJob(LThreadJob *j)
 				else
 				{
 					Job->Status = LDocumentEnv::LoadJob::JobErr_FileOpen;
-					Job->Error.Printf("%s:%i - Cant read from '%s' (err=%i).", _FL, CachedFile.Get(), f->GetError());
+					Job->Error.Set(	LErrorFuncFailed,
+									LString::Fmt("%s:%i - Cant read from '%s' (err=%i).", _FL, CachedFile.Get(), f->GetError()));
 					delete f;
 				}
 			}
@@ -552,12 +554,12 @@ void HttpImageThread::DoJob(LThreadJob *j)
 	else if (!Job->Error)
 	{
 		Job->Status = LDocumentEnv::LoadJob::JobErr_NoCachedFile;
-		Job->Error = "No file in cache";
+		Job->Error.Set(LErrorFuncFailed, "No file in cache");
 	}
 	
 	if (Job->Error)
 	{
-		LgiTrace("Image load failed: %s\n", Job->Error.Get());
+		LgiTrace("Image load failed: %s\n", Job->Error.ToString().Get());
 	}
 }
 
@@ -2070,7 +2072,7 @@ void ScriptDownloadContentThread::OnComplete()
 	if (Result)
 		vData.OwnStr(Out.NewStr());
 	else
-		vData = Err.Get();
+		vData = Err.ToString();
 	Args.Add(&vData);
 
 	Args.Add(&UserData);

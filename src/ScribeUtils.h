@@ -254,7 +254,7 @@ class ScriptDownloadContentThread : public LThread, public LCancel
 	LString Uri;
 	LString CallbackName;
 	LStringPipe Out;
-	LString Err;
+	LError Err;
 	LVariant UserData;
 	bool Result = false;
 

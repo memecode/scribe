@@ -6075,15 +6075,15 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_CALENDAR_SOURCE_EVENT:
 		{
-			CalendarSource *cs = (CalendarSource*)Msg->A();
-			LAutoPtr<LMessage> m((LMessage*)Msg->B());
+			auto cs = (CalendarSource*)Msg->A();
+			auto m = Msg->AutoB<LMessage>();
 			if (cs && m)
 				cs->OnEvent(m);
 			break;
 		}
 		case M_SET_HTML:
 		{
-			auto Html = Msg->AutoA<LString*>();
+			auto Html = Msg->AutoA<LString>();
 			if (PreviewPanel && Html)
 			{
 				LScriptArguments Arg(NULL);
