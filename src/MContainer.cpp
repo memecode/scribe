@@ -151,37 +151,11 @@ void MContainer::OnPaint(LSurface *pDC, LRect &r, LItemColumn *c, LColour Fore, 
 	}
 }
 
-int ContainerCompare(MContainer **a, MContainer **b)
-{
-	if ((*a)->Message && (*b)->Message)
-	{
-	    NativeInt ni = (NativeInt) (*a)->Message->GetFolder();
-		return ThingCompare((*a)->Message, (*b)->Message, ni);
-	}
-
-	#ifdef _DEBUG
-	LgiMsg(0, "ContainerCompare error.", "MContainer");
-	#endif
-	return 0;
-}
-
 int ContainerSorter(MContainer *&a, MContainer *&b, ThingSortParams *Params)
 {
 	if (a->Message && b->Message)
 	{
 	    return ThingSorter(a->Message, b->Message, Params);
-	}
-
-	return 0;
-}
-
-int ContainerIndexer(Thing *a, Thing *b, NativeInt Data)
-{
-	Mail *Ma = a->IsMail();
-	Mail *Mb = b->IsMail();
-	if (Ma && Mb && Ma->Container && Mb->Container)
-	{
-		return Ma->Container->Index - Mb->Container->Index;
 	}
 
 	return 0;
@@ -205,7 +179,6 @@ void MContainer::Pour(int &index, int depth, int tree, bool next, ThingSortParam
 	LAssert(!Message || Message->Container == this);
 	#endif
 
-	// Children.Sort(ContainerCompare);
 	if (Children.Length() > 1)
 	    LQuickSort(&Children[0], Children.Length(), ContainerSorter, params);
 

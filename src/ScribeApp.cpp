@@ -7076,11 +7076,6 @@ DefaultClient::FileType DefaultClient::FileTypes[] =
 };
 #endif
 
-static int AccountCmp(ScribeAccount *a, ScribeAccount *b, int Data)
-{
-	return a->Compare(b);
-}
-
 class ScribePasteState : public LProgressDlg
 {
 	ScribeWnd *App = NULL;
@@ -7838,7 +7833,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			#define LOG_RECEIVE_ALL		0
 			int i = 0;
 			
-			Accounts.Sort(AccountCmp);
+			Accounts.Sort([](auto a, auto b){ return a->Compare(b); });
 			
 			for (auto a : Accounts)
 			{
@@ -7885,7 +7880,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		{
 			LArray<ScribeAccount*> Account;
 
-			Accounts.Sort(AccountCmp);
+			Accounts.Sort([](auto a, auto b){ return a->Compare(b); });
 
 			for (auto a: Accounts)
 			{
@@ -9059,8 +9054,10 @@ void ScribeWnd::GetFilters(List<Filter> &Filters, bool JustIn, bool JustOut, boo
 		}
 	}
 
-	extern int FilterCompare(Filter *a, Filter *b, NativeInt Data);
-	Filters.Sort(FilterCompare);
+	Filters.Sort([](auto a, auto b)
+		{
+			return a->GetIndex() - b->GetIndex();
+		});
 }
 
 bool ScribeWnd::ShowToolbarText()

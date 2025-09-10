@@ -510,20 +510,6 @@ int MailTree::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
 	return Status;
 }
 
-static int FolderItemCmp(LTreeItem *a, LTreeItem *b, NativeInt UserData)
-{
-	ScribeFolder *ta = dynamic_cast<ScribeFolder*>(a);
-	ScribeFolder *tb = dynamic_cast<ScribeFolder*>(b);
-	if (ta && tb)
-	{
-		int64 IndexA = ta->GetObject()->GetInt(FIELD_FOLDER_INDEX);
-		int64 IndexB = tb->GetObject()->GetInt(FIELD_FOLDER_INDEX);
-		return (int)IndexA - (int)IndexB;
-	}
-	
-	return 0;
-}
-
 int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 {
 	int Status = DROPEFFECT_NONE;
@@ -619,7 +605,21 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 							}
 							else
 							{
-								LDataFolderI *fo = Folder->GetFldObj();
+								auto folderItemCmp = [](auto a, auto b)
+													{
+														auto ta = dynamic_cast<ScribeFolder*>(a);
+														auto tb = dynamic_cast<ScribeFolder*>(b);
+														if (ta && tb)
+														{
+															auto IndexA = ta->GetObject()->GetInt(FIELD_FOLDER_INDEX);
+															auto IndexB = tb->GetObject()->GetInt(FIELD_FOLDER_INDEX);
+															return (int)(IndexA - IndexB);
+														}
+	
+														return 0;
+													};
+
+								auto fo = Folder->GetFldObj();
 								if (NewParent == OldParent)
 								{
 									// Re-index only...
@@ -627,7 +627,7 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 									if (fo->SetInt(FIELD_FOLDER_INDEX, Index))
 									{
 										// Change the UI to match...
-										NewParent->Sort(FolderItemCmp);
+										NewParent->Sort(folderItemCmp);
 										Status = Store3Success;
 									}
 								}
@@ -640,10 +640,10 @@ int MailTree::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 										#warning("Reimplement index and async handler here.")
 									#endif
 									Folder->SetFolder(NewParent,
-										[this, NewParent](auto Status)
+										[this, NewParent, folderItemCmp=std::move(folderItemCmp)](auto Status)
 										{
 											if (Status == Store3Success)
-												NewParent->Sort(FolderItemCmp);
+												NewParent->Sort(folderItemCmp);
 										});
 								}
 							}

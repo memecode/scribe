@@ -322,15 +322,10 @@ class ResultList : public LList
 {
 	friend int FindCompare(LListItem *a, LListItem *b, NativeInt Data);
 
-	int Col;
-	bool Ascend;
-
 public:
 	ResultList(int id, int x, int y, int cx, int cy, const char *name = "") :
 		LList(id, x, y, cx, cy, name)
 	{
-		Col = -1;
-		Ascend = true;
 		MultiSelect(true);
 	}
 
@@ -376,12 +371,11 @@ public:
 		}
 	}
 
-	void SetSort(int col, int ascend)
+	void Sort()
 	{
-		Col = col;
-		Ascend = ascend != 0;
-		Sort([this](auto *a, auto *b)
+		LList::Sort([this](auto a, auto b)
 			{
+				auto sort = GetSort();
 				auto t1 = dynamic_cast<ResultItem*>(a);
 				auto t2 = dynamic_cast<ResultItem*>(b);
 				if (t1 && t2)
@@ -389,10 +383,10 @@ public:
 					// do specific compare on mail items..
 					auto m1 = t1->T->IsMail();
 					auto m2 = t2->T->IsMail();
-					int Mul = Ascend ? 1 : -1;
+					int Mul = sort.Ascend ? 1 : -1;
 					if (m1 && m2)
 					{
-						switch (Col)
+						switch (sort.Col)
 						{
 							case 2:
 							{
@@ -420,23 +414,23 @@ public:
 					}
 
 					// default back to a string compare
-					return Mul * Stricmp(a->GetText(Col), b->GetText(Col));
+					return Mul * Stricmp(a->GetText(sort.Col), b->GetText(sort.Col));
 				}
 
 				return 0;
 			});
-		SetSortingMark(Col, !Ascend);
 	}
 
 	void OnColumnClick(int col, LMouse &m)
 	{
-		if (Col != col)
+		auto sort = GetSort();
+		if (sort.Col != col)
 		{
-			SetSort(col, true);
+			SetSort({col, true});
 		}
 		else
 		{
-			SetSort(Col, !Ascend);
+			SetSort({col, !sort.Ascend});
 		}
 	}
 };

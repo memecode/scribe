@@ -1889,11 +1889,12 @@ void AddActions(LSubMenu *Menu, List<Filter> &Filters, LArray<ScribeFolder*> Fol
 		List<Filter> a;
 		Folder->LoadThings();
 		for (auto t: Folder->Items)
-		{
 			a.Insert(t->IsFilter());
-		}
 
-		a.Sort(FilterCompare);
+		a.Sort([](auto a, auto b)
+			{
+				return a->GetIndex() - b->GetIndex();
+			});
 
 		for (auto i: a)
 		{
@@ -7538,7 +7539,7 @@ ThingUi *Mail::DoUI(MailContainer *c)
 
 int Mail::Compare(LListItem *t, ssize_t Field)
 {
-	Thing *T = (Thing*)t->_UserPtr;
+	Thing *T = (Thing*)t->User.Ptr;
 	Mail *m = T ? T->IsMail() : 0;
 	if (m)
 	{

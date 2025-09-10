@@ -93,7 +93,6 @@ extern int MakeOpenFlags(ScribeAccount *a, bool Send);
 extern bool HasEmoji(char *Txt);
 extern bool HasEmoji(uint32_t *Txt);
 extern LAutoWString TextToEmoji(uint32_t *Txt, bool IsHtml);
-extern int FilterCompare(Filter *a, Filter *b, NativeInt Data);
 
 extern bool ExtractHtmlContent(	LString &OutHtml,
 								LString &Charset,
@@ -388,8 +387,9 @@ public:
 	int GetSortCol() { return (Container) ? Container->GetSortCol() : 0; }
 	int GetSortField() { return (Container) ? Container->GetSortField() : 0; }
 	bool GetSortAscending() { return (Container) ? Container->GetSortAscend() != 0 : 0; }
-	void SetSort(int Col, int Ascend);
+	bool SetSort(SortParam sort, bool reorderItems = true, bool setMark = true) override;
 	void ReSort();
+	
 	ScribeFolder *GetContainer() { return Container; }
 	void SetContainer(ScribeFolder *c) { Container = c; }
 

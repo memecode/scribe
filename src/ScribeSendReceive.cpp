@@ -1658,11 +1658,6 @@ void ReceiveAccountlet::Enabled(bool b)
 	}
 }
 
-int FilterCompare(Filter *a, Filter *b, NativeInt Data)
-{
-	return a->GetIndex() - b->GetIndex();
-}
-
 bool ReceiveAccountlet::IsPersistant()
 {
 	LVariant Proto = Protocol();

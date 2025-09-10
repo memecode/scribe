@@ -134,7 +134,7 @@ LArray<ThingType*> ThingType::DirtyThings;
 
 Thing::Thing(ScribeWnd *app, LDataI *object)
 {
-	_UserPtr = this;
+	User.Ptr = this;
 	App = app;
 	IncRef(); // Someone always starts with owning this object.
 	SetObject(object, false, _FL);

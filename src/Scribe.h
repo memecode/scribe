@@ -944,17 +944,12 @@ public:
 	static void Thread(List<Mail> &In, LArray<MContainer*> &Out);
 };
 
-extern int ContainerIndexer(Thing *a, Thing *b, NativeInt Data);
 extern int GetFolderVersion(const char *Path);
 extern bool CreateMailHeaders(ScribeWnd *App, LStream &Out, LDataI *Mail, MailProtocol *Protocol);
 extern void Base36(char *Out, uint64 In);
 
 ////////////////////////////////////////////////////////////
 // Thing sorting
-
-// The old way
-extern int ContainerCompare(MContainer **a, MContainer **b);
-extern int ThingCompare(Thing *a, Thing *b, NativeInt Data);
 
 // The new way
 extern int ContainerSorter(MContainer *&a, MContainer *&b, ThingSortParams *Params);
@@ -1314,7 +1309,8 @@ public:
 	LDATA_INT_TYPE_PROP(ScribePerm, WriteAccess, FIELD_FOLDER_PERM_WRITE, PermRequireNone);
 	LDATA_ENUM_PROP(SystemFolderType, FIELD_SYSTEM_FOLDER, Store3SystemFolder);
 
-	void SetSort(int Col, bool Ascend, bool CanDirty = true);
+	// void SetSort(int Col, bool Ascend, bool CanDirty = true);
+	bool SetSort(SortParam sort, bool reorderItems = true, bool setMark = true) override;
 	int GetSortAscend() { return GetObject()->GetInt(FIELD_SORT) > 0; }
 	int GetSortCol() { return abs((int)GetObject()->GetInt(FIELD_SORT)) - 1; }
 	int GetSortField();

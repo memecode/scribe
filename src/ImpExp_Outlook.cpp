@@ -951,7 +951,10 @@ public:
 		LCombo *SrcClient;
 		if (Email.GetKeyNames(Clients) && GetViewById(IDC_CLIENT, SrcClient))
 		{
-			Clients.Sort(StrCmp);
+			Clients.Sort([](auto a, auto b)
+				{
+					return Strcmp(a, b);
+				});
 
 			DefClient = NewStr(Email.GetStr());
 			int i = 0;

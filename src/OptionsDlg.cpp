@@ -168,11 +168,6 @@ const char *AccountItem::GetText(int i)
 	return NULL;
 }
 
-int LangCompare(LLanguage *a, LLanguage *b, NativeInt d)
-{
-	return _stricmp(a->Name, b->Name);
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 class RemoteContentDlg : public LDialog, public LXmlTreeUi
 {
@@ -471,7 +466,7 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 				}
 			}
 
-			Langs.Sort(LangCompare);
+			Langs.Sort([](auto a, auto b) { return Stricmp(a->Name, b->Name); });
 			int n = 0;
 			LVariant LangId;
 			App->GetOptions()->GetValue(OPT_UiLanguage, LangId);

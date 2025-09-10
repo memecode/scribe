@@ -312,9 +312,8 @@ void ScribeAccountPreview::SetSort(int s)
 
 		if (d->Lst)
 		{
-			int Col = abs(d->SortCol)-1;
-			int Ascend = d->SortCol > 0;
-			d->Lst->SetSortingMark(Col, !Ascend);
+			LItemContainer::SortParam sort{ abs(d->SortCol)-1, d->SortCol > 0 };
+			d->Lst->SetSortingMark(sort);
 			d->Lst->Sort(
 				[this](auto A, auto B)
 				{
@@ -497,7 +496,8 @@ int ScribeAccountPreview::OnNotify(LViewI *Ctrl, const LNotification &n)
 			{
 				List<AccountMessage> All;
 				GetMsgs(All);
-				All.Sort(IndexCompare);
+				All.Sort([](auto a, auto b)
+					{ return a->Index - b->Index; });
 
 				for (auto a: d->Accounts)
 				{

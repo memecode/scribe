@@ -749,39 +749,21 @@ Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)
 	return Store3Success;
 }
 
-int ThingContainerNameCmp(LTreeItem *a, LTreeItem *b, NativeInt d)
-{
-	auto A = dynamic_cast<ScribeFolder*>(a);
-	auto B = dynamic_cast<ScribeFolder*>(b);
-	if (A && B)
-		return Stricmp(A->GetText(), B->GetText());
-
-	LAssert(!"Invalid objects.");
-	return 0;
-}
-
-int ThingContainerIdxCmp(LTreeItem *a, LTreeItem *b, NativeInt d)
-{
-	auto A = dynamic_cast<ScribeFolder*>(a);
-	auto B = dynamic_cast<ScribeFolder*>(b);
-	if (A && B)
-	{
-		auto Aidx = A->GetSortIndex();
-		auto Bidx = B->GetSortIndex();
-		if (Aidx >= 0 || Bidx >= 0)
-			return Aidx - Bidx;
-	}
-	else LAssert(!"Invalid objects.");
-
-	return 0;
-}
-
 void ScribeFolder::SortSubfolders()
 {
 	int i = 0;
 	ScribeFolder *c;
 
-	LTreeItem::Items.Sort(ThingContainerNameCmp);
+	LTreeItem::Items.Sort([](auto a, auto b)
+		{
+			auto A = dynamic_cast<ScribeFolder*>(a);
+			auto B = dynamic_cast<ScribeFolder*>(b);
+			if (A && B)
+				return Stricmp(A->GetText(), B->GetText());
+
+			LAssert(!"Invalid objects.");
+			return 0;
+		});
 
 	for (c = GetChildFolder(); c; c = c->GetNextFolder())
 	{
@@ -1331,7 +1313,21 @@ bool ScribeFolder::LoadFolders()
 		}
 	}
 
-	LTreeItem::Items.Sort(ThingContainerIdxCmp);
+	LTreeItem::Items.Sort([](auto a, auto b)
+		{
+			auto A = dynamic_cast<ScribeFolder*>(a);
+			auto B = dynamic_cast<ScribeFolder*>(b);
+			if (A && B)
+			{
+				auto Aidx = A->GetSortIndex();
+				auto Bidx = B->GetSortIndex();
+				if (Aidx >= 0 || Bidx >= 0)
+					return Aidx - Bidx;
+			}
+			else LAssert(!"Invalid objects.");
+
+			return 0;
+		});
 		
 	CurState = FldState_Idle;
 	FoldersCurrentlyLoading--;
@@ -1392,7 +1388,6 @@ class LoadingItem : public LListItem
 public:
 	LoadingItem(LDataIterator<LDataI*> *it)
 	{
-		_UserPtr = NULL;
 		if ((Iter = it))
 		{
 			Iter->SetProgressFn([this](ssize_t pos, ssize_t sz)
@@ -2178,35 +2173,6 @@ public:
 	}
 };
 
-template <class T>
-int TrashCompare(T *pa, T *pb, NativeInt Data)
-{
-	ScribeFolder *f = (ScribeFolder*)Data;
-	Thing *a = dynamic_cast<Thing*>(pa);
-	Thing *b = dynamic_cast<Thing*>(pb);
-	if (!a || !b)
-		return 0;
-
-	int type = a->Type() - b->Type();
-	if (type)
-		return type;
-
-	int col = f->GetSortCol();
-	int *defs = a->GetDefaultFields();
-	if (!defs || !defs[col])
-		return 0;
-
-	return (f->GetSortAscend() ? 1 : -1) * a->Compare(b, defs[col]);
-}
-
-template int TrashCompare<LListItem>(LListItem *pa, LListItem *pb, NativeInt Data);
-
-int ThingCompare(Thing *a, Thing *b, NativeInt Data)
-{
-	ScribeFolder *f = (ScribeFolder*)Data;
-	return (f->GetSortAscend() ? 1 : -1) * a->Compare(b, f->GetSortField());
-}
-
 int ThingSorter(Thing *a, Thing *b, ThingSortParams *Params)
 {
 	return (Params->SortAscend ? 1 : -1) * a->Compare(b, Params->SortField);
@@ -2315,7 +2281,17 @@ bool ScribeFolder::Thread()
 			}
 			
 			// Sort all the items by index			
-			Items.Sort(ContainerIndexer);
+			Items.Sort([](auto a, auto b)
+				{
+					Mail *Ma = a->IsMail();
+					Mail *Mb = b->IsMail();
+					if (Ma && Mb && Ma->Container && Mb->Container)
+					{
+						return Ma->Container->Index - Mb->Container->Index;
+					}
+
+					return 0;
+				});
 			Status = true;
 			
 			/*
@@ -2610,7 +2586,7 @@ Prof.Add("Set def fields");
 			if (GetSortCol() >= 0)
 			{
 				// set current sort settings
-				View()->SetSort(GetSortCol(), GetSortAscend());
+				View()->Sort();
 			}
 		}
 
@@ -2631,12 +2607,32 @@ Prof.Add("Load things");
 Prof.Add(SortMsg);
 		if (GetItemType() == MAGIC_ANY)
 		{
-			Items.Sort(TrashCompare<Thing>, (NativeInt)this);
+			Items.Sort([this](auto pa, auto pb)
+				{
+					Thing *a = dynamic_cast<Thing*>(pa);
+					Thing *b = dynamic_cast<Thing*>(pb);
+					if (!a || !b)
+						return 0;
+
+					int type = a->Type() - b->Type();
+					if (type)
+						return type;
+
+					int col = GetSortCol();
+					int *defs = a->GetDefaultFields();
+					if (!defs || !defs[col])
+						return 0;
+
+					return (GetSortAscend() ? 1 : -1) * a->Compare(b, defs[col]);
+				});
 		}
 		else
 		{
 			// Sort..
-			Items.Sort(ThingCompare, (NativeInt)this);
+			Items.Sort([this](auto a, auto b)
+				{
+					return (GetSortAscend() ? 1 : -1) * a->Compare(b, GetSortField());
+				});
 		}
 	}
 
@@ -2789,7 +2785,7 @@ void ScribeFolder::OnProperties(int Tab)
 	SerializeFieldWidths();
 	if (View())
 	{
-		SetSort(View()->GetSortCol(), View()->GetSortAscending());
+		Sort();
 	}
 
 	OpenFolderProperties(this, Tab, [this](auto repop)
@@ -2951,52 +2947,48 @@ void ScribeFolder::MoveTo(LArray<Thing*> &Items, bool CopyOnly, std::function<vo
 	new AsyncOperationState(this, Items, CopyOnly, Callback);
 }
 
-int ThingFilterCompare(Thing *a, Thing *b, NativeInt Data)
-{
-	auto A = a->IsFilter();
-	auto B = b->IsFilter();
-	return (A && B) ? A->GetIndex() - B->GetIndex() : 0;
-}
-
 void ScribeFolder::ReSort()
 {
 	if (View() && Select())
 	{
-		View()->SetSort(GetSortCol(), GetSortAscend());
+		View()->Sort();
 	}
 }
 
-void ScribeFolder::SetSort(int Col, bool Ascend, bool CanDirty)
+bool ScribeFolder::SetSort(SortParam sort, bool reorderItems, bool setMark)
 {
 	if (GetItemType() == MAGIC_FILTER)
 	{
 		// Remove any holes in the indexing
-		int i = 1;
-		Items.Sort(ThingFilterCompare);
+		Items.Sort([](auto a, auto b)
+			{
+				auto A = a->IsFilter();
+				auto B = b->IsFilter();
+				return (A && B) ? A->GetIndex() - B->GetIndex() : 0;
+			});
 
+		int i = 1;
 		for (auto t : Items)
 		{
-			Filter *f = t->IsFilter();
-			if (f)
+			if (auto f = t->IsFilter())
 			{
 				if (f->GetIndex() != i)
-				{
 					f->SetIndex(i);
-				}
-
 				i++;
 			}
 		}
 	}
 
-	if (GetSortCol() != Col ||
-		GetSortAscend() != (uchar)Ascend)
+	if (GetSortCol() != sort.Col ||
+		GetSortAscend() != (uchar)sort.Ascend)
 	{
-		GetObject()->SetInt(FIELD_SORT, (Col + 1) * (Ascend ? 1 : -1));
+		GetObject()->SetInt(FIELD_SORT, (sort.Col + 1) * (sort.Ascend ? 1 : -1));
 
-		if (CanDirty)
-			SetDirty();
+		// FIXME:
+		// if (CanDirty) SetDirty();
 	}
+
+	return true;
 }
 
 int ScribeFolder::GetSortField()

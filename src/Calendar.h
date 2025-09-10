@@ -373,7 +373,7 @@ public:
 class RemoteCalendarSource :
 	public CalendarSource
 {
-	struct RemoteCalendarSourcePriv *d;
+	class RemoteCalendarSourcePriv *d;
 
 public:
 	RemoteCalendarSource(ScribeWnd *a, const char *id = NULL);

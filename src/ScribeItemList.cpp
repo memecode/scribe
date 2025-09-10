@@ -293,17 +293,14 @@ void ThingList::OnColumnClick(int Col, LMouse &m)
 	{
 		if (GetSortCol() != Col)
 		{
-			SetSort(Col, true);
+			SetSort({Col, true});
 		}
 		else
 		{
-			SetSort(GetSortCol(), !GetSortAscending());
+			SetSort({GetSortCol(), !GetSortAscending()});
 		}
 	}
 }
-
-template <class T> extern
-int TrashCompare(T *a, T *b, NativeInt Data);
 
 void ThingList::ReSort()
 {
@@ -344,8 +341,8 @@ void ThingList::ReSort()
 
 			Sort([this](auto *a, auto *b)
 				{
-					auto ta = (Thing*)a->_UserPtr;
-					auto tb = (Thing*)b->_UserPtr;
+					auto ta = (Thing*)a->User.Ptr;
+					auto tb = (Thing*)b->User.Ptr;
 
 					auto A = ta->IsMail();
 					auto B = tb->IsMail();
@@ -409,21 +406,20 @@ void ThingList::ReSort()
 	#endif
 }
 
-void ThingList::SetSort(int Col, int Ascend)
+bool ThingList::SetSort(SortParam sort, bool reorderItems, bool setMark)
 {
 	if (!Container)
-		return;
+		return false;
 
-	Container->SetSort(Col, Ascend != 0);
+	Container->SetSort(sort);
 	
 	_Dir = GetSortAscending() ? 1 : -1;
 	_Field = GetSortField();
 	ReSort();
 	
-	LListItem *Sel = GetSelected();
-	if (Sel)
+	if (auto Sel = GetSelected())
 	{
-		LVariant Txt(Sel->GetText(Col));
+		LVariant Txt(Sel->GetText(sort.Col));
 		if (Txt.Str())
 		{
 			int Index = IndexOf(Sel);
@@ -432,7 +428,7 @@ void ThingList::SetSort(int Col, int Ascend)
 				LListItem *Prev = ItemAt(--Index);
 				if (Prev)
 				{
-					const char *PrevTxt = Prev->GetText(Col);
+					const char *PrevTxt = Prev->GetText(sort.Col);
 					if (PrevTxt)
 					{
 						if (strcmp(PrevTxt, Txt.Str()) == 0)
@@ -460,7 +456,8 @@ void ThingList::SetSort(int Col, int Ascend)
 		}
 	}
 
-	SetSortingMark(Col, Ascend ? false : true);
+	SetSortingMark(sort);
+	return true;
 }
 
 void ThingList::OnItemClick(LListItem *Item, LMouse &m)
