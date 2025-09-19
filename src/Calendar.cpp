@@ -1266,6 +1266,11 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 	}
 	float Scale = Sx < Sy ? Sx : Sy;
 
+	int minSize = Font->GetHeight() + 2;
+	if (p.Y() < minSize)
+		// Bump the size of the box to at least allow one line of text...
+		p.y2 = p.y1 + minSize - 1;
+
 	Now.SetNow();
 	GetField(FIELD_CAL_SUBJECT, Title);
 	bool Delayed = GetObject() ? GetObject()->GetInt(FIELD_STATUS) == Store3Delayed : false;
@@ -1332,11 +1337,15 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 	}
 
 	pDC->Rectangle(&p);
-	p.Inset((int)SX(1), (int)SY(1));
 
-	Font->Transparent(false);
+	Font->Transparent(true);
 
-	LPoint pad((int)SX(3), (int)SY(3));
+	LPoint pad((int)SX(2), (int)SY(2));
+	if (p.Y() <= Font->GetHeight())
+		pad = LPoint(0, 0);
+	else
+		p.Inset((int)SX(1), (int)SY(1));
+
 	LFontCache fntCache(Font);
 	LCss textStyle;
 	textStyle.Color(text);
@@ -1346,7 +1355,7 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 	if (layout.DoLayout(p.X() - pad.x))
 	{
 		pDC->ClipRgn(&p);
-		layout.Paint(pDC, pad + p.TopLeft(), back, p, true, inSelection);
+		layout.Paint(pDC, pad + p.TopLeft(), LColour(), p, true, inSelection);
 		pDC->ClipRgn(nullptr);
 	}
 	else
