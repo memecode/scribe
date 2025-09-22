@@ -114,29 +114,29 @@ void FolderDlgPriv::OnFilter()
 	// Initialize visible
 	View->ForAllItems([vis = Filter ? LCss::DispNone : LCss::DispBlock](auto i)
 	{
-		FolderLeaf *l = dynamic_cast<FolderLeaf*>(i);
-		if (!l) return;
-		
-		l->GetCss(true)->Display(vis);
+		if (auto l = dynamic_cast<FolderLeaf*>(i))		
+			l->GetCss(true)->Display(vis);
+		return true;
 	});
 
 	// Find matching items...
 	View->ForAllItems([this](auto i)
 	{
-		FolderLeaf *l = dynamic_cast<FolderLeaf*>(i);
-		if (!l) return;
-
-		auto nm = l->GetText();
-		if (Stristr(nm, this->Filter.Get()))
+		if (auto l = dynamic_cast<FolderLeaf*>(i))
 		{
-			l->GetCss(true)->Display(LCss::DispBlock);
-
-			for (auto p = l->GetParent(); p; p = p->GetParent())
+			auto nm = l->GetText();
+			if (Stristr(nm, this->Filter.Get()))
 			{
-				FolderLeaf *lp = dynamic_cast<FolderLeaf*>(p);
-				if (lp) lp->GetCss(true)->Display(LCss::DispBlock);
+				l->GetCss(true)->Display(LCss::DispBlock);
+
+				for (auto p = l->GetParent(); p; p = p->GetParent())
+				{
+					FolderLeaf *lp = dynamic_cast<FolderLeaf*>(p);
+					if (lp) lp->GetCss(true)->Display(LCss::DispBlock);
+				}
 			}
 		}
+		return true;
 	});
 
 	View->UpdateAllItems();
