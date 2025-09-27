@@ -401,7 +401,7 @@ void ScribeFolder::SetThreaded(bool t)
 
 ThingList *ScribeFolder::View()
 {
-	return	App ? App->GetMailList() : 0;
+	return	App ? App->GetMailList() : nullptr;
 }
 
 bool ScribeFolder::HasFieldId(int Id)
@@ -2173,9 +2173,9 @@ public:
 	}
 };
 
-int ThingSorter(Thing *a, Thing *b, ThingSortParams *Params)
+int ThingSorter(Thing *a, Thing *b, LSortable::SortParam *Params)
 {
-	return (Params->SortAscend ? 1 : -1) * a->Compare(b, Params->SortField);
+	return (Params->Ascend ? 1 : -1) * a->Compare(b, Params->Col);
 }
 
 bool ScribeFolder::Thread()
@@ -2235,9 +2235,7 @@ bool ScribeFolder::Thread()
 			
 			// Sort root list
 			LArray<MContainer*> Containers2 = Containers;
-			ThingSortParams Params;
-			Params.SortAscend = GetSortAscend();
-			Params.SortField = GetSortField();
+			auto Params = GetFieldSort();
 
             #if 0
 			for (int i=0; i<Containers.Length(); i++)
@@ -2436,15 +2434,16 @@ bool ScribeFolder::SortItems()
 
 	if (intType)
 	{
-		if (GetSortAscend())
-			for (auto i: intPairs) Items.Add(i.t);
+		if (GetColumnSort().Ascend)
+			for (auto i: intPairs)
+				Items.Add(i.t);
 		else
 			for (auto it = intPairs.rbegin(); it != intPairs.end(); it--)
 				Items.Add((*it).t);
 	}
 	else
 	{
-		if (GetSortAscend())
+		if (GetColumnSort().Ascend)
 			for (auto i: strPairs) Items.Add(i.t);
 		else
 			for (auto it = strPairs.rbegin(); it != strPairs.end(); it--)
@@ -2465,7 +2464,7 @@ LProfile Prof("ScribeFolder::Populate", 1000);
 
 	CurState = FldState_Populating;
 		
-	ScribeFolder *Prev = list->GetContainer();
+	auto Prev = list->GetContainer();
 	bool Refresh = Prev == this;
 
 	// Remove old items from list
@@ -2578,15 +2577,15 @@ Prof.Add("Set def fields");
 		}
 
 		// Add all items to list
-		if (View())
+		if (auto v = View())
 		{
-			View()->SetContainer(this);
+			v->SetContainer(this);
 
 			// tell the list who we are
-			if (GetSortCol() >= 0)
+			if (auto sort = GetColumnSort())
 			{
 				// set current sort settings
-				View()->Sort();
+				v->SetSort(sort);
 			}
 		}
 
@@ -2600,45 +2599,50 @@ Prof.Add("Load things");
 
 	// Do any threading/sorting
 	static LString SortMsg;
-	if (!Thread() &&
-		GetSortField())
+	auto field = GetSortField();
+	if (!Thread() && field)
 	{
-		SortMsg.Printf("Sorting " LPrintfInt64 " items", Items.Length());
+		SortMsg.Printf("Sorting " LPrintfSizeT " items", Items.Length());
 Prof.Add(SortMsg);
+
+		int direction = GetColumnSort().Ascend ? 1 : -1;
 		if (GetItemType() == MAGIC_ANY)
 		{
-			Items.Sort([this](auto pa, auto pb)
+			auto col = GetColumnSort().Col;
+			Items.Sort([this, direction, col](auto pa, auto pb)
 				{
-					Thing *a = dynamic_cast<Thing*>(pa);
-					Thing *b = dynamic_cast<Thing*>(pb);
+					auto a = dynamic_cast<Thing*>(pa);
+					auto b = dynamic_cast<Thing*>(pb);
 					if (!a || !b)
-						return 0;
+						goto noParam;
 
-					int type = a->Type() - b->Type();
+					auto type = a->Type() - b->Type();
 					if (type)
 						return type;
 
-					int col = GetSortCol();
-					int *defs = a->GetDefaultFields();
+					auto defs = a->GetDefaultFields();
 					if (!defs || !defs[col])
-						return 0;
+						goto noParam;
 
-					return (GetSortAscend() ? 1 : -1) * a->Compare(b, defs[col]);
+					return direction * a->Compare(b, defs[col]);
+
+				noParam:
+					return (int) (pb - pa);
 				});
 		}
 		else
 		{
 			// Sort..
-			Items.Sort([this](auto a, auto b)
+			Items.Sort([this, direction, field](auto a, auto b)
 				{
-					return (GetSortAscend() ? 1 : -1) * a->Compare(b, GetSortField());
+					return direction * a->Compare(b, field);
 				});
 		}
 	}
 
 	// Do any filtering...
 Prof.Add("Filtering");
-	ThingFilter *Filter = App->GetThingFilter();
+	auto Filter = App->GetThingFilter();
 	auto FilterStart = LCurrentTime();
 	size_t Pos = 0;
 	for (auto t: Items)
@@ -2950,9 +2954,7 @@ void ScribeFolder::MoveTo(LArray<Thing*> &Items, bool CopyOnly, std::function<vo
 void ScribeFolder::ReSort()
 {
 	if (View() && Select())
-	{
 		View()->Sort();
-	}
 }
 
 bool ScribeFolder::SetSort(SortParam sort, bool reorderItems, bool setMark)
@@ -2964,11 +2966,13 @@ bool ScribeFolder::SetSort(SortParam sort, bool reorderItems, bool setMark)
 			{
 				auto A = a->IsFilter();
 				auto B = b->IsFilter();
-				return (A && B) ? A->GetIndex() - B->GetIndex() : 0;
+				if (A && B)
+					return A->GetIndex() - B->GetIndex();
+				return (int)(b - a);
 			});
 
 		int i = 1;
-		for (auto t : Items)
+		for (auto t: Items)
 		{
 			if (auto f = t->IsFilter())
 			{
@@ -2979,13 +2983,24 @@ bool ScribeFolder::SetSort(SortParam sort, bool reorderItems, bool setMark)
 		}
 	}
 
-	if (GetSortCol() != sort.Col ||
-		GetSortAscend() != (uchar)sort.Ascend)
+	auto curSort = GetColumnSort();
+	if (curSort != sort)
 	{
 		GetObject()->SetInt(FIELD_SORT, (sort.Col + 1) * (sort.Ascend ? 1 : -1));
 
 		// FIXME:
-		// if (CanDirty) SetDirty();
+		if (GetWillDirty())
+			SetDirty();
+
+		if (reorderItems)
+			ReSort();
+
+	}
+
+	if (setMark)
+	{
+		if (View() && Select())
+			View()->SetSortingMark(sort);
 	}
 
 	return true;
@@ -2994,7 +3009,7 @@ bool ScribeFolder::SetSort(SortParam sort, bool reorderItems, bool setMark)
 int ScribeFolder::GetSortField()
 {
 	int Status = 0;
-	int Col = GetSortCol();
+	int Col = abs((int)GetObject()->GetInt(FIELD_SORT)) - 1;
 
 	if (Col >= 0 && Col < (int)FieldArray.Length())
 		Status = FieldArray[Col];

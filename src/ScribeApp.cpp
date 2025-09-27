@@ -11574,10 +11574,14 @@ void ScribeWnd::OnNew
 		Fld->OnUpdateUnRead(UnreadDiff, false);
 
 	if (MailList && Fld->Select())
-		MailList->Sort([Fld](auto *a, auto *b)
+	{
+		auto fieldSort = Fld->GetFieldSort();
+		auto dir = fieldSort.Ascend ? 1 : -1;
+		MailList->Sort([Fld, dir, fieldSort](auto *a, auto *b)
 			{
-				return (Fld->GetSortAscend() ? 1 : -1) * a->Compare(b, Fld->GetSortField());
+				return dir * a->Compare(b, fieldSort.Col);
 			});
+	}
 
 	if (NewMail.Length())
 		OnNewMail(&NewMail);

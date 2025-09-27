@@ -18,17 +18,15 @@
 #include "resdefs.h"
 
 //////////////////////////////////////////////////////////////////////////////
-int _Dir = 0;
-int _Field = 0;
-
-int ArrCompare(Thing **a, Thing **b)
-{
-	return _Dir * (*a)->Compare(*b, _Field);
-}
-
 inline int DateToInt(const LDateTime *dt)
 {
 	return (dt->Year() * 12) + dt->Month();
+}
+
+/*
+int ArrCompare(Thing **a, Thing **b)
+{
+	return _Dir * (*a)->Compare(*b, _Field);
 }
 
 void DateSort(List<LListItem> &Lst)
@@ -65,6 +63,7 @@ void DateSort(List<LListItem> &Lst)
 		}
 	}
 }
+*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ThingList::ThingList(ScribeWnd *wnd) :
@@ -164,6 +163,16 @@ LFont *ThingList::GetFont()
 	}
 
 	return LList::GetFont();
+}
+
+int ThingList::GetSortCol()
+{
+	return Container ? Container->GetColumnSort().Col : 0;
+}
+
+bool ThingList::GetSortAscending()
+{
+	return Container ? Container->GetColumnSort().Ascend : true;
 }
 
 LRect &ThingList::GetClient(bool ClientSpace)
@@ -291,19 +300,23 @@ void ThingList::OnColumnClick(int Col, LMouse &m)
 	}
 	else
 	{
-		if (GetSortCol() != Col)
+		auto sort = GetSort();
+		if (sort.Col != Col)
 		{
 			SetSort({Col, true});
 		}
 		else
 		{
-			SetSort({GetSortCol(), !GetSortAscending()});
+			SetSort({sort.Col, !sort.Ascend});
 		}
 	}
 }
 
 void ThingList::ReSort()
 {
+	auto fieldSort = GetFieldSort();
+	int direction = fieldSort.Ascend ? 1 : -1;
+
 	if (App->GetCtrlValue(IDM_THREAD))
 	{
 		LArray<MContainer*> Root;
@@ -323,9 +336,7 @@ void ThingList::ReSort()
 		if (Root.Length())
 		{
 			// Sort the root items
-			ThingSortParams Params;
-			Params.SortAscend = Container->GetSortAscend();
-			Params.SortField = Container->GetSortField();
+			auto Params = Container->GetFieldSort();
 
             #if 0
 			Root.Sort(ContainerCompare);
@@ -356,7 +367,8 @@ void ThingList::ReSort()
 	}
 	else if (Container->GetItemType() == MAGIC_ANY)
 	{
-		Sort([this, f=Container](auto *pa, auto *pb)
+		auto colSort = Container->GetColumnSort();
+		Sort([this, colSort](auto *pa, auto *pb)
 			{
 				auto a = dynamic_cast<Thing*>(pa);
 				auto b = dynamic_cast<Thing*>(pb);
@@ -367,20 +379,19 @@ void ThingList::ReSort()
 				if (type)
 					return type;
 
-				auto col = f->GetSortCol();
 				auto defs = a->GetDefaultFields();
-				if (!defs || !defs[col])
+				if (!defs || !defs[colSort.Col])
 					return 0;
 
-				return (f->GetSortAscend() ? 1 : -1) * a->Compare(b, defs[col]);
+				return (colSort.Ascend ? 1 : -1) * a->Compare(b, defs[colSort.Col]);
 
 			});
 	}
 	else
 	{
-		Sort([this](auto *a, auto *b)
+		Sort([this, direction, fieldSort](auto *a, auto *b)
 			{
-				return _Dir * a->Compare(b, _Field);
+				return direction * a->Compare(b, fieldSort.Col);
 			});
 	}
 
@@ -413,8 +424,7 @@ bool ThingList::SetSort(SortParam sort, bool reorderItems, bool setMark)
 
 	Container->SetSort(sort);
 	
-	_Dir = GetSortAscending() ? 1 : -1;
-	_Field = GetSortField();
+	auto fieldSort = GetFieldSort();
 	ReSort();
 	
 	if (auto Sel = GetSelected())

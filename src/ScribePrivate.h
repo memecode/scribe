@@ -384,11 +384,14 @@ public:
 	const char *GetClass() { return "ThingList"; }
 	LRect &GetClient(bool ClientSpace = true);
 
-	int GetSortCol() { return (Container) ? Container->GetSortCol() : 0; }
+	[[deprecated]] int GetSortCol();
+	[[deprecated]] bool GetSortAscending();
 	int GetSortField() { return (Container) ? Container->GetSortField() : 0; }
-	bool GetSortAscending() { return (Container) ? Container->GetSortAscend() != 0 : 0; }
 	bool SetSort(SortParam sort, bool reorderItems = true, bool setMark = true) override;
 	void ReSort();
+	// Field sort is using the 'col' member for the field ID.
+	LSortable::SortParam GetFieldSort() { return Container ? Container->GetFieldSort() : LSortable::SortParam(); }
+	LSortable::SortParam GetSort() override { return Container ? Container->GetColumnSort() : LSortable::SortParam(); }
 	
 	ScribeFolder *GetContainer() { return Container; }
 	void SetContainer(ScribeFolder *c) { Container = c; }

@@ -434,6 +434,7 @@ public:
 	virtual Store3ItemTypes Type() { return MAGIC_NONE; }
 	bool GetDirty() { return Dirty; }
 	virtual bool SetDirty(bool b = true);
+	bool GetWillDirty() const { return WillDirty; }
 	void SetWillDirty(bool c) { WillDirty = c; }
 
 	virtual bool Save(ScribeFolder *Into) { return false; }
@@ -892,12 +893,6 @@ public:
 // Mail threading
 //
 //    See: http://www.jwz.org/doc/threading.html
-struct ThingSortParams
-{
-	int SortAscend;
-	int SortField;
-};
-
 class MContainer
 {
 	int			Lines;
@@ -937,7 +932,7 @@ public:
 	void RemoveChild(MContainer *m);
 	int CountMessages();
 	
-	void Pour(int &index, int depth, int tree, bool next, ThingSortParams *folder);
+	void Pour(int &index, int depth, int tree, bool next, LSortable::SortParam *folder);
 	void OnPaint(LSurface *pDC, LRect &r, LItemColumn *c, LColour Fore, LColour Back, LFont *Font, const char *Txt);
 
 	static void Prune(int &ParentIndex, LArray<MContainer*> &L);
@@ -952,8 +947,8 @@ extern void Base36(char *Out, uint64 In);
 // Thing sorting
 
 // The new way
-extern int ContainerSorter(MContainer *&a, MContainer *&b, ThingSortParams *Params);
-extern int ThingSorter(Thing *a, Thing *b, ThingSortParams *Data);
+extern int ContainerSorter(MContainer *&a, MContainer *&b, LSortable::SortParam *Params);
+extern int ThingSorter(Thing *a, Thing *b, LSortable::SortParam *Data);
 
 /////////////////////////////////////////////////////////////
 class MailViewOwner : public LCapabilityTarget
@@ -1309,12 +1304,26 @@ public:
 	LDATA_INT_TYPE_PROP(ScribePerm, WriteAccess, FIELD_FOLDER_PERM_WRITE, PermRequireNone);
 	LDATA_ENUM_PROP(SystemFolderType, FIELD_SYSTEM_FOLDER, Store3SystemFolder);
 
-	// void SetSort(int Col, bool Ascend, bool CanDirty = true);
+	// Sorting
 	bool SetSort(SortParam sort, bool reorderItems = true, bool setMark = true) override;
-	int GetSortAscend() { return GetObject()->GetInt(FIELD_SORT) > 0; }
-	int GetSortCol() { return abs((int)GetObject()->GetInt(FIELD_SORT)) - 1; }
+	[[deprecated]] int GetSortAscend() { return GetObject()->GetInt(FIELD_SORT) > 0; }
+	[[deprecated]] int GetSortCol() { return abs((int)GetObject()->GetInt(FIELD_SORT)) - 1; }
 	int GetSortField();
+	// Field sort is using the 'col' member for the field ID.
+	LSortable::SortParam GetFieldSort()
+	{
+		return LSortable::SortParam{
+			(int)GetSortField(),
+			GetObject()->GetInt(FIELD_SORT) > 0
+		};
+	}
+	LSortable::SortParam GetColumnSort()
+	{
+		auto s = GetObject()->GetInt(FIELD_SORT);
+		return LSortable::SortParam{ (int)abs(s)-1, s > 0 };
+	}
 	void ReSort();
+
 	bool Save(ScribeFolder *Into = NULL) override;
 	bool ReindexField(int OldIndex, int NewIndex);
 	void CollectSubFolderMail(ScribeFolder *To = NULL);

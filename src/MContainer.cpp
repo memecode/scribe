@@ -151,7 +151,7 @@ void MContainer::OnPaint(LSurface *pDC, LRect &r, LItemColumn *c, LColour Fore, 
 	}
 }
 
-int ContainerSorter(MContainer *&a, MContainer *&b, ThingSortParams *Params)
+int ContainerSorter(MContainer *&a, MContainer *&b, LSortable::SortParam *Params)
 {
 	if (a->Message && b->Message)
 	{
@@ -161,7 +161,7 @@ int ContainerSorter(MContainer *&a, MContainer *&b, ThingSortParams *Params)
 	return 0;
 }
 
-void MContainer::Pour(int &index, int depth, int tree, bool next, ThingSortParams *params)
+void MContainer::Pour(int &index, int depth, int tree, bool next, LSortable::SortParam *params)
 {
 	Index = index++;
 	Lines = tree;
