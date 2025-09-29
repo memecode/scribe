@@ -384,8 +384,6 @@ public:
 	const char *GetClass() { return "ThingList"; }
 	LRect &GetClient(bool ClientSpace = true);
 
-	[[deprecated]] int GetSortCol();
-	[[deprecated]] bool GetSortAscending();
 	int GetSortField() { return (Container) ? Container->GetSortField() : 0; }
 	bool SetSort(SortParam sort, bool reorderItems = true, bool setMark = true) override;
 	void ReSort();

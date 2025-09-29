@@ -165,16 +165,6 @@ LFont *ThingList::GetFont()
 	return LList::GetFont();
 }
 
-int ThingList::GetSortCol()
-{
-	return Container ? Container->GetColumnSort().Col : 0;
-}
-
-bool ThingList::GetSortAscending()
-{
-	return Container ? Container->GetColumnSort().Ascend : true;
-}
-
 LRect &ThingList::GetClient(bool ClientSpace)
 {
 	static LRect r;

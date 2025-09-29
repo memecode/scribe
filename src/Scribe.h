@@ -1306,8 +1306,6 @@ public:
 
 	// Sorting
 	bool SetSort(SortParam sort, bool reorderItems = true, bool setMark = true) override;
-	[[deprecated]] int GetSortAscend() { return GetObject()->GetInt(FIELD_SORT) > 0; }
-	[[deprecated]] int GetSortCol() { return abs((int)GetObject()->GetInt(FIELD_SORT)) - 1; }
 	int GetSortField();
 	// Field sort is using the 'col' member for the field ID.
 	LSortable::SortParam GetFieldSort()
