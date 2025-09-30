@@ -2614,20 +2614,17 @@ Prof.Add(SortMsg);
 					auto a = dynamic_cast<Thing*>(pa);
 					auto b = dynamic_cast<Thing*>(pb);
 					if (!a || !b)
-						goto noParam;
+						return (int64) (pb - pa);
 
-					auto type = a->Type() - b->Type();
+					auto type = (int64) a->Type() - (int) b->Type();
 					if (type)
 						return type;
 
 					auto defs = a->GetDefaultFields();
 					if (!defs || !defs[col])
-						goto noParam;
+						return (int64) (pb - pa);
 
-					return direction * a->Compare(b, defs[col]);
-
-				noParam:
-					return (int) (pb - pa);
+					return (int64)direction * a->Compare(b, defs[col]);
 				});
 		}
 		else
