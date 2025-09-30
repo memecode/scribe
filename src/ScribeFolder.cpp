@@ -2599,13 +2599,13 @@ Prof.Add("Load things");
 
 	// Do any threading/sorting
 	static LString SortMsg;
-	auto field = GetSortField();
-	if (!Thread() && field)
+	auto fieldSort = GetFieldSort();
+	if (!Thread() && fieldSort.Col)
 	{
 		SortMsg.Printf("Sorting " LPrintfSizeT " items", Items.Length());
 Prof.Add(SortMsg);
 
-		int direction = GetColumnSort().Ascend ? 1 : -1;
+		int direction = fieldSort.Ascend ? 1 : -1;
 		if (GetItemType() == MAGIC_ANY)
 		{
 			auto col = GetColumnSort().Col;
@@ -2614,25 +2614,25 @@ Prof.Add(SortMsg);
 					auto a = dynamic_cast<Thing*>(pa);
 					auto b = dynamic_cast<Thing*>(pb);
 					if (!a || !b)
-						return (int64) (pb - pa);
+						return (int) (pb - pa);
 
-					auto type = (int64) a->Type() - (int) b->Type();
+					auto type = (int) a->Type() - b->Type();
 					if (type)
 						return type;
 
 					auto defs = a->GetDefaultFields();
 					if (!defs || !defs[col])
-						return (int64) (pb - pa);
+						return (int) (pb - pa);
 
-					return (int64)direction * a->Compare(b, defs[col]);
+					return direction * a->Compare(b, defs[col]);
 				});
 		}
 		else
 		{
 			// Sort..
-			Items.Sort([this, direction, field](auto a, auto b)
+			Items.Sort([this, direction, fieldSort](auto a, auto b)
 				{
-					return direction * a->Compare(b, field);
+					return direction * a->Compare(b, fieldSort.Col);
 				});
 		}
 	}
