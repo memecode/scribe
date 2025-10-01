@@ -256,13 +256,10 @@ class ScriptDownloadContentThread : public LThread, public LCancel
 	LStringPipe Out;
 	LError Err;
 	LVariant UserData;
-	bool Result = false;
 
 public:
-	ScriptDownloadContentThread(ScribeWnd *App, LString Uri, LString CallbackName, LVariant *userData = NULL);
-	
+	ScriptDownloadContentThread(ScribeWnd *App, LString Uri, LString CallbackName, LVariant *userData = NULL);	
 	int Main();
-	void OnComplete();
 };
 
 #endif

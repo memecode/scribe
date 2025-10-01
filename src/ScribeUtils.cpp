@@ -2033,51 +2033,53 @@ bool SearchHtml(LVariant *ReturnValue, const char *Html, const char *SearchExp, 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 ScriptDownloadContentThread::ScriptDownloadContentThread(ScribeWnd *app, LString uri, LString callbackName, LVariant *userData) :
-	LThread("ScriptDownloadContentThread", (App = app)->AddDispatch())
+	LThread("ScriptDownloadContentThread"),
+	App(app)
 {
 	Uri = uri;
 	CallbackName = callbackName;
 	if (userData)
 		UserData = *userData;
-
-	DeleteOnExit = true;
 	Run();
 }
 
 int ScriptDownloadContentThread::Main()
 {
-	Result = LGetUri(this, &Out, &Err, Uri);
-	return false;
-}
+	bool Result = LGetUri(this, &Out, &Err, Uri);
 
-void ScriptDownloadContentThread::OnComplete()
-{
-	auto Cb = App->GetCallback(CallbackName);
-	if (!Cb.Func)
-		return;
+	App->RunCallback([this, Result]()
+		{
+			auto Cb = App->GetCallback(CallbackName);
+			if (!Cb.Func)
+				return;
 
-	LVirtualMachine Vm;
-	LScriptArguments Args(&Vm);
+			LVirtualMachine Vm;
+			LScriptArguments Args(&Vm);
 
-	LVariant vApp((LDom*)App);
-	Args.Add(&vApp);
+			LVariant vApp((LDom*)App);
+			Args.Add(&vApp);
 
-	LVariant vUri = Uri.Get();
-	Args.Add(&vUri);
+			LVariant vUri = Uri.Get();
+			Args.Add(&vUri);
 
-	LVariant vResult = Result;
-	Args.Add(&vResult);
+			LVariant vResult = Result;
+			Args.Add(&vResult);
 
-	LVariant vData;
-	if (Result)
-		vData.OwnStr(Out.NewStr());
-	else
-		vData = Err.ToString();
-	Args.Add(&vData);
+			LVariant vData;
+			if (Result)
+				vData.OwnStr(Out.NewStr());
+			else
+				vData = Err.ToString();
+			Args.Add(&vData);
 
-	Args.Add(&UserData);
+			Args.Add(&UserData);
 		
-	App->ExecuteScriptCallback(Cb, Args);
+			App->ExecuteScriptCallback(Cb, Args);
+
+			delete this;
+		});
+
+	return false;
 }
 
 const char *ToString(ScribeMailType t)
