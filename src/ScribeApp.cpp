@@ -11575,12 +11575,16 @@ void ScribeWnd::OnNew
 
 	if (MailList && Fld->Select())
 	{
-		auto fieldSort = Fld->GetFieldSort();
-		auto dir = fieldSort.Ascend ? 1 : -1;
-		MailList->Sort([Fld, dir, fieldSort](auto *a, auto *b)
-			{
-				return dir * a->Compare(b, fieldSort.Col);
-			});
+		#if 1
+			MailList->Sort();
+		#else
+			auto fieldSort = Fld->GetFieldSort();
+			auto dir = fieldSort.Ascend ? 1 : -1;
+			MailList->Sort([Fld, dir, fieldSort](auto *a, auto *b)
+				{
+					return dir * a->Compare(b, fieldSort.Col);
+				});
+		#endif
 	}
 
 	if (NewMail.Length())
@@ -11940,7 +11944,7 @@ bool ScribeWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArra
 						if (New->Select())
 						{
 							MailList->Insert(t);
-							MailList->ReSort();
+							MailList->Sort();
 						}
 						if (UnreadMail) New->OnUpdateUnRead(1, false);
 						if (New->GetItemType() == MAGIC_ANY &&

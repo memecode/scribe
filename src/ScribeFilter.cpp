@@ -4015,7 +4015,7 @@ int FilterUi::OnNotify(LViewI *Col, const LNotification &n)
 				Item->Save();
 
 				SetCtrlValue(IDC_FILTER_INDEX, Item->GetIndex());
-				Item->App->GetItemList()->ReSort();
+				Item->App->GetItemList()->Sort();
 
 				Item->Update();
 				f->Update();

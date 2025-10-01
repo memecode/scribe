@@ -16,7 +16,7 @@ class AsyncOperationState
 	ScribeFolder *Folder = NULL;
 	LArray<Thing*> Items;
 	bool CopyOnly;
-	std::function<void(bool, LArray<Store3Status>&)> Callback;
+	ScribeFolder::TStatusArrayCb Callback;
 
 	// Output
 	bool Result = false; // Overall success/failure
@@ -54,9 +54,9 @@ class AsyncOperationState
 
 public:
 	AsyncOperationState(ScribeFolder *folder,
-		LArray<Thing*> &items,
-		bool copyOnly,
-		std::function<void(bool, LArray<Store3Status>&)> callback) :
+						LArray<Thing*> &items,
+						bool copyOnly,
+						ScribeFolder::TStatusArrayCb callback) :
 		Folder(folder),
 		Items(items),
 		CopyOnly(copyOnly),
@@ -291,11 +291,11 @@ public:
 		}
 
 		// Calculate result based on the Status array:
-		Result = true;
+		LError err;
 		for (auto s: Status)
 		{
 			if (s < Store3Delayed)
-				Result = false;
+				err.Set(LErrorFuncFailed);
 		}
 
 		if (BuildDynMenus)
@@ -304,7 +304,7 @@ public:
 
 		LOG_ASYNC("%p.OnComplete calling cb\n", this);
 		if (Callback)
-			Callback(Result, Status);
+			Callback(err, Status);
 
 		delete this;
 	}

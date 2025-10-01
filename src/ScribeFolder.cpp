@@ -327,37 +327,40 @@ void ScribeFolder::SetLoadOnDemand()
 	}
 }
 
-void ScribeFolder::GetMessageById(const char *Id, std::function<void(Mail*)> Callback)
+void ScribeFolder::GetMessageById(const char *Id, TMailCb Callback)
 {
 	if (!Id)
 	{
-		if (Callback) Callback(NULL);
+		if (Callback)
+			Callback(nullptr);
 		return;
 	}
 
-	LoadThings(NULL, [this, Id=LString(Id), Callback](auto s)
-	{
-		if (s < Store3Delayed)
+	LoadThings(
+		nullptr,
+		[this, Id=LString(Id), Callback](auto s)
 		{
-			if (Callback) Callback(NULL);
-			return;
-		}
-
-		for (auto t : Items)
-		{
-			Mail *r = t->IsMail();
-			if (!r)
-				continue;
-		
-			auto rid = r->GetMessageId();
-			if (!Stricmp(rid, Id.Get()))
+			if (s < Store3Delayed)
 			{
-				if (Callback)
-					Callback(r);
+				if (Callback) Callback(NULL);
 				return;
 			}
-		}
-	});
+
+			for (auto t : Items)
+			{
+				Mail *r = t->IsMail();
+				if (!r)
+					continue;
+		
+				auto rid = r->GetMessageId();
+				if (!Stricmp(rid, Id.Get()))
+				{
+					if (Callback)
+						Callback(r);
+					return;
+				}
+			}
+		});
 }
 
 bool ScribeFolder::InsertThing(Thing *t)
@@ -367,7 +370,7 @@ bool ScribeFolder::InsertThing(Thing *t)
 	if (t && Select() && View())
 	{
 		// Filter
-		ThingFilter *Filter = App->GetThingFilter();
+		auto Filter = App->GetThingFilter();
 		t->SetFieldArray(FieldArray);
 		if (!Filter || Filter->TestThing(t))
 		{
@@ -639,7 +642,7 @@ void ScribeFolder::SetFolder(ScribeFolder *newParent, std::function<void(Store3S
 	}
 }
 
-Store3Status ScribeFolder::DeleteAllThings(std::function<void(Store3Status)> Callback)
+Store3Status ScribeFolder::DeleteAllThings(TStatusCb Callback)
 {
 	if (!GetFldObj())
 		return Store3Error;
@@ -659,7 +662,7 @@ Store3Status ScribeFolder::DeleteAllThings(std::function<void(Store3Status)> Cal
 	return r;
 }
 
-Store3Status ScribeFolder::DeleteThing(Thing *t, std::function<void(Store3Status)> Callback)
+Store3Status ScribeFolder::DeleteThing(Thing *t, TStatusCb Callback)
 {
 	Store3Status Status = Store3Error;
 
@@ -685,7 +688,7 @@ Store3Status ScribeFolder::DeleteThing(Thing *t, std::function<void(Store3Status
 	return Status;
 }
 
-Store3Status ScribeFolder::WriteThing(Thing *t, std::function<void(Store3Status)> Callback)
+Store3Status ScribeFolder::WriteThing(Thing *t, TStatusCb Callback)
 {
 	if (!t)
 	{
@@ -1571,7 +1574,7 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 	}
 }
 
-Store3Status ScribeFolder::LoadThings(LViewI *Parent, std::function<void(Store3Status)> Callback, bool waitForResults)
+Store3Status ScribeFolder::LoadThings(LViewI *Parent, TStatusCb Callback, bool waitForResults)
 {
 	int OldUnRead = GetUnRead();
 
@@ -2215,7 +2218,7 @@ bool ScribeFolder::Thread()
 			// Insert blank items for missing thread parents
 			for (unsigned i=0; i<Containers.Length(); i++)
 			{
-			    MContainer *c = Containers[i];
+			    auto c = Containers[i];
 				if (!c->Message)
 				{
 					LAssert(c->Children.Length() > 1);
@@ -2938,20 +2941,26 @@ bool ScribeFolder::Delete(LArray<Thing*> &Items, bool ToTrash)
 	return true;
 }
 
-void ScribeFolder::MoveTo(LArray<Thing*> &Items, bool CopyOnly, std::function<void(bool, LArray<Store3Status>&)> Callback)
+void ScribeFolder::MoveTo(LArray<Thing*> &Items, bool CopyOnly, TStatusArrayCb Callback)
 {
-	if (Items.Length() == 0)
+	if (Items.Length() == 0 ||
+		!GetObject() ||
+		!App)
+	{
+		LArray<Store3Status> a;
+		if (Callback)
+			Callback(LError(LErrorInvalidParam), a);
 		return;
-	if (!GetObject() || !App)
-		return;
+	}
 
 	new AsyncOperationState(this, Items, CopyOnly, Callback);
 }
 
 void ScribeFolder::ReSort()
 {
-	if (View() && Select())
-		View()->Sort();
+	if (Select())
+		if (auto v = View())
+			v->Sort();
 }
 
 bool ScribeFolder::SetSort(SortParam sort, bool reorderItems, bool setMark)
@@ -3543,12 +3552,13 @@ const char *ScribeFolder::GetStorageMimeType()
 	return NULL;
 }
 
-void ScribeFolder::ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, std::function<void(LProgressDlg*)> Callback)
+void ScribeFolder::ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, TProgressCb Callback)
 {
 	if (!MimeType)
 	{
 		LAssert(!"No Mimetype");
-		if (Callback) Callback(NULL);
+		if (Callback)
+			Callback(nullptr);
 		return;
 	}
 
@@ -3596,8 +3606,7 @@ size_t ScribeFolder::Length()
 {
 	if (GetItemType() == MAGIC_MAIL)
 	{
-		ThingList *v = View();
-		if (v)
+		if (auto v = View())
 			return v->Length();
 	}
 
@@ -3611,8 +3620,7 @@ ssize_t ScribeFolder::IndexOf(Mail *m)
 {
 	if (GetItemType() == MAGIC_MAIL)
 	{
-		ThingList *v = View();
-		if (v)
+		if (auto v = View())
 			return v->IndexOf(m);
 	
 		return Items.IndexOf(m);
@@ -3625,16 +3633,14 @@ Mail *ScribeFolder::operator [](size_t i)
 {
 	if (GetItemType() == MAGIC_MAIL)
 	{
-		ThingList *v = View();
-		if (v)
+		if (auto v = View())
 			return dynamic_cast<Mail*>(v->ItemAt(i));
 
-		Thing *t = Items[i];
-		if (t)
+		if (auto t = Items[i])
 			return t->IsMail();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool ScribeFolder::GetVariant(const char *Name, LVariant &Value, const char *Array)

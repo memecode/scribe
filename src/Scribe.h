@@ -1258,6 +1258,11 @@ protected:
 	}	CurState = FldState_Idle;
 
 public:
+	using TMailCb = std::function<void(Mail*)>;
+	using TStatusCb = std::function<void(Store3Status)>;
+	using TStatusArrayCb = std::function<void(LError, LArray<Store3Status>&)>;
+	using TProgressCb = std::function<void(LProgressDlg*)>;
+
 	List<Thing> Items;
 	std::function<void()> BeforeDelete;
 
@@ -1322,11 +1327,11 @@ public:
 	}
 	void ReSort();
 
-	bool Save(ScribeFolder *Into = NULL) override;
+	bool Save(ScribeFolder *Into = nullptr) override;
 	bool ReindexField(int OldIndex, int NewIndex);
-	void CollectSubFolderMail(ScribeFolder *To = NULL);
+	void CollectSubFolderMail(ScribeFolder *To = nullptr);
 	bool InsertThing(Thing *Item);
-	void MoveTo(LArray<Thing*> &Items, bool CopyOnly, std::function<void(bool, LArray<Store3Status>&)> Callback = NULL);
+	void MoveTo(LArray<Thing*> &Items, bool CopyOnly, TStatusArrayCb Callback = nullptr);
 	bool Delete(LArray<Thing*> &Items, bool ToTrash);
 	void SetDefaultFields(bool Force = false);
 	bool Thread();
@@ -1334,8 +1339,7 @@ public:
 	void SetFolderPerms(LView *Parent, ScribeAccessType Access, ScribePerm Perm, std::function<void(bool)> Callback); 
 	bool GetThreaded();
 	void SetThreaded(bool t);
-	// void Update();
-	void GetMessageById(const char *Id, std::function<void(Mail*)> Callback);
+	void GetMessageById(const char *Id, TMailCb Callback);
 	void SetLoadOnDemand();
 	void SortSubfolders();
 	void DoContextMenu(LMouse &m);
@@ -1355,10 +1359,10 @@ public:
 	/// return Store3Delayed in the status immediately. Currently this is used by CalendarSourceGetEvents
 	/// to return a combined list of events available immediately. Some remote calendar or Webdav sources
 	/// can take a while to get their content.
-	Store3Status LoadThings(LViewI *Parent = NULL,	std::function<void(Store3Status)> Callback = NULL, bool waitForResults = true);
-	Store3Status WriteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
-	Store3Status DeleteThing(Thing *t,				std::function<void(Store3Status)> Callback = NULL);
-	Store3Status DeleteAllThings(					std::function<void(Store3Status)> Callback = NULL);
+	Store3Status LoadThings(LViewI *Parent = NULL,	TStatusCb Callback = NULL, bool waitForResults = true);
+	Store3Status WriteThing(Thing *t,				TStatusCb Callback = NULL);
+	Store3Status DeleteThing(Thing *t,				TStatusCb Callback = NULL);
+	Store3Status DeleteAllThings(					TStatusCb Callback = NULL);
 	bool LoadFolders();
 	bool UnloadThings();
 	bool IsWriteable() { return true; }
@@ -1396,7 +1400,7 @@ public:
 	bool GetFormats(bool Export, LString::Array &MimeTypes);
 	IoProgress Import(IoProgressFnArgs);
 	IoProgress Export(IoProgressFnArgs);
-	void ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, std::function<void(LProgressDlg*)> Callback = NULL);
+	void ExportAsync(LAutoPtr<LStreamI> f, const char *MimeType, TProgressCb Callback = NULL);
 	const char *GetStorageMimeType();
 
 	// Dom

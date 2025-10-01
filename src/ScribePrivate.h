@@ -384,12 +384,21 @@ public:
 	const char *GetClass() { return "ThingList"; }
 	LRect &GetClient(bool ClientSpace = true);
 
-	int GetSortField() { return (Container) ? Container->GetSortField() : 0; }
 	bool SetSort(SortParam sort, bool reorderItems = true, bool setMark = true) override;
-	void ReSort();
+	void Sort() override;
+	int GetSortField()
+	{
+		return (Container) ? Container->GetSortField() : FIELD_NULL;
+	}
 	// Field sort is using the 'col' member for the field ID.
-	LSortable::SortParam GetFieldSort() { return Container ? Container->GetFieldSort() : LSortable::SortParam(); }
-	LSortable::SortParam GetSort() override { return Container ? Container->GetColumnSort() : LSortable::SortParam(); }
+	LSortable::SortParam GetFieldSort()
+	{
+		return Container ? Container->GetFieldSort() : LSortable::SortParam();
+	}
+	LSortable::SortParam GetSort() override
+	{
+		return Container ? Container->GetColumnSort() : LSortable::SortParam();
+	}
 	
 	ScribeFolder *GetContainer() { return Container; }
 	void SetContainer(ScribeFolder *c) { Container = c; }

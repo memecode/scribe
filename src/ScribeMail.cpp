@@ -7539,8 +7539,8 @@ ThingUi *Mail::DoUI(MailContainer *c)
 
 int Mail::Compare(LListItem *t, ssize_t Field)
 {
-	Thing *T = (Thing*)t->User.Ptr;
-	Mail *m = T ? T->IsMail() : 0;
+	auto thing = (Thing*) t->User.Ptr;
+	auto m = thing ? thing->IsMail() : nullptr;
 	if (m)
 	{
 		static int Fields[] = {FIELD_FROM, FIELD_SUBJECT, FIELD_SIZE, FIELD_DATE_RECEIVED};
@@ -7557,7 +7557,7 @@ int Mail::Compare(LListItem *t, ssize_t Field)
 		const char *s1 = "", *s2 = "";
 		switch (Field)
 		{
-			case 0:
+			case FIELD_NULL:
 			{
 				break;
 			}

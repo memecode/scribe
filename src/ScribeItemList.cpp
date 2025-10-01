@@ -302,7 +302,7 @@ void ThingList::OnColumnClick(int Col, LMouse &m)
 	}
 }
 
-void ThingList::ReSort()
+void ThingList::Sort()
 {
 	auto fieldSort = GetFieldSort();
 	int direction = fieldSort.Ascend ? 1 : -1;
@@ -340,7 +340,7 @@ void ThingList::ReSort()
 				Root[i]->Pour(i, 0, 0, i<(int)Root.Length()-1, &Params);
 			}
 
-			Sort([this](auto *a, auto *b)
+			LList::Sort([this](auto *a, auto *b)
 				{
 					auto ta = (Thing*)a->User.Ptr;
 					auto tb = (Thing*)b->User.Ptr;
@@ -358,7 +358,7 @@ void ThingList::ReSort()
 	else if (Container->GetItemType() == MAGIC_ANY)
 	{
 		auto colSort = Container->GetColumnSort();
-		Sort([this, colSort](auto *pa, auto *pb)
+		LList::Sort([this, colSort](auto *pa, auto *pb)
 			{
 				auto a = dynamic_cast<Thing*>(pa);
 				auto b = dynamic_cast<Thing*>(pb);
@@ -379,7 +379,7 @@ void ThingList::ReSort()
 	}
 	else
 	{
-		Sort([this, direction, fieldSort](auto *a, auto *b)
+		LList::Sort([this, direction, fieldSort](auto *a, auto *b)
 			{
 				return direction * a->Compare(b, fieldSort.Col);
 			});
@@ -412,10 +412,11 @@ bool ThingList::SetSort(SortParam sort, bool reorderItems, bool setMark)
 	if (!Container)
 		return false;
 
+	sortParam = sort;
 	Container->SetSort(sort);
 	
 	auto fieldSort = GetFieldSort();
-	ReSort();
+	Sort();
 	
 	if (auto Sel = GetSelected())
 	{
