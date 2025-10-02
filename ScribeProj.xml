@@ -94,6 +94,7 @@
 		</Node>
 		<Node Name="Html" Type="1" Platforms="15" Open="0" Id="9">
 			<Node File="../../lgi/trunk/src/common/Text/Html.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/include/lgi/common/Html.h" Type="3" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Text/HtmlCommon.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Text/HtmlParser.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/include/lgi/common/HtmlParser.h" Type="3" Platforms="15" />

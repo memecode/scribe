@@ -37,18 +37,18 @@ ifeq ($(Build),Debug)
 		-llgi-gtk3$(Tag) \
 		-L../../lgi/trunk/$(BuildDir)
 	Inc =  \
+		-I../../lgi/trunk/include \
 		-I../../lgi/trunk/private/common \
+		-I./resources \
 		-I../../lgi/trunk/include/lgi/linux/Gtk \
 		-I../../lgi/deps/build-x64-debug/include \
+		-I./utils/Tables \
 		-I./src/Store3Webdav \
-		-I../libs/build-x64-debug/include \
-		-I./resources \
-		-I../../lgi/trunk/include \
 		-I../../lgi/trunk/include/lgi/linux \
-		-I./src \
 		`pkg-config --cflags gtk+-3.0` \
 		-I./src/Sqlite \
-		-I./utils/Tables
+		-I./src \
+		-I../libs/build-x64-debug/include
 else
 	CFlags += -s -Os -Wno-format-truncation
 	CppFlags += -s -Os -Wno-format-truncation
@@ -67,128 +67,28 @@ else
 		-llgi-gtk3$(Tag) \
 		-L../../lgi/trunk/$(BuildDir)
 	Inc =  \
-		-I../../lgi/trunk/private/common \
-		-I./resources \
-		-I../../lgi/deps/build-x64-release/include \
-		-I../../lgi/trunk/include/lgi/linux \
-		-I../../lgi/trunk/include/lgi/linux/Gtk \
-		-I./src/Store3Webdav \
-		-I./src/Sqlite \
-		-I../libs/build-x64-release/include \
 		`pkg-config --cflags gtk+-3.0` \
-		-I./utils/Tables \
+		-I./src/Store3Webdav \
+		-I./src \
+		-I../../lgi/trunk/private/common \
 		-I../../lgi/trunk/include \
-		-I./src
+		-I../libs/build-x64-release/include \
+		-I./src/Sqlite \
+		-I../../lgi/trunk/include/lgi/linux/Gtk \
+		-I../../lgi/deps/build-x64-release/include \
+		-I./resources \
+		-I./utils/Tables \
+		-I../../lgi/trunk/include/lgi/linux
 endif
 
 # Dependencies
-Source =	../libs/Btree/btree_header.c \
-			../../lgi/trunk/src/common/Net/HttpTools.cpp \
-			../../lgi/trunk/src/common/Text/Emoji/EmojiTools.cpp \
-			../../lgi/trunk/src/common/General/TimeZone.cpp \
-			../../lgi/trunk/src/common/Text/TextConvert.cpp \
-			../libs/Btree/btree_delete.c \
-			src/Encryption/GnuPG.cpp \
-			../../lgi/trunk/src/common/General/SoftwareUpdate.cpp \
-			../libs/Btree/db_blocks.c \
-			../../lgi/trunk/src/common/General/SegmentTree.cpp \
-			../libs/Btree/db_blocklist.c \
-			../libs/Btree/btree.c \
-			src/GBTreeWordStore.cpp \
-			../libs/Btree/btree_lock.c \
-			../libs/Btree/btree_node.c \
-			../../lgi/trunk/src/common/General/Tnef.cpp \
-			src/Exp_Scribe.cpp \
-			../libs/Btree/db_header.c \
-			src/BayesDlg.cpp \
-			src/ScribeUi.cpp \
-			../libs/Btree/btree_traverse.c \
-			../libs/Btree/db.c \
-			../libs/Btree/db_cache.c \
-			src/Store3Imap/ScribeImap_Folder.cpp \
-			../libs/Btree/db_lock.c \
-			../libs/Btree/db_utils.c \
-			../libs/Btree/gbtree.cpp \
-			src/Calendar.cpp \
-			../libs/Btree/btree_search.c \
-			src/Store3Mail3/Mail3Group.cpp \
-			../libs/Btree/btree_insert.c \
-			../libs/Btree/hashtable.c \
-			../libs/Btree/offsetlist.c \
-			src/HtmlToText.cpp \
-			src/ScribeAccount.cpp \
-			../../lgi/trunk/src/common/Text/vCard-vCal.cpp \
-			../../lgi/trunk/src/common/General/SharedMemory.cpp \
-			../../lgi/trunk/src/common/Net/Http.cpp \
-			../../lgi/trunk/src/common/Text/Html.cpp \
-			../../lgi/trunk/src/common/Net/Mail.cpp \
-			../../lgi/trunk/src/common/Net/MailHttp.cpp \
-			../../lgi/trunk/src/common/Net/MailImap.cpp \
-			../../lgi/trunk/src/common/Net/OAuth2.cpp \
-			src/ScribeAccountPreview.cpp \
-			../../lgi/trunk/src/common/Gdc2/DrawListSurface.cpp \
-			../../lgi/trunk/src/common/Text/Emoji/EmojiMap.cpp \
-			../../lgi/trunk/src/common/Gdc2/Font/EmojiFont.cpp \
-			src/Imp_Eml.cpp \
-			../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp \
-			../../lgi/trunk/src/common/Text/HtmlCommon.cpp \
-			../../lgi/trunk/src/common/Net/Ftp.cpp \
-			../../lgi/trunk/src/common/Text/HtmlParser.cpp \
-			../../lgi/trunk/src/common/Lgi/Browser.cpp \
-			../../lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp \
-			../../lgi/trunk/src/common/Text/Homoglyphs/HomoglyphsTable.cpp \
-			../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp \
+Source =	../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp \
 			../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/Editor/TextBlock.cpp \
 			../../lgi/trunk/src/common/Text/Homoglyphs/Homoglyphs.cpp \
-			../../lgi/trunk/src/common/Lgi/LgiMain.cpp \
-			../../lgi/trunk/src/common/Text/SpellCheckAspell.cpp \
-			../../lgi/trunk/src/common/Db/Db-Csv.cpp \
-			../../lgi/trunk/src/common/Text/XmlTreeUi.cpp \
-			../../lgi/trunk/src/common/Widgets/DatePopup.cpp \
-			src/ScribeAccountUI.cpp \
-			src/ScribeSendReceive.cpp \
-			src/ScribeStatusPanel.cpp \
-			src/ScribeAbout.cpp \
-			src/ScribeApp.cpp \
-			src/ScribeIpc.cpp \
-			src/ScribeMain.cpp \
-			src/ScribeRepair.cpp \
-			src/ScribeSockets.cpp \
-			src/ScribeThing.cpp \
-			src/ScribeUtils.cpp \
-			src/Components.cpp \
-			src/Imp_CsvContacts.cpp \
-			src/Imp_Eudora.cpp \
-			src/Imp_Mozilla.cpp \
-			src/Imp_NetscapeContacts.cpp \
-			src/Imp_OutlookExpress.cpp \
-			src/ImpExp_Mbox.cpp \
-			src/CalendarView.cpp \
-			../../lgi/trunk/src/common/Widgets/TimePopup.cpp \
-			../../lgi/trunk/src/common/Widgets/ZoomView.cpp \
-			../../lgi/trunk/src/common/Widgets/MonthView.cpp \
-			../../lgi/trunk/src/common/Widgets/YearView.cpp \
-			../../lgi/trunk/src/common/Widgets/FilterUi.cpp \
-			src/RemoteCalendarSource.cpp \
-			src/BayesianFilter.cpp \
-			src/PrintContext.cpp \
-			src/MContainer.cpp \
-			../../lgi/trunk/src/common/General/Growl.cpp \
-			../../lgi/trunk/src/common/Net/OpenSSLSocket.cpp \
-			src/ScribeAttachment.cpp \
-			src/ScribeContact.cpp \
-			src/ScribeFilter.cpp \
-			src/ScribeFolder.cpp \
-			src/ScribeFolderTree.cpp \
-			src/ScribeGroup.cpp \
-			src/ScribeItemList.cpp \
-			src/ScribeMail.cpp \
-			src/ScribeFolderDlg.cpp \
-			src/ScribeFolderSelect.cpp \
-			src/ScribeListAddr.cpp \
-			src/ScribePageSetup.cpp \
+			../../lgi/trunk/src/common/Lgi/Browser.cpp \
+			../../lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp \
 			utils/Tables/MailFlags.c \
 			src/SearchView.cpp \
 			../../lgi/trunk/src/common/Coding/ScriptCompiler.cpp \
@@ -199,11 +99,54 @@ Source =	../libs/Btree/btree_header.c \
 			src/PrintPreview.cpp \
 			src/ObjectInspector.cpp \
 			src/OptionsDlg.cpp \
+			../../lgi/trunk/src/common/Widgets/ZoomView.cpp \
+			../../lgi/trunk/src/common/Text/Emoji/EmojiTools.cpp \
+			../../lgi/trunk/src/common/Text/SpellCheckAspell.cpp \
+			../../lgi/trunk/src/common/Text/XmlTreeUi.cpp \
+			src/ScribeIpc.cpp \
+			src/ScribeMain.cpp \
+			src/ScribeRepair.cpp \
+			src/ScribeSockets.cpp \
+			src/ScribeFolder.cpp \
+			src/ScribeFolderTree.cpp \
+			src/ScribeGroup.cpp \
+			src/ScribeItemList.cpp \
+			src/ScribeMail.cpp \
+			src/ScribeFolderDlg.cpp \
+			src/ScribeFolderSelect.cpp \
+			src/ScribeListAddr.cpp \
+			src/ScribePageSetup.cpp \
+			src/Imp_OutlookExpress.cpp \
+			src/ImpExp_Mbox.cpp \
+			src/CalendarView.cpp \
+			../../lgi/trunk/src/common/Widgets/MonthView.cpp \
+			../../lgi/trunk/src/common/Widgets/YearView.cpp \
+			../../lgi/trunk/src/common/Widgets/FilterUi.cpp \
+			src/RemoteCalendarSource.cpp \
+			../libs/Btree/btree_header.c \
+			src/FolderCalendarSource.cpp \
+			src/Store3Common.cpp \
+			src/Store3Webdav/WebdavStore.cpp \
+			src/Store3Webdav/WebdavCalendar.cpp \
+			src/Store3Webdav/WebdavFolder.cpp \
+			src/Store3Webdav/WebdavContact.cpp \
+			src/Store3Webdav/WebdavThread.cpp \
+			src/Test/UnitTests.cpp \
+			../libs/Btree/btree_delete.c \
+			../../lgi/trunk/src/common/Widgets/DatePopup.cpp \
+			src/BayesianFilter.cpp \
+			src/PrintContext.cpp \
+			src/MContainer.cpp \
+			../../lgi/trunk/src/common/General/Growl.cpp \
+			../../lgi/trunk/src/common/Coding/ScriptVM.cpp \
+			src/ScribeAttachment.cpp \
+			src/ScribeContact.cpp \
+			src/ScribeFilter.cpp \
+			../../lgi/trunk/src/common/Net/OpenSSLSocket.cpp \
 			src/AddressSelect.cpp \
 			src/NewMailDlg.cpp \
 			src/ManageMailStores.cpp \
 			../../lgi/trunk/src/common/Widgets/ControlTree.cpp \
-			../../lgi/trunk/src/common/Coding/ScriptVM.cpp \
 			../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			../../lgi/trunk/src/common/Net/Mime.cpp \
 			src/ReplicateDlg.cpp \
@@ -211,6 +154,32 @@ Source =	../libs/Btree/btree_header.c \
 			src/ScribePassword.cpp \
 			src/SecurityDlg.cpp \
 			src/TitlePage.cpp \
+			../libs/Btree/btree_node.c \
+			../libs/Btree/db_utils.c \
+			../../lgi/trunk/src/common/Gdc2/DrawListSurface.cpp \
+			../libs/Btree/db.c \
+			../libs/Btree/btree.c \
+			src/GBTreeWordStore.cpp \
+			../../lgi/trunk/src/common/Net/Http.cpp \
+			../../lgi/trunk/src/common/Net/HttpTools.cpp \
+			../../lgi/trunk/src/common/Gdc2/Font/EmojiFont.cpp \
+			../libs/Btree/btree_lock.c \
+			../libs/Btree/db_blocklist.c \
+			../../lgi/trunk/src/common/General/SoftwareUpdate.cpp \
+			src/Imp_Eml.cpp \
+			../libs/Btree/hashtable.c \
+			../libs/Btree/offsetlist.c \
+			src/HtmlToText.cpp \
+			src/ScribeUi.cpp \
+			src/ScribeThing.cpp \
+			src/ScribeUtils.cpp \
+			src/Components.cpp \
+			src/Imp_CsvContacts.cpp \
+			src/Exp_Scribe.cpp \
+			src/Imp_Eudora.cpp \
+			src/Imp_Mozilla.cpp \
+			src/Imp_NetscapeContacts.cpp \
+			../../lgi/trunk/src/common/Text/Homoglyphs/HomoglyphsTable.cpp \
 			src/Scripting.cpp \
 			src/Sqlite/v3.50.1/sqlite3.c \
 			../../lgi/trunk/src/common/Coding/ScriptLibrary.cpp \
@@ -219,6 +188,28 @@ Source =	../libs/Btree/btree_header.c \
 			src/Store3Imap/ScribeImap_Store.cpp \
 			src/Store3Imap/ScribeImap_Thread.cpp \
 			src/Store3Mail3/Mail3Attachment.cpp \
+			src/Calendar.cpp \
+			../../lgi/trunk/src/common/Widgets/TimePopup.cpp \
+			../libs/Btree/btree_search.c \
+			../../lgi/trunk/src/common/General/SegmentTree.cpp \
+			../libs/Btree/db_header.c \
+			src/ScribeAbout.cpp \
+			../../lgi/trunk/src/common/Text/Emoji/EmojiMap.cpp \
+			../libs/Btree/db_cache.c \
+			../../lgi/trunk/src/common/General/TimeZone.cpp \
+			../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp \
+			../../lgi/trunk/src/common/Text/HtmlCommon.cpp \
+			../../lgi/trunk/src/common/Net/Ftp.cpp \
+			../../lgi/trunk/src/common/Text/HtmlParser.cpp \
+			src/ScribeApp.cpp \
+			../../lgi/trunk/src/common/Net/MailImap.cpp \
+			src/ScribeAccountUI.cpp \
+			../../lgi/trunk/src/common/Text/TextConvert.cpp \
+			../../lgi/trunk/src/common/Net/OAuth2.cpp \
+			src/ScribeAccountPreview.cpp \
+			../libs/Btree/db_lock.c \
+			../../lgi/trunk/src/common/Lgi/LgiMain.cpp \
+			../../lgi/trunk/src/common/Db/Db-Csv.cpp \
 			src/Store3Mail3/Mail3Calendar.cpp \
 			src/Store3Mail3/Mail3Contact.cpp \
 			../../lgi/trunk/src/common/Net/WebDav.cpp \
@@ -226,14 +217,23 @@ Source =	../libs/Btree/btree_header.c \
 			src/Store3Mail3/Mail3Folder.cpp \
 			src/Store3Mail3/Mail3Mail.cpp \
 			src/Store3Mail3/Mail3Store.cpp \
-			src/FolderCalendarSource.cpp \
-			src/Store3Common.cpp \
-			src/Store3Webdav/WebdavStore.cpp \
-			src/Store3Webdav/WebdavCalendar.cpp \
-			src/Store3Webdav/WebdavFolder.cpp \
-			src/Store3Webdav/WebdavContact.cpp \
-			src/Store3Webdav/WebdavThread.cpp \
-			src/Test/UnitTests.cpp
+			../../lgi/trunk/src/common/General/SharedMemory.cpp \
+			src/BayesDlg.cpp \
+			../libs/Btree/btree_insert.c \
+			../libs/Btree/btree_traverse.c \
+			src/Store3Mail3/Mail3Group.cpp \
+			../libs/Btree/db_blocks.c \
+			../../lgi/trunk/src/common/Net/Mail.cpp \
+			src/ScribeStatusPanel.cpp \
+			../../lgi/trunk/src/common/Text/Html.cpp \
+			src/ScribeAccount.cpp \
+			../../lgi/trunk/src/common/Net/MailHttp.cpp \
+			src/ScribeSendReceive.cpp \
+			src/Store3Imap/ScribeImap_Folder.cpp \
+			../../lgi/trunk/src/common/Text/vCard-vCal.cpp \
+			src/Encryption/GnuPG.cpp \
+			../libs/Btree/gbtree.cpp \
+			../../lgi/trunk/src/common/General/Tnef.cpp
 
 SourceC    := $(filter %.c,$(Source))
 ObjectsC   := $(SourceC:.c=.o)
@@ -575,24 +575,24 @@ cleanall :
 	+make -C "../../lgi/trunk" -f ./linux/Makefile.linux clean
 
 VPATH=$(BuildDir) \
-	./src/Encryption \
-	../libs/Btree \
-	./src \
-	../../lgi/trunk/src/common/General \
-	./src/Store3Webdav \
-	../../lgi/trunk/src/common/Net \
-	../../lgi/trunk/src/common/Gdc2 \
-	../../lgi/trunk/src/common/Text/Emoji \
 	../../lgi/trunk/src/common/Gdc2/Font \
 	../../lgi/trunk/src/common/Text \
+	../../lgi/trunk/src/common/Widgets \
+	./utils/Tables \
+	./src/Test \
+	./src \
+	../../lgi/trunk/src/common/Text/Emoji \
+	../../lgi/trunk/src/common/General \
 	../../lgi/trunk/src/common/Widgets/Editor \
+	../../lgi/trunk/src/common/Coding \
+	./src/Store3Mail3 \
+	./src/Encryption \
+	../../lgi/trunk/src/common/Gdc2 \
+	../libs/Btree \
 	../../lgi/trunk/src/common/Lgi \
 	../../lgi/trunk/src/common/Db \
 	../../lgi/trunk/src/common/Text/Homoglyphs \
 	./src/Store3Imap \
-	../../lgi/trunk/src/common/Widgets \
-	./utils/Tables \
-	../../lgi/trunk/src/common/Coding \
-	./src/Store3Mail3 \
+	./src/Store3Webdav \
 	./src/Sqlite/v3.50.1 \
-	./src/Test
+	../../lgi/trunk/src/common/Net
