@@ -2621,7 +2621,7 @@ Prof.Add(SortMsg);
 
 					auto type = (int) a->Type() - b->Type();
 					if (type)
-						return type;
+						return (int)type;
 
 					auto defs = a->GetDefaultFields();
 					if (!defs || !defs[col])
