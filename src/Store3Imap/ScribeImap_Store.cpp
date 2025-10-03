@@ -1157,7 +1157,7 @@ void ImapStore::OnEvent(void *Param)
 			case IMAP_RENAME_FOLDER:
 			{
 				LArray<LDataI*> Renamed;
-				ImapFolder *f = Root->Find(0, m->Parent);
+				auto f = Root->Find(0, m->Parent);
 				if (f && f->OnRename(m->NewRemote))
 					Renamed.Add(f);
 				OnChange(_FL, Renamed, FIELD_FOLDER_NAME);
@@ -1260,14 +1260,15 @@ void ImapStore::OnEvent(void *Param)
 			}
 			case IMAP_LOAD_FOLDER:
 			{
-				// This event comes from the delayed ImapFolder::LoadMail thread... NOT the imap worker thread.
+				// This event comes from the delayed ImapFolder::LoadMail thread (ImapFolderLoadThread)...
+				// NOT the imap worker thread.
 				if (!m->Fld.Length())
 				{
 					LAssert(!"Must have 1 entry.");
 					break;
 				}
 
-				ImapFolder *f = Root->Find(m->Fld[0].Local, NULL);
+				auto f = Root->Find(m->Fld[0].Local, nullptr);
 				if (!f)
 				{
 					LAssert(!"Not an IMAP folder.");
@@ -1279,10 +1280,10 @@ void ImapStore::OnEvent(void *Param)
 			}
 		}
 
-		int Time = (int) (LCurrentTime() - Start);
+		auto Time = LCurrentTime() - Start;
 		if (Time > 1000)
 		{
-			LgiTrace("%s:%i - ImapStore::OnEvent took %ims processing msg %s (len=%i)\n",
+			LgiTrace("%s:%i - ImapStore::OnEvent took " LPrintfUInt64 "ms processing msg %s (len=%i)\n",
 				_FL,
 				Time,
 				m && m->Type < IMAP_MSG_MAX

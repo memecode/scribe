@@ -2456,6 +2456,26 @@ bool ScribeFolder::SortItems()
 	return true;
 }
 
+bool ScribeFolder::CanHaveSubFolders(Store3ItemTypes Type)
+{
+	auto isTrash = GetItemType() == MAGIC_ANY;
+	if (isTrash)
+		return false; // trash folders don't have sub-folders.
+
+	if (auto o = GetObject())
+	{
+		auto storeType = o->GetInt(FIELD_STORE_TYPE);
+		if (storeType == Store3Imap &&
+			Type != MAGIC_MAIL)
+		{
+			// Imap folders can only have mail as the type for sub-folders...
+			return false;
+		}
+	}
+
+	return true;
+}
+
 void ScribeFolder::Populate(ThingList *list)
 {
 LProfile Prof("ScribeFolder::Populate", 1000);

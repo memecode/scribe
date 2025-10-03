@@ -805,15 +805,22 @@ void ImapFolder::LoadSub(bool All)
 	}
 }
 
-struct ImapFolderLoadThread : public LThread, public ImapFolderData
+struct ImapFolderLoadThread :
+	public LThread,
+	public ImapFolderData
 {
 	ImapFolder *f;
 	LString Local, Remote;
 	LArray<ImapMail*> PostDel;
 
-	ImapFolderLoadThread(ImapFolder *folder) : f(folder), LThread("ImapFolderLoadThread")
+	ImapFolderLoadThread(ImapFolder *folder) :
+		LThread("ImapFolderLoadThread"),
+		f(folder)
 	{
+		// This object will own the 'UidMap' and 'Mail' containers for it's life time
+		// Returning the ownership to the actual folder is in 'ImapFolder::OnLoadMail'
 		Swap(*f);
+
 		Local = f->Local.Get();
 		Remote = f->Remote.Get();
 
@@ -929,6 +936,7 @@ struct ImapFolderLoadThread : public LThread, public ImapFolderData
 		LAutoPtr<ImapMsg> msg(new ImapMsg(IMAP_LOAD_FOLDER, _FL));
 		auto &fi = msg->Fld.New();
 		fi.Local = Local.Get();
+		fi.Remote = Remote.Get();
 		Store->GetEvents()->Post(Store, msg.Release());
 		return 0;
 	}
@@ -969,19 +977,14 @@ void ImapFolder::OnLoadMail(bool Threaded)
 
 	if (LoadThread)
 	{
-		// auto StartTs = LCurrentTime();
-
 		// Return all the data to the main folder
 		ImapFolderData::Swap(*LoadThread.Get());
 
-		// NULL out the data ptrs
+		// NULL out the data pointers
 		for (auto m: Mail.a)
-			m->Data = NULL;
+			m->Data = nullptr;
 
 		LoadThread.Reset();
-
-		//LgiTrace("ImapFolder::OnLoadMail(%s) prcessing: " LPrintfInt64 "ms.\n",
-		// 	Remote.Get(), LCurrentTime() - StartTs);
 	}
 	else LAssert(!"Where is the thread?");
 
@@ -1080,6 +1083,7 @@ Store3Status ImapFolder::Save(LDataI *Into)
 
 			SetParent(f);
 			Field.State = Store3Loaded;
+			Mail.State = Store3Loaded;
 		}
 		else
 		{
@@ -1945,6 +1949,13 @@ Store3Status ImapFolder::SetStr(int id, const char *str)
 	{
 		case FIELD_FOLDER_NAME:
 		{
+			if (!IsOnDisk())
+			{
+				// There is nothing to load...?
+				LeafName = str;
+				return Store3Success;
+			}
+
 			return WhenLoaded([this, str](auto Status)
 			{
 				if (IsOnDisk())
@@ -1969,8 +1980,8 @@ Store3Status ImapFolder::SetStr(int id, const char *str)
 				}
 				else
 				{
-					LeafName = str;
-					return Store3Success;
+					LAssert(!"Should have been handled outside of 'WhenLoaded'?");
+					return Store3Error;
 				}
 			});
 			break;
@@ -2118,6 +2129,11 @@ Store3Status ImapFolder::SetInt(int id, int64 i)
 				#endif
 			});
 		case FIELD_FOLDER_TYPE:
+			if (!IsOnDisk())
+			{
+				ItemType = (int)i;
+				return Store3Success;
+			}
 			return WhenLoaded([this, i](auto Status)
 			{
 				ItemType = (int)i;
@@ -2243,12 +2259,11 @@ ImapFolder *ImapFolder::Find(const char *local, const char *remote)
 	for (auto cf: Sub.a)
 	{
 		LAssert(cf->GetParent() == this);
-		ImapFolder *r = cf->Find(local, remote);
-		if (r)
+		if (auto r = cf->Find(local, remote))
 			return r;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 ImapMail *ImapFolder::FindMail(const char *File, int32 Uid)
@@ -2264,7 +2279,7 @@ ImapMail *ImapFolder::FindMail(const char *File, int32 Uid)
 			return m;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 ImapMail::IMeta ImapFolderData::GetMeta(uint32_t id, bool Create)

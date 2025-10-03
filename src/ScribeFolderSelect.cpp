@@ -26,7 +26,9 @@ public:
 	ScribeFolderTree(int id, int x, int y, int cx, int cy);
 
 	void Setup(FolderDlgPriv *d, ScribeFolder *Root, const char *InitSel);
-	LString Get2();
+
+	/// \returns the path of the selected folder...
+	LString GetSelectedPath();
 };
 
 class FolderDlgPriv
@@ -247,14 +249,12 @@ void ScribeFolderTree::AddFolder(FolderDlgPriv *d, LTreeItem *i, ScribeFolder *f
 	}
 }
 
-LString ScribeFolderTree::Get2()
+LString ScribeFolderTree::GetSelectedPath()
 {
 	LString a;
-	FolderLeaf *Leaf = dynamic_cast<FolderLeaf*>(Selection());
-	if (Leaf)
+	if (auto Leaf = dynamic_cast<FolderLeaf*>(Selection()))
 	{
-		ScribeFolder *Folder = Leaf->GetFolder();
-		if (Folder)
+		if (auto Folder = Leaf->GetFolder())
 			a = Folder->GetPath();
 	}
 
@@ -292,8 +292,7 @@ FolderDlg::FolderDlg(	LViewI *parent,
 					{
 						Root = dynamic_cast<ScribeFolder*>(Root->GetPrev());
 					}
-				}
-			}
+				}			}
 			
 			d->View->Setup(d, Root, InitialSelect);
 			d->View->SetImageList(d->App->GetIconImgList(), false);
@@ -329,7 +328,7 @@ int FolderDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 			if (n.Type == LNotifyItemDoubleClick)
 			{
 				if (d->View)
-					d->Path = d->View->Get2();
+					d->Path = d->View->GetSelectedPath();
 
 				EndModal(1);
 			}
@@ -337,31 +336,40 @@ int FolderDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		}
 		case IDC_NEW_FOLDER:
 		{
-			auto Cur = d->View->Get2();
-			if (!Cur)
+			auto selectedPath = d->View->GetSelectedPath();
+			if (!selectedPath)
 				break;
 
-			Store3ItemTypes Type[] = { MAGIC_MAIL, MAGIC_CONTACT, MAGIC_FILTER, MAGIC_CALENDAR, MAGIC_GROUP };
-			bool Enable[] = {true, true, true, true, true};
-			CreateSubFolderDlg Dlg(this, 0, Enable, d->DefaultNewFolderName);
-			ScribeFolder *f = d->App->GetFolder(Cur);
-			if (!f)
-				break;
+			bool enable[] = {true, true, true, true, true};
+			auto createDlg = new CreateSubFolderDlg(this, 0, enable, d->DefaultNewFolderName);
+			createDlg->DoModal([this, selectedPath, createDlg](auto dlg, auto code)
+				{
+					if (!code)
+						return; // user cancelled
 
-			ScribeFolder *Sub = f->GetSubFolder(Dlg.SubName);
-			if (!Sub)
-				Sub = f->CreateSubFolder(Dlg.SubName, Type[Dlg.SubType]);
-			if (!Sub)
-				break;
+					auto folder = d->App->GetFolder(selectedPath);
+					if (!folder)
+						return;
 
-			LTreeItem *s = d->View->Selection();
-			if (!s)
-				break;
+					auto newFolderType = createDlg->getType();
+					if (!newFolderType)
+						return;
 
-			FolderLeaf *NewLeaf = new FolderLeaf(d, Sub);
-			s->Insert(NewLeaf);
-			NewLeaf->Select(true);
-			NewLeaf->ScrollTo();
+					auto Sub = folder->GetSubFolder(createDlg->SubName);
+					if (!Sub)
+						Sub = folder->CreateSubFolder(createDlg->SubName, newFolderType);
+					if (!Sub)
+						return;
+
+					auto s = d->View->Selection();
+					if (!s)
+						return;
+
+					auto NewLeaf = new FolderLeaf(d, Sub);
+					s->Insert(NewLeaf);
+					NewLeaf->Select(true);
+					NewLeaf->ScrollTo();
+				});
 			break;
 		}
 		case IDC_FILTER:
@@ -384,7 +392,7 @@ int FolderDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		case IDOK:
 		{
 			if (d->View)
-				d->Path = d->View->Get2();
+				d->Path = d->View->GetSelectedPath();
 
 			EndModal(1);
 			break;

@@ -584,14 +584,21 @@ class CreateSubFolderDlg : public LDialog
 {
 	LEdit		*FolderName = NULL;
 	LRadioGroup	*FolderType = NULL;
+	int typeIndex = -1; // index into 'types'
 
 public:
-	int SubType = -1;
+	constexpr static Store3ItemTypes types[] = { MAGIC_MAIL, MAGIC_CONTACT, MAGIC_FILTER, MAGIC_CALENDAR, MAGIC_GROUP };
 	LString SubName;
 
-	CreateSubFolderDlg(LView *parent, int defaulttype = 0, bool *enable = NULL, char *default_name = NULL);
+	CreateSubFolderDlg(LView *parent, int defaultType = 0, bool *enable = NULL, char *defaultName = NULL);
 
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
+	Store3ItemTypes getType()
+	{
+		return	typeIndex >= 0 && typeIndex < CountOf(types) ?
+				types[typeIndex] :
+				MAGIC_NONE;
+	}
 };
 
 class LanguageDlg : public LDialog

@@ -409,6 +409,7 @@ void MailTree::OnCreateSubDirectory(ScribeFolder *Item)
 	}
 
 	// do ui..
+
 	bool Enable[] =
 	{
 		Item->CanHaveSubFolders(MAGIC_MAIL),
@@ -421,29 +422,42 @@ void MailTree::OnCreateSubDirectory(ScribeFolder *Item)
 	auto Dlg = new CreateSubFolderDlg(this, i, Enable);
 	Dlg->DoModal([this, Dlg, Item, Type](auto dlg, auto code)
 	{
-		if (code &&
-			ValidStr(Dlg->SubName) &&
-			Dlg->SubType >= 0)
+		if (!code ||
+			!ValidStr(Dlg->SubName))
 		{
-			// check the name doesn't conflict..
-			auto Path = Item->GetPath();
-			if (Path)
-			{
-				LString s;
-				s.Printf("%s/%s", Path.Get(), Dlg->SubName.Get());
-				if (App->GetFolder(s))
-				{
-					LgiMsg(this, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);
-					Dlg->SubName.Empty();
-				}
-			}
+			LgiTrace("%s:%i - error: missing param.\n", _FL);
+			return;
+		}
 
-			if (Dlg->SubName)
+		auto createFolderType = Dlg->getType();
+		if (!createFolderType)
+		{
+			LgiTrace("%s:%i - error: no folder type.\n", _FL);
+			return;
+		}
+
+		// check the name doesn't conflict..
+		auto Path = Item->GetPath();
+		if (Path)
+		{
+			LString s;
+			s.Printf("%s/%s", Path.Get(), Dlg->SubName.Get());
+			if (App->GetFolder(s))
 			{
-				// insert the folder...
-				Item->CreateSubFolder(Dlg->SubName, Type[Dlg->SubType]);
+				LgiMsg(this, LLoadString(IDS_SUBFLD_NAME_CLASH), AppName, MB_OK);
+				Dlg->SubName.Empty();
+				return;
 			}
 		}
+
+		if (!Dlg->SubName)
+		{
+			LgiTrace("%s:%i - error: no subfolder name given.\n", _FL);
+			return;
+		}
+		
+		// insert the folder...
+		Item->CreateSubFolder(Dlg->SubName, createFolderType);
 	});
 }
 

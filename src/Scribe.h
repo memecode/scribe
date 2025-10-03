@@ -1375,7 +1375,7 @@ public:
 	void OnDelete();
 	LString GetPath();
 	void Populate(ThingList *List);
-	bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL) { return GetItemType() != MAGIC_ANY; }
+	bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL);
 	void OnRethread();
 
 	// Name

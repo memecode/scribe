@@ -29,7 +29,7 @@
 // static char AutoInBrackets[] = "(auto)";
 
 //////////////////////////////////////////////////////////////////////////////
-CreateSubFolderDlg::CreateSubFolderDlg(LView *parent, int defaulttype, bool *Enable, char *default_name)
+CreateSubFolderDlg::CreateSubFolderDlg(LView *parent, int defaultType, bool *Enable, char *defaultName)
 {
 	SetParent(parent);
 	LRect r(0, 0, 380, 195);
@@ -40,12 +40,13 @@ CreateSubFolderDlg::CreateSubFolderDlg(LView *parent, int defaulttype, bool *Ena
 	{
 		if (GetViewById(IDC_NAME, FolderName))
 		{
-			FolderName->Name(default_name);
+			if (defaultName)
+				FolderName->Name(defaultName);
 			FolderName->Focus(true);
 		}
 
 		GetViewById(IDC_TYPE, FolderType);
-		SetCtrlValue(IDC_TYPE, defaulttype);
+		SetCtrlValue(IDC_TYPE, defaultType);
 
 		int Ctrls[] = { IDC_MAIL, IDC_CONTACTS, IDC_FILTERS, IDC_CALENDER, IDC_GROUP };
 		for (int c=0; c<CountOf(Ctrls); c++)
@@ -68,7 +69,7 @@ int CreateSubFolderDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 				SubName = FolderName->Name();
 
 			if (FolderType)
-				SubType = (int)FolderType->Value();
+				typeIndex = (int)FolderType->Value();
 
 			EndModal(1);
 			break;

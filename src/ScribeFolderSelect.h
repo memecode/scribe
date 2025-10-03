@@ -1,6 +1,7 @@
 #ifndef __SCRIBE_FOLDER_SELECT_H
 #define __SCRIBE_FOLDER_SELECT_H
 
+// Dialog to select a folder
 class ScribeClass FolderDlg : public LDialog
 {
 	class FolderDlgPriv *d;
@@ -9,11 +10,11 @@ public:
 	FolderDlg(	LViewI *Parent,
 				ScribeWnd *App,
 				int LimitToType = MAGIC_ANY,
-				ScribeFolder *Root = NULL,
-				const char *InitialSelect = NULL,
+				ScribeFolder *Root = nullptr,
+				const char *InitialSelect = nullptr,
 				bool AllowCreate = true,
-				char *DefaultNewFolderName = NULL,
-				char *DialogMsg = NULL);
+				char *DefaultNewFolderName = nullptr,
+				char *DialogMsg = nullptr);
 	~FolderDlg();
 	
 	char *Get();
