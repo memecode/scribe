@@ -26,9 +26,9 @@
 #include "ScribeSpellCheck.h"
 #include "lgi/common/TableLayout.h"
 
-// static char AutoInBrackets[] = "(auto)";
-
 //////////////////////////////////////////////////////////////////////////////
+constexpr Store3ItemTypes CreateSubFolderDlg::types[];
+
 CreateSubFolderDlg::CreateSubFolderDlg(LView *parent, int defaultType, bool *Enable, char *defaultName)
 {
 	SetParent(parent);
