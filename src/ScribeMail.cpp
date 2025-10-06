@@ -7892,8 +7892,7 @@ void Mail::DeleteAsSpam(LView *View)
 	{
 		// Tell the account it's spam... so that any further connects can
 		// delete it off the server.
-		ScribeAccount *a = GetAccountSentTo();
-		if (a)
+		if (auto a = GetAccountSentTo())
 		{
 			auto ServerUid = GetServerUid();
 			if (ServerUid.Str())
@@ -7920,7 +7919,7 @@ void Mail::DeleteAsSpam(LView *View)
 		}
 	}
 
-	if (DeleteAttachments.CastBool())
+	if (DeleteAttachments.CastInt32())
 	{
 		// Delete all attachments... they're useless and more than likely
 		// just virii anyway.
@@ -7928,10 +7927,7 @@ void Mail::DeleteAsSpam(LView *View)
 		if (GetAttachments(&Files))
 		{
 			for (auto a: Files)
-			{
 				DeleteAttachment(a);
-			}
-			Files.Empty();
 		}
 	}
 
@@ -7977,7 +7973,7 @@ void Mail::DeleteAsSpam(LView *View)
 						Spam = Ms->GetRoot()->CreateSubFolder(SpamLeaf, MAGIC_MAIL);
 				}
 			}
-			else LgiMsg(View, "Error: Couldn't get mail store for '%s'.", AppName, MB_OK, FolderPath.Get());
+			else LgiMsg(View, LLoadString(IDS_ERR_GET_MAIL_STORE_FMT), AppName, MB_OK, FolderPath.Get());
 		}
 		else Spam = Ms->GetRoot()->CreateSubFolder("Spam", MAGIC_MAIL);
 	}
@@ -7988,10 +7984,14 @@ void Mail::DeleteAsSpam(LView *View)
 		Items.Add(this);
 		Spam->MoveTo(Items,
 			false,
-			[View](auto result, auto status)
+			[View](auto err, auto status)
 			{
-				if (!result)
-					LgiMsg(View, "Error: Couldn't move email to spam folder.", AppName);
+				if (err)
+					LgiMsg(	View,
+							LLoadString(IDS_ERR_COULDNT_MOVE_SPAM_FMT),
+							AppName,
+							MB_OK,
+							err.ToString().Get());
 			});
 	}
 }

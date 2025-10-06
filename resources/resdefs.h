@@ -899,6 +899,7 @@
 #define IDC_PUBLIC								1092
 #define IDC_PRIVATE								1093
 #define IDC_NEW_FILTER_ACTION					1094
+#define IDS_ERR_GET_MAIL_STORE_FMT				1095
 #define IDS_MAIL								1096
 #define IDC_RADIO1								1097
 #define IDC_RADIO2								1098
@@ -1010,6 +1011,7 @@
 #define IDC_PASSWORD							1204
 #define IDS_ERROR_SERVER_CONNECT				1205
 #define IDC_DST									1206
+#define IDS_ERR_COULDNT_MOVE_SPAM_FMT			1207
 #define IDS_ERROR_PRINT_FAILED					1214
 #define IDS_ASK_ACCOUNT_PASSWORD				1215
 #define IDS_SELECT_IO							1216

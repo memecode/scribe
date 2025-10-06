@@ -7708,8 +7708,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 
 			for (auto i: Sel)
 			{
-				Mail *m = IsMail(i);
-				if (m)
+				if (auto m = IsMail(i))
 				{
 					if (Index < 0)
 						Index = MailList->IndexOf(i);
@@ -7720,7 +7719,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 
 			if (Index >= 0)
 			{
-				LListItem *i = MailList->ItemAt(Index);
+				auto i = MailList->ItemAt(Index);
 				if (!i)
 					i = MailList->ItemAt(MailList->Length()-1);
 				if (i)
