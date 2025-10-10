@@ -2077,7 +2077,8 @@ int ScriptDownloadContentThread::Main()
 			App->ExecuteScriptCallback(Cb, Args);
 
 			delete this;
-		});
+		},
+		_FL);
 
 	return false;
 }

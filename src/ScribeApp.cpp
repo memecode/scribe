@@ -6030,7 +6030,8 @@ void ScribeWnd::GetUserInput(LView *Parent, LString Msg, bool Password, std::fun
 			{
 				GetUserInput(Parent, Msg, Password, Callback);
 				return 0;
-			});
+			},
+			_FL);
 		return;
 	}
 
