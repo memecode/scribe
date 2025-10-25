@@ -1386,7 +1386,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 				Folder->MoveTo(Items, false, [this, Log](auto result, auto status)
 				{
 			        if (Log)
-				        Log->Print("\tACTION_MOVE_TO_FOLDER(%s) = %i.\n", Arg1.Get(), result);
+				        Log->Print("\tACTION_MOVE_TO_FOLDER(%s) = %i.\n", Arg1.Get(), result.ToString().Get());
 				});
 				Status = true;
 			}
@@ -1409,7 +1409,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 				Folder->MoveTo(Items, true, [this, Log](auto result, auto status)
 				{
 					if (Log)
-    					Log->Print("\tACTION_COPY(%s) = %i.\n", Arg1.Get(), result);
+    					Log->Print("\tACTION_COPY(%s) = %i.\n", Arg1.Get(), result.ToString().Get());
 				});
 				Status = true;
 			}
