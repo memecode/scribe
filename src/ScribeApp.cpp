@@ -11552,7 +11552,7 @@ void ScribeWnd::OnNew
 					bool read = TestFlag(m->GetFlags(), MAIL_READ);
 					UnreadDiff += read ? 0 : 1;
 
-					#if 1 // DEBUG_NEW_MAIL
+					#if 0 // DEBUG_NEW_MAIL
 					LgiTrace("%s:%i - NewMail.OnNew t=%p uid=%s read=%i IsNew=%i\n", _FL,
 						t, m->GetServerUid().ToString().Get(),
 						read, IsNew);
