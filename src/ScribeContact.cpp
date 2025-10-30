@@ -1893,29 +1893,27 @@ public:
 					{
 						EditOneShot = !Email;
 
-						LViewI *v = EditLabel(0);
+						auto v = EditLabel(0);
 						if (v && k.IsChar && IsAlpha(k.c16))
 						{
-							v->IterateViews().DeleteObjects();
-							if (v)
+							auto e = dynamic_cast<LEdit*>(v);
+							if (!e)
 							{
-								LEdit *e = dynamic_cast<LEdit*>(v);
-								if (e && !ValidStr(v->Name()))
-								{
-									LAutoString u(WideToUtf8(&k.c16, 1));
-									if (u)
-									{
-										e->Name(u);
-										e->SetCaret(1);
-									}
-								}
-
-								v->Focus(true);
+								// Probably the first child then.
+								e = dynamic_cast<LEdit*>(v->IterateViews()[0]);
 							}
+							
+							if (e && !ValidStr(v->Name()))
+							{
+								auto ch = k.utf8();
+								e->Name(ch);
+								e->SetCaret(1);
+								e->Focus(true);
+							}					
 							else
 							{
-								LgiTrace("%s:%i - no edit.\n", __FILE__, __LINE__);
-							}
+								v->Focus(true);
+							}		
 						}
 
 						return true;
