@@ -990,8 +990,7 @@ void ImapFolder::OnLoadMail(bool Threaded)
 
 	if (_Parent)
 	{
-		ImapMsg *m = new ImapMsg(IMAP_FOLDER_LISTING, _FL);
-		if (m)
+		if (auto m = new ImapMsg(IMAP_FOLDER_LISTING, _FL))
 		{
 			ImapFolderInfo &i = m->Fld.New();
 			i.Remote = Remote.Get();
@@ -1051,8 +1050,7 @@ Store3Status ImapFolder::Save(LDataI *Into)
 			return Store3Error;
 		}
 
-		ImapFolder *f = dynamic_cast<ImapFolder*>(Into);
-		if (f)
+		if (auto f = dynamic_cast<ImapFolder*>(Into))
 		{
 			f->LoadSub();
 
@@ -1072,7 +1070,7 @@ Store3Status ImapFolder::Save(LDataI *Into)
 
 			FileDev->CreateFolder(Local);
 
-			ImapMsg *m = new ImapMsg(IMAP_CREATE_FOLDER, _FL);
+			auto m = new ImapMsg(IMAP_CREATE_FOLDER, _FL);
 			if (!m)
 				return Store3Error;
 
@@ -1094,9 +1092,13 @@ Store3Status ImapFolder::Save(LDataI *Into)
 
 	if (Mail.State != Store3Loaded)
 	{
-		// First read the state off disk so we don't lose anything...
-		LAssert(!"State needs to be loaded before saving.");
-		return Store3Error;
+		OnLoad.New() = [this, Into](auto status)
+			{
+				Save(Into);
+			};
+
+		LoadMail();
+		return Store3Delayed;
 	}
 
 	return Serialize(true) ? Store3Success : Store3Error;
