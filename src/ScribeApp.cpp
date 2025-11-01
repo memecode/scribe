@@ -9566,8 +9566,11 @@ class MailTextView : public LTextView3
 		int Id;
 		while (ErrMap.Find(Id = LRand(10000)))
 			;
-		SpellErrorInst *Inst = new SpellErrorInst(Id);
-		if (!Inst) return NULL;
+		
+		auto Inst = new SpellErrorInst(Id);
+		if (!Inst)
+			return NULL;
+		
 		ErrMap.Add(Id, Inst);
 		return Inst;
 	}
@@ -9667,13 +9670,13 @@ public:
 		for (auto l: Line)
 		{
 			int n=0;
-			char16 *t = Text + l->Start;
-			char16 *e = t + l->Len;
+			auto t = Text + l->Start;
+			auto e = t + l->Len;
 			while ((*t == ' ' || *t == '>') && t < e)
 				if (*t++ == '>') n++;
 
 			if (n > 0)
-				l->c = c[(n-1)%CountOf(c)];
+				l->c = c[(n-1) % CountOf(c)];
 		}
 	}
 
@@ -9685,15 +9688,17 @@ public:
 			{
 				auto Ct = m->AutoA<LSpellCheck::CheckText>();
 				if (!Ct || !Thread)
+				{
+					LgiTrace("%s:%i - missing param %p,%p\n", _FL, Ct.Get(), Thread);
 					break;
+				}
+				
+				// LgiTrace("%s:%i - M_CHECK_TEXT: %s\n", _FL, Ct->ToString().Get());
 				
 				// Clear existing spelling error styles
-				ssize_t Start = Ct->Start;
-				ssize_t End = Start + Ct->Len;
 				for (auto i = Style.begin(); i != Style.end(); )
 				{
-					if (i->End() < (size_t)Start ||
-						i->Start >= End)
+					if (!i->Overlap(*Ct.Get()))
 					{
 						// Outside the area we are re-styling.
 						i++;
@@ -9703,6 +9708,7 @@ public:
 						if (i->Owner == STYLE_SPELLING)
 						{
 							// Existing error style inside the area
+							// LgiTrace("%s:%i - delete existing spell style: %s\n", _FL, i->ToString().Get());
 							Style.Delete(i);
 						}
 						else
@@ -9714,25 +9720,30 @@ public:
 				}
 
 				// Insert the new styles
-				for (auto Ct: Ct->Errors)
+				for (auto err: Ct->Errors)
 				{
-					SpellErrorInst *ErrInst = NewErrorInst();
-					LAutoPtr<LTextView3::LStyle> Style(new LTextView3::LStyle(STYLE_SPELLING));
-					if (Style && ErrInst)
+					if (auto ErrInst = NewErrorInst())
 					{
-						Style->View = this;
-						Style->Start = Ct.Start;
-						Style->Len = Ct.Len;
-						Style->Font = GetFont();
-						Style->Data = ErrInst->Id;
-						Style->DecorColour = LColour::Red;
-						Style->Decor = LCss::TextDecorSquiggle;
+						LAutoPtr<LTextView3::LStyle> Style(new LTextView3::LStyle(STYLE_SPELLING));
+						if (Style)
+						{
+							Style->View = this;
+							Style->Start = Ct->Start + err.Start;
+							Style->Len = err.Len;
+							Style->Font = GetFont();
+							Style->Data = ErrInst->Id;
+							Style->DecorColour = LColour::Red;
+							Style->Decor = LCss::TextDecorSquiggle;
 
-						ErrInst->Word = LString(Text + Style->Start, Style->End());
-						ErrInst->Suggestions = Ct.Suggestions;
-						
-						InsertStyle(Style);
+							ErrInst->Word = LString(Text + Style->Start, Style->End());
+							ErrInst->Suggestions = err.Suggestions;
+							
+							// LgiTrace("%s:%i - insert new spell style: %s\n", _FL, Style->ToString().Get());
+							InsertStyle(Style);
+						}
+						else LgiTrace("%s:%i - style alloc failed.\n", _FL);
 					}
+					else LgiTrace("%s:%i - NewErrorInst failed.\n", _FL);
 				}
 
 				// Update the screen...
@@ -9741,7 +9752,7 @@ public:
 			}
 			case M_DELETE_STYLE:
 			{
-				/*
+				/* Why is this disabled?
 				LTextView3::LStyle *s = (LTextView3::LStyle*)m->A();
 				if (s && Style.HasItem(s))
 				{

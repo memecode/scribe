@@ -1184,12 +1184,14 @@ bool LAddressEdit::Insert(size_t At, const char16 *Data, ssize_t Len)
 bool LAddressEdit::Delete(size_t at, ssize_t Len)
 {
 	ssize_t At = (ssize_t)at;
+	LRange delRange(At, Len);
+
 	for (auto &s : Style)
 	{
 		LAssert(s.Data.Type != GV_NULL);
 		AddressMeta *m = GetMeta(s);
 
-		if (s.Overlap(At, Len) &&
+		if (s.Overlap(delRange) &&
 			m &&
 			m->Matched())
 		{
