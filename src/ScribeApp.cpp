@@ -9556,9 +9556,9 @@ public:
 
 class MailTextView : public LTextView3
 {
-	ScribeWnd *App;
-	LSpellCheck *Thread;
-	LColour c[8];
+	ScribeWnd *App = nullptr;
+	LSpellCheck *Thread = nullptr;
+	LColour c[8]; // different colours for the different reply depths.
 	LHashTbl<IntKey<int>, SpellErrorInst*> ErrMap;
 
 	SpellErrorInst *NewErrorInst()
@@ -9576,11 +9576,12 @@ class MailTextView : public LTextView3
 	}
 
 public:
+	using TParent = LTextView3;
+
 	MailTextView(ScribeWnd *app, int Id, int x, int y, int cx, int cy, LFontType *FontType) :
-		LTextView3(Id, x, y, cx, cy, FontType)
+		TParent(Id, x, y, cx, cy, FontType)
 	{
 		App = app;
-		Thread = 0;
 
 		int i=0;
 		c[i++].Rgb(0x80, 0, 0);
@@ -9606,7 +9607,7 @@ public:
 
 	void PourStyle(size_t Start, ssize_t Length)
 	{
-		LTextView3::PourStyle(Start, Length);
+		TParent::PourStyle(Start, Length);
 
 		if (!GetReadOnly())
 		{
@@ -9665,7 +9666,7 @@ public:
 
 	void PourText(size_t Start, ssize_t Len)
 	{
-		LTextView3::PourText(Start, Len);
+		TParent::PourText(Start, Len);
 
 		for (auto l: Line)
 		{
@@ -9678,6 +9679,75 @@ public:
 			if (n > 0)
 				l->c = c[(n-1) % CountOf(c)];
 		}
+	}
+	
+	constexpr static int BASE_MENU_ID = 1000;
+	
+	SpellErrorInst *Lookup(LStyle *style)
+	{
+		auto errId = style->Data.CastInt32();
+		if (auto err = ErrMap.Find(errId))
+			return err;
+			
+		LgiTrace("%s:%i - no err in map for id=%i\n", _FL, errId);
+		return nullptr;
+	}
+	
+	bool OnStyleMenu(LStyle *style, LSubMenu *m) override
+	{
+		bool status = false;
+		
+		if (m && style && style->Owner == STYLE_SPELLING)
+		{
+			if (auto err = Lookup(style)) // this will emit error if id not found
+			{
+				int menuId = BASE_MENU_ID;
+				for (auto &s: err->Suggestions)
+					m->AppendItem(s, menuId++);
+				status = true;
+			}
+		}
+	
+		return TParent::OnStyleMenu(style, m) || status;
+	}
+	
+	void OnStyleMenuClick(LStyle *style, int menuId) override
+	{
+		if (style && style->Owner == STYLE_SPELLING)
+		{
+			if (auto err = Lookup(style)) // this will emit error if id not found
+			{
+				// Apply the spelling suggestion...
+				int index = menuId - BASE_MENU_ID;
+				
+				if (!err->Suggestions.IdxCheck(index))
+				{	
+					LgiTrace("%s:%i - suggestion index %i out of range.\n", _FL, index);
+				}
+				// Replace the old text with the new suggestion
+				else if (!Delete(style->Start, style->Len))
+				{
+					LgiTrace("%s:%i - Delete(%s) failed.\n", _FL, style->GetStr());
+				}
+				else
+				{
+					LAutoWString w(Utf8ToWide(err->Suggestions[index]));
+					if (!Insert(style->Start, w, Strlen(w.Get())))
+					{
+						LgiTrace("%s:%i - Insert(%S) failed.\n", _FL, w.Get());
+					}
+					else
+					{
+						// LgiTrace("%s:%i - applied suggestion: %i, style=%s\n", _FL, index, style->ToString().Get());
+						
+						// Move the cursor to the end of the insertion.
+						SetCaret(style->End());
+					}
+				}
+			}
+		}		
+	
+		TParent::OnStyleMenuClick(style, menuId);
 	}
 
 	LMessage::Result OnEvent(LMessage *m)
@@ -9782,8 +9852,8 @@ public:
 					LUri u(s);
 					if
 					(
-						(u.sProtocol && !_stricmp(u.sProtocol, "mailto"))
-						||
+						u.IsProtocol("mailto")
+						&&
 						LIsValidEmail(s)
 					)
 					{
