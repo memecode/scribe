@@ -379,32 +379,29 @@ void ThingList::Sort()
 	}
 	else
 	{
+		/*
+		auto dumpLst = [&]()
+			{
+				LArray<Mail*> all;
+				if (GetAll(all))
+				{
+					for (auto m: all)
+						LgiTrace("	%p = %s\n", m, m->GetDateSent()->Get().Get());
+				}
+			};
+
+		LgiTrace("Before sort:\n");
+		dumpLst();
+		*/
+
 		LList::Sort([this, direction, fieldSort](auto *a, auto *b)
 			{
 				return direction * a->Compare(b, fieldSort.Col);
 			});
-	}
 
-	#if 0
-	if (Items.Length() == 4)
-	{
-		LgiTrace("Resort %i\n", Items.Length());
-		for (LListItem *i = Items.First(); i; i = Items.Next())
-		{
-			Mail *m = dynamic_cast<Mail*>(i);
-			if (m)
-			{
-				LDateTime *sent = m->GetObject()->GetDate(FIELD_DATE_SENT);
-				if (sent)
-				{
-					char s[32];
-					sent->Get(s);
-					LgiTrace("    %p=%s\n", i, s);
-				}
-			}
-		}
+		// LgiTrace("After sort:\n");
+		// dumpLst();
 	}
-	#endif
 }
 
 bool ThingList::SetSort(SortParam sort, bool reorderItems, bool setMark)

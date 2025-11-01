@@ -93,6 +93,7 @@ int LgiMain(OsAppArguments &AppArgs)
 
 		LHeaderUnitTests();
 		InitStrToDom();
+		LUnrolledList<int>::UnitTest();
 		if (App.GetOption("crtcheck"))
 			return 0;
 		LUri::UnitTests();

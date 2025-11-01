@@ -1637,9 +1637,8 @@ public:
 	bool Parse();
 };
 
-class MailTransferEvent
+struct MailTransferEvent
 {
-public:
 	// Message
 	LAutoPtr<LStreamI> Rfc822Msg;
 	ReceiveAction Action = MailNoop;
@@ -1660,10 +1659,6 @@ public:
 
 	// Other
 	class Accountlet *Account = NULL;
-
-	MailTransferEvent()
-	{
-	}
 
 	~MailTransferEvent()
 	{
