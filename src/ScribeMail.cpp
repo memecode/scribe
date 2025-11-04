@@ -1476,7 +1476,7 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 
 	if (Attach(0))
 	{
-		DropTarget(true);
+		SetWindow(this);
 
 		// Setup main toolbar
 		Commands.Toolbar = App->LoadToolbar(this,
@@ -1518,7 +1518,7 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 
 			Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_PRINT)), IDM_PRINT, TBT_PUSH, true, IMG_PRINT);
 
-			for (LViewI *w: Commands.Toolbar->IterateViews())
+			for (auto w: Commands.Toolbar->IterateViews())
 				MinButY = MAX(MinButY, w->Y());
 
 			Commands.Toolbar->Customizable(App->GetOptions(), "MailWindowToolbar");
@@ -1538,9 +1538,9 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 		auto pos = ReplyChk->GetPos();
 		pos.Offset(	21-pos.x1,
 					#ifdef MAC
-					1-pos.y1
+						1-pos.y1
 					#else
-					6-pos.y1
+						6-pos.y1
 					#endif
 					);
 		ReplyChk->SetPos(pos);
@@ -1807,6 +1807,25 @@ Mail *MailUi::GetItem()
 	THREAD_UNSAFE(NULL);
 
 	return _Item ? _Item->IsMail() : NULL;
+}
+
+int MailUi::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
+{
+	Formats.Supports(ScribeThingList);
+	Formats.Supports(LGI_FileDropFormat);
+	return DROPEFFECT_COPY;
+}
+
+int MailUi::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
+{
+	int status = DROPEFFECT_NONE;
+
+	for (auto &dd: Data)
+	{
+		LgiTrace("%s:%i - MailUi drop: %s\n", _FL, dd.Format.Get());
+	}
+
+	return status;
 }
 
 void MailUi::SetItem(Mail *m)

@@ -779,8 +779,7 @@ void AccountStatusPanel::OnPaint(LSurface *pDC)
 		auto Send = App->GetSendAccount();
 		LColour Background(L_MED);
 
-		auto Bounds = ImgLst->GetBounds();
-		if (Bounds)
+		if (auto Bounds = ImgLst->GetBounds())
 		{
 			// SMTP
 			int UpArrow = STATUS_BASE + UP_ARROW;

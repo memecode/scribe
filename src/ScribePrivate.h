@@ -352,6 +352,10 @@ public:
 	bool IsWorking(int Set = -1);
 	bool OnRequestClose(bool OsClose) override;
 	bool CallMethod(const char *Name, LScriptArguments &Arg) override;
+
+	// D'n'd
+	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState) override;
+	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState) override;
 };
 
 class AttachmentList : public LList
