@@ -5871,7 +5871,7 @@ void ScribeWnd::OnTrayMenu(LSubMenu &m)
 	m.SetImageList(ImageList, false);
 	d->TrayMenuContacts.Length(0);
 
-	#ifdef MAC
+	#if MAC || LINUX
 	m.AppendItem(LLoadString(IDS_OPEN), IDM_OPEN);
 	m.AppendSeparator();
 	#endif
@@ -6157,6 +6157,9 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 				CmdReceive.Enabled(true);
 				CmdPreview.Enabled(true);
 			}
+			
+			if (d->TrayIcon)
+				d->TrayIcon->UpdateMenu();
 			break;
 		}
 		case M_SCRIBE_THREAD_DONE:

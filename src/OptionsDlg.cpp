@@ -12,8 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "Scribe.h"
-#include "ScribePrivate.h"
+#include "lgi/common/Lgi.h"
 #include "lgi/common/Edit.h"
 #include "lgi/common/RadioGroup.h"
 #include "lgi/common/Combo.h"
@@ -29,6 +28,8 @@
 #include "lgi/common/TextView3.h"
 #include "lgi/common/FileSelect.h"
 
+#include "Scribe.h"
+#include "ScribePrivate.h"
 #include "resdefs.h"
 #include "CalendarView.h"
 
@@ -639,10 +640,11 @@ void OptionsDlg::OnCreate()
 {
     TabDialog::OnCreate();
     
-	LList *ACtrl;
-	if (GetViewById(IDC_ACCOUNTS, ACtrl))
+	LList *lst;
+	if (GetViewById(IDC_ACCOUNTS, lst))
 	{
-		ACtrl->Select(ACtrl->ItemAt(0));
+		lst->ResizeColumnsToContent();
+		lst->Select(lst->ItemAt(0));
 	}
 }
 
