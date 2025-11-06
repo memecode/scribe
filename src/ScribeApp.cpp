@@ -1392,6 +1392,15 @@ LString ScribeWnd::GetResourceFile(SribeResourceType Type)
 	return File;
 }
 
+int GetPxFromFile(LString fn)
+{
+	auto parts = fn.SplitDelimit("-.");
+	for (auto p: parts)
+		if (p.IsNumeric())
+			return (int)p.Int();
+	return 0;
+}
+
 void ScribeWnd::LoadImageResources()
 {
 	THREAD_UNSAFE();
@@ -1410,6 +1419,9 @@ void ScribeWnd::LoadImageResources()
 	{
 		LDirectory Dir;
 
+		auto dpi = GetDpiScale();
+		auto idealPx = dpi.x < 1.5f ? 16 : 32;
+
 		LgiTrace("%s:%i - Loading resource folder '%s'\n", _FL, p.Get());
 		for (auto b = Dir.First(p); b; b = Dir.Next())
 		{
@@ -1417,15 +1429,25 @@ void ScribeWnd::LoadImageResources()
 				continue;
 
 			auto Name = Dir.GetName();
-			if (MatchStr("Toolbar-*.png", Name))
-			{
-				if (!d->ResFiles.Find(ResToolbarFile))
-					d->ResFiles.Add(ResToolbarFile, Dir.FullPath());
-			}
-			else if (MatchStr("xgate-icons-*.png", Name))
-				d->ResFiles.Add(ResToolbarFile, Dir.FullPath());
+			int curPx = GetPxFromFile(Name);
+
+			SribeResourceType type = ResNone;
+			if (MatchStr("Toolbar-*.png", Name) ||
+				MatchStr("xgate-icons-*.png", Name))
+				type = ResToolbarFile;
 			else if (MatchStr("Icons-*.png", Name))
-				d->ResFiles.Add(ResIconsFile, Dir.FullPath());
+				type = ResIconsFile;
+
+			if (type != ResNone)
+			{
+				int prevPx = 0;
+				auto prevFile = d->ResFiles.Find(type);
+				if (prevFile)
+					prevPx = GetPxFromFile(prevFile);
+
+				if (!prevFile || (prevPx != idealPx && curPx == idealPx))
+					d->ResFiles.Add(type, Dir.FullPath());
+			}
 		}
 	}
 
