@@ -1430,10 +1430,11 @@ void ScribeWnd::LoadImageResources()
 
 			auto Name = Dir.GetName();
 			int curPx = GetPxFromFile(Name);
+			bool pref = false;
 
 			SribeResourceType type = ResNone;
 			if (MatchStr("Toolbar-*.png", Name) ||
-				MatchStr("xgate-icons-*.png", Name))
+				(pref = MatchStr("xgate-icons-*.png", Name)))
 				type = ResToolbarFile;
 			else if (MatchStr("Icons-*.png", Name))
 				type = ResIconsFile;
@@ -1445,7 +1446,7 @@ void ScribeWnd::LoadImageResources()
 				if (prevFile)
 					prevPx = GetPxFromFile(prevFile);
 
-				if (!prevFile || (prevPx != idealPx && curPx == idealPx))
+				if (!prevFile || (prevPx != idealPx && curPx == idealPx) || pref)
 					d->ResFiles.Add(type, Dir.FullPath());
 			}
 		}
