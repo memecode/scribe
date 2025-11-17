@@ -82,6 +82,12 @@ ThingList::~ThingList()
 	DeletePlaceHolders();
 }
 
+void ThingList::OnCreate()
+{
+	LList::OnCreate();
+	SetWindow(this);
+}
+
 int ThingList::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
 {
 	Formats.SupportsFileDrops();

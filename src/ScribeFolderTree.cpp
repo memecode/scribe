@@ -23,39 +23,20 @@
 #include "DynamicHtml.h"
 
 //////////////////////////////////////////////////////////////////////////////
-int FolderSorter(ScribeFolder *a, ScribeFolder *b, int d)
-{
-	auto A = a->GetName(true);
-	auto B = b->GetName(true);
-	return A && B ? _stricmp(A, B) : 0;
-}
-
-//////////////////////////////////////////////////////////////////////////////
 MailTree::MailTree(ScribeWnd *app) : LTree(100, 0, 0, 100, 100, "")
 {
 	App = app;
-	LastHit = 0;
-	LastWasRoot = -1;
-
 	Sunken(false);
-	DropTarget(true);
 }
 
 MailTree::~MailTree()
 {
 }
 
-ssize_t MailTree::Sizeof()
+void MailTree::OnCreate()
 {
-	LAssert(0);
-	return 0;
-}
-
-bool MailTree::Serialize(LFile &f, bool Write)
-{
-	bool Status = false;
-	LAssert(0);
-	return Status;
+	LTree::OnCreate();
+	SetWindow(this);
 }
 
 #ifdef _DEBUG

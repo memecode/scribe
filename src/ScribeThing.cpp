@@ -721,8 +721,7 @@ bool Thing::GetData(LArray<LDragData> &Data)
 		}
 		else if (dd.IsFormat(ScribeThingList))
 		{
-			ScribeClipboardFmt *Fmt = ScribeClipboardFmt::Alloc(Objs);
-			if (Fmt)
+			if (auto Fmt = ScribeClipboardFmt::Alloc(Objs))
 			{
 				Status |= dd.Data[0].SetBinary(Fmt->Sizeof(), Fmt);
 				free(Fmt);

@@ -34,6 +34,7 @@
 #include "lgi/common/ThreadEvent.h"
 #include "lgi/common/GdcTools.h"
 #include "lgi/common/Charset.h"
+#include "lgi/common/DropFiles.h"
 
 #include "../src/common/Coding/ScriptingPriv.h"
 #include "PrintPreview.h"
@@ -1822,7 +1823,45 @@ int MailUi::OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState)
 
 	for (auto &dd: Data)
 	{
-		LgiTrace("%s:%i - MailUi drop: %s\n", _FL, dd.Format.Get());
+		if (dd.IsFileDrop())
+		{
+			LDropFiles files(dd);
+			if (files.Length() > 0)
+			{
+				for (auto f: files)
+					AttachFile(f);
+				
+				status = DROPEFFECT_COPY;
+				break;
+			}
+			else LgiTrace("%s:%i - LDropFiles empty?\n", _FL);
+		}
+		else if (dd.IsFormat(ScribeThingList))
+		{
+			if (dd.Data.Length() == 0 || dd.Data[0].Type != GV_BINARY)
+				continue;
+			auto &bin = dd.Data[0].Value.Binary;
+			if (!ScribeClipboardFmt::IsThing(bin.Data, bin.Length))
+				continue;
+
+			auto tl = (ScribeClipboardFmt*)bin.Data;
+			for (uint32_t i=0; i<tl->Length(); i++)
+			{
+				LString::Array Files;
+				if (auto t = tl->ThingAt(i))
+					t->GetDropFiles(Files);
+
+				for (auto &f: Files)
+					AttachFile(f);
+			}
+
+			status = DROPEFFECT_COPY;
+			break;
+		}
+		else
+		{
+			LgiTrace("%s:%i - MailUi unsupported drop format: %s\n", _FL, dd.Format.Get());
+		}
 	}
 
 	return status;

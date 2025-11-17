@@ -376,10 +376,10 @@ class ThingList :
 {
 	friend class Mail;
 
-	ScribeFolder *Container = NULL;
-	Mail *CurrentMail = NULL;
+	ScribeFolder *Container = nullptr;
+	Mail *CurrentMail = nullptr;
 	int BoldUnread = false;
-	ScribeWnd *App = NULL;
+	ScribeWnd *App = nullptr;
 
 public:
 	ThingList(ScribeWnd *wnd);
@@ -415,6 +415,7 @@ public:
 	bool OnKey(LKey &k);
 	void OnColumnDrag(int Col, LMouse &m);
 	bool OnColumnReindex(LItemColumn *Col, int OldIndex, int NewIndex);
+	void OnCreate() override;
 
 	List<Thing> PlaceHolders;
 	void DeletePlaceHolders();
@@ -429,25 +430,21 @@ public:
 class MailTree : public LTree
 {
 protected:
-	ScribeWnd *App;
-	LTreeItem *LastHit;
-	int8 LastWasRoot;
+	ScribeWnd *App = nullptr;
+	LTreeItem *LastHit = nullptr;
+	int8 LastWasRoot = -1;
 
 	ThingList *Things() { return App->GetMailList(); }
-	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState);
-	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState);
-
-	void OnDragEnter() { LTree::OnDragEnter(); }
-	void OnDragExit() { LTree::OnDragExit(); }
+	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState) override;
+	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState) override;
 
 public:
 	MailTree(ScribeWnd *app);
 	~MailTree();
 
-	const char *GetClass() { return "MailTree"; }	
-	ssize_t Sizeof();
-	bool Serialize(LFile &f, bool Write);
+	const char *GetClass() override { return "MailTree"; }	
 
+	void OnCreate() override;
 	void OnCreateSubDirectory(ScribeFolder *Item);
 	void OnDelete(ScribeFolder *Item, bool Force);
 	void OnProperties(ScribeFolder *Item);
