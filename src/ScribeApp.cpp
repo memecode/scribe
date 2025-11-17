@@ -5464,6 +5464,7 @@ void ScribeWnd::SetupUi()
 	d->TrayIcon->Load(_T("tray_small.png"));
 	d->TrayIcon->Load(_T("tray_error.png"));
 	d->TrayIcon->Load(_T("tray_mail.png"));
+	d->TrayIcon->Load(_T("tray_empty.png"));
 	#endif
 	
 	LStringPipe s(256);

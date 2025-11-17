@@ -38,6 +38,7 @@ MailTree::MailTree(ScribeWnd *app) : LTree(100, 0, 0, 100, 100, "")
 	LastWasRoot = -1;
 
 	Sunken(false);
+	DropTarget(true);
 }
 
 MailTree::~MailTree()
