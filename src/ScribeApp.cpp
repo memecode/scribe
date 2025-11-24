@@ -109,7 +109,11 @@
 
 #endif
 
-char ScribeThingList[] = "com.memecode.ThingList";
+#if LINUX
+const char ScribeThingList[] = "application/x-scribe-thing-list";
+#else
+const char ScribeThingList[] = "com.memecode.ThingList";
+#endif
 
 ScribeClipboardFmt *ScribeClipboardFmt::Alloc(bool ForFolders, size_t Size)
 {

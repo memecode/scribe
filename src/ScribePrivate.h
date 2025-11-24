@@ -57,7 +57,7 @@ extern void LogMsg(char *str, ...);
 extern LStringPipe ScribeInitTraceStore;
 
 // Dnd and clipboard format for an array of "Thing*"
-extern char ScribeThingList[];
+extern const char ScribeThingList[];
 #define ScribeThingMagic			"thng"
 #define ScribeFolderMagic			"fldr"
 class ScribeClipboardFmt

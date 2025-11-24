@@ -141,7 +141,11 @@ public:
 
 int FoldersCurrentlyLoading =		0;
 
-char ScribeFolderObject[] = "com.memecode.Folder";
+#if LINUX
+const char *ScribeFolderObject = "application/x-scribe-folder";
+#else
+const char *ScribeFolderObject = "com.memecode.Folder";
+#endif
 
 class ScribeFolderPriv
 {

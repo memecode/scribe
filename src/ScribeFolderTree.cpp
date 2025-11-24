@@ -474,15 +474,13 @@ LMessage::Result MailTree::OnEvent(LMessage *Msg)
 	return LTree::OnEvent(Msg);
 }
 
-extern char ScribeFolderObject[];
+extern const char *ScribeFolderObject;
 
 int MailTree::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
 {
 	int Status = DROPEFFECT_NONE;
-
 	LastHit = ItemAtPoint(Pt.x, Pt.y);
-	
-	if (LastHit)
+	if (LastHit || Formats.IsSource())
 	{
 		List<char> Accepted;
 
