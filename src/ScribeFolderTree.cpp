@@ -488,10 +488,10 @@ int MailTree::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
 		Formats.Supports(ScribeFolderObject);
 		Formats.SupportsFileDrops();
 		#if WINNATIVE
-		Formats.Supports(CFSTR_FILEDESCRIPTOR);
+			Formats.Supports(CFSTR_FILEDESCRIPTOR);
 		#endif
-		#ifdef MAC
-		Formats.Supports(LGI_StreamDropFormat);
+		#if MAC
+			Formats.Supports(LGI_StreamDropFormat);
 		#endif
 
 		if (Formats.GetSupported().Length())
@@ -499,6 +499,10 @@ int MailTree::WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState)
 			SelectDropTarget(LastHit);
 			Status = KeyState & LGI_EF_CTRL ? DROPEFFECT_COPY : DROPEFFECT_MOVE;
 		}
+	}
+	else
+	{
+		DND_LOG("MailTree::WillAccept no support: %i, %i\n", LastHit!=NULL, Formats.IsSource());
 	}
 
 	return Status;

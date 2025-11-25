@@ -480,8 +480,7 @@ bool Thing::OnBeginDrag(LMouse &m)
 
 	if (Ico >= 0)
 	{
-		LImageList *s = App->GetIconImgList();
-		if (s)
+		if (auto s = App->GetIconImgList())
 		{
 			LRect r;
 			r.ZOff(s->TileX()-1, s->TileY()-1);
