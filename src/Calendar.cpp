@@ -2307,7 +2307,7 @@ protected:
 	LAutoPtr<LPopup> Popup;
 
 public:
-	LEditDropDown(int id) : LEdit(id, 0, 0, 60, 20, NULL)
+	LEditDropDown(int id) : LEdit(id)
 	{
 		Type = DropNone;
 		SetObjectName(Res_Custom);
@@ -3679,7 +3679,7 @@ class LDateTimeView : public LLayout, public ResObject
 public:
     LDateTimeView() : ResObject(Res_Custom)
     {
-        AddView(Edit = new LEdit(10, 0, 0, 60, 20, NULL));
+        AddView(Edit = new LEdit(10));
         AddView(Date = new LDateDropDown());
         AddView(Time = new LTimeDropDown());
 

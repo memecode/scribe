@@ -1123,12 +1123,13 @@ void FilterAction::Select(bool b)
 		LList *Lst = LListItem::GetList();
 		if (Lst && Lst->IsAttached())
 		{
-			LRect *r = GetPos(0);
+			auto r = GetPos(0);
 
 			if (!TypeCbo)
 			{
-				if (!TypeCbo.Reset(new LCombo(IDC_TYPE_CBO, r->x1, r->y1, r->X(), r->Y(), 0)))
+				if (!TypeCbo.Reset(new LCombo(IDC_TYPE_CBO)))
 					return;
+				TypeCbo->SetPos(*r);
 				for (int i=0; ActionNames[i].Id; i++)
 					TypeCbo->Insert(LLoadString(ActionNames[i].Id));
 				TypeCbo->Attach(Lst);
@@ -1139,7 +1140,7 @@ void FilterAction::Select(bool b)
 			r = GetPos(1);
 			if (!ArgEdit)
 			{
-				if (!ArgEdit.Reset(new LEdit(IDC_ARG_EDIT, r->x1, r->y1, r->X(), r->Y(), 0)))
+				if (!ArgEdit.Reset(new LEdit(IDC_ARG_EDIT, nullptr, r)))
 					return;
 				ArgEdit->Attach(Lst);
 			}

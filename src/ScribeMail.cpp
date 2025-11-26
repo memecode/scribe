@@ -1566,9 +1566,11 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 		if (ToPanel)
 		{
 		    int Cy = 4;
-			ToPanel->AddView(SetTo = new LCombo(IDC_SET_TO, 20, Cy, 60, EditHeight, 0));
+			ToPanel->AddView(SetTo = new LCombo(IDC_SET_TO));
 			if (SetTo)
 			{
+				LRect r(20, Cy, 60, EditHeight);
+				SetTo->SetPos(r);
 				SetTo->Insert(LLoadString(IDS_TO));
 				SetTo->Insert(LLoadString(IDS_CC));
 				SetTo->Insert(LLoadString(IDS_BCC));
@@ -1577,7 +1579,12 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 				    RECIP_X = SetTo->GetPos().x2 + 10;
 			}
 			
-			ToPanel->AddView(Entry = new LEdit(IDC_ENTRY, RECIP_X, Cy, RECIP_SX, EditHeight, ""));
+			ToPanel->AddView(Entry = new LEdit(IDC_ENTRY));
+			if (Entry)
+			{
+				LRect r(RECIP_X, Cy, RECIP_SX, EditHeight);
+				Entry->SetPos(r);
+			}
 			
 			Cy = SetTo->GetPos().y2 + 5;
 
@@ -1607,7 +1614,8 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 			}
 			else
 			{
-				FromPanel->AddView(FromCbo = new LCombo(IDC_FROM, RECIP_X, 2, RECIP_SX, EditHeight, 0));
+				LRect r(RECIP_X, 2, RECIP_SX, EditHeight);
+				FromPanel->AddView(FromCbo = new LCombo(IDC_FROM, &r));
 			}
 
 			if (IsCreated)
@@ -1636,7 +1644,8 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 		{
 			ReplyToPanel->Raised(false);
 			ReplyToPanel->AddView(ReplyToChk = ReplyChk.Release());
-			ReplyToPanel->AddView(ReplyToCbo = new LCombo(IDC_REPLY_TO_ADDR, RECIP_X, 2, RECIP_SX, EditHeight, 0));
+			LRect r(RECIP_X, 2, RECIP_SX, EditHeight);
+			ReplyToPanel->AddView(ReplyToCbo = new LCombo(IDC_REPLY_TO_ADDR, &r));
 			ReplyToPanel->Attach(this);
 		}
 
@@ -1645,7 +1654,8 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 		{
 			SubjectPanel->Raised(false);
 			SubjectPanel->AddView(			new LTextLabel(IDC_STATIC, 21, 8, -1, -1, LLoadString(IDS_SUBJECT)));
-			SubjectPanel->AddView(Subject = new LEdit(IDC_SUBJECT, RECIP_X, 4, RECIP_SX, EditHeight, ""));
+			LRect r(RECIP_X, 4, RECIP_SX, EditHeight);
+			SubjectPanel->AddView(Subject = new LEdit(IDC_SUBJECT, nullptr, &r));
 			SubjectPanel->Attach(this);
 		}
 
