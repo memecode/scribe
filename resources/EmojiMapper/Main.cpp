@@ -872,7 +872,7 @@ public:
 
 			c = Tbl->GetCell(0, y++);
 			LEdit *e = NULL;
-			c->Add(e = new LEdit(IDC_SEARCH, 0, 0, 60, 20));
+			c->Add(e = new LEdit(IDC_SEARCH));
 			e->GetCss(true)->Width(LCss::Len(LCss::LenPx, 50));
 			
 			AttachChildren();
