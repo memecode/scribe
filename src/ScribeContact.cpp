@@ -2037,7 +2037,7 @@ ContactUi::ContactUi(Contact *item) :
 			if (GetViewById(IDC_PICK_TZ, c))
 			{
 				c->Sort(true);
-				c->Sub(GV_DOUBLE);
+				c->SubMenuType(GV_DOUBLE);
 
 				auto Tz = LTimeZone::GetTimeZones();
 				while (Tz->Text)

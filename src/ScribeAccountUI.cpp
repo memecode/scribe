@@ -132,7 +132,7 @@ void AccountDlg::FillWithCharsets(int id, bool All)
 
 	c->Value(-1);
 	c->Sort(true);
-	c->Sub(GV_STRING);
+	c->SubMenuType(GV_STRING);
 
 	for (auto Cs = LGetCsInfo("us-ascii"); Cs->Charset; Cs++)
 	{
