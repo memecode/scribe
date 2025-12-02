@@ -431,7 +431,7 @@ bool LScribeScript::BrowseFolder(LScriptArguments &Args)
 			{
 				LVirtualMachine Vm;
 				LScriptArguments Args(&Vm);
-				LVariant vFolderPath = FolderPath;
+				LVariant vFolderPath = FolderPath.Get();
 				Args.Add(&vFolderPath);		
 				App->ExecuteScriptCallback(cb, Args);
 			}

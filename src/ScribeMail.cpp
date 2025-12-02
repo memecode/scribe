@@ -6623,24 +6623,15 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 		int Marked = 0;
 		for (auto t: Sel)
 		{
-			Mail *m = dynamic_cast<Mail*>(t);
-			if (m)
-			{
+			if (auto m = dynamic_cast<Mail*>(t))
 				if (m->GetMarkColour())
-				{
 					Marked++;
-				}
-			}
 		}
 
 		if (Marked == 1)
-		{
 			MarkState = MS_One;
-		}
 		else if (Marked)
-		{
 			MarkState = MS_Multiple;
-		}
 	}
 
 	#ifdef _DEBUG
@@ -6649,404 +6640,433 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 
 	// Create menu
 	LScriptUi s(new LSubMenu);
-	if (s.Sub)
+	if (!s.Sub)
+		return;
+
+	/*
+	Keyboard shortcuts:
+
+	o - Open
+	d - Delete
+	x - Export
+	e - Set read
+	u - Set unread
+	r - Reply
+	a - Reply all
+	f - Forward
+	b - Bounce
+	m - Mark
+	s - Select marked
+	c - Create filter
+	i - Inspect
+	p - Properties
+	
+	*/
+	LMenuItem *i;
+	s.Sub->SetImageList(App->GetIconImgList(), false);
+
+	s.Sub->AppendItem(LLoadString(IDS_OPEN), IDM_OPEN);
+	i = s.Sub->AppendItem(LLoadString(IDS_DELETE), IDM_DELETE);
+	i->Icon(ICON_TRASH);
+	s.Sub->AppendItem(LLoadString(IDS_EXPORT), IDM_EXPORT);
+	
+	#if defined(__GTK_H__)
+		s.Sub->AppendSeparator();
+		s.Sub->AppendItem("Move..", ID_MOVE_MAIL);
+		s.Sub->AppendItem("Copy..", ID_COPY_MAIL);
+	#endif
+
+	#ifdef _DEBUG
+	Prof->Add("GetAttachments");
+	#endif
+
+	int AttachBaseMsg = 10000;
+	List<Attachment> AttachLst;
+	if (GetAttachments(&AttachLst) &&
+		AttachLst[0])
 	{
-		/*
-		Keyboard shortcuts:
+		if (auto Attachments = s.Sub->AppendSub(LLoadString(IDS_SAVE_ATTACHMENT_AS)))
+		{
+			int n=0;
+			for (auto a: AttachLst)
+			{
+				auto Name = a->GetName();
+				Attachments->AppendItem(Name?Name:(char*)"Attachment.txt", AttachBaseMsg+(n++), true);
+			}
+		}
+	}
+	s.Sub->AppendSeparator();
 
-		o - Open
-		d - Delete
-		x - Export
-		e - Set read
-		u - Set unread
-		r - Reply
-		a - Reply all
-		f - Forward
-		b - Bounce
-		m - Mark
-		s - Select marked
-		c - Create filter
-		i - Inspect
-		p - Properties
+	#ifdef _DEBUG
+	Prof->Add("Read/Unread");
+	#endif
+
+	i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_SET_READ), 'e'), IDM_SET_READ, true);
+	i->Icon(ICON_READ_MAIL);
+	i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_SET_UNREAD), 'u'), IDM_SET_UNREAD, true);
+	i->Icon(ICON_UNREAD_MAIL);
+	s.Sub->AppendSeparator();
+
+	#ifdef _DEBUG
+	Prof->Add("Reply/Bounce");
+	#endif
+
+	i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_REPLY), 'r'), IDM_REPLY, true);
+	i->Icon(ICON_FLAGS_REPLY);
+	s.Sub->AppendItem(AddAmp(LLoadString(IDS_REPLYALL), 'a'), IDM_REPLY_ALL, true);
+	i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_FORWARD), 'f'), IDM_FORWARD, true);
+	i->Icon(ICON_FLAGS_FORWARD);
+	i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_BOUNCE), 'b'), IDM_BOUNCE, true);
+	i->Icon(ICON_FLAGS_BOUNCE);
+	s.Sub->AppendSeparator();
+
+	#ifdef _DEBUG
+	Prof->Add("Thread");
+	#endif
+
+	if (App->GetCtrlValue(IDM_THREAD))
+	{
+		auto Thread = s.Sub->AppendSub(LLoadString(IDS_THREAD));
+		if (Thread)
+		{
+			Thread->AppendItem(LLoadString(IDS_THREAD_SELECT), IDM_SELECT_THREAD);
+			Thread->AppendItem(LLoadString(IDS_THREAD_DELETE), IDM_DELETE_THREAD);
+			Thread->AppendItem(LLoadString(IDS_THREAD_IGNORE), IDM_IGNORE_THREAD);
+			s.Sub->AppendSeparator();
+		}
+	}
+
+	#ifdef _DEBUG
+	Prof->Add("Mark");
+	#endif
+
+	auto MarkMenu = s.Sub->AppendSub(AddAmp(LLoadString(IDS_MARK), 'm'));
+	if (MarkMenu)
+	{
+		BuildMarkMenu(MarkMenu, MarkState, (uint32_t)GetMarkColour(), true);
+	}
+
+	MarkMenu = s.Sub->AppendSub(AddAmp(LLoadString(IDS_SELECT_MARKED), 's'));
+	if (MarkMenu)
+	{
+		BuildMarkMenu(MarkMenu, MS_Multiple, 0, true, true, true);
+	}
+
+	s.Sub->AppendSeparator();
+	s.Sub->AppendItem(AddAmp(LLoadString(IDS_INSPECT), 'i'), IDM_INSPECT);
+	s.Sub->AppendItem(LLoadString(IDS_REPARSE), IDM_REPARSE);
+	s.Sub->AppendItem(LLoadString(IDS_PROPERTIES), IDM_PROPERTIES);
+
+	#ifdef _DEBUG
+	Prof->Add("ScriptCallbacks");
+	#endif
+
+	LArray<LScriptCallback*> Callbacks;
+	if (App->GetScriptCallbacks(LThingContextMenu, Callbacks))
+	{
+		LScriptArguments Args(NULL);
+		Args[0] = new LVariant(App);
+		Args[1] = new LVariant(this);
+		Args[2] = new LVariant(&s);
 		
-		*/
-		LMenuItem *i;
-		s.Sub->SetImageList(App->GetIconImgList(), false);
+		for (auto c: Callbacks)
+			App->ExecuteScriptCallback(*c, Args);
+	}
 
-		s.Sub->AppendItem(LLoadString(IDS_OPEN), IDM_OPEN, true);
-		i = s.Sub->AppendItem(LLoadString(IDS_DELETE), IDM_DELETE, true);
-		i->Icon(ICON_TRASH);
-		s.Sub->AppendItem(LLoadString(IDS_EXPORT), IDM_EXPORT, true);
-		int AttachBaseMsg = 10000;
+	m.ToScreen();
+	int Result;
 
-		#ifdef _DEBUG
-		Prof->Add("GetAttachments");
-		#endif
+	#ifdef _DEBUG
+	Prof.Reset();
+	#endif
 
-		List<Attachment> AttachLst;
-		if (GetAttachments(&AttachLst) &&
-			AttachLst[0])
+	int Btn = 0;
+	if (m.Left())
+		Btn = LSubMenu::BtnLeft;
+	else if (m.Right())
+		Btn = LSubMenu::BtnRight;
+
+	Result = s.Sub->Float(p, m.x, m.y);
+	switch (Result)
+	{
+		case ID_MOVE_MAIL:
+		case ID_COPY_MAIL:
 		{
-			LSubMenu *Attachments = s.Sub->AppendSub(LLoadString(IDS_SAVE_ATTACHMENT_AS));
-			if (Attachments)
+			auto copy = Result == ID_COPY_MAIL;
+			if (auto dlg = new FolderDlg(App, App, MAGIC_MAIL))
 			{
-				int n=0;
-				for (auto a: AttachLst)
-				{
-					auto Name = a->GetName();
-					Attachments->AppendItem(Name?Name:(char*)"Attachment.txt", AttachBaseMsg+(n++), true);
-				}
-			}
-		}
-		s.Sub->AppendSeparator();
-
-		#ifdef _DEBUG
-		Prof->Add("Read/Unread");
-		#endif
-
-		i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_SET_READ), 'e'), IDM_SET_READ, true);
-		i->Icon(ICON_READ_MAIL);
-		i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_SET_UNREAD), 'u'), IDM_SET_UNREAD, true);
-		i->Icon(ICON_UNREAD_MAIL);
-		s.Sub->AppendSeparator();
-
-		#ifdef _DEBUG
-		Prof->Add("Reply/Bounce");
-		#endif
-
-		i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_REPLY), 'r'), IDM_REPLY, true);
-		i->Icon(ICON_FLAGS_REPLY);
-		s.Sub->AppendItem(AddAmp(LLoadString(IDS_REPLYALL), 'a'), IDM_REPLY_ALL, true);
-		i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_FORWARD), 'f'), IDM_FORWARD, true);
-		i->Icon(ICON_FLAGS_FORWARD);
-		i = s.Sub->AppendItem(AddAmp(LLoadString(IDS_BOUNCE), 'b'), IDM_BOUNCE, true);
-		i->Icon(ICON_FLAGS_BOUNCE);
-		s.Sub->AppendSeparator();
-
-		#ifdef _DEBUG
-		Prof->Add("Thread");
-		#endif
-
-		if (App->GetCtrlValue(IDM_THREAD))
-		{
-			auto Thread = s.Sub->AppendSub(LLoadString(IDS_THREAD));
-			if (Thread)
-			{
-				Thread->AppendItem(LLoadString(IDS_THREAD_SELECT), IDM_SELECT_THREAD);
-				Thread->AppendItem(LLoadString(IDS_THREAD_DELETE), IDM_DELETE_THREAD);
-				Thread->AppendItem(LLoadString(IDS_THREAD_IGNORE), IDM_IGNORE_THREAD);
-				s.Sub->AppendSeparator();
-			}
-		}
-
-		#ifdef _DEBUG
-		Prof->Add("Mark");
-		#endif
-
-		auto MarkMenu = s.Sub->AppendSub(AddAmp(LLoadString(IDS_MARK), 'm'));
-		if (MarkMenu)
-		{
-			BuildMarkMenu(MarkMenu, MarkState, (uint32_t)GetMarkColour(), true);
-		}
-
-		MarkMenu = s.Sub->AppendSub(AddAmp(LLoadString(IDS_SELECT_MARKED), 's'));
-		if (MarkMenu)
-		{
-			BuildMarkMenu(MarkMenu, MS_Multiple, 0, true, true, true);
-		}
-
-		s.Sub->AppendSeparator();
-		s.Sub->AppendItem(AddAmp(LLoadString(IDS_INSPECT), 'i'), IDM_INSPECT);
-		s.Sub->AppendItem(LLoadString(IDS_REPARSE), IDM_REPARSE);
-		s.Sub->AppendItem(LLoadString(IDS_PROPERTIES), IDM_PROPERTIES);
-
-		#ifdef _DEBUG
-		Prof->Add("ScriptCallbacks");
-		#endif
-
-		LArray<LScriptCallback*> Callbacks;
-		if (App->GetScriptCallbacks(LThingContextMenu, Callbacks))
-		{
-			LScriptArguments Args(NULL);
-			Args[0] = new LVariant(App);
-			Args[1] = new LVariant(this);
-			Args[2] = new LVariant(&s);
-			
-			for (auto c: Callbacks)
-				App->ExecuteScriptCallback(*c, Args);
-		}
-
-		m.ToScreen();
-		int Result;
-
-		#ifdef _DEBUG
-		Prof.Reset();
-		#endif
-
-		int Btn = 0;
-		if (m.Left())
-			Btn = LSubMenu::BtnLeft;
-		else if (m.Right())
-			Btn = LSubMenu::BtnRight;
-
-		Result = s.Sub->Float(p, m.x, m.y);
-		switch (Result)
-		{
-			case IDM_OPEN:
-			{
-				DoUI();
-				break;
-			}
-			case IDM_DELETE:
-			{
-				LVariant ConfirmDelete = false;
-				App->GetOptions()->GetValue(OPT_ConfirmDelete, ConfirmDelete);
-
-				if (!ConfirmDelete.CastInt32() ||
-					LgiMsg(GetList(), LLoadString(IDS_DELETE_ASK), AppName, MB_YESNO) == IDYES)
-				{
-					if (_GetListItems(Sel, false))
+				dlg->DoModal([this, dlg, copy](auto obj, auto code)
 					{
-						int Index = -1;
-						LList *TheList = LListItem::Parent;
-						LArray<Thing*> Items;
+						if (!code)
+							return;
 
-						for (auto s: Sel)
+						if (auto folder = App->GetFolder(dlg->Get()))
 						{
-							Mail *m = dynamic_cast<Mail*>(s);
-							if (m)
-							{
-								if (Index < 0) Index = TheList->IndexOf(m);
-								Items.Add(m);
-							}
+							LArray<Thing*> items;
+							if (GetList())
+								GetList()->GetSelection(items);
+							else
+								items.Add(this);
+							folder->MoveTo(items, copy);
 						}
-						
-						GetFolder()->Delete(Items, true);
+					});
+			}
+			break;
+		}
+		case IDM_OPEN:
+		{
+			DoUI();
+			break;
+		}
+		case IDM_DELETE:
+		{
+			LVariant ConfirmDelete = false;
+			App->GetOptions()->GetValue(OPT_ConfirmDelete, ConfirmDelete);
 
-						if (Index >= 0)
+			if (!ConfirmDelete.CastInt32() ||
+				LgiMsg(GetList(), LLoadString(IDS_DELETE_ASK), AppName, MB_YESNO) == IDYES)
+			{
+				if (_GetListItems(Sel, false))
+				{
+					int Index = -1;
+					LList *TheList = LListItem::Parent;
+					LArray<Thing*> Items;
+
+					for (auto s: Sel)
+					{
+						Mail *m = dynamic_cast<Mail*>(s);
+						if (m)
 						{
-							LListItem *i = TheList->ItemAt(Index);
-							if (i) i->Select(true);
+							if (Index < 0) Index = TheList->IndexOf(m);
+							Items.Add(m);
 						}
 					}
-				}
-				break;
-			}
-			case IDM_EXPORT:
-			{
-				ExportAll(Parent, sMimeMessage, NULL);
-				break;
-			}
-			case IDM_REPLY:
-			case IDM_REPLY_ALL:
-			{
-				App->MailReplyTo(this, Result == IDM_REPLY_ALL);
-				SetDirty(false);
-				break;
-			}
-			case IDM_FORWARD:
-			{
-				App->MailForward(this);
-				SetDirty(false);
-				break;
-			}
-			case IDM_BOUNCE:
-			{
-				App->MailBounce(this);
-				SetDirty(false);
-				break;
-			}
-			case IDM_SET_READ:
-			{
-				SetListRead(true);
-				break;
-			}
-			case IDM_SET_UNREAD:
-			{
-				SetListRead(false);
-				break;
-			}
-			case IDM_INSPECT:
-			{
-				OnInspect();
-				break;
-			}
-			case IDM_PROPERTIES:
-			{
-				OnProperties();
-				break;
-			}
-			case IDM_SELECT_THREAD:
-			{
-				if (_GetListItems(Sel, false))
-				{
-					List<Mail> Thread;
-					for (auto s: Sel)
-					{
-						Mail *m = dynamic_cast<Mail*>(s);
-						if (m)
-							m->GetThread(Thread);
-					}
-					for (auto m: Thread)
-					{
-						m->Select(true);
-					}
-				}
-				break;
-			}
-			case IDM_DELETE_THREAD:
-			{
-				if (_GetListItems(Sel, false))
-				{
-					List<Mail> Thread;
-					for (auto s: Sel)
-					{
-						Mail *m = dynamic_cast<Mail*>(s);
-						if (m)
-							m->GetThread(Thread);
-					}
-					for (auto m: Thread)
-					{
-						m->OnDelete();
-					}
-				}
-				break;
-			}
-			case IDM_IGNORE_THREAD:
-			{
-				if (_GetListItems(Sel, false))
-				{
-					List<Mail> Thread;
-					for (auto s: Sel)
-					{
-						Mail *m = dynamic_cast<Mail*>(s);
-						if (m)
-							m->GetThread(Thread);
-					}
-					for (auto m: Thread)
-					{
-						m->SetFlags(m->GetFlags() | MAIL_IGNORE | MAIL_READ);
-					}
-				}
-				break;
-			}
-			case IDM_REPARSE:
-			{
-				if (!_GetListItems(Sel, false))
-					break;
+					
+					GetFolder()->Delete(Items, true);
 
+					if (Index >= 0)
+					{
+						LListItem *i = TheList->ItemAt(Index);
+						if (i) i->Select(true);
+					}
+				}
+			}
+			break;
+		}
+		case IDM_EXPORT:
+		{
+			ExportAll(Parent, sMimeMessage, NULL);
+			break;
+		}
+		case IDM_REPLY:
+		case IDM_REPLY_ALL:
+		{
+			App->MailReplyTo(this, Result == IDM_REPLY_ALL);
+			SetDirty(false);
+			break;
+		}
+		case IDM_FORWARD:
+		{
+			App->MailForward(this);
+			SetDirty(false);
+			break;
+		}
+		case IDM_BOUNCE:
+		{
+			App->MailBounce(this);
+			SetDirty(false);
+			break;
+		}
+		case IDM_SET_READ:
+		{
+			SetListRead(true);
+			break;
+		}
+		case IDM_SET_UNREAD:
+		{
+			SetListRead(false);
+			break;
+		}
+		case IDM_INSPECT:
+		{
+			OnInspect();
+			break;
+		}
+		case IDM_PROPERTIES:
+		{
+			OnProperties();
+			break;
+		}
+		case IDM_SELECT_THREAD:
+		{
+			if (_GetListItems(Sel, false))
+			{
+				List<Mail> Thread;
 				for (auto s: Sel)
 				{
 					Mail *m = dynamic_cast<Mail*>(s);
 					if (m)
-						m->Reparse();
+						m->GetThread(Thread);
 				}
-				break;
-			}
-			case IDM_UNMARK:
-			case IDM_SELECT_NONE:
-			case IDM_SELECT_ALL:
-			default:
-			{
-				if (Result == IDM_UNMARK ||
-					(Result >= IDM_MARK_BASE && Result < IDM_MARK_BASE+CountOf(MarkColours32)))
+				for (auto m: Thread)
 				{
-					bool Marked = Result != IDM_UNMARK;
+					m->Select(true);
+				}
+			}
+			break;
+		}
+		case IDM_DELETE_THREAD:
+		{
+			if (_GetListItems(Sel, false))
+			{
+				List<Mail> Thread;
+				for (auto s: Sel)
+				{
+					Mail *m = dynamic_cast<Mail*>(s);
+					if (m)
+						m->GetThread(Thread);
+				}
+				for (auto m: Thread)
+				{
+					m->OnDelete();
+				}
+			}
+			break;
+		}
+		case IDM_IGNORE_THREAD:
+		{
+			if (_GetListItems(Sel, false))
+			{
+				List<Mail> Thread;
+				for (auto s: Sel)
+				{
+					Mail *m = dynamic_cast<Mail*>(s);
+					if (m)
+						m->GetThread(Thread);
+				}
+				for (auto m: Thread)
+				{
+					m->SetFlags(m->GetFlags() | MAIL_IGNORE | MAIL_READ);
+				}
+			}
+			break;
+		}
+		case IDM_REPARSE:
+		{
+			if (!_GetListItems(Sel, false))
+				break;
 
-					if (_GetListItems(Sel, false))
+			for (auto s: Sel)
+			{
+				Mail *m = dynamic_cast<Mail*>(s);
+				if (m)
+					m->Reparse();
+			}
+			break;
+		}
+		case IDM_UNMARK:
+		case IDM_SELECT_NONE:
+		case IDM_SELECT_ALL:
+		default:
+		{
+			if (Result == IDM_UNMARK ||
+				(Result >= IDM_MARK_BASE && Result < IDM_MARK_BASE+CountOf(MarkColours32)))
+			{
+				bool Marked = Result != IDM_UNMARK;
+
+				if (_GetListItems(Sel, false))
+				{
+					COLOUR Col32 = Marked ? MarkColours32[Result - IDM_MARK_BASE] : 0;
+
+					for (auto s: Sel)
 					{
-						COLOUR Col32 = Marked ? MarkColours32[Result - IDM_MARK_BASE] : 0;
-
-						for (auto s: Sel)
+						Mail *m = dynamic_cast<Mail*>(s);
+						if (m)
 						{
-							Mail *m = dynamic_cast<Mail*>(s);
-							if (m)
+							if (m->SetMarkColour(Col32))
 							{
-								if (m->SetMarkColour(Col32))
-								{
-									if (m->GetObject()->GetInt(FIELD_STORE_TYPE) != Store3Imap) // Imap knows to save itself.
-										m->SetDirty();
-								}
-								m->Update();
+								if (m->GetObject()->GetInt(FIELD_STORE_TYPE) != Store3Imap) // Imap knows to save itself.
+									m->SetDirty();
 							}
+							m->Update();
 						}
 					}
 				}
-				else if (Result == IDM_SELECT_NONE ||
-						 Result == IDM_SELECT_ALL ||
-						(Result >= IDM_MARK_SELECT_BASE && Result < IDM_MARK_SELECT_BASE+CountOf(MarkColours32)))
+			}
+			else if (Result == IDM_SELECT_NONE ||
+					 Result == IDM_SELECT_ALL ||
+					(Result >= IDM_MARK_SELECT_BASE && Result < IDM_MARK_SELECT_BASE+CountOf(MarkColours32)))
+			{
+				bool None = Result == IDM_SELECT_NONE;
+				bool All = Result == IDM_SELECT_ALL;
+				uint32_t c32 = MarkColours32[Result - IDM_MARK_SELECT_BASE];
+
+				if (_GetListItems(Sel, true))
 				{
-					bool None = Result == IDM_SELECT_NONE;
-					bool All = Result == IDM_SELECT_ALL;
-					uint32_t c32 = MarkColours32[Result - IDM_MARK_SELECT_BASE];
-
-					if (_GetListItems(Sel, true))
+					for (auto s: Sel)
 					{
-						for (auto s: Sel)
-						{
-							Mail *m = dynamic_cast<Mail*>(s);
-							if (!m)
-								break;
+						Mail *m = dynamic_cast<Mail*>(s);
+						if (!m)
+							break;
 
-							auto CurCol = m->GetMarkColour();
-							if (None)
+						auto CurCol = m->GetMarkColour();
+						if (None)
+						{
+							m->Select(CurCol <= 0);
+						}
+						else
+						{
+							if (CurCol > 0)
 							{
-								m->Select(CurCol <= 0);
-							}
-							else
-							{
-								if (CurCol > 0)
+								if (All)
 								{
-									if (All)
-									{
-										m->Select(true);
-									}
-									else
-									{
-										m->Select(CurCol && CurCol == c32);
-									}
+									m->Select(true);
 								}
 								else
 								{
-									m->Select(false);
+									m->Select(CurCol && CurCol == c32);
 								}
+							}
+							else
+							{
+								m->Select(false);
 							}
 						}
 					}
 				}
-				else if (Result >= AttachBaseMsg &&
-						 Result < AttachBaseMsg + (ssize_t)AttachLst.Length())
-				{
-					// save attachment as...
-					Attachment *a = AttachLst.ItemAt(Result - AttachBaseMsg);
-					if (a)
-					{
-						a->OnSaveAs(Parent);
-					}
-				}
-				else
-				{
-					// Handle any installed callbacks for menu items
-					for (unsigned i=0; i<s.Callbacks.Length(); i++)
-					{
-						LScriptCallback &Cb = s.Callbacks[i];
-						if (Cb.Param == Result)
-						{
-							LScriptArguments Args(NULL);
-							Args[0] = new LVariant(App);
-							Args[1] = new LVariant(this);
-							Args[2] = new LVariant(Cb.Param);
-							
-							App->ExecuteScriptCallback(Cb, Args);
-						}
-					}
-				}
-				break;
 			}
+			else if (Result >= AttachBaseMsg &&
+					 Result < AttachBaseMsg + (ssize_t)AttachLst.Length())
+			{
+				// save attachment as...
+				Attachment *a = AttachLst.ItemAt(Result - AttachBaseMsg);
+				if (a)
+				{
+					a->OnSaveAs(Parent);
+				}
+			}
+			else
+			{
+				// Handle any installed callbacks for menu items
+				for (unsigned i=0; i<s.Callbacks.Length(); i++)
+				{
+					LScriptCallback &Cb = s.Callbacks[i];
+					if (Cb.Param == Result)
+					{
+						LScriptArguments Args(NULL);
+						Args[0] = new LVariant(App);
+						Args[1] = new LVariant(this);
+						Args[2] = new LVariant(Cb.Param);
+						
+						App->ExecuteScriptCallback(Cb, Args);
+					}
+				}
+			}
+			break;
 		}
-
-		DeleteObj(s.Sub);
 	}
+
+	DeleteObj(s.Sub);
 }
 
 void Mail::OnMouseClick(LMouse &m)

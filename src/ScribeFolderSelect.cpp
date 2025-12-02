@@ -298,11 +298,12 @@ FolderDlg::FolderDlg(	LViewI *parent,
 			d->View->SetImageList(d->App->GetIconImgList(), false);
 		}
 
-		LViewI *msg;
-		if (DialogMsg && GetViewById(IDC_FOLDER_MSG, msg))
-		{
-			msg->Name(DialogMsg);
-		}
+		LViewI *v;
+		if (DialogMsg && GetViewById(IDC_FOLDER_MSG, v))
+			v->Name(DialogMsg);
+			
+		if (GetViewById(IDC_FILTER, v))
+			v->Focus(true);
 	}
 
 	SetCtrlEnabled(IDOK, false);
@@ -314,7 +315,7 @@ FolderDlg::~FolderDlg()
 	DeleteObj(d);
 }
 
-char *FolderDlg::Get()
+LString FolderDlg::Get()
 {
 	return d->Path;
 }

@@ -17,7 +17,7 @@ public:
 				char *DialogMsg = nullptr);
 	~FolderDlg();
 	
-	char *Get();
+	LString Get();
 
 	/// DoModal returns TRUE on select, FALSE on cancel
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;

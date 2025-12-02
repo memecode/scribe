@@ -167,31 +167,24 @@ public:
 class LScriptUi : public LDom
 {
 public:
-	LScriptUi *Parent;
-	LSubMenu *Sub;
-	LToolBar *Toolbar;
+	LScriptUi *Parent = nullptr;
+	LSubMenu *Sub = nullptr;
+	LToolBar *Toolbar = nullptr;
 	LArray<LScriptCallback> Callbacks;
 	LArray<LScriptUi*> Subs;
 
 	LScriptUi()
 	{
-		Parent = 0;
-		Sub = 0;
-		Toolbar = 0;
 	}
 
 	LScriptUi(LSubMenu *s)
 	{
-		Parent = 0;
-		Toolbar = 0;
 		Sub = s;
 	}
 
 	LScriptUi(LToolBar *t)
 	{
-		Parent = 0;
 		Toolbar = t;
-		Sub = 0;
 	}
 
 	~LScriptUi()

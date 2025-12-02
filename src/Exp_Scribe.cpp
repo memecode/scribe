@@ -482,7 +482,7 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 
 						for (auto n: *Lst)
 						{
-							if (Stricmp(n->GetText(), s->Get()) == 0)
+							if (s->Get().Equals(n->GetText()))
 							{
 								Has = true;
 								break;
