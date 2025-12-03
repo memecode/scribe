@@ -18,6 +18,8 @@
 #include "resdefs.h"
 
 class FolderDlgPriv;
+struct FolderLeaf;
+
 class ScribeFolderTree : public LTree
 {
 	void AddFolder(FolderDlgPriv *d, LTreeItem *i, ScribeFolder *f);
@@ -34,14 +36,15 @@ public:
 class FolderDlgPriv
 {
 public:
-	FolderDlg *Dlg = NULL;
-	ScribeWnd *App = NULL;
+	FolderDlg *Dlg = nullptr;
+	ScribeWnd *App = nullptr;
 	bool CreateNew = false;
 	int LimitTo = MAGIC_NONE;
 	LString Path;
 	LString DefaultNewFolderName;
 	LString Filter;
-	ScribeFolderTree *View = NULL;
+	ScribeFolderTree *View = nullptr;
+	LArray<FolderLeaf*> matches;
 
 	FolderDlgPriv(ScribeWnd *app, FolderDlg *t, bool create)
 	{
@@ -56,15 +59,23 @@ public:
 //////////////////////////////////////////////////////////////////////////////
 struct FolderLeaf : public LTreeItem
 {
-	FolderDlgPriv *d;
-	ScribeFolder *Folder;
+	FolderDlgPriv *d = nullptr;
+	ScribeFolder *Folder = nullptr;
 	bool isRoot = false;
+	bool match = false;
 
 	FolderLeaf(FolderDlgPriv *priv, ScribeFolder *folder, bool isroot = false)
 	{
 		d = priv;
 		Folder = folder;
 		isRoot = isroot;
+	}
+
+	void Reset(LCss::DisplayType vis)
+	{
+		match = false;
+		GetCss(true)->Display(vis);
+		GetCss()->Color(LCss::ColorInherit);
 	}
 
 	bool IsSelectable()
@@ -116,30 +127,38 @@ void FolderDlgPriv::OnFilter()
 	// Initialize visible
 	View->ForAllItems([vis = Filter ? LCss::DispNone : LCss::DispBlock](auto i)
 	{
-		if (auto l = dynamic_cast<FolderLeaf*>(i))		
-			l->GetCss(true)->Display(vis);
+		if (auto l = dynamic_cast<FolderLeaf*>(i))
+			l->Reset(vis);
 		return true;
 	});
 
 	// Find matching items...
-	View->ForAllItems([this](auto i)
+	matches.Empty();
+	
+	View->ForAllItems([&](auto i)
 	{
 		if (auto l = dynamic_cast<FolderLeaf*>(i))
 		{
 			auto nm = l->GetText();
 			if (Stristr(nm, this->Filter.Get()))
 			{
+				matches.Add(l);
+				l->match = true;
 				l->GetCss(true)->Display(LCss::DispBlock);
+				l->GetCss()->Color(LColour::Blue);
 
 				for (auto p = l->GetParent(); p; p = p->GetParent())
 				{
-					FolderLeaf *lp = dynamic_cast<FolderLeaf*>(p);
-					if (lp) lp->GetCss(true)->Display(LCss::DispBlock);
+					if (auto lp = dynamic_cast<FolderLeaf*>(p))
+						lp->GetCss(true)->Display(LCss::DispBlock);
 				}
 			}
 		}
 		return true;
 	});
+	
+	if (matches.Length())
+		matches[0]->Select(true);
 
 	View->UpdateAllItems();
 	View->Invalidate();
@@ -201,9 +220,9 @@ void ScribeFolderTree::Setup(FolderDlgPriv *d, ScribeFolder *Root, const char *I
 		LTreeNode *n = this;
 		for (unsigned i=0; i<Path.Length(); i++)
 		{
-			FolderLeaf *Match = 0;
-			for (FolderLeaf *c = dynamic_cast<FolderLeaf*>(n->GetChild()); c;
-								c = dynamic_cast<FolderLeaf*>(c->GetNext()))
+			FolderLeaf *Match = nullptr;
+			for (auto c = dynamic_cast<FolderLeaf*>(n->GetChild()); c;
+					  c = dynamic_cast<FolderLeaf*>(c->GetNext()))
 			{
 				auto s = c->GetFolder()->GetName(true);
 				if (s.Equals(Path[i]))
@@ -219,8 +238,7 @@ void ScribeFolderTree::Setup(FolderDlgPriv *d, ScribeFolder *Root, const char *I
 				break;
 		}
 
-		LTreeItem *it = dynamic_cast<LTreeItem*>(n);
-		if (it)
+		if (auto it = dynamic_cast<LTreeItem*>(n))
 			it->Select(true);
 	}
 
@@ -292,7 +310,8 @@ FolderDlg::FolderDlg(	LViewI *parent,
 					{
 						Root = dynamic_cast<ScribeFolder*>(Root->GetPrev());
 					}
-				}			}
+				}
+			}
 			
 			d->View->Setup(d, Root, InitialSelect);
 			d->View->SetImageList(d->App->GetIconImgList(), false);
@@ -308,11 +327,64 @@ FolderDlg::FolderDlg(	LViewI *parent,
 
 	SetCtrlEnabled(IDOK, false);
 	SetCtrlEnabled(IDC_NEW_FOLDER, false);
+	
+	// Catch the up/down arrow keys to select the next / last match when filtering
+	RegisterHook(this, LKeyEvents);
 }
 
 FolderDlg::~FolderDlg()
 {
 	DeleteObj(d);
+}
+
+bool FolderDlg::OnViewKey(LView *v, LKey &k)
+{
+	if (!v || v->GetId() != IDC_FILTER)
+		return false;
+		
+	if (k.vkey != LK_UP &&
+		k.vkey != LK_DOWN)
+	{
+		k.Trace(LString::Fmt("FolderDlg::OnViewKey - not an arrow %i", LK_UP));
+		return false;
+	}
+		
+	if (k.Down())
+	{
+		// whats the current selected match?
+		auto sel = d->View->Selection();
+		auto item = dynamic_cast<FolderLeaf*>(sel);
+		if (!item)
+		{
+			LgiTrace("%s:%i - item not a folder leaf?\n", _FL);
+			return false;
+		}
+		
+		auto idx = d->matches.IndexOf(item);
+		if (idx < 0)
+		{
+			LgiTrace("%s:%i - item not a match?\n", _FL);
+			return false;
+		}
+		
+		if (k.vkey == LK_UP)
+		{
+			// prev match..
+			if (idx > 0)
+				d->matches[idx-1]->Select(true);
+			else
+				LgiTrace("%s:%i - no previous match.\n", _FL);
+		}
+		else
+		{
+			// next match..
+			if (idx < d->matches.Length() - 1)
+				d->matches[idx+1]->Select(true);
+			else
+				LgiTrace("%s:%i - no next match.\n", _FL);
+		}
+	}
+	return true;
 }
 
 LString FolderDlg::Get()
@@ -375,10 +447,10 @@ int FolderDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		}
 		case IDC_FILTER:
 		{
-			LString n = Ctrl->Name();
-			if (d->Filter != n)
+			LString str = Ctrl->Name();
+			if (d->Filter != str)
 			{
-				d->Filter = n;
+				d->Filter = str;
 				d->OnFilter();
 			}
 			break;
