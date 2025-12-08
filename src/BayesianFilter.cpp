@@ -1242,10 +1242,41 @@ bool IsUriChar(int32 ch)
 	return false;
 }
 
-typedef LHashTbl<ConstStrKey<char,false>,bool> TokenMap;
-void TokeniseText(bool DebugLog, const char *Source, bool *Lut, LString::Array &Blocks, TokenMap *Ignore = NULL)
+bool IsEmailChar(int32 ch)
 {
-	if (!Source || !Lut)
+	if (!ch)
+		return false;
+
+	if (IsDigit(ch) || IsAlpha(ch))
+		return true;
+
+	if ((ch >= 0 && ch <= 31) || ch == 127)
+		return false;
+
+	if (strchr("()<>,;:\\<[]", ch))
+		return false;
+
+	return true;
+}
+
+bool IsWordChar(int32 ch)
+{
+	if (IsDigit(ch) || IsAlpha(ch))
+		return true;
+
+	return false;
+}
+
+typedef bool (*pInWordFn)(int32);
+typedef LHashTbl<ConstStrKey<char,false>,bool> TokenMap;
+
+void TokeniseText(	bool DebugLog,
+					const char *Source,
+					pInWordFn inWord,
+					LString::Array &Blocks,
+					TokenMap *Ignore = NULL)
+{
+	if (!Source || !inWord)
 		return;
 
 	char buf[16 << 10];
@@ -1270,7 +1301,7 @@ void TokeniseText(bool DebugLog, const char *Source, bool *Lut, LString::Array &
 				&&
 				ch < 256
 				&&
-				!Lut[ch]
+				!inWord(ch)
 			)
 		{
 			start++;
@@ -1284,7 +1315,7 @@ void TokeniseText(bool DebugLog, const char *Source, bool *Lut, LString::Array &
 				(
 					ch >= 256
 					||
-					Lut[ch]
+					inWord(ch)
 				)
 			)
 		{
@@ -1378,22 +1409,6 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 	{
 		Processing = true;
 
-		// create word lut for deciding whether a char is part of a word or not
-		bool Lut[256];
-		ZeroObj(Lut);
-		memset(Lut + 'a', true, 'z'-'a'+1);
-		memset(Lut + 'A', true, 'Z'-'A'+1);
-		Lut[(int)'-'] = true;
-		// Lut[(int)'!'] = true;
-		Lut[(int)'$'] = true;
-		
-		bool Email[256];
-		memcpy(Email, Lut, sizeof(Email));
-		Email[(int)'@'] = true;
-		Email[(int)'.'] = true;
-		
-		memset(Lut + 0x80, true, 128);
-		
 		// create ignored words list
 		LString::Array Temp;
 		TokenMap Ignore;
@@ -1401,10 +1416,10 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 		{
 			auto s = a->Identity.Name();
 			if (ValidStr(s.Str()))
-				TokeniseText(d->DebugLog, s.Str(), Lut, Temp);
+				TokeniseText(d->DebugLog, s.Str(), IsWordChar, Temp);
 			s = a->Identity.Email();
 			if (ValidStr(s.Str()))
-				TokeniseText(d->DebugLog, s.Str(), Email, Temp);
+				TokeniseText(d->DebugLog, s.Str(), IsEmailChar, Temp);
 		}
 		ProcessWords(LString("").Join(Temp), [&Ignore](auto w)
 		{
@@ -1412,9 +1427,9 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 		});
 		
 		// process various parts of the email
-		TokeniseText(d->DebugLog, m->GetSubject(), Lut, Blocks, &Ignore);
-		TokeniseText(d->DebugLog, m->GetFromStr(FIELD_EMAIL), Email, Blocks, &Ignore);
-		TokeniseText(d->DebugLog, m->GetFromStr(FIELD_NAME), Lut, Blocks, &Ignore);
+		TokeniseText(d->DebugLog, m->GetSubject(), IsWordChar, Blocks, &Ignore);
+		TokeniseText(d->DebugLog, m->GetFromStr(FIELD_EMAIL), IsEmailChar, Blocks, &Ignore);
+		TokeniseText(d->DebugLog, m->GetFromStr(FIELD_NAME), IsWordChar, Blocks, &Ignore);
 		LVariant Body;
 
 		Store3State Loaded = (Store3State)m->GetObject()->GetInt(FIELD_LOADED);
@@ -1434,7 +1449,7 @@ Store3Status BayesianFilter::MakeMailWordList(Mail *m, LString &out)
 		if (Req)
 		{
 			// auto id = m->GetMessageId();
-			TokeniseText(d->DebugLog, Body.Str(), Lut, Blocks, &Ignore);
+			TokeniseText(d->DebugLog, Body.Str(), IsWordChar, Blocks, &Ignore);
 		}
 		else
 		{
