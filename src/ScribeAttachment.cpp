@@ -390,17 +390,15 @@ void Attachment::OnOpen(LView *Parent, char *Dest)
 	else if ((VCal = IsVCalendar()) || IsVCard())
 	{
 		// Open the event or contact...
-		Thing *c = App->CreateItem(VCal ? MAGIC_CALENDAR : MAGIC_CONTACT, 0, false);
-		if (c)
+		if (auto c = App->CreateItem(VCal ? MAGIC_CALENDAR : MAGIC_CONTACT, 0, false))
 		{
 			LAutoPtr<LStreamI> f(GotoObject(_FL));
 			if (f)
 			{
 				if (c->Import(f, GetMimeType()))
-				{
 					c->DoUI();
-				}
-				else LgiMsg(Parent, "Failed to parse calendar.", "Error");
+				else
+					LgiMsg(Parent, "Failed to parse calendar.", "Error");
 			}
 			else LgiTrace("%s:%i - Failed to get attachment stream.\n", _FL);
 		}
@@ -413,8 +411,7 @@ void Attachment::OnOpen(LView *Parent, char *Dest)
 		LArray<TnefFileInfo*> TnefIndex;
 
 		int64 AttachPos = -1;
-		LAutoStreamI f = GetObject()->GetStream(_FL);
-		if (f)
+		if (auto f = GetObject()->GetStream(_FL))
 		{
 			IsExe = LIsFileExecutable(GetName(), f, AttachPos = f->GetPos(), f->GetSize());
 			if (!IsExe &&
@@ -565,21 +562,39 @@ void Attachment::OnOpen(LView *Parent, char *Dest)
 					}
 				}
 				
-				if (!LExecute(FileToExecute, 0, Tmp))
+				LError err;
+				if (!LExecute(FileToExecute, 0, Tmp, &err))
 				{
 					// if the default open fails.. open as text
-					LString AppPath = LGetAppForMimeType(Mime ? Mime : sTextPlain);
+					auto AppPath = LGetAppForMimeType(Mime ? Mime : sTextPlain);
 					bool Status = false;
 					if (AppPath)
 					{
-						char *s = strchr(AppPath, '%');
-						if (s) s[0] = 0;
-						Status = LExecute(AppPath, FileToExecute, Tmp);
+						const char *s = AppPath.Get();
+						LAutoString exe(LTokStr(s));
+						LString args = s;
+						
+						auto pos = args.Find("%");
+						if (pos >= 0)
+						{
+							LString::Array parts;
+							parts.Add(args(0, pos));
+							parts.New().Printf("\"%s\"", FileToExecute.Get());
+							parts.Add(args(pos + 2, -1));
+							args = LString(" ").Join(parts);
+						}
+						else
+						{
+							args += LString::Fmt(" \"%s\"", FileToExecute.Get());
+						}
+													
+						printf("LExecute '%s' '%s'\n", exe.Get(), args.Get());
+						Status = LExecute(exe, args, Tmp, &err);
 					}
 
 					if (!Status)
 					{
-						LgiMsg(Parent, "Couldn't open file.", AppName, MB_OK);
+						LgiMsg(Parent, "Couldn't open file: %s", AppName, MB_OK, err.ToString().Get());
 					}
 				}
 			}
