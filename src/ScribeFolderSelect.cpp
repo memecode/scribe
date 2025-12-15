@@ -345,7 +345,7 @@ bool FolderDlg::OnViewKey(LView *v, LKey &k)
 	if (k.vkey != LK_UP &&
 		k.vkey != LK_DOWN)
 	{
-		k.Trace(LString::Fmt("FolderDlg::OnViewKey - not an arrow %i", LK_UP));
+		// k.Trace(LString::Fmt("FolderDlg::OnViewKey - not an arrow %i", LK_UP));
 		return false;
 	}
 		
