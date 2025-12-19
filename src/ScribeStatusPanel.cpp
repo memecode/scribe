@@ -28,9 +28,9 @@ const char *AccountStatusTxt[] = { "Idle", "Connected", "Waiting", "Error" };
 ////////////////////////////////////////////////////////////////////////////
 
 #if 1
-typedef LThreadSafeTextView<LTextView3> LAccountLogParent;
+typedef LTsTextView<LTextView3> LAccountLogParent;
 #else
-typedef LThreadSafeTextView<LTextView4> LAccountLogParent;
+typedef LTsTextView<LTextView4> LAccountLogParent;
 #endif
 
 class LAccountLog : public LAccountLogParent
