@@ -25,10 +25,6 @@
 
 #define IDC_RESULTS 90
 
-enum FindMsgs {
-	M_END_SEARCH = M_USER + 0x400
-};
-
 //////////////////////////////////////////////////////////////////////////////////
 #include "LMarkColourSelect.h"
 
@@ -436,35 +432,47 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////
-class FindTask
+class FindWnd :
+	public LWindow,
+	public LResourceLoad,
+	public LDataEventsI
 {
+	ScribeWnd *App = nullptr;
+	LEdit *Text = nullptr;
+	LButton *Search = nullptr;
+	LEdit *FolderEdit = nullptr;
+	LCombo *MailFieldCbo = nullptr;
+	LCombo *ContactFieldCbo = nullptr;
+	ResultList *Results = nullptr;
+	LArray<int> MailFieldIds;
+
+	LString searchBtnText;
+	LString originalStatusText;
+
+	void OnSearch(bool Searching);
+
 	// Work vars
-	ScribeWnd *App = NULL;
-	ResultList *Results = NULL;
-	bool InMail;
-	int MailF;
-	bool InContacts;
-	int ContactF;
-	LArray<char*> SearchText;
-	bool Deep;
-	bool CaseSensitive;
-	bool MatchWord;
-	bool Loop = true;
-	LArray<uint32_t> Colours;
-	LAutoPtr<LGroupMap> GroupMap;
+	bool isSearching = false;
+	bool inMail = false;
+	int mailField = 0;
+	bool inContacts = false;
+	int contactField = 0;
+	LString::Array searchText;
+	bool deep = false;
+	bool caseSensitive = true;
+	bool matchWord = false;
+	LArray<uint32_t> colours;
+	LAutoPtr<LGroupMap> groupMap;
 
 	// Iteration control
-	ssize_t CurFolder = -1;
-	LArray<ScribeFolder*> Folders;
-	size_t CurItem = 0;
+	ssize_t curFolder = -1;
+	LArray<ScribeFolder*> folders;
+	size_t curItem = 0;
 
 	// Status
-	uint64 StartTime = 0;
-	int ItemsSearched = 0;
-	LString CurFolderPath;
-
-	// Thread vars
-	LViewI *Notify;
+	uint64_t startTs = 0;
+	int itemsSearched = 0;
+	LString curFolderPath;
 
 	bool MatchString(const char *String, char *Pattern)
 	{
@@ -474,11 +482,11 @@ class FindTask
 			auto s = String;
 			do
 			{
-				auto c = (CaseSensitive)?strstr(s, Pattern):stristr(s, Pattern);
+				auto c = caseSensitive ? strstr(s, Pattern) : stristr(s, Pattern);
 				
 				if (c)
 				{
-					if (MatchWord)
+					if (matchWord)
 					{
 						bool Before = c <= String || IsWordBoundry(c[-1]);
 						bool After = c[Len] == 0 || IsWordBoundry(c[Len]);
@@ -530,10 +538,10 @@ class FindTask
 		#define StrField(fld, id) if (id == Field || Field < 0) Status |= (MatchString(fld, Text) != 0);
 
 		bool Result = true;
-		for (unsigned i=0; i<SearchText.Length(); i++)
+		for (auto searchTerm: searchText)
 		{
 			bool Status = false;
-			char *Text = SearchText[i];
+			char *Text = searchTerm;
 
 			if (Field == FIELD_SIZE)
 			{
@@ -650,9 +658,9 @@ class FindTask
 				if (From)
 				{
 					auto email = From->GetStr(FIELD_EMAIL);
-					if (email && GroupMap)
+					if (email && groupMap)
 					{
-						auto grps = GroupMap->Find(email);
+						auto grps = groupMap->Find(email);
 						if (grps)
 							Status |= MatchString(grps->toString(), Text);
 					}
@@ -662,10 +670,10 @@ class FindTask
 			Result &= Status;
 		}
 
-		if (Colours.Length())
+		if (colours.Length())
 		{
 			auto Col = mail->GetMarkColour();
-			Result &= Colours.HasItem((uint32_t)Col);
+			Result &= colours.HasItem((uint32_t)Col);
 		}
 
 		return Result;
@@ -673,7 +681,7 @@ class FindTask
 
 	bool MatchFilter(Filter *filter)
 	{
-		if (!filter || !filter->GetObject() || SearchText.Length() == 0)
+		if (!filter || !filter->GetObject() || searchText.Length() == 0)
 			return false;
 
 		LArray<const char*> Strs;
@@ -685,10 +693,10 @@ class FindTask
 			if (s) Strs.Add(s);
 		}
 
-		for (auto t: SearchText)
+		for (auto &term: searchText)
 		{
 			for (auto s : Strs)
-				if (MatchString(s, t))
+				if (MatchString(s, term))
 					return true;
 		}
 		
@@ -697,25 +705,23 @@ class FindTask
 
 	bool MatchContact(Contact *contact, int Field = -1)
 	{
-		if (!contact || !contact->GetObject() || SearchText.Length() == 0)
+		if (!contact || !contact->GetObject() || searchText.Length() == 0)
 			return false;
 
-		const char *v = 0;
+		const char *v = nullptr;
 		bool Status = true;
 
-		for (unsigned i=0; i<SearchText.Length(); i++)
+		for (auto &text: searchText)
 		{
-			char *Text = SearchText[i];
 			bool Found = false;
 			
 			if (Field >= 0)
 			{
-				ItemFieldDef *Def = GetFieldDefById(Field);
-				if (Def)
+				if (auto Def = GetFieldDefById(Field))
 				{
 					if ((v = contact->GetObject()->GetStr(Def->FieldId)))
 					{
-						Found |= (stristr(v, Text) != 0);
+						Found |= stristr(v, text) != 0;
 					}
 				}
 			}
@@ -725,7 +731,7 @@ class FindTask
 				{
 					if ((v = contact->GetObject()->GetStr(fd->FieldId)))
 					{
-						Found |= stristr(v, Text) != 0;
+						Found |= stristr(v, text) != 0;
 					}
 				}
 			}
@@ -740,100 +746,13 @@ class FindTask
 	{
 		for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
 		{
-			Folders.Add(c);
+			folders.Add(c);
 			AddSubFolders(c);
 		}
 	}
 
-public:
-	char Status[256];
 	constexpr static int TIMESLICE  = 250; // ms - use this much time to do searching... then yeild
 	constexpr static int PULSE_TIME = 500; // ms
-
-	FindTask(	ScribeWnd *app,
-				LView *notify,
-				ScribeFolder *folder,
-				ResultList *results,
-				bool mail,
-				int mailf,
-				bool contact,
-				int contactf,
-				const char *searchText,
-				bool deep,
-				bool case_sensitive,
-				bool match_word,
-				LArray<uint32_t> colours,
-				LAutoPtr<LGroupMap> groupMap)
-	{
-		App = app;
-		Notify = notify;
-		Results = results;
-		InMail = mail;
-		MailF = mailf;
-		InContacts = contact;
-		ContactF = contactf;
-		Deep = deep;
-		CaseSensitive = case_sensitive;
-		MatchWord = match_word;
-		Colours = colours;
-		ItemsSearched = 0;
-		GroupMap = groupMap;
-
-		Folders.Add(folder);
-		if (Deep)
-			AddSubFolders(folder);
-
-		if (searchText)
-		{
-			const char *White = " \t\r\n";
-			
-			for (auto s = searchText; s && *s; )
-			{
-				while (*s && strchr(White, *s)) s++;
-				if (*s && strchr("\'\"", *s))
-				{
-					char Delim = *s++;
-					char *e = strchr(s, Delim);
-					if (e)
-					{
-						SearchText.Add( NewStr(s, e-s) );
-						s = e + 1;
-					}
-					else
-					{
-						SearchText.Add( NewStr(s) );
-						break;
-					}
-				}
-				else
-				{
-					const char *e = s;
-					while (*e && !strchr(White, *e)) e++;
-					SearchText.Add( NewStr(s, e-s) );
-					s = *e ? e + 1 : 0;
-				}
-			}
-		}
-
-		Loop = true;
-		StartTime = LCurrentTime();
-	}
-
-	~FindTask()
-	{
-		Loop = false;
-		SearchText.DeleteArrays();
-	}
-
-	void Search(bool i)
-	{
-		Loop = i;
-	}
-
-	void SetNotify(LViewI *w)
-	{
-		Notify = w;
-	}
 
 	bool AddThing(Thing *T)
 	{
@@ -845,79 +764,76 @@ public:
 		return Item != 0;
 	}
 
-	void OnComplete()
-	{
-		Loop = false;
-
-		if (Notify)
-			Notify->PostEvent(M_END_SEARCH);
-	}
-
 	void SearchTimeslice()
 	{
 		auto StartTs = LCurrentTime();
-		ScribeFolder *Folder = NULL;
+		ScribeFolder *Folder = nullptr;
 
-		while (	Loop &&
-				(LCurrentTime() - StartTs) < TIMESLICE)
+		while (	(LCurrentTime() - StartTs) < TIMESLICE)
 		{
-			if (!Folder && Folders.IdxCheck(CurFolder))
-				Folder = Folders[CurFolder]; // Get the current folder...
-			if (Folder && CurItem >= Folder->Items.Length())
+			if (!Folder && folders.IdxCheck(curFolder))
+				Folder = folders[curFolder]; // Get the current folder...
+			if (Folder && curItem >= Folder->Items.Length())
 				Folder = NULL; // Completed current folder...
 			if (!Folder)
 			{
 				// Setup new folder...
-				if (Folders.IdxCheck(++CurFolder))
+				if (folders.IdxCheck(++curFolder))
 				{
-					if ((Folder = Folders[CurFolder]))
+					if ((Folder = folders[curFolder]))
 					{
-						CurFolderPath = Folder->GetPath();
-						CurItem = 0;
+						curFolderPath = Folder->GetPath();
+						curItem = 0;
 					}
-					else return OnComplete();
+					else return OnSearch(false);
 				}
-				else return OnComplete();
+				else return OnSearch(false);
+			}
+			
+			if (!Folder || Folder->Items.Length() == 0)
+			{
+				Folder = nullptr;
+				continue;
 			}
 
 			LAssert(Folder);
-			LAssert(CurItem < Folder->Items.Length());
+			LAssert(curItem < Folder->Items.Length());
 
-			auto Item = Folder->Items[CurItem++];
+			auto Item = Folder->Items[curItem++];
 			LAssert(Item);
 
 			switch ((uint32_t)Item->Type())
 			{
 				case MAGIC_MAIL:
 				{
-					if (InMail)
+					if (inMail)
 					{
 						bool PreLoad = Item->GetObject() != 0;
 						if (auto m = Item->IsMail())
 						{
-							if (MatchMail(m, MailF))
+							if (MatchMail(m, mailField))
 							{
 								PreLoad = AddThing(m);
 								break;
 							}
-							ItemsSearched++;
+							itemsSearched++;
 						}
 					}
 					break;
 				}
 				case MAGIC_CONTACT:
 				{
-					if (InContacts)
+					if (inContacts)
 					{
 						bool PreLoad = Item->GetObject() != 0;
 						if (auto c = Item->IsContact())
 						{
-							if (MatchContact(c, ContactF))
+							if (MatchContact(c, contactField))
 							{
 								PreLoad = AddThing(c);
 								break;
 							}
-							ItemsSearched++;
+							itemsSearched++;
 						}
 					}
 					break;
@@ -932,7 +848,7 @@ public:
 							PreLoad = AddThing(f);
 							break;
 						}
-						ItemsSearched++;
+						itemsSearched++;
 					}
 					break;						
 				}
@@ -942,45 +858,16 @@ public:
 	
 	LString GetStatus()
 	{
-		char s[256];
-		double Sec = (double)(LCurrentTime() - StartTime) / 1000.0;
-		double Rate = Sec != 0.0 ? ItemsSearched / Sec : 0.0;
-
-		sprintf_s(s, sizeof(s), "Searching '%s', %.1f items/s.", CurFolderPath.Get(), Rate);
-		
-		return s;
+		double Sec = (double)(LCurrentTime() - startTs) / 1000.0;
+		double Rate = Sec != 0.0 ? itemsSearched / Sec : 0.0;
+		return LString::Fmt("Searching '%s', %.1f items/s.", curFolderPath.Get(), Rate);
 	}
-};
-
-///////////////////////////////////////////////////////////////////////
-class FindWnd :
-	public LWindow,
-	public LResourceLoad,
-	public LDataEventsI
-{
-	ScribeWnd *App = NULL;
-	LEdit *Text = NULL;
-	LButton *Search = NULL;
-	LEdit *Folder = NULL;
-	LCheckBox *SearchSub = NULL;
-	LCheckBox *SearchMail = NULL;
-	LCombo *MailField = NULL;
-	LCheckBox *SearchContact = NULL;
-	LCombo *ContactField = NULL;
-	ResultList *Results = NULL;
-	LArray<int> MailFieldIds;
-
-	char *SearchBtnText = NULL;
-	FindTask *Task = NULL;
-
-	void OnSearch(bool Searching);
 
 public:
 	FindWnd(ScribeWnd *app, ScribeFolder *folder);
 	~FindWnd();
 
 	int OnNotify(LViewI *Col, const LNotification &n) override;
-	LMessage::Result OnEvent(LMessage *m) override;
 
 	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new) override;
 	bool OnDelete(LDataFolderI *parent, LArray<LDataI*> &items) override;
@@ -1005,17 +892,13 @@ FindWnd::FindWnd(ScribeWnd *app, ScribeFolder *folder)
 
 		GetViewById(IDC_TEXT, Text);
 		GetViewById(IDOK, Search);
-		GetViewById(IDC_FOLDER, Folder);
-		GetViewById(IDC_SEARCH_SUB, SearchSub);
-		GetViewById(IDC_MAIL, SearchMail);
-		GetViewById(IDC_MAIL_FIELD, MailField);
-		GetViewById(IDC_CONTACT, SearchContact);
-		GetViewById(IDC_CONTACT_FIELD, ContactField);
+		GetViewById(IDC_FOLDER, FolderEdit);
+		GetViewById(IDC_MAIL_FIELD, MailFieldCbo);
+		GetViewById(IDC_CONTACT_FIELD, ContactFieldCbo);
 		
 		if (Search)
-		{
-			SearchBtnText = NewStr(Search->Name());
-		}
+			searchBtnText = Search->Name();
+		originalStatusText = GetCtrlName(IDC_STATUS);
 
 		LTableLayout *Tbl;
 		if (GetViewById(IDC_TABLE, Tbl))
@@ -1038,15 +921,15 @@ FindWnd::FindWnd(ScribeWnd *app, ScribeFolder *folder)
 
 		char n[256];
 		sprintf_s(n, sizeof(n), "(%s)", LLoadString(IDS_NONE));
-		if (MailField)
+		if (MailFieldCbo)
 		{
-			MailField->Insert(n);
+			MailFieldCbo->Insert(n);
 			for (ItemFieldDef *Def = MailFieldDefs; Def->FieldId; Def++)
 			{
 				const char *FName = LLoadString(Def->FieldId);
 				if (FName)
 				{
-					MailField->Insert(FName);
+					MailFieldCbo->Insert(FName);
 					MailFieldIds.Add(Def->FieldId);
 				}
 			}
@@ -1056,18 +939,18 @@ FindWnd::FindWnd(ScribeWnd *app, ScribeFolder *folder)
 			MailFieldIds.Add(FIELD_ATTACHMENTS_DATA);
 			*/
 
-			MailField->Insert(LLoadString(IDS_ATTACHMENTS_NAME));
+			MailFieldCbo->Insert(LLoadString(IDS_ATTACHMENTS_NAME));
 			MailFieldIds.Add(FIELD_ATTACHMENTS_NAME);
 
-			MailField->Insert(LLoadString(IDS_MEMBER_OF_GROUP));
+			MailFieldCbo->Insert(LLoadString(IDS_MEMBER_OF_GROUP));
 			MailFieldIds.Add(FIELD_MEMBER_OF_GROUP);
 		}
-		if (ContactField)
+		if (GetCtrlValue(IDC_CONTACT))
 		{
-			ContactField->Insert(n);
-			for (ItemFieldDef *Def = ContactFieldDefs; Def->CtrlId; Def++)
+			ContactFieldCbo->Insert(n);
+			for (auto Def = ContactFieldDefs; Def->CtrlId; Def++)
 			{
-				ContactField->Insert(LLoadString(Def->FieldId));
+				ContactFieldCbo->Insert(LLoadString(Def->FieldId));
 			}
 		}
 		if (Results)
@@ -1123,8 +1006,8 @@ FindWnd::FindWnd(ScribeWnd *app, ScribeFolder *folder)
 
 			if (Search)
 				Search->Default(true);
-			if (Folder)
-				Folder->Enabled(false);
+			if (FolderEdit)
+				FolderEdit->Enabled(false);
 
 			Visible(true);
 			Text->Focus(true);
@@ -1137,25 +1020,23 @@ FindWnd::FindWnd(ScribeWnd *app, ScribeFolder *folder)
 FindWnd::~FindWnd()
 {
 	App->RemoveStore3EventHandler(this);
-
-	DeleteObj(Task);
-	DeleteArray(SearchBtnText);
 }
 
 void FindWnd::OnSearch(bool Searching)
 {
+	isSearching = Searching;
 	Text->Enabled(!Searching);
-	Folder->Enabled(!Searching);
-	SearchSub->Enabled(!Searching);
-	SearchMail->Enabled(!Searching);
-	MailField->Enabled(!Searching);
-	SearchContact->Enabled(!Searching);
-	ContactField->Enabled(!Searching);
-	// Results->Enabled(!Searching);
-
-	MailField->Invalidate();
-	ContactField->Invalidate();
-	SetPulse(Searching ? FindTask::PULSE_TIME : -1);
+	FolderEdit->Enabled(!Searching);
+	MailFieldCbo->Enabled(!Searching);
+	ContactFieldCbo->Enabled(!Searching);
+	SetCtrlEnabled(IDC_SEARCH_SUB, !Searching);
+	SetCtrlEnabled(IDC_MAIL, !Searching);
+	SetCtrlEnabled(IDC_CONTACT, !Searching);
+	
+	MailFieldCbo->Invalidate();
+	ContactFieldCbo->Invalidate();
+	printf("%s:%i - OnSearch=%i\n", _FL, Searching);
+	SetPulse(Searching ? PULSE_TIME : -1);
 
 	if (Searching)
 	{
@@ -1163,7 +1044,8 @@ void FindWnd::OnSearch(bool Searching)
 	}
 	else
 	{
-		Search->Name(SearchBtnText ? SearchBtnText : (char*)"Search");
+		Search->Name(searchBtnText ? searchBtnText.Get() : "Search");
+		SetCtrlName(IDC_STATUS, originalStatusText);
 	}
 }
 
@@ -1173,101 +1055,133 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 	{
 		case IDC_PICK_FOLDER:
 		{
-			if (Folder)
+			if (FolderEdit)
 			{
 				auto Dlg = new FolderDlg(this, App);
 				Dlg->DoModal([this, Dlg](auto dlg, auto id)
 				{
 					if (id)
-						this->Folder->Name(Dlg->Get());
+						this->FolderEdit->Name(Dlg->Get());
 				});
 			}
 			break;
 		}
 		case IDOK:
 		{
-			if (Results && Folder)
+			if (!Results || !FolderEdit)
 			{
-				if (Task)
-				{
-					Task->Search(false);
-					Search->Name("Ending...");
-				}
-				else
-				{
-					Results->Empty();
+				LAssert(!"missing params");
+				break;
+			}
+			
+			if (isSearching)
+			{
+				OnSearch(false);
+				break;
+			}
+				
+			Results->Empty();
 
-					int MailF = -1;
-					int ContactF = -1;
-					if (MailField)
+			mailField = -1;
+			contactField = -1;
+			if (MailFieldCbo)
+			{
+				auto Index = MailFieldCbo->Value();
+				if (Index > 0)
+				{
+					Index--;
+					if (Index < MailFieldIds.Length())
 					{
-						int Index = (int)MailField->Value();
-						if (Index > 0)
-						{
-							Index--;
-							if (Index < (int)MailFieldIds.Length())
-							{
-								MailF = MailFieldIds[Index];
-							}
-						}
+						mailField = MailFieldIds[Index];
 					}
-					if (ContactField)
+				}
+			}
+			if (ContactFieldCbo)
+			{
+				auto Index = ContactFieldCbo->Value();
+				if (Index > 0)
+				{
+					contactField = ContactFieldDefs[Index-1].FieldId;
+				}
+			}
+			
+			if (auto Root = App->GetFolder(FolderEdit->Name()))
+			{
+				auto it = Root->Items.begin();
+
+				LProgressDlg prog(this, 1000);
+				prog.SetDescription("Get message id's...");
+				prog.SetRange(Root->Items.Length());
+				int n = 0;
+				for (Thing *t = *it; t; t = *++it, n++)
+				{
+					if (auto m = t->IsMail())
 					{
-						int Index = (int) ContactField->Value();
-						if (Index > 0)
-						{
-							ContactF = ContactFieldDefs[Index-1].FieldId;
-						}
+						// This can't be done in the thread, so do it here
+						m->GetMessageId();
 					}
+					prog.Value(n);
+				}
+
+				colours.Length(0);
+				LMarkColourSelect *Mcs;
+				if (GetViewById(IDC_COLOUR, Mcs))
+				{
+					for (int i=0; i<CountOf(Mcs->ColSel); i++)
+					{
+						if (Mcs->ColSel[i])
+							colours.Add(MarkColours32[i]);
+					}
+				}
+
+				inMail = GetCtrlValue(IDC_MAIL) != 0;
+				inContacts = GetCtrlValue(IDC_CONTACT) != 0;
+				deep = GetCtrlValue(IDC_SEARCH_SUB) != 0;
+				caseSensitive = GetCtrlValue(IDC_FIND_CASE) != 0;
+				matchWord = GetCtrlValue(IDC_FIND_WORD) != 0;
+				itemsSearched = 0;
+				
+				folders.Add(Root);
+				if (deep)
+					AddSubFolders(Root);
+
+				if (auto txt = Text->Name())
+				{
+					const char *White = " \t\r\n";
 					
-					ScribeFolder *Root = App->GetFolder(Folder->Name());
-					if (Root)
+					for (auto s = txt; s && *s; )
 					{
-						auto it = Root->Items.begin();
-
-						LProgressDlg prog(this, 1000);
-						prog.SetDescription("Get message id's...");
-						prog.SetRange(Root->Items.Length());
-						int n = 0;
-						for (Thing *t = *it; t; t = *++it, n++)
+						while (*s && strchr(White, *s))
+							s++;
+						
+						if (*s && strchr("\'\"", *s))
 						{
-							Mail *m = t->IsMail();
-							if (m)
+							auto delim = *s++;
+							auto e = strchr(s, delim);
+							if (e)
 							{
-								// This can't be done in the thread, so do it here
-								m->GetMessageId();
+								searchText.New().Set(s, e - s);
+								s = e + 1;
 							}
-							prog.Value(n);
-						}
-
-						LArray<uint32_t> Colours;
-						LMarkColourSelect *Mcs;
-						if (GetViewById(IDC_COLOUR, Mcs))
-						{
-							for (int i=0; i<CountOf(Mcs->ColSel); i++)
+							else
 							{
-								if (Mcs->ColSel[i])
-									Colours.Add(MarkColours32[i]);
+								searchText.New().Set(s);
+								break;
 							}
 						}
-
-						Task = new FindTask(App,
-											this,
-											Root,
-											Results,
-											SearchMail && SearchMail->Value() > 0,
-											MailF,
-											SearchContact && SearchContact->Value() > 0,
-											ContactF,
-											Text->Name(),
-											SearchSub && SearchSub->Value(),
-											GetCtrlValue(IDC_FIND_CASE) != 0,
-											GetCtrlValue(IDC_FIND_WORD) != 0,
-											Colours,
-											LAutoPtr<LGroupMap>(new LGroupMap(App)));
-						OnSearch(true);
+						else
+						{
+							const char *e = s;
+							while (*e && !strchr(White, *e))
+								e++;
+							searchText.New().Set(s, e - s);
+							s = *e ? e + 1 : nullptr;
+						}
 					}
 				}
+
+				startTs = LCurrentTime();
+				OnSearch(true);
 			}
 			break;
 		}
@@ -1276,45 +1190,29 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 	return 0;
 }
 
-LMessage::Result FindWnd::OnEvent(LMessage *m)
-{
-	switch (m->Msg())
-	{
-		case M_END_SEARCH:
-		{
-			// thread is ended, it will delete itself
-			OnSearch(false);
-			DeleteObj(Task);
-			break;
-		}
-	}
-
-	return LWindow::OnEvent(m);
-}
-
 void FindWnd::OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new)
 {
 }
 
 bool FindWnd::OnDelete(LDataFolderI *parent, LArray<LDataI*> &items)
 {
-	if (Results)
-	{
-		LHashTbl<PtrKey<LDataI*>, LListItem*> Map;
-		List<ResultItem> a;
-		if (Results->GetAll(a))
-		{
-			for (auto i: a)
-			{
-				Map.Add(i->GetThing()->GetObject(), i);
-			}
-		}
+	if (!Results)
+		return true;
 
-		for (unsigned i=0; i<items.Length(); i++)
+	LHashTbl<PtrKey<LDataI*>, LListItem*> Map;
+	List<ResultItem> a;
+	if (Results->GetAll(a))
+	{
+		for (auto i: a)
 		{
-			LListItem *it = Map.Find(items[i]);
-			DeleteObj(it);
+			Map.Add(i->GetThing()->GetObject(), i);
 		}
+	}
+
+	for (unsigned i=0; i<items.Length(); i++)
+	{
+		if (auto it = Map.Find(items[i]))
+			DeleteObj(it);
 	}
 
 	return true;
@@ -1322,26 +1220,21 @@ bool FindWnd::OnDelete(LDataFolderI *parent, LArray<LDataI*> &items)
 
 bool FindWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items)
 {
-	if (Results)
-	{
-		LHashTbl<PtrKey<LDataI*>, LListItem*> Map;
-		List<ResultItem> a;
-		if (Results->GetAll(a))
-		{
-			for (auto i: a)
-			{
-				Map.Add(i->GetThing()->GetObject(), i);
-			}
-		}
+	if (!Results)
+		return true;
 
-		for (unsigned i=0; i<items.Length(); i++)
-		{
-			LListItem *it = Map.Find(items[i]);
-			if (it)
-			{
-				it->Update();
-			}
-		}
+	LHashTbl<PtrKey<LDataI*>, LListItem*> Map;
+	List<ResultItem> a;
+	if (Results->GetAll(a))
+	{
+		for (auto i: a)
+			Map.Add(i->GetThing()->GetObject(), i);
+	}
+
+	for (size_t i=0; i<items.Length(); i++)
+	{
+		if (auto it = Map.Find(items[i]))
+			it->Update();
 	}
 
 	return true;
@@ -1350,11 +1243,11 @@ bool FindWnd::OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<
 void FindWnd::OnPulse()
 {
 	LViewI *v;
-	if (!Task || !GetViewById(IDC_STATUS, v))
+	if (!isSearching || !GetViewById(IDC_STATUS, v))
 		return;
 
-	Task->SearchTimeslice();
-	v->Name(Task->GetStatus());
+	SearchTimeslice();
+	v->Name(GetStatus());
 	v->SendNotify(LNotifyTableLayoutRefresh);
 }
 

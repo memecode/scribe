@@ -2,9 +2,9 @@
 **	FILE:			ScribeFolder.cpp
 **	AUTHOR:			Matthew Allen
 **	DATE:			17/1/2000
-**	DESCRIPTION:	Scribe folder's
+**	DESCRIPTION:	Scribe folder
 **
-**	Copyright (C) 2000-2002, Matthew Allen
+**	Copyright (C) 2000-2025, Matthew Allen
 **		fret@memecode.com
 */
 

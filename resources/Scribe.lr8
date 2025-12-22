@@ -3228,21 +3228,21 @@
 		<Custom pos="7,7,321,272" ref="767" Ctrl="LTextView3" />
 	</Dialog>
 	<Dialog pos="7,7,539,540" ref="505">
-		<TableLayout pos="0,0,524,503" ref="17" cols="1.000" rows="0.870,0.130">
+		<TableLayout pos="0,0,524,503" ref="17" CellStyle="padding: 6px;" cols="1.000" rows="0.870,0.130">
 			<tr>
 				<td addr="0,0" style="padding: 6px;">
 					<TableLayout pos="21,28,468,363" ref="75" cols="0.333,0.333,0.333" rows="0.113,0.118,0.111,0.106,0.111,0.100,0.113,0.113,0.113">
 						<tr>
 							<td addr="0,0" colspan="2">
-								<EditBox Pos="0,0,244,20" ref="83" />
+								<EditBox Pos="7,7,251,27" ref="83" />
 							</td>
 							<td addr="2,0">
-								<Button Pos="290,0,373,20" toggle="0" ref="136" />
+								<Button Pos="301,7,384,27" toggle="0" ref="136" />
 							</td>
 						</tr>
 						<tr>
 							<td addr="0,1">
-								<StaticText pos="0,36,41,49" ref="137" />
+								<StaticText pos="7,42,48,55" ref="137" />
 							</td>
 							<td addr="1,1">
 								<EditBox Pos="144,36,286,56" Enabled="0" ref="140" />
@@ -3253,26 +3253,26 @@
 						</tr>
 						<tr>
 							<td addr="0,2" colspan="2">
-								<CheckBox pos="0,73,202,86" ref="162" />
+								<CheckBox pos="7,84,209,97" ref="162" />
 							</td>
 							<td addr="2,2">
-								<CheckBox pos="288,73,431,86" ref="170" />
+								<CheckBox pos="294,84,433,97" ref="170" />
 							</td>
 						</tr>
 						<tr>
 							<td addr="0,3" colspan="2">
-								<CheckBox pos="0,109,209,122" ref="171" />
+								<CheckBox pos="7,112,216,125" ref="171" />
 							</td>
 							<td addr="2,3">
-								<CheckBox pos="288,109,431,122" ref="172" />
+								<CheckBox pos="294,119,426,132" ref="172" />
 							</td>
 						</tr>
 						<tr>
 							<td addr="0,4" valign="Center">
-								<StaticText pos="14,155,104,168" ref="174" />
+								<StaticText pos="14,154,104,167" ref="174" />
 							</td>
 							<td addr="1,4">
-								<ComboBox pos="145,145,270,165" ref="176" />
+								<ComboBox pos="154,147,279,167" ref="176" />
 							</td>
 							<td addr="2,4" />
 						</tr>
@@ -3281,27 +3281,27 @@
 								<StaticText pos="5,187,102,207" ref="178" />
 							</td>
 							<td addr="1,5" colspan="2">
-								<Custom pos="143,187,429,207" ref="191" Ctrl="LMarkColourSelect" />
+								<Custom pos="154,182,426,202" ref="191" Ctrl="LMarkColourSelect" />
 							</td>
 						</tr>
 						<tr>
 							<td addr="0,6" colspan="2">
-								<CheckBox pos="0,212,106,225" ref="206" />
+								<CheckBox pos="7,217,153,230" ref="206" />
 							</td>
 							<td addr="2,6" />
 						</tr>
 						<tr>
 							<td addr="0,7">
-								<StaticText pos="0,248,90,261" ref="207" />
+								<StaticText pos="7,252,97,265" ref="207" />
 							</td>
 							<td addr="1,7">
-								<ComboBox pos="145,248,270,268" ref="226" />
+								<ComboBox pos="154,252,279,272" ref="226" />
 							</td>
 							<td addr="2,7" />
 						</tr>
 						<tr>
 							<td addr="0,8" colspan="3">
-								<StaticText pos="0,298,431,311" ref="316" />
+								<StaticText pos="7,294,433,307" ref="316" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -4715,23 +4715,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4739,9 +4725,23 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>
