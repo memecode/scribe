@@ -2452,9 +2452,7 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 			if (p.Start())
 			{
 				p.Communicate(&Out);
-				LAutoString o(Out.NewStr());
-				LAutoString t(TrimStr(o));
-				Value = t;
+				Value = Out.NewLStr().Strip();
 			}
 			
 			DeleteArray(Exe);

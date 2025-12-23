@@ -13,10 +13,10 @@ LString HtmlToText(const char *InputHtml, const char *CharSet)
 	Html1::LHtml Html(100, 0, 0, GdcD->X(), GdcD->Y());
 	if (CharSet)
 	{
-		char *Eq = strchr(CharSet, '=');
+		auto Eq = strchr(CharSet, '=');
 		if (Eq)
 		{
-			LAutoString a(TrimStr(Eq+1));
+			auto a = LString(Eq+1).Strip();
 			if (LGetCsInfo(a))
 				Html.SetCharset(a);
 		}

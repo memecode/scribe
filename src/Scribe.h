@@ -608,7 +608,8 @@ protected:
 	void SetItem(Thing *i);
 
 public:
-	ScribeWnd *App = NULL;
+	constexpr static int AutoSaveTimeout = 60 * 1000; // seconds
+	ScribeWnd *App = nullptr;
 	static LArray<ThingUi*> All;
 
 	ThingUi(Thing *item, const char *name);
@@ -2587,7 +2588,7 @@ public:
 	bool OnDelete(LDataFolderI *parent, LArray<LDataI*> &items) override;
 	bool OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &Items) override;
 	void SetContext(const char *file, int line) override;
-	bool OnChange(LArray<LDataI*> &items, int FieldHint) override;
+	bool OnChange(LArray<LDataI*> &items, int FieldHint = 0) override;
 	void Post(LDataStoreI *store, void *Param) override { PostEvent(M_STORAGE_EVENT, store->Id, (LMessage::Param)Param); }
 	void OnPropChange(LDataStoreI *store, int Prop, LVariantType Type) override;
 	bool Match(LDataStoreI *store, LDataPropI *Addr, int Type, LArray<LDom*> &Matches) override;

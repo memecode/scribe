@@ -35,28 +35,27 @@
 #include "lgi/common/GdcTools.h"
 #include "lgi/common/Charset.h"
 #include "lgi/common/DropFiles.h"
+#include "lgi/common/TextConvert.h"
+#include "lgi/common/FileSelect.h"
+#include "lgi/common/EventTargetThread.h"
+#include "lgi/common/LgiRes.h"
+#include "lgi/common/Printer.h"
+#include "lgi/common/SubProcess.h"
 
 #include "../src/common/Coding/ScriptingPriv.h"
 #include "PrintPreview.h"
 #include "ScribeListAddr.h"
 #include "PrintContext.h"
-#include "lgi/common/LgiRes.h"
 #include "Encryption/GnuPG.h"
 #include "ObjectInspector.h"
-#include "lgi/common/EventTargetThread.h"
 #include "Store3Common.h"
 #include "Tables.h"
 #include "Calendar.h"
 #include "CalendarView.h"
 #include "AddressSelect.h"
 #include "Store3Imap/ScribeImap.h"
-#include "lgi/common/TextConvert.h"
-#include "lgi/common/FileSelect.h"
-
 #include "resdefs.h"
 #include "resource.h"
-#include "lgi/common/Printer.h"
-#include "lgi/common/SubProcess.h"
 
 #define SAVE_HEADERS					0
 
@@ -2773,24 +2772,28 @@ void MailUi::OnSave()
 {
 	THREAD_UNSAFE();
 
-	if (!GetItem())
+	auto Item = GetItem();
+	if (!Item)
 		return;
+	auto Obj = Item->GetObject();
+	if (!Obj)
+		return;
+	auto Store = Obj->GetStore();
 
-	if (GetItem()->GetFlags() & MAIL_SENT)
+	if (Item->GetFlags() & MAIL_SENT)
 	{
 		// Save a copy instead of over writing the original sent email
-		Mail *Copy = new Mail(App, GetItem()->GetObject()->GetStore()->Create(MAGIC_MAIL));
+		auto Copy = new Mail(App, Item->GetObject()->GetStore()->Create(MAGIC_MAIL));
 		if (Copy)
 		{
 			*Copy = *_Item;
 			Copy->SetFlags(MAIL_READ | MAIL_CREATED, true);
-			Copy->SetFolder(GetItem()->GetFolder(), NULL);
+			Copy->SetFolder(Item->GetFolder(), NULL);
 			Copy->SetDateSent(0);
 			SetItem(Copy);
 		}
 	}
 
-	Mail *Item = GetItem();
 	if (To)
 	{
 		To->OnSave(Item->GetObject()->GetStore(), Item->GetTo());
@@ -2802,7 +2805,7 @@ void MailUi::OnSave()
 	{
 		int64 CboVal = FromCbo->Value();
 		LAssert(CboVal < (ssize_t)FromAccountId.Length());
-		int AccountId = FromAccountId[(int)CboVal];
+		int AccountId = FromAccountId[CboVal];
 		
 		LDataPropI *Frm = Item->GetFrom();
 		if (AccountId < 0)
@@ -2848,16 +2851,16 @@ void MailUi::OnSave()
 		else LAssert(!"No account id.");
 	}
 	
-	LDataPropI *ReplyObj = Item->GetReply();
-	if (ReplyToCbo != NULL &&
-		ReplyObj != NULL   &&
-		ReplyToChk != NULL &&
+	auto ReplyObj = Item->GetReply();
+	if (ReplyToCbo != nullptr &&
+		ReplyObj   != nullptr &&
+		ReplyToChk != nullptr &&
 		ReplyToChk->Value())
 	{		
 		Mailto mt(App, ReplyToCbo->Name());
 		if (mt.To.Length() == 1)
 		{
-			AddressDescriptor *a = mt.To[0];
+			auto a = mt.To[0];
 			if (a && a->sAddr)
 			{
 				if (a->sName)
@@ -2878,10 +2881,10 @@ void MailUi::OnSave()
 	if (Ctrl)
 	{
 		// Delete all existing data...
-		Item->SetBody(0);
-		Item->SetBodyCharset(0);
-		Item->SetHtml(0);
-		Item->SetHtmlCharset(0);
+		Item->SetBody(nullptr);
+		Item->SetBodyCharset(nullptr);
+		Item->SetHtml(nullptr);
+		Item->SetHtmlCharset(nullptr);
 
 		const char *MimeType = Ctrl->GetMimeType();
 		const char *Charset = Ctrl->GetCharset();
@@ -2891,7 +2894,7 @@ void MailUi::OnSave()
 
 			// Set the HTML part
 			LString HtmlFormat;
-			if (!Ctrl->GetFormattedContent("text/html", HtmlFormat, &Media))
+			if (!Ctrl->GetFormattedContent(sTextHtml, HtmlFormat, &Media))
 				HtmlFormat = Ctrl->Name();
 			Item->SetHtml(HtmlFormat);
 			Item->SetHtmlCharset(Charset);
@@ -2908,8 +2911,6 @@ void MailUi::OnSave()
 				Item->SetBodyCharset(Charset);
 			}
 
-			auto Obj = Item->GetObject();
-
 			// This clears any existing multipart/related objects...
 			Obj->SetObj(FIELD_HTML_RELATED, NULL);
 
@@ -2919,60 +2920,75 @@ void MailUi::OnSave()
 				// these new ones.
 				LArray<LDataI*> Objs;
 				LHashTbl<ConstStrKey<char,false>,LDataI*> Map;
-				if (GetItem()->GetAttachmentObjs(Objs))
+				if (Item->GetAttachmentObjs(Objs))
 				{
-					for (auto i : Objs)
-					{
-						auto Cid = i->GetStr(FIELD_CONTENT_ID);
-						if (Cid)
+					for (auto i: Objs)
+						if (auto Cid = i->GetStr(FIELD_CONTENT_ID))
+						{
+							printf("%s:%i - existing: %s\n", _FL, Cid);
 							Map.Add(Cid, i);
-					}
+						}
 				}
 
 				// If there are media attachments, splice them into the MIME tree.
 				// This should go after setting the text part so that the right
 				// MIME alternative structure is generated.
-				auto Store = Obj->GetStore();
-				for (auto &Cm : Media)
+				for (auto &Cm: Media)
 				{
-					LDataI *a = Store->Create(MAGIC_ATTACHMENT);
-					if (a)
+					LAssert(Cm.Valid());
+
+					auto existing = Map.Find(Cm.Id);
+					printf("%s:%i - media: %s, sz=%i, existing=%p\n", _FL, Cm.Id.Get(), (int)Cm.GetSize(), existing);
+					if (existing) // Find existing LDataI*
 					{
-						LAssert(Cm.Valid());
+						// Need to decide is this attachment is the same as the existing one?
+						bool sameSz =	existing->GetInt(FIELD_SIZE) ==
+										Cm.GetSize();
+						bool sameMt =	Cm.MimeType.Equals(existing->GetStr(FIELD_MIME_TYPE));
 						
-						auto Existing = Map.Find(Cm.Id);
-						if (Existing)
+						LgiTrace("%s:%i - same=%i,%i\n", _FL, sameSz, sameMt);
+						if (sameSz && sameMt)
 						{
-							// Delete the existing attachment
-							Thing *t = CastThing(Existing);
-							Attachment *a = t ? t->IsAttachment() : NULL;
-							if (a)
+							// Skip over the 'same' media
+							continue;
+						}
+
+						// Delete the existing, but different, attachment
+						if (auto t = CastThing(existing))
+						{
+							if (auto attachment = t->IsAttachment())
 							{
 								// Delete both the Attachment and it's store object...
-								auto it = GetItem();
-								it->DeleteAttachment(a);
+								LgiTrace("%s:%i - delete attachment\n", _FL);
+								Item->DeleteAttachment(attachment);
 							}
 							else
 							{
 								// There is Attachment object for the LDataI.... but we can
 								// still delete it from the store.
-								LArray<LDataI*> del;
-								del.Add(Existing);
-								Existing->GetStore()->Delete(del, false);
+								LArray<LDataI*> del { existing };
+								LgiTrace("%s:%i - delete attachment dataI\n", _FL);
+								Store->Delete(del, false);
 							}
 						}
+						else LgiTrace("%s:%i - not a thing?\n", _FL);
+					}
 
-						LgiTrace("Adding related: %s %s " LPrintfInt64 "\n",
+					// Add the related media attachment:
+					if (auto attachment = Store->Create(MAGIC_ATTACHMENT))
+					{
+						LgiTrace("%s:%i - adding related media: %s %s " LPrintfInt64 "\n",
+							_FL,
 							Cm.FileName.Get(),
 							Cm.MimeType.Get(),
 							Cm.Stream->GetSize());
 
-						a->SetStr(FIELD_CONTENT_ID, Cm.Id);
-						a->SetStr(FIELD_NAME, Cm.FileName);
-						a->SetStr(FIELD_MIME_TYPE, Cm.MimeType);
-						a->SetStream(Cm.Stream);
+						attachment->SetStr(FIELD_CONTENT_ID, Cm.Id);
+						attachment->SetStr(FIELD_NAME, Cm.FileName);
+						attachment->SetStr(FIELD_MIME_TYPE, Cm.MimeType);
+						attachment->SetStream(Cm.Stream);
 						
-						Obj->SetObj(FIELD_HTML_RELATED, a);
+						Obj->SetObj(FIELD_HTML_RELATED, attachment);
 					}
 				}
 			}
@@ -2998,21 +3014,19 @@ void MailUi::OnSave()
 	Item->CreateMailHeaders();
 	Item->Update();
 	
-	ScribeFolder *Folder = Item->GetFolder();
+	auto Folder = Item->GetFolder();
 
 	// Now get the associated outbox for this mail
-	ScribeFolder *Outbox = Item->App->GetFolder(FOLDER_OUTBOX, AccountMailStore);
+	auto Outbox = Item->App->GetFolder(FOLDER_OUTBOX, AccountMailStore);
 	
 	auto Fld = Folder ? Folder : Outbox;
 	LAssert(Fld != NULL);
-	bool Status = Fld ? Item->Save(Fld) : false;
+	auto Status = Fld ? Item->Save(Fld) : false;
 	if (Status)
 	{
-		LArray<LDataI*> c;
-		c.Add(Item->GetObject());
-
+		LArray<LDataI*> c{ Obj };
 		Item->App->SetContext(_FL);
-		Item->App->OnChange(c, 0);
+		Item->App->OnChange(c);
 	}
 }
 
@@ -3842,11 +3856,17 @@ void MailUi::OnPulse()
 
 	if (IsDirty() && TextView && GetItem())
 	{
-		// Ui -> Object
-		OnSave();
+		auto now = LCurrentTime();
+		if (now - autoSaveTs >= AutoSaveTimeout)
+		{
+			autoSaveTs = now;
+			
+			// Ui -> Object
+			OnSave();
 		
-		// Object -> Disk
-		GetItem()->Save(0);
+			// Object -> Disk
+			GetItem()->Save(0);
+		}
 	}
 	else
 	{
@@ -3863,7 +3883,7 @@ void MailUi::OnDirty(bool Dirty)
 	
 	if (Dirty)
 	{
-		SetPulse(60 * 1000); // every minute
+		SetPulse(AutoSaveTimeout); // every minute
 	}
 	else
 	{
@@ -5228,26 +5248,27 @@ bool Mail::SetMessageId(const char *MsgId)
 {
 	if (LAppInst->InThread())
 	{
-        LAssert(GetObject() != NULL);
-        
-        auto OldId = GetObject()->GetStr(FIELD_MESSAGE_ID);
-		if (OldId)
-		    MessageIdMap.Delete(OldId);
-
-		LAutoString m(NewStr(MsgId));
-		LAutoString s(TrimStr(m, "<>"));
-		if (GetObject()->SetStr(FIELD_MESSAGE_ID, s))
-			SetDirty();
-			
-		return s != 0;
-	}
-	else
-	{
 		// No no no NO NON NOT NADA.
-		LAssert(0);
+		LAssert(!"not in gui thread");
+		return false;
 	}
 
-	return false;
+    if (!GetObject())
+    {
+    	LAssert(!"no object");
+    	return false;
+    }
+    
+    auto OldId = GetObject()->GetStr(FIELD_MESSAGE_ID);
+	if (OldId)
+	    MessageIdMap.Delete(OldId);
+
+	LString m = MsgId;
+	auto s = m.Strip("<>");
+	if (GetObject()->SetStr(FIELD_MESSAGE_ID, s))
+		SetDirty();
+		
+	return !s.IsEmpty();
 }
 
 LAutoString Mail::GetThreadIndex(int TruncateChars)

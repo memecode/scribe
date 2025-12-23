@@ -234,7 +234,7 @@ class MailUi :
 	friend class Mail;
 	friend class ScribeTextPipe;
 
-	LViewI *WorkingDlg = NULL;
+	LViewI *WorkingDlg = nullptr;
 
 protected:
 	int AddMode = MAIL_ADDR_TO;
@@ -245,64 +245,65 @@ protected:
 	bool TextCtrlDirty = false;
 	bool IgnoreShowImgNotify = false;
 	int CurrentEditCtrl = -1;
-	MissingCapsBar *MissingCaps = NULL;
+	MissingCapsBar *MissingCaps = nullptr;
 	LCapabilityTarget::CapsHash Caps;
+	uint64_t autoSaveTs = 0;
 
 	// Commands
 	LScriptUi Commands;
-		LToolButton *BtnPrev = NULL;
-		LToolButton *BtnNext = NULL;
-		LToolButton *BtnSend = NULL;
-		LToolButton *BtnSave = NULL;
-		LToolButton *BtnSaveClose = NULL;
-		LToolButton *BtnAttach = NULL;
-		LToolButton *BtnReply = NULL;
-		LToolButton *BtnReplyAll = NULL;
-		LToolButton *BtnForward = NULL;
-		LToolButton *BtnBounce = NULL;
+		LToolButton *BtnPrev = nullptr;
+		LToolButton *BtnNext = nullptr;
+		LToolButton *BtnSend = nullptr;
+		LToolButton *BtnSave = nullptr;
+		LToolButton *BtnSaveClose = nullptr;
+		LToolButton *BtnAttach = nullptr;
+		LToolButton *BtnReply = nullptr;
+		LToolButton *BtnReplyAll = nullptr;
+		LToolButton *BtnForward = nullptr;
+		LToolButton *BtnBounce = nullptr;
 
 	// Gpg
-	class MailUiGpg *GpgUi = NULL;
+	class MailUiGpg *GpgUi = nullptr;
 
 	// To:
-	LPanel *ToPanel = NULL;
-		LEdit *Entry = NULL;
-		class AddressBrowse *Browse = NULL;
-		LCombo *SetTo = NULL;
-		AddressList *To = NULL;
-		LCombo *Remove = NULL;
+	LPanel *ToPanel = nullptr;
+		LEdit *Entry = nullptr;
+		class AddressBrowse *Browse = nullptr;
+		LCombo *SetTo = nullptr;
+		AddressList *To = nullptr;
+		LCombo *Remove = nullptr;
 	
 	// From
-	LPanel *FromPanel = NULL;
-		AddressList *FromList = NULL;
-		LCombo *FromCbo = NULL;
+	LPanel *FromPanel = nullptr;
+		AddressList *FromList = nullptr;
+		LCombo *FromCbo = nullptr;
 		LArray<int> FromAccountId;
 		// GDropDown *Drop;
 
-	LPanel *ReplyToPanel = NULL;
-		LCheckBox *ReplyToChk = NULL;
-		LCombo *ReplyToCbo = NULL;
+	LPanel *ReplyToPanel = nullptr;
+		LCheckBox *ReplyToChk = nullptr;
+		LCombo *ReplyToCbo = nullptr;
 	
 	// Subject
-	LPanel *SubjectPanel = NULL;
-		LEdit *Subject = NULL;
+	LPanel *SubjectPanel = nullptr;
+		LEdit *Subject = nullptr;
 
 	// Calendar panel
-	LPanel *CalendarPanel = NULL;
-		LView *CalPanelStatus = NULL;
+	LPanel *CalendarPanel = nullptr;
+		LView *CalPanelStatus = nullptr;
 
 	// Tabs
-	LTabView *Tab = NULL;
-		LTabPage *TabText = NULL;
-			bool TextLoaded = NULL;
-			LDocView *TextView = NULL;
-		LTabPage *TabHtml = NULL;
-			bool HtmlLoaded = NULL;
-			LDocView *HtmlView = NULL;
-		LTabPage *TabAttachments = NULL;
-			class AttachmentList *Attachments = NULL;
-		LTabPage *TabHeader = NULL;
-			LDocView *Header = NULL;
+	LTabView *Tab = nullptr;
+		LTabPage *TabText = nullptr;
+			bool TextLoaded = false;
+			LDocView *TextView = nullptr;
+		LTabPage *TabHtml = nullptr;
+			bool HtmlLoaded = false;
+			LDocView *HtmlView = nullptr;
+		LTabPage *TabAttachments = nullptr;
+			class AttachmentList *Attachments = nullptr;
+		LTabPage *TabHeader = nullptr;
+			LDocView *Header = nullptr;
 
 	// Methods
 	bool SeekMsg(int Delta);
