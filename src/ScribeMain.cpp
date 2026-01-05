@@ -116,6 +116,7 @@ int LgiMain(OsAppArguments &AppArgs)
 					"    -b                             Attach body as an attachment instead.\n"
 					"    -nch                           [Linux] Don't use KDE crash handler.\n"
 					"\n");
+			return 0;
 		}
 		else if (!(Wnd = new ScribeWnd))
 		{
