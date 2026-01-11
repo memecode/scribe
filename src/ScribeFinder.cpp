@@ -1090,7 +1090,7 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 				if (Index > 0)
 				{
 					Index--;
-					if (Index < MailFieldIds.Length())
+					if ((size_t)Index < MailFieldIds.Length())
 					{
 						mailField = MailFieldIds[Index];
 					}

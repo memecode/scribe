@@ -378,7 +378,7 @@ bool FolderDlg::OnViewKey(LView *v, LKey &k)
 		else
 		{
 			// next match..
-			if (idx < d->matches.Length() - 1)
+			if (idx < (ssize_t)d->matches.Length() - 1)
 				d->matches[idx+1]->Select(true);
 			else
 				LgiTrace("%s:%i - no next match.\n", _FL);

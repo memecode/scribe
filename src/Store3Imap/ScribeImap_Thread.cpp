@@ -416,11 +416,11 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 		return false;
 	}
 
-	char *Flags			= Parts.Find("FLAGS");
-	char *Uid			= Parts.Find("UID");
-	char *Rfc822Size	= Parts.Find("RFC822.SIZE");
-	char *BodyStructure	= Parts.Find("BODYSTRUCTURE");
-	char *Header		= Parts.Find("BODY[HEADER]");
+	auto Flags			= Parts.Find("FLAGS");
+	auto Uid			= Parts.Find("UID");
+	auto Rfc822Size		= Parts.Find("RFC822.SIZE");
+	auto BodyStructure	= Parts.Find("BODYSTRUCTURE");
+	auto Header			= Parts.Find("BODY[HEADER]");
 
 	#if DEBUG_INPUT_FETCHES
 	const char *k;
@@ -456,7 +456,7 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 	}
 	else
 	{
-		ImapMailInfo &i = m->Mail.New();
+		auto &i = m->Mail.New();
 
 		i.Seq = Msg;
 		i.Flags.Set(Flags);
@@ -466,8 +466,17 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 		if (Header)
 		{
 			i.Headers = Header;
-			LAutoString Date(InetGetHeaderField(Header, "Date", -1));
-			if (Date)
+			
+			if (!Stricmp(Uid.Get(), "50195"))
+			{
+				LFile out("C:\\code\\Scribe\\broken-hdr.txt", O_WRITE);
+				out.SetSize(0);
+				out.Write(Header);
+				out.Close();
+				int asd=0;
+			}
+
+			if (auto Date = LGetHeaderField(Header, "Date"))
 				i.Date = Date;
 			#if DEBUG_INPUT_FETCHES
 			else LgiTrace("%s:%i - No date field? (Uid=%i)\n", _FL, i.Uid);
@@ -478,7 +487,7 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 		#endif
 
 		if (Rfc822Size)
-			i.Size = Atoi(Rfc822Size);
+			i.Size = Rfc822Size.Int();
 	}
 
 	return true;

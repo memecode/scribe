@@ -875,11 +875,10 @@ struct ImapFolderLoadThread :
 				{
 					// Check the format of the msgid, old versions of Scribe used to
 					// leave new-lines in the text... this fixes that on the fly.
-					auto MsgId = it.value->GetAttr(ATTR_MSGID);
-					if (MsgId && strchr(MsgId, '\n'))
+					LString MsgId = it.value->GetAttr(ATTR_MSGID);
+					if (MsgId.Find("\n") >= 0)
 					{
-						LAutoString a(TrimStr(MsgId, " \t\r\n"));
-						it.value->SetAttr(ATTR_MSGID, a);
+						it.value->SetAttr(ATTR_MSGID, MsgId.Strip(" \t\r\n"));
 						f->SetDirty();
 					}
 
@@ -1510,8 +1509,7 @@ void ImapFolder::OnListing(ImapMsg *m)
 		}
 		
 		// Do we have the mail in our local mail?
-		ImapMail *Existing = Tbl.Find(Inf.Uid);
-		if (Existing)
+		if (auto Existing = Tbl.Find(Inf.Uid))
 		{
 			// Already exists.
 			Tbl.Delete(Inf.Uid); // Clear the ref, we've "seen" this email on the server.
@@ -1644,8 +1642,7 @@ void ImapFolder::OnListing(ImapMsg *m)
 		else if (!Inf.Flags.ImapDeleted)
 		{
 			// Doesn't exist, so must be new.
-			ImapMail *New = new ImapMail(Store, _FL, Inf.Uid);
-			if (New)
+			if (auto New = new ImapMail(Store, _FL, Inf.Uid))
 			{
 				#if IMAP_ONLISTING_LOG
 				LString sDate;

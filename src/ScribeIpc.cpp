@@ -65,10 +65,10 @@ public:
 
 LString GetUtfArgs()
 {
-	OsAppArguments *Args = LAppInst->GetAppArgs();
+	auto Args = LAppInst->GetAppArgs();
 
 	#if WINNATIVE
-		LAutoString u(WideToUtf8(Args->lpCmdLine));
+		LAutoString u(WideToUtf8(Args->GetFull()));
 		return LString(u.Get());
 	#else
 		LStringPipe p;
