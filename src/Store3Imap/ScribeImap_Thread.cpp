@@ -467,15 +467,6 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 		{
 			i.Headers = Header;
 			
-			if (!Stricmp(Uid.Get(), "50195"))
-			{
-				LFile out("C:\\code\\Scribe\\broken-hdr.txt", O_WRITE);
-				out.SetSize(0);
-				out.Write(Header);
-				out.Close();
-				int asd=0;
-			}
-
 			if (auto Date = LGetHeaderField(Header, "Date"))
 				i.Date = Date;
 			#if DEBUG_INPUT_FETCHES
