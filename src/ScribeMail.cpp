@@ -8377,7 +8377,7 @@ const char *Mail::GetFieldText(int Field)
 		case FIELD_DATE_SENT:
 		{
 			auto DateSent = GetDateSent();
-			if (DateSent->Year())
+			if (DateSent->IsValid())
 			{
 				LDateTime dt = *DateSent;
 				if (GetObject() &&
@@ -8411,7 +8411,7 @@ const char *Mail::GetFieldText(int Field)
 		case FIELD_DATE_RECEIVED:
 		{
 			auto DateReceived = GetDateReceived();
-			if (DateReceived->Year())
+			if (DateReceived->IsValid())
 			{
 		        LDateTime dt = *DateReceived;
 			    if (AdjustDateTz)
