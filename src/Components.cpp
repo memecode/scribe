@@ -401,7 +401,7 @@ public:
 
     CapabilityInstallerPriv(const char *TmpFolder) :
 		LMutex("ComponentInstaller.Mutex"),
-		LThread("ComponentInstaller.Thread")
+		LThread("CompInst.Th")
     {
 		TempFolder.Reset(NewStr(TmpFolder));
         Loop = true;

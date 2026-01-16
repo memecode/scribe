@@ -65,7 +65,7 @@ struct LScribeScriptPriv : public LStream, public LThread
 	LScriptConsole *Console = NULL;
 	
 	LScribeScriptPriv(ScribeWnd *app) :
-		LThread("LScribeScriptPriv.Thread"),
+		LThread("ScriptPriv.Th"),
 		App(app),
 		InputLock("LScribeScriptPriv.Input"),
 		OutputLock("LScribeScriptPriv.Output")

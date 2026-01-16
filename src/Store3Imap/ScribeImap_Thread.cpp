@@ -207,26 +207,24 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 		}
 	}
 
-	void CollectSubFolders(LHashTbl<StrKey<char,false>,bool> &t, char *Path)
+	using TStrMap = LHashTbl<ConstStrKey<char,false>,bool>;
+	
+	void CollectSubFolders(TStrMap &t, const char *Path)
 	{
 		LDirectory Dir;
 		for (int b=Dir.First(Path); b && !IsCancelled(); b=Dir.Next())
 		{
-			if (Dir.IsDir())
-			{
-				char p[MAX_PATH_LEN];
-				Dir.Path(p, sizeof(p));
-				t.Add(p, true);
-
-				CollectSubFolders(t, p);
-			}
+			if (!Dir.IsDir())
+				continue;
+			t.Add(Dir.FullPath(), true);
+			CollectSubFolders(t, Dir.FullPath());
 		}
 	}
 
 	// Do folder sync
 	void SyncFolders()
 	{
-		ImapFolder *Root = CastFld(Store->GetRoot(false));
+		auto Root = CastFld(Store->GetRoot(false));
 		if (!Root)
 			return;
 
@@ -235,7 +233,7 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 		if (Imap->GetFolders(Folders))
 		{
 			// Collect all the local folders...
-			LHashTbl<StrKey<char,false>,bool> Existing;
+			TStrMap Existing;
 			CollectSubFolders(Existing, Root->Local);
 
 			LAutoPtr<ImapMsg> NewFolders;
@@ -245,7 +243,7 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 			// For all the imap folders, check they exist locally...
 			for (unsigned i=0; i<Folders.Length(); i++)
 			{
-				MailImapFolder *f = Folders[i];
+				auto f = Folders[i];
 				if (Sep[0] == 0)
 				{
 					Sep[0] = f->GetSep();
@@ -265,8 +263,10 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 					// Remove from list of existing... at the end of this loop
 					// existing will contain a list of folder NOT on the imap
 					// server.
-					LAssert(Existing.Find(p));
-					Existing.Delete(p);
+					if (Existing.Find(p))
+						Existing.Delete(p);
+					else
+						LgiTrace("%s:%i - remote folder '%s' doesn't exist locally (%s).\n", _FL, f->Path, p);
 				}
 				else
 				{
@@ -332,7 +332,7 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 };
 
 ImapThread::ImapThread(ImapStore *s, LCapabilityClient *caps, LStream *log, ProtocolSettingStore *store) :
-	LThread("ImapThread.Thread"),
+	LThread("ImapThread"),
 	LMutex("ImapThread.Mutex")
 {
 	if ((d = new ImapThreadPrivate(this, s, caps, log, store)))
@@ -971,6 +971,9 @@ int ImapThread::Main()
 					if (!d->SelectFolder(m->Parent))
 						break;
 
+					// Optionally collect the failures and report them back to the store thread
+					LAutoPtr<ImapMsg> failed;
+
 					for (auto &mi: m->Mail)
 					{
 						LAutoPtr<DownloadInfo> Inf(new DownloadInfo);
@@ -999,15 +1002,18 @@ int ImapThread::Main()
 							{
 								// Ok the fetch failed because the object doesn't exist anymore?
 								// We should delete it from the store right? Hmmmm...
-								ImapMsg *Msg = new ImapMsg(IMAP_ON_DEL, _FL);
-								if (Msg)
+								if (!failed)
 								{
-									Msg->Error = Err;
-									
-									ImapMailInfo &i = Msg->Mail.New();
+									if (failed.Reset(new ImapMsg(IMAP_ON_DEL, _FL)))
+									{
+										failed->Parent = Inf->Parent;
+										failed->Error = Err;
+									}
+								}
+								if (failed)
+								{									
+									auto &i = failed->Mail.New();
 									i.Uid = mi.Uid;
-									Msg->Parent = Inf->Parent;
-									PostStore(Msg);
 								}
 							}
 
@@ -1015,6 +1021,9 @@ int ImapThread::Main()
 								p->StartTransfer(0);
 						}
 					}
+					
+					if (failed)
+						PostStore(failed.Release());
 					break;
 				}
 				case IMAP_CREATE_FOLDER:

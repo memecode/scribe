@@ -814,7 +814,7 @@ struct ImapFolderLoadThread :
 	LArray<ImapMail*> PostDel;
 
 	ImapFolderLoadThread(ImapFolder *folder) :
-		LThread("ImapFolderLoadThread"),
+		LThread("ImapFldLoad"),
 		f(folder)
 	{
 		// This object will own the 'UidMap' and 'Mail' containers for it's life time
