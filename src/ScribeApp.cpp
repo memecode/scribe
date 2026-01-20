@@ -2879,7 +2879,7 @@ bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 			auto dataFolder = dynamic_cast<LDataFolderI*>(fld->GetObject());
 			LArray<LDataI*> a = { thing->GetObject() };
-			OnNew(dataFolder, a, 0, true);
+			OnNew(dataFolder, a, 0, true, true);
 			break;
 		}
 		default:
@@ -6579,7 +6579,7 @@ bool ScribeWnd::OnBayesResult(Mail *m, double Rating)
 			List<Mail> Nm;
 			Nm.Insert(m);
 			m->NewEmail = Mail::NewEmailGrowl;
-			OnNewMail(&Nm, true);
+			OnNewMail(Nm, true);
 		}
 		return false;
 	}
@@ -6600,8 +6600,8 @@ bool ScribeWnd::OnBayesResult(Mail *m, double Rating)
 		{
 			MoveToPath = "/Spam/Probably";
 		}
-		ScribeFolder *f = GetFolder(MoveToPath.Str());
-		if (f)
+		
+		if (auto f = GetFolder(MoveToPath.Str()))
 		{
 			LArray<Thing*> Items;
 			Items.Add(m);
@@ -6609,7 +6609,7 @@ bool ScribeWnd::OnBayesResult(Mail *m, double Rating)
 			{			
 				List<Mail> obj;
 				obj.Insert(m);
-				OnNewMail(&obj, false);
+				OnNewMail(obj, false);
 			});
 		}
 	}
@@ -10119,21 +10119,18 @@ void ScribeWnd::OnFolderSelect(ScribeFolder *f)
 		SearchView->OnFolder();
 }
 
-void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
+void ScribeWnd::OnNewMail(List<Mail> &MailObjs, bool Add)
 {
 	THREAD_UNSAFE();
 
-	if (!MailObjs)
-		return;
-
 	LVariant v;
-	bool ShowDetail = MailObjs->Length() < 5;
+	bool ShowDetail = MailObjs.Length() < 5;
 	List<Mail> NeedsFiltering;
 	LArray<Mail*> NeedsBayes;
 	LArray<Mail*> NeedsGrowl;
 	LArray<ScribeFolder*> Resort;
 
-	for (auto m: *MailObjs)
+	for (auto m: MailObjs)
 	{
 		if (Add)
 		{
@@ -10352,7 +10349,7 @@ void ScribeWnd::OnNewMail(List<Mail> *MailObjs, bool Add)
 					LAutoPtr<LGrowl::LNotify> n(new LGrowl::LNotify);
 					n->Name = "new-mail";
 					n->Title = "New Mail";
-					n->Text.Printf("%i new messages", (int)MailObjs->Length());
+					n->Text.Printf("%i new messages", (int)MailObjs.Length());
 					d->Growl->Notify(n);
 				}
 				else
@@ -11527,21 +11524,15 @@ void ScribeWnd::OnNew
 	/// The position in the parent folder or -1
 	int Pos,
 	/// Non-zero if the object is a new email.
-	bool IsNew
+	bool IsNew,
+	/// Account requests filtering of email.
+	bool FilterIncoming
 )
 {
 	THREAD_UNSAFE();
 
 	auto Fld = CastFolder(Parent);
 	int UnreadDiff = 0;
-
-	/*
-	if (Stricmp(Parent->GetStr(FIELD_FOLDER_NAME), "Contacts") &&
-		Stricmp(Parent->GetStr(FIELD_FOLDER_NAME), "Calendar"))
-	{
-		LOG_STORE("OnNew(%s, %s, %i, %i)\n", Parent->GetStr(FIELD_FOLDER_NAME), _GetUids(NewItems).Get(), Pos, IsNew);
-	}
-	*/
 
 	if (!Fld)
 	{
@@ -11565,7 +11556,7 @@ void ScribeWnd::OnNew
 	}
 
 	for (auto cb: d->Store3EventCallbacks)
-		cb->OnNew(Parent, NewItems, Pos, IsNew);
+		cb->OnNew(Parent, NewItems, Pos, IsNew, FilterIncoming);
 
 	List<Mail> NewMail;
 	for (auto Item: NewItems)
@@ -11668,7 +11659,7 @@ void ScribeWnd::OnNew
 						read, IsNew);
 					#endif
 
-					if (IsNew)
+					if (IsNew && FilterIncoming)
 					{
 						LAssert(!NewMail.HasItem(m));
 						NewMail.Insert(m);
@@ -11698,7 +11689,7 @@ void ScribeWnd::OnNew
 	}
 
 	if (NewMail.Length())
-		OnNewMail(&NewMail);
+		OnNewMail(NewMail, true);
 }
 
 void ScribeWnd::OnPropChange(LDataStoreI *store, int Prop, LVariantType Type)
@@ -11892,7 +11883,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 		Parent->OnUpdateUnRead(0, true);
 
 	if (NewMail.Length())
-		OnNewMail(&NewMail);
+		OnNewMail(NewMail, true);
 
 	d->CtxFile = NULL;
 	d->CtxLine = 0;

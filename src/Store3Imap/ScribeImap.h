@@ -189,9 +189,10 @@ class ImapStore : public LDataStoreI
 	friend class ImapFolder;
 	friend class FolderLoaderThread;
 
-	LVariant Host, User, Pass;
+	LString Host, User, Pass;
 	int Port;
 	int ConnectFlags;
+	bool FilterIncoming = true;
 	LDataEventsI *Callback = NULL;
 	ImapFolder *Root = NULL;
 	char *Cache = NULL;
@@ -215,10 +216,10 @@ class ImapStore : public LDataStoreI
 	ImapFolder *GetSystemFolder(int Type);
 
 public:
-	ImapStore(	char *host,
+	ImapStore(	LString host,
 				int port,
-				char *user,
-				char *pass,
+				LString user,
+				LString pass,
 				int flags,
 				LDataEventsI *callback,
 				LCapabilityClient *caps,

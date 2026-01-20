@@ -421,7 +421,7 @@ struct ScribeExportDlg : public LDialog, public LDataEventsI
 		}
 	}
 
-	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new) override
+	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new, bool filter) override
 	{
 	}
 

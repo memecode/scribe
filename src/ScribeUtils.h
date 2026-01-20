@@ -214,7 +214,7 @@ public:
 
 class ProtocolSettingStore : public LDom
 {
-	LOptionsFile *Opts;
+	LOptionsFile *Opts = nullptr;
 	LString AccountTag;
 	
 public:

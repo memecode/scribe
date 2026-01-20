@@ -1921,9 +1921,9 @@ const char *ImapFolder::GetStr(int id)
 				
 				if (!RootName)
 				{
-					char *User = Store->User.Str();
-					char *At = User ? strchr(User, '@') : 0;
-					RootName.Printf("%.*s@%s", (int)(At ? At - User : strlen(User)), Store->User.Str(), Store->Host.Str());
+					auto User = Store->User.Get();
+					auto At = User ? strchr(User, '@') : nullptr;
+					RootName.Printf("%.*s@%s", (int)(At ? At - User : Strlen(User)), Store->User.Get(), Store->Host.Get());
 				}
 				
 				return RootName;

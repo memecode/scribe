@@ -320,13 +320,13 @@ public:
 		if (Txt.Length() < 1)
 			return;
 
-		LAutoString TxtEmail;
+		LString TxtEmail;
 		ssize_t i, EmailIdx = -1;
 		for (i=0; i<(int)Txt.Length(); i++)
 		{
 			if (strchr(Txt[i], '@'))
 			{
-				TxtEmail.Reset(TrimStr(Txt[i], "{}[]<>()"));
+				TxtEmail = Txt[i].Strip("{}[]<>()");
 				EmailIdx = i;
 				break;
 			}
@@ -369,7 +369,7 @@ public:
 			// Full email match?
 			if (TxtEmail)
 			{
-				if (stristr(Email[i], TxtEmail))
+				if (Stristr(Email[i].Get(), TxtEmail.Get()))
 				{
 					Match = Email[i];
 					Score += 7;

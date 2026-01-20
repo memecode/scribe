@@ -63,10 +63,10 @@ char *TrimWhite(char *c)
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-ImapStore::ImapStore(char *host,
+ImapStore::ImapStore(LString host,
 					int port,
-					char *user,
-					char *pass,
+					LString user,
+					LString pass,
 					int flags,
 					LDataEventsI *callback,
 					LCapabilityClient *caps,
@@ -86,6 +86,12 @@ ImapStore::ImapStore(char *host,
 	ItemProgress = prog[0];
 	DataProgress = prog[1];
 	SettingStore = store;
+
+	LVariant v;
+	if (SettingStore && SettingStore->GetValue(OPT_ReceiveFilterIncoming, v))
+	{
+		FilterIncoming = v.CastInt32() != 0;
+	}
 
 	Thread = new ImapThread(this, caps, log, SettingStore);
 }
@@ -220,7 +226,7 @@ void ImapStore::OnNew(const char *File, int Line, LDataFolderI *parent, LArray<L
 	if (!Callback)
 		return;
 	Callback->SetContext(File, Line);
-	Callback->OnNew(parent, new_items, pos, is_new);
+	Callback->OnNew(parent, new_items, pos, is_new, FilterIncoming);
 }
 
 bool ImapStore::OnDelete(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &del)
@@ -828,7 +834,7 @@ void ImapStore::OnEvent(void *Param)
 					if (Parent->Sub.State != Store3Loaded)
 						Parent->LoadSub();
 						
-					Callback->OnNew(Parent, Items, -1, false);
+					Callback->OnNew(Parent, Items, -1, false, FilterIncoming);
 				}
 
 				// New email?
@@ -875,9 +881,9 @@ void ImapStore::OnEvent(void *Param)
 					if (Callback)
 					{
 						if (Recent.Length())
-							Callback->OnNew(Parent, Recent, -1, true);
+							Callback->OnNew(Parent, Recent, -1, true, FilterIncoming);
 						if (Old.Length())
-							Callback->OnNew(Parent, Old, -1, false);
+							Callback->OnNew(Parent, Old, -1, false, FilterIncoming);
 					}
 				}
 				break;
@@ -1055,13 +1061,13 @@ void ImapStore::OnEvent(void *Param)
 				{
 					for (unsigned i=0; i<m->Fld.Length(); i++)
 					{
-						ImapFolderInfo &Inf = m->Fld[i];
-						ImapFolder *f = Root->Find(Inf.Local, Inf.Remote);
+						auto &Inf = m->Fld[i];
+						auto f = Root->Find(Inf.Local, Inf.Remote);
 						if (f)
 						{
 							LArray<LDataI*> New;
 							New.Add(f);
-							Callback->OnNew(f->GetParent(), New, -1, false);
+							Callback->OnNew(f->GetParent(), New, -1, false, false);
 						}
 					}
 				}
@@ -1114,7 +1120,7 @@ void ImapStore::OnEvent(void *Param)
 										// the old parent folder before we start collecting ones from the new
 										// folder..
 										if (Callback && NewItems.Length() > 0)
-											Callback->OnNew(NewItemParent, NewItems, -1, false);
+											Callback->OnNew(NewItemParent, NewItems, -1, false, FilterIncoming);
 										NewItems.Length(0);										
 									}
 									
@@ -1143,7 +1149,7 @@ void ImapStore::OnEvent(void *Param)
 				if (Callback && NewItems.Length())
 				{
 					// Notify the client the object has arrived.
-					Callback->OnNew(NewItemParent, NewItems, -1, false);
+					Callback->OnNew(NewItemParent, NewItems, -1, false, FilterIncoming);
 				}
 				break;
 			}
@@ -1240,7 +1246,7 @@ void ImapStore::OnEvent(void *Param)
 				if (OnNew.Length())
 				{
 					f->SetDirty();
-					Callback->OnNew(f, OnNew, -1, true);
+					Callback->OnNew(f, OnNew, -1, true, FilterIncoming);
 				}
 				if (Change.Length())
 				{
@@ -1317,10 +1323,10 @@ bool ValidateImapDate(LDateTime &dt)
 	return true;
 }
 
-LDataStoreI *OpenImap(	char *Host,
+LDataStoreI *OpenImap(	LString Host,
 						int Port,
-						char *User,
-						char *Pass,
+						LString User,
+						LString Pass,
 						int ConnectFlags,
 						LDataEventsI *Callback,
 						LCapabilityClient *Caps,

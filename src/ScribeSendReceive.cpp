@@ -80,11 +80,6 @@ int MakeOpenFlags(ScribeAccount *a, bool Send)
 			break;
 	}
 
-	if (!Send && a->Receive.SecureAuth())
-	{
-		OpenFlags |= MAIL_SECURE_AUTH;
-	}
-
 	if (Send)
 	{
 		if (a->Send.RequireAuthentication())
@@ -1475,7 +1470,7 @@ void ReceiveAccountlet::CreateMaps()
 	Account->Map(OptionName(OPT_ReceiveAsciiCs),		IDC_REC_ASCII_CP, GV_STRING);
 	Account->Map(OptionName(OPT_ReceiveAuthType),		IDC_RECEIVE_AUTH_TYPE, GV_INT32);
 	Account->Map(OptionName(OPT_Pop3SSL),				IDC_RECEIVE_SSL, GV_INT32);
-	Account->Map(OptionName(OPT_ReceiveSecAuth),		IDC_SEC_AUTH, GV_INT32);
+	Account->Map(OptionName(OPT_ReceiveFilterIncoming), IDC_FILTER_INCOMING, GV_BOOL);
 }
 
 int ReceiveAccountlet::GetCheckTimeout()
@@ -1905,7 +1900,7 @@ if (DebugTrace) LgiTrace("Receive(%i) protocol=%i client=%p, time=%i\n", Account
 	{
 		if (TempPsw)
 			Password = TempPsw;
-		else if (!SecureAuth())
+		else
 			LAssert(!"Need to ask user for password BEFORE we're in the worker thread.");
 	}
 
@@ -1915,7 +1910,7 @@ if (DebugTrace) LgiTrace("Receive(%i) opening connection..., time=%i\n", Account
 	LHashTbl<StrKey<char>,bool> Uids;
 	ReceiveAccountlet *Receive = dynamic_cast<ReceiveAccountlet*>(Thread->Acc);
 
-	if (!RecHotFolder.Str() && !SecureAuth() && !ValidStr(Password))
+	if (!RecHotFolder.Str() && !ValidStr(Password))
 	{
 		// Status = true;
 	}

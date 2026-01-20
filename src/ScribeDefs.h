@@ -56,8 +56,9 @@
 #define OPT_ReceiveAsciiCs			"Receive.AsciiCharset"
 #define OPT_ReceiveAuthType			"Receive.AuthType"		//(int)
 #define OPT_MaxEmailSize			"Receive.MaxSize"		//(int)
-#define OPT_ReceiveSecAuth			"Receive.SecAuth"		//(int)
+// #define OPT_ReceiveSecAuth			"Receive.SecAuth"		//(int)
 #define OPT_ReceiveSubFolders		"Receive.SubFolders"
+#define OPT_ReceiveFilterIncoming	"Receive.FilterIncoming" //(bool)
 
 #define OPT_SplitterPos				"ScribeUI.SplitPos"	//(int)	
 #define OPT_SubSplitPos				"ScribeUI.SubSplitPos" //(int)	

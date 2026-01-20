@@ -8126,7 +8126,7 @@ void Mail::SetFlagsCache(int64_t NewFlags, bool IgnoreReceipt, bool UpdateScreen
 			// Becoming read
 			List<Mail> Objs;
 			Objs.Insert(this);
-			App->OnNewMail(&Objs, false);
+			App->OnNewMail(Objs, false);
 			PreviewCache.DeleteObjects();
 
 			// Read receipt

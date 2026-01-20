@@ -1160,7 +1160,7 @@ struct ScribeReplicator : public LProgressDlg, public LDataEventsI
 		return App->GetOptions();
 	}
 
-	void OnNew(LDataFolderI *parent, LArray<LDataI*> &items, int pos, bool is_new)
+	void OnNew(LDataFolderI *parent, LArray<LDataI*> &items, int pos, bool is_new, bool filter)
 	{
 		#if DEBUG_LOGGING
 		LgiTrace("%s:%i - OnNew %i\n", _FL, items.Length());

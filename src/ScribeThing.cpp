@@ -413,7 +413,7 @@ bool Thing::OnDelete()
 	{
 		List<Mail> Lst;
 		Lst.Insert(m);
-		App->OnNewMail(&Lst, false);
+		App->OnNewMail(Lst, false);
 	}
 
 	if (GetObject() && GetObject()->GetStore())

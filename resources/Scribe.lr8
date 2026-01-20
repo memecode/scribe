@@ -313,7 +313,7 @@
 		<String Ref="506" Cid="472" Define="IDS_472" en="Recently opened folders:" fr="Dossiers ouvert recement:" cs="Naposledy otevřené soubory" de="Kürzlich geöffnete Mail-Datenbanken:" nl="Laatst geopende mappen:" es="Carpetas abiertas recientemente:" pt_br="Pastas abertas recentemente:" ru="Последние открытые папки" pt="Pastas abertas recentemente:" pl="Ostatnio otwierane foldery:" it="Cartelle aperte di recente:" vi="Danh mục vừa mới mở:" zh_tw="最近開啟的資料夾:" ja="最近開いたフォルダ:" sr="Nedavno otvarane omotnice" no="Nylig åpnede mapper:" lt="Atverta rinkmenų:" fa=":پوشه هايي که به تازگي باز شده اند" da="Fornylig åbnede mapper:" sv="Senast öppnade mappar:" lg="Kabada ezagulwawo jjuuzi:" tr="Önceden açılan klasörler:" hu="Gyakran megnyitott mappák:" ko="최근 열었던 폴더" uk="Нещодавно відкриті теки:" />
 		<String Ref="508" Cid="83" Define="IDC_COLOUR" />
 		<String Ref="509" Cid="-1" Define="IDC_STATIC" en="Key words:" fr="Mots clés:" />
-		<String Ref="511" Cid="906" Define="IDS_1082" en="Via STARTTLS" lt="„STARTTLS“ būdu" cs="Pomocí STARTTLS" de="Mit STARTTLS" tr="STARTTLS ile" ru="Через STARTTLS" pl="STARTTLS" ko="STARTTLS를 통해" uk="Через STARTTLS" />
+		<String Ref="511" Cid="906" Define="IDS_1082" en="STARTTLS" lt="„STARTTLS“ būdu" cs="Pomocí STARTTLS" de="Mit STARTTLS" tr="STARTTLS ile" ru="Через STARTTLS" ko="STARTTLS를 통해" uk="Через STARTTLS" />
 		<String Ref="512" Cid="-1" Define="IDC_STATIC" en="User name:" fr="Nom d&apos;usager:" it="Nome utente:" cs="Jméno uživatele:" es="Nombre de Usuario:" de="Benutzername:" nl="Gebruikersnaam:" pt_br="Nome de usuário:" ru="Пользователь:" pt="Utilizador:" pl="Nazwa użytkownika:" vi="Tên người dùng:" zh_tw="用戶名稱:" ja="ユーザ名:" sr="Korisničko ime:" no="Brukernavn:" lt="Naudotojo vardas:" fa="نام کاربري" da="Brugernavn:" sv="Användarnamn:" lg="Erinnya ly&apos;Omukozesa:" tr="Kullanıcı adı:" hu="Felhasználó név:" ko="사용자 이름:" uk="Користувач:" />
 		<String Ref="513" Cid="342" Define="IDC_MAX_SIZE" />
 		<String Ref="518" Cid="518" Define="ID_BTN_TBL" />
@@ -676,7 +676,7 @@
 		<String Ref="1088" Cid="849" Define="IDC_START_DATE" />
 		<String Ref="1089" Cid="680" Define="IDC_REC_8BIT_CS" />
 		<String Ref="1090" Cid="852" Define="IDC_REC_ASCII_CP" />
-		<String Ref="1091" Cid="1235" Define="IDS_1235" en="Via direct SSL connection" sv="Via direkt SSL-anslutning" lt="Tiesioginis SSL prisijungimas" hu="Via közvetlen SSL kapcsolat" cs="Přímé SSL spojení" de="Direkte SSL Verbindung" tr="Direkt SSL bağlantısı ile" ru="Через прямое SSL соединение" pl="Bezpośrednie połączenie SSL" ko="직접적인 SSL 연결을 통해" uk="Через пряме SSL з`єднання" fr="Via une connexion SSL directe" />
+		<String Ref="1091" Cid="1235" Define="IDS_1235" en="Direct SSL" sv="Via direkt SSL-anslutning" lt="Tiesioginis SSL prisijungimas" hu="Via közvetlen SSL kapcsolat" cs="Přímé SSL spojení" de="Direkte SSL Verbindung" tr="Direkt SSL bağlantısı ile" ru="Через прямое SSL соединение" pl="Bezpośrednie połączenie SSL" ko="직접적인 SSL 연결을 통해" uk="Через пряме SSL з`єднання" fr="Via une connexion SSL directe" />
 		<String Ref="1092" Cid="-1" Define="IDC_STATIC" en="Assume 8-bit text is:" cs="Kódování 8bitového textu:" de="8-Bit-Text annehmen als:" lt="Tarkime, kad 8 bitų tekstas koduotas:" da="Antag 8-bits tekst er:" fa="متن هشت بيتي را تفسير کن به:" vi="Xem văn bản 8 bit như:" sv="Förutsätt att 8-bitars text är:" es="Asumir texto 8-bit como:" pt_br="Assumir que o texto de 8 bits é:" lg="Ebigambo bwebiba bya biti 8 biba:" tr="Varsayılan 8 bit text:" hu="8bites szöveget átvesz:" ru="Принимать 8-бит текст как:" pl="Traktuj 8-bitowy tekst jako:" ko="8-bit 문서 추정 :" uk="Приймати 8-біт текст як:" fr="Supposons c&apos;est du texte 8 bits:" />
 		<String Ref="1101" Cid="896" Define="IDS_896" en="Date" vi="Ngày tháng" pt="Data" pl="Data" zh_tw="日期" ja="日付" nl="Datum" sr="Datum" es="Fecha" cs="Datum" no="Dato" lt="Data" fa="تاريخ" de="Datum" da="Dato" sv="Datum" pt_br="Data" lg="Ebiro" tr="Tarih" hu="Dátum" ru="Дата" ko="날짜" uk="Дата" />
 		<String Ref="1108" Cid="1165" Define="IDC_TABLE" />
@@ -755,7 +755,7 @@
 		<String Ref="1233" Cid="-1" Define="IDC_STATIC" en="Smtp Server" fr="Serveur SMTP" it="Server SMTP" cs="SMTP server" es="Servidor SMTP" de="SMTP Server" nl="SMTP-server" pt_br="Servidor SMTP" ru="SMTP сервер" pt="Servidor SMTP" pl="Serwer SMTP" vi="Máy chủ SMTP" zh_tw="Smtp 主機" ja="SMTPサーバ" no="SMTP tjener" lt="Laiškų išsiuntimo (SMTP) serveris" sv="SMTP-server" lg="Saava ya SMTP" tr="SMTP Sunucu" hu="Smtp kiszolgáló" ko="Smtp 서버" uk="SMTP сервер" />
 		<String Ref="1234" Cid="-1" Define="IDC_STATIC" en="Server:" fr="Serveur:" es="Servidor:" pt_br="Servidor:" ru="Сервер:" pt="Servidor:" pl="Serwer:" vi="Máy chủ:" zh_tw="伺服器:" ja="サーバ名:" no="Tjener:" lt="Serveris:" lg="Saava:" tr="Sunucu:" hu="Kiszolgáló:" ko="서버:" uk="Сервер:" />
 		<String Ref="1235" Cid="1235" Define="IDS_1235" en="Via direct SSL connection" sv="Via direkt SSL-anslutning" lt="Tiesioginis SSL prisijungimas" hu="Via közvetlen SSL kapcsolat" cs="Přímé SSL spojení" de="Direkte SSL Verbindung" tr="Direkt SSL bağlantısı ile" ru="Через прямое SSL соединение" pl="Bezpośrednie połączenie SSL" ko="직접 SSL 연결을 통함" uk="Через пряме SSL з`єднання" fr="Via une connexion SSL directe" />
-		<String Ref="1237" Cid="1357" Define="IDC_SEC_AUTH" />
+		<String Ref="1237" Cid="1357" Define="IDC_FILTER_INCOMING" />
 		<String Ref="1238" Cid="1238" Define="IDC_MONDAY" en="M" uk="Пн" de="Mo" fr="L" />
 		<String Ref="1239" Cid="1239" Define="IDC_TUESDAY" en="T" uk="Вт" de="Di" fr="Ma" />
 		<String Ref="1240" Cid="-1" Define="IDC_STATIC" en="Ends:" uk="Закінчення:" de="Endet:" fr="Prend fin:" />
@@ -834,7 +834,7 @@
 		<String Ref="1340" Cid="1340" Define="IDS_1340" en="Log file:" fr="Fichier log:" it="File di log:" cs="Log soubor:" es="Archivo Log:" de="Logbuch-Datei:" nl="Logbestand:" pt_br="Arquivo:" ru="Файл журнала:" pt="Registar erros no ficheiro &apos;Scribe.txt&apos;" ja="ログファイル" pl="Plik dziennika:" vi="Xuất thông tin bắt lỗi vào tập tin &apos;Scribe.txt&apos;" zh_tw="紀錄檔案:" sr="Fajl dnevnika:" no="Loggefil:" lt="Rašyti derinimo informaciją į „Scribe.txt“" fa="گزارش کار" da="Logfil:" sv="Loggfil:" lg="Ebiva mu dibaaga biwanululire mu &apos;Scribe.txt&apos;" tr="Kütük dosyası:" hu="Napló file:" ko="로그 파일:" uk="Лог-файл:" />
 		<String Ref="1341" Cid="1341" Define="IDS_1341" en="Account connection debug logging:" pt="Registar erros no ficheiro &apos;Scribe.txt&apos;" nl="Plaats data van testversies in &apos;Scribe.txt&apos;" ja="&apos;Scribe.txt&apos;にデバッグトレースを出力" cs="Zapisovat ladicí hlášení do &apos;Scribe.txt&apos;" pl="Zapisuj błędy programu w &apos;Scribe.txt&apos;" it="Scrivi messaggi di debug in &apos;Scribe.txt&apos;" vi="Xuất dấu vết bắt lỗi vào tập tin &apos;Scribe.txt&apos;" zh_tw="輸出除錯追蹤聲明到 &apos;Scribe.txt&apos;" sr="Izlazne izjave tragova popravki grešaka u &apos;Scribe.txt&apos;" es="Registrar Errores de Depuración en &apos;Scribe.txt&apos;" no="Skriv feilsøkingsinformasjon til  &apos;Scribe.txt&apos;" lt="Rašyti derinimo informaciją į „Scribe.txt“" fa="قرار بده scribe.txt خروجی عمل عیب یابی را در" de="Konto-Verbindungs-Debuglogbuch" da="Skriv fejlsøgningsinformation til  &apos;Scribe.txt&apos;" sv="Skriv felsökningsinformation till &apos;Scribe.txt&apos;" pt_br="Enviar informações de debug para &apos;Scribe.txt&apos;" tr="Debug takibi kayıtlarını &apos;Scribe.txt&apos; dosyasına yaz" hu="Hibakeresés állapot kimenete a &apos;Scribe.txt&apos;-be" ru="Журнал глюколова  &apos;Scribe.txt&apos;" ko="출력 디버그 추적 진숙은 &apos;Scribe.txt&apos;로" uk="Звіт протоколювання підключення налагодження:" fr="Journalisation du débogage de la connexion au compte:" />
 		<String Ref="1342" Cid="1342" Define="IDD_REPLICATE" en="Replicate Mail Stores" pl="Powiel magazyny poczty" ko="메일 사서함 복제" uk="Реплікація поштових скриньок" de="Mail-Datenbank replizieren" fr="Réproduire dossiers courrier" />
-		<String Ref="1343" Cid="-1" Define="IDC_STATIC" en="Use secure authentication:" pl="Użyj bezpiecznego uwierzytelnienia:" ko="보안 인증 사용:" uk="Використання безпечної аутентифікації:" de="Sichere Authenifizierung verwenden:" fr="Utilisez authentification sécurisée:" />
+		<String Ref="1343" Cid="-1" Define="IDC_STATIC" en="Filter incoming email:" pl="Użyj bezpiecznego uwierzytelnienia:" ko="보안 인증 사용:" uk="Використання безпечної аутентифікації:" de="Sichere Authenifizierung verwenden:" fr="Utilisez authentification sécurisée:" />
 		<String Ref="1344" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="1345" Cid="-1" Define="IDC_STATIC" en="Source folders:" pl="Foldery źródłowe:" ko="원본 폴더" uk="Теки з файлами:" de="Quellordner:" fr="Dossiers source:" />
 		<String Ref="1346" Cid="712" Define="IDC_SRC" />
@@ -1875,17 +1875,17 @@
 					</tr>
 					<tr>
 						<td addr="0,12" colspan="4">
-							<StaticText pos="0,346,174,359" ref="1075" />
+							<StaticText pos="0,343,398,356" ref="1075" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,13" colspan="4">
-							<StaticText pos="0,373,363,386" ref="1076" />
+							<StaticText pos="0,371,496,384" ref="1076" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,14">
-							<StaticText pos="0,405,103,418" ref="1092" />
+							<StaticText pos="14,399,117,412" ref="1092" />
 						</td>
 						<td addr="1,14" colspan="3">
 							<ComboBox pos="187,393,340,413" ref="1089" />
@@ -1893,7 +1893,7 @@
 					</tr>
 					<tr>
 						<td addr="0,15">
-							<StaticText pos="7,427,104,440" ref="1018" />
+							<StaticText pos="14,427,146,440" ref="1018" />
 						</td>
 						<td addr="1,15" colspan="3">
 							<ComboBox pos="187,426,340,446" ref="1090" />
@@ -3228,7 +3228,7 @@
 		<Custom pos="7,7,321,272" ref="767" Ctrl="LTextView3" />
 	</Dialog>
 	<Dialog pos="7,7,539,540" ref="505">
-		<TableLayout pos="0,0,524,503" ref="17" CellStyle="padding: 6px;" cols="1.000" rows="0.870,0.130">
+		<TableLayout pos="0,0,524,503" ref="17" cols="1.000" rows="0.870,0.130">
 			<tr>
 				<td addr="0,0" style="padding: 6px;">
 					<TableLayout pos="21,28,468,363" ref="75" cols="0.333,0.333,0.333" rows="0.113,0.118,0.111,0.106,0.111,0.100,0.113,0.113,0.113">
@@ -4715,9 +4715,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4725,23 +4739,9 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>

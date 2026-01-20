@@ -244,7 +244,7 @@ void WebdavStore::OnEvent(void *Param)
 
 				LArray<LDataI*> a;
 				a.Add(o);
-				Callback->OnNew(e->Folder, a, -1, false);
+				Callback->OnNew(e->Folder, a, -1, false, false);
 			}
 			break;
 		}

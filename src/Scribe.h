@@ -1046,23 +1046,23 @@ public:
 
 	const char *GetFromStr(int id)
 	{
-		LDataPropI *From = GetObject() ? GetObject()->GetObj(FIELD_FROM) : 0;
+		LDataPropI *From = GetObject() ? GetObject()->GetObj(FIELD_FROM) : nullptr;
 		return From ? From->GetStr(id) : NULL;
 	}
 
 	LDataPropI *GetFrom()
 	{
-		return GetObject() ? GetObject()->GetObj(FIELD_FROM) : 0;
+		return GetObject() ? GetObject()->GetObj(FIELD_FROM) : nullptr;
 	}
 
 	LDataPropI *GetReply()
 	{
-		return GetObject() ? GetObject()->GetObj(FIELD_REPLY) : 0;
+		return GetObject() ? GetObject()->GetObj(FIELD_REPLY) : nullptr;
 	}
 
 	LDataIt GetTo()
 	{
-		return GetObject() ? GetObject()->GetList(FIELD_TO) : 0;
+		return GetObject() ? GetObject()->GetList(FIELD_TO) : nullptr;
 	}
 
 	bool GetAttachmentObjs(LArray<LDataI*> &Objs);
@@ -2057,7 +2057,7 @@ public:
 	AccStrOption(AssumeAsciiCharset, OPT_ReceiveAsciiCs);
 	AccIntOption(AuthType, OPT_ReceiveAuthType);
 	AccStrOption(HotFolder, OPT_ReceiveHotFolder);
-	AccIntOption(SecureAuth, OPT_ReceiveSecAuth);
+	AccIntOption(FilterIncoming, OPT_ReceiveFilterIncoming);
 	
 	/// Get/Set the SSL mode
 	/// \sa #SSL_NONE, #SSL_STARTTLS or #SSL_DIRECT
@@ -2453,7 +2453,7 @@ public:
 	bool			MailBounce(Mail *m);
 	void			MailMerge(LArray<ListAddr*> &Recip, const char *FileName, Mail *Source);
 
-	void			OnNewMail(List<Mail> *NewMailObjs, bool Add = true);
+	void			OnNewMail(List<Mail> &NewMailObjs, bool Add);
 	void			OnNewMailSound();
 	void			OnTrayClick(LMouse &m) override;
 	void			OnTrayMenu(LSubMenu &m) override;
@@ -2584,7 +2584,7 @@ public:
 
 	// Data events from storage back ends
 	bool GetSystemPath(int Folder, LVariant &Path) override;
-	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new) override;
+	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new, bool filter) override;
 	bool OnDelete(LDataFolderI *parent, LArray<LDataI*> &items) override;
 	bool OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &Items) override;
 	void SetContext(const char *file, int line) override;

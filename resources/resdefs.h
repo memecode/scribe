@@ -1089,7 +1089,7 @@
 #define IDS_1353								1353
 #define IDS_1354								1354
 #define IDS_ERROR_FONT_SETTINGS					1356
-#define IDC_SEC_AUTH							1357
+#define IDC_FILTER_INCOMING						1357
 #define IDC_EDIT_CONTROL						1359
 #define IDC_DELETE_LARGER						1360
 #define IDC_DELETE_SIZE							1361

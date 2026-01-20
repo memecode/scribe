@@ -869,7 +869,7 @@ public:
 
 	int OnNotify(LViewI *Col, const LNotification &n) override;
 
-	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new) override;
+	void OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new, bool filter) override;
 	bool OnDelete(LDataFolderI *parent, LArray<LDataI*> &items) override;
 	bool OnMove(LDataFolderI *new_parent, LDataFolderI *old_parent, LArray<LDataI*> &items) override;
 	bool OnChange(LArray<LDataI*> &items, int FieldHint) override;
@@ -1190,7 +1190,7 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 	return 0;
 }
 
-void FindWnd::OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new)
+void FindWnd::OnNew(LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new, bool filter)
 {
 }
 

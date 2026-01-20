@@ -362,7 +362,7 @@ void LMail3Store::OnNew(const char *File, int Line, LDataFolderI *parent, LArray
 	if (!Callback)
 		return;
 	Callback->SetContext(File, Line);
-	Callback->OnNew(parent, new_items, pos, is_new);
+	Callback->OnNew(parent, new_items, pos, is_new, true);
 }
 
 bool LMail3Store::OnChange(const char *File, int Line, LArray<LDataI*> &items, int FieldHint)

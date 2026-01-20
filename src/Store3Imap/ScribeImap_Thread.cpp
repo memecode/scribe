@@ -747,7 +747,7 @@ int ImapThread::Main()
 
 			if (d->Imap)
 			{
-				LUri u(d->Store->Host.Str());
+				LUri u(d->Store->Host);
 				if (u.Port <= 0 &&
 					d->Store->Port > 0)
 				{
@@ -767,12 +767,12 @@ int ImapThread::Main()
 				}
 
 				// Connect to the server
-				LSocketI *Sock = 0;
+				LSocketI *Sock = nullptr;
 				bool SslDirect = (d->Store->ConnectFlags & MAIL_SSL) != 0;
 				bool StartTls = (d->Store->ConnectFlags & MAIL_USE_STARTTLS) != 0;
 				if (SslDirect || StartTls)
 				{
-					ImapLogSocket<SslSocket> *s = new ImapLogSocket<SslSocket>(	LogFileName[0] ? LogFileName : NULL,
+					auto s = new ImapLogSocket<SslSocket>(	LogFileName[0] ? LogFileName : NULL,
 																				d->Caps,
 																				d->Store->GetLogger(),
 																				d->Store->DataProgress);
@@ -801,8 +801,8 @@ int ImapThread::Main()
 				if (d->Imap->Open(	Sock,
 									u.sHost,
 									u.Port,
-									d->Store->User.Str(),
-									d->Store->Pass.Str(),
+									d->Store->User,
+									d->Store->Pass,
 									d->SettingStore,
 									d->Store->ConnectFlags))
 				{

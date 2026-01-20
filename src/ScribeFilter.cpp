@@ -1547,7 +1547,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 			{
 				List<Mail> Objs;
 				Objs.Insert(m);
-				App->OnNewMail(&Objs, false);
+				App->OnNewMail(Objs, false);
 			}
 			break;
 		}
@@ -1585,7 +1585,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 						}
 					}
 
-					F->App->OnNewMail(&m, false);
+					F->App->OnNewMail(m, false);
 					Folder->OnUpdateUnRead(0, true);
 
 			        if (Log)

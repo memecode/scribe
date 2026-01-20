@@ -2946,7 +2946,7 @@ bool ScribeFolder::Delete(LArray<Thing*> &Items, bool ToTrash)
 	}
 
 	if (NotNew.Length())
-		App->OnNewMail(&NotNew, false);
+		App->OnNewMail(NotNew, false);
 
 	if (Del.Length() == 0)
 		return true;
