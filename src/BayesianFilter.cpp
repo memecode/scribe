@@ -271,6 +271,7 @@ public:
 
 private:
 	ScribeWnd *App;
+	LAutoPtr<LSpellCheck> SpellCheck;
 	LAutoPtr<LWordStore> WhiteList;
 	LAutoPtr<LWordStore> Ham;
 	LAutoPtr<LWordStore> Spam;
@@ -313,8 +314,8 @@ private:
 
 public:
 	BayesianThread(ScribeWnd *app) :
-		LThread("BayesianThread.Thread"),
-		LMutex ("BayesianThread.Mutex")
+		LThread("Bayesian.Th"),
+		LMutex ("Bayesian.Lock")
 	{
 		App = app;
 		State = BayesLoading;		
@@ -470,7 +471,6 @@ public:
 		}
 
 		bool Analyse = t->Analyse;
-		LAutoPtr<LSpellCheck> Spell(App->CreateSpellObject());
 		Tokens.Reset(new TokenStore);
 		
 		if (!Ham || !Spam)
@@ -485,9 +485,12 @@ public:
 		if (Analyse)
 			LgiTrace("HamItems=" LPrintfSSizeT " SpamItems=" LPrintfSSizeT "\n");
 
-		if (Spell)
+		if (!SpellCheck)
+			SpellCheck.Reset(App->CreateSpellObject());
+
+		if (SpellCheck)
 		{
-			Spell->Check(GetHandle(), t->Words, 0, t->Words.Length());
+			SpellCheck->Check(GetHandle(), t->Words, 0, t->Words.Length());
 
 			auto Start = LCurrentTime();
 			while (!CheckText) // Wait for the spell check to complete
