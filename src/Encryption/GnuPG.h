@@ -71,7 +71,7 @@ class MailUiGpg : public LView
 	bool ReadFile(LArray<char> &Data, const char *Path);
 	
 public:
-	MailUiGpg(ScribeWnd *App, MailUi *Ui, int ColX1, int ColX2, bool WritingEmail);
+	MailUiGpg(ScribeWnd *App, MailUi *Ui, const char *ColX1, const char *ColX2, bool WritingEmail);
 	~MailUiGpg();
 	
 	const char *GetClass() override { return "MailUiGpg"; }

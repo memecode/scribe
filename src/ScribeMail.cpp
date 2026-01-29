@@ -1545,116 +1545,129 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 					);
 		ReplyChk->SetPos(pos);
 		int ReplyChkPx = ReplyChk ? ReplyChk->X() : 0;
-		int RECIP_X = 20 + MAX(ReplyChkPx, Recip.X()) + 10;
-		int EditHeight = FontHeight + 6;
-
+		int PanelHeight = FontHeight + 16;
+		const char *firstColMinWidth = "5em";
+		const char *tableLeftMargin = "1em";
+		
 		LVariant HideGpg;
 		if (!item->App->GetOptions()->GetValue(OPT_HideGnuPG, HideGpg) ||
 			HideGpg.CastInt32() == 0)
 		{
 			GpgUi = new MailUiGpg(	App,
 									this,
-									21,
-									RECIP_X,
+									tableLeftMargin,
+									firstColMinWidth,
 									!ReadOnly && !TestFlag(GetItem()->GetFlags(), MAIL_SENT));
 			if (GpgUi)
 				GpgUi->Attach(this);
 		}
 		
+		LTableLayout *tbl = nullptr;
+				
+		auto createTbl = [&](int id)
+			{
+				if (tbl = new LTableLayout(id))
+				{
+					if (auto css = tbl->GetCss(true))
+					{
+						css->Width("auto");
+						css->Height("auto");
+						css->MarginTop("0em");
+						css->MarginRight("0.5em");
+						css->MarginBottom("0.5em");
+						css->MarginLeft(tableLeftMargin);
+					}
+				}
+				return tbl;
+			};
+		
 		ToPanel = new LPanel(LLoadString(IDS_TO), FontHeight * 8, !ShowFrom);
 		if (ToPanel)
 		{
-		    int Cy = 4;
-			ToPanel->AddView(SetTo = new LCombo(IDC_SET_TO));
-			if (SetTo)
-			{
-				LRect r(20, Cy, 60, EditHeight);
-				SetTo->SetPos(r);
-				SetTo->Insert(LLoadString(IDS_TO));
-				SetTo->Insert(LLoadString(IDS_CC));
-				SetTo->Insert(LLoadString(IDS_BCC));
+			ToPanel->AddView(tbl = createTbl(ID_MAIL_TO_TABLE));
+			
+			auto cell = tbl->GetCell(0, 0);
+				cell->MinWidth(firstColMinWidth);
+				if (cell->Add(SetTo = new LCombo(IDC_SET_TO)))
+				{
+					SetTo->Insert(LLoadString(IDS_TO));
+					SetTo->Insert(LLoadString(IDS_CC));
+					SetTo->Insert(LLoadString(IDS_BCC));
+				}
 				
-				if (SetTo->GetPos().x2 + 10 > RECIP_X)
-				    RECIP_X = SetTo->GetPos().x2 + 10;
-			}
+			cell = tbl->GetCell(1, 0);
+				cell->Add(Entry = new LEdit(IDC_ENTRY));
 			
-			ToPanel->AddView(Entry = new LEdit(IDC_ENTRY));
-			if (Entry)
-			{
-				LRect r(RECIP_X, Cy, RECIP_SX, EditHeight);
-				Entry->SetPos(r);
-			}
-			
-			Cy = SetTo->GetPos().y2 + 5;
+			cell = tbl->GetCell(0, 1);
+				cell->Add(new LTextLabel(IDC_STATIC, 20, 60, -1, -1, LLoadString(IDS_RECIPIENTS)));
 
-			ToPanel->AddView(To = new AddressList(App, IDC_TO, RECIP_X, Cy, RECIP_SX, ToPanel->GetOpenSize() - Cy - 6));
-			if (To)
-				To->SetImageList(App->GetIconImgList(), false);
-			ToPanel->AddView(new LTextLabel(IDC_STATIC, 20, Cy, -1, -1, LLoadString(IDS_RECIPIENTS)));
+			cell = tbl->GetCell(1, 1);
+				if (cell->Add(To = new AddressList(App, IDC_TO, 0, 0, 60, 100)))
+					To->SetImageList(App->GetIconImgList(), false);
 			
 			ToPanel->Raised(false);
 			ToPanel->Attach(this);
 		}
 
-		FromPanel = new LPanel(LLoadString(IDS_FROM), FontHeight + 13, AlwaysShowFrom.CastInt32() || ShowFrom);
+		FromPanel = new LPanel(LLoadString(IDS_FROM), PanelHeight, AlwaysShowFrom.CastInt32() || ShowFrom);
 		if (FromPanel)
 		{
-			FromPanel->AddView(new LTextLabel(IDC_STATIC, 21,
-										#ifdef MAC
-										8,
-										#else
-										4,
-										#endif
-										-1, -1, LLoadString(IDS_FROM)));
+			FromPanel->AddView(tbl = createTbl(ID_MAIL_FROM_TABLE));
+	
+			auto cell = tbl->GetCell(0, 0);
+				cell->MinWidth(firstColMinWidth);
+				cell->Add(new LTextLabel(IDC_STATIC, 0, 0, -1, -1, LLoadString(IDS_FROM)));
 
+			cell = tbl->GetCell(1, 0);
 			if (ShowFrom)
-			{
-				FromPanel->AddView(FromList = new AddressList(App, IDC_FROM, RECIP_X, 2, RECIP_SX, EditHeight));
-			}
+				cell->Add(FromList = new AddressList(App, IDC_FROM, 0, 0, RECIP_SX, 20));
 			else
-			{
-				LRect r(RECIP_X, 2, RECIP_SX, EditHeight);
-				FromPanel->AddView(FromCbo = new LCombo(IDC_FROM, &r));
-			}
+				cell->Add(FromCbo = new LCombo(IDC_FROM));
 
+			cell = tbl->GetCell(2, 0);
+			cell->VerticalAlign(LCss::VerticalMiddle);
 			if (IsCreated)
 			{
-				LCheckBox *Chk;
-				auto Label = LLoadString(IDS_ALWAYS_SHOW);
-				FromPanel->AddView(Chk = new LCheckBox(IDC_SHOW_FROM, Label));
-				auto pos = Chk->GetPos();
-				pos.Offset(	ADD_X,
-							#ifdef MAC
-							1
-							#else
-							6
-							#endif
-							);
-				Chk->SetPos(pos);
-				if (Chk) Chk->Value(AlwaysShowFrom.CastInt32());
+				LCheckBox *Chk = nullptr;
+				cell->Add(Chk = new LCheckBox(IDC_SHOW_FROM, LLoadString(IDS_ALWAYS_SHOW)));
+				if (Chk)
+					Chk->Value(AlwaysShowFrom.CastInt32());
 			}
 
 			FromPanel->Raised(false);
 			FromPanel->Attach(this);
 		}
 
-		ReplyToPanel = new LPanel("Reply To:", FontHeight + 13, false);
+		ReplyToPanel = new LPanel("Reply To:", PanelHeight, false);
 		if (ReplyToPanel)
 		{
+			ReplyToPanel->AddView(tbl = createTbl(ID_MAIL_REPLY_TABLE));
+
+			auto cell = tbl->GetCell(0, 0);
+				cell->MinWidth(firstColMinWidth);
+				cell->Add(ReplyToChk = ReplyChk.Release());
+
+			cell = tbl->GetCell(1, 0);
+				cell->Add(ReplyToCbo = new LCombo(IDC_REPLY_TO_ADDR));
+
 			ReplyToPanel->Raised(false);
-			ReplyToPanel->AddView(ReplyToChk = ReplyChk.Release());
-			LRect r(RECIP_X, 2, RECIP_SX, EditHeight);
-			ReplyToPanel->AddView(ReplyToCbo = new LCombo(IDC_REPLY_TO_ADDR, &r));
 			ReplyToPanel->Attach(this);
 		}
 
-		SubjectPanel = new LPanel(LLoadString(IDS_SUBJECT), -(LSysFont->GetHeight() + 16));
+		SubjectPanel = new LPanel(LLoadString(IDS_SUBJECT), PanelHeight);
 		if (SubjectPanel)
 		{
+			SubjectPanel->AddView(tbl = createTbl(ID_MAIL_SUBJ_TABLE));
+
+			auto cell = tbl->GetCell(0, 0);
+				cell->MinWidth(firstColMinWidth);
+				cell->VerticalAlign(LCss::VerticalMiddle);
+				cell->Add(new LTextLabel(IDC_STATIC, 0, 0, -1, -1, LLoadString(IDS_SUBJECT)));
+				
+			cell = tbl->GetCell(1, 0);
+				cell->Add(Subject = new LEdit(IDC_SUBJECT, nullptr, &r));
+			
 			SubjectPanel->Raised(false);
-			SubjectPanel->AddView(			new LTextLabel(IDC_STATIC, 21, 8, -1, -1, LLoadString(IDS_SUBJECT)));
-			LRect r(RECIP_X, 4, RECIP_SX, EditHeight);
-			SubjectPanel->AddView(Subject = new LEdit(IDC_SUBJECT, nullptr, &r));
 			SubjectPanel->Attach(this);
 		}
 
@@ -1662,8 +1675,7 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 		if (CalendarPanel)
 		{
 			CalendarPanel->Raised(false);
-			LTableLayout *t = new LTableLayout(IDC_TABLE);
-			if (t)
+			if (auto t = new LTableLayout(IDC_TABLE))
 			{
 				t->GetCss(true)->Margin(LCss::Len(LCss::LenPx, LTableLayout::CellSpacing));
 				t->GetCss()->Width(LCss::LenAuto);
@@ -1672,7 +1684,7 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 				CalendarPanel->AddView(t);
 				auto c = t->GetCell(0, 0);
 				
-				c->Width(LCss::Len(LCss::LenPx, RECIP_X - (LTableLayout::CellSpacing * 2)));
+				// c->Width(LCss::Len(LCss::LenPx, RECIP_X - (LTableLayout::CellSpacing * 2)));
 				c->PaddingLeft(LCss::Len(LCss::LenPx, 21 - LTableLayout::CellSpacing));
 				c->Debug = true;
 

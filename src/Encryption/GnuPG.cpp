@@ -912,7 +912,7 @@ static LCss::Len Px(int px)
 	return LCss::Len(LCss::LenPx, (float)px);
 }
 	
-MailUiGpg::MailUiGpg(ScribeWnd *App, MailUi *Ui, int ColX1, int ColX2, bool WritingEmail)
+MailUiGpg::MailUiGpg(ScribeWnd *App, MailUi *Ui, const char *ColX1, const char *ColX2, bool WritingEmail)
 {
 	d = new MailUiGpgPriv(App, Ui, WritingEmail);
 	int TextY = 6;
@@ -924,38 +924,32 @@ MailUiGpg::MailUiGpg(ScribeWnd *App, MailUi *Ui, int ColX1, int ColX2, bool Writ
 	
 	if (AddView(d->Table = new LTableLayout(50)))
 	{
-		Mail *m = Ui->GetItem();
-		LDataI *obj = m ? m->GetObject() : NULL;
+		auto m = Ui->GetItem();
+		LDataI *obj = m ? m->GetObject() : nullptr;
+
+		d->Table->GetCss(true)->MarginLeft(ColX1);
+		d->Table->GetCss(true)->MarginTop("0.4em");
 
 		int x = 0;
 		LTextLabel *Txt;
-		auto *c = d->Table->GetCell(x++, 0);
-		c->Position(LCss::PosAbsolute);
-		c->Left(Px(ColX1 - PANEL_BORDER_PX));
-		c->Top(Px(TextY - PANEL_BORDER_PX));
-		c->Add(Txt = new LTextLabel(IDC_STATIC, ColX1, TextY, -1, -1, "GnuPG:"));
+		auto c = d->Table->GetCell(x++, 0);
+		c->Add(Txt = new LTextLabel(IDC_STATIC, 0, 0, -1, -1, "GnuPG:"));
+		c->Width(ColX2);
 		
 		if (WritingEmail)
 		{
 			c = d->Table->GetCell(x++, 0);
-			c->Position(LCss::PosAbsolute);
-			c->Left(Px(ColX2 - PANEL_BORDER_PX + 1));
-			c->Top(Px(ChkY - PANEL_BORDER_PX));
 			c->Add(d->Enc = new LCheckBox(IDC_ENCRYPT, LLoadString(IDS_GNUPG_ENCRYPT)));
 			
 			c = d->Table->GetCell(x++, 0);
-			c->PaddingTop(Px(ChkY - PANEL_BORDER_PX));
 			c->Add(d->Sign = new LCheckBox(IDC_SIGN, LLoadString(IDS_GNUPG_SIGN)));
 			
 			c = d->Table->GetCell(x++, 0);
-			c->PaddingTop(Px(ChkY - PANEL_BORDER_PX));
 			c->Add(d->Attach = new LCheckBox(IDC_ATTACH_PUB_KEY, LLoadString(IDS_GNUPG_ATTACH_PUB_KEY)));
 		}
 		else
 		{
 			c = d->Table->GetCell(x++, 0);
-			c->Position(LCss::PosAbsolute);
-			c->Left(Px(ColX2 - PANEL_BORDER_PX + 1));
 			c->Add(d->Decrypt = new LButton(IDC_DECRYPT, 0, 0, -1, -1, LLoadString(IDS_GNUPG_DECRYPT)));
 			
 			auto seg = obj ? obj->GetObj(FIELD_MIME_SEG) : NULL;
@@ -987,7 +981,6 @@ MailUiGpg::MailUiGpg(ScribeWnd *App, MailUi *Ui, int ColX1, int ColX2, bool Writ
 		}
 
 		c = d->Table->GetCell(x++, 0);
-		c->PaddingTop(Px(TextY - PANEL_BORDER_PX));
 		c->PaddingLeft(LCss::Len(LCss::LenEm, 1.0f));
 		c->Add(d->Msg = new LTextLabel(IDC_MSG, 0, 0, 300, -1, "..."));
 
@@ -1934,8 +1927,8 @@ bool MailUiGpg::Pour(LRegion &r)
 	
 	if (d->Table)
 	{
-		LRect c = GetClient();
-		c.Inset(PANEL_BORDER_PX, PANEL_BORDER_PX);
+		LCssTools layout(d->Table);
+		auto c = layout.ApplyMargin(GetClient());
 		d->Table->SetPos(c);
 	}
 
