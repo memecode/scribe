@@ -4,16 +4,11 @@
 typedef LXmlTag ImpRecord;
 class ImpRecordSet : public List<ImpRecord> {
 public:
-	List<char> Fields;
+	LString::Array fields;
 
 	ImpRecordSet() {}
 	~ImpRecordSet()
 	{
-		for (auto c: Fields)
-		{
-			DeleteArray(c);
-		}
-
 		for (auto r: *this)
 		{
 			DeleteObj(r);
@@ -37,16 +32,17 @@ int ReadCsv(const char *Name, ImpRecordSet &Rs, bool HasHeadings = true)
 			{
 				char *c = Buf;
 				while (	!f.Eof() &&
-					f.Read(c, 1) == 1 &&
-					!strchr(",\r\n", *c))
+						f.Read(c, 1) == 1 &&
+						!strchr(",\r\n", *c))
 				{
 					c++;
 				}
 
 				Done = strchr("\r\n", *c) != 0;
-				if (Done) f >> *c;
+				if (Done)
+					f >> *c;
 				*c++ = 0;
-				Rs.Fields.Insert(TrimStr(Buf, "\"' \t\r\n"));
+				Rs.fields.New() = LString(Buf).Strip("\"' \t\r\n");
 			}
 		}
 
@@ -57,16 +53,16 @@ int ReadCsv(const char *Name, ImpRecordSet &Rs, bool HasHeadings = true)
 			if (r)
 			{
 				Done = false;
-				auto It = Rs.Fields.begin();
+				auto It = Rs.fields.begin();
 				char *Field = *It;
 				while (!Done)
 				{
 					char *c = Buf;
 					for (	;
-						f.Read(c, 1) == 1 &&
-						!f.Eof() &&						
-						!strchr(",\r\n", *c);
-						c++)
+							f.Read(c, 1) == 1 &&
+							!f.Eof() &&						
+							!strchr(",\r\n", *c);
+							c++)
 					{
 					}
 					
@@ -74,7 +70,7 @@ int ReadCsv(const char *Name, ImpRecordSet &Rs, bool HasHeadings = true)
 					if (Done) f >> *c;
 					*c++ = 0;
 					
-					char *Str = TrimStr(Buf, "\"'");
+					auto Str = LString(Buf).Strip("\"'");
 					if (Str && Field)
 					{
 						r->SetAttr(Field, Str);
@@ -128,26 +124,26 @@ void Import_NetscapeContacts(ScribeWnd *Parent)
 			ImpRecordSet Rs;
 
 			// Pre populated the field names
-			Rs.Fields.Insert(NewStr("DisplayName"));
-			Rs.Fields.Insert(NewStr("Surname"));
-			Rs.Fields.Insert(NewStr("First"));
-			Rs.Fields.Insert(NewStr("Notes"));
-			Rs.Fields.Insert(NewStr("City"));
-			Rs.Fields.Insert(NewStr("State"));
-			Rs.Fields.Insert(NewStr("Email"));
-			Rs.Fields.Insert(NewStr("Title"));
-			Rs.Fields.Insert(NewStr("Unknown"));
-			Rs.Fields.Insert(NewStr("Address"));
-			Rs.Fields.Insert(NewStr("PostCode"));
-			Rs.Fields.Insert(NewStr("Country"));
-			Rs.Fields.Insert(NewStr("PhoneWork"));
-			Rs.Fields.Insert(NewStr("Fax"));
-			Rs.Fields.Insert(NewStr("PhoneHome"));
-			Rs.Fields.Insert(NewStr("Organization"));
-			Rs.Fields.Insert(NewStr("Nick"));
-			Rs.Fields.Insert(NewStr("Mobile"));
-			Rs.Fields.Insert(NewStr("Pager"));
-			Rs.Fields.Insert(NewStr("Unknown2"));
+			Rs.fields.Add("DisplayName");
+			Rs.fields.Add("Surname");
+			Rs.fields.Add("First");
+			Rs.fields.Add("Notes");
+			Rs.fields.Add("City");
+			Rs.fields.Add("State");
+			Rs.fields.Add("Email");
+			Rs.fields.Add("Title");
+			Rs.fields.Add("Unknown");
+			Rs.fields.Add("Address");
+			Rs.fields.Add("PostCode");
+			Rs.fields.Add("Country");
+			Rs.fields.Add("PhoneWork");
+			Rs.fields.Add("Fax");
+			Rs.fields.Add("PhoneHome");
+			Rs.fields.Add("Organization");
+			Rs.fields.Add("Nick");
+			Rs.fields.Add("Mobile");
+			Rs.fields.Add("Pager");
+			Rs.fields.Add("Unknown2");
 
 			// read file
 			if (ReadCsv(Name, Rs, false) <= 0)
