@@ -1032,7 +1032,7 @@ BuildMarkMenu(	LSubMenu *MarkMenu,
 	int SelectedIndex = -1;
 
 	// Build image list
-	LImageList *ImgLst = new LImageList(_FL, 16, 16);
+	auto ImgLst = new LImageList(_FL, 16, 16);
 	if (ImgLst &&
 		ImgLst->Create(16 * CountOf(MarkColours32), 16, System32BitColourSpace))
 	{
@@ -1063,29 +1063,19 @@ BuildMarkMenu(	LSubMenu *MarkMenu,
 
 		LMenuItem *Item = NULL;
 		if (None)
-		{
 			Item = MarkMenu->AppendItem(LLoadString(IDS_NONE), Select ? IDM_SELECT_NONE : IDM_UNMARK, MarkState != MS_None);
-		}
 		if (All)
-		{
 			Item = MarkMenu->AppendItem(LLoadString(IDS_ALL), Select ? IDM_SELECT_ALL : IDM_MARK_ALL, true);
-		}
 		if (Item)
-		{
 			MarkMenu->AppendSeparator();
-		}
 
 		for (int i=0; i<CountOf(MarkColours32); i++)
 		{
-			char s[32];
-			sprintf_s(s, sizeof(s), " (%i, %i, %i)", R32(MarkColours32[i]), G32(MarkColours32[i]), B32(MarkColours32[i]));
-			Item = MarkMenu->AppendItem(s,
-										((Select) ? IDM_MARK_SELECT_BASE : IDM_MARK_BASE) + i,
-										(MarkState != 1) || (i != SelectedIndex));
-			if (Item)
-			{
+			auto s = LString::Fmt(" (%i, %i, %i)", R32(MarkColours32[i]), G32(MarkColours32[i]), B32(MarkColours32[i]));
+			if (Item = MarkMenu->AppendItem(s,
+											((Select) ? IDM_MARK_SELECT_BASE : IDM_MARK_BASE) + i,
+											(MarkState != 1) || (i != SelectedIndex)))
 				Item->Icon(i);
-			}
 		}
 	}
 
@@ -9551,11 +9541,15 @@ void Mail::OnPaint(LItem::ItemPaintCtx &InCtx)
         Ctx.Back = Mixed;
 	}
 
-	if (Parent) ((ThingList*)Parent)->CurrentMail = this;
+	auto thingList = dynamic_cast<ThingList*>(Parent);
+	if (thingList)
+		thingList->CurrentMail = this;
 	LListItem::OnPaint(Ctx);
-	if (Parent) ((ThingList*)Parent)->CurrentMail = 0;
-	LFont *PreviewFont = App->GetPreviewFont();
-	LFont *ColumnFont = Parent && Parent->GetFont() ? Parent->GetFont() : LSysFont;
+	if (thingList)
+		thingList->CurrentMail = nullptr;
+	
+	auto PreviewFont = App->GetPreviewFont();
+	auto ColumnFont = Parent && Parent->GetFont() ? Parent->GetFont() : LSysFont;
 
 	if (Parent &&
 		PreviewLines &&
@@ -9580,8 +9574,8 @@ void Mail::OnPaint(LItem::ItemPaintCtx &InCtx)
 			if (GetValue("BodyAsText[1024]", v) &&
 				v.Str())
 			{
-				char16 *Base = Utf8ToWide(v.Str());
-				char16 *Txt = Base;
+				auto Base = Utf8ToWide(v.Str());
+				auto Txt = Base;
 				int i;
 				for (i=0; Txt[i]; i++)
 				{
@@ -9619,10 +9613,10 @@ void Mail::OnPaint(LItem::ItemPaintCtx &InCtx)
 		LColour PreviewCol(App->GetColour(L_MAIL_PREVIEW));
 		if (Select())
 		{
-			int GreyPrev = PreviewCol.GetGray();
-			int GreyBack = Ctx.Back.GetGray();
+			auto  GreyPrev = PreviewCol.GetGray();
+			auto  GreyBack = Ctx.Back.GetGray();
 			
-			int d = GreyPrev - GreyBack;
+			auto  d = GreyPrev - GreyBack;
 			if (d < 0) d = -d;
 			if (d < 128)
 			{
