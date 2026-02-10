@@ -10545,6 +10545,8 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 										switch (v.Type)
 										{
 											case GV_STRING:
+											case GV_WSTRING:
+											case GV_LSTRING:
 											{
 												p.Push(v.Str());
 												break;
