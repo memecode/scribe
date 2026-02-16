@@ -7137,7 +7137,7 @@ void Mail::OnCreate()
 
 	LVariant EditCtrl;
 	App->GetOptions()->GetValue(OPT_EditControl, EditCtrl);
-	LAutoString Sig = GetSig(EditCtrl.CastInt32() != 0, Ident);
+	auto Sig = GetSig(EditCtrl.CastInt32() != 0, Ident);
 	if (!Sig && EditCtrl.CastInt32())
 	{
 		Sig = GetSig(false, Ident);
@@ -8926,9 +8926,9 @@ void Mail::WrapAndQuote(LStringPipe &p, const char *Quote, int WrapAt)
 	::WrapAndQuote(p, Quote, WrapAt > 0 ? WrapAt : 76, Mem ? Mem.Get() : GetBody(), Cp);
 }
 
-LAutoString Mail::GetSig(bool HtmlVersion, ScribeAccount *Account)
+LString Mail::GetSig(bool HtmlVersion, ScribeAccount *Account)
 {
-	LAutoString r;
+	LString r;
 	LVariant Xml;
 		
 	if (!Account)
@@ -8960,11 +8960,11 @@ void Mail::ProcessTextForResponse(Mail *From, LOptionsFile *Options, ScribeAccou
 
 	From->WrapAndQuote(Temp, Quote.CastInt32() ? QuoteStr.Str() : NULL, WrapAt.CastInt32());
 	
-	LAutoString s = From->GetSig(false, Account);
+	auto s = From->GetSig(false, Account);
 	if (s)
-		Temp.Write(s, strlen(s));
+		Temp.Write(s);
 
-	s.Reset(Temp.NewStr());
+	s = Temp.NewLStr();
 	SetBody(s);
 	SetBodyCharset("utf-8");
 }
