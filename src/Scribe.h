@@ -1131,7 +1131,7 @@ public:
 	int Compare(LListItem *Arg, ssize_t Field) override;
 	char *GetDropFileName() override;
 	bool GetDropFiles(LString::Array &Files) override;
-	LAutoString GetSig(bool HtmlVersion, ScribeAccount *Account = NULL);
+	LString GetSig(bool HtmlVersion, ScribeAccount *Account = NULL);
 	bool LoadFromFile(char *File);
 	void PrepSend();
 	void NewRecipient(char *Email, char *Name = NULL);
@@ -2537,7 +2537,7 @@ public:
 	LAutoString		GetForwardXml(const char *MimeType);
 	bool			GetHelpFilesPath(char *Path, int PathSize);
 	bool			LaunchHelp(const char *File);
-	LAutoString		ProcessSig(Mail *m, char *Xml, const char *MimeType);
+	LString			ProcessSig(Mail *m, char *Xml, const char *MimeType);
 	LString			ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int &Cursor, const char *MimeType);
 	bool			LogFilterActivity();
 	ScribeFolder *FindContainer(LDataFolderI *f);

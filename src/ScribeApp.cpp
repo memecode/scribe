@@ -10660,14 +10660,14 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 	return p.NewLStr();
 }
 
-LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
+LString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 {
-	THREAD_UNSAFE(LAutoString());
+	THREAD_UNSAFE(LString());
 
 	LStringPipe p;
 
 	if (!m || !Xml)
-		return LAutoString();
+		return LString();
 	
 	if (MimeType && !_stricmp(MimeType, sTextHtml))
 		p.Write(Xml, strlen(Xml));
@@ -10766,7 +10766,7 @@ LAutoString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 		}
 	}
 
-	return LAutoString(p.NewStr());
+	return p.NewLStr();
 }
 
 // Get the effective permissions for a resource.
