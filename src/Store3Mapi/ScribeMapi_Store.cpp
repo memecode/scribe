@@ -240,7 +240,7 @@ ULONG LMapiStore::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications)
 	}
 
 	if (NewItems.Length() && Callback)
-		Callback->OnNew(Inbox, NewItems, -1, true);
+		Callback->OnNew(Inbox, NewItems, -1, true, false);
 	if (DelItems.Length() && Callback)
 		Callback->OnDelete(Inbox, DelItems);
 	
