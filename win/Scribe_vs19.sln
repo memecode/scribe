@@ -1,20 +1,20 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
+# Visual Studio Version 2019
 VisualStudioVersion = 16.0.32413.511
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scribe", "Scribe_vs2019.vcxproj", "{540DDE64-0927-4E67-B927-2E3BE7ECB029}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scribe", "Scribe_vs19.vcxproj", "{540DDE64-0927-4E67-B927-2E3BE7ECB029}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lgi", "..\..\..\lgi\trunk\win\Lgi_vs2019.vcxproj", "{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lgi", "..\..\..\lgi\trunk\win\Lgi_vs19.vcxproj", "{95DF9CA4-6D37-4A85-A648-80C2712E0DA1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScribeMapi", "..\mapi\ScribeMapi_vs2019.vcxproj", "{148574CE-4DA6-4B8A-9EC6-FF68ADC2A046}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScribeMapi", "..\mapi\ScribeMapi_vs19.vcxproj", "{148574CE-4DA6-4B8A-9EC6-FF68ADC2A046}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LgiStatic", "..\..\..\Lgi\trunk\win\LgiStatic_vs2019.vcxproj", "{DE6D97B9-A194-401B-A8A4-83110C56D572}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LgiStatic", "..\..\..\Lgi\trunk\win\LgiStatic_vs19.vcxproj", "{DE6D97B9-A194-401B-A8A4-83110C56D572}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Updater", "..\..\..\Lgi\trunk\utils\Updater\Updater_vs2019.vcxproj", "{11E9238B-921E-44E5-A3D2-61C5BFA7CC6C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Updater", "..\..\..\Lgi\trunk\utils\Updater\Updater_vs19.vcxproj", "{11E9238B-921E-44E5-A3D2-61C5BFA7CC6C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aspell-dist-0.60", "..\..\libs\aspell-0.60.6.1\win32\dist\aspell-dist-0.60-vs2019.vcxproj", "{1509FE6D-0B3A-422A-99D1-E26A26CE8DA5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aspell-dist-0.60", "..\..\libs\aspell-0.60.6.1\win32\dist\aspell-dist-0.60-vs19.vcxproj", "{1509FE6D-0B3A-422A-99D1-E26A26CE8DA5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bzip2-1.0.6", "..\..\libs\bzip2-1.0.6\windows\bzip2-1.0.6-vs2019.vcxproj", "{E5575141-C1A2-4997-BADB-7584CF546E1F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bzip2-1.0.6", "..\..\libs\bzip2-1.0.6\windows\bzip2-1.0.6-vs19.vcxproj", "{E5575141-C1A2-4997-BADB-7584CF546E1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
