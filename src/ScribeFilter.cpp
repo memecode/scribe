@@ -770,6 +770,8 @@ bool FilterCondition::TestData(Filter *F, LVariant &Var, LStream *Log, LStream *
 				break;
 			}
 			case GV_STRING:
+			case GV_WSTRING:
+			case GV_LSTRING:
 			{
 				auto sVar = Var.Str();
 				auto sVal = Val.Str();
@@ -3389,8 +3391,12 @@ void Filter::OnMouseClick(LMouse &m)
 		RClick.AppendItem(LLoadString(IDS_OPEN), IDM_OPEN);
 		RClick.AppendItem(LLoadString(IDS_DELETE), IDM_DELETE);
 		RClick.AppendItem(LLoadString(IDS_EXPORT), IDM_EXPORT);
-
-		switch (RClick.Float(Parent, m))
+		
+		RClick.AppendSeparator();
+		RClick.AppendItem("Move..", ID_MOVE_ITEM);
+		RClick.AppendItem("Copy..", ID_COPY_ITEM);
+		
+		switch (auto result = RClick.Float(Parent, m))
 		{
 			case IDM_OPEN:
 			{
@@ -3422,6 +3428,30 @@ void Filter::OnMouseClick(LMouse &m)
 			case IDM_EXPORT:
 			{
 				ExportAll(GetList(), sTextXml, NULL);
+				break;
+			}
+			case ID_MOVE_ITEM:
+			case ID_COPY_ITEM:
+			{
+				auto copy = result == ID_COPY_ITEM;
+				if (auto dlg = new FolderDlg(App, App, MAGIC_FILTER))
+				{
+					dlg->DoModal([this, dlg, copy](auto obj, auto code)
+						{
+							if (!code)
+								return;
+
+							if (auto folder = App->GetFolder(dlg->Get()))
+							{
+								LArray<Thing*> items;
+								if (GetList())
+									GetList()->GetSelection(items);
+								else
+									items.Add(this);
+								folder->MoveTo(items, copy);
+							}
+						});
+				}
 				break;
 			}
 		}

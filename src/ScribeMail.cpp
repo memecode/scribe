@@ -6695,8 +6695,8 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 	
 	#if defined(__GTK_H__)
 		s.Sub->AppendSeparator();
-		s.Sub->AppendItem("Move..", ID_MOVE_MAIL);
-		s.Sub->AppendItem("Copy..", ID_COPY_MAIL);
+		s.Sub->AppendItem("Move..", ID_MOVE_ITEM);
+		s.Sub->AppendItem("Copy..", ID_COPY_ITEM);
 	#endif
 
 	#ifdef _DEBUG
@@ -6812,10 +6812,10 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 	Result = s.Sub->Float(p, m.x, m.y);
 	switch (Result)
 	{
-		case ID_MOVE_MAIL:
-		case ID_COPY_MAIL:
+		case ID_MOVE_ITEM:
+		case ID_COPY_ITEM:
 		{
-			auto copy = Result == ID_COPY_MAIL;
+			auto copy = Result == ID_COPY_ITEM;
 			if (auto dlg = new FolderDlg(App, App, MAGIC_MAIL))
 			{
 				dlg->DoModal([this, dlg, copy](auto obj, auto code)
