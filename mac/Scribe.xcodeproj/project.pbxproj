@@ -168,6 +168,7 @@
 		3497D5522399D288009FCC14 /* Mail Filters Menu.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5462399D260009FCC14 /* Mail Filters Menu.script */; };
 		3497D5542399D2AB009FCC14 /* resdefs.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5532399D2A5009FCC14 /* resdefs.h */; };
 		349AB0C0217B3D9500573982 /* scribe-mac-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */; };
+		34A118A92F504C40000FB211 /* ListBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A118A82F504C40000FB211 /* ListBlock.cpp */; };
 		34A66681237968A200ED0212 /* FolderCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A66680237968A200ED0212 /* FolderCalendarSource.cpp */; };
 		34A891DF2B0C177100D2930B /* libcrypto.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A891DD2B0C177100D2930B /* libcrypto.3.dylib */; };
 		34A891E12B0C178000D2930B /* libssl.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A891E02B0C178000D2930B /* libssl.3.dylib */; };
@@ -518,6 +519,7 @@
 		3497D5492399D260009FCC14 /* Delete Duplicate Messages.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Delete Duplicate Messages.script"; path = "../../Scripts/Delete Duplicate Messages.script"; sourceTree = "<group>"; };
 		3497D5532399D2A5009FCC14 /* resdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resdefs.h; path = ../../Resources/resdefs.h; sourceTree = "<group>"; };
 		349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "scribe-mac-icon.icns"; path = "../../Resources/scribe-mac-icon.icns"; sourceTree = "<group>"; };
+		34A118A82F504C40000FB211 /* ListBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ListBlock.cpp; sourceTree = "<group>"; };
 		34A66680237968A200ED0212 /* FolderCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FolderCalendarSource.cpp; path = ../../src/FolderCalendarSource.cpp; sourceTree = "<group>"; };
 		34A891DD2B0C177100D2930B /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.3.dylib; path = /opt/local/libexec/openssl3/lib/libcrypto.3.dylib; sourceTree = "<absolute>"; };
 		34A891E02B0C178000D2930B /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.3.dylib; path = /opt/local/libexec/openssl3/lib/libssl.3.dylib; sourceTree = "<absolute>"; };
@@ -619,6 +621,7 @@
 		3445E57D1F1F426B00D0A824 /* RichEdit */ = {
 			isa = PBXGroup;
 			children = (
+				34A118A82F504C40000FB211 /* ListBlock.cpp */,
 				34417DBD205FD5B800D2E80C /* HorzRuleBlock.cpp */,
 				3445E57E1F1F428400D0A824 /* BlockCursor.cpp */,
 				3445E57F1F1F428400D0A824 /* RichTextEdit.cpp */,
@@ -1351,6 +1354,7 @@
 				3477C4571CC262AF0028B84B /* ScriptCompiler.cpp in Sources */,
 				3477C4301CC2319B0028B84B /* Mail3Store.cpp in Sources */,
 				3477C40D1CC230C30028B84B /* Mail.cpp in Sources */,
+				34A118A92F504C40000FB211 /* ListBlock.cpp in Sources */,
 				3477C3EE1CC227ED0028B84B /* ScribeSockets.cpp in Sources */,
 				3477C3D61CC227ED0028B84B /* ScribeAccountPreview.cpp in Sources */,
 				3477C4341CC233CF0028B84B /* Db-Csv.cpp in Sources */,
