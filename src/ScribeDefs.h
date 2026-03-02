@@ -35,46 +35,47 @@
 #define OPT_SendCharset1			"Send.PrefCharset1"
 #define OPT_SendCharset2			"Send.PrefCharset2"
 
-#define	OPT_Pop3Type				"Receive.Type"			//(int)
-#define	OPT_Pop3Protocol			"Receive.Protocol"		//(char*) one of the PROTOCOL_??? defs
-#define OPT_Pop3Server				"Receive.Server"		//(char*)
+#define	OPT_Pop3Type				"Receive.Type"				//(int)
+#define	OPT_Pop3Protocol			"Receive.Protocol"			//(char*) one of the PROTOCOL_??? defs
+#define OPT_Pop3Server				"Receive.Server"			//(char*)
 #define OPT_Pop3Port				"Receive.Port"
-#define OPT_ReceiveService			"Receive.Service"		//(bool)
-#define OPT_Pop3Name				"Receive.Name"			//(char*)
-#define OPT_Pop3AutoReceive			"Receive.AutoReceive"	//(bool)
-#define OPT_Pop3CheckEvery			"Receive.CheckEvery"	//(char*)
-#define OPT_Pop3LeaveOnServer		"Receive.LeaveOnServer"	//(bool)(int)
-#define OPT_Pop3Folder				"Receive.Folder"		//(char*)
-#define OPT_Pop3SSL					"Receive.SSL"			//(int)
-#define OPT_EncryptedPop3Password	"Receive.Password"		//(void*)
-#define OPT_DeleteAfter				"Receive.DeleteAfter"	// (bool)
-#define OPT_DeleteDays				"Receive.DeleteDays"	// (int)
-#define OPT_DeleteIfLarger			"Receive.DelIfLarger"	// (bool)
+#define OPT_ReceiveService			"Receive.Service"			//(bool)
+#define OPT_Pop3Name				"Receive.Name"				//(char*)
+#define OPT_Pop3AutoReceive			"Receive.AutoReceive"		//(bool)
+#define OPT_Pop3CheckEvery			"Receive.CheckEvery"		//(char*)
+#define OPT_Pop3LeaveOnServer		"Receive.LeaveOnServer"		//(bool)(int)
+#define OPT_Pop3Folder				"Receive.Folder"			//(char*)
+#define OPT_Pop3SSL					"Receive.SSL"				//(int)
+#define OPT_EncryptedPop3Password	"Receive.Password"			//(void*)
+#define OPT_DeleteAfter				"Receive.DeleteAfter"		// (bool)
+#define OPT_DeleteDays				"Receive.DeleteDays"		// (int)
+#define OPT_DeleteIfLarger			"Receive.DelIfLarger"		// (bool)
 #define OPT_DeleteIfLargerSize		"Receive.DelIfLargerSize"
-#define OPT_ReceiveHotFolder		"Receive.HotFolder"		//(char*)
+#define OPT_ReceiveHotFolder		"Receive.HotFolder"			//(char*)
 #define OPT_Receive8BitCs			"Receive.8BitCharSet"
 #define OPT_ReceiveAsciiCs			"Receive.AsciiCharset"
-#define OPT_ReceiveAuthType			"Receive.AuthType"		//(int)
-#define OPT_MaxEmailSize			"Receive.MaxSize"		//(int)
+#define OPT_ReceiveAuthType			"Receive.AuthType"			//(int)
+#define OPT_MaxEmailSize			"Receive.MaxSize"			//(int)
 // #define OPT_ReceiveSecAuth			"Receive.SecAuth"		//(int)
 #define OPT_ReceiveSubFolders		"Receive.SubFolders"
-#define OPT_ReceiveFilterIncoming	"Receive.FilterIncoming" //(bool)
+#define OPT_ReceiveFilterIncoming	"Receive.FilterIncoming"	//(bool)
+#define OPT_MapiProfiles			"Receive.MapiProfiles"		// (char*)
 
-#define OPT_SplitterPos				"ScribeUI.SplitPos"	//(int)	
-#define OPT_SubSplitPos				"ScribeUI.SubSplitPos" //(int)	
-#define OPT_UiLanguage				"ScribeUI.Lang"		//(char*)
-#define OPT_UiFontSize				"ScribeUI.FontSize"	//(int)
-#define OPT_ScribeWndPos			"ScribeUI.Pos"		//(char*)
+#define OPT_SplitterPos				"ScribeUI.SplitPos"			//(int)	
+#define OPT_SubSplitPos				"ScribeUI.SubSplitPos"		//(int)	
+#define OPT_UiLanguage				"ScribeUI.Lang"				//(char*)
+#define OPT_UiFontSize				"ScribeUI.FontSize"			//(int)
+#define OPT_ScribeWndPos			"ScribeUI.Pos"				//(char*)
 #define OPT_ScribeWndToolbar		"ScribeUI.Toolbar"
 #define OPT_ShowScriptConsole		"ScribeUI.ShowScriptConsole"
 #define OPT_ShowFolderTotals		"ScribeUI.ShowFldTotals"
-#define OPT_Theme					"ScribeUI.Theme"		//(char*)
+#define OPT_Theme					"ScribeUI.Theme"			//(char*)
 
-#define OPT_LocalCalendarColour		"CalendarUI.LocCol"	  //(int)Rgb24(x, x, x)
-#define OPT_CalendarViewPos			"CalendarUI.ViewPos"  //(char*)
-#define OPT_CalendarViewMode		"CalendarUI.Mode"	  //(int)
-#define OPT_CalendarViewTodo		"CalendarUI.Todo"	  //(int)
-#define OPT_CalendarEventPos		"CalendarUI.EventPos" //(char*)
+#define OPT_LocalCalendarColour		"CalendarUI.LocCol"			//(int)Rgb24(x, x, x)
+#define OPT_CalendarViewPos			"CalendarUI.ViewPos"		//(char*)
+#define OPT_CalendarViewMode		"CalendarUI.Mode"			//(int)
+#define OPT_CalendarViewTodo		"CalendarUI.Todo"			//(int)
+#define OPT_CalendarEventPos		"CalendarUI.EventPos"		//(char*)
 #define OPT_CalendarCreateIn		"CalendarUI.Create"
 #define OPT_CalendarSources			"CalendarUI.Sources"
 #define OPT_CalendarFirstDayOfWeek	"CalendarUI.FirstDayOfWeek"

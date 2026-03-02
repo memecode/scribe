@@ -193,12 +193,28 @@ const char *LMapiContact::GetStr(int id)
 		case FIELD_TIMEZONE:
 			return NULL;
 
+		case FIELD_CONTACT_JSON:
+			// FIXME: what is this?
+			break;
+
 		default:
 			LAssert(0);
 			break;
 	}
 	
 	return NULL;
+}
+
+const LVariant *LMapiContact::GetVar(int id)
+{
+	switch (id)
+	{
+		case FIELD_CONTACT_IMAGE:
+			// FIXME: impl
+			break;
+	}
+
+	return nullptr;
 }
 
 Store3Status LMapiContact::SetStr(int id, const char *str)

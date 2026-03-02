@@ -507,6 +507,7 @@ public:
 	Store3Status SetDate(int id, const LDateTime *i);
 	LDataPropI *GetObj(int id);
 	LDataIt GetList(int id);
+	const LVariant *GetVar(int id) override;
 
 	// LDataI API
 	LDataI &operator =(LDataI &p);
@@ -548,18 +549,18 @@ class LMapiFolder : public LDataFolderI, public LMapiBase
 {
 	friend class LMapiStore;
 
-	LPMAPIFOLDER MapiFolder;
+	LPMAPIFOLDER MapiFolder = nullptr;
 	LArray<uint8_t> Entry;
 	
-	LMapiStore *Store;
-	LMapiFolder *Parent;
+	LMapiStore *Store = nullptr;
+	LMapiFolder *Parent = nullptr;
 	LString Name;
 	LString Class;
-	int64 Unread;
-	bool IsOpen;
-	int SortIndex;
-	uint32_t ItemType;
-	Store3SystemFolder FolderType;
+	int64 Unread = 0;
+	bool IsOpen = false;
+	int SortIndex = -6;
+	uint32_t ItemType = MAGIC_MAIL;
+	Store3SystemFolder FolderType = Store3SystemNone;
 
 	DIterator<LDataFolderI, LMapiFolder, LMapiStore> Sub;
 	DIterator<LDataI, LMapiThing, LMapiStore> Items;
@@ -766,18 +767,19 @@ class LMapiStore : public LDataStoreI, public LLibrary
 	friend class LMapiThing;
 	friend class LMapiMail;
 
-	LDataEventsI *Callback;
-	LMapiFolder *Root;
+	LDataEventsI *Callback = nullptr;
+	LMapiFolder *Root = nullptr;
 	LAutoPtr<MapiEntryRef> EntryRef;
-	LString Profile, Username, Password, RootName;
+	LString Profile, Username, Password, RootName, profileCache;
 	uint64 AccountId;
 	LArray<uint8_t> InboxEntry;
 	LArray<LMapiThing*> Dirty;
-	LMapiAdviseSink *Notify;
-	bool MapiInitialized;
+	LMapiAdviseSink *Notify = nullptr;
+	LString::Array availableProfiles;
+	bool MapiInitialized = false;
 
-	LPMAPISESSION				Session;
-	IMsgStore					*MsgStore;
+	LPMAPISESSION				Session = nullptr;
+	IMsgStore					*MsgStore = nullptr;
 	UI_TYPE						Ui;
 	
 	MAPIINITIALIZE				*MAPIInitialize;

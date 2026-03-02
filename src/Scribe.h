@@ -2058,7 +2058,9 @@ public:
 	AccIntOption(AuthType, OPT_ReceiveAuthType);
 	AccStrOption(HotFolder, OPT_ReceiveHotFolder);
 	AccIntOption(FilterIncoming, OPT_ReceiveFilterIncoming);
-	
+
+	AccStrOption(MapiProfiles, OPT_MapiProfiles);
+
 	/// Get/Set the SSL mode
 	/// \sa #SSL_NONE, #SSL_STARTTLS or #SSL_DIRECT
 	AccIntOption(UseSSL, OPT_Pop3SSL);

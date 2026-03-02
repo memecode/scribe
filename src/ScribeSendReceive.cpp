@@ -689,24 +689,23 @@ bool Accountlet::Connect(LView *p, bool quiet)
 				#endif
 
 				#ifdef WIN32
+				LString profile = Server().Str();
 				if (!DataStore &&
-					Protocol == ProtocolMapi &&
-					ValidStr(Server().Str()))
+					Protocol == ProtocolMapi)
 				{
 					char Password[256] = "";
 					LPassword p;
 					if (GetPassword(&p))
 						p.Get(Password);
 
-					DataStore = OpenMapiStore(	Server().Str(),
+					DataStore = OpenMapiStore(	profile,
 												UserName().Str(),
 												Password,
 												Account->Receive.Id(),
 												Account->GetApp());
 					if (DataStore)
 					{
-					    LDataFolderI *r = DataStore->GetRoot();
-					    if (r)
+					    if (auto r = DataStore->GetRoot())
 					    {					    
     						DeleteObj(Root);
     						if ((Root = new ScribeFolder))

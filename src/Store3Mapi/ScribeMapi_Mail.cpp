@@ -221,6 +221,8 @@ int64 LMapiMail::GetInt(int id)
 			return 0;
 		case FIELD_ACCOUNT_ID:
 			return Store->GetInt(FIELD_ACCOUNT_ID);
+		case FIELD_STORE_TYPE:
+			return Store3Mapi;
 		default:
 			LAssert(0);
 			break;

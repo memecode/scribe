@@ -11710,7 +11710,7 @@ void ScribeWnd::OnPropChange(LDataStoreI *store, int Prop, LVariantType Type)
 			if (StatusPanel)
 				StatusPanel->Invalidate();
 			
-			for (auto a : Accounts)
+			for (auto a: Accounts)
 			{
 				if (a->Receive.GetDataStore() == store)
 				{
@@ -11725,6 +11725,22 @@ void ScribeWnd::OnPropChange(LDataStoreI *store, int Prop, LVariantType Type)
 					a->Receive.OnOnlineChange(Online != 0);
 					ScribeState = Old;
 					break;
+				}
+			}
+			break;
+		}
+		case FIELD_MAPI_PROFILES:
+		{
+			// Store the available profiles in the account, so the user can pick from them later:
+			auto profiles = store->GetStr(Prop);
+			LString userName = store->GetStr(FIELD_NAME);
+
+			for (auto a : Accounts)
+			{
+				if (a->Receive.ProtocolType() == ProtocolMapi &&
+					userName.Equals(a->Receive.UserName().Str()))
+				{
+					a->Receive.MapiProfiles(profiles);
 				}
 			}
 			break;

@@ -75,18 +75,13 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 LMapiStore::LMapiStore(const char *profile, const char *username, const char *password, uint64 accountId, LDataEventsI *callback)
 {
-	Session = NULL;
-	MsgStore = NULL;
 	Profile = profile;
 	Username = username;
 	Password = password;
 	Callback = callback;
 	AccountId = accountId;
-	Notify = NULL;
-	MapiInitialized = false;
-	Root = NULL;
 	
-	LViewI *v = dynamic_cast<LViewI*>(Callback);
+	auto v = dynamic_cast<LViewI*>(Callback);
 	Ui = 
 		#ifndef __GTK_H__
 		v ? (UI_TYPE)v->Handle() :
@@ -109,23 +104,29 @@ LMapiStore::LMapiStore(const char *profile, const char *username, const char *pa
 	{
 		ScribeMsgStores Stores(this, Session);
 
-		for (unsigned i=0; i<Stores.Length(); i++)
+		MapiEntryRef *toOpen = nullptr;
+		for (auto e: Stores)
 		{
-			MapiEntryRef *e = Stores[i];
-			if (e->DisplayName && stristr(e->DisplayName, Username))
+			availableProfiles.Add(e->DisplayName);
+			if (e->DisplayName.Equals(Username))
+				toOpen = e;
+		}
+
+		if (Callback)
+			Callback->OnPropChange(this, FIELD_MAPI_PROFILES, GV_LIST);
+
+		if (toOpen)
+		{
+			auto res = Session->OpenMsgStore(Ui,
+											(ULONG)toOpen->Entry.Length(),	// entry bytes
+											(LPENTRYID)&toOpen->Entry[0],	// ptr to entry
+											NULL,						// default interface: IMsgStore
+											MAPI_BEST_ACCESS,
+											&MsgStore);
+			if (SUCCEEDED(res))
 			{
-				HRESULT res = Session->OpenMsgStore(Ui,
-													(ULONG)e->Entry.Length(),		// entry bytes
-													(LPENTRYID)&e->Entry[0],// ptr to entry
-													NULL,					// default interface: IMsgStore
-													MAPI_BEST_ACCESS,
-													&MsgStore);
-				if (SUCCEEDED(res))
-				{
-					Stores.Delete(e);
-					EntryRef.Reset(e);
-					break;
-				}
+				Stores.Delete(toOpen);
+				EntryRef.Reset(toOpen);
 			}
 		}
 
@@ -274,7 +275,7 @@ bool LMapiStore::Login()
 		return false;
 	}
 	
-	HRESULT res = MAPIInitialize(NULL);
+	auto res = MAPIInitialize(NULL);
 	if (FAILED(res))
 	{
 		Error("%s:%i - MAPIInitialize failed with 0x%x.\n", _FL, res);
@@ -288,7 +289,7 @@ bool LMapiStore::Login()
 	res = MAPILogonEx(	Ui,
 						wProfile,
 						wPassword,
-						MAPI_LOGON_UI | MAPI_EXTENDED,
+						MAPI_LOGON_UI | MAPI_EXTENDED | MAPI_USE_DEFAULT,
 						&Session);
 	if (FAILED(res) || !Session)
 	{
@@ -396,6 +397,11 @@ const char *LMapiStore::GetStr(int id)
 			return RootName;
 		case FIELD_STORE_TYPE:
 			return "LMapiStore";
+		case FIELD_MAPI_PROFILES:
+			profileCache = LString(",").Join(availableProfiles);
+			return profileCache;
+		case FIELD_NAME:
+			return Username;
 	}
 	
 	return NULL;
@@ -446,7 +452,6 @@ LDataFolderI *LMapiStore::GetRoot(bool create)
 				}
 			}
 		}
-		// else LAssert(0);
 	}
 	
 	return Root;

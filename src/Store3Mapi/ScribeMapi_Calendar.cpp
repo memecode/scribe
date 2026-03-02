@@ -105,6 +105,13 @@ const char *LMapiCalendar::GetStr(int id)
 			return Notes;
 		case FIELD_CAL_TIMEZONE:
 			return TimeZone;
+		case FIELD_CAL_REMINDERS:
+			// FIXME: impl?
+			break;
+		case FIELD_ATTENDEE_JSON:
+			// FIXME: impl?
+			break;
+
 		default:
 			LAssert(0);
 			break;
@@ -157,6 +164,11 @@ int64 LMapiCalendar::GetInt(int id)
 			return ShowAs;
 		case FIELD_CAL_PRIVACY:
 			return Priv;
+		case FIELD_CAL_ALL_DAY:
+			// FIXME: impl
+			return 0;
+		case FIELD_READONLY:
+			return true;
 
 		default:
 			LAssert(0);
@@ -242,6 +254,13 @@ LDataPropI *LMapiCalendar::GetObj(int id)
 
 LDataIt LMapiCalendar::GetList(int id)
 {
+	switch (id)
+	{
+		case FIELD_CAL_ATTACHMENTS:
+			// FIXME: impl?
+			return nullptr;
+	}
+
 	LAssert(0);
 	return NULL;
 }

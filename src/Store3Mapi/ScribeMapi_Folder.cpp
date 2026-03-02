@@ -5,15 +5,6 @@ extern const GUID IID_IMessage;
 LMapiFolder::LMapiFolder(LMapiStore *store)
 {
 	Store = store;
-	Parent = NULL;
-	MapiFolder = NULL;
-	FolderType = Store3SystemNone;
-
-	Unread = 0;
-	IsOpen = false;
-	SortIndex = -6;
-	ItemType = MAGIC_MAIL;
-
 	if (!Parent)
 		Name = Store->GetStr(FIELD_FOLDER_NAME);
 }
@@ -21,7 +12,7 @@ LMapiFolder::LMapiFolder(LMapiStore *store)
 LMapiFolder::~LMapiFolder()
 {
 	if (Store->Root == this)
-		Store->Root = NULL;
+		Store->Root = nullptr;
 	ReleaseHandle();
 }
 
@@ -33,7 +24,7 @@ bool LMapiFolder::Set(LPMAPIFOLDER f)
 
 bool LMapiFolder::Set(LMapiFolder *parent, ScribeMapiList *Lst)
 {
-	SPropValue *p = Lst->GetField(PR_ENTRYID);
+	auto p = Lst->GetField(PR_ENTRYID);
 	if (!p)
 		return false;
 
@@ -79,7 +70,7 @@ bool LMapiFolder::Set(LMapiFolder *parent, ScribeMapiList *Lst)
 	{
 		// Check if we are the Inbox
 		ULONG Result = 0;
-		HRESULT res = Store->Handle()->CompareEntryIDs(	(ULONG)Store->InboxEntry.Length(),
+		auto res = Store->Handle()->CompareEntryIDs(	(ULONG)Store->InboxEntry.Length(),
 														(LPENTRYID)&Store->InboxEntry[0],
 														(ULONG)Entry.Length(),
 														(LPENTRYID)&Entry[0],
@@ -377,6 +368,7 @@ LDataIterator<LDataI*> &LMapiFolder::Children()
 
 LDataIterator<LDataPropI*> &LMapiFolder::Fields()
 {
+	Flds.State = Store3Loaded;
 	return Flds;
 }
 
