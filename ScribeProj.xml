@@ -102,12 +102,13 @@
 		</Node>
 		<Node Name="RichTextEdit" Type="1" Platforms="15" Open="0" Id="13">
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/src/common/Widgets/Editor/ListBlock.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/include/lgi/common/RichTextEdit.h" Type="3" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.h" Type="3" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/TextBlock.cpp" Type="2" Platforms="15" />
 		</Node>
 		<Node File="../../lgi/trunk/src/common/Lgi/Browser.cpp" Type="2" Platforms="15" />
