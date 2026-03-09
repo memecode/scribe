@@ -312,50 +312,48 @@
 		<Node File="../../lgi/trunk/src/common/Coding/Instructions.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Storage" Type="1" Platforms="7" Open="0" Id="39">
-		<Node Name="3" Type="1" Platforms="7" Open="0" Id="40">
-			<Node Name="Imap" Type="1" Platforms="7" Open="0" Id="41">
-				<Node File="../../lgi/trunk/src/common/Net/Mime.cpp" Type="2" Platforms="15" />
-				<Node File="../../lgi/trunk/include/lgi/common/Mime.h" Type="3" Platforms="15" />
-				<Node File="./src/Store3Imap/ScribeImap.h" Type="3" Platforms="15" />
-				<Node File="./src/Store3Imap/ScribeImap_Attachment.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Imap/ScribeImap_Folder.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Imap/ScribeImap_Mail.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Imap/ScribeImap_Store.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Imap/ScribeImap_Thread.cpp" Type="2" Platforms="15" />
-			</Node>
-			<Node Name="Mail3" Type="1" Platforms="7" Open="0" Id="42">
-				<Node Name="Sqlite" Type="1" Platforms="7" Open="1" Id="44">
-					<Node File="./src/Sqlite/v3.50.1/sqlite3.c" Type="2" Platforms="15" />
-					<Node File="./src/Sqlite/v3.50.1/sqlite3.h" Type="3" Platforms="15" />
-					<Node File="./src/Sqlite/v3.50.1/sqlite3ext.h" Type="3" Platforms="15" />
-				</Node>
-				<Node File="./src/Store3Mail3/Mail3.h" Type="3" Platforms="15" />
-				<Node File="./src/Store3Mail3/Mail3Attachment.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Mail3/Mail3Calendar.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Mail3/Mail3Contact.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Mail3/Mail3Filter.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Mail3/Mail3Folder.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Mail3/Mail3Group.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Mail3/Mail3Mail.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Mail3/Mail3Store.cpp" Type="2" Platforms="15" />
-			</Node>
-			<Node Name="Webdav" Type="1" Platforms="15" Id="45">
-				<Node File="./src/FolderCalendarSource.cpp" Type="2" Platforms="15" />
-				<Node File="../../lgi/trunk/src/common/Net/WebDav.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Webdav/WebdavCalendar.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Webdav/WebdavContact.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Webdav/WebdavFolder.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Webdav/WebdavStore.cpp" Type="2" Platforms="15" />
-				<Node File="./src/Store3Webdav/WebdavStore.h" Type="3" Platforms="15" />
-				<Node File="./src/Store3Webdav/WebdavStorePriv.h" Type="3" Platforms="15" />
-				<Node File="./src/Store3Webdav/WebdavThread.cpp" Type="2" Platforms="15" />
-			</Node>
-			<Node File="../../lgi/trunk/include/lgi/common/Store3.h" Type="3" Platforms="15" />
-			<Node File="./src/Store3Common.cpp" Type="2" Platforms="15" />
-			<Node File="./src/Store3Common.h" Type="3" Platforms="15" />
-			<Node File="../../lgi/trunk/include/lgi/common/Store3MimeTree.h" Type="3" Platforms="15" />
-			<Node File="../../lgi/trunk/include/lgi/common/Store3Defs.h" Type="3" Platforms="15" />
+		<Node Name="Imap" Type="1" Platforms="7" Open="0" Id="41">
+			<Node File="../../lgi/trunk/src/common/Net/Mime.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/include/lgi/common/Mime.h" Type="3" Platforms="15" />
+			<Node File="./src/Store3Imap/ScribeImap.h" Type="3" Platforms="15" />
+			<Node File="./src/Store3Imap/ScribeImap_Attachment.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Imap/ScribeImap_Folder.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Imap/ScribeImap_Mail.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Imap/ScribeImap_Store.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Imap/ScribeImap_Thread.cpp" Type="2" Platforms="15" />
 		</Node>
+		<Node Name="Mail3" Type="1" Platforms="7" Open="0" Id="42">
+			<Node Name="Sqlite" Type="1" Platforms="7" Open="1" Id="44">
+				<Node File="./src/Sqlite/v3.50.1/sqlite3.c" Type="2" Platforms="15" />
+				<Node File="./src/Sqlite/v3.50.1/sqlite3.h" Type="3" Platforms="15" />
+				<Node File="./src/Sqlite/v3.50.1/sqlite3ext.h" Type="3" Platforms="15" />
+			</Node>
+			<Node File="./src/Store3Mail3/Mail3.h" Type="3" Platforms="15" />
+			<Node File="./src/Store3Mail3/Mail3Attachment.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Mail3/Mail3Calendar.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Mail3/Mail3Contact.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Mail3/Mail3Filter.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Mail3/Mail3Folder.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Mail3/Mail3Group.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Mail3/Mail3Mail.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Mail3/Mail3Store.cpp" Type="2" Platforms="15" />
+		</Node>
+		<Node Name="Webdav" Type="1" Platforms="15" Id="45">
+			<Node File="./src/FolderCalendarSource.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/src/common/Net/WebDav.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Webdav/WebdavCalendar.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Webdav/WebdavContact.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Webdav/WebdavFolder.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Webdav/WebdavStore.cpp" Type="2" Platforms="15" />
+			<Node File="./src/Store3Webdav/WebdavStore.h" Type="3" Platforms="15" />
+			<Node File="./src/Store3Webdav/WebdavStorePriv.h" Type="3" Platforms="15" />
+			<Node File="./src/Store3Webdav/WebdavThread.cpp" Type="2" Platforms="15" />
+		</Node>
+		<Node File="../../lgi/trunk/include/lgi/common/Store3.h" Type="3" Platforms="15" />
+		<Node File="./src/Store3Common.cpp" Type="2" Platforms="15" />
+		<Node File="./src/Store3Common.h" Type="3" Platforms="15" />
+		<Node File="../../lgi/trunk/include/lgi/common/Store3Defs.h" Type="3" Platforms="15" />
+		<Node File="../../lgi/trunk/include/lgi/common/Store3MimeTree.h" Type="3" Platforms="15" />
 	</Node>
 	<Node Name="Testing" Type="1" Platforms="15" Id="46">
 		<Node File="./src/Test/UnitTests.cpp" Type="2" Platforms="15" />

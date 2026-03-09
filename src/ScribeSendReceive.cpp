@@ -636,15 +636,14 @@ bool Accountlet::Connect(LView *p, bool quiet)
 				(Receive = &GetAccount()->Receive) &&
 				Receive->IsPersistant())
 			{
-				LVariant Proto = GetAccount()->Receive.Protocol();
-				ScribeWnd *Wnd = GetAccount()->Parent;
+				auto Protocol = GetAccount()->Receive.ProtocolType();
+				auto Wnd = GetAccount()->Parent;
 
-				ScribeProtocol Protocol = ProtocolToEnum(Proto.Str());
 				#ifdef ImapSupport
 				LString HostName = Server().Str();
 				
 				if (!DataStore &&
-					Protocol == ProtocolImapFull &&
+					(Protocol == ProtocolImapFull || Protocol == ProtocolGoogle) &&
 					ValidStr(HostName))
 				{
 					char Password[256] = "";
@@ -1654,18 +1653,14 @@ void ReceiveAccountlet::Enabled(bool b)
 
 bool ReceiveAccountlet::IsPersistant()
 {
-	LVariant Proto = Protocol();
-	if (Proto.Str())
+	switch (ProtocolType())
 	{
-		#ifdef ImapSupport
-		if (_stricmp(Proto.Str(), PROTOCOL_IMAP4) == 0)
-			return true;
-		#endif
-		
+		case ProtocolImapFull:
+		case ProtocolGoogle:
 		#ifdef WIN32
-		if (!_stricmp(Proto.Str(), PROTOCOL_MAPI))
-			return true;
+		case ProtocolMapi:
 		#endif
+			return true;
 	}
 
 	return false;

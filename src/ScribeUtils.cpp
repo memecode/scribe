@@ -8,6 +8,7 @@
 #include "lgi/common/TabView.h"
 #include "lgi/common/OpenSSLSocket.h"
 #include "lgi/common/LgiRes.h"
+#include "lgi/common/Json.h"
 
 #include "ScribeUtils.h"
 #include "ScribeDefs.h"
@@ -1864,10 +1865,19 @@ LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes Context)
 
 	// FYI: None of this works due to issues at the providers end. It did sometime in the
 	// past. And is only here in case someone wants to try and get it working again.
+	LFile::Path oauthOpts(LSP_APP_INSTALL);
+	oauthOpts = oauthOpts / "oauth.json";
+	LFile optionsFile(oauthOpts, O_READ);
+	LJson opts;
+	if (optionsFile)
+		opts.SetJson(optionsFile.Read());
+	else
+		LgiTrace("%s:%i - failed to open oauth options file '%s'\n", _FL, oauthOpts.GetFull().Get());
 
 	if (stristr(Host, "google.") ||
 		stristr(Host, "gmail."))
 	{
+		// https://developers.google.com/workspace/gmail/imap/xoauth2-protocol
 		if (Context == MAGIC_MAIL)
 		{
 			p.AuthUri = "https://accounts.google.com/o/oauth2/auth";
@@ -1894,9 +1904,15 @@ LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes Context)
 		else return p;
 					
 		p.Provider = LOAuth2::Params::OAuthGoogle;
-					
-		p.ClientID = "<add yours here>";
-		p.ClientSecret = "<add yours here>";
+		
+		if (auto s = opts.Get("ClientID"))
+			p.ClientID = s;
+		else
+			p.ClientID = "<add yours here>";
+		if (auto s = opts.Get("ClientSecret"))
+			p.ClientSecret = s;
+		else
+			p.ClientSecret = "<add yours here>";
 		p.RedirURIs = "urn:ietf:wg:oauth:2.0:oob\nhttp://localhost";
 	}
 	else if (stristr(Host, "outlook.") &&
