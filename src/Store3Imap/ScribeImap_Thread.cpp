@@ -7,11 +7,13 @@
 #include "ScribeImap.h"
 #include "ScribeUtils.h"
 
+#define SECONDS(sec)					((sec) * 1000)
+#define MINUTES(min)					(SECONDS(min * 60))
 #define DEBUG_OUTPUT_FETCHES			0
 #define DEBUG_INPUT_FETCHES				0
 #define MAX_LISTING_SIZE				50
-#define IDLE_MAX						(28 * 60 * 1000)
-#define ERROR_RECONNECT_TIMEOUT			(10 * 1000)
+#define IDLE_MAX						MINUTES(28)
+#define ERROR_RECONNECT_TIMEOUT			SECONDS(30)
 
 #define RUN_TEST_CMDS					0
 #if RUN_TEST_CMDS

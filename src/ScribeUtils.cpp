@@ -1886,7 +1886,7 @@ LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes Context)
 			p.AuthUri = "https://accounts.google.com/o/oauth2/v2/auth";
 			p.ApiUri = "https://www.googleapis.com/oauth2/v3/token";
 			
-			#if 0
+			#if 1
 			// Old scope:
 			p.Scope = "https://mail.google.com/";
 			#else
@@ -1939,7 +1939,6 @@ LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes Context)
 
 	return p;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 class ScribeHtmLParser : public LHtmlParser
