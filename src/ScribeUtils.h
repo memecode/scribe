@@ -9,6 +9,7 @@
 #include "lgi/common/OAuth2.h"
 
 #include "ScribeInc.h"
+#include "DomType.h"
 
 ScribeFunc const char *MimeToUti(const char *Mime);
 ScribeFunc char *ScribeTempPath();
@@ -214,14 +215,16 @@ public:
 
 class ProtocolSettingStore : public LDom
 {
+	ScribeWnd *App = nullptr;
 	LOptionsFile *Opts = nullptr;
 	LString AccountTag;
 	
 public:
-	ProtocolSettingStore(LOptionsFile *opts, const char *accountTag)
+	ProtocolSettingStore(ScribeWnd *app, LOptionsFile *opts, const char *accountTag)
+		: App(app)
+		, Opts(opts)
+		, AccountTag(accountTag)
 	{
-		Opts = opts;
-		AccountTag = accountTag;
 	}
 	
 	const char *GetClass() override { return "ProtocolSettingStore"; }
@@ -246,6 +249,8 @@ public:
 		LAssert(Array == NULL); // Shouldn't need this
 		return Opts->SetValue(s, Value);
 	}
+
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 };
 
 class ScriptDownloadContentThread : public LThread, public LCancel

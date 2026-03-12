@@ -147,21 +147,22 @@
 			<Node File="./src/ScribeStatusPanel.h" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Application" Type="1" Open="0" Platforms="7" Id="17">
-			<Node File=".\resources\About.html" Type="3" Platforms="15" />
-			<Node File=".\src\DomType.h" Type="3" Platforms="15" />
-			<Node File=".\src\DomTypeValues.h" Type="3" Platforms="15" />
-			<Node File=".\src\LoadMailStoreState.h" Type="3" Platforms="15" />
-			<Node File=".\src\ScribeAbout.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeApp.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeIpc.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeIpc.h" Type="3" Platforms="15" />
-			<Node File=".\src\ScribeMain.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeRepair.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeSockets.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeThing.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeUtils.cpp" Type="2" Platforms="15" />
-			<Node File=".\src\ScribeWndPrivate.h" Type="3" Platforms="15" />
-			<Node File=".\resources\Title.html" Type="3" Platforms="15" />
+			<Node File="./resources/About.html" Type="3" Platforms="15" />
+			<Node File="./src/DomType.h" Type="3" Platforms="15" />
+			<Node File="./src/DomTypeValues.h" Type="3" Platforms="15" />
+			<Node File="./src/LoadMailStoreState.h" Type="3" Platforms="15" />
+			<Node File="./src/ScribeAbout.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeApp.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeIpc.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeIpc.h" Type="3" Platforms="15" />
+			<Node File="./src/ScribeMain.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeRepair.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeSockets.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeThing.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeUtils.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeUtils.h" Type="3" Platforms="15" />
+			<Node File="./src/ScribeWndPrivate.h" Type="3" Platforms="15" />
+			<Node File="./resources/Title.html" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Components" Type="1" Platforms="15" Open="0" Id="18">
 			<Node File="./src/Components.cpp" Type="2" Platforms="15" />

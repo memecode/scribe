@@ -656,7 +656,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
 					int OpenFlags = MakeOpenFlags(Account, false);
 					MailProtocolProgress *Prog[2] = { &Group, &Item };
 					LAutoPtr<ProtocolSettingStore> Store;
-					Store.Reset(new ProtocolSettingStore(Wnd->GetOptions(), OptionName(NULL)));
+					Store.Reset(new ProtocolSettingStore(Account->GetApp(), Wnd->GetOptions(), OptionName(NULL)));
 					
 					DataStore = OpenImap(HostName,
 										Receive->Port(),

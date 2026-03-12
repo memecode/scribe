@@ -2111,3 +2111,27 @@ const char *ToString(ScribeMailType t)
 	}
 	return "Invalid";
 }
+
+bool ProtocolSettingStore::CallMethod(const char *MethodName, LScriptArguments &Args)
+{
+	switch (StrToDom(MethodName))
+	{
+		case SdSaveOptions:
+		{
+			if (!App)
+				return false;
+				
+			if (App->InThread())
+				App->SaveOptions();
+			else
+				App->RunCallback([this]()
+				{
+					App->SaveOptions();
+				},	_FL);
+				
+			return true;
+		}
+	}
+	
+	return false;
+}
