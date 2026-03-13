@@ -16,6 +16,11 @@
 #include "resdefs.h"
 #include "../src/common/Coding/ScriptingPriv.h"
 
+#if __has_include("ScribeGoogleClient.h")
+	// This is Memecode's client details, which is NOT stored in version control:
+	#include "ScribeGoogleClient.h"
+#endif
+
 #define COMP_FUNCTIONS 1
 #include "lgi/common/ZlibWrapper.h"
 
@@ -1908,14 +1913,19 @@ LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes Context)
 					
 		p.Provider = LOAuth2::Params::OAuthGoogle;
 		
-		if (auto s = opts.Get("ClientID"))
-			p.ClientID = s;
-		else
+		#ifdef Scribe_GoogleClientId
+			// This is Memecode's client ID, which is NOT stored in version control:
+			p.ClientID = Scribe_GoogleClientId;
+		#else
 			p.ClientID = "<add yours here>";
-		if (auto s = opts.Get("ClientSecret"))
-			p.ClientSecret = s;
-		else
+		#endif
+		#ifdef Scribe_GoogleClientSecret
+			// This is Memecode's client secret, which is NOT stored in version control:
+			p.ClientSecret = Scribe_GoogleClientSecret;
+		#else
 			p.ClientSecret = "<add yours here>";
+		#endif
+
 		p.RedirURIs = "urn:ietf:wg:oauth:2.0:oob\nhttp://localhost";
 	}
 	else if (stristr(Host, "outlook.") &&
