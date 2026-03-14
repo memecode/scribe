@@ -1,25 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="ReleaseNoOptimize|Win32">
-      <Configuration>ReleaseNoOptimize</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="ReleaseNoOptimize|x64">
       <Configuration>ReleaseNoOptimize</Configuration>
       <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -34,23 +22,6 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
@@ -71,15 +42,6 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -93,14 +55,6 @@
   <PropertyGroup>
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(Platform)$(Configuration)19\</OutDir>
-    <IntDir>$(Platform)$(Configuration)19\</IntDir>
-    <PreLinkEventUseInBuild>false</PreLinkEventUseInBuild>
-    <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
-    <TargetName>$(ProjectName)</TargetName>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(Platform)$(Configuration)22\</OutDir>
     <IntDir>$(Platform)$(Configuration)22\</IntDir>
@@ -108,23 +62,9 @@
     <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;C:\Office 2010 Developer Resources\include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(Platform)$(Configuration)19\</OutDir>
-    <IntDir>$(Platform)$(Configuration)19\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
-    <TargetName>$(ProjectName)</TargetName>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(Platform)$(Configuration)22\</OutDir>
     <IntDir>$(Platform)$(Configuration)22\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
-    <TargetName>$(ProjectName)</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|Win32'">
-    <OutDir>$(Platform)$(Configuration)19\</OutDir>
-    <IntDir>$(Platform)$(Configuration)19\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
@@ -136,43 +76,6 @@
     <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\src;..\Resources;..\src\Sqlite;..\..\libs\libchardet\include;..\..\libs\libchardet\src;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\include;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\private\common;..\..\..\..\CodeLib\libpng;..\..\..\..\CodeLib\libpng\build32;..\..\..\..\CodeLib\libpng\build32\zlib_dir;..\..\..\..\CodeLib\zlib;..\..\..\..\CodeLib\libjpeg-9a;..\..\libs\mapi;..\..\libs\libchardet\src;..\..\libs\libchardet\include;c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;c:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories);Utils\Tables</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SCRIBE_APP;WIN32;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ShowIncludes>false</ShowIncludes>
-    </ClCompile>
-    <PreLinkEvent>
-      <Message>Update version</Message>
-      <Command>cd Code\Py
-"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
-cd ..
-call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
-rc Resource.rc
-cd ..
-copy Code\Resource.res $(OutDir)
-</Command>
-    </PreLinkEvent>
-    <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
-      <AdditionalLibraryDirectories>..\..\libs\build-x32;..\..\..\Lgi\trunk\lib;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <Manifest>
-      <AdditionalManifestFiles>..\Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
-    </Manifest>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -206,41 +109,6 @@ copy Code\Resource.res $(OutDir)
     <Manifest>
       <AdditionalManifestFiles>..\Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
       <VerboseOutput>true</VerboseOutput>
-    </Manifest>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>..\src;..\Resources;..\src\Sqlite;..\..\libs\libchardet\include;..\..\libs\libchardet\src;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\include;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\private\common;..\..\..\..\CodeLib\libpng;..\..\..\..\CodeLib\libpng\build32;..\..\..\..\CodeLib\libpng\build32\zlib_dir;..\..\..\..\CodeLib\zlib;..\..\..\..\CodeLib\libjpeg-9a;..\..\libs\mapi;c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;c:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories);Utils\Tables;..\crashpad-release-x86-64-stable\include;..\crashpad-release-x86-64-stable\include\mini_chromium</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SCRIBE_APP;WIN32;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <PreLinkEvent>
-      <Command>cd Code\Py
-"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
-cd ..
-call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
-rc Resource.rc
-cd ..
-copy Code\Resource.res $(OutDir)
-</Command>
-    </PreLinkEvent>
-    <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
-      <AdditionalLibraryDirectories>..\..\libs\build-x32;..\..\..\Lgi\trunk\lib;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <Manifest>
-      <AdditionalManifestFiles>Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -280,43 +148,6 @@ copy Resource.res ..\win\$(OutDir)</Command>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
-    </Manifest>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\src;..\Resources;..\src\Sqlite;..\..\libs\libchardet\include;..\..\libs\libchardet\src;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\include;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\private\common;..\..\..\..\CodeLib\libpng;..\..\..\..\CodeLib\libpng\build32;..\..\..\..\CodeLib\libpng\build32\zlib_dir;..\..\..\..\CodeLib\zlib;..\..\..\..\CodeLib\libjpeg-9a;..\..\libs\mapi;c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;c:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories);Utils\Tables;..\crashpad-release-x86-64-stable\include;..\crashpad-release-x86-64-stable\include\mini_chromium</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SCRIBE_APP;WIN32;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <PreLinkEvent>
-      <Message>Update Version</Message>
-      <Command>cd Code\Py
-"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
-cd ..
-call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
-rc Resource.rc
-cd ..
-copy Code\Resource.res $(OutDir)
-</Command>
-    </PreLinkEvent>
-    <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
-      <AdditionalLibraryDirectories>..\..\libs\build-x32;..\..\..\Lgi\trunk\lib;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <Manifest>
-      <AdditionalManifestFiles>Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'">

@@ -7,10 +7,7 @@ wordsize = 64
 if len(sys.argv) > 1 and sys.argv[1] == "32":
 	wordsize = 32
 
-if wordsize == 64:
-	build_folder = "x64ReleaseNoOptimize19"
-else:
-	build_folder = "Win32ReleaseNoOptimize19"
+build_folder = "x64ReleaseNoOptimize22"
 	
 # setup paths
 basepath = os.path.abspath(os.path.join(os.path.realpath(__file__), "..\\..\\.."))

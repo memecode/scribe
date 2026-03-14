@@ -9,8 +9,8 @@
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"
 
-!system "copy .\x64ReleaseNoOptimize19\Scribe.exe scribe-setup" = 0
-!system "copy .\x64Release19\ScribeMapi.dll scribe-setup"       = 0
+!system "copy .\x64ReleaseNoOptimize22\Scribe.exe scribe-setup" = 0
+!system "copy .\x64Release22\ScribeMapi.dll scribe-setup"       = 0
 
 ; Scribe specific deps
 !system "copy ..\..\libs\build-x64\lib\aspell-dist-0.60.dll scribe-setup" = 0
@@ -19,14 +19,14 @@
 !system "copy ..\..\libs\build-x64\lib\bzip2.dll scribe-setup"            = 0
 
 ; Lgi deps
-!system "copy ..\..\..\lgi\deps\build-x64\lib\jpeg62.dll scribe-setup"   = 0
-!system "copy ..\..\..\lgi\deps\build-x64\lib\libpng16.dll scribe-setup" = 0
-!system "copy ..\..\..\lgi\deps\build-x64\lib\zlib.dll scribe-setup"     = 0
-!system "copy ..\..\..\lgi\deps\build-x64\lib\libiconv.dll scribe-setup" = 0
-!system "copy ..\..\..\lgi\deps\build-x64\lib\libntlm.dll scribe-setup"  = 0
+!system "copy ..\..\..\lgi\deps\build-x64\bin\jpeg62.dll scribe-setup"   = 0
+!system "copy ..\..\..\lgi\deps\build-x64\bin\libpng16.dll scribe-setup" = 0
+!system "copy ..\..\..\lgi\deps\build-x64\bin\z.dll scribe-setup"     = 0
+!system "copy ..\..\..\lgi\deps\build-x64\bin\libiconv.dll scribe-setup" = 0
+!system "copy ..\..\..\lgi\deps\build-x64\bin\libntlm.dll scribe-setup"  = 0
 
-!system "copy ..\..\..\lgi\trunk\lib\Lgi19x64nop.dll scribe-setup" = 0
-!system "copy ..\..\..\lgi\trunk\utils\Updater\x64Release19\Updater.exe scribe-setup" = 0
+!system "copy ..\..\..\lgi\trunk\lib\Lgi22nop.dll scribe-setup" = 0
+!system "copy ..\..\..\lgi\trunk\utils\Updater\x64Release22\Updater.exe scribe-setup" = 0
 
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.exe'
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.dll'
@@ -34,9 +34,9 @@
 ; Generate the DOM documentation
 !system "py ..\src\Py\DomScan.py > scribe-setup\Dom.txt"
 
-!system "python ..\Utils\Store\store.py .\x64ReleaseNoOptimize19\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
-!system "python ..\Utils\Store\store.py .\x64Release19\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0
-!system "python ..\Utils\Store\store.py ..\..\..\Lgi\trunk\lib\Lgi19x64nop.pdb Lgi ${__DATE__} ${__TIME__}" = 0
+!system "python ..\Utils\Store\store.py .\x64ReleaseNoOptimize22\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
+!system "python ..\Utils\Store\store.py .\x64Release22\ScribeMapi.pdb Mapi ${__DATE__} ${__TIME__}" = 0
+!system "python ..\Utils\Store\store.py ..\..\..\Lgi\trunk\lib\Lgi22nop.pdb Lgi ${__DATE__} ${__TIME__}" = 0
 !system "python ..\Utils\Store\check-dlls.py" = 0
 
 ;--------------------------------
