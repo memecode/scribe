@@ -1,0 +1,730 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseNoOptimize|Win32">
+      <Configuration>ReleaseNoOptimize</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseNoOptimize|x64">
+      <Configuration>ReleaseNoOptimize</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Scribe</ProjectName>
+    <ProjectGuid>{540DDE64-0927-4E67-B927-2E3BE7ECB029}</ProjectGuid>
+    <RootNamespace>Scribe_vc8</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(Platform)$(Configuration)19\</OutDir>
+    <IntDir>$(Platform)$(Configuration)19\</IntDir>
+    <PreLinkEventUseInBuild>false</PreLinkEventUseInBuild>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(Platform)$(Configuration)22\</OutDir>
+    <IntDir>$(Platform)$(Configuration)22\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;C:\Office 2010 Developer Resources\include;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(Platform)$(Configuration)19\</OutDir>
+    <IntDir>$(Platform)$(Configuration)19\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(Platform)$(Configuration)22\</OutDir>
+    <IntDir>$(Platform)$(Configuration)22\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|Win32'">
+    <OutDir>$(Platform)$(Configuration)19\</OutDir>
+    <IntDir>$(Platform)$(Configuration)19\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'">
+    <OutDir>$(Platform)$(Configuration)22\</OutDir>
+    <IntDir>$(Platform)$(Configuration)22\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files\OpenSSL-Win64\include;P:\CodeLib\libpng-1.6.26;P:\CodeLib\zlib-1.2.8;P:\CodeLib\libjpeg-9a;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src;..\Resources;..\src\Sqlite;..\..\libs\libchardet\include;..\..\libs\libchardet\src;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\include;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\private\common;..\..\..\..\CodeLib\libpng;..\..\..\..\CodeLib\libpng\build32;..\..\..\..\CodeLib\libpng\build32\zlib_dir;..\..\..\..\CodeLib\zlib;..\..\..\..\CodeLib\libjpeg-9a;..\..\libs\mapi;..\..\libs\libchardet\src;..\..\libs\libchardet\include;c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;c:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories);Utils\Tables</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SCRIBE_APP;WIN32;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <PreLinkEvent>
+      <Message>Update version</Message>
+      <Command>cd Code\Py
+"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
+cd ..
+call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
+rc Resource.rc
+cd ..
+copy Code\Resource.res $(OutDir)
+</Command>
+    </PreLinkEvent>
+    <Link>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <AdditionalLibraryDirectories>..\..\libs\build-x32;..\..\..\Lgi\trunk\lib;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>..\Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\lgi\deps\build-x64\include;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SupportJustMyCode>true</SupportJustMyCode>
+    </ClCompile>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+    <Link>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Debug\chardet19x64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>..\Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+      <VerboseOutput>true</VerboseOutput>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\src;..\Resources;..\src\Sqlite;..\..\libs\libchardet\include;..\..\libs\libchardet\src;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\include;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\private\common;..\..\..\..\CodeLib\libpng;..\..\..\..\CodeLib\libpng\build32;..\..\..\..\CodeLib\libpng\build32\zlib_dir;..\..\..\..\CodeLib\zlib;..\..\..\..\CodeLib\libjpeg-9a;..\..\libs\mapi;c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;c:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories);Utils\Tables;..\crashpad-release-x86-64-stable\include;..\crashpad-release-x86-64-stable\include\mini_chromium</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SCRIBE_APP;WIN32;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <PreLinkEvent>
+      <Command>cd Code\Py
+"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
+cd ..
+call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
+rc Resource.rc
+cd ..
+copy Code\Resource.res $(OutDir)
+</Command>
+    </PreLinkEvent>
+    <Link>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <AdditionalLibraryDirectories>..\..\libs\build-x32;..\..\..\Lgi\trunk\lib;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\lgi\deps\build-x64\include;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>MinSpace</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+    </ClCompile>
+    <PreLinkEvent>
+      <Command>cd ..\src\Py
+"C:\Program Files\Python312\python.exe"  win32_pre_build_step.py
+cd ..
+call "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+rc Resource.rc
+copy Resource.res ..\win\$(OutDir)</Command>
+    </PreLinkEvent>
+    <Link>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>..\Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src;..\Resources;..\src\Sqlite;..\..\libs\libchardet\include;..\..\libs\libchardet\src;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\include;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\private\common;..\..\..\..\CodeLib\libpng;..\..\..\..\CodeLib\libpng\build32;..\..\..\..\CodeLib\libpng\build32\zlib_dir;..\..\..\..\CodeLib\zlib;..\..\..\..\CodeLib\libjpeg-9a;..\..\libs\mapi;c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mapi;c:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories);Utils\Tables;..\crashpad-release-x86-64-stable\include;..\crashpad-release-x86-64-stable\include\mini_chromium</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SCRIBE_APP;WIN32;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <PreLinkEvent>
+      <Message>Update Version</Message>
+      <Command>cd Code\Py
+"C:\Program Files\Python311\python.exe"  win32_pre_build_step.py
+cd ..
+call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
+rc Resource.rc
+cd ..
+copy Code\Resource.res $(OutDir)
+</Command>
+    </PreLinkEvent>
+    <Link>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet14x32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <AdditionalLibraryDirectories>..\..\libs\build-x32;..\..\..\Lgi\trunk\lib;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\src;..\src\Sqlite;..\Resources;..\Utils\Tables;..\..\libs\mapi;..\..\libs\build-x64\include;..\..\libs\aspell-0.60.6.1\interfaces\cc;..\..\..\Lgi\trunk\private\common;..\..\..\Lgi\trunk\include\lgi\win;..\..\..\Lgi\trunk\include;..\..\..\lgi\deps\build-x64\include;c:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SCRIBE_APP;WIN64;HAVE_STRING_H;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>MinSpace</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+    </ClCompile>
+    <PreLinkEvent>
+      <Command>cd ..\src\Py
+"C:\Program Files\Python312\python.exe"  win32_pre_build_step.py
+cd ..
+call "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+rc Resource.rc
+copy Resource.res ..\win\$(OutDir)</Command>
+    </PreLinkEvent>
+    <Link>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>..\Resources\ScribeWindows.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\LexCpp.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptCompiler.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptLibrary.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptVM.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Db\Db-Csv.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Db\DbTable.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Font\EmojiFont.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\DrawListSurface.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Tools\GdcTools.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SegmentTree.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SharedMemory.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SoftwareUpdate.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\Tnef.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Mime.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\HttpTools.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Ftp.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Http.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\OAuth2.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\WebDav.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Mail.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\MailHttp.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\MailImap.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\OpenSSLSocket.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Lgi\Browser.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Lgi\LgiMain.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Storage\3\Store3.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Emoji\EmojiMap.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Emoji\EmojiTools.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\Homoglyphs.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\HomoglyphsTable.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Html.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlCommon.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlParser.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\SpellCheckAspell.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\XmlTreeUi.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\RtfHtml.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextConvert.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\vCard-vCal.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\BlockCursor.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEdit.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\HorzRuleBlock.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\ImageBlock.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\TextBlock.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ColourSelect.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ControlTree.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\DatePopup.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\FilterUi.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Graph.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\TimePopup.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ZoomView.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\MonthView.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\YearView.cpp" />
+    <ClCompile Include="..\..\..\Lgi\trunk\src\win\Lgi\SpellCheckWindows.cpp" />
+    <ClCompile Include="..\..\libs\Btree\btree.c" />
+    <ClCompile Include="..\..\libs\Btree\btree_delete.c" />
+    <ClCompile Include="..\..\libs\Btree\btree_header.c" />
+    <ClCompile Include="..\..\libs\Btree\btree_insert.c" />
+    <ClCompile Include="..\..\libs\Btree\btree_lock.c" />
+    <ClCompile Include="..\..\libs\Btree\btree_node.c" />
+    <ClCompile Include="..\..\libs\Btree\btree_search.c" />
+    <ClCompile Include="..\..\libs\Btree\btree_traverse.c" />
+    <ClCompile Include="..\..\libs\Btree\config.c" />
+    <ClCompile Include="..\..\libs\Btree\db.c" />
+    <ClCompile Include="..\..\libs\Btree\db_blocklist.c" />
+    <ClCompile Include="..\..\libs\Btree\db_blocks.c" />
+    <ClCompile Include="..\..\libs\Btree\db_cache.c" />
+    <ClCompile Include="..\..\libs\Btree\db_header.c" />
+    <ClCompile Include="..\..\libs\Btree\db_lock.c" />
+    <ClCompile Include="..\..\libs\Btree\db_utils.c" />
+    <ClCompile Include="..\..\libs\Btree\gbtree.cpp" />
+    <ClCompile Include="..\..\libs\Btree\hashtable.c" />
+    <ClCompile Include="..\..\libs\Btree\offsetlist.c" />
+    <ClCompile Include="..\src\AddressSelect.cpp" />
+    <ClCompile Include="..\src\BayesDlg.cpp" />
+    <ClCompile Include="..\src\BayesianFilter.cpp" />
+    <ClCompile Include="..\src\Calendar.cpp" />
+    <ClCompile Include="..\src\CalendarView.cpp" />
+    <ClCompile Include="..\src\Components.cpp" />
+    <ClCompile Include="..\src\Encryption\GnuPG.cpp" />
+    <ClCompile Include="..\src\Exp_Scribe.cpp" />
+    <ClCompile Include="..\src\FolderCalendarSource.cpp" />
+    <ClCompile Include="..\src\GBTreeWordStore.cpp" />
+    <ClCompile Include="..\src\NewMailDlg.cpp" />
+    <ClCompile Include="..\src\RemoteCalendarSource.cpp" />
+    <ClCompile Include="..\src\ScribeIpc.cpp" />
+    <ClCompile Include="..\src\SearchView.cpp" />
+    <ClCompile Include="..\src\HtmlToText.cpp" />
+    <ClCompile Include="..\src\ImpExp_Mbox.cpp" />
+    <ClCompile Include="..\src\ImpExp_Outlook.cpp" />
+    <ClCompile Include="..\src\Imp_CsvContacts.cpp" />
+    <ClCompile Include="..\src\Imp_Eml.cpp" />
+    <ClCompile Include="..\src\Imp_Eudora.cpp" />
+    <ClCompile Include="..\src\Imp_Mozilla.cpp" />
+    <ClCompile Include="..\src\Imp_NetscapeContacts.cpp" />
+    <ClCompile Include="..\src\Imp_OutlookExpress.cpp" />
+    <ClCompile Include="..\src\ManageMailStores.cpp" />
+    <ClCompile Include="..\src\MContainer.cpp" />
+    <ClCompile Include="..\src\ObjectInspector.cpp" />
+    <ClCompile Include="..\src\OptionsDlg.cpp" />
+    <ClCompile Include="..\src\PreviewPanel.cpp" />
+    <ClCompile Include="..\src\PrintContext.cpp" />
+    <ClCompile Include="..\src\PrintPreview.cpp" />
+    <ClCompile Include="..\src\ReplicateDlg.cpp" />
+    <ClCompile Include="..\src\ScribeAbout.cpp" />
+    <ClCompile Include="..\src\ScribeAccount.cpp" />
+    <ClCompile Include="..\src\ScribeAccountPreview.cpp" />
+    <ClCompile Include="..\src\ScribeAccountUI.cpp" />
+    <ClCompile Include="..\src\ScribeApp.cpp" />
+    <ClCompile Include="..\src\ScribeAttachment.cpp" />
+    <ClCompile Include="..\src\ScribeContact.cpp" />
+    <ClCompile Include="..\src\ScribeFilter.cpp" />
+    <ClCompile Include="..\src\ScribeFinder.cpp" />
+    <ClCompile Include="..\src\ScribeFolder.cpp" />
+    <ClCompile Include="..\src\ScribeFolderDlg.cpp" />
+    <ClCompile Include="..\src\ScribeFolderProp.cpp" />
+    <ClCompile Include="..\src\ScribeFolderSelect.cpp" />
+    <ClCompile Include="..\src\ScribeFolderTree.cpp" />
+    <ClCompile Include="..\src\ScribeGroup.cpp" />
+    <ClCompile Include="..\src\ScribeItemList.cpp" />
+    <ClCompile Include="..\src\ScribeLangDlg.cpp" />
+    <ClCompile Include="..\src\ScribeListAddr.cpp" />
+    <ClCompile Include="..\src\ScribeMail.cpp" />
+    <ClCompile Include="..\src\ScribeMain.cpp" />
+    <ClCompile Include="..\src\ScribePageSetup.cpp" />
+    <ClCompile Include="..\src\ScribePassword.cpp" />
+    <ClCompile Include="..\src\ScribeSendReceive.cpp" />
+    <ClCompile Include="..\src\ScribeSockets.cpp" />
+    <ClCompile Include="..\src\ScribeStatusPanel.cpp" />
+    <ClCompile Include="..\src\ScribeThing.cpp" />
+    <ClCompile Include="..\src\ScribeUi.cpp" />
+    <ClCompile Include="..\src\ScribeUtils.cpp" />
+    <ClCompile Include="..\src\Scripting.cpp" />
+    <ClCompile Include="..\src\SecurityDlg.cpp" />
+    <ClCompile Include="..\src\Sqlite\v3.41.2\sqlite3.c" />
+    <ClCompile Include="..\src\Store3Common.cpp" />
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Attachment.cpp" />
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Folder.cpp" />
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Mail.cpp" />
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Store.cpp" />
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Thread.cpp" />
+    <ClCompile Include="..\src\Store3Mail3\Mail3Attachment.cpp" />
+    <ClCompile Include="..\src\Store3Mail3\Mail3Calendar.cpp" />
+    <ClCompile Include="..\src\Store3Mail3\Mail3Contact.cpp" />
+    <ClCompile Include="..\src\Store3Mail3\Mail3Filter.cpp" />
+    <ClCompile Include="..\src\Store3Mail3\Mail3Folder.cpp" />
+    <ClCompile Include="..\src\Store3Mail3\Mail3Group.cpp" />
+    <ClCompile Include="..\src\Store3Mail3\Mail3Mail.cpp" />
+    <ClCompile Include="..\src\Store3Mail3\Mail3Store.cpp" />
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Attachment.cpp" />
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Calendar.cpp" />
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Contact.cpp" />
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Folder.cpp" />
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Mail.cpp" />
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Store.cpp" />
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Thing.cpp" />
+    <ClCompile Include="..\src\Store3Webdav\WebdavCalendar.cpp" />
+    <ClCompile Include="..\src\Store3Webdav\WebdavContact.cpp" />
+    <ClCompile Include="..\src\Store3Webdav\WebdavFolder.cpp" />
+    <ClCompile Include="..\src\Store3Webdav\WebdavStore.cpp" />
+    <ClCompile Include="..\src\Store3Webdav\WebdavThread.cpp" />
+    <ClCompile Include="..\src\Test\UnitTests.cpp" />
+    <ClCompile Include="..\src\TitlePage.cpp" />
+    <ClCompile Include="..\Utils\Tables\MailFlags.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\common\LDbTable.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\common\LWebDav.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\common\OpenSSLSocket.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\common\ZlibWrapper.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Browser.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\ColourSelect.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\ControlTree.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\DateTimeCtrls.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Db.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\DrawListSurface.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Emoji.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\EmojiFont.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\FilterUi.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Ftp.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\GdcTools.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Graph.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Homoglyphs.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Html.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HtmlCommon.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HtmlParser.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Http.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HttpTools.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Mail.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Mime.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OAuth2.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OpenSSLSocket.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\RichTextEdit.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Scripting.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SegmentTree.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SharedMemory.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SoftwareUpdate.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SpellCheck.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Store3.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Store3Defs.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Store3MimeTree.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\StoreCommon.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\TextConvert.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Tnef.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\WebDav.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\XmlTreeUi.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\ZoomView.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\src\common\Coding\Instructions.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptingPriv.h" />
+    <ClInclude Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.h" />
+    <ClInclude Include="..\..\libs\Btree\btree.h" />
+    <ClInclude Include="..\..\libs\Btree\btree_header.h" />
+    <ClInclude Include="..\..\libs\Btree\btree_lock.h" />
+    <ClInclude Include="..\..\libs\Btree\btree_node.h" />
+    <ClInclude Include="..\..\libs\Btree\config.h" />
+    <ClInclude Include="..\..\libs\Btree\db.h" />
+    <ClInclude Include="..\..\libs\Btree\db_blocklist.h" />
+    <ClInclude Include="..\..\libs\Btree\db_blocks.h" />
+    <ClInclude Include="..\..\libs\Btree\db_cache.h" />
+    <ClInclude Include="..\..\libs\Btree\db_header.h" />
+    <ClInclude Include="..\..\libs\Btree\db_internal.h" />
+    <ClInclude Include="..\..\libs\Btree\db_lock.h" />
+    <ClInclude Include="..\..\libs\Btree\db_types.h" />
+    <ClInclude Include="..\..\libs\Btree\db_utils.h" />
+    <ClInclude Include="..\..\libs\Btree\gbtree.h" />
+    <ClInclude Include="..\..\libs\Btree\hashtable.h" />
+    <ClInclude Include="..\..\libs\Btree\offsetlist.h" />
+    <ClInclude Include="..\src\BayesianFilter.h" />
+    <ClInclude Include="..\src\BZip2File.h" />
+    <ClInclude Include="..\src\Calendar.h" />
+    <ClInclude Include="..\src\CalendarView.h" />
+    <ClInclude Include="..\src\Components.h" />
+    <ClInclude Include="..\src\DomFields.h" />
+    <ClInclude Include="..\src\DomType.h" />
+    <ClInclude Include="..\src\DomTypeValues.h" />
+    <ClInclude Include="..\src\Encryption\GnuPG.h" />
+    <ClInclude Include="..\src\FolderTask.h" />
+    <ClInclude Include="..\src\Imp_Outlook.h" />
+    <ClInclude Include="..\src\ManageMailStores.h" />
+    <ClInclude Include="..\src\ObjectInspector.h" />
+    <ClInclude Include="..\src\PreviewPanel.h" />
+    <ClInclude Include="..\src\PrintContext.h" />
+    <ClInclude Include="..\src\PrintPreview.h" />
+    <ClInclude Include="..\src\ReplicateDlg.h" />
+    <ClInclude Include="..\src\Scribe.h" />
+    <ClInclude Include="..\src\ScribeAccountPreview.h" />
+    <ClInclude Include="..\src\ScribeAccountUI.h" />
+    <ClInclude Include="..\src\ScribeDefs.h" />
+    <ClInclude Include="..\src\ScribeFolderDlg.h" />
+    <ClInclude Include="..\src\ScribeFolderSelect.h" />
+    <ClInclude Include="..\src\ScribeInc.h" />
+    <ClInclude Include="..\src\ScribeIpc.h" />
+    <ClInclude Include="..\src\ScribeListAddr.h" />
+    <ClInclude Include="..\src\ScribePageSetup.h" />
+    <ClInclude Include="..\src\ScribePrivate.h" />
+    <ClInclude Include="..\src\ScribeStatusPanel.h" />
+    <ClInclude Include="..\src\ScribeUtils.h" />
+    <ClInclude Include="..\src\ScribeWndPrivate.h" />
+    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3.h" />
+    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3ext.h" />
+    <ClInclude Include="..\src\Store3Imap\include\Scribe.pb.h" />
+    <ClInclude Include="..\src\Store3Imap\ScribeImap.h" />
+    <ClInclude Include="..\src\Store3Mail3\Mail3.h" />
+    <ClInclude Include="..\src\Store3Mapi\ScribeMapi.h" />
+    <ClInclude Include="..\src\Store3Webdav\WebdavStore.h" />
+    <ClInclude Include="..\src\Store3Webdav\WebdavStorePriv.h" />
+    <ClInclude Include="..\Scripts\ScribeScripts.h" />
+    <ClInclude Include="..\Utils\Tables\Tables.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\Lgi\trunk\src\common\Coding\ExternCall.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cd $(IntDir)
+"c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\ml64.exe" %(FullPath) /c</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'">cd $(IntDir)
+"c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\ml64.exe" %(FullPath) /c</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cd $(IntDir)
+"c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\ml64.exe" %(FullPath) /c</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\gen.py" />
+    <None Include="..\..\libs\build.py" />
+    <None Include="..\Scripts\MoveTest.script" />
+    <None Include="..\src\Encryption\Examples\encrypted+attach.eml" />
+    <None Include="..\src\Encryption\Examples\encrypted+html+attach+key.eml" />
+    <None Include="..\src\Encryption\Examples\encrypted.eml" />
+    <None Include="..\src\Encryption\Examples\signed+attach.eml" />
+    <None Include="..\src\Encryption\Examples\signed+encrypted.eml" />
+    <None Include="..\src\Encryption\Examples\signed+HTML+attach+key.eml" />
+    <None Include="..\src\Encryption\Examples\signed+html.eml" />
+    <None Include="..\src\Encryption\Examples\signed.eml" />
+    <None Include="..\src\Py\DomScan.py" />
+    <None Include="..\src\Py\win32_pre_build_step.py" />
+    <None Include="..\src\Store3Imap\Scribe.proto" />
+    <None Include="..\Help\calendar.html" />
+    <None Include="..\Help\contacts.html" />
+    <None Include="..\Help\email.html" />
+    <None Include="..\Help\features.html" />
+    <None Include="..\Help\filters.html" />
+    <None Include="..\Help\help.css" />
+    <None Include="..\Help\import.html" />
+    <None Include="..\Help\index.html" />
+    <None Include="..\Help\install.html" />
+    <None Include="..\Help\intro.html" />
+    <None Include="..\Help\menu.html" />
+    <None Include="..\Help\plugins.html" />
+    <None Include="..\Help\print.html" />
+    <None Include="..\Help\scripting.html" />
+    <None Include="..\Help\ui.html" />
+    <None Include="..\Resources\About.html" />
+    <None Include="..\Resources\PreviewContact.html" />
+    <None Include="..\Resources\PreviewGroup.html" />
+    <None Include="..\Resources\PreviewMail.html" />
+    <None Include="..\Resources\Themes\Dark\colours.json" />
+    <None Include="..\Resources\Themes\Dark\styles.css" />
+    <None Include="..\Resources\Title.html" />
+    <None Include="..\Scripts\Add Senders To Contacts.script" />
+    <None Include="..\Scripts\DecrementAll.script" />
+    <None Include="..\Scripts\Delete Attachments.script" />
+    <None Include="..\Scripts\Delete Duplicate Messages.script" />
+    <None Include="..\Scripts\LdapPlugin.script" />
+    <None Include="..\Scripts\Mail Filters Menu.script" />
+    <None Include="..\Utils\Store\check-build.py" />
+    <None Include="..\Utils\Store\store.py" />
+    <None Include="Installer-64bit.nsi" />
+    <None Include="Installer-64bit.nsi.in" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Resources\Icons\app.ico" />
+    <Image Include="..\Resources\Icons\Blank.ico" />
+    <Image Include="..\Resources\Icons\calender.ico" />
+    <Image Include="..\Resources\Icons\contact.ico" />
+    <Image Include="..\Resources\Icons\error.ico" />
+    <Image Include="..\Resources\Icons\event.ico" />
+    <Image Include="..\Resources\Icons\filter.ico" />
+    <Image Include="..\Resources\Icons\Mail.ico" />
+    <Image Include="..\Resources\Icons\Small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\src\Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Resources\ScribeWindows.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Utils\Tables\MailFlags.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\lgi\trunk\utils\Updater\Updater_vs22.vcxproj">
+      <Project>{11e9238b-921e-44e5-a3d2-61c5bfa7cc6c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\lgi\trunk\win\Lgi_vs22.vcxproj">
+      <Project>{95df9ca4-6d37-4a85-a648-80c2712e0da1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\libs\aspell-0.60.6.1\win32\dist\aspell-dist-0.60-vs22.vcxproj">
+      <Project>{1509fe6d-0b3a-422a-99d1-e26a26ce8da5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\libs\bzip2-1.0.6\windows\bzip2-1.0.6-vs22.vcxproj">
+      <Project>{e5575141-c1a2-4997-badb-7584cf546e1f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\mapi\ScribeMapi_vs22.vcxproj">
+      <Project>{148574ce-4da6-4b8a-9ec6-ff68adc2a046}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

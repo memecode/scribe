@@ -1,0 +1,1083 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\Btree\btree_traverse.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\btree.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\btree_delete.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\btree_header.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\btree_insert.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\btree_lock.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\btree_node.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\btree_search.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\db.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\db_blocklist.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\db_blocks.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\db_cache.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\db_header.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\db_lock.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\db_utils.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\gbtree.cpp">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Emoji\EmojiMap.cpp">
+      <Filter>Emoji</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Emoji\EmojiTools.cpp">
+      <Filter>Emoji</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Font\EmojiFont.cpp">
+      <Filter>Emoji</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\BlockCursor.cpp">
+      <Filter>RichTextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ColourSelect.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ControlTree.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\DatePopup.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\DrawListSurface.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\FilterUi.cpp">
+      <Filter>Filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Ftp.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Tools\GdcTools.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Graph.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\hashtable.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\HorzRuleBlock.cpp">
+      <Filter>RichTextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Mime.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\LexCpp.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\offsetlist.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\ImageBlock.cpp">
+      <Filter>RichTextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Lgi\LgiMain.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\OpenSSLSocket.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\MailHttp.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\MailImap.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\OAuth2.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEdit.cpp">
+      <Filter>RichTextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.cpp">
+      <Filter>RichTextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Storage\3\Store3.cpp">
+      <Filter>Store3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\Btree\config.c">
+      <Filter>BTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Db\Db-Csv.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Db\DbTable.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\Homoglyphs.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\HomoglyphsTable.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Mail.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Utils\Tables\MailFlags.c">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\RtfHtml.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptCompiler.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptLibrary.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptVM.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SegmentTree.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SharedMemory.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SoftwareUpdate.cpp">
+      <Filter>Install</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\win\Lgi\SpellCheckWindows.cpp">
+      <Filter>SpellCheck</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\TextBlock.cpp">
+      <Filter>RichTextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextConvert.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\Tnef.cpp">
+      <Filter>Lgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\TimePopup.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ZoomView.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\XmlTreeUi.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\WebDav.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\vCard-vCal.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\YearView.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\MonthView.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Html.cpp">
+      <Filter>Controls/UI\Html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlCommon.cpp">
+      <Filter>Controls/UI\Html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlParser.cpp">
+      <Filter>Controls/UI\Html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Lgi\Browser.cpp">
+      <Filter>Controls/UI\Html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\HttpTools.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Http.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\SpellCheckAspell.cpp">
+      <Filter>SpellCheck</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\AddressSelect.cpp">
+      <Filter>Controls/UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BayesDlg.cpp">
+      <Filter>Filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BayesianFilter.cpp">
+      <Filter>Filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Calendar.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CalendarView.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Components.cpp">
+      <Filter>Install</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Exp_Scribe.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FolderCalendarSource.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GBTreeWordStore.cpp">
+      <Filter>Filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Encryption\GnuPG.cpp">
+      <Filter>Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_CsvContacts.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_Eml.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_Eudora.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_Mozilla.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_NetscapeContacts.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Imp_OutlookExpress.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ImpExp_Mbox.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ImpExp_Outlook.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Attachment.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Calendar.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Contact.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Filter.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Folder.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Group.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Mail.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mail3\Mail3Store.cpp">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ManageMailStores.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MContainer.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NewMailDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ObjectInspector.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\OptionsDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PreviewPanel.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PrintContext.cpp">
+      <Filter>Printing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PrintPreview.cpp">
+      <Filter>Printing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ReplicateDlg.cpp">
+      <Filter>Import/Export</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAccount.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeApp.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RemoteCalendarSource.cpp">
+      <Filter>Calendar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAccountUI.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolderProp.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolderSelect.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolderTree.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Attachment.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Folder.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Mail.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Store.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Imap\ScribeImap_Thread.cpp">
+      <Filter>Store3\Imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAbout.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAccountPreview.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeItemList.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeContact.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAttachment.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFilter.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFinder.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolder.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeFolderDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeGroup.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeLangDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Attachment.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Calendar.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Contact.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Folder.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Mail.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Store.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Mapi\ScribeMapi_Thing.cpp">
+      <Filter>Store3\Mapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeUi.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeThing.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeListAddr.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Sqlite\v3.41.2\sqlite3.c">
+      <Filter>Store3\Mail3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Common.cpp">
+      <Filter>Store3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeStatusPanel.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeMail.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavCalendar.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavContact.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavFolder.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavStore.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Store3Webdav\WebdavThread.cpp">
+      <Filter>Store3\WebDav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SecurityDlg.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TitlePage.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SearchView.cpp">
+      <Filter>User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribePageSetup.cpp">
+      <Filter>Printing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeMain.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeSendReceive.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeSockets.cpp">
+      <Filter>Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribePassword.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeUtils.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\HtmlToText.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Test\UnitTests.cpp">
+      <Filter>Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeIpc.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\Btree\btree.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\btree_header.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\btree_lock.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\btree_node.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db_utils.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Db.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db_blocklist.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db_blocks.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db_cache.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db_header.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db_internal.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db_lock.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\db_types.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\gbtree.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\EmojiFont.h">
+      <Filter>Emoji</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Emoji.h">
+      <Filter>Emoji</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\ColourSelect.h">
+      <Filter>Controls/UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\ControlTree.h">
+      <Filter>Controls/UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\DateTimeCtrls.h">
+      <Filter>Controls/UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\DrawListSurface.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\FilterUi.h">
+      <Filter>Filtering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Ftp.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\GdcTools.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Graph.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\hashtable.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Mime.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\common\LDbTable.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\offsetlist.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\common\OpenSSLSocket.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OpenSSLSocket.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OAuth2.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\RichTextEdit.h">
+      <Filter>RichTextEdit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.h">
+      <Filter>RichTextEdit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Scripting.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\StoreCommon.h">
+      <Filter>Store3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Store3MimeTree.h">
+      <Filter>Store3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Store3Defs.h">
+      <Filter>Store3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Store3.h">
+      <Filter>Store3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\common\LWebDav.h">
+      <Filter>Store3\WebDav</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\Btree\config.h">
+      <Filter>BTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Homoglyphs.h">
+      <Filter>Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Mail.h">
+      <Filter>Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\src\common\Coding\Instructions.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scripts\ScribeScripts.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptingPriv.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SegmentTree.h">
+      <Filter>Controls/UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SharedMemory.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SoftwareUpdate.h">
+      <Filter>Install</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SpellCheck.h">
+      <Filter>SpellCheck</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\TextConvert.h">
+      <Filter>Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Tnef.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\WebDav.h">
+      <Filter>Store3\WebDav</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\ZoomView.h">
+      <Filter>Controls/UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\XmlTreeUi.h">
+      <Filter>Controls/UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Utils\Tables\Tables.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\common\ZlibWrapper.h">
+      <Filter>Lgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Html.h">
+      <Filter>Controls/UI\Html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HtmlCommon.h">
+      <Filter>Controls/UI\Html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HtmlParser.h">
+      <Filter>Controls/UI\Html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Browser.h">
+      <Filter>Controls/UI\Html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HttpTools.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Http.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BayesianFilter.h">
+      <Filter>Filtering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Calendar.h">
+      <Filter>Calendar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CalendarView.h">
+      <Filter>Calendar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Components.h">
+      <Filter>Install</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DomFields.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DomType.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DomTypeValues.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Encryption\GnuPG.h">
+      <Filter>Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Imp_Outlook.h">
+      <Filter>Import/Export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Mail3\Mail3.h">
+      <Filter>Store3\Mail3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ManageMailStores.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ObjectInspector.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PreviewPanel.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PrintContext.h">
+      <Filter>Printing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PrintPreview.h">
+      <Filter>Printing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ReplicateDlg.h">
+      <Filter>Import/Export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scribe.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Imap\include\Scribe.pb.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeAccountUI.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeFolderSelect.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Imap\ScribeImap.h">
+      <Filter>Store3\Imap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeAccountPreview.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeDefs.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeFolderDlg.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeInc.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Mapi\ScribeMapi.h">
+      <Filter>Store3\Mapi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeListAddr.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3.h">
+      <Filter>Store3\Mail3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3ext.h">
+      <Filter>Store3\Mail3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeStatusPanel.h">
+      <Filter>User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Webdav\WebdavStore.h">
+      <Filter>Store3\WebDav</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Store3Webdav\WebdavStorePriv.h">
+      <Filter>Store3\WebDav</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribePageSetup.h">
+      <Filter>Printing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribePrivate.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeUtils.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FolderTask.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeWndPrivate.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScribeIpc.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BZip2File.h">
+      <Filter>SpellCheck</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Resources\Icons\app.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="..\Resources\Icons\Blank.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="..\Resources\Icons\event.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="..\Resources\Icons\error.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="..\Resources\Icons\Small.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="..\Resources\Icons\calender.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="..\Resources\Icons\contact.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="..\Resources\Icons\filter.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="..\Resources\Icons\Mail.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resources\About.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\email.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\features.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\filters.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\intro.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\install.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\index.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\import.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\calendar.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\contacts.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\ui.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Resources\Themes\Dark\styles.css">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\gen.py">
+      <Filter>Scripting</Filter>
+    </None>
+    <None Include="..\Resources\Themes\Dark\colours.json">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Help\menu.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\plugins.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\help.css">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\print.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\scripting.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Resources\Title.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Utils\Store\check-build.py">
+      <Filter>Install</Filter>
+    </None>
+    <None Include="..\Utils\Store\store.py">
+      <Filter>Install</Filter>
+    </None>
+    <None Include="..\..\libs\build.py">
+      <Filter>Install</Filter>
+    </None>
+    <None Include="Installer-64bit.nsi">
+      <Filter>Install</Filter>
+    </None>
+    <None Include="..\Scripts\Add Senders To Contacts.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\Delete Attachments.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\DecrementAll.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\Delete Duplicate Messages.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\LdapPlugin.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="..\Scripts\Mail Filters Menu.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+    <None Include="Installer-64bit.nsi.in">
+      <Filter>Install</Filter>
+    </None>
+    <None Include="..\Resources\PreviewContact.html">
+      <Filter>Controls/UI\PreviewPanel</Filter>
+    </None>
+    <None Include="..\Resources\PreviewMail.html">
+      <Filter>Controls/UI\PreviewPanel</Filter>
+    </None>
+    <None Include="..\Resources\PreviewGroup.html">
+      <Filter>Controls/UI\PreviewPanel</Filter>
+    </None>
+    <None Include="..\src\Py\DomScan.py">
+      <Filter>Install</Filter>
+    </None>
+    <None Include="..\src\Store3Imap\Scribe.proto">
+      <Filter>Application</Filter>
+    </None>
+    <None Include="..\src\Py\win32_pre_build_step.py">
+      <Filter>Application</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+HTML+attach+key.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted+attach.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted+html+attach+key.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+attach.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+encrypted.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\signed+html.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\src\Encryption\Examples\encrypted.eml">
+      <Filter>Testing\Email</Filter>
+    </None>
+    <None Include="..\Scripts\MoveTest.script">
+      <Filter>Scripting\Scripts</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Utils\Tables\MailFlags.txt">
+      <Filter>Scripting</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="BTree">
+      <UniqueIdentifier>{28943112-0c58-468a-b315-7696092c8778}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Help">
+      <UniqueIdentifier>{f16baf81-af69-4eb1-9faf-6f448a36a13b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting">
+      <UniqueIdentifier>{ffd46a02-1aed-411d-a961-754cfaf46299}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{cac512da-cfa7-4bbe-b5be-14a1d31848fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Calendar">
+      <UniqueIdentifier>{15bf5500-86f7-4217-ad50-dfc441b2fb89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emoji">
+      <UniqueIdentifier>{111097d8-3c3a-4fb4-a418-548f08670ade}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lgi">
+      <UniqueIdentifier>{3347deb8-7d16-4010-9dff-676bafee8413}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI">
+      <UniqueIdentifier>{84e29f91-6e12-481b-8d4c-18e499c9a501}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Filtering">
+      <UniqueIdentifier>{1d79521d-1efc-4656-bec1-13973241c432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RichTextEdit">
+      <UniqueIdentifier>{90145701-794d-4956-af76-5cc116600a6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Import/Export">
+      <UniqueIdentifier>{963cf563-311f-4292-8aef-947945b63c15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encryption">
+      <UniqueIdentifier>{762f00ae-b360-4e54-b181-857af25a6490}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Store3">
+      <UniqueIdentifier>{98c796a3-d418-4adb-b8f8-1a51e8349d96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{9f3b229f-b2f8-4bbb-897c-f048d35571d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Store3\Mail3">
+      <UniqueIdentifier>{8139c7b4-9593-48c3-98af-a0db78c410aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Store3\Imap">
+      <UniqueIdentifier>{d7ace5ac-018a-4ae6-882e-652cf33d3f50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Store3\Mapi">
+      <UniqueIdentifier>{2431021b-92a9-444c-9796-2b1e7d81bd5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Store3\WebDav">
+      <UniqueIdentifier>{b63a6ed6-bb9e-4538-95f8-2f7782e199eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Install">
+      <UniqueIdentifier>{7b5dbea7-b971-4a65-a5f5-e12726480450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mail">
+      <UniqueIdentifier>{432fd674-ec47-4cfc-afdf-d60b633feb48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{dbfbd2a8-e411-4b43-a188-bde8cd1ac292}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpellCheck">
+      <UniqueIdentifier>{cc8997f1-f092-4b82-a5e5-a3bcc92846ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI\Html">
+      <UniqueIdentifier>{6fbe15c0-133a-4ae9-a441-03a9dcafe050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting\Scripts">
+      <UniqueIdentifier>{4fd600f1-77c6-4b58-b9a8-85d436233d52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI\PreviewPanel">
+      <UniqueIdentifier>{22d7ec0d-a127-4b05-b6f0-937c3255224a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="User Interface">
+      <UniqueIdentifier>{8fc43a66-4c8f-4df4-a79b-195ac2b933f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Printing">
+      <UniqueIdentifier>{0bbd47dc-9bff-40f0-9d61-182a4dc33ff7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Testing">
+      <UniqueIdentifier>{c8868eeb-fe8d-42a2-a647-9df3bff160c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Testing\Email">
+      <UniqueIdentifier>{a1a4d9a6-dba2-4699-8d31-fc77816706cd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\Lgi\trunk\src\common\Coding\ExternCall.asm">
+      <Filter>Scripting</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\src\Resource.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Resources\ScribeWindows.manifest">
+      <Filter>Resources</Filter>
+    </Manifest>
+  </ItemGroup>
+</Project>
