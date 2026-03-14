@@ -1899,7 +1899,8 @@ LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes Context)
 			p.Scope = "https://www.googleapis.com/auth/gmail.modify";
 			#endif
 			
-			// p.RevokeUri = "https://accounts.google.com/o/oauth2/revoke";
+			p.RequiredCapabilities.Add(LOAuth2::Params::CapMkcert);
+			p.RequiredCapabilities.Add(LOAuth2::Params::CapHttpsCert);
 		}
 		/*
 		else if (Context == MAGIC_CALENDAR)

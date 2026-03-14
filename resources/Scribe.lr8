@@ -1581,6 +1581,7 @@
 		<String Ref="182" Cid="182" Define="IDS_GROUP" en="Contact Group" />
 		<String Ref="519" Cid="1095" Define="IDS_ERR_GET_MAIL_STORE_FMT" en="Error: Couldn&apos;t get mail store for &apos;%s&apos;." />
 		<String Ref="970" Cid="1207" Define="IDS_ERR_COULDNT_MOVE_SPAM_FMT" en="Error: Couldn&apos;t move email to spam folder (err=%s)." />
+		<String Ref="1637" Cid="1637" Define="IDS_OPEN_WEBSITE" en="Open Website" />
 	</string-group>
 	<string-group Name="Title.html">
 		<String Ref="1062" Cid="782" Define="IDS_SUMMARY" en="Summary" de="Zusammenfassung" lt="Bendrai" da="Oversigt" pt="Caminho" fa="گزارش" cs="Přehled" sv="Sammanfattning" pt_br="Resumo" es="Sumario" lg="Panya" tr="Özet" hu="Összegzés" pl="Podsumowanie" ko="요약" uk="Резюме" fr="Résumé" />
@@ -1689,7 +1690,7 @@
 							<StaticText pos="231,56,279,69" ref="1518" />
 						</td>
 						<td addr="3,1">
-							<EditBox Pos="340,53,416,73" Style="width: 7em;" ref="1519" />
+							<EditBox Pos="340,53,416,73" ref="1519" />
 						</td>
 					</tr>
 					<tr>
@@ -1778,13 +1779,13 @@
 							<StaticText pos="394,34,435,47" ref="1520" />
 						</td>
 						<td addr="3,1">
-							<EditBox Pos="446,34,508,54" Style="width: 7em;" ref="1521" />
+							<EditBox Pos="446,34,508,54" ref="1521" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,2" />
 						<td addr="1,2" colspan="3">
-							<Button Pos="196,63,251,76" Style="height: 3em;" image="sign_in_with_google.png" toggle="0" ref="532" />
+							<Button Pos="196,63,251,76" ref="532" image="sign_in_with_google.png" toggle="0" />
 						</td>
 					</tr>
 					<tr>
@@ -1814,7 +1815,7 @@
 							<CheckBox pos="187,177,260,190" ref="841" />
 						</td>
 						<td addr="2,6">
-							<EditBox Pos="378,170,435,190" Style="width: 3em;" ref="1275" />
+							<EditBox Pos="378,170,435,190" ref="1275" />
 						</td>
 						<td addr="3,6">
 							<StaticText pos="446,177,508,190" ref="1276" />
@@ -1826,7 +1827,7 @@
 							<CheckBox pos="189,209,356,222" ref="1360" />
 						</td>
 						<td addr="2,7">
-							<EditBox Pos="387,202,435,222" Style="width: 3em;" ref="1361" />
+							<EditBox Pos="387,202,435,222" ref="1361" />
 						</td>
 						<td addr="3,7">
 							<StaticText pos="456,204,490,217" ref="1362" />
@@ -2021,7 +2022,7 @@
 								</tr>
 								<tr>
 									<td addr="0,9" colspan="2" class="inset">
-										<EditBox Pos="133,180,195,197" Style="width: 5em;" ref="949" />
+										<EditBox Pos="133,180,195,197" ref="949" />
 									</td>
 								</tr>
 								<tr>
@@ -2200,7 +2201,7 @@
 					<StaticText pos="14,247,62,260" ref="871" />
 				</td>
 				<td addr="1,4" colspan="2">
-					<EditBox Pos="124,251,370,271" Style="height: 4em;" MultiLine="1" ref="771" />
+					<EditBox Pos="124,251,370,271" ref="771" MultiLine="1" />
 				</td>
 				<td addr="3,4">
 					<Button Pos="381,251,443,271" toggle="0" ref="872" />
@@ -2219,7 +2220,7 @@
 					<StaticText pos="7,318,69,338" ref="906" />
 				</td>
 				<td addr="1,6" colspan="3">
-					<EditBox Pos="135,326,421,346" Style="height: 4em;" MultiLine="1" ref="910" />
+					<EditBox Pos="135,326,421,346" ref="910" MultiLine="1" />
 				</td>
 			</tr>
 			<tr>
@@ -2241,7 +2242,7 @@
 								<ComboBox pos="0,0,53,20" ref="1153" />
 							</td>
 							<td addr="1,0">
-								<EditBox Pos="67,0,108,20" Style="width: 4em;" ref="914" />
+								<EditBox Pos="67,0,108,20" ref="914" />
 							</td>
 							<td addr="2,0">
 								<ComboBox pos="115,0,163,20" ref="918" />
@@ -2250,7 +2251,7 @@
 								<StaticText pos="175,7,188,20" ref="526" />
 							</td>
 							<td addr="4,0">
-								<EditBox Pos="224,0,265,20" Style="width: 8em;" ref="527" />
+								<EditBox Pos="224,0,265,20" ref="527" />
 							</td>
 							<td addr="5,0">
 								<Button Pos="279,0,333,20" toggle="0" ref="525" />
@@ -2331,7 +2332,7 @@
 					<TableLayout pos="111,38,362,72" ref="948" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0">
-								<EditBox Pos="0,0,62,18" Style="width: 4em;" ref="955" />
+								<EditBox Pos="0,0,62,18" ref="955" />
 							</td>
 							<td addr="1,0" valign="Center">
 								<StaticText pos="137,0,192,18" ref="941" />
@@ -2389,7 +2390,7 @@
 								<RadioBox pos="7,7,83,20" ref="1251" />
 							</td>
 							<td addr="1,0">
-								<EditBox Pos="98,7,167,20" Style="width: 4em;" ref="1252" />
+								<EditBox Pos="98,7,167,20" ref="1252" />
 							</td>
 							<td addr="2,0" valign="Center">
 								<StaticText pos="204,5,273,25" ref="1253" />
@@ -2407,7 +2408,7 @@
 								<RadioBox pos="0,7,94,20" ref="1255" />
 							</td>
 							<td addr="1,0">
-								<Custom pos="158,3,234,23" ref="1256" Style="width: 6em;" Ctrl="LEditDropDown" />
+								<Custom pos="158,3,234,23" ref="1256" Ctrl="LEditDropDown" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -2541,7 +2542,7 @@
 								<Custom pos="6,7,138,139" ref="76" Ctrl="LContactImage" />
 							</td>
 							<td addr="1,0">
-								<EditBox Pos="153,14,278,125" Style="height: 160px;" MultiLine="1" ref="254" />
+								<EditBox Pos="153,14,278,125" ref="254" MultiLine="1" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -2759,7 +2760,7 @@
 						</tr>
 						<tr>
 							<td addr="0,1">
-								<Custom pos="14,57,293,98" ref="561" Style="height: 150px;" Ctrl="LFieldEditor" />
+								<Custom pos="14,57,293,98" ref="561" Ctrl="LFieldEditor" />
 							</td>
 						</tr>
 					</TableLayout>
@@ -2776,7 +2777,7 @@
 						</tr>
 						<tr>
 							<td addr="0,1">
-								<EditBox Pos="0,28,104,48" Style="width: 6em;" ref="78" />
+								<EditBox Pos="0,28,104,48" ref="78" />
 							</td>
 							<td addr="1,1">
 								<ComboBox pos="133,28,237,48" ref="428" Style="width: 10em;" />
@@ -3576,7 +3577,7 @@
 					<StaticText pos="7,49,118,69" ref="635" />
 				</td>
 				<td addr="1,1">
-					<EditBox Pos="182,42,300,62" Style="width:70%;" ref="1327" />
+					<EditBox Pos="182,42,300,62" ref="1327" />
 				</td>
 			</tr>
 			<tr>
@@ -4715,23 +4716,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4739,9 +4726,23 @@
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>

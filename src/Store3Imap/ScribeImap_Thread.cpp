@@ -790,9 +790,23 @@ int ImapThread::Main()
 														d->Store->DataProgress);
 				}
 
+				bool reqsOk = true;
 				LOAuth2::Params p = GetOAuth2Params(u.sHost, MAGIC_MAIL);
 				if (p.Provider != LOAuth2::Params::None)
-				{		
+				{
+					// Check any requirements:
+					for (auto req: p.RequiredCapabilities)
+					{
+						if (!p.CheckRequirement(req))
+						{
+							reqsOk = false;
+							if (d->Caps)
+								d->Caps->NeedsCapability(req);
+							else
+								LAssert(!"no capabilty object?");
+						}
+					}
+
 					d->Imap->SetOAuthParams(p);
 					d->Imap->SetCancel(d);
 					d->Imap->SetParentWindow(dynamic_cast<LViewI*>(d->Store->Callback));
@@ -800,7 +814,8 @@ int ImapThread::Main()
 
 				Sock->SetCancel(d);
 					
-				if (d->Imap->Open(	Sock,
+				if (reqsOk &&
+					d->Imap->Open(	Sock,
 									u.sHost,
 									u.Port,
 									d->Store->User,

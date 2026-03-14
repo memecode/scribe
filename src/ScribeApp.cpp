@@ -1542,6 +1542,11 @@ bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 			MsgBuf.Print(LLoadString(IDS_ERROR_NEED_INSTALL), Param);
 			Actions.Add(new LVariant(LLoadString(IDS_DOWNLOAD)));
 		}
+		else if (stristr(Name, "mkcert"))
+		{
+			MsgBuf.Print(LLoadString(IDS_ERROR_NEED_INSTALL), Name);
+			Actions.Add(new LVariant(LLoadString(IDS_OPEN_WEBSITE)));
+		}
 		Actions.Add(new LVariant(LLoadString(IDS_OK)));
 		
 		#if DEBUG_CAPABILITIES
@@ -2076,6 +2081,14 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 		GetOptions()->SetValue(OPT_RegisterWindowsClient, No);
 		GetOptions()->SetValue(OPT_CheckDefaultEmail, No);
 	}
+	else if (!_stricmp(Action.Str(), LLoadString(IDS_OPEN_WEBSITE)))
+	{
+		for (auto c: *Components)
+		{
+			if (!Stricmp(c.key, "mkcert"))
+				LExecute("https://github.com/FiloSottile/mkcert");
+		}
+	}
 	else if (!_stricmp(Action.Str(), LLoadString(IDS_INSTALL)))
 	{
 		#ifdef WINDOWS
@@ -2093,7 +2106,7 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 			LString s;
 			s.Printf(LLoadString(IDS_WINDOWS_SSL_INSTALL), LGetOsName());
 			
-			auto q = new LAlert(this, AppName, s, "Open Website", LLoadString(IDS_CANCEL));
+			auto q = new LAlert(this, AppName, s, LLoadString(IDS_OPEN_WEBSITE), LLoadString(IDS_CANCEL));
 			q->DoModal([this, q](auto dlg, auto id)
 			{
 				switch (id)
@@ -6127,8 +6140,8 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_NEEDS_CAP:
 		{
-			LAutoString c((char*)Msg->A());
-			LAutoString param((char*)Msg->B());
+			auto c = Msg->AutoA<char, true>();
+			auto param = Msg->AutoB<char, true>();
 			NeedsCapability(c, param);
 			return 0;
 			break;
