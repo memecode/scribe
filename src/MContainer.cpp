@@ -260,7 +260,7 @@ void MContainer::Thread(List<Mail> &In, LArray<MContainer*> &Root)
 	// Stage 1: For each message
 	for (auto m: In)
 	{
-		auto MsgId = m->GetMessageId(true);
+		LString MsgId = m->GetMessageId(true);
 		if (!MsgId)
 		{
 		    // LAssert(!"No message ID for this email.");
@@ -268,15 +268,13 @@ void MContainer::Thread(List<Mail> &In, LArray<MContainer*> &Root)
 		}
 
         // If the message-id still has '<>' characters around it, then trim them off.		
-		LAutoString Mem;
-		if (strchr(MsgId, '<') &&
-		    Mem.Reset(TrimStr(MsgId, "<>")))
+		if (MsgId.Find("<") >= 0)
 		{
-		    MsgId = Mem;
+		    MsgId = MsgId.Strip("<>");
 		}
 
 		// Add message to thread-index map
-		LAutoString Thread = m->GetThreadIndex();
+		auto Thread = m->GetThreadIndex();
         if (Thread)
         {
 			if (!ThreadToMsgID.Find(Thread))

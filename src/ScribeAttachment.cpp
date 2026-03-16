@@ -516,22 +516,21 @@ void Attachment::OnOpen(LView *Parent, char *Dest)
 			auto Mime = GetMimeType();
 			if (FileToExecute)
 			{
-				LAutoString AssociatedApp;
-				LXmlTag *FileTypes = App->GetOptions()->LockTag(OPT_FileTypes, _FL);
-				if (FileTypes)
+				LString AssociatedApp;
+				if (auto FileTypes = App->GetOptions()->LockTag(OPT_FileTypes, _FL))
 				{
 					auto Mime = GetMimeType();
 					auto FileName = GetName();
 					
 					for (auto t: FileTypes->Children)
 					{
-						char *mt = t->GetAttr("mime");
-						char *ext = t->GetAttr("extension");
-						bool MimeMatch = mt && Mime && !_stricmp(mt, Mime);
+						auto mt = t->GetAttr("mime");
+						auto ext = t->GetAttr("extension");
+						bool MimeMatch = !Stricmp(mt, Mime);
 						bool ExtMatch = ext && FileName && MatchStr(ext, FileName);
 						if (MimeMatch || ExtMatch)
 						{
-							AssociatedApp.Reset(TrimStr(t->GetContent()));
+							AssociatedApp = LString(t->GetContent()).Strip();
 							break;
 						}
 					}
@@ -542,8 +541,7 @@ void Attachment::OnOpen(LView *Parent, char *Dest)
 				if (AssociatedApp)
 				{
 					const char *s = AssociatedApp;
-					LAutoString Exe(LTokStr(s));
-					if (Exe)
+					if (auto Exe = LTokLStr(s))
 					{
 						char Args[MAX_PATH_LEN+100];
 						
@@ -571,7 +569,7 @@ void Attachment::OnOpen(LView *Parent, char *Dest)
 					if (AppPath)
 					{
 						const char *s = AppPath.Get();
-						LAutoString exe(LTokStr(s));
+						auto exe = LTokLStr(s);
 						LString args = s;
 						
 						auto pos = args.Find("%");
