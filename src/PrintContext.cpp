@@ -21,7 +21,7 @@ ScribePrintContext::~ScribePrintContext()
 
 LDrawListSurface *ScribePrintContext::NewPage()
 {
-	LDrawListSurface *dls = new LDrawListSurface(PrintDC);
+	auto dls = new LDrawListSurface(PrintDC);
 	if (dls)
 		Pages.Add(dls);
 	return dls;

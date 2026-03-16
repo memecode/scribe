@@ -5,6 +5,7 @@
 #include "lgi/common/Growl.h"
 #include "lgi/common/EventTargetThread.h"
 #include "lgi/common/TrayIcon.h"
+#include "lgi/common/PopupNotification.h"
 
 #include "../unittests/UnitTest.h"
 #include "../src/common/Coding/ScriptingPriv.h"
@@ -246,6 +247,13 @@ public:
 		return c.Compile(Output, Engine->GetSystemContext(), LScribeScript::Inst, FileName, Source, NULL);
 	}
 
+	// LBrowserEvents impl:
+	void FileNotFound(LBrowser* br, const char* path) override
+	{
+		LPopupNotification::Message(App, LString::Fmt("Error: '%s' not found", path));
+	}
+
+	// LBrowserEvents impl:
 	bool OnSearch(LBrowser *br, const char *txt) override
 	{
 		char Path[256];

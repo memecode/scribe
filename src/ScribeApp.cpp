@@ -1153,8 +1153,7 @@ void ScribeWnd::Construct3()
 											Source,
 											NULL))
 							{
-								LFunctionInfo *Main = Cur->Code->GetMethod("Main");
-								if (Main)
+								if (auto Main = Cur->Code->GetMethod("Main"))
 								{
 									LVirtualMachine Vm(d);
 									
@@ -2622,6 +2621,20 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 					Value.Add(new LVariant(p));
 				}
 			}
+			break;
+		}
+		case SdCalendarWindow: // Type: CalendarWindow
+		{
+			if (auto folder = GetFolder(FOLDER_CALENDAR))
+			{
+				auto wnd = OpenCalender(folder);
+				LAssert(wnd);
+				auto dom = dynamic_cast<LDom*>(wnd);
+				LAssert(dom);
+				Value = dynamic_cast<LDom*>(wnd);
+				LAssert(!Value.IsNull());
+			}
+			else return false;
 			break;
 		}
 		default:
@@ -7593,7 +7606,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		case IDM_PRINTSETUP:
 		{
 			auto *p = GetPrinter();
-			if (p && p->Browse(this))
+			if (p && p->Browse(this, LPrinter::PoDefault))
 			{
 				LString Str;
 				if (p->Serialize(Str, true))
@@ -7948,13 +7961,8 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 
 		case IDM_CALENDAR:
 		{
-			extern void OpenCalender(ScribeFolder *folder);
-
-			ScribeFolder *Folder = GetFolder(FOLDER_CALENDAR);
-			if (Folder)
-			{
-				OpenCalender(Folder);
-			}
+			if (auto folder = GetFolder(FOLDER_CALENDAR))
+				OpenCalender(folder);
 			break;
 		}
 
@@ -11264,6 +11272,7 @@ bool ScribeWnd::LaunchHelp(const char *File)
 		Browse = new LBrowser(this, "Help");
 		if (Browse)
 		{
+			auto p = ScribeResourcePath();
 			Browse->AddPath(ScribeResourcePath());
 			Browse->SetEvents(d);
 			return Browse->SetUri(Path);

@@ -17,6 +17,7 @@
 #include "lgi/common/Box.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/PopupNotification.h"
+#include "lgi/common/DrawListSurface.h"
 
 #include "CalendarView.h"
 #include "ScribePageSetup.h"
@@ -1058,7 +1059,7 @@ void CalendarView::OnCursorChange(bool Day, bool Month, bool Year)
 bool CalendarView::OnPrintPage(LPrintDC *pDC, int PageIndex)
 {
 	LVariant Bx1, By1, Bx2, By2;
-	LOptionsFile *Options = App->GetOptions();
+	auto Options = App->GetOptions();
 	LFontType FontType("Courier New", 8);
 	FontType.GetSystemFont("small");
 
@@ -1072,6 +1073,7 @@ bool CalendarView::OnPrintPage(LPrintDC *pDC, int PageIndex)
 		GetMargin(OPT_MarginY1, By1);
 		GetMargin(OPT_MarginX2, Bx2);
 		GetMargin(OPT_MarginY2, By2);
+		#undef GetMargin
 	}
 
 	LAutoPtr<LFont> ScreenFont = Font;
@@ -1084,11 +1086,11 @@ bool CalendarView::OnPrintPage(LPrintDC *pDC, int PageIndex)
 		auto DcDpi = pDC->GetDpi();
 		double ScaleX = (double)ScreenDpi.x / DcDpi.x;
 		double ScaleY = (double)ScreenDpi.y / DcDpi.y;
-		// LRect c = GetClient();
-		PrintMargin.x1 = (int) (( (Bx1.CastDouble() * CmToInch) * DcDpi.x ) * ScaleX);
-		PrintMargin.y1 = (int) (( (By1.CastDouble() * CmToInch) * DcDpi.y ) * ScaleY);
-		PrintMargin.x2 = (int) (( pDC->X() - ((Bx2.CastDouble() * CmToInch) * DcDpi.x) ) * ScaleX);
-		PrintMargin.y2 = (int) (( pDC->Y() - ((By2.CastDouble() * CmToInch) * DcDpi.y) ) * ScaleY);
+
+		PrintMargin.x1 = (int) (Bx1.CastDouble() * CmToInch * DcDpi.x);
+		PrintMargin.y1 = (int) (By1.CastDouble() * CmToInch * DcDpi.y);
+		PrintMargin.x2 = pDC->X() - (int)(Bx2.CastDouble() * CmToInch * DcDpi.x);
+		PrintMargin.y2 = pDC->Y() - (int)(By2.CastDouble() * CmToInch * DcDpi.y);
 
 		// setup font
 		Font.Reset(FontType.Create(pDC));
@@ -1199,45 +1201,45 @@ void CalendarView::DrawSelectionBox(LSurface *pDC, LRect &r)
 void CalendarView::OnPaint(LSurface *pDC)
 {
 	#ifndef MAC // Mac is double buffered anyway
-	LDoubleBuffer Buf(pDC);
+	LAutoPtr<LDoubleBuffer> Buf;
+	if (!pDC->IsPrint()) // don't double buffer printing
+		Buf.Reset(new LDoubleBuffer(pDC));
 	#endif
 	
 	LColour InMonth(L_WORKSPACE);
 	LColour OutMonth = GdcMixColour(LColour(L_HIGH), LColour(L_WORKSPACE), 0.5);
 	LColour CellEdge(0xc0, 0xc0, 0xc0);
-	LSkinEngine *SkinEngine = LAppInst->SkinEngine;
+	auto SkinEngine = pDC->IsPrint() ? nullptr : LAppInst->SkinEngine;
 
-	pDC->Colour(Rgb32(255, 255, 255), 32);
+	pDC->Colour(L_WHITE);
 	pDC->Rectangle();
 
-	LRect c = GetClient();
-	c.Offset(-c.x1, -c.y1);
-	float _Sx = 1.0;
-	float _Sy = 1.0;
+	LRect client = GetClient();
+	// c.Offset(-c.x1, -c.y1);
+
+	PaintScaler scale;
 	if (pDC->IsPrint())
 	{
-		c = PrintMargin;
+		client = PrintMargin;
 		auto ScreenDpi = LScreenDpi();
 		auto DcDpi = pDC->GetDpi();
-		_Sx = (float)DcDpi.x / ScreenDpi.x;
-		_Sy = (float)DcDpi.y / ScreenDpi.y;
+		scale.x = (double)DcDpi.x / ScreenDpi.x;
+		scale.y = (double)DcDpi.y / ScreenDpi.y;
 	}
 	
-	float Scale = _Sx < _Sy ? _Sx : _Sy;
+	Layout = client;
 
-	SRect(c);
-	Layout = c;
-
-	if (Mode != CAL_VIEW_YEAR)
+	if (pDC->IsPrint())
 	{
-		Title = c;
-		Title.y2 = Title.y1 + Font->GetHeight() + (int)SY(6);
+		Title = Layout;
+		Title.y2 = Title.y1 + Font->GetHeight() + scale.sx(6) - 1;
 		Layout.y1 = Title.y2 + 1;
 	}
-	else
-	{
-		Title.ZOff(-1, -1);
-	}
+	else Title.SetSize(-1, -1);
+
+	ColumnHeading = Layout;
+	ColumnHeading.y2 = ColumnHeading.y1 + Font->GetHeight() + scale.sx(6) - 1;
+	Layout.y1 = ColumnHeading.y2 + 1;
 
 	for (auto &c: Current)
 	{
@@ -1268,9 +1270,16 @@ void CalendarView::OnPaint(LSurface *pDC)
 			Dt.SetTime("0:0:0.0");
 			Now.SetNow();
 			LDisplayString ds(Font, "22:00p");
-			int TimeX = (int)((float)ds.X() + SX(10));
+			auto TimeX = ds.X() + scale.sx(10);
 
-			Layout.Set(TimeX, Title.y2 + 1, c.x2, c.y2);
+			if (Title.Valid())
+			{
+				// Show title
+				LDisplayString titleDs(Font, LString::Fmt("Week - %s", Start.GetDate().Get()));
+				Font->Transparent(true);
+				Font->Fore(L_TEXT);
+				titleDs.Draw(pDC, Title.x1, Title.y1);
+			}
 
 			// d=0 is the hours column, d=1 is the first day (either sun or mon), etc... d=7 is last day
 			for (int d=0; d<8; d++)
@@ -1282,19 +1291,19 @@ void CalendarView::OnPaint(LSurface *pDC)
 				Tomorrow.Get(TomorrowTs);
 
 				// Heading
-				int x1 = d ? TimeX + ((d-1) * (c.X()-TimeX) / 7) : 0;
-				int x2 = d ? TimeX + ((d * (c.X()-TimeX) / 7) - 1) : TimeX - 1;
+				int x1 = Layout.x1 + (d ? TimeX + ((d-1) * (Layout.X()-TimeX) / 7)      : 0);
+				int x2 = Layout.x1 + (d ? TimeX + ((d    * (Layout.X()-TimeX) / 7) - 1) : TimeX - 1);
 				LRect p(	x1,
-							Title.y1,
+							ColumnHeading.y1,
 							x2,
-							Title.y2);
+							ColumnHeading.y2);
 
 				if (d)
 				{
-					int NameIdx = (FirstDayOfWeek+d-1) % 7;
+					int NameIdx = (FirstDayOfWeek + d - 1) % 7;
 					if (SkinEngine)
 					{
-						ColumnPaintInfo i = { Font, FullDayNames[NameIdx], (int)SX(2), (int)SY(3) };
+						ColumnPaintInfo i = { Font, FullDayNames[NameIdx], scale.sx(2), scale.sy(3) };
 
 						LSkinState State;
 						State.pScreen = pDC;
@@ -1308,7 +1317,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 						Font->Colour(L_TEXT, L_MED);
 						Font->Transparent(false);
 						LDisplayString ds(Font, (char*)FullDayNames[NameIdx]);
-						ds.Draw(pDC, p.x1 + (int)SX(2), p.y1 + (int)SY(2), &p);
+						ds.Draw(pDC, p.x1 + scale.sx(2), p.y1 + scale.sy(2), &p);
 					}
 				}
 				else
@@ -1319,14 +1328,14 @@ void CalendarView::OnPaint(LSurface *pDC)
 
 				// Content area
 				p.Set(	x1,
-						Title.y2 + 1,
+						ColumnHeading.y2 + 1,
 						x2,
-						c.y2);
+						Layout.y2);
 
 				pDC->Colour(CellEdge);
 				pDC->Line(p.x2, p.y1, p.x2, p.y2);
 
-				int Divisions = DayEnd - DayStart;
+				int Divisions = DayEnd - DayStart + 1;
 				int DayOfWeek = Dt.DayOfWeek();
 
 				#define HourToY(hour) (p.y1 + (((hour)-(double)DayStart) * p.Y() / Divisions))
@@ -1359,9 +1368,9 @@ void CalendarView::OnPaint(LSurface *pDC)
 					}
 					*/
 
-					bool Today =	Now.Day() == Dt.Day() &&
+					bool Today =	Now.Day()   == Dt.Day()   &&
 									Now.Month() == Dt.Month() &&
-									Now.Year() == Dt.Year();
+									Now.Year()  == Dt.Year();
 					if (Today)
 					{
 						Back = GdcMixColour(Back, TODAY_TINT_COLOUR, TODAY_TINT_LEVEL);
@@ -1402,7 +1411,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 						Font->Colour(L_TEXT, L_MED);
 						Font->Transparent(false);
 						LDisplayString ds(Font, s);
-						ds.Draw(pDC, Temp.x1 + (int)SX(2), Temp.y1, &Temp);
+						ds.Draw(pDC, Temp.x1 + scale.sx(2), Temp.y1, &Temp);
 					}
 				}
 
@@ -1472,11 +1481,11 @@ void CalendarView::OnPaint(LSurface *pDC)
 							else
 								EndH = 24;
 
-							int x1 = p.x1 + (int)SX(4);
-							int x2 = p.x2 - (int)SX(5);
-							double dx = x2 - x1 + SX(3);
+							int x1 = p.x1 + scale.sx(4);
+							int x2 = p.x2 - scale.sx(5);
+							double dx = x2 - x1 + scale.sx(3);
 							int StartX = x1 + (int)((double)i * dx / (double)Group.Length());
-							int EndX = StartX + (int)((dx / (double)Group.Length()) - SX(5));
+							int EndX = StartX + (int)((dx / (double)Group.Length()) - scale.sx(5));
 							
 							LRect Vp(	StartX,
 										(int)HourToY(StartH) - 1,
@@ -1484,7 +1493,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 										(int)HourToY(EndH) - 3);
 
 							// LgiTrace("paint: %s %s\n", Vp.GetStr(), t.c->ToString().Get());
-							t.c->OnPaintView(pDC, Font, &Vp, &t);
+							t.c->OnPaintView(pDC, Font, &Vp, &t, scale);
 						}
 					}
 					
@@ -1531,7 +1540,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 		case CAL_VIEW_MONTH:
 		{
 			LDateTime *Cur = (DragStart.IsValid()) ? &DragStart : &Cursor;
-			int ObjY = Font->GetHeight() + (int)SY(4);
+			int ObjY = Font->GetHeight() + scale.sy(4);
 			LDateTime i = Start, Now, Tomorrow;
 
 			Now.SetNow();
@@ -1550,7 +1559,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 				int NameIdx = (h + FirstDayOfWeek) % 7;
 				if (SkinEngine)
 				{
-					ColumnPaintInfo i = { Font, FullDayNames[NameIdx], (int)SX(2), (int)SY(3) };
+					ColumnPaintInfo i = { Font, FullDayNames[NameIdx], scale.sx(2), scale.sy(3) };
 
 					LSkinState State;
 					State.pScreen = pDC;
@@ -1565,7 +1574,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 					Font->Colour(L_TEXT, L_MED);
 					Font->Transparent(false);
 					LDisplayString ds(Font, (char*)FullDayNames[NameIdx]);
-					ds.Draw(pDC, p.x1 + (int)SX(2), p.y1 + (int)SY(2), &p);
+					ds.Draw(pDC, p.x1 + scale.sx(2), p.y1 + scale.sy(2), &p);
 				}
 			}
 
@@ -1610,7 +1619,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 					if (Today)
 						Back = GdcMixColour(Back, TODAY_TINT_COLOUR, TODAY_TINT_LEVEL);
 
-					int Edge = (int)SX(1);
+					int Edge = scale.sx(1);
 					if (!pDC->IsPrint() || Back != LColour(L_WORKSPACE))
 					{
 						pDC->Colour(Back);
@@ -1628,13 +1637,13 @@ void CalendarView::OnPaint(LSurface *pDC)
 					Font->Transparent(true);
 					Font->Back(Back);
 					LDisplayString ds(Font, Str);
-					ds.Draw(pDC, p.x1 + (int)SX(2), p.y1 + (int)SX(2));
+					ds.Draw(pDC, p.x1 + scale.sx(2), p.y1 + scale.sy(2));
 
 					LRect Clip = p;
 					Clip.Inset(Edge, Edge);
 					pDC->ClipRgn(&Clip);
 
-					int CalY = ObjY + (int)SY(2);
+					int CalY = ObjY + scale.sy(2);
 
 					LArray<TimePeriod> All;
 					uint32_t n;
@@ -1648,18 +1657,18 @@ void CalendarView::OnPaint(LSurface *pDC)
 					for (n=0; n<All.Length(); n++)
 					{
 						TimePeriod &t = All[n];
-						LRect Vp(p.x1 + (int)SX(3), p.y1 + CalY, p.x2 - (int)SX(4), p.y1 + CalY + ObjY);
-						t.c->OnPaintView(pDC, Font, &Vp, &t);
-						CalY += ObjY + (int)SY(2);
+						LRect Vp(p.x1 + scale.sx(3), p.y1 + CalY, p.x2 - scale.sx(4), p.y1 + CalY + ObjY);
+						t.c->OnPaintView(pDC, Font, &Vp, &t, scale);
+						CalY += ObjY + scale.sy(2);
 					}
 
 					for (auto rng : Ranges)
 					{
 						if (rng.Overlap(i.Ts(), Tomorrow.Ts()))
 						{							
-							LRect Vp(p.x1 + (int)SX(3), p.y1 + CalY, p.x2 - (int)SX(4), p.y1 + CalY + ObjY);
+							LRect Vp(p.x1 + scale.sx(3), p.y1 + CalY, p.x2 - scale.sx(4), p.y1 + CalY + ObjY);
 							DrawSelectionBox(pDC, Vp);
-							CalY += ObjY + (int)SY(2);
+							CalY += ObjY + scale.sy(2);
 							break;
 						}
 					}
@@ -1686,22 +1695,22 @@ void CalendarView::OnPaint(LSurface *pDC)
 			Tomorrow = i;
 			Tomorrow.AddDays(1);
 
-			Layout.x1 += (int)SX(BORDER_YEAR);
+			Layout.x1 += scale.sx(BORDER_YEAR);
 
 			int Fy = Font->GetHeight();
 			char Str[256];
 
 			for (int y=0; y<v.Y(); y++)
 			{
-				int y1 = y * c.Y() / v.Y();
-				int y2 = ((y+1) * c.Y() / v.Y()) - 1;
+				int y1 = y * Layout.Y() / v.Y();
+				int y2 = ((y+1) * Layout.Y() / v.Y()) - 1;
 
 				LRect T(0, y1, Layout.x1-1, y2);
 				LWideBorder(pDC, T, DefaultRaisedEdge);
 				Font->Transparent(false);
 				Font->Colour(L_BLACK, L_MED);
 				LDisplayString ds(Font, (char*)ShortMonthNames[y]);
-				ds.Draw(pDC, T.x1 + (int)SX(2), T.y1, &T);
+				ds.Draw(pDC, T.x1 + scale.sx(2), T.y1, &T);
 
 				for (int x=0; x<v.X(); x++)
 				{
@@ -1787,9 +1796,9 @@ void CalendarView::OnPaint(LSurface *pDC)
 							}
 							else
 							{
-								LRect Vp(p.x1 + (int)SX(1), Cy, p.x2 - (int)SX(2), Cy + Fy);
+								LRect Vp(p.x1 + scale.sx(1), Cy, p.x2 - scale.sx(2), Cy + Fy);
 								Vp.Bound(&Safe);
-								c->OnPaintView(pDC, Font, &Vp, &e[i]);
+								c->OnPaintView(pDC, Font, &Vp, &e[i], scale);
 								Cy += Fy + 1;
 							}
 						}
@@ -1799,7 +1808,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 					{
 						if (rng.Overlap(t.Ts(), Tomorrow.Ts()))
 						{							
-							LRect Vp(p.x1 + (int)SX(1), Cy, p.x2 - (int)SX(2), Cy + Fy);
+							LRect Vp(p.x1 + scale.sx(1), Cy, p.x2 - scale.sx(2), Cy + Fy);
 							DrawSelectionBox(pDC, Vp);
 							Cy += Fy + 1;
 							break;
@@ -2822,19 +2831,74 @@ bool CalendarView::GetFormats(LDragFormats &Formats)
 }
 
 
-class CalendarViewPrint : public LPrintEvents
+class CalendarViewPrint : public LPrinter::Context, public LCssBox
 {
-	CalendarView *cv;
-	
+	ScribeWnd *app = nullptr;
+	CalendarView *cv = nullptr;
+	/*
+	LPrintDC *pdc = nullptr;
+	LPoint dpi;
+	LFontType FontType;
+	LAutoPtr<LFont> fnt;
+	LArray<LDrawListSurface*> Pages;
+	*/
+
 public:
 	CalendarViewPrint(CalendarView *v)
 	{
 		cv = v;
+		app = CalendarView::App;
+	}
+
+	~CalendarViewPrint()
+	{
+		// Pages.DeleteObjects();
+	}
+
+	LPrinter::PageOrientation GetOrientation() override
+	{
+		return LPrinter::PoLandscape;
 	}
 	
-	bool OnPrintPage(LPrintDC *pDC, int PageIndex)
+	void OnBeginPrint(LPrintDC* pDC, std::function<void(int)> callback) override
+	{
+		/*
+		pdc = pDC;
+		dpi = pdc->GetDpi();
+		auto bounds = pdc->Bounds();
+
+		// Read options and create the font and margin:
+		FontType.Serialize(app->GetOptions(), OPT_PrintFont, false);
+		fnt.Reset(FontType.Create(pdc));
+
+		LVariant v;
+		#define GetMargin(opt, var, Box, Dpi) \
+			{ LCss::Len m(LCss::LenCm, app->GetOptions()->GetValue(opt, v) ? (float)v.CastDouble() : 1.0f); \
+			var = m.ToPx(Box, fnt, Dpi); }
+		GetMargin(OPT_MarginX1, margin.x1, bounds.X(), dpi.x);
+		GetMargin(OPT_MarginY1, margin.y1, bounds.Y(), dpi.y);
+		GetMargin(OPT_MarginX2, margin.x2, bounds.X(), dpi.x);
+		GetMargin(OPT_MarginY2, margin.y2, bounds.Y(), dpi.y);
+
+		fnt->Transparent(true);
+		fnt->Colour(L_TEXT, L_WORKSPACE);
+		fnt->Create(0, 0, pdc);
+		LDisplayString dsSpace2(fnt, " ");
+		fnt->TabSize(dsSpace2.X() * 8);
+		*/
+
+		if (callback)
+			callback(1); // (int)Pages.Length());
+	}
+
+	bool OnPrintPage(LPrintDC *pDC, int PageIndex) override
 	{
 		return cv->OnPrintPage(pDC, PageIndex);
+	}
+
+	LPrintPageRanges *GetPageRanges() override
+	{
+		return nullptr;
 	}
 };
 
@@ -2974,11 +3038,11 @@ void LMonthView::OnPaint(LSurface *pDC)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-LArray<CalendarViewWnd*> CalendarViewWindows;
+LArray<CalendarViewWnd*> CalendarViewWnd::instances;
 
 CalendarViewWnd::CalendarViewWnd(ScribeFolder *folder)
 {
-	CalendarViewWindows.Add(this);
+	instances.Add(this);
 	App = folder ? folder->App : 0;
 	Name("Calendar View");
 
@@ -3114,7 +3178,7 @@ CalendarViewWnd::~CalendarViewWnd()
 		
 	LVariant s;
 	App->GetOptions()->SetValue(OPT_CalendarViewTodo, s = (int)GetCtrlValue(IDM_TODO));
-	CalendarViewWindows.Delete(this);
+	instances.Delete(this);
 }
 
 void CalendarViewWnd::OptionsChange()
@@ -3134,13 +3198,13 @@ void CalendarViewWnd::OptionsChange()
 void CalendarViewWnd::OnOptionsChange()
 {
 	if (!CalendarView::App &&
-		CalendarViewWindows.Length() > 0)
+		instances.Length() > 0)
 	{
-		CalendarView::App = CalendarViewWindows[0]->App;
+		CalendarView::App = instances[0]->App;
 	}
 	CalendarView::OnOptionsChange();
 
-	for (auto w: CalendarViewWindows)
+	for (auto w: instances)
 		w->OptionsChange();
 }
 
@@ -3231,12 +3295,7 @@ int CalendarViewWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_PRINT:
 		{
-			auto *Printer = Cv && App ? App->GetPrinter() : NULL;
-			if (Printer)
-			{
-				CalendarViewPrint Cvp(Cv);
-				Printer->Print(&Cvp, NULL, "Scribe Calendar", -1, this);
-			}				
+			OnPrint();
 			break;
 		}
 		case IDM_HELP:
@@ -3309,6 +3368,31 @@ LString CalendarViewWnd::UnusedKey()
 	}
 	
 	return Key;
+}
+
+void CalendarViewWnd::OnPrint()
+{
+	auto Printer = Cv && App ? App->GetPrinter() : nullptr;
+	if (Printer)
+	{
+		CalendarViewPrint Cvp(Cv);
+		Printer->Print(&Cvp, NULL, "Scribe Calendar", -1, this);
+	}
+	else LPopupNotification::Message(this, "Error: GetPrinter failed.");
+}
+
+bool CalendarViewWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
+{
+	switch (StrToDom(MethodName))
+	{
+		case SdPrint:
+		{
+			OnPrint();
+			break;
+		}
+	}
+
+	return false;
 }
 
 int CalendarViewWnd::OnNotify(LViewI *c, const LNotification &n)
@@ -3536,12 +3620,12 @@ int CalendarViewWnd::OnNotify(LViewI *c, const LNotification &n)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void OpenCalender(ScribeFolder *folder)
+CalendarViewWnd *OpenCalender(ScribeFolder *folder)
 {
-	if (!CalendarView::CalendarViews.Length())
-	{
+	if (!CalendarViewWnd::instances.Length())
 		new CalendarViewWnd(folder);
-	}
+
+	return CalendarViewWnd::instances[0];
 }
 
 void CalendarSource::FolderDelete(ScribeFolder *f)

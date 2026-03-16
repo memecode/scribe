@@ -21,6 +21,13 @@ class CalendarSourceGetEvents;
 extern void InitCalendarView();
 extern const char *RelativeTime(LDateTime &Then);
 
+struct PaintScaler : public LPointF
+{
+	PaintScaler() : LPointF(1.0, 1.0) {}
+	int sx(int px) { return (int)x * px; }
+	int sy(int px) { return (int)y * px; }
+};
+
 enum CalRecurEndType {
 	CalEndError,
 	CalEndNever,
@@ -92,7 +99,7 @@ class ScribeClass Calendar :
 
 	// Member
 	bool GetParentSelection(LList *Lst, List<LListItem> &s);
-	void OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *Period);
+	void OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *Period, PaintScaler &scale);
 
 public:
 	static void CheckReminders();

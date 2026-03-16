@@ -1249,24 +1249,13 @@ LColour Calendar::GetColour()
 	return LColour(L_LOW);
 }
 
-void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *Period)
+void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *Period, PaintScaler &scale)
 {
 	LRect p = *Pos;
 	const char *Title = "...";
 	LDateTime Now;
 
-	float Sx = 1.0;
-	float Sy = 1.0;
-	if (pDC->IsPrint())
-	{
-		auto DcDpi = pDC->GetDpi();
-		auto SrcDpi = LScreenDpi();
-		Sx = (float)DcDpi.x / SrcDpi.x;
-		Sy = (float)DcDpi.y / SrcDpi.y;
-	}
-	float Scale = Sx < Sy ? Sx : Sy;
-
-	int minSize = Font->GetHeight() + 2;
+	auto minSize = Font->GetHeight() + scale.sy(2);
 	if (p.Y() < minSize)
 		// Bump the size of the box to at least allow one line of text...
 		p.y2 = p.y1 + minSize - 1;
@@ -1340,13 +1329,18 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 
 	Font->Transparent(true);
 
-	LPoint pad((int)SX(2), (int)SY(2));
+	LPoint pad(scale.sx(2), scale.sy(2));
 	if (p.Y() <= Font->GetHeight())
 		pad = LPoint(0, 0);
 	else
-		p.Inset((int)SX(1), (int)SY(1));
+		p.Inset(scale.sx(1), scale.sy(1));
 
-	LFontCache fntCache(Font);
+	if (pDC->IsPrint())
+	{
+		int asd=0;
+	}
+
+	LFontCache fntCache(Font, pDC);
 	LCss textStyle;
 	textStyle.Color(text);
 	LStringLayout layout(&fntCache);
@@ -1365,7 +1359,7 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 		if (Ht < 0.75f)
 			p.Inset(pad.x, pad.y);
 		else if (Ht < 0.95f)
-			p.Inset((int)SX(1), (int)SY(1));
+			p.Inset(scale.sx(1), scale.sy(1));
 		ds.Draw(pDC, p.x1, p.y1, &p);
 	}
 

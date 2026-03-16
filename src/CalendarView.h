@@ -3,14 +3,6 @@
 
 #include "Calendar.h"
 
-#define SX(x)		((x)*Scale)
-#define SY(y)		((y)*Scale)
-#define SRect(r)	((r).x1 = (int)((double)(r).x1*Scale));\
-					((r).y1 = (int)((double)(r).y1*Scale));\
-					((r).x2 = (int)((double)(r).x2*Scale));\
-					((r).y2 = (int)((double)(r).y2*Scale));
-
-
 class CalendarView :
 	public LLayout,
 	public LDragDropTarget,
@@ -81,6 +73,7 @@ protected:
 
 	// Layout data
 	LRect Title;
+	LRect ColumnHeading;
 	LRect Layout;
 	LRect PrintMargin;
 	int MonthX, MonthY;
@@ -165,7 +158,9 @@ public:
 	LMessage::Result OnEvent(LMessage *Msg) override;
 };
 
-class CalendarViewWnd : public LWindow
+class CalendarViewWnd :
+	public LWindow,
+	public LDom
 {
 	ScribeWnd *App = nullptr;
 	CalendarView *Cv = nullptr;
@@ -177,6 +172,8 @@ class CalendarViewWnd : public LWindow
 
 public:
 	LList *CalLst = nullptr;
+	static LArray<CalendarViewWnd*> instances;
+	static void OnOptionsChange();
 
 	CalendarViewWnd(ScribeFolder *folder);
 	~CalendarViewWnd();
@@ -188,7 +185,10 @@ public:
 	int OnCommand(int Cmd, int Event, OsView WndHandle) override;
 	LMessage::Result OnEvent(LMessage *m) override;
 	int OnNotify(LViewI *c, const LNotification &n) override;
-	static void OnOptionsChange();
+	void OnPrint();
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 };
+
+extern CalendarViewWnd *OpenCalender(ScribeFolder *folder);
 
 #endif

@@ -4,14 +4,14 @@
 #include "lgi/common/Printer.h"
 #include "lgi/common/DrawListSurface.h"
 
-struct ScribePrintContext : public LCss, public LPrintEvents
+struct ScribePrintContext : public LCss, public LPrinter::Context
 {
 public:
-	ScribeWnd *App = NULL;
-	LSurface *pDC = NULL;
-	LPrintDC *PrintDC = NULL;
+	ScribeWnd *App = nullptr;
+	LSurface *pDC = nullptr;
+	LPrintDC *PrintDC = nullptr;
 	LPoint Dpi;
-	Thing *Object = NULL;
+	Thing *Object = nullptr;
 	LFontType FontType;
 	LRect MarginPx;
 	LAutoPtr<LFont> AppFont, MailFont;

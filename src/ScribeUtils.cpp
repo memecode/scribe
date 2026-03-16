@@ -1870,17 +1870,6 @@ LOAuth2::Params GetOAuth2Params(const char *Host, Store3ItemTypes Context)
 
 	// FYI: None of this works due to issues at the providers end. It did sometime in the
 	// past. And is only here in case someone wants to try and get it working again.
-	LFile::Path oauthOpts(LSP_APP_INSTALL);
-	oauthOpts = oauthOpts / "oauth.json";
-	LFile optionsFile(oauthOpts, O_READ);
-	LJson opts;
-	if (optionsFile)
-		opts.SetJson(optionsFile.Read());
-	else
-		LgiTrace("%s:%i - failed to open oauth options file '%s'\n", _FL, oauthOpts.GetFull().Get());
-		
-	p.SslKey = opts.Get("Key");
-	p.SslCert = opts.Get("Cert");
 
 	if (stristr(Host, "google.") ||
 		stristr(Host, "gmail."))
