@@ -1785,7 +1785,7 @@
 					<tr>
 						<td addr="0,2" />
 						<td addr="1,2" colspan="3">
-							<Button Pos="196,63,251,76" ref="532" image="sign_in_with_google.png" toggle="0" />
+							<Button Pos="196,63,251,76" Class="" Style="height: 3em;" image="sign_in_with_google.png" toggle="0" ref="532" />
 						</td>
 					</tr>
 					<tr>
@@ -2201,7 +2201,7 @@
 					<StaticText pos="14,247,62,260" ref="871" />
 				</td>
 				<td addr="1,4" colspan="2">
-					<EditBox Pos="124,251,370,271" ref="771" MultiLine="1" />
+					<EditBox Pos="124,251,370,271" MultiLine="1" ref="771" />
 				</td>
 				<td addr="3,4">
 					<Button Pos="381,251,443,271" toggle="0" ref="872" />
@@ -2220,7 +2220,7 @@
 					<StaticText pos="7,318,69,338" ref="906" />
 				</td>
 				<td addr="1,6" colspan="3">
-					<EditBox Pos="135,326,421,346" ref="910" MultiLine="1" />
+					<EditBox Pos="135,326,421,346" MultiLine="1" ref="910" />
 				</td>
 			</tr>
 			<tr>
@@ -2542,7 +2542,7 @@
 								<Custom pos="6,7,138,139" ref="76" Ctrl="LContactImage" />
 							</td>
 							<td addr="1,0">
-								<EditBox Pos="153,14,278,125" ref="254" MultiLine="1" />
+								<EditBox Pos="153,14,278,125" MultiLine="1" ref="254" />
 							</td>
 						</tr>
 					</TableLayout>

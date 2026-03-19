@@ -96,9 +96,9 @@
       </Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Debug\chardet19x64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
-      <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -136,7 +136,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <Link>
       <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
-      <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -173,9 +173,9 @@ rc Resource.rc
 copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
-      <AdditionalLibraryDirectories>..\..\libs\build-x64;..\bzip2-1.0.6\windows\$(Platform)$(Configuration)14;..\aspell-0.60.6.1\win32\dist\$(Platform)$(Configuration)14;..\..\..\Lgi\trunk\lib;..\..\..\CodeLib\protobuf-3.9.1\cmake\build\solution\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -462,13 +462,13 @@ copy Resource.res ..\win\$(OutDir)</Command>
   <ItemGroup>
     <CustomBuild Include="..\..\..\Lgi\trunk\src\common\Coding\ExternCall.asm">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cd $(IntDir)
-"c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\ml64.exe" %(FullPath) /c</Command>
+ml64.exe %(FullPath) /c</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'">cd $(IntDir)
-"c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\ml64.exe" %(FullPath) /c</Command>
+ml64.exe %(FullPath) /c</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseNoOptimize|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cd $(IntDir)
-"c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\ml64.exe" %(FullPath) /c</Command>
+ml64.exe %(FullPath) /c</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\gen.py" />

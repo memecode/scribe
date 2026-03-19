@@ -20,8 +20,15 @@ sysLibs = [
     "netapi32.dll",
 ]
 
+basePaths = [
+    "c:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64",
+    "c:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\"
+]
+for base in basePaths:
+    dumpBin = os.path.join(base, "dumpbin.exe")
+    if os.path.exists(dumpBin):
+        break
 
-dumpBin = "c:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\dumpbin.exe"
 if not os.path.exists(dumpBin):
     print("dumpBin not found:", dumpBin)
     sys.exit(2)

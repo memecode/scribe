@@ -4,7 +4,7 @@
 !include LogicLib.nsh
 ; !include WinVer.nsh
 
-!system '"C:\Program Files\Python312\python.exe" ..\Utils\Store\check-build.py' = 0
+!system 'python ..\Utils\Store\check-build.py' = 0
 
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"
@@ -14,7 +14,7 @@
 
 ; Scribe specific deps
 !system "copy ..\..\libs\build-x64\lib\aspell-dist-0.60.dll scribe-setup" = 0
-!system "copy ..\..\libs\build-x64\lib\chardet19x64.dll scribe-setup"     = 0
+!system "copy ..\..\libs\build-x64\lib\chardetx64.dll scribe-setup"     = 0
 !system "copy ..\..\libs\build-x64\lib\btree.dll scribe-setup"            = 0
 !system "copy ..\..\libs\build-x64\lib\bzip2.dll scribe-setup"            = 0
 
@@ -89,6 +89,7 @@ Section ""
 	File ..\Resources\NoFace*.png
 	File ..\Resources\EmojiMap.png
 	File ..\Resources\Preview*.html
+	File ..\Resources\sign_in_with_google.png
 
 	CreateDirectory $INSTDIR\Resources\Themes
 	SetOutPath $INSTDIR\Resources\Themes
