@@ -19,6 +19,13 @@
 #if __has_include("ScribeGoogleClient.h")
 	// This is Memecode's client details, which is NOT stored in version control:
 	#include "ScribeGoogleClient.h"
+#else
+	// Warn the user that ScribeGoogleClient.h is missing
+	#ifdef _DEBUG
+		#warning "ScribeGoogleClient.h is missing, no gmail support"
+	#else
+		#error "ScribeGoogleClient.h is missing, no gmail support"
+	#endif
 #endif
 
 #define COMP_FUNCTIONS 1
