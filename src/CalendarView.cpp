@@ -1209,13 +1209,12 @@ void CalendarView::OnPaint(LSurface *pDC)
 	LColour InMonth(L_WORKSPACE);
 	LColour OutMonth = GdcMixColour(LColour(L_HIGH), LColour(L_WORKSPACE), 0.5);
 	LColour CellEdge(0xc0, 0xc0, 0xc0);
-	auto SkinEngine = pDC->IsPrint() ? nullptr : LAppInst->SkinEngine;
+	auto SkinEngine = LAppInst->SkinEngine;
 
 	pDC->Colour(L_WHITE);
 	pDC->Rectangle();
 
-	LRect client = GetClient();
-	// c.Offset(-c.x1, -c.y1);
+	auto client = GetClient();
 
 	PaintScaler scale;
 	if (pDC->IsPrint())
@@ -1335,12 +1334,12 @@ void CalendarView::OnPaint(LSurface *pDC)
 				pDC->Colour(CellEdge);
 				pDC->Line(p.x2, p.y1, p.x2, p.y2);
 
-				int Divisions = DayEnd - DayStart + 1;
+				int Divisions = DayEnd - DayStart;
 				int DayOfWeek = Dt.DayOfWeek();
 
 				#define HourToY(hour) (p.y1 + (((hour)-(double)DayStart) * p.Y() / Divisions))
 
-				for (int h=DayStart; h<=DayEnd; h++)
+				for (int h=DayStart; h<DayEnd; h++)
 				{
 					LRect Hour(	x1,
 								(int)HourToY(h),
@@ -1539,7 +1538,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 		}
 		case CAL_VIEW_MONTH:
 		{
-			LDateTime *Cur = (DragStart.IsValid()) ? &DragStart : &Cursor;
+			auto Cur = (DragStart.IsValid()) ? &DragStart : &Cursor;
 			int ObjY = Font->GetHeight() + scale.sy(4);
 			LDateTime i = Start, Now, Tomorrow;
 
@@ -1548,14 +1547,20 @@ void CalendarView::OnPaint(LSurface *pDC)
 			Tomorrow = i;
 			Tomorrow.AddDays(1);
 
-			char Str[256];
+			if (pDC->IsPrint())
+			{
+				auto sTitle = LString::Fmt("%s %i", LDateTime::MonthsLong[Cur->Month()-1], Cur->Year());
+				LDisplayString dsTitle(Font, sTitle);
+				Font->Fore(L_TEXT);
+				dsTitle.Draw(pDC, Title.x1, Title.y1);
+			}
 
 			for (int h=0; h<7; h++)
 			{
-				LRect p(	Title.x1 + (h * Title.X() / MonthX),
-							Title.y1,
-							Title.x1 + (((h+1) * Title.X() / MonthX) - 1),
-							Title.y2);
+				LRect p(	ColumnHeading.x1 + (h * ColumnHeading.X() / MonthX),
+							ColumnHeading.y1,
+							ColumnHeading.x1 + (((h+1) * ColumnHeading.X() / MonthX) - 1),
+							ColumnHeading.y2);
 				int NameIdx = (h + FirstDayOfWeek) % 7;
 				if (SkinEngine)
 				{
@@ -1588,8 +1593,6 @@ void CalendarView::OnPaint(LSurface *pDC)
 								((y+1) * Layout.Y() / MonthY) - 1);
 					p.Offset(Layout.x1, Layout.y1);
 
-					i.GetDate(Str, sizeof(Str));
-					
 					LColour Back(L_BLACK);
 					int DayOfWeek = i.DayOfWeek();
 					bool IsInMonth = i.Month() == Cur->Month();
@@ -1636,7 +1639,7 @@ void CalendarView::OnPaint(LSurface *pDC)
 
 					Font->Transparent(true);
 					Font->Back(Back);
-					LDisplayString ds(Font, Str);
+					LDisplayString ds(Font, i.GetDate());
 					ds.Draw(pDC, p.x1 + scale.sx(2), p.y1 + scale.sy(2));
 
 					LRect Clip = p;
@@ -1974,14 +1977,14 @@ LDateTime *CalendarView::TimeAt(int x, int y, int SnapMinutes, LPoint *Cell)
 		{
 			if (Layout.Overlap(x, y))
 			{
-				LDateTime *Day = new LDateTime;
+				auto Day = new LDateTime;
 				if (Day)
 				{
-					int64 Page = (int)(Calendar::DayEnd - Calendar::DayStart);
-					int FirstHr = 0;
+					int64 Page = (int64)Calendar::DayEnd - Calendar::DayStart;
+					int64 FirstHr = 0;
 					if (VScroll)
 					{
-						FirstHr = (int) VScroll->Value();
+						FirstHr = VScroll->Value();
 						Page = VScroll->Page();
 					}
 
@@ -1989,10 +1992,11 @@ LDateTime *CalendarView::TimeAt(int x, int y, int SnapMinutes, LPoint *Cell)
 					int MinuteOffset = ((y - Layout.y1) * (int)Page * 60) / Layout.Y();
 					Cell->y = ((y - Layout.y1) * (int)Page) / Layout.Y();	// hour of day
 					LAssert(MinuteOffset / 60 == Cell->y);
-					int Minutes = (FirstHr * 60) + MinuteOffset;					
+					
+					auto Minutes = (FirstHr * 60) + MinuteOffset;					
 					if (SnapMinutes)
 					{
-						int Snap = Minutes % SnapMinutes;
+						auto Snap = Minutes % SnapMinutes;
 						if (Snap)
 						{
 							Minutes -= Snap;
@@ -2001,7 +2005,7 @@ LDateTime *CalendarView::TimeAt(int x, int y, int SnapMinutes, LPoint *Cell)
 				
 					*Day = Start;
 					Day->AddDays(Cell->x);
-					Day->Hours(Minutes / 60);
+					Day->Hours((int) Minutes / 60);
 					Day->Minutes(Minutes % 60);
 					Day->Seconds(0);
 					Day->Thousands(0);
@@ -2083,11 +2087,11 @@ bool CalendarView::HitTest(int x, int y, EventDragMode &mode, Calendar *&event)
 
 	for (uint32_t i=0; i<Current.Length(); i++)
 	{
-		Calendar *c = Current[i].c;
+		auto c = Current[i].c;
 
 		if (Mode <= CAL_VIEW_WEEK) // In month and year modes you can't edit start/end with dnd
 		{
-			for (LRect *r = c->ViewPos.First(); r; r = c->ViewPos.Next())
+			for (auto r = c->ViewPos.First(); r; r = c->ViewPos.Next())
 			{
 				if (x >= r->x1 &&
 					x <= r->x2)
@@ -2175,7 +2179,7 @@ Calendar *CalendarView::NewEvent(LDateTime &dtStart, LDateTime &dtEnd)
 void CalendarView::OnMouseClick(LMouse &m)
 {
 	EventDragMode HitMode = DragNone;
-	Calendar *c = NULL;
+	Calendar *c = nullptr;
 	HitTest(m.x, m.y, HitMode, c);
 	bool AlreadySelected = (c) ? Selection.HasItem(c) : false;
 	LAutoPtr<LDateTime> Hit(TimeAt(m.x, m.y, SnapMinutes));
@@ -2281,7 +2285,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 						DragEnd.ToLocal(true);
 						DragEvent = c;
 						
-						TsRange &r = Ranges.New();
+						auto &r = Ranges.New();
 						r.StartTs = DragStart;
 						r.EndTs = DragEnd;
 					}
@@ -2294,7 +2298,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 						DragEnd.ToLocal(true);
 						DragEvent = c;
 						
-						TsRange &r = Ranges.New();
+						auto &r = Ranges.New();
 						r.StartTs = DragStart;
 						r.EndTs = DragEnd;
 					}
@@ -2305,10 +2309,10 @@ void CalendarView::OnMouseClick(LMouse &m)
 						
 						for (unsigned i=0; i<Selection.Length(); i++)
 						{
-							Calendar *s = Selection[i];
-							TsRange &r = Ranges.New();
+							auto s = Selection[i];
+							auto &r = Ranges.New();
 							
-							LDateTime dt = *s->GetObject()->GetDate(FIELD_CAL_START_UTC);
+							auto dt = *s->GetObject()->GetDate(FIELD_CAL_START_UTC);
 							dt.ToLocal(true);
 							r.StartTs = dt.Ts().Get();
 							dt = *s->GetObject()->GetDate(FIELD_CAL_END_UTC);
@@ -2325,7 +2329,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 							// Does this new range overlap any existing range?
 							for (unsigned n=0; n<Ranges.Length()-1; n++)
 							{
-								TsRange &nr = Ranges[n];
+								auto &nr = Ranges[n];
 								if (nr.Overlap(r))
 								{
 									// Merge ranges and delete dupe...
@@ -2344,7 +2348,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 						DragEnd.AddHours(1);
 						// printf("Drag: %s -> %s\n", DragStart.Get().Get(), DragEnd.Get().Get());
 						
-						TsRange &r = Ranges.New();
+						auto &r = Ranges.New();
 						DragStart.Get(r.StartTs);
 						DragEnd.Get(r.EndTs);
 					}
@@ -2385,14 +2389,14 @@ void CalendarView::OnMouseClick(LMouse &m)
 							// TsOffset = 0;
 							for (unsigned i=0; i<Selection.Length(); i++)
 							{
-								Calendar *s = Selection[i];
-								LDataI *o = s->GetObject();
+								auto s = Selection[i];
+								auto o = s->GetObject();
 
-								LDateTime start_dt = *o->GetDate(FIELD_CAL_START_UTC);
+								auto start_dt = *o->GetDate(FIELD_CAL_START_UTC);
 								start_dt.Set(start_dt.Ts() + TsOffset);
 								o->SetDate(FIELD_CAL_START_UTC, &start_dt);
 
-								LDateTime end_dt = *o->GetDate(FIELD_CAL_END_UTC);
+								auto end_dt = *o->GetDate(FIELD_CAL_END_UTC);
 								end_dt.Set(end_dt.Ts() + TsOffset);
 								o->SetDate(FIELD_CAL_END_UTC, &end_dt);								
 								
@@ -2401,7 +2405,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 								s->SetDirty();
 							}
 							
-							OnContentsChanged(NULL);
+							OnContentsChanged(nullptr);
 						}
 						break;
 					}
@@ -2411,7 +2415,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 						{
 							if (DragEnd > DragStart)
 							{
-								LDateTime dt = DragStart;
+								auto dt = DragStart;
 								dt.ToUtc(true);
 								DragEvent->GetObject()->SetDate(FIELD_CAL_START_UTC, &dt);
 								dt = DragEnd;
@@ -2420,7 +2424,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 							}
 							else
 							{
-								LDateTime dt = DragEnd;
+								auto dt = DragEnd;
 								dt.ToUtc(true);
 								DragEvent->GetObject()->SetDate(FIELD_CAL_START_UTC, &dt);
 							}
@@ -2435,7 +2439,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 						{
 							if (DragEnd < DragStart)
 							{
-								LDateTime dt = DragEnd;
+								auto dt = DragEnd;
 								dt.ToUtc(true);
 								DragEvent->GetObject()->SetDate(FIELD_CAL_START_UTC, &dt);
 								dt = DragStart;
@@ -2444,7 +2448,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 							}
 							else
 							{
-								LDateTime dt = DragEnd;
+								auto dt = DragEnd;
 								dt.ToUtc(true);
 								DragEvent->GetObject()->SetDate(FIELD_CAL_END_UTC, &dt);
 							}
@@ -2471,7 +2475,7 @@ void CalendarView::OnMouseClick(LMouse &m)
 				Invalidate();
 			}
 			
-			DragEvent = NULL;
+			DragEvent = nullptr;
 		}
 	}
 

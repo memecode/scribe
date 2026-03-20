@@ -72,9 +72,9 @@ protected:
 	LDstInfo *GetDstForDate(LDateTime t);
 
 	// Layout data
-	LRect Title;
-	LRect ColumnHeading;
-	LRect Layout;
+	LRect Title; // This is the title at the top of the page...
+	LRect ColumnHeading; // Column headings...
+	LRect Layout; // Content boxes...
 	LRect PrintMargin;
 	int MonthX, MonthY;
 
