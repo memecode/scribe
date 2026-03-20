@@ -22,8 +22,13 @@
 #else
 	// Warn the user that ScribeGoogleClient.h is missing
 	#ifdef _DEBUG
-		#warning "ScribeGoogleClient.h is missing, no gmail support"
+		#ifdef _MSC_VER
+			#pragma message("warning: ScribeGoogleClient.h is missing, no gmail support")
+		#else
+			#warning "ScribeGoogleClient.h is missing, no gmail support"
+		#endif
 	#else
+		// For release mode, this is an error
 		#error "ScribeGoogleClient.h is missing, no gmail support"
 	#endif
 #endif
