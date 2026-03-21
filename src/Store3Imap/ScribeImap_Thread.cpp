@@ -165,19 +165,17 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 			MailIMap::StrMap Local;
 
 			Exists = -1;
-			if (Imap->SelectFolder(f, Values ? Values : &Local))
-			{
-				CurrentFolder = f;
-				LString e = (Values ? *Values : Local).Find("Exists");
-				if (e)
-					Exists = (int) e.Int();
-				
-				LString s;
-				s.Printf("Select(%s) Exists=%i\n", f, Exists);
-				Log->Write(s.Get(), s.Length(), LSocketI::SocketMsgInfo);
-			}
-			else
+			if (!Imap->SelectFolder(f, Values ? Values : &Local))
 				return false;
+
+			CurrentFolder = f;
+			LString e = (Values ? *Values : Local).Find("Exists");
+			if (e)
+				Exists = (int) e.Int();
+			
+			LString s;
+			s.Printf("Select(%s) Exists=%i\n", f, Exists);
+			Log->Write(s.Get(), s.Length(), LSocketI::SocketMsgInfo);
 		}
 
 		return true;

@@ -37,12 +37,13 @@ then
     exit -1
 fi
 
-DEPLOY=./appimagetool-x86_64.AppImage
-if [ ! -f $DEPLOY ] 
+DEPLOY=appimagetool
+
+if ! command -v $DEPLOY >/dev/null 2>&1
 then
-    echo "Error: appimagetool doesn't exist." 
+    echo "Error: $DEPLOY doesn't exist." 
     echo "Download: https://github.com/AppImage/appimagetool/releases/tag/continuous"
-    exit -1
+    exit 1
 fi
 
 VERSION=$(python3 ../utils/getversion.py)
@@ -63,7 +64,7 @@ BTREE_SO="$LIBS/libbtree.so"
 # lgi libs:
 LGI_SO="$LGI/$BUILD/liblgi-gtk3$TAG.so"
 LIBPNG="$LGI_DEPS/libpng*.so*"
-ZLIB="$LGI_DEPS/libz*.so*"
+# ZLIB="$LGI_DEPS/libz*.so*"
 LIBJPEG="$LGI_DEPS/libjpeg*.so*"
 LIBNTLM="$LGI_DEPS/libntlm.so"
 ICONV="$LGI_DEPS/libiconv.so"
@@ -89,7 +90,7 @@ cp $BTREE_SO   $LIBDIR
 cp $LGI/src/linux/CrashHandler/crash-handler $BINDIR
 cp $LGI_SO     $LIBDIR
 cp -av --preserve=links $LIBPNG     $LIBDIR
-cp -av --preserve=links $ZLIB       $LIBDIR
+# cp -av --preserve=links $ZLIB       $LIBDIR
 cp -av --preserve=links $LIBJPEG    $LIBDIR
 cp $LIBNTLM    $LIBDIR
 cp $ICONV      $LIBDIR

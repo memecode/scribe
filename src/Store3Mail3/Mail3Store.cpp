@@ -1249,7 +1249,11 @@ public:
 		#ifdef __GTK_H__
 		// Gtk::
 		#endif
-		getcwd(wd, MAX_PATH_LEN);
+		if (!getcwd(wd, MAX_PATH_LEN))
+		{
+			printf("%s:%i - getcwd failed.\n", _FL);
+			return -1;
+		}
 		#endif
 		
 		char base[MAX_PATH_LEN];
@@ -1261,7 +1265,11 @@ public:
 		#ifdef __GTK_H__
 		// Gtk::
 		#endif
-		chdir(base);
+		if (chdir(base))
+		{
+			printf("%s:%i - chdir(%s) failed.\n", _FL, base);
+			return -1;
+		}
 		#endif
 		char *exe_leaf = strrchr(Exe, DIR_CHAR);
 		
@@ -1275,7 +1283,11 @@ public:
 		#ifdef __GTK_H__
 		// Gtk::
 		#endif
-		chdir(wd);
+		if (chdir(wd))
+		{
+			printf("%s:%i - chdir(%s) failed.\n", _FL, wd);
+			return -1;
+		}
 		#endif
 
 		StatusMsg("Deleting temporary files...");

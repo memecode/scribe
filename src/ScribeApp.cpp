@@ -3992,7 +3992,7 @@ bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 	LString OnClose = LAppInst->GetConfig("Scribe.OnClose");
 	if (!d->IngoreOnClose &&
 		!OsShuttingDown &&
-		!Stricmp(OnClose.Get(), "minimize"))
+		OnClose.Equals("minimize"))
 	{
 		SetZoom(LZoomMin);
 		return false;
@@ -4014,11 +4014,11 @@ bool ScribeWnd::OnRequestClose(bool OsShuttingDown)
 	{
 		// whack up a shutdown window
 		LArray<ScribeAccount*> Online;
-		for (auto i: Accounts)
+		for (auto acc: Accounts)
 		{
-			i->OnEndSession();
-			if (i->IsOnline())
-				Online.Add(i);
+			acc->OnEndSession();
+			if (acc->IsOnline())
+				Online.Add(acc);
 		}
 
 		if (Online.Length() > 0)
