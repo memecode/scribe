@@ -45,5 +45,4 @@
 #pragma warning(disable:4355)
 #endif
 
-
 #endif // __SCRIBE_INC_H
