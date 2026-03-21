@@ -18,6 +18,7 @@
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/FileSelect.h"
 #include "lgi/common/ClipBoard.h"
+#include "lgi/common/PopupNotification.h"
 
 #include "Calendar.h"
 #include "resdefs.h"
@@ -1487,8 +1488,6 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 			if (Unread < 0)
 				Unread = GetUnRead();
 
-			Loading.Reset();
-
 			if (loadStatus == Store3Success)
 			{
 				auto &Children = GetFldObj()->Children();
@@ -1568,9 +1567,6 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 		auto Status = Children.GetState();
 		if (Status != Store3Loaded)
 		{
-			if (View() && Loading.Reset(Ui ? new LoadingItem(&Children) : NULL))
-				View()->Insert(Loading);
-
 			return; // Ie deferred or error...
 		}
 
@@ -2480,14 +2476,15 @@ bool ScribeFolder::CanHaveSubFolders(Store3ItemTypes Type)
 	return true;
 }
 
-void ScribeFolder::Populate(ThingList *list)
+bool ScribeFolder::Populate(ThingList *list)
 {
+	bool status = true;
 LProfile Prof("ScribeFolder::Populate", 1000);
 
 	App->OnSelect();
 
 	if (!GetFldObj() || !list)
-		return;
+		return false;
 
 	CurState = FldState_Populating;
 		
@@ -2678,18 +2675,12 @@ Prof.Add("Filtering");
 			Is.Insert(t);
 		}
 
-		if ((LCurrentTime()-FilterStart) > 300)
+		auto now = LCurrentTime();
+		if ((now-FilterStart) > 5000)
 		{
-			if (!Loading && Loading.Reset(new LoadingItem(NULL)))
-				list->Insert(Loading, 0);
-			if (Loading)
-			{
-				LString s;
-				s.Printf(LPrintfInt64 " of " LPrintfInt64 ", %.1f%%",
-					Pos, Items.Length(), (double)Pos * 100 / Items.Length());
-				Loading->SetText(s);
-			}
-			FilterStart = LCurrentTime();
+			status = false;
+			LPopupNotification::Message(App, "List population taking too long..."); 
+			break;
 		}
 
 		Pos++;
@@ -2703,11 +2694,12 @@ Prof.Add("Inserting");
 
 Prof.Add("Deleting");
 	list->DeletePlaceHolders();
-	Loading.Reset();
 
 Prof.Add("OnSelect");
 	GetFldObj()->OnSelect(true);
 	CurState = FldState_Idle;
+
+	return status;
 }
 
 void ScribeFolder::OnUpdateUnRead(int Offset, bool ScanItems)

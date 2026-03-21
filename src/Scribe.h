@@ -1227,7 +1227,6 @@ protected:
 	LAutoString NameCache;
 	int ChildUnRead = 0;
 	LTreeItem *LoadOnDemand = NULL;
-	LAutoPtr<LListItem> Loading;
 
 	LArray<int> FieldArray;
 	void SerializeFieldWidths(bool Write = false);
@@ -1368,7 +1367,7 @@ public:
 	void OnRename(char *NewName);
 	void OnDelete();
 	LString GetPath();
-	void Populate(ThingList *List);
+	bool Populate(ThingList *List);
 	bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL);
 	void OnRethread();
 
