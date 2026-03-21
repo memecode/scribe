@@ -266,7 +266,7 @@ int LSearchView::OnNotify(LViewI *c, const LNotification &n)
 	LList *Lst = App->GetItemList();
 	ScribeFolder *Folder = App->GetCurrentFolder();
 	if (Folder && Lst && Update)
-		Folder->Populate(dynamic_cast<ThingList*>(Lst));
+		Folder->Populate(dynamic_cast<ThingList*>(Lst), nullptr);
 
 	return 0;
 }

@@ -7580,11 +7580,8 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				DeleteObj(SearchView);
 			}
 
-			ScribeFolder *Folder = GetCurrentFolder();
-			if (Folder)
-			{
-				Folder->Populate(MailList);
-			}
+			if (auto Folder = GetCurrentFolder())
+				Folder->Populate(MailList, nullptr);
 			break;
 		}
 		case IDM_PRINT:
@@ -7872,14 +7869,13 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 		case IDM_THREAD:
 		{
-			if (MailList)
+			if (!MailList)
+				break;
+
+			if (auto f = GetCurrentFolder())
 			{
-				ScribeFolder *f = GetCurrentFolder();
-				if (f)
-				{
-					f->SetThreaded(!f->GetThreaded());
-					f->Populate(MailList);
-				}
+				f->SetThreaded(!f->GetThreaded());
+				f->Populate(MailList, nullptr);
 			}
 			break;
 		}
@@ -11810,7 +11806,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 					// This is the delayed folder load case:
 					fld->IsLoaded(true);
 					if (fld->Select())
-						fld->Populate(GetMailList());
+						fld->Populate(GetMailList(), nullptr);
 				}
 				else
 				{

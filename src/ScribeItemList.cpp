@@ -289,8 +289,11 @@ void ThingList::OnColumnClick(int Col, LMouse &m)
 				}
 
 				Container->SetDirty();
-				Container->Populate(this);
-				UpdateAllItems();
+				Container->Populate(this, [this](auto status)
+					{
+						if (status)
+							UpdateAllItems();
+					});
 			}
 		}
 	}

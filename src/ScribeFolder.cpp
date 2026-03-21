@@ -2476,90 +2476,152 @@ bool ScribeFolder::CanHaveSubFolders(Store3ItemTypes Type)
 	return true;
 }
 
-bool ScribeFolder::Populate(ThingList *list)
+struct ScribeFolder::PopulateState : public LView::ViewEventTarget
 {
-	bool status = true;
-LProfile Prof("ScribeFolder::Populate", 1000);
+	ScribeFolder *f;
+	ThingList *list;
+	ScribeWnd *App;
+	LProfile Prof;
+	LDataFolderI *folderObj;
+	bool Refresh = false;
 
-	App->OnSelect();
-
-	if (!GetFldObj() || !list)
-		return false;
-
-	CurState = FldState_Populating;
-		
-	auto Prev = list->GetContainer();
-	bool Refresh = Prev == this;
-
-	// Remove old items from list
-Prof.Add("Delete Placeholders");
-	list->DeletePlaceHolders();
-	list->RemoveAll();
-
-	if (!Refresh || list->GetColumns() == 0 || GetItemType() == MAGIC_FILTER)
+	PopulateState(ScribeFolder *folder, ThingList *lst) :
+		LView::ViewEventTarget(lst, M_FOLDER_POPULATE),
+		f(folder),
+		list(lst),
+		Prof("ScribeFolder::Populate", 1000),
+		App(f->App),
+		folderObj(f->GetFldObj())
 	{
-		if (Prev)
-		{
-			// save previous folders settings
-			Prev->SerializeFieldWidths();
-		}
+		PostEvent(M_FOLDER_POPULATE);
+	}
 
-Prof.Add("Empty cols");
-		LVariant GridLines;
-		if (App->GetOptions()->GetValue(OPT_GridLines, GridLines))
-		{
-			list->DrawGridLines(GridLines.CastInt32() != 0);
-		}
-		list->EmptyColumns();
+	#define POPULATE_STATES() \
+		_(Start) \
+		_(Load) \
+		_(Sort) \
+		_(Filter) \
+		_(Finish)
 
-Prof.Add("Set def fields");
-		bool ForceDefaultFields = GetItemType() == MAGIC_FILTER;
-		if (GetFldObj()->Fields().Length() <= 0 || ForceDefaultFields)
-		{
-			SetDefaultFields(ForceDefaultFields);
-		}
-			
-		// Add fields to list view
-		int n = 0;
-		LArray<int> Empty;
-		for (auto t: Items)
-		{
-			t->SetFieldArray(Empty);
-		}
-		LRect *Bounds = 0;
-		if (App->GetIconImgList())
-		{
-			Bounds = App->GetIconImgList()->GetBounds();
-		}
+	enum TState
+	{
+		#define _(name) S##name,
+		POPULATE_STATES()
+		#undef _
+	}	state = SStart;
 
-		switch (GetItemType())
+	const char *ToString(TState s)
+	{
+		switch (s)
 		{
-			case MAGIC_ANY:
-			{
-				list->AddColumn("", 170);
-				list->AddColumn("", 170);
-				list->AddColumn("", 170);
-				list->AddColumn("", 170);
-				break;
-			}
-			default:
-			{
-				n = 0;
-				FieldArray.Length(0);
-					
-				for (LDataPropI *i = GetFldObj()->Fields().First(); i; i = GetFldObj()->Fields().Next())
+			#define _(name) case S##name: return "S" #name;
+			POPULATE_STATES()
+			#undef _
+		}
+		return nullptr;
+	}
+
+	void SetState(TState s)
+	{
+		LgiTrace("%s:%i - SetState(%s)\n", _FL, ToString(s));
+		state = s;
+		PostEvent(M_FOLDER_POPULATE);
+	}
+
+	LMessage::Result OnEvent(LMessage *m) override
+	{
+		switch (m->Msg())
+		{
+			case M_FOLDER_POPULATE:
+				switch (state)
 				{
-					int FieldId = (int)i->GetInt(FIELD_ID);
-					const char *FName = LLoadString(FieldId);
-					int Width = (int)i->GetInt(FIELD_WIDTH);
-					const char *FieldText = FName ? FName : i->GetStr(FIELD_NAME);
-					LAssert(FieldText != NULL);
-						
-					LItemColumn *c = list->AddColumn(FieldText, Width);
-					if (c)
+				case SStart:  Start();  break;
+				case SLoad:   Load();   break;
+				case SSort:   Sort();  break;
+				case SFilter: Filter(); break;
+				case SFinish: Finish(); break;
+				}
+				break;
+		}
+
+		return 1;
+	}
+
+	void Start()
+	{
+		f->CurState = FldState_Populating;
+
+		auto Prev = list->GetContainer();
+		Refresh = Prev == f;
+
+		// Remove old items from list
+		Prof.Add("Delete Placeholders");
+		list->DeletePlaceHolders();
+		list->RemoveAll();
+
+		if (!Refresh || list->GetColumns() == 0 || f->GetItemType() == MAGIC_FILTER)
+		{
+			if (Prev)
+			{
+				// save previous folders settings
+				Prev->SerializeFieldWidths();
+			}
+
+			Prof.Add("Empty cols");
+			LVariant GridLines;
+			if (App->GetOptions()->GetValue(OPT_GridLines, GridLines))
+			{
+				list->DrawGridLines(GridLines.CastInt32() != 0);
+			}
+			list->EmptyColumns();
+
+			Prof.Add("Set def fields");
+			bool ForceDefaultFields = f->GetItemType() == MAGIC_FILTER;
+			if (folderObj->Fields().Length() <= 0 || ForceDefaultFields)
+			{
+				f->SetDefaultFields(ForceDefaultFields);
+			}
+
+			// Add fields to list view
+			int n = 0;
+			LArray<int> Empty;
+			for (auto t: f->Items)
+			{
+				t->SetFieldArray(Empty);
+			}
+			LRect *Bounds = nullptr;
+			if (App->GetIconImgList())
+			{
+				Bounds = App->GetIconImgList()->GetBounds();
+			}
+
+			switch (f->GetItemType())
+			{
+				case MAGIC_ANY:
+				{
+					list->AddColumn("", 170);
+					list->AddColumn("", 170);
+					list->AddColumn("", 170);
+					list->AddColumn("", 170);
+					break;
+				}
+				default:
+				{
+					n = 0;
+					f->FieldArray.Length(0);
+
+					for (auto i = folderObj->Fields().First(); i; i = folderObj->Fields().Next())
 					{
-						switch (i->GetInt(FIELD_ID))
+						auto FieldId = i->GetInt(FIELD_ID);
+						auto FName = LLoadString((int)FieldId);
+						auto Width = i->GetInt(FIELD_WIDTH);
+						auto FieldText = FName ? FName : i->GetStr(FIELD_NAME);
+						LAssert(FieldText != NULL);
+
+						if (auto c = list->AddColumn(FieldText, (int)Width))
 						{
+							switch (i->GetInt(FIELD_ID))
+							{
 							case FIELD_PRIORITY:
 							{
 								int x = 12;
@@ -2591,49 +2653,60 @@ Prof.Add("Set def fields");
 								c->TextAlign(LCss::Len(LCss::AlignRight));
 								break;
 							}
+							}
 						}
-					}
-						
-					FieldArray[n++] = (int)i->GetInt(FIELD_ID);
-				}
-				break;
-			}
-		}
 
-		// Add all items to list
-		if (auto v = View())
+						f->FieldArray[n++] = (int)i->GetInt(FIELD_ID);
+					}
+					break;
+				}
+			}
+
+			SetState(SLoad);
+		}
+		else
 		{
-			v->SetContainer(this);
+			SetState(SSort);
+		}
+	}
+
+	void Load()
+	{
+		// Add all items to list
+		if (auto v = f->View())
+		{
+			v->SetContainer(f);
 
 			// tell the list who we are
-			if (auto sort = GetColumnSort())
+			if (auto sort = f->GetColumnSort())
 			{
 				// set current sort settings
 				v->SetSort(sort);
 			}
 		}
 
-Prof.Add("Load things");
-		// FIXME:
-		LoadThings();
+		Prof.Add("Load things");
+
+		f->LoadThings();
+
+		SetState(SSort);
 	}
 
-	// Filter
-	List<LListItem> Is;
-
-	// Do any threading/sorting
-	static LString SortMsg;
-	auto fieldSort = GetFieldSort();
-	if (!Thread() && fieldSort.Col)
+	void Sort()
 	{
-		SortMsg.Printf("Sorting " LPrintfSizeT " items", Items.Length());
-Prof.Add(SortMsg);
-
-		int direction = fieldSort.Ascend ? 1 : -1;
-		if (GetItemType() == MAGIC_ANY)
+		// Do any threading/sorting
+		static LString SortMsg;
+		auto fieldSort = f->GetFieldSort();
+		if (!f->Thread() && fieldSort.Col)
 		{
-			auto col = GetColumnSort().Col;
-			Items.Sort([this, direction, col](auto pa, auto pb)
+			SortMsg.Printf("Sorting " LPrintfSizeT " items", f->Items.Length());
+			Prof.Add(SortMsg);
+
+			int direction = fieldSort.Ascend ? 1 : -1;
+			if (f->GetItemType() == MAGIC_ANY)
+			{
+				auto col = f->GetColumnSort().Col;
+				f->Items.Sort([this, direction, col](auto pa, auto pb)
 				{
 					auto a = dynamic_cast<Thing*>(pa);
 					auto b = dynamic_cast<Thing*>(pb);
@@ -2650,56 +2723,87 @@ Prof.Add(SortMsg);
 
 					return direction * a->Compare(b, defs[col]);
 				});
-		}
-		else
-		{
-			// Sort..
-			Items.Sort([this, direction, fieldSort](auto a, auto b)
+			}
+			else
+			{
+				// Sort..
+				f->Items.Sort([this, direction, fieldSort](auto a, auto b)
 				{
 					return direction * a->Compare(b, fieldSort.Col);
 				});
+			}
 		}
+
+		SetState(SFilter);
 	}
 
-	// Do any filtering...
-Prof.Add("Filtering");
-	auto Filter = App->GetThingFilter();
-	auto FilterStart = LCurrentTime();
-	size_t Pos = 0;
-	for (auto t: Items)
+	List<LListItem> Is;
+	size_t FilterPos = 0;
+
+	void Filter()
 	{
-		t->SetFieldArray(FieldArray);
-		if (!Filter || Filter->TestThing(t))
+		// Filter
+
+		// Do any filtering...
+		Prof.Add("Filtering");
+		auto Filter = App->GetThingFilter();
+		auto FilterStart = LCurrentTime();
+		for (; FilterPos < f->Items.Length(); FilterPos++)
 		{
-			// Add anyway... because all items are not part of list
-			Is.Insert(t);
+			auto t = f->Items[FilterPos];
+			t->SetFieldArray(f->FieldArray);
+			if (!Filter || Filter->TestThing(t))
+			{
+				// Add anyway... because all items are not part of list
+				Is.Insert(t);
+			}
+
+			auto now = LCurrentTime();
+			if ((now-FilterStart) >= 50)
+			{
+				return SetState(SFilter);
+			}
+
+			FilterPos++;
 		}
 
-		auto now = LCurrentTime();
-		if ((now-FilterStart) > 5000)
-		{
-			status = false;
-			LPopupNotification::Message(App, "List population taking too long..."); 
-			break;
-		}
-
-		Pos++;
+		SetState(SFinish);
 	}
 
-Prof.Add("Inserting");
-	if (View() && Is[0])
+	void Finish()
 	{
-		View()->Insert(Is, -1, true);
+		Prof.Add("Inserting");
+		if (f->View() && Is[0])
+		{
+			f->View()->Insert(Is, -1, true);
+		}
+
+		Prof.Add("Deleting");
+		list->DeletePlaceHolders();
+
+		Prof.Add("OnSelect");
+		f->GetFldObj()->OnSelect(true);
+		f->CurState = FldState_Idle;
+
+		// delete this object..
+		LAssert(f->populateState == this);		
+		auto fld = f;
+		DeleteObj(fld->populateState);
+	}
+};
+
+void ScribeFolder::Populate(ThingList *list, std::function<void(bool)> callback)
+{
+	App->OnSelect();
+
+	if (!GetFldObj() || !list || populateState)
+	{
+		if (callback)
+			callback(false);
+		return;
 	}
 
-Prof.Add("Deleting");
-	list->DeletePlaceHolders();
-
-Prof.Add("OnSelect");
-	GetFldObj()->OnSelect(true);
-	CurState = FldState_Idle;
-
-	return status;
+	populateState = new PopulateState(this, list);
 }
 
 void ScribeFolder::OnUpdateUnRead(int Offset, bool ScanItems)
@@ -2814,7 +2918,7 @@ void ScribeFolder::OnProperties(int Tab)
 		{
 			SetDirty();
 			SerializeFieldWidths(true);
-			Populate(View());
+			Populate(View(), nullptr);
 		}
 	});
 }

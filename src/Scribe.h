@@ -1209,6 +1209,8 @@ class ScribeClass ScribeFolder :
 	public LDragDropSource,
 	public MailContainer
 {
+	struct PopulateState;
+
 	friend class MailTree;
 	friend class FolderPropertiesDlg;
 	friend class ThingList;
@@ -1249,6 +1251,8 @@ protected:
 		FldState_Loading,
 		FldState_Populating,
 	}	CurState = FldState_Idle;
+
+	PopulateState *populateState = nullptr;
 
 public:
 	using TMailCb = std::function<void(Mail*)>;
@@ -1367,7 +1371,7 @@ public:
 	void OnRename(char *NewName);
 	void OnDelete();
 	LString GetPath();
-	bool Populate(ThingList *List);
+	void Populate(ThingList *List, std::function<void(bool)> callback);
 	bool CanHaveSubFolders(Store3ItemTypes Type = MAGIC_MAIL);
 	void OnRethread();
 

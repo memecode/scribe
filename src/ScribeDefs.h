@@ -356,6 +356,7 @@ enum ScribeMessages
 	M_GET_EVENTS_DONE,
 	M_CONSTRUCT_0,				// A=(LOptionsFile::PortableType)Type
 	M_DELETE_ATTACHMENT,		// A=(CalendarAttachmentItem*)
+	M_FOLDER_POPULATE,
 };
 
 enum ScribeControls

@@ -360,12 +360,14 @@ void MailTree::OnItemSelect(LTreeItem *Item)
 
 	if (Things() && !Item->IsRoot())
 	{
-		ScribeFolder *C = dynamic_cast<ScribeFolder*>(Item);
-		if (C)
+		if (auto C = dynamic_cast<ScribeFolder*>(Item))
 		{
-			C->Populate(Things());
-			App->SetCtrlValue(IDM_THREAD, C->GetThreaded());
-			App->OnFolderSelect(C);
+			C->Populate(Things(), [this, C](auto status)
+				{
+					App->SetCtrlValue(IDM_THREAD, C->GetThreaded());
+					App->OnFolderSelect(C);
+				});
+			
 		}
 	}
 	else
