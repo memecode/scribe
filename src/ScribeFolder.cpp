@@ -2763,8 +2763,6 @@ struct ScribeFolder::PopulateState : public LView::ViewEventTarget
 			{
 				return SetState(SFilter);
 			}
-
-			FilterPos++;
 		}
 
 		SetState(SFinish);
