@@ -2383,12 +2383,16 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		}
 		case SdCalendarToday: // Type: String
 		{
+			// Fixme: This isn't ideal, it updates 'CalendarSummary' after it's needed to return
+			// to the caller. So it's always out of date. Probably the best solution is to update
+			// it after startup somewhere and then also when the user saves calendar events.
 			Calendar::SummaryOfToday(this, [this](auto s)
 			{
 				d->CalendarSummary = s;
 			});
 
-			return d->CalendarSummary;
+			Value = d->CalendarSummary;
+			break;
 		}
 		case SdInboxSummary:
 		{

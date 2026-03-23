@@ -59,6 +59,8 @@ LString DynamicHtml::OnDynamicContent(LDocView *Parent, const char *Code)
 			return LString(i);
 		}
 		case GV_STRING:
+		case GV_LSTRING:
+		case GV_WSTRING:
 		{
 			return Val.Str();
 		}
