@@ -2440,6 +2440,7 @@ public:
 	LDocView		*CreateTextControl(int Id, const char *MimeType, bool Editor, Mail *m = NULL);
 	void			SetLastDrop() { LastDrop = LCurrentTime(); }
 	void			SetListPane(LAutoPtr<LView> listPane);
+	void			LoadTitleListPane();
 	void			SetLayout(LayoutMode Mode = OptionsLayout);
 	bool			IsMyEmail(const char *Email);
 	bool			SetItemPreview(LView *v);

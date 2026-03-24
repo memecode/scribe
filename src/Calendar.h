@@ -45,8 +45,8 @@ enum CalRecurFreq {
 // Classes
 struct TimePeriod
 {
-	Calendar *c = NULL;
-	CalendarSource *src = NULL;
+	Calendar *c = nullptr;
+	CalendarSource *src = nullptr;
 	LDateTime s, e;
 
 	void ToLocal()
@@ -323,6 +323,7 @@ public:
 							CalendarSource::GetEventCb callback);
 	~CalendarSourceGetEvents();
 
+	const char *GetClass() { return "CalendarSourceGetEvents"; }
 	void OnState();
 	LMessage::Result OnEvent(LMessage *Msg);
 };
@@ -381,6 +382,14 @@ class RemoteCalendarSource :
 	public CalendarSource
 {
 	class RemoteCalendarSourcePriv *d;
+	friend class RemoteCalendarSourcePriv;
+
+	struct CallbackInfo
+	{
+		LDateTime startTs, endTs;
+		GetEventCb cb;
+	};	
+	void ProcessCallback(CallbackInfo &inf);
 
 public:
 	RemoteCalendarSource(ScribeWnd *a, const char *id = NULL);

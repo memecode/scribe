@@ -33,6 +33,7 @@
 #define MAX_RECUR			1024
 #define DEBUG_REMINDER		0
 #define DEBUG_DATES			0
+
 #if DEBUG_DATES
 #define LOG_DEBUG(...)		LgiTrace(__VA_ARGS__)
 #else
@@ -694,11 +695,18 @@ void Calendar::SummaryOfToday(ScribeWnd *App, std::function<void(LString)> Callb
 
     LArray<CalendarSource*> Sources;
 	if (!App || !Callback || !App->GetCalendarSources(Sources))
+	{
+		LOG_DEBUG("%s:%i - param error\n", _FL);
 		return;
+	}
 
 	if (GetEvents)
+	{
+		LOG_DEBUG("%s:%i - GetEvents true\n", _FL);
 		return;
+	}
 
+	LOG_DEBUG("%s:%i - CalendarSourceGetEvents %s -> %s\n", _FL, Now.Get().Get(), Next.Get().Get());
 	new CalendarSourceGetEvents(
 		App,
 		&GetEvents,
@@ -707,11 +715,10 @@ void Calendar::SummaryOfToday(ScribeWnd *App, std::function<void(LString)> Callb
 		Sources,
 		[Callback](auto e)
 		{
+			LOG_DEBUG("%s:%i - CalendarSourceGetEvents cb: %i events\n", _FL, (int)e.Length());
 			if (!e.Length())
 			{
-				char s[256];
-				sprintf_s(s, sizeof(s), "<font color='#808080'>%s</font>", LLoadString(IDS_NO_EVENTS));
-				Callback(s);
+				Callback(LString::Fmt("<font color='#808080'>%s</font>", LLoadString(IDS_NO_EVENTS)));
 			}
 			else
 			{

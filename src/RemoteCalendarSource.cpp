@@ -61,6 +61,8 @@ public:
 	LError err;
 	bool Error = false;
 	bool Loaded = false;
+	
+	LArray<RemoteCalendarSource::CallbackInfo> onLoadCallbacks;
 
 	const char *GetClass() override { return "RemoteCalendarSourcePriv"; }
 
@@ -69,7 +71,7 @@ public:
 
 	RemoteCalendarSourcePriv(RemoteCalendarSource *src) :
 		Source(src),
-		LEventTargetThread("RemoteCalendarSourcePriv")
+		LEventTargetThread("RemCalSrcPrv")
 	{
 	}
 
@@ -190,7 +192,7 @@ public:
 							break;
 						}
 					}
-
+					
 					Post(M_LOADED);
 				}
 				else
@@ -340,6 +342,48 @@ bool RemoteCalendarSource::Match(char *Email)
 	return false;
 }
 
+void RemoteCalendarSource::ProcessCallback(CallbackInfo &inf)
+{
+	LArray<TimePeriod> Events;
+	if (!Display)
+	{
+		inf.cb(Events);
+		return;
+	}
+
+	LDateTime Start = inf.startTs;
+	Start.ToUtc();
+
+	LDateTime End = inf.endTs;
+	End.ToUtc();
+
+	if (d->Lock(_FL))
+	{
+		for (auto c: d->Events)
+		{
+			LDateTime s;
+			if (c->GetCalType() == CalEvent &&
+				c->GetField(FIELD_CAL_START_UTC, s))
+			{
+				LArray<TimePeriod> Times;
+				if (c->GetTimes(Start, End, Times))
+				{
+					SetCalendarsSource(c);
+					for (auto &t: Times)
+					{
+						t.src = this;
+						Events.Add(t);
+					}
+				}
+			}
+		}
+
+		d->Unlock();
+	}
+
+	inf.cb(Events);
+}
+
 bool RemoteCalendarSource::GetEvents(const LDateTime StartTs,
 									 const LDateTime EndTs,
 									 GetEventCb Callback)
@@ -359,41 +403,18 @@ bool RemoteCalendarSource::GetEvents(const LDateTime StartTs,
 		d->Loaded = true;
 		d->PostEvent(M_LOAD_URI);
 		
-		// FIXME: Should call the callback when loaded...?
-		Callback(Events);
+		if (Callback)
+		{
+			auto &inf = d->onLoadCallbacks.New();
+			inf.startTs = StartTs;
+			inf.endTs = EndTs;
+			inf.cb = std::move(Callback);
+		}
 		return true;
 	}
-	
-	LDateTime Start = StartTs;
-	Start.ToUtc();
-	LDateTime End = EndTs;
-	End.ToUtc();
 
-	if (d->Lock(_FL))
-	{
-		for (auto c: d->Events)
-		{
-			LDateTime s;
-			if (c->GetCalType() == CalEvent &&
-				c->GetField(FIELD_CAL_START_UTC, s))
-			{
-				LArray<TimePeriod> Times;
-				if (c->GetTimes(Start, End, Times))
-				{						    
-					SetCalendarsSource(c);
-					for (auto &t: Times)
-					{
-						t.src = this;
-						Events.Add(t);
-					}
-				}
-			}
-		}
-
-		d->Unlock();
-	}
-
-	Callback(Events);
+	CallbackInfo inf{ StartTs, EndTs, Callback };
+	ProcessCallback(inf);
 	return true;
 }
 
@@ -512,7 +533,7 @@ void RemoteCalendarSource::OnChange(bool IsDelete)
 	if (!w)
 		return;
 
-	CalendarView *cv = NULL;
+	CalendarView *cv = nullptr;
 	if (!w->GetViewById(IDC_CALENDAR, cv))
 		return;
 
@@ -528,6 +549,10 @@ LMessage::Result RemoteCalendarSource::OnEvent(LMessage *Msg)
 	{
 		case M_LOADED:
 		{
+			for (auto &inf: d->onLoadCallbacks)
+				ProcessCallback(inf);
+			d->onLoadCallbacks.Length(0);
+
 			OnChange(false);
 			break;
 		}

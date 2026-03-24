@@ -2383,13 +2383,24 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		}
 		case SdCalendarToday: // Type: String
 		{
-			// Fixme: This isn't ideal, it updates 'CalendarSummary' after it's needed to return
-			// to the caller. So it's always out of date. Probably the best solution is to update
-			// it after startup somewhere and then also when the user saves calendar events.
-			Calendar::SummaryOfToday(this, [this](auto s)
-			{
-				d->CalendarSummary = s;
-			});
+			static uint64_t lastUpdate = 0;
+			auto now = LCurrentTime();
+			
+			if (now - lastUpdate > 60000)
+			{			
+				lastUpdate = now;
+				
+				// Due to the asyncronous nature of SummaryOfToday, it maybe waiting for network calendars....
+				Calendar::SummaryOfToday(this,
+					[this](auto s)
+					{
+						// This is called sometime after the value is returned to the caller...
+						d->CalendarSummary = s;
+						
+						// But we can refresh the display, with the new value:
+						LoadTitleListPane();
+					});
+			}
 
 			Value = d->CalendarSummary;
 			break;
@@ -5098,6 +5109,12 @@ LToolBar *ScribeWnd::LoadToolbar(LViewI *Parent, const char *File, LAutoPtr<LIma
 	}
 
 	return Tools;
+}
+
+void ScribeWnd::LoadTitleListPane()
+{
+	LAutoPtr<LView> v(new DynamicHtml(this, "title.html"));
+	SetListPane(v);
 }
 
 void ScribeWnd::SetListPane(LAutoPtr<LView> listPane)

@@ -35,7 +35,6 @@ auto ScribeCalendarObject	=	"com.memecode.Calendar";
 #define TODAY_TINT_LEVEL		0.95f
 #define TODAY_TINT_COLOUR		LColour(255, 0, 0)
 
-/////////////////////////////////////////////////////////////////////////////////////
 #define IDM_CAL_DAY				100
 #define IDM_CAL_WEEK			101
 #define IDM_CAL_MONTH			102
@@ -55,6 +54,13 @@ auto ScribeCalendarObject	=	"com.memecode.Calendar";
 #define IDM_NEW_EVENT			210
 
 #define IDC_TODO				300
+
+
+#if 0
+#define LOG_DEBUG(...)			LgiTrace(__VA_ARGS__)
+#else
+#define LOG_DEBUG(...)
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////
 void LoadCalendarStringTable()
@@ -3685,16 +3691,19 @@ CalendarSourceGetEvents::CalendarSourceGetEvents(ScribeWnd *app,
 
 CalendarSourceGetEvents::~CalendarSourceGetEvents()
 {
-	*Owner = NULL;
+	*Owner = nullptr;
 }
 
 void CalendarSourceGetEvents::OnState()
 {
+	LOG_DEBUG("%s::OnState() sources=%i\n", GetClass(), (int)Sources.Length());
 	if (Sources.Length() == 0)
 	{
-		//LgiTrace("CalendarSourceGetEvents: finished...\n");
 		if (Callback)
+		{
+			LOG_DEBUG("%s::OnState() events=%i\n", GetClass(), (int)Events.Length());
 			Callback(Events);
+		}
 		delete this;
 	}
 	else if (auto src = Sources[0])
@@ -3703,7 +3712,7 @@ void CalendarSourceGetEvents::OnState()
 		if (!App)
 			App = src->GetApp();
 
-		//LgiTrace("CalendarSourceGetEvents: %s\n", src->ToString().Get());
+		LOG_DEBUG("%s: %s\n", GetClass(), src->ToString().Get());
 		src->GetEvents(Start, End, [this, src](auto events)
 			{
 				#ifdef _DEBUG
@@ -3711,7 +3720,7 @@ void CalendarSourceGetEvents::OnState()
 				GotCb.Add(src, true);
 				#endif
 
-				//LgiTrace("CalendarSourceGetEvents: Callback %s %i\n", src->ToString().Get(), (int)events.Length());
+				LOG_DEBUG("%s: GetEvents.cb %s %i\n", GetClass(), src->ToString().Get(), (int)events.Length());
 				Events += events;
 
 				PostEvent(M_CALENDAR_SOURCE_STATE);

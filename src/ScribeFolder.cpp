@@ -2523,7 +2523,7 @@ struct ScribeFolder::PopulateState : public LView::ViewEventTarget
 
 	void SetState(TState s)
 	{
-		LgiTrace("%s:%i - SetState(%s)\n", _FL, ToString(s));
+		// LgiTrace("%s:%i - SetState(%s)\n", _FL, ToString(s));
 		state = s;
 		PostEvent(M_FOLDER_POPULATE);
 	}
