@@ -262,13 +262,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 		$(Target) $(Objects) $(Libs)
 	@echo Done.
 
-../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so : ../../lgi/deps/build-x64-debug/include/iconv.h \
-	../../lgi/deps/build-x64-debug/include/jconfig.h \
-	../../lgi/deps/build-x64-debug/include/jerror.h \
-	../../lgi/deps/build-x64-debug/include/jmorecfg.h \
-	../../lgi/deps/build-x64-debug/include/jpeglib.h \
-	../../lgi/deps/build-x64-debug/include/lunasvg/lunasvg.h \
-	../../lgi/deps/build-x64-debug/include/png.h \
+../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so : \
 	../../lgi/trunk/include/lgi/common/App.h \
 	../../lgi/trunk/include/lgi/common/Array.h \
 	../../lgi/trunk/include/lgi/common/AutoPtr.h \
