@@ -367,22 +367,22 @@ void ThingList::Sort()
 	else if (Container->GetItemType() == MAGIC_ANY)
 	{
 		auto colSort = Container->GetColumnSort();
-		LList::Sort([this, colSort](auto *pa, auto *pb) -> int64_t
+		LList::Sort([this, colSort](auto *pa, auto *pb) -> int
 			{
 				auto a = dynamic_cast<Thing*>(pa);
 				auto b = dynamic_cast<Thing*>(pb);
 				if (!a || !b)
-					return pa - pb;
+					return LCastComparison(pa - pb);
 
 				auto type = a->Type() - b->Type();
 				if (type)
-					return type;
+					return LCastComparison(type);
 
 				auto defs = a->GetDefaultFields();
 				if (!defs || !defs[colSort.Col])
-					return pa - pb;
+					return LCastComparison(pa - pb);
 
-				return (colSort.Ascend ? 1 : -1) * a->Compare(b, defs[colSort.Col]);
+				return LCastComparison((colSort.Ascend ? 1 : -1) * a->Compare(b, defs[colSort.Col]));
 
 			});
 	}
