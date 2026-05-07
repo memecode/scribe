@@ -16,7 +16,7 @@ MakeDir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BuildDir = $(Build)
 
 CFlags = -MMD -MP -fPIC -fno-inline
-CppFlags = $(CFlags) -fpermissive -std=c++14
+CppFlags = $(CFlags) -fpermissive -std=c++17
 
 ifeq ($(Build),Debug)
 	CFlags += -g -Wno-format-truncation
