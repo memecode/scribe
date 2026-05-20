@@ -87,8 +87,13 @@ LPMAPIFOLDER LMapiFolder::Handle()
 {
 	if (!MapiFolder)
 	{
+		if (Name.Equals("Server Failures"))
+			return nullptr;
+
 		if (Parent && Parent->MapiFolder)
 		{
+			auto startTs = LCurrentTime();
+
 			ULONG Type;
 			HRESULT res = Parent->MapiFolder->OpenEntry
 			(
@@ -99,6 +104,11 @@ LPMAPIFOLDER LMapiFolder::Handle()
 				&Type,
 				(IUnknown**)&MapiFolder
 			);
+
+			auto endTs = LCurrentTime();
+			if (endTs - startTs > 1000)
+				LgiTrace("%s:%i - MapiFolder->OpenEntry took %ims, name=%s\n", _FL, (int)(endTs-startTs), Name.Get());
+
 			if (FAILED(res) || !MapiFolder)
 			{
 				Store->Error("%s:%i - OpenEntry failed with 0x%x\n", _FL, res);
@@ -348,7 +358,7 @@ LDataIterator<LDataI*> &LMapiFolder::Children()
 				LAutoPtr<LDataI> t(Store->Create(ItemType));
 				if (t)
 				{
-					LMapiThing *tptr = dynamic_cast<LMapiThing*>(t.Get());
+					auto tptr = dynamic_cast<LMapiThing*>(t.Get());
 					if (tptr)
 					{
 						tptr->Set(Lst.GetField(PR_ENTRYID), this, &Lst);

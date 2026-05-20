@@ -6,12 +6,6 @@ LMapiMail::LMapiMail(LMapiStore *store) :
 	From(store),
 	Reply(store)
 {
-	Subject = NULL;
-	Flags = 0;
-	MsgSize = 0;
-	Seg = NULL;
-	TxtBody = NULL;
-	HtmlBody = NULL;
 	From.m = this;
 	Reply.m = this;
 }
@@ -118,30 +112,36 @@ const char *LMapiMail::GetStr(int id)
 	{
 		// Mail fields
 		case FIELD_INTERNET_HEADER:
-			return MapiGetPropStr(Handle(), PR_TRANSPORT_MESSAGE_HEADERS);
+			if (!InetHeaders)
+				InetHeaders = MapiGetPropStr(Handle(), PR_TRANSPORT_MESSAGE_HEADERS);
+			return InetHeaders;
 		case FIELD_MIME_TYPE:
 			if (!MimeType)
 			{
-				char *Hdrs = MapiGetPropStr(Handle(), PR_TRANSPORT_MESSAGE_HEADERS);
+				auto Hdrs = MapiGetPropStr(Handle(), PR_TRANSPORT_MESSAGE_HEADERS);
 				LAutoString c(InetGetHeaderField(Hdrs, "Content-Type", -1));
-				char *semi = c ? strchr(c, ';') : NULL;
+				char *semi = c ? strchr(c, ';') : nullptr;
 				if (semi) *semi = 0;
 				MimeType = c;
 				MimeType = MimeType.Strip();
 			}
 			return MimeType;
 		case FIELD_MESSAGE_ID:
-			return MapiGetPropStr(Handle(), PR_INTERNET_MESSAGE_ID);
+			if (!MsgId)
+				MsgId = MapiGetPropStr(Handle(), PR_INTERNET_MESSAGE_ID);
+			return MsgId;
 		case FIELD_SUBJECT:
-			if (!Subject) Subject = MapiGetPropStr(Handle(), PR_SUBJECT);
+			if (!Subject)
+				Subject = MapiGetPropStr(Handle(), PR_SUBJECT);
 			return Subject;
 		case FIELD_TEXT:
-			if (!TxtBody) TxtBody = MapiGetPropStr(Handle(), PR_BODY);
+			if (!TxtBody)
+				TxtBody = MapiGetPropStr(Handle(), PR_BODY);
 			return TxtBody;
 		case FIELD_ALTERNATE_HTML:
 			if (!HtmlBody && Handle())
 			{
-				IStream *Html = NULL;
+				IStream *Html = nullptr;
 				HRESULT res = Handle()->OpenProperty(PR_HTML, &IID_IStream, 0, 0, (IUnknown**) &Html);
 				if (SUCCEEDED(res))
 				{
@@ -149,7 +149,7 @@ const char *LMapiMail::GetStr(int id)
 					HRESULT res = Html->Stat(&s, STATFLAG_DEFAULT);
 					if (SUCCEEDED(res))
 					{
-						HtmlBody.Set(NULL, (NativeInt)s.cbSize.QuadPart);
+						HtmlBody.Set(nullptr, (NativeInt)s.cbSize.QuadPart);
 						ULONG Rd = 0;
 						res = Html->Read(HtmlBody.Get(), (ULONG)HtmlBody.Length(), &Rd);
 						if (FAILED(res))
@@ -174,7 +174,7 @@ const char *LMapiMail::GetStr(int id)
 			}
 			return Charset;
 		case FIELD_LABEL:
-			return NULL;
+			return nullptr;
 		default:
 			LAssert(0);
 			break;

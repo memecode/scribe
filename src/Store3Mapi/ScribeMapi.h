@@ -391,15 +391,17 @@ class LMapiMail : public LMapiThing
 	LMapiAddr Reply;
 	DIterator<LDataPropI, LMapiAddr, LMapiStore> To;
 	LDateTime Date;
-	uint64 Flags;
-	uint64 MsgSize;
+	uint64 Flags = 0;
+	uint64 MsgSize = 0;
 	LString Charset;
 	LString TxtBody;
 	LString HtmlBody;
 	LString MimeType;
+	LString MsgId;
+	LString InetHeaders;
 
 public:
-	LMapiAttachment *Seg;
+	LMapiAttachment *Seg = nullptr;
 
 	LMapiMail(LMapiStore *store);
 	~LMapiMail();
@@ -612,22 +614,17 @@ public:
 class ScribeMapiList : public LMapiBase
 {
 	LPMAPITABLE List;
-	ULONG Rows;
-	SRowSet *BaseRow;
-	uint32_t i, StartIndex;
-	bool ReleaseList;
-	bool Status;
+	ULONG Rows = 0;
+	SRowSet *BaseRow = nullptr;
+	uint32_t i = 0, StartIndex = 0;
+	bool ReleaseList = false;
+	bool Status = false;
 
 public:
 	ScribeMapiList(LPMAPITABLE list, bool release = true)
 	{
 		List = list;
-		Rows = 0;
-		BaseRow = 0;
-		i = 0;
-		StartIndex = 0;
 		ReleaseList = release;
-		Status = false;
 
 		if (List)
 		{
