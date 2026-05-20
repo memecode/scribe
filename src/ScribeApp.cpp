@@ -297,32 +297,6 @@ void ScribeOptionsDefaults(LOptionsFile *f)
 	DefaultStrOption(OPT_SpamFolder, LLoadString(IDS_SPAM, "Spam"));
 }
 
-const char *Store3ItemTypeName(Store3ItemTypes t)
-{
-	switch (t)
-	{
-		case MAGIC_NONE:		return "MAGIC_NONE";
-		case MAGIC_BASE:		return "MAGIC_BASE";
-		case MAGIC_MAIL:		return "MAGIC_MAIL";
-		case MAGIC_CONTACT:		return "MAGIC_CONTACT";
-		// case MAGIC_FOLDER:	return "MAGIC_FOLDER";
-		case MAGIC_MAILBOX:		return "MAGIC_MAILBOX";
-		case MAGIC_ATTACHMENT:	return "MAGIC_ATTACHMENT";
-		case MAGIC_ANY:			return "MAGIC_ANY";
-		case MAGIC_FILTER:		return "MAGIC_FILTER";
-		case MAGIC_FOLDER:		return "MAGIC_FOLDER";
-		case MAGIC_CONDITION:	return "MAGIC_CONDITION";
-		case MAGIC_ACTION:		return "MAGIC_ACTION";
-		case MAGIC_CALENDAR:	return "MAGIC_CALENDAR";
-		case MAGIC_ATTENDEE:	return "MAGIC_ATTENDEE";
-		case MAGIC_GROUP:		return "MAGIC_GROUP";
-		default:
-			LAssert(0);
-			break;
-	}
-	
-	return "(error)";
-}
 
 void SetRecipients(ScribeWnd *App, char *Start, LDataIt l, EmailAddressType CC)
 {

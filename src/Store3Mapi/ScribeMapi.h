@@ -731,8 +731,8 @@ public:
 		{
 			for (ScribeMapiList Lst(MsgStores, false); Lst.More(); Lst.Next())
 			{
-				SPropValue *DisplayName = Lst.GetField(PR_DISPLAY_NAME); 
-				SPropValue *Entry = Lst.GetField(PR_ENTRYID);
+				auto DisplayName = Lst.GetField(PR_DISPLAY_NAME); 
+				auto Entry = Lst.GetField(PR_ENTRYID);
 				if (DisplayName && Entry)
 				{
 					LAutoPtr<MapiEntryRef> Ref(new MapiEntryRef(Store));
@@ -782,12 +782,12 @@ class LMapiStore : public LDataStoreI, public LLibrary
 	IMsgStore					*MsgStore = nullptr;
 	UI_TYPE						Ui;
 	
-	MAPIINITIALIZE				*MAPIInitialize;
-	MAPILOGONEX					*MAPILogonEx;
-	MAPIUNINITIALIZE			*MAPIUninitialize;
-	MAPIALLOCATEBUFFER			*MAPIAllocateBuffer;
-	MAPIFREEBUFFER				*MAPIFreeBuffer;
-	pWrapCompressedRTFStream	WrapCompressedRTFStream;
+	MAPIINITIALIZE				*MAPIInitialize = nullptr;
+	MAPILOGONEX					*MAPILogonEx = nullptr;
+	MAPIUNINITIALIZE			*MAPIUninitialize = nullptr;
+	MAPIALLOCATEBUFFER			*MAPIAllocateBuffer = nullptr;
+	MAPIFREEBUFFER				*MAPIFreeBuffer = nullptr;
+	pWrapCompressedRTFStream	WrapCompressedRTFStream = nullptr;
 
 	LMapiFolder *FindSystemFolder(Store3SystemFolder Type);
 	

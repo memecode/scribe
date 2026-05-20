@@ -171,13 +171,6 @@ LMapiStore::LMapiStore(const char *profile, const char *username, const char *pa
 
 LMapiStore::~LMapiStore()
 {
-	MAPIUninitialize = NULL;
-	MAPIInitialize = NULL;
-	MAPILogonEx = NULL;
-	MAPIAllocateBuffer = NULL;
-	MAPIFreeBuffer = NULL;
-	WrapCompressedRTFStream = NULL;
-
 	// Make sure we have cleaned up
 	SetInt(FIELD_IS_ONLINE, false);
 	
@@ -289,7 +282,11 @@ bool LMapiStore::Login()
 	res = MAPILogonEx(	Ui,
 						wProfile,
 						wPassword,
-						MAPI_LOGON_UI | MAPI_EXTENDED | MAPI_USE_DEFAULT,
+						MAPI_LOGON_UI |
+						MAPI_UNICODE |
+							MAPI_EXTENDED |
+							MAPI_NEW_SESSION |
+							(wProfile ? MAPI_EXPLICIT_PROFILE : MAPI_USE_DEFAULT),
 						&Session);
 	if (FAILED(res) || !Session)
 	{
@@ -306,22 +303,22 @@ bool LMapiStore::Login()
 
 LMapiFolder *LMapiStore::FindSystemFolder(Store3SystemFolder Type)
 {
-	LDataFolderI *r = GetRoot();
+	auto r = GetRoot();
 	if (!r)
-		return NULL;
+		return nullptr;
 	
-	LDataIterator<LDataFolderI*> &it = r->SubFolders();
+	auto &it = r->SubFolders();
 	for (LDataFolderI *f=it.First(); f; f=it.Next())
 	{
 		if (f->GetInt(FIELD_SYSTEM_FOLDER) == Type)
 		{
 			LMapiFolder *Trash = dynamic_cast<LMapiFolder*>(f);
-			LAssert(Trash != NULL);
+			LAssert(Trash != nullptr);
 			return Trash;
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 
@@ -376,7 +373,7 @@ int64 LMapiStore::GetInt(int id)
 	switch (id)
 	{
 		case FIELD_IS_ONLINE:
-			return Session != NULL;
+			return Session != nullptr;
 			break;
 		case FIELD_ACCOUNT_ID:
 			return AccountId;
