@@ -493,6 +493,9 @@
     <ClCompile Include="..\src\ScribeIpc.cpp">
       <Filter>Application</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\StrToDom.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\Btree\btree.h">

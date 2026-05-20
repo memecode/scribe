@@ -29,7 +29,7 @@
 #else
 
 	// is a plugin
-	#ifdef WIN32
+	#if defined(WIN32) && !defined(MAPI_CONNECTOR)
 		#define ScribeFunc		extern "C" __declspec(dllimport)
 		#define ScribeClass		__declspec(dllimport)
 		#define ScribeExtern	extern __declspec(dllimport)

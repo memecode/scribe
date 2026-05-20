@@ -351,6 +351,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\src\Store3Webdav\WebdavFolder.cpp" />
     <ClCompile Include="..\src\Store3Webdav\WebdavStore.cpp" />
     <ClCompile Include="..\src\Store3Webdav\WebdavThread.cpp" />
+    <ClCompile Include="..\src\StrToDom.cpp" />
     <ClCompile Include="..\src\Test\UnitTests.cpp" />
     <ClCompile Include="..\src\TitlePage.cpp" />
     <ClCompile Include="..\Utils\Tables\MailFlags.c" />
