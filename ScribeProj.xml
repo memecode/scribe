@@ -161,6 +161,7 @@
 			<Node File="./src/ScribeUtils.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeUtils.h" Type="3" Platforms="15" />
 			<Node File="./src/ScribeWndPrivate.h" Type="3" Platforms="15" />
+			<Node File="./src/StrToDom.cpp" Type="2" Platforms="15" />
 			<Node File="./resources/Title.html" Type="3" Platforms="15" />
 		</Node>
 		<Node Name="Components" Type="1" Platforms="15" Open="0" Id="18">
@@ -570,6 +571,7 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 				<All>0</All>
 			</DebugAdmin>
 			<InitialDir />
+			<Debugger />
 		</Debug>
 		<Remote>
 			<RemoteUri />
