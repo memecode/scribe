@@ -151,6 +151,10 @@ struct Context
 		validateOptions();
 	}
 
+	~Context()
+	{
+	}
+
 	bool saveOptions()
 	{
 		LFile out(optionsPath, O_WRITE);
@@ -265,11 +269,17 @@ struct Context
 		auto argRange = arg.SplitDelimit(":");
 		LString::Array a;
 		if (!folder)
+		{
+			log.Print("%s:%i - error: no folder.\n", _FL);
 			return a;
+		}
 
 		auto meta = getMeta(folder);
 		if (!meta)
+		{
+			log.Print("%s:%i - error: no meta.\n", _FL);
 			return a;
+		}
 
 		LAssert(isUid); // don't support not UID yet...
 
@@ -340,7 +350,7 @@ struct Context
 						}
 						else
 						{
-							int asd=0;
+							LAssert(!"not implemented");
 						}
 					}
 
@@ -351,6 +361,62 @@ struct Context
 		}
 
 		meta->save();
+
+		return a;
+	}
+
+	LString::Array Search(LDataFolderI *folder, bool isUid, LArray<LString> params)
+	{
+		LString::Array a;
+		if (!folder)
+		{
+			log.Print("%s:%i - error: no folder.\n", _FL);
+			return a;
+		}
+
+		auto meta = getMeta(folder);
+		if (!meta)
+		{
+			log.Print("%s:%i - error: no meta.\n", _FL);
+			return a;
+		}
+
+		LAssert(isUid); // don't support not UID yet...
+
+		auto &it = folder->Children();
+		for (auto i = it.First(); i; i = it.Next())
+		{
+			if (i->Type() != MAGIC_MAIL)
+				continue;
+
+			if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
+			{
+				auto uid = meta->getUid(msgId);
+				if (uid != FolderMeta::INVALID)
+					continue;
+			
+				// Does 'i' match the search params?
+				bool match = false;
+				for (auto &p: params)
+				{
+					if (p.Equals("RECENT"))
+					{
+						auto flags = i->GetInt(FIELD_FLAGS);
+						if (!(flags & MAIL_READ))
+						{
+							match = true;
+						}
+					}
+					else
+					{
+						LAssert(!"Impl support for field");
+					}
+				}
+
+				if (match)
+					a.New().Printf("* SEARCH %i\r\n", uid);
+			}
+		}
 
 		return a;
 	}
@@ -372,6 +438,11 @@ struct ImapConnection : public LSocket
 		log(c->log),
 		rdBuf(8 << 10)
 	{
+	}
+
+	~ImapConnection()
+	{
+		log.Print("%s:%i - delete connect.\n", _FL);
 	}
 
 	void ImapErr(const char *reason, const char *msg)
@@ -513,6 +584,23 @@ struct ImapConnection : public LSocket
 				}
 				Write(LString::Fmt("%s OK Fetch completed\r\n", cmdRef.Get()));
 			}
+			else if (cmd.Equals("SEARCH"))
+			{
+				if (!selectFolder)
+					return ImapErr("UNAVAILABLE", "no folder selected");
+
+				auto resp = ctx->Search(selectFolder, isUid, parts.Slice(3, -1));
+				for (auto &r: resp)
+				{
+					log.Print("Search: %s\n", r.Get());
+					Write(r);
+				}
+				Write(LString::Fmt("%s OK Search completed\r\n", cmdRef.Get()));
+			}
+			else if (cmd.Equals("IDLE"))
+			{
+				Write(LString::Fmt("%s OK idle\r\n", cmdRef.Get()));
+			}
 			else
 			{
 				log.Print("UnknownImapCmd: %s\n", line.Strip().Get());
@@ -520,16 +608,23 @@ struct ImapConnection : public LSocket
 		}
 	}
 
-	void Readable()
+	bool Readable()
 	{
 		char buf[1024];
 		auto rd = Read(buf, sizeof(buf));
-		// log.Print("Conn: read %i\n", (int)rd);
+		log.Print("Conn: read %i\n", (int)rd);
 		if (rd > 0)
 		{
 			rdBuf.Write(buf, rd);
 			DoRead();
 		}
+		else if (rd == 0)
+		{
+			// Disconnected?
+			return false;
+		}
+
+		return true;
 	}
 };
 
@@ -728,10 +823,23 @@ public:
 				{
 					// log.Print("Select: readable %i\n", (int)readable.Length());
 					for (auto r: readable)
+					{
 						if (auto c = dynamic_cast<ImapConnection*>(r))
-							c->Readable();
+						{
+							if (!c->Readable())
+							{
+								// clean up closed connection:
+								auto del = connections.Delete(c);
+								LAssert(del);
+								log.Print("Deleting closed connection..\n");
+								delete c;
+							}
+						}
 						else
+						{
 							log.Print("Error: not a valid object?\n");
+						}
+					}
 				}
 			}
 

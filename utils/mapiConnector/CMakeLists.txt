@@ -39,3 +39,7 @@ target_include_directories(mapiConnector
 target_compile_definitions(mapiConnector
     PRIVATE
         MAPI_CONNECTOR)
+
+target_compile_definitions(mapiConnector
+    PRIVATE
+        $<$<CONFIG:Debug>:_DEBUG>)
