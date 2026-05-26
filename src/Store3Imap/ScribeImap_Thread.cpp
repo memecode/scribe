@@ -755,6 +755,7 @@ int ImapThread::Main()
 				}
 				
 				d->Imap->Logger = d->Store->GetLogger();
+				d->Imap->SetCancel(d);
 
 				char LogFileName[MAX_PATH_LEN] = "", Part[32];
 				LVariant LogFmt;
@@ -806,7 +807,6 @@ int ImapThread::Main()
 					}
 
 					d->Imap->SetOAuthParams(p);
-					d->Imap->SetCancel(d);
 					d->Imap->SetParentWindow(dynamic_cast<LViewI*>(d->Store->Callback));
 				}
 

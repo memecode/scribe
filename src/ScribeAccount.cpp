@@ -318,21 +318,21 @@ bool ScribeAccount::ReIndex(ssize_t i)
 	}
 
 	auto Opts = GetApp()->GetOptions();
-	auto OldKey = Receive.OptionName(NULL);
-	auto NewKey = Receive.OptionName(NULL, i);
-	if (Opts->LockTag(NewKey, _FL))
-	{
-		Opts->Unlock();
-
-		// The new key already exists... this will cause namespace clashes
-		// Rename the destination FIRST and then re-index this account.
-		LAssert(!"Dest index already exists.");
-		return false;
-	}
-
-	EmptyMaps();
+	auto OldKey = Receive.OptionName(nullptr);
 	if (i >= 0)
 	{
+		LString NewKey = Receive.OptionName(nullptr, i);
+		if (Opts->LockTag(NewKey, _FL))
+		{
+			Opts->Unlock();
+
+			// The new key already exists... this will cause namespace clashes
+			// Rename the destination FIRST and then re-index this account.
+			LAssert(!"Dest index already exists.");
+			return false;
+		}
+
+		EmptyMaps();
 		LString oldName = Receive.Name().Str();
 
 		auto Tag = Opts->LockTag(OldKey, _FL);
@@ -350,6 +350,7 @@ bool ScribeAccount::ReIndex(ssize_t i)
 	}
 	else
 	{
+		EmptyMaps();
 		GetApp()->GetOptions()->DeleteTag(OldKey);
 	}
 
