@@ -75,9 +75,9 @@ template<class TStore, class TMail, class TAttach>
 class Store3Attachment : public LDataI
 {
 protected:
-	TStore *Kit = NULL;
-	TMail *Mail = NULL;
-	TAttach *Parent = NULL;
+	TStore *Kit = nullptr;
+	TMail *Mail = nullptr;
+	TAttach *Parent = nullptr;
 	DIterator<LDataPropI, TAttach, TStore> Children;
 	bool Dirty = true;
 	LAutoPtr<LStreamI> Import;
@@ -91,13 +91,13 @@ protected:
 			#endif
 			LAssert(This && Parent->Children.IndexOf(This) >= 0);
 			Parent->Children.Delete(this);
-			Parent = NULL;
+			Parent = nullptr;
 		}
 		else if (Mail)
 		{
-			Mail->Seg = NULL;
+			Mail->Seg = nullptr;
 		}
-		Mail = NULL;
+		Mail = nullptr;
 
 		TAttach *c;
 		while (Children.Length())
@@ -283,6 +283,98 @@ public:
 
 	virtual void OnSave() = 0;
 	LDataStoreI *GetStore() { return Kit; }
+	
+	LString GenerateBoundary()
+	{
+		return LString::Fmt("store3." LPrintfUInt64 ".%u", LCurrentTime(), LRand());
+	}
+
+	// Takes the existing fields and creates new internet headers:
+	bool GenerateHeaders()
+	{
+		auto MimeType = GetStr(FIELD_MIME_TYPE);
+		if (!MimeType)
+		{
+			LAssert(!"MimeType is required.");
+			return false;
+		}
+
+		LStringPipe p;
+
+		if (!Parent && Mail)
+		{
+			// Need to grab the to, from, subject, date and so on from the parent email...
+			if (auto subj = Mail->GetStr(FIELD_SUBJECT))
+				p.Print("Subject: %s\r\n", subj);
+
+			if (auto dateSent = Mail->GetDate(FIELD_DATE_SENT))
+				p.Print("Date: %s\r\n", MailProtocol::FormatDateTimeRfc(dateSent).Get());
+
+			LArray<LDataPropI*> to, cc, from;
+			if (auto recip = Mail->GetList(FIELD_TO))
+			{
+				if (recip->Length())
+				{
+					for (auto a=recip->First(); a; a=recip->Next())
+					{
+						auto type = (EmailAddressType)a->GetInt(FIELD_CC);
+						if (type == MAIL_ADDR_CC)
+							cc.Add(a);
+						else if (type == MAIL_ADDR_TO)
+							to.Add(a);
+					}
+				}
+			}
+			if (auto sender = Mail->GetObj(FIELD_FROM))
+			{
+				from.Add(sender);
+			}
+
+			auto arrToHdr = [&](const char *hdr, LArray<LDataPropI*> &arr) {
+				if (arr.Length() == 0)
+					return;
+				p.Print("%s: ", hdr);
+				int idx = 0;
+				for (auto i: arr)
+				{
+					LString nm = i->GetStr(FIELD_NAME);
+					LString em = i->GetStr(FIELD_EMAIL);
+					p.Print("%s\"%s\" <%s>", idx++ ? ",\r\n\t" : "", nm.Escape().Get(), em.Escape().Get());
+				}
+				p.Print("\r\n");
+			};
+
+			arrToHdr("From", from);
+			arrToHdr("To", to);
+			arrToHdr("Cc", cc);
+		}
+		
+		p.Print("Content-Type: %s", MimeType);
+		if (auto Charset = GetStr(FIELD_CHARSET))
+			p.Print("; charset=%s", Charset);
+		auto Name = GetStr(FIELD_NAME);
+		if (Name)
+			p.Print("; name=\"%s\"", Name);
+		if (auto children = GetList(FIELD_MIME_SEG))
+		{
+			if (children->Length() > 0)
+				p.Print("; boundary=\"%s\"", GenerateBoundary().Get());
+		}
+		p.Print("\r\n");
+		
+		if (auto ContentId = GetStr(FIELD_CONTENT_ID))
+		{
+			p.Print("Content-Id: <%s>\r\n", LString(ContentId).Strip("<>").Get());
+			if (Name)
+				p.Print("Content-Disposition: inline; filename=\"%s\"\r\n", Name);
+		}
+		if (auto hdrs = p.NewLStr())
+			SetStr(FIELD_INTERNET_HEADER, hdrs);
+		else
+			return false;
+
+		return true;
+	}
 };
 
 extern bool Store3ToLMime(LMime *Out, LDataPropI *In);

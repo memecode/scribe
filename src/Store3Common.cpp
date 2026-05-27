@@ -450,8 +450,7 @@ bool Store3ToLMime(LMime *Out, LDataPropI *InInterface)
 	auto Type = In->Type();
 	if (Type == MAGIC_MAIL)
 	{
-		auto Sub = In->GetList(FIELD_MIME_SEG);
-		auto Child = Sub->First();
+		auto Child = In->GetObj(FIELD_MIME_SEG);
 		if (Child)
 		{
 			if (!Store3ToLMime(Out, Child))

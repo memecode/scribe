@@ -8,6 +8,8 @@ add_subdirectory(../../../../lgi/trunk lgi)
 
 add_executable(mapiConnector
     src/main.cpp
+
+    ../../src/Store3Mapi/ScribeMapi.h
     ../../src/Store3Mapi/ScribeMapi_Store.cpp
     ../../src/Store3Mapi/ScribeMapi_Mail.cpp
     ../../src/Store3Mapi/ScribeMapi_Calendar.cpp
@@ -15,8 +17,14 @@ add_executable(mapiConnector
     ../../src/Store3Mapi/ScribeMapi_Folder.cpp
     ../../src/Store3Mapi/ScribeMapi_Thing.cpp
     ../../src/Store3Mapi/ScribeMapi_Attachment.cpp
+
     ../../src/Store3Common.cpp
     ../../src/StrToDom.cpp
+
+    ../../../libs/mapi/MAPIX.h
+
+    ${LGI_DIR}/include/lgi/common/Com.h
+    ${LGI_DIR}/include/lgi/common/Mail.h
     ${LGI_DIR}/src/common/Text/TextConvert.cpp
     ${LGI_DIR}/src/common/Net/Mail.cpp
     ${LGI_DIR}/src/common/Net/Mime.cpp

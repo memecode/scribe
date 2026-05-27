@@ -24,6 +24,10 @@ typedef HRESULT (STDAPICALLTYPE *pWrapCompressedRTFStream)
 	ULONG ulFlags,
 	LPSTREAM FAR *lpUncompressedRTFStream
 );
+typedef HRESULT (STDMETHODCALLTYPE* pHrCreateNewToMapiConverter)
+(
+	IConverterSession** pConverterSession
+);
 
 #define PR_SMTP_ADDRESS				(PROP_TAG(PT_STRING8,	0x39fe))
 #define PR_SENDER_SMTP_ADDRESS		(PROP_TAG(PT_STRING8,	0x0065))
@@ -356,6 +360,7 @@ class LMapiAttachment :
 	LString ContentId;
 	LString Charset;
 	LString Literal;
+	LString Headers;
 	
 public:
 	LMapiAttachment(LMapiStore *store);
@@ -399,6 +404,7 @@ class LMapiMail : public LMapiThing
 	LString MimeType;
 	LString MsgId;
 	LString InetHeaders;
+	LString Rfc822;
 
 public:
 	LMapiAttachment *Seg = nullptr;
@@ -785,8 +791,10 @@ class LMapiStore : public LDataStoreI, public LLibrary
 	MAPIALLOCATEBUFFER			*MAPIAllocateBuffer = nullptr;
 	MAPIFREEBUFFER				*MAPIFreeBuffer = nullptr;
 	pWrapCompressedRTFStream	WrapCompressedRTFStream = nullptr;
+	pHrCreateNewToMapiConverter HrCreateNewToMapiConverter = nullptr;
 
 	LMapiFolder *FindSystemFolder(Store3SystemFolder Type);
+	IConverterSession *CreateConverterSession();
 	
 public:
 	LMapiStore(	const char *Server,
@@ -805,6 +813,9 @@ public:
 
 	// MAPI API
 	bool Login();
+
+	// LDom API
+	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// LDataPropI API
 	Store3Status SetInt(int id, int64 i);

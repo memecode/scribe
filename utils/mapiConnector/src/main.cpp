@@ -255,6 +255,79 @@ struct Context
 			}
 	}
 
+	void SegToStructure(LStringPipe &p, LDataPropI *seg, int depth = 0)
+	{
+		if (!seg)
+			return;
+		auto children = seg->GetList(FIELD_MIME_SEG);
+		bool hasChild = children->Length() > 0;
+
+		if (hasChild || depth == 0)
+			p.Print("(");
+
+		for (auto child = children->First(); child; child = children->Next())
+		{
+			SegToStructure(p, child, depth + 1);
+			p.Print(" ");
+		}
+
+		auto mimeType = seg->GetStr(FIELD_MIME_TYPE);
+		auto mimeParts = LString(mimeType).SplitDelimit("/");
+		auto multi = mimeParts[0].Equals("multipart");
+		if (multi)
+		{
+			LString hdrs = seg->GetStr(FIELD_INTERNET_HEADER);
+			auto contentType = LGetHeaderField(hdrs, "Content-Type");
+			auto boundary = LGetSubField(contentType, "boundary");
+
+			p.Print("\"%s\" (\"boundary\" \"%s\")  NIL NIL NIL", mimeParts[1].Get(), boundary.Get());
+		}
+		else // single
+		{
+			p.Print("(\"%s\" \"%s\"", mimeParts[0].Get(), mimeParts[1].Get());
+
+			// figure out what fields to print
+			LString::Array fields;
+			if (auto charSet = seg->GetStr(FIELD_CHARSET))
+				fields.New().Printf("\"charset\" \"%s\"", charSet);
+			if (auto name = seg->GetStr(FIELD_NAME))
+				fields.New().Printf("\"name\" \"%s\"", name);
+
+			if (fields.Length())
+				p.Print(" (%s)", LString(" ").Join(fields).Get());
+			else
+				p.Print(" NIL");
+
+			if (auto contentId = seg->GetStr(FIELD_CONTENT_ID))
+				p.Print(" \"%s\"", contentId);
+			else
+				p.Print(" NIL");
+
+			p.Print(" NIL"); // Content description
+
+			// FIXME:
+			p.Print(" NIL"); // Content-Transfer-Encoding
+
+			auto size = seg->GetInt(FIELD_SIZE);
+			p.Print(" " LPrintfSizeT ")", size);
+		}
+
+		if (hasChild || depth == 0)
+			p.Print(")");
+	}
+
+	LString BodyStructure(LDataI *mail)
+	{
+		LStringPipe p;
+		
+		if (auto root = mail->GetObj(FIELD_MIME_SEG))
+			SegToStructure(p, root);
+		else
+			LAssert(!"no seg?");
+
+		return p.NewLStr();
+	}
+
 	LArray<FolderInfo> FolderList()
 	{
 		LArray<FolderInfo> a;
@@ -340,13 +413,25 @@ struct Context
 						else if (fld.Equals("BODYSTRUCTURE"))
 						{
 							// FIXME
-							record.Print("%sBODYSTRUCTURE ()", space);
+							record.Print("%sBODYSTRUCTURE %s", space, BodyStructure(i).Get());
 						}
 						else if (fld.Equals("BODY.PEEK[HEADER]"))
 						{
 							auto inetHdr = i->GetStr(FIELD_INTERNET_HEADER);
 							auto len = Strlen(inetHdr);
-							record.Print("BODY.PEEK[HEADER] {" LPrintfInt64 "}\r\n%s\r\n", len, inetHdr);
+							record.Print("%sBODY.PEEK[HEADER] {" LPrintfInt64 "}\r\n%s", space, len, inetHdr);
+						}
+						else if (fld.Equals("BODY.PEEK[]"))
+						{
+							if (auto rfc822 = i->GetStream(_FL))
+							{
+								auto len = rfc822->GetSize();
+								record.Print("%sBODY.PEEK[] {" LPrintfInt64 "}\r\n", space, len);
+								LCopyStreamer copy;
+								copy.Copy(rfc822, &record);
+							}
+							else
+								LAssert(0);
 						}
 						else
 						{
@@ -559,7 +644,9 @@ struct ImapConnection : public LSocket
 					Write(LString::Fmt("* " LPrintfInt64 " EXISTS\r\n", children.Length()));
 					Write(LString::Fmt("* " LPrintfInt64 " RECENT\r\n", selectFolder->GetInt(FIELD_UNREAD)));
 					Write(LString::Fmt("%s OK [READ-WRITE] Select completed\r\n", cmdRef.Get()));
+					log.Print("Selected '%s'...\n", selectPath.Get());
 				}
+				else return ImapErr("UNAVAILABLE", "path doesn't exist");
 			}
 			else if (cmd.Equals("FETCH"))
 			{
@@ -576,10 +663,11 @@ struct ImapConnection : public LSocket
 					return ImapErr("UNAVAILABLE", "no folder selected");
 				if (!arg)
 					return ImapErr("UNAVAILABLE", "missing argument");
+				
 				auto resp = ctx->Fetch(selectFolder, isUid, arg, fields);
 				for (auto &r: resp)
 				{
-					log.Print("Fetch: %s\n", r.Get());
+					// log.Print("Fetch: %s\n", r.Get());
 					Write(r);
 				}
 				Write(LString::Fmt("%s OK Fetch completed\r\n", cmdRef.Get()));
@@ -612,7 +700,7 @@ struct ImapConnection : public LSocket
 	{
 		char buf[1024];
 		auto rd = Read(buf, sizeof(buf));
-		log.Print("Conn: read %i\n", (int)rd);
+		// log.Print("Conn: read %i\n", (int)rd);
 		if (rd > 0)
 		{
 			rdBuf.Write(buf, rd);
@@ -751,6 +839,11 @@ public:
 
 	int Main() override
 	{
+		// COM
+		LScriptArguments args(nullptr);
+		auto initOk = store->CallMethod("init", args);
+		LAssert(initOk);
+
 		// got log in status:
 		auto online = store->GetInt(FIELD_IS_ONLINE);
 		if (!online)

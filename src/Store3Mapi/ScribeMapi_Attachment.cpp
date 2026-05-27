@@ -80,7 +80,9 @@ const char *LMapiAttachment::GetStr(int id)
 	switch (id)
 	{
 		case FIELD_INTERNET_HEADER:
-			return NULL;
+			if (!Headers)
+				GenerateHeaders();
+			return Headers;
 		case FIELD_NAME:
 			return Name;
 		case FIELD_MIME_TYPE:
@@ -102,8 +104,8 @@ Store3Status LMapiAttachment::SetStr(int id, const char *str)
 	switch (id)
 	{
 		case FIELD_INTERNET_HEADER:
-			LAssert(0);
-			return Store3Error;
+			Headers = str;
+			return Store3Success;
 		case FIELD_NAME:
 			Name = str;
 			break;
@@ -162,12 +164,12 @@ uint32_t LMapiAttachment::Type()
 
 bool LMapiAttachment::IsOnDisk()
 {
-	return Mail != NULL;
+	return Mail != nullptr;
 }
 
 bool LMapiAttachment::IsOrphan()
 {
-	return Mail == NULL;
+	return Mail == nullptr;
 }
 
 uint64 LMapiAttachment::Size()

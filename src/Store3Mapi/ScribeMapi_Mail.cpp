@@ -1,5 +1,7 @@
 #include "ScribeMapi.h"
 #include "lgi/common/Store3MimeTree.h"
+#include "lgi/common/Com.h"
+#include "lgi/common/Library.h"
 
 LMapiMail::LMapiMail(LMapiStore *store) :
 	LMapiThing(store),
@@ -302,7 +304,7 @@ LDataPropI *LMapiMail::GetObj(int id)
 		case FIELD_MIME_SEG:
 			if (!Seg && Handle())
 			{
-				LPMAPITABLE hAttach = NULL;
+				LPMAPITABLE hAttach = nullptr;
 				HRESULT res = Handle()->GetAttachmentTable(MAPI_UNICODE, &hAttach);
 				if (SUCCEEDED(res))
 				{
@@ -378,9 +380,9 @@ LDataIt LMapiMail::GetList(int id)
 				{
 					for (ScribeMapiList Lst(Recipients); Lst.More(); Lst.Next())
 					{
-						SPropValue *Name = Lst.GetField(PR_DISPLAY_NAME_W);
-						SPropValue *Email1 = Lst.GetField(PR_EMAIL_ADDRESS);
-						SPropValue *Email2 = Lst.GetField(PR_SMTP_ADDRESS);
+						auto Name = Lst.GetField(PR_DISPLAY_NAME_W);
+						auto Email1 = Lst.GetField(PR_EMAIL_ADDRESS);
+						auto Email2 = Lst.GetField(PR_SMTP_ADDRESS);
 						LAutoPtr<LMapiAddr> a(new LMapiAddr(Store));
 						if ((Name || Email1 || Email2) && a)
 						{
@@ -390,7 +392,7 @@ LDataIt LMapiMail::GetList(int id)
 							else
 								a->Email = MapiCastString(Email2);
 							
-							SPropValue *Type = Lst.GetField(PR_RECIPIENT_TYPE);
+							auto Type = Lst.GetField(PR_RECIPIENT_TYPE);
 							if (Type)
 							{
 								int64 Flags = MapiCastInt(Type);
@@ -464,9 +466,40 @@ Store3Status LMapiMail::Delete(bool ToTrash)
 
 LAutoStreamI LMapiMail::GetStream(const char *file, int line)
 {
-	LAutoStreamI s;
-	LAssert(0);
-	return s;
+	// MAPI -> MIME
+	LAutoStreamI out(new LStringPipe(1024));
+	LAutoPtr<LStreamWrap> wrapper(new LStreamWrap("temp", out.Get(), false));
+	LAutoPtr<LLibrary> mapiDll;
+
+	if (auto pConverter = Store->CreateConverterSession())
+	{
+		// 2. Set options for standard RFC822 output
+		pConverter->SetEncoding(iet7Bit);       // Force standard text layout transport
+		pConverter->SetSaveFormat(mstDefault);   // Standard EML / RFC822 layout structure
+
+		auto hr = pConverter->MAPIToMIMEStm(Handle(), wrapper.Get(), 0);
+		if (SUCCEEDED(hr))
+			out->SetPos(0);
+		else
+			out.Reset();
+
+		if (pConverter)
+			pConverter->Release();
+	}
+	else
+	{
+		// Fall back to all LGI code...
+		LMime mime;
+		if (!Store3ToLMime(&mime, this))
+		{
+			out.Reset();
+			return out;
+		}
+
+		mime.Text.Encode.Push(out);
+	}
+
+	return out;
 }
 
 ////////////////////////////////////////////

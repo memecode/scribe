@@ -93,12 +93,22 @@ LMapiStore::LMapiStore(const char *profile, const char *username, const char *pa
 		Error("%s:%i - Failed to load \"mapi32.dll\".\n", _FL);
 	}
 	
-	MAPIInitialize			= (MAPIINITIALIZE*)				GetAddress("MAPIInitialize");
-	MAPILogonEx				= (MAPILOGONEX*)				GetAddress("MAPILogonEx");
-	MAPIAllocateBuffer		= (MAPIALLOCATEBUFFER*)			GetAddress("MAPIAllocateBuffer");
-	MAPIFreeBuffer			= (MAPIFREEBUFFER*)				GetAddress("MAPIFreeBuffer");
-	WrapCompressedRTFStream = (pWrapCompressedRTFStream)	GetAddress("WrapCompressedRTFStream");
-	MAPIUninitialize		= (MAPIUNINITIALIZE*)			GetAddress("MAPIUninitialize");
+	MAPIInitialize				= (MAPIINITIALIZE*)				GetAddress("MAPIInitialize");
+	MAPIUninitialize			= (MAPIUNINITIALIZE*)			GetAddress("MAPIUninitialize");
+	MAPILogonEx					= (MAPILOGONEX*)				GetAddress("MAPILogonEx");
+	MAPIAllocateBuffer			= (MAPIALLOCATEBUFFER*)			GetAddress("MAPIAllocateBuffer");
+	MAPIFreeBuffer				= (MAPIFREEBUFFER*)				GetAddress("MAPIFreeBuffer");
+
+	WrapCompressedRTFStream		= (pWrapCompressedRTFStream)	GetAddress("WrapCompressedRTFStream");
+	HrCreateNewToMapiConverter	= (pHrCreateNewToMapiConverter)	GetAddress("HrCreateNewToMapiConverter");
+	if (!HrCreateNewToMapiConverter)
+	{
+		// FFS microsoft... really?
+		HrCreateNewToMapiConverter = (pHrCreateNewToMapiConverter) GetProcAddress(
+			LLibrary::Handle(), 
+			MAKEINTRESOURCEA(237) // Pass ordinal 237 instead of the string name
+		);
+	}
 
 	if (Login())
 	{
@@ -301,6 +311,30 @@ bool LMapiStore::Login()
 	return true;
 }
 
+IConverterSession *LMapiStore::CreateConverterSession()
+{
+	IConverterSession *cs = nullptr;
+
+	auto hr = CoCreateInstance(	CLSID_IConverterSession, 
+								nullptr, 
+								CLSCTX_INPROC_SERVER, 
+								IID_IConverterSession, 
+								reinterpret_cast<void**>(&cs));
+	if (SUCCEEDED(hr) && cs)
+		return cs;
+
+	// oh we can't have nice things :(
+	if (!HrCreateNewToMapiConverter)
+		return nullptr;
+
+	hr = HrCreateNewToMapiConverter(&cs);
+	if (SUCCEEDED(hr))
+		return cs;
+
+	// argh, still can't have nice things...
+	return nullptr;
+}
+
 LMapiFolder *LMapiStore::FindSystemFolder(Store3SystemFolder Type)
 {
 	auto r = GetRoot();
@@ -321,6 +355,37 @@ LMapiFolder *LMapiStore::FindSystemFolder(Store3SystemFolder Type)
 	return nullptr;
 }
 
+bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
+{
+	if (!Stricmp(MethodName, "init"))
+	{
+		if (!MAPIInitialize)
+		{
+			LgiTrace("%s:%i - no MAPIInitialize fn\n", _FL);
+			return false;
+		}
+		
+		auto hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+		if (FAILED(hr))
+		{
+			LgiTrace("%s:%i - CoInitializeEx failed with: 0x%x\n", _FL, hr);
+			return false;
+		}
+
+		MAPIINIT_0 mapiInit = { MAPIINIT_0_VERSION, MAPI_MULTITHREAD_NOTIFICATIONS };
+		hr = MAPIInitialize(&mapiInit);
+		if (FAILED(hr))
+		{
+			LgiTrace("%s:%i - MAPIInitialize failed with: 0x%x\n", _FL, hr);
+			return false;
+		}
+
+		return true;
+	}
+	else LAssert(!"not impl");
+
+	return false;
+}
 
 Store3Status LMapiStore::SetInt(int id, int64 i)
 {
