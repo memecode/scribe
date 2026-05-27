@@ -27,7 +27,7 @@ const char *TestCmds[] = {
 size_t CurTestCmd = 0;
 #endif
 
-static char BodyTag[]			= "BODY.PEEK[]"; // If you change this, check DownloadCallback as well
+static char BodyTag[]			= "UID BODY.PEEK[]"; // If you change this, check DownloadCallback as well
 static char MailListingParts[]	= "FLAGS UID RFC822.SIZE BODYSTRUCTURE BODY.PEEK[HEADER]";
 static char OtherListingParts[]	= "FLAGS UID";
 
