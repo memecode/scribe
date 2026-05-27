@@ -426,7 +426,7 @@ struct Context
 							if (auto rfc822 = i->GetStream(_FL))
 							{
 								auto len = rfc822->GetSize();
-								record.Print("%sBODY.PEEK[] {" LPrintfInt64 "}\r\n", space, len);
+								record.Print("%sBODY[] {" LPrintfInt64 "}\r\n", space, len);
 								LCopyStreamer copy;
 								copy.Copy(rfc822, &record);
 							}
