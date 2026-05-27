@@ -1,7 +1,51 @@
 #include "ScribeMapi.h"
+#include "lgi/common/Com.h"
 
 extern const GUID IID_IMessage;
+DEFINE_OLEGUID(IID_IMAPIAdviseSink,	0x00020302, 0, 0);
 
+// This is to catch new email events...
+struct LMapiAdvise : public LUnknownImpl<IMAPIAdviseSink>
+{
+	LMapiFolder *folder = nullptr;
+	ULONG_PTR connectionId = 0;
+	IMsgStore *msgStore = nullptr;
+
+	LMapiAdvise(LMapiFolder *f) :
+		folder(f)
+	{		
+		AddInterface(IID_IMAPIAdviseSink, static_cast<IMAPIAdviseSink*>(this));
+
+		if (f &&
+			f->Store &&
+			f->Store->MsgStore)
+		{
+			msgStore = f->Store->MsgStore;
+			auto hr = msgStore->Advise(	(ULONG) f->Entry.Length(),
+										(LPENTRYID) f->Entry.AddressOf(),
+										fnevObjectCreated | fnevObjectDeleted | fnevObjectModified | fnevObjectMoved | fnevObjectCopied,
+										this,
+										&connectionId);
+			if (FAILED(hr))
+				LAssert(!"advise failed?");
+		}
+		else LAssert(!"missing param");
+	}
+
+	~LMapiAdvise()
+	{
+		if (msgStore && connectionId)
+			msgStore->Unadvise(connectionId);
+	}
+
+	// IMAPIAdviseSink method
+	STDMETHODIMP_(ULONG) OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
+	{
+		return folder->OnNotify(cNotif, lpNotif);
+	}
+};
+
+// MAPI folder impl:
 LMapiFolder::LMapiFolder(LMapiStore *store)
 {
 	Store = store;
@@ -11,6 +55,7 @@ LMapiFolder::LMapiFolder(LMapiStore *store)
 
 LMapiFolder::~LMapiFolder()
 {
+	advise.Reset();
 	if (Store->Root == this)
 		Store->Root = nullptr;
 	ReleaseHandle();
@@ -18,8 +63,27 @@ LMapiFolder::~LMapiFolder()
 
 bool LMapiFolder::Set(LPMAPIFOLDER f)
 {
-	MapiFolder = f;
+	if (MapiFolder = f)
+		advise.Reset(new LMapiAdvise(this));
+
 	return MapiFolder != NULL;
+}
+
+ULONG LMapiFolder::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
+{
+	for (ULONG i = 0; i < cNotif; i++)
+	{
+		if (lpNotif[i].ulEventType == fnevObjectCreated)
+		{
+			// A new object was created in the folder
+			if (lpNotif[i].info.obj.ulObjType == MAPI_MESSAGE)
+			{
+				// It's an email! You can open it here using lpNotif[i].info.obj.lpEntryID
+			}
+		}
+	}
+
+	return S_OK;
 }
 
 bool LMapiFolder::Set(LMapiFolder *parent, ScribeMapiList *Lst)

@@ -3,9 +3,6 @@
 LMapiThing::LMapiThing(LMapiStore *store)
 {
 	Store = store;
-	MapiMsg = NULL;
-	Parent = NULL;
-	IsDirty = false;
 }
 
 LMapiThing::~LMapiThing()

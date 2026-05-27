@@ -315,11 +315,11 @@ class LMapiThing : public LDataI, public LMapiBase
 	friend class LMapiStore;
 
 protected:
-	LArray<uint8_t> Entry;
-	LPMESSAGE MapiMsg;
 	LString Class;
-	LMapiFolder *Parent;
-	bool IsDirty;
+	LArray<uint8_t> Entry;
+	LPMESSAGE MapiMsg = nullptr;
+	LMapiFolder *Parent = nullptr;
+	bool IsDirty = false;
 
 public:
 	LMapiStore *Store;
@@ -556,6 +556,7 @@ public:
 class LMapiFolder : public LDataFolderI, public LMapiBase
 {
 	friend class LMapiStore;
+	friend struct LMapiAdvise;
 
 	LPMAPIFOLDER MapiFolder = nullptr;
 	LArray<uint8_t> Entry;
@@ -574,6 +575,10 @@ class LMapiFolder : public LDataFolderI, public LMapiBase
 	DIterator<LDataI, LMapiThing, LMapiStore> Items;
 	DIterator<LDataPropI, LMapiFolderField, LMapiStore> Flds;
 	
+	// MAPI notifications:
+	LAutoPtr<struct LMapiAdvise> advise;
+	ULONG OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif);
+
 public:
 	LMapiFolder(LMapiStore *store);
 	~LMapiFolder();
@@ -769,6 +774,7 @@ class LMapiStore : public LDataStoreI, public LLibrary
 	friend class LMapiFolder;
 	friend class LMapiThing;
 	friend class LMapiMail;
+	friend struct LMapiAdvise;
 
 	LDataEventsI *Callback = nullptr;
 	LMapiFolder *Root = nullptr;
