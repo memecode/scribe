@@ -73,12 +73,47 @@ ULONG LMapiFolder::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
 {
 	for (ULONG i = 0; i < cNotif; i++)
 	{
-		if (lpNotif[i].ulEventType == fnevObjectCreated)
+		OBJECT_NOTIFICATION &obj = lpNotif[i].info.obj;
+
+		switch (lpNotif[i].ulEventType)
 		{
-			// A new object was created in the folder
-			if (lpNotif[i].info.obj.ulObjType == MAPI_MESSAGE)
+			case fnevObjectCreated:
 			{
-				// It's an email! You can open it here using lpNotif[i].info.obj.lpEntryID
+				// A new object was created in the folder
+				if (obj.ulObjType == MAPI_MESSAGE)
+				{
+					auto &children = LMapiFolder::Children();
+
+					LAutoPtr<LDataI> t(Store->Create(MAGIC_MAIL));
+					if (auto tptr = dynamic_cast<LMapiMail*>(t.Get()))
+					{
+						LMapiEntry entry = obj;
+						tptr->Set(entry, this);
+						Items.Insert(tptr, -1, true);
+						t.Release();
+					}
+				}
+				// else fixme: other types like calendar and contacts?
+				break;
+			}
+			case fnevObjectMoved:
+			case fnevObjectDeleted:
+			{
+				if (obj.ulObjType == MAPI_MESSAGE)
+				{
+					// use: lpNotif[i].info.obj.lpEntryID
+					int asd=0;
+				}
+				break;
+			}
+			case fnevObjectModified:
+			{
+				if (obj.ulObjType == MAPI_MESSAGE)
+				{
+					// use: lpNotif[i].info.obj.lpEntryID
+					int asd=0;
+				}
+				break;
 			}
 		}
 	}
@@ -86,44 +121,38 @@ ULONG LMapiFolder::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
 	return S_OK;
 }
 
-bool LMapiFolder::Set(LMapiFolder *parent, ScribeMapiList *Lst)
+bool LMapiFolder::Set(LMapiFolder *parent, LMapiList *Lst)
 {
 	auto p = Lst->GetField(PR_ENTRYID);
 	if (!p)
 		return false;
 
-	Entry.Add(p->Value.bin.lpb, p->Value.bin.cb);
+	Entry = p;
 
 	Parent = parent;
 	if (Lst)
 	{	
 		Name = MapiCastString(Lst->GetField(PR_DISPLAY_NAME));
-		if (Name)
+		if (Name.Equals("Deleted Items") ||
+			Name.Equals("Trash"))
 		{
-			if (!_stricmp(Name, "Deleted Items") ||
-				!_stricmp(Name, "Trash"))
-			{
-				FolderType = Store3SystemTrash;
-				ItemType = MAGIC_ANY;
-			}
-			else if (!_stricmp(Name, "Sent"))
-			{
-				FolderType = Store3SystemSent;
-			}
-			else if (!_stricmp(Name, "Outbox"))
-			{
-				FolderType = Store3SystemOutbox;
-			}
+			FolderType = Store3SystemTrash;
+			ItemType = MAGIC_ANY;
+		}
+		else if (Name.Equals("Sent"))
+		{
+			FolderType = Store3SystemSent;
+		}
+		else if (Name.Equals("Outbox"))
+		{
+			FolderType = Store3SystemOutbox;
 		}
 		
 		Class = MapiCastString(Lst->GetField(PR_CONTAINER_CLASS));
-		if (Class)
-		{
-			if (!_stricmp(Class, "IPF.Appointment"))
-				ItemType = MAGIC_CALENDAR;
-			else if (!_stricmp(Class, "IPF.Contact"))
-				ItemType = MAGIC_CONTACT;
-		}
+		if (Class.Equals("IPF.Appointment"))
+			ItemType = MAGIC_CALENDAR;
+		else if (Class.Equals("IPF.Contact"))
+			ItemType = MAGIC_CONTACT;
 
 		Unread = MapiCastInt(Lst->GetField(PR_CONTENT_UNREAD));
 	}
@@ -189,7 +218,7 @@ void LMapiFolder::ReleaseHandle()
 	if (MapiFolder)
 	{
 		MapiFolder->Release();
-		MapiFolder = NULL;
+		MapiFolder = nullptr;
 	}
 	for (unsigned i=0; i<Items.Length(); i++)
 	{
@@ -389,7 +418,7 @@ LDataIterator<LDataFolderI*> &LMapiFolder::SubFolders()
 		HRESULT res = MapiFolder->GetHierarchyTable(MAPI_UNICODE , &Folders);
 		if (SUCCEEDED(res))
 		{
-			for (ScribeMapiList Lst(Folders); Lst.More(); Lst.Next())
+			for (LMapiList Lst(Folders); Lst.More(); Lst.Next())
 			{
 				LMapiFolder *SubFolder = new LMapiFolder(Store);
 				if (SubFolder)
@@ -413,11 +442,11 @@ LDataIterator<LDataI*> &LMapiFolder::Children()
 	if (Items.State == Store3Unloaded &&
 		Handle())
 	{
-		LPMAPITABLE Tbl = 0;
+		LPMAPITABLE Tbl = nullptr;
 		HRESULT res = MapiFolder->GetContentsTable(0, &Tbl);
 		if (SUCCEEDED(res))
 		{
-			for (ScribeMapiList Lst(Tbl); Lst.More(); Lst.Next())
+			for (LMapiList Lst(Tbl); Lst.More(); Lst.Next())
 			{
 				LAutoPtr<LDataI> t(Store->Create(ItemType));
 				if (t)

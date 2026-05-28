@@ -8,8 +8,6 @@ LMapiMail::LMapiMail(LMapiStore *store) :
 	From(store),
 	Reply(store)
 {
-	From.m = this;
-	Reply.m = this;
 }
 
 LMapiMail::~LMapiMail()
@@ -18,14 +16,20 @@ LMapiMail::~LMapiMail()
 	DeleteObj(Seg);
 }
 
-void LMapiMail::Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *Lst)
+void LMapiMail::Set(LMapiEntry &entry, LMapiFolder *parent)
 {
-	Entry.Add((uint8_t*)entry->Value.bin.lpb, entry->Value.bin.cb);
+	Entry = entry;
+	Parent = parent;
+}
+
+void LMapiMail::Set(SPropValue *entry, LMapiFolder *parent, LMapiList *Lst)
+{
+	Entry = entry;
 	Parent = parent;
 	
 	if (Lst)
 	{
-		SPropValue *p = Lst->GetField(PR_CLIENT_SUBMIT_TIME);
+		auto p = Lst->GetField(PR_CLIENT_SUBMIT_TIME);
 		if (p) MapiCastDate(Date, p);
 		p = Lst->GetField(PR_SUBJECT);
 		if (p) Subject = MapiCastString(p);	
@@ -33,12 +37,12 @@ void LMapiMail::Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *Lst)
 		From.Name = MapiCastString(Lst->GetField(PR_SENT_REPRESENTING_NAME));
 		if (!From.Name)
 			From.Name = MapiCastString(Lst->GetField(PR_SENDER_NAME));
-		From.Email = MapiCastString(Lst->GetField(PR_SENDER_EMAIL_ADDRESS));
+		From.Addr = MapiCastString(Lst->GetField(PR_SENDER_EMAIL_ADDRESS));
 
 		Class = MapiCastString(Lst->GetField(PR_ORIG_MESSAGE_CLASS));
 		if (!Class)
 			Class = MapiCastString(Lst->GetField(PR_MESSAGE_CLASS));
-		bool Post = Class ? _strnicmp(Class, "IPM.Post", 8) == 0 : false;
+		auto Post = Class ? _strnicmp(Class, "IPM.Post", 8) == 0 : false;
 
 		int64 f = MapiCastInt(Lst->GetField(PR_MESSAGE_FLAGS));
 		if (f & (MSGFLAG_SUBMIT | MSGFLAG_UNSENT) && !Post)
@@ -309,7 +313,7 @@ LDataPropI *LMapiMail::GetObj(int id)
 				if (SUCCEEDED(res))
 				{
 					LArray<LMapiAttachment*> Segs;
-					for (ScribeMapiList Lst(hAttach); Lst.More(); Lst.Next())
+					for (LMapiList Lst(hAttach); Lst.More(); Lst.Next())
 					{
 						LAutoPtr<LMapiAttachment> a(new LMapiAttachment(Store));
 						if (a->Set(this, &Lst))
@@ -373,24 +377,24 @@ LDataIt LMapiMail::GetList(int id)
 		{
 			if (To.State == Store3Unloaded)
 			{
-				LPMAPITABLE Recipients = 0;
+				LPMAPITABLE Recipients = nullptr;
 				if (Handle() &&
 					SUCCEEDED(Handle()->GetRecipientTable(MAPI_UNICODE, &Recipients)) &&
 					Recipients)
 				{
-					for (ScribeMapiList Lst(Recipients); Lst.More(); Lst.Next())
+					for (LMapiList Lst(Recipients); Lst.More(); Lst.Next())
 					{
 						auto Name = Lst.GetField(PR_DISPLAY_NAME_W);
 						auto Email1 = Lst.GetField(PR_EMAIL_ADDRESS);
 						auto Email2 = Lst.GetField(PR_SMTP_ADDRESS);
-						LAutoPtr<LMapiAddr> a(new LMapiAddr(Store));
+						LAutoPtr<Store3Addr> a(new Store3Addr(Store));
 						if ((Name || Email1 || Email2) && a)
 						{
 							a->Name = MapiCastString(Name);
 							if (strchr(MapiCastString(Email1), '@'))
-								a->Email = MapiCastString(Email1);
+								a->Addr = MapiCastString(Email1);
 							else
-								a->Email = MapiCastString(Email2);
+								a->Addr = MapiCastString(Email2);
 							
 							auto Type = Lst.GetField(PR_RECIPIENT_TYPE);
 							if (Type)
@@ -404,7 +408,6 @@ LDataIt LMapiMail::GetList(int id)
 									a->CC = MAIL_ADDR_BCC;
 							}
 							
-							a->m = this;
 							To.Insert(a.Release(), -1, true);
 						}
 					}
@@ -426,23 +429,9 @@ LDataIt LMapiMail::GetList(int id)
 Store3Status LMapiMail::SetRfc822(LStreamI *m)
 {
 	// IConverterSession does the handling of converting MIME to MAPI (and back)
+	// But can't create that because MS broke it.
 	LAssert(0);
 	return Store3Error;
-}
-
-uint32_t LMapiMail::Type()
-{
-	return MAGIC_MAIL;
-}
-
-bool LMapiMail::IsOnDisk()
-{
-	return true;
-}
-
-bool LMapiMail::IsOrphan()
-{
-	return false;
 }
 
 uint64 LMapiMail::Size()
@@ -488,7 +477,7 @@ LAutoStreamI LMapiMail::GetStream(const char *file, int line)
 	}
 	else
 	{
-		// Fall back to all LGI code...
+		// Fall back to LGI code... I mean look at that... at least it works!
 		LMime mime;
 		if (!Store3ToLMime(&mime, this))
 		{
@@ -501,95 +490,3 @@ LAutoStreamI LMapiMail::GetStream(const char *file, int line)
 
 	return out;
 }
-
-////////////////////////////////////////////
-LMapiAddr::LMapiAddr(LMapiStore *store)
-{
-	Store = store;
-	CC = 0;
-	Status = 0;
-	m = NULL;	
-}
-
-Store3CopyImpl(LMapiAddr)
-{
-	CC = (int)p.GetInt(FIELD_CC);
-	Name = p.GetStr(FIELD_NAME);
-	Email = p.GetStr(FIELD_EMAIL);
-	return true;
-}
-
-const char *LMapiAddr::GetStr(int id)
-{
-	if (!m)
-	{
-		LAssert(0);
-		return NULL;
-	}
-	switch (id)
-	{
-		case FIELD_NAME:
-			return Name;
-		case FIELD_EMAIL:
-			return Email;
-		default:
-			LAssert(0);
-			break;
-	}
-	return NULL;
-}
-
-Store3Status LMapiAddr::SetStr(int id, const char *str)
-{
-	if (!m)
-	{
-		LAssert(0);
-		return Store3Error;
-	}
-	switch (id)
-	{
-		case FIELD_NAME:
-			Name = str;
-			return Store3Success;
-		case FIELD_EMAIL:
-			Email = str;
-			return Store3Success;
-		default:
-			LAssert(0);
-			break;
-	}
-	return Store3Error;
-}
-
-int64 LMapiAddr::GetInt(int id)
-{
-	switch (id)
-	{
-		case FIELD_CC:
-			return CC;
-		case FIELD_STATUS:
-			return Status;
-	}
-	
-	LAssert(0);
-	return -1;
-}
-
-Store3Status LMapiAddr::SetInt(int id, int64 i)
-{
-	switch (id)
-	{
-		case FIELD_CC:
-			CC = (int)i;
-			break;
-		case FIELD_STATUS:
-			Status = (int)i;
-			break;
-		default:
-			LAssert(0);
-			return Store3Error;
-	}
-	
-	return Store3Success;
-}
-

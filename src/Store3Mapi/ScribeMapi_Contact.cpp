@@ -29,10 +29,9 @@ LMapiContact::~LMapiContact()
 {
 }
 
-void LMapiContact::Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst)
+void LMapiContact::Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst)
 {
-	if (Entry.Length(entry->Value.bin.cb))
-		memcpy(&Entry[0], entry->Value.bin.lpb, entry->Value.bin.cb);
+	Entry = entry;
 	Parent = parent;
 }
 

@@ -174,13 +174,13 @@ bool LDataI::ParseAddresses(const char *Str, int CC)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Store3Addr::Store3Addr(LDataStoreI *store, LDataPropI *i)
+Store3Addr::Store3Addr(LDataStoreI *store, LDataPropI *initFromObj)
 {
 	LAssert(store != NULL);
 	Store = store;
 	CC = 0;
-	if (i)
-		CopyProps(*i);
+	if (initFromObj)
+		CopyProps(*initFromObj);
 }
 
 Store3Addr::~Store3Addr()

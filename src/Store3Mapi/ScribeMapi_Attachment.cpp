@@ -34,7 +34,7 @@ LPATTACH LMapiAttachment::Handle()
 	return MapiAttach;
 }
 
-bool LMapiAttachment::Set(LMapiMail *mail, ScribeMapiList *Lst)
+bool LMapiAttachment::Set(LMapiMail *mail, LMapiList *Lst)
 {
 	SetMail(mail);
 	

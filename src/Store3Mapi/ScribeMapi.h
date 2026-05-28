@@ -59,8 +59,33 @@ extern uint32_t MapiContactEmailTags[];
 class LMapiStore;
 class LMapiFolder;
 class LMapiMail;
-class ScribeMapiList;
+class LMapiList;
 class LMapiAdviseSink;
+
+struct LMapiEntry : public LArray<uint8_t>
+{
+	LMapiEntry() {}
+
+	LMapiEntry(const SPropValue *p) { *this = p; }
+	LMapiEntry &operator =(const SPropValue *p)
+	{
+		Empty();
+		if (p && p->ulPropTag == PT_BINARY)		
+			Add(p->Value.bin.lpb, p->Value.bin.cb);
+		else
+			LAssert(!"unexpected type.");
+
+		return *this;
+	}
+
+	LMapiEntry(const OBJECT_NOTIFICATION &o) { *this = o; }
+	LMapiEntry &operator =(const OBJECT_NOTIFICATION &o)
+	{
+		Empty();
+		Add((uint8_t*)o.lpEntryID, o.cbEntryID);
+		return *this;
+	}
+};
 
 class LMapiBase
 {
@@ -290,13 +315,13 @@ public:
 	}
 };
 
+/*
 class LMapiAddr : public LDataPropI
 {
 	LMapiStore *Store;
 
 public:
-	LMapiMail *m;
-	int CC, Status;
+	int CC = 0, Status = 0;
 	LString Name, Email;
 
 	LMapiAddr(LMapiStore *store);
@@ -309,6 +334,7 @@ public:
 	int64 GetInt(int id);
 	Store3Status SetInt(int id, int64 i);
 };
+*/
 
 class LMapiThing : public LDataI, public LMapiBase
 {
@@ -316,7 +342,7 @@ class LMapiThing : public LDataI, public LMapiBase
 
 protected:
 	LString Class;
-	LArray<uint8_t> Entry;
+	LMapiEntry Entry;
 	LPMESSAGE MapiMsg = nullptr;
 	LMapiFolder *Parent = nullptr;
 	bool IsDirty = false;
@@ -329,7 +355,7 @@ public:
 
 	const char* GetClass() override { return "LMapiThing"; }
 
-	virtual void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst) {}
+	virtual void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst) {}
 	virtual LPMESSAGE Handle() { return MapiMsg; }
 	virtual void ReleaseHandle();
 	void SetDirty();
@@ -369,7 +395,7 @@ public:
 	const char* GetClass() override { return "LMapiAttachment"; }
 
 	LPATTACH Handle();
-	bool Set(LMapiMail *mail, ScribeMapiList *Lst);
+	bool Set(LMapiMail *mail, LMapiList *Lst);
 	bool Set(const char *Content, const char *Charset, const char *MimeType);
 
 	Store3CopyDecl;
@@ -392,9 +418,9 @@ public:
 class LMapiMail : public LMapiThing
 {
 	LString Subject;
-	LMapiAddr From;
-	LMapiAddr Reply;
-	DIterator<LDataPropI, LMapiAddr, LMapiStore> To;
+	Store3Addr From;
+	Store3Addr Reply;
+	DIterator<LDataPropI, Store3Addr, LMapiStore> To;
 	LDateTime Date;
 	uint64 Flags = 0;
 	uint64 MsgSize = 0;
@@ -412,7 +438,8 @@ public:
 	LMapiMail(LMapiStore *store);
 	~LMapiMail();
 
-	void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst);	
+	void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst);
+	void Set(LMapiEntry &entry, LMapiFolder *parent);
 	LPMESSAGE Handle();
 
 	// LDataPropI API
@@ -429,9 +456,9 @@ public:
 	Store3Status SetRfc822(LStreamI *m);
 
 	// LDataI API
-	uint32_t Type();
-	bool IsOnDisk();
-	bool IsOrphan();
+	uint32_t Type() { return MAGIC_MAIL; }
+	bool IsOnDisk() { return true; }
+	bool IsOrphan() { return false; }
 	uint64 Size();
 	Store3Status Save(LDataI *Parent);
 	Store3Status Delete(bool ToTrash = true);
@@ -452,7 +479,7 @@ public:
 	LMapiCalendar(LMapiStore *store);	
 	~LMapiCalendar();
 
-	void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst);	
+	void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst);	
 	LPMESSAGE Handle();
 
 	// LDataPropI API
@@ -502,7 +529,7 @@ public:
 	LMapiContact(LMapiStore *store);	
 	~LMapiContact();
 
-	void Set(SPropValue *entry, LMapiFolder *parent, ScribeMapiList *lst);	
+	void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst);	
 	LPMESSAGE Handle();
 
 	// LDataPropI API
@@ -559,7 +586,7 @@ class LMapiFolder : public LDataFolderI, public LMapiBase
 	friend struct LMapiAdvise;
 
 	LPMAPIFOLDER MapiFolder = nullptr;
-	LArray<uint8_t> Entry;
+	LMapiEntry Entry;
 	
 	LMapiStore *Store = nullptr;
 	LMapiFolder *Parent = nullptr;
@@ -586,7 +613,7 @@ public:
 	const char* GetClass() override { return "LMapiFolder"; }
 
 	bool Set(LPMAPIFOLDER f);
-	bool Set(LMapiFolder *parent, ScribeMapiList *Lst);
+	bool Set(LMapiFolder *parent, LMapiList *Lst);
 	LPMAPIFOLDER Handle();
 	void ReleaseHandle();
 
@@ -622,7 +649,7 @@ public:
 	void OnCommand(const char *Name);
 };
 
-class ScribeMapiList : public LMapiBase
+class LMapiList : public LMapiBase
 {
 	LPMAPITABLE List;
 	ULONG Rows = 0;
@@ -632,7 +659,7 @@ class ScribeMapiList : public LMapiBase
 	bool Status = false;
 
 public:
-	ScribeMapiList(LPMAPITABLE list, bool release = true)
+	LMapiList(LPMAPITABLE list, bool release = true)
 	{
 		List = list;
 		ReleaseList = release;
@@ -652,7 +679,7 @@ public:
 		}
 	}
 
-	~ScribeMapiList()
+	~LMapiList()
 	{
 		if (List && ReleaseList)
 		{
@@ -737,7 +764,7 @@ public:
 		HRESULT res = Session->GetMsgStoresTable(0, &MsgStores);
 		if (SUCCEEDED(res) && MsgStores)
 		{
-			for (ScribeMapiList Lst(MsgStores, false); Lst.More(); Lst.Next())
+			for (LMapiList Lst(MsgStores, false); Lst.More(); Lst.Next())
 			{
 				auto DisplayName = Lst.GetField(PR_DISPLAY_NAME); 
 				auto Entry = Lst.GetField(PR_ENTRYID);

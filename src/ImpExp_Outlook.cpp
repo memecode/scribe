@@ -1,16 +1,16 @@
 #undef UNICODE
 #include "Scribe.h"
 #include "lgi/common/Com.h"
-#include "mapix.h"
-#include "mapiutil.h"
 #include "lgi/common/Button.h"
 #include "lgi/common/Combo.h"
 #include "lgi/common/Edit.h"
 #include "lgi/common/ProgressDlg.h"
 #include "lgi/common/RtfHtml.h"
-#include "Calendar.h"
-#include "resdefs.h"
 #include "lgi/common/LgiRes.h"
+
+#include "resdefs.h"
+#include "Calendar.h"
+#include "Store3Mapi/ScribeMapi.h"
 
 #if _MSC_VER >= 1400
 typedef ULONG_PTR	UI_TYPE;
@@ -248,87 +248,6 @@ bool MapiSetPropDate(IMAPIProp *Props, int Field, const LDateTime &d, bool Adjus
 
 	return false;
 }
-
-class LMapiList
-{
-	LPMAPITABLE List;
-	ULONG Rows;
-	SRowSet *BaseRow;
-	uint32_t i, StartIndex;
-	bool ReleaseList;
-
-public:
-	LMapiList(LPMAPITABLE &list, bool release = true)
-	{
-		List = list;
-		list = NULL;
-		Rows = 0;
-		BaseRow = 0;
-		i = 0;
-		StartIndex = 0;
-		ReleaseList = release;
-
-		if (List)
-		{
-			HRESULT r = List->GetRowCount(0, &Rows);
-			if (Rows &&
-				List->SeekRow(BOOKMARK_BEGINNING, 0, NULL) == S_OK)
-			{
-				if (List->QueryRows(Rows, 0, &BaseRow) == S_OK)
-				{
-					// Ok
-				}
-			}
-		}
-	}
-
-	~LMapiList()
-	{
-		if (List && ReleaseList)
-		{
-			List->Release();
-		}
-	}
-
-	int Index() { return i; }
-	int Length() { return Rows; }
-	bool More() { return (BaseRow && i >= StartIndex && i < BaseRow->cRows + StartIndex); }
-	void Next()
-	{
-		i++;
-
-		if (BaseRow->cRows < Rows &&
-			i-StartIndex >= BaseRow->cRows)
-		{
-			// run into the end of the list section
-			int s = StartIndex + BaseRow->cRows;
-			if (List->QueryRows(Rows-StartIndex, 0, &BaseRow) == S_OK)
-			{
-				StartIndex = s;
-			}
-		}
-	}
-
-	SRowSet *Current()
-	{
-		if (More()) // in range
-		{
-			return BaseRow + i - StartIndex;
-		}
-
-		return 0;
-	}
-
-	SPropValue *GetField(int Field)
-	{
-		if (More()) // in range
-		{
-			return MapiGetField(BaseRow->aRow + i - StartIndex, Field);
-		}
-
-		return 0;
-	}
-};
 
 // DEBUG STUFF
 #ifdef _DEBUG

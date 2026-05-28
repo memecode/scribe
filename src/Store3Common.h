@@ -38,7 +38,7 @@ public:
 	LString Name, Addr;
 	int CC;
 
-	Store3Addr(LDataStoreI *store, LDataPropI *i = NULL);	
+	Store3Addr(LDataStoreI *store, LDataPropI *initFromObj = nullptr);	
 	~Store3Addr();
 
 	const char *GetClass() override { return "Store3Addr"; }
@@ -52,8 +52,8 @@ public:
 	Store3Status SetInt(int id, int64 i) override;
 	size_t Sizeof();
 
-	bool GetVariant(const char *n, LVariant &Value, const char *Array = NULL) override;
-	bool SetVariant(const char *n, LVariant &Value, const char *Array = NULL) override;
+	bool GetVariant(const char *n, LVariant &Value, const char *Array = nullptr) override;
+	bool SetVariant(const char *n, LVariant &Value, const char *Array = nullptr) override;
 };
 
 class Store3Field : public LDataPropI
