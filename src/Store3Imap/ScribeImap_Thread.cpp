@@ -961,12 +961,15 @@ int ImapThread::Main()
                             sprintf_s(UidRange, sizeof(UidRange), "%i:*", Inf.LastUid > 0 ? Inf.LastUid + 1 : 1);
 								
 							#if !RUN_TEST_CMDS
+							LError fetchErr;
 							if (d->Imap->Fetch(	true,
 												UidRange,
 												ListingParts,
 												ListingCallback,
 												Resp,
-												Raw))
+												Raw,
+												-1,
+												&fetchErr))
 							{
 								r.Local = Inf.Local;
 								r.Remote = Inf.Remote;
@@ -974,7 +977,7 @@ int ImapThread::Main()
 								PostStore(Resp.Release());
 							}
 							else
-								d->Error(_FL, "Fetch failed.");
+								d->Error(_FL, LString::Fmt("Fetch failed: %s", fetchErr.ToString().Get()));
 							#endif
 						}
 					}

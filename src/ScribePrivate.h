@@ -193,7 +193,7 @@ class AddressList : public LList
 public:
 	AddressList(ScribeWnd *app, int id, int x, int y, int cx, int cy, const char *name = "List");
 
-	const char *GetClass() { return "AddressList"; }
+	const char *GetClass() override { return "AddressList"; }
 
 	void OnCreate();
 	bool OnKey(LKey &k);
