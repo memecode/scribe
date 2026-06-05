@@ -3068,7 +3068,7 @@ CalendarViewWnd::CalendarViewWnd(ScribeFolder *folder)
 	OnOptionsChange();
 		
 	#if !defined(WINDOWS)
-	SetIcon("_cal.png");
+	SetIcon("_cal.png", nullptr);
 	#endif
 		
 	auto ToolBar = folder->App->LoadToolbar(this,

@@ -1776,7 +1776,7 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 			else LgiTrace("%s:%i - No size for commands toolbar?\n", _FL);
 		}
 
-		SetIcon("About64px.png");
+		SetIcon("About64px.png", "Network;Email;");
 		OnLoad();
 		_Running = true;
 		Visible(true);

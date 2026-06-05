@@ -1003,7 +1003,7 @@ void ScribeWnd::Construct2()
 	#endif
 
 	#if defined LINUX
-	SetIcon("About64px.png");
+	SetIcon("About64px.png", "Network;Email;");
 	LFinishXWindowsStartup(this);
 	#endif
 
