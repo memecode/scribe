@@ -34,17 +34,17 @@ typedef HRESULT (STDAPICALLTYPE *pWrapCompressedRTFStream)(LPSTREAM lpCompressed
 #define PR_ATTACH_CONTENT_ID		0x3712001E
 #endif
 
-char *RClientsEmail = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail";
+static const char *regClientsEmail = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail";
 
 // Helper classes/functions
 void RemoveChars(char *Str, int Start, int Len)
 {
-	memmove(Str, Str + Len, strlen(Str + Len) + 1);
+	memmove(Str, Str + Len, Strlen(Str + Len) + 1);
 }
 
 void InsertChars(char *Ins, char *Str, int At)
 {
-	auto Len = strlen(Ins);
+	auto Len = Strlen(Ins);
 	memmove(Str + Len, Str, strlen(Str) + 1);
 	memcpy(Str, Ins, Len);
 }
@@ -866,7 +866,7 @@ public:
 
 	void InitSrcClients()
 	{
-		LRegKey Email(false, RClientsEmail);
+		LRegKey Email(false, regClientsEmail);
 		LCombo *SrcClient;
 		if (Email.GetKeyNames(Clients) && GetViewById(IDC_CLIENT, SrcClient))
 		{

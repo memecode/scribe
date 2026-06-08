@@ -16,48 +16,54 @@ LMapiMail::~LMapiMail()
 	DeleteObj(Seg);
 }
 
-void LMapiMail::Set(LMapiEntry &entry, LMapiFolder *parent)
-{
-	Entry = entry;
-	Parent = parent;
-}
-
 void LMapiMail::Set(SPropValue *entry, LMapiFolder *parent, LMapiList *Lst)
 {
 	Entry = entry;
 	Parent = parent;
 	
-	if (Lst)
-	{
-		auto p = Lst->GetField(PR_CLIENT_SUBMIT_TIME);
-		if (p) MapiCastDate(Date, p);
-		p = Lst->GetField(PR_SUBJECT);
-		if (p) Subject = MapiCastString(p);	
+	LAssert(Lst);
+	if (!Lst)
+		return;
 
-		From.Name = MapiCastString(Lst->GetField(PR_SENT_REPRESENTING_NAME));
-		if (!From.Name)
-			From.Name = MapiCastString(Lst->GetField(PR_SENDER_NAME));
-		From.Addr = MapiCastString(Lst->GetField(PR_SENDER_EMAIL_ADDRESS));
+	auto p = Lst->GetField(PR_CLIENT_SUBMIT_TIME);
+	if (p) MapiCastDate(Date, p);
+	p = Lst->GetField(PR_SUBJECT);
+	if (p) Subject = MapiCastString(p);	
 
-		Class = MapiCastString(Lst->GetField(PR_ORIG_MESSAGE_CLASS));
-		if (!Class)
-			Class = MapiCastString(Lst->GetField(PR_MESSAGE_CLASS));
-		auto Post = Class ? _strnicmp(Class, "IPM.Post", 8) == 0 : false;
+	From.Name = MapiCastString(Lst->GetField(PR_SENT_REPRESENTING_NAME));
+	if (!From.Name)
+		From.Name = MapiCastString(Lst->GetField(PR_SENDER_NAME));
+	From.Addr = MapiCastString(Lst->GetField(PR_SENDER_EMAIL_ADDRESS));
 
-		int64 f = MapiCastInt(Lst->GetField(PR_MESSAGE_FLAGS));
-		if (f & (MSGFLAG_SUBMIT | MSGFLAG_UNSENT) && !Post)
-			Flags |= MAIL_CREATED;
-		else
-			Flags |= MAIL_RECEIVED;	
-		if (f & MSGFLAG_HASATTACH)
-			Flags |= MAIL_ATTACHMENTS;
-		if (f & MSGFLAG_READ)
-			Flags |= MAIL_READ;
-		
-		MsgSize = MapiCastInt(Lst->GetField(PR_MESSAGE_SIZE));
-		TxtBody = MapiCastString(Lst->GetField(PR_BODY));
-		HtmlBody = MapiCastString(Lst->GetField(PR_BODY_HTML));
-	}
+	Class = MapiCastString(Lst->GetField(PR_ORIG_MESSAGE_CLASS));
+	if (!Class)
+		Class = MapiCastString(Lst->GetField(PR_MESSAGE_CLASS));
+	auto Post = Class ? _strnicmp(Class, "IPM.Post", 8) == 0 : false;
+
+	MsgId = MapiCastString(Lst->GetField(PR_INTERNET_MESSAGE_ID));
+
+	auto f = MapiCastInt(Lst->GetField(PR_MESSAGE_FLAGS));
+	if (f & (MSGFLAG_SUBMIT | MSGFLAG_UNSENT) && !Post)
+		Flags |= MAIL_CREATED;
+	else
+		Flags |= MAIL_RECEIVED;	
+	if (f & MSGFLAG_HASATTACH)
+		Flags |= MAIL_ATTACHMENTS;
+	if (f & MSGFLAG_READ)
+		Flags |= MAIL_READ;
+	
+	MsgSize = MapiCastInt(Lst->GetField(PR_MESSAGE_SIZE));
+	TxtBody = MapiCastString(Lst->GetField(PR_BODY));
+	HtmlBody = MapiCastString(Lst->GetField(PR_BODY_HTML));
+
+	Subject = MapiCastString(Lst->GetField(PR_SUBJECT));
+	MapiCastDate(Date, Lst->GetField(PR_CLIENT_SUBMIT_TIME));
+
+	printf("Mapi msg: '%s', read=%i, date=%s, id='%s'\n",
+		Subject.Get(),
+		f & MSGFLAG_READ ? 1 : 0,
+		Date.Get().Get(),
+		MsgId.Get());
 }
 
 static int HandleLoads = 0;
@@ -384,9 +390,10 @@ LDataIt LMapiMail::GetList(int id)
 				{
 					for (LMapiList Lst(Recipients); Lst.More(); Lst.Next())
 					{
-						auto Name = Lst.GetField(PR_DISPLAY_NAME_W);
+						auto Name   = Lst.GetField(PR_DISPLAY_NAME_W);
 						auto Email1 = Lst.GetField(PR_EMAIL_ADDRESS);
 						auto Email2 = Lst.GetField(PR_SMTP_ADDRESS);
+
 						LAutoPtr<Store3Addr> a(new Store3Addr(Store));
 						if ((Name || Email1 || Email2) && a)
 						{
@@ -396,8 +403,7 @@ LDataIt LMapiMail::GetList(int id)
 							else
 								a->Addr = MapiCastString(Email2);
 							
-							auto Type = Lst.GetField(PR_RECIPIENT_TYPE);
-							if (Type)
+							if (auto Type = Lst.GetField(PR_RECIPIENT_TYPE))
 							{
 								int64 Flags = MapiCastInt(Type);
 								if (Flags & MAPI_TO)
@@ -419,11 +425,11 @@ LDataIt LMapiMail::GetList(int id)
 			return &To;
 		}
 		default:
-			LAssert(0);
+			LAssert(!"unsupported field");
 			break;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 Store3Status LMapiMail::SetRfc822(LStreamI *m)

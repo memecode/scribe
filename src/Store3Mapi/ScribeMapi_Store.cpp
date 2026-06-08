@@ -7,6 +7,7 @@
 #include "ScribeMapi.h"
 
 /////////////////////////////////////////////////////////////////////////////
+/*
 class LMapiAdviseSink : public IMAPIAdviseSink
 {
 	LMapiStore *Store;
@@ -71,6 +72,7 @@ public:
 		return Store->OnNotify(cNotif, lpNotifications);
 	}
 };
+*/
 
 /////////////////////////////////////////////////////////////////////////////
 LMapiStore::LMapiStore(const char *profile, const char *username, const char *password, uint64 accountId, LDataEventsI *callback)
@@ -157,7 +159,7 @@ LMapiStore::LMapiStore(const char *profile, const char *username, const char *pa
 				InboxEntry.Add((uint8_t*)entry, size);
 				MAPIFreeBuffer(entry);
 
-				#if 1
+				#if false
 				// Setup notification
 				Notify = new LMapiAdviseSink(this);
 				if (Notify)
@@ -204,16 +206,18 @@ ULONG LMapiStore::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications)
 			case fnevNewMail:
 			{
 				LAutoPtr<LMapiMail> nm(new LMapiMail(this));
-				if (nm)
-				{
-					SPropValue e;
-					ZeroObj(e);
-					e.Value.bin.lpb = (LPBYTE)n->info.newmail.lpEntryID;
-					e.Value.bin.cb = n->info.newmail.cbEntryID;
-					nm->Set(&e, Inbox, NULL);
-					NewItems.Add(nm);
-					Inbox->Items.Insert(nm.Release());
-				}
+				if (!nm)
+					continue;
+
+				SPropValue e = {};
+				e.ulPropTag = PROP_TAG(PR_ENTRYID, PT_BINARY);
+				e.Value.bin.lpb = (LPBYTE)n->info.newmail.lpEntryID;
+				e.Value.bin.cb = n->info.newmail.cbEntryID;
+				nm->Set(&e, Inbox, NULL);
+				
+				NewItems.Add(nm);				
+				Inbox->Items.Insert(nm.Release());
+
 				break;
 			}
 			case fnevObjectDeleted:
@@ -399,11 +403,13 @@ Store3Status LMapiStore::SetInt(int id, int64 i)
 					Root->ReleaseHandle();
 				
 				EntryRef.Reset();
+				/*
 				if (Notify)
 				{
 					ULONG r = Notify->Release();
 					Notify = NULL;
 				}
+				*/
 				if (MsgStore)
 				{
 					ULONG r = MsgStore->Release();

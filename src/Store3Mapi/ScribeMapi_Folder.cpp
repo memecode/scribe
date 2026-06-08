@@ -28,6 +28,8 @@ struct LMapiAdvise : public LUnknownImpl<IMAPIAdviseSink>
 										&connectionId);
 			if (FAILED(hr))
 				LAssert(!"advise failed?");
+			else
+				printf("%s:%i - advise on folder '%s'\n", _FL, f->Name.Get());
 		}
 		else LAssert(!"missing param");
 	}
@@ -71,6 +73,11 @@ bool LMapiFolder::Set(LPMAPIFOLDER f)
 
 ULONG LMapiFolder::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
 {
+	if (!MapiFolder)
+		return S_FALSE;
+
+	LArray<LDataI*> newObjs, delObjs;
+
 	for (ULONG i = 0; i < cNotif; i++)
 	{
 		OBJECT_NOTIFICATION &obj = lpNotif[i].info.obj;
@@ -83,14 +90,33 @@ ULONG LMapiFolder::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
 				if (obj.ulObjType == MAPI_MESSAGE)
 				{
 					auto &children = LMapiFolder::Children();
-
-					LAutoPtr<LDataI> t(Store->Create(MAGIC_MAIL));
-					if (auto tptr = dynamic_cast<LMapiMail*>(t.Get()))
+					
+					// loop over the contents table and find the new entry..
+					LPMAPITABLE tbl = nullptr;
+					auto hr = MapiFolder->GetContentsTable(0, &tbl);
+					if (SUCCEEDED(hr) && tbl)
 					{
-						LMapiEntry entry = obj;
-						tptr->Set(entry, this);
-						Items.Insert(tptr, -1, true);
-						t.Release();
+						hr = tbl->SeekRow(BOOKMARK_BEGINNING, 0, nullptr);
+
+						for (LMapiList contents(tbl); contents.More(); contents.Next())
+						{
+							auto entryProp = contents.GetField(PR_ENTRYID);
+							LMapiEntry entry = entryProp;
+							if (obj.cbEntryID != entry.Length())
+								continue;
+							if (memcmp(obj.lpEntryID, entry.AddressOf(), entry.Length()))
+								continue;
+							
+							LAutoPtr<LDataI> t(Store->Create(MAGIC_MAIL));
+							if (auto tptr = dynamic_cast<LMapiMail*>(t.Get()))
+							{
+								LMapiEntry entry = obj;
+								tptr->Set(entryProp, this, &contents);
+								Items.Insert(tptr, -1, true);
+								newObjs.Add(tptr);
+								t.Release();								
+							}
+						}
 					}
 				}
 				// else fixme: other types like calendar and contacts?
@@ -116,6 +142,15 @@ ULONG LMapiFolder::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
 				break;
 			}
 		}
+	}
+
+	if (Store && Store->Callback)
+	{
+		if (newObjs.Length())
+			Store->Callback->OnNew(this, newObjs, -1, true, true);
+
+		if (delObjs.Length())
+			Store->Callback->OnDelete(this, delObjs);
 	}
 
 	return S_OK;
@@ -172,6 +207,9 @@ bool LMapiFolder::Set(LMapiFolder *parent, LMapiList *Lst)
 		if (SUCCEEDED(res) && Result)
 			FolderType = Store3SystemInbox;
 	}
+
+	
+	advise.Reset(new LMapiAdvise(this));
 	
 	return true;
 }
@@ -443,7 +481,7 @@ LDataIterator<LDataI*> &LMapiFolder::Children()
 		Handle())
 	{
 		LPMAPITABLE Tbl = nullptr;
-		HRESULT res = MapiFolder->GetContentsTable(0, &Tbl);
+		auto res = MapiFolder->GetContentsTable(0, &Tbl);
 		if (SUCCEEDED(res))
 		{
 			for (LMapiList Lst(Tbl); Lst.More(); Lst.Next())
@@ -458,7 +496,9 @@ LDataIterator<LDataI*> &LMapiFolder::Children()
 						Items.Insert(tptr, -1, true);
 						t.Release();
 					}
+					else LAssert(!"not a LMapiThing?");
 				}
+				else LAssert("store couldn't create object?");
 			}
 		}
 		else Store->Error("%s:%i - GetContentsTable failed with %x\n", _FL, res);

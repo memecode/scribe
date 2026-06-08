@@ -17,7 +17,8 @@ add_executable(mapiConnector
     ../../src/Store3Mapi/ScribeMapi_Folder.cpp
     ../../src/Store3Mapi/ScribeMapi_Thing.cpp
     ../../src/Store3Mapi/ScribeMapi_Attachment.cpp
-
+    
+    ../../src/Store3Common.h
     ../../src/Store3Common.cpp
     ../../src/StrToDom.cpp
 
@@ -25,6 +26,7 @@ add_executable(mapiConnector
 
     ${LGI_DIR}/include/lgi/common/Com.h
     ${LGI_DIR}/include/lgi/common/Mail.h
+    ${LGI_DIR}/include/lgi/common/Store3.h
     ${LGI_DIR}/src/common/Text/TextConvert.cpp
     ${LGI_DIR}/src/common/Net/Mail.cpp
     ${LGI_DIR}/src/common/Net/Mime.cpp

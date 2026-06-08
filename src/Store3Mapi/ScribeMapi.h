@@ -70,7 +70,7 @@ struct LMapiEntry : public LArray<uint8_t>
 	LMapiEntry &operator =(const SPropValue *p)
 	{
 		Empty();
-		if (p && p->ulPropTag == PT_BINARY)		
+		if (p && PROP_TYPE(p->ulPropTag) == PT_BINARY)		
 			Add(p->Value.bin.lpb, p->Value.bin.cb);
 		else
 			LAssert(!"unexpected type.");
@@ -202,11 +202,9 @@ public:
 
 	LString MapiGetPropStr(IMAPIProp *Props, int Field)
 	{
-		SPropValue *Val = MapiGetProp(Props, Field);
-		if (Val)
-		{
+		if (auto Val = MapiGetProp(Props, Field))
 			return MapiCastString(Val);
-		}
+
 		return LString();
 	}
 
@@ -225,11 +223,10 @@ public:
 		if (!Props)
 			return false;
 			
-		SPropValue *p = MapiGetProp(Props, Field);
-		if (!p)
-			return false;
+		if (auto p = MapiGetProp(Props, Field))
+			return MapiCastDate(dt, p);
 
-		return MapiCastDate(dt, p);
+		return false;
 	}
 
 	bool MapiSetPropStr(IMAPIProp *Props, int Field, const char *Str, bool Unicode = false)
@@ -387,6 +384,7 @@ class LMapiAttachment :
 	LString Charset;
 	LString Literal;
 	LString Headers;
+	LString msgId;
 	
 public:
 	LMapiAttachment(LMapiStore *store);
@@ -439,7 +437,6 @@ public:
 	~LMapiMail();
 
 	void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst);
-	void Set(LMapiEntry &entry, LMapiFolder *parent);
 	LPMESSAGE Handle();
 
 	// LDataPropI API
@@ -734,7 +731,7 @@ class MapiEntryRef : public LMapiBase
 	
 public:
 	LString DisplayName;
-	LArray<uint8_t> Entry;
+	LMapiEntry Entry;
 
 	MapiEntryRef(LMapiStore *store)
 	{
@@ -808,9 +805,9 @@ class LMapiStore : public LDataStoreI, public LLibrary
 	LAutoPtr<MapiEntryRef> EntryRef;
 	LString Profile, Username, Password, RootName, profileCache;
 	uint64 AccountId;
-	LArray<uint8_t> InboxEntry;
+	LMapiEntry InboxEntry;
 	LArray<LMapiThing*> Dirty;
-	LMapiAdviseSink *Notify = nullptr;
+	// LMapiAdviseSink *Notify = nullptr;
 	LString::Array availableProfiles;
 	bool MapiInitialized = false;
 

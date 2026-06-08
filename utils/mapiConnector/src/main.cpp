@@ -18,6 +18,8 @@ struct PrintLog : public LStream
 
 struct FolderMeta
 {
+	LStream *log = nullptr;
+
 	// Storage:
 	LString path;
 	bool dirty = false;
@@ -27,7 +29,8 @@ struct FolderMeta
 	int nextUid = 0;
 	LHashTbl<ConstStrKey<char>, int> uidMap;
 
-	FolderMeta(LString fullPath) :
+	FolderMeta(LString fullPath, LStream *logger) :
+		log(logger),
 		path(fullPath),
 		uidMap(0, INVALID)
 	{
@@ -54,6 +57,7 @@ struct FolderMeta
 		{
 			for (auto p: uidMap)
 				f.Print("uid,%s,%i\n", p.key, p.value);
+			log->Print("Wrote %i msg->uid maps to '%s'\n", (int)uidMap.Length(), path.Get());
 		}
 		else
 		{
@@ -78,6 +82,8 @@ struct FolderMeta
 					else LAssert(!"invalid token count");
 				}
 			}
+
+			log->Print("Read %i msg->uid maps from '%s'\n", (int)uidMap.Length(), path.Get());
 		}
 		return true;
 	}
@@ -135,7 +141,7 @@ struct Context
 		auto full = fullPath(f);
 		LAssert(full);
 
-		m = new FolderMeta((inst / full).GetFull());
+		m = new FolderMeta((inst / full).GetFull(), &log);
 		m->serialize(false);
 		folderMetaData.Add(f, m);
 
@@ -356,6 +362,7 @@ struct Context
 
 		LAssert(isUid); // don't support not UID yet...
 
+		int maxUid = 0;
 		auto fields = fieldSpec.Strip("()").SplitDelimit();
 		auto &it = folder->Children();
 		for (auto i = it.First(); i; i = it.Next())
@@ -366,6 +373,8 @@ struct Context
 			if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
 			{
 				auto uid = meta->getUid(msgId);
+				maxUid = MAX(maxUid, uid);
+
 				if (uid != FolderMeta::INVALID)
 				{
 					// is the UID in range?
@@ -447,6 +456,89 @@ struct Context
 
 		meta->save();
 
+		if (a.Length() == 0)
+		{
+			log.Print("Warn: fetched no records '%s', '%s', maxUid=%i\n",
+				arg.Get(),
+				fieldSpec.Get(),
+				maxUid);
+		}
+
+		return a;
+	}
+
+	// e.g. A0861 UID STORE 875 FLAGS (\seen)
+	LString::Array Store(LDataFolderI *folder, bool isUid, LArray<LString> params)
+	{
+		LString::Array a;
+		if (!folder)
+		{
+			log.Print("%s:%i - error: no folder.\n", _FL);
+			return a;
+		}
+
+		auto meta = getMeta(folder);
+		if (!meta)
+		{
+			log.Print("%s:%i - error: no meta.\n", _FL);
+			return a;
+		}
+
+		LAssert(isUid); // don't support not UID yet...
+
+		if (params.Length() != 3)
+		{
+			log.Print("%s:%i - error: unexpected arg count: %s.\n",
+				_FL, LString(",").Join(params).Get());
+			return a;
+		}
+
+		auto storeUids = params[0].SplitDelimit(",");
+		auto &storeField = params[1];
+		auto &storeValue = params[2];
+
+		auto &it = folder->Children();
+		for (auto i = it.First(); i; i = it.Next())
+		{
+			if (i->Type() != MAGIC_MAIL)
+				continue;
+
+			if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
+			{
+				auto uid = meta->getUid(msgId);
+				bool match = false;
+				for (auto &u: storeUids)
+					if (u.Int() == uid)
+						match = true;
+				if (!match)
+					continue;
+
+				log.Print("%s:%i STORE on msgId='%s' uid=%u\n", _FL, msgId, uid);
+
+				if (storeField.Equals("FLAGS"))
+				{
+					auto flags = storeValue.Strip("()").SplitDelimit();
+					auto curFlags = i->GetInt(FIELD_FLAGS);
+					int64_t newFlags = curFlags & (~MAIL_READ);
+					for (auto &f: flags)
+					{
+						if (f.Equals("\\seen"))
+							newFlags = MAIL_READ;
+						else
+							log.Print("%s:%i - unsupported store flag '%s'\n", _FL, f.Get());
+					}
+
+					if (newFlags != curFlags)
+						i->SetInt(FIELD_FLAGS, newFlags);
+				}
+				else
+				{
+					log.Print("%s:%i - unsupported store field '%s'\n", _FL, storeField.Get());
+					LAssert(!"unsupported field");
+				}
+			}
+		}
+
 		return a;
 	}
 
@@ -513,7 +605,7 @@ struct ImapConnection : public LSocket
 	LStream &log;
 	LStringPipe rdBuf;
 
-	LString cmdRef;
+	LString cmdRef, idleCmdRef;
 	LString AuthenticateType;
 	LString selectPath;
 	LDataFolderI *selectFolder = nullptr;
@@ -572,7 +664,16 @@ struct ImapConnection : public LSocket
 			const char *ptr = line.Get();
 			while (auto s = LTokLStr(ptr))
 				parts.Add(s);
-			if (parts.Length() < 2)
+
+			if (parts.Length() == 1 &&
+				parts[0].Equals("DONE"))
+			{
+				auto w = LString::Fmt("%s OK Idle completed\r\n", idleCmdRef.Get());
+				Write(w);
+				idleCmdRef.Empty();
+				return;
+			}
+			else if (parts.Length() < 2)
 			{
 				log.Print("Error: unexpected part count for '%s'\n", line.Strip().Get());
 				return ImapErr("TOOFEW", "unexpected cmd argument count");
@@ -687,7 +788,21 @@ struct ImapConnection : public LSocket
 			}
 			else if (cmd.Equals("IDLE"))
 			{
+				idleCmdRef = cmdRef;
 				Write(LString::Fmt("%s OK idle\r\n", cmdRef.Get()));
+			}
+			else if (cmd.Equals("STORE"))
+			{
+				if (!selectFolder)
+					return ImapErr("UNAVAILABLE", "no folder selected");
+
+				auto resp = ctx->Store(selectFolder, isUid, parts.Slice(3, -1));
+				for (auto &r: resp)
+				{
+					log.Print("Search: %s\n", r.Get());
+					Write(r);
+				}
+				Write(LString::Fmt("%s OK Store completed\r\n", cmdRef.Get()));
 			}
 			else
 			{

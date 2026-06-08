@@ -347,6 +347,9 @@ public:
 			arrToHdr("From", from);
 			arrToHdr("To", to);
 			arrToHdr("Cc", cc);
+
+			if (auto msgId = Mail->GetStr(FIELD_MESSAGE_ID))
+				p.Print("Message-ID: <%s>\r\n", LString(msgId).Strip("<>").Get());
 		}
 		
 		p.Print("Content-Type: %s", MimeType);

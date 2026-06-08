@@ -48,6 +48,7 @@ bool LMapiAttachment::Set(LMapiMail *mail, LMapiList *Lst)
 		Name = MapiCastString(Lst->GetField(PR_DISPLAY_NAME_W));
 	MimeType = MapiCastString(Lst->GetField(PR_ATTACH_MIME_TAG_W));
 	ContentId = MapiCastString(Lst->GetField(PR_ATTACH_CONTENT_ID_W));
+	msgId = MapiCastString(Lst->GetField(PR_INTERNET_MESSAGE_ID));
 	
 	if (!MimeType)
 	{
@@ -66,6 +67,7 @@ bool LMapiAttachment::Set(const char *content, const char *charset, const char *
 	Charset = charset;
 	MimeType = mimeType;
 	DataSize = Literal.Length();
+	
 	return true;
 }
 
@@ -91,6 +93,8 @@ const char *LMapiAttachment::GetStr(int id)
 			return ContentId;
 		case FIELD_CHARSET:
 			return Charset;
+		case FIELD_MESSAGE_ID:
+			return msgId;
 		default:
 			LAssert(0);
 			break;
