@@ -9646,7 +9646,7 @@ public:
 	{
 	}
 
-	void PourStyle(size_t Start, ssize_t Length)
+	void PourStyle(size_t Start, ssize_t Length) override
 	{
 		TParent::PourStyle(Start, Length);
 
@@ -9705,7 +9705,7 @@ public:
 		}
 	}
 
-	void PourText(size_t Start, ssize_t Len)
+	void PourText(size_t Start, ssize_t Len) override
 	{
 		TParent::PourText(Start, Len);
 
@@ -9791,7 +9791,7 @@ public:
 		TParent::OnStyleMenuClick(style, menuId);
 	}
 
-	LMessage::Result OnEvent(LMessage *m)
+	LMessage::Result OnEvent(LMessage *m) override
 	{
 		switch (m->Msg())
 		{
@@ -9879,7 +9879,7 @@ public:
 		return LTextView3::OnEvent(m);
 	}
 
-	bool OnStyleClick(LStyle *style, LMouse *m)
+	bool OnStyleClick(LStyle *style, LMouse *m) override
 	{
 		switch (style->Owner)
 		{

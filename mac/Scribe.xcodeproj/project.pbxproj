@@ -10,7 +10,6 @@
 		34063DA52DCBF8C8007CB2C2 /* Tnef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */; };
 		340AE3822E2CA79E009F705F /* libpng16.16.45.git.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 340AE37E2E2CA781009F705F /* libpng16.16.45.git.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		340AE3832E2CA7A3009F705F /* libjpeg.62.4.0.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 340AE37F2E2CA781009F705F /* libjpeg.62.4.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 34749B44278B042500C8197E /* LgiCocoa.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		340FA6A9237E7E2D0043D1F2 /* EmojiMap.png in Resources */ = {isa = PBXBuildFile; fileRef = 340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */; };
 		340FAAEA23888A570017BC62 /* WebdavContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 340FAADC23888A570017BC62 /* WebdavContact.cpp */; };
 		3416149A238484F800A65477 /* WebdavFolder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34161495238484F700A65477 /* WebdavFolder.cpp */; };
@@ -48,7 +47,6 @@
 		346E1A4E231293570019B4AA /* tray_small.png in Resources */ = {isa = PBXBuildFile; fileRef = 346E1A4B231293570019B4AA /* tray_small.png */; };
 		346E1A4F231293570019B4AA /* tray_mail.png in Resources */ = {isa = PBXBuildFile; fileRef = 346E1A4C231293570019B4AA /* tray_mail.png */; };
 		34723EB72A8EE5D200EC80E8 /* ScribeIpc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34723EA62A8EE5D200EC80E8 /* ScribeIpc.cpp */; };
-		34749B5F278B08B200C8197E /* LgiCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34749B44278B042500C8197E /* LgiCocoa.framework */; };
 		3474FC5F226DE0960064E0AD /* libBtree.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474FC4E226DCCDD0064E0AD /* libBtree.a */; };
 		3477C3581CC1149F0028B84B /* LgiMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3571CC1149F0028B84B /* LgiMain.cpp */; };
 		3477C3621CC226450028B84B /* ScribeMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3611CC226450028B84B /* ScribeMain.cpp */; };
@@ -190,6 +188,7 @@
 		34C1BF9D238CAEC500658B99 /* scripting.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF7A238CA23600658B99 /* scripting.html */; };
 		34C1BF9E238CAEC500658B99 /* ui.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34C1BF74238CA23500658B99 /* ui.html */; };
 		34C1BF9F238CB05A00658B99 /* About64px.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 34DD329B23153B2300FA2B35 /* About64px.png */; };
+		34C819D92FE0B0A700B39646 /* LgiCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C6DFBD2FE0AF9F008FC0C2 /* LgiCocoa.framework */; };
 		34C9A80B23C9615300129861 /* NoFace160.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A7FC23C9615200129861 /* NoFace160.png */; };
 		34C9A80C23C9615300129861 /* NoFace80.png in Resources */ = {isa = PBXBuildFile; fileRef = 34C9A80A23C9615200129861 /* NoFace80.png */; };
 		34D2892F275B3EF5005961A8 /* RemoteCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D2892E275B3EF5005961A8 /* RemoteCalendarSource.cpp */; };
@@ -205,20 +204,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		34749B43278B042500C8197E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3477C2681CBF020F0028B84B;
-			remoteInfo = LgiCocoa;
-		};
-		34749B5A278B06B900C8197E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 3477C2671CBF020F0028B84B;
-			remoteInfo = LgiCocoa;
-		};
 		3474FC4D226DCCDD0064E0AD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3477C4DF1CC27C9F0028B84B /* Btree.xcodeproj */;
@@ -247,6 +232,20 @@
 			remoteGlobalIDString = 3477C4FB1CC3021B0028B84B;
 			remoteInfo = sqlite;
 		};
+		34C6DFBC2FE0AF9F008FC0C2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3477C2681CBF020F0028B84B;
+			remoteInfo = LgiCocoa;
+		};
+		34C819DA2FE0B0AE00B39646 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3477C2671CBF020F0028B84B;
+			remoteInfo = LgiCocoa;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -263,7 +262,6 @@
 				34452C9E2AD4A30300AE820D /* libaspell-dist-0.60.dylib in Copy Files */,
 				34452C9B2AD4A2D700AE820D /* libbzip2.dylib in Copy Files */,
 				34452C9A2AD4A2C700AE820D /* libchardet.dylib in Copy Files */,
-				340E2A1E278CEA7200F0B4C8 /* LgiCocoa.framework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -317,7 +315,7 @@
 		340AE37F2E2CA781009F705F /* libjpeg.62.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjpeg.62.4.0.dylib; path = "../../../lgi/deps/build-release/lib/libjpeg.62.4.0.dylib"; sourceTree = "<group>"; };
 		340AE3842E2CA7BF009F705F /* libz.1.4.1.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.4.1.1.dylib; path = "../../../lgi/deps/build-release/lib/libz.1.4.1.1.dylib"; sourceTree = "<group>"; };
 		340AE3862E2CBC87009F705F /* LoadMailStoreState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoadMailStoreState.h; path = ../../src/LoadMailStoreState.h; sourceTree = "<group>"; };
-		340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EmojiMap.png; path = ../../Resources/EmojiMap.png; sourceTree = "<group>"; };
+		340FA6A8237E7E2D0043D1F2 /* EmojiMap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EmojiMap.png; path = ../../resources/EmojiMap.png; sourceTree = "<group>"; };
 		340FAADC23888A570017BC62 /* WebdavContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavContact.cpp; path = ../../src/Store3Webdav/WebdavContact.cpp; sourceTree = "<group>"; };
 		34161495238484F700A65477 /* WebdavFolder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavFolder.cpp; path = ../../src/Store3Webdav/WebdavFolder.cpp; sourceTree = "<group>"; };
 		34161496238484F700A65477 /* WebdavCalendar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavCalendar.cpp; path = ../../src/Store3Webdav/WebdavCalendar.cpp; sourceTree = "<group>"; };
@@ -325,28 +323,28 @@
 		34161498238484F800A65477 /* WebdavThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavThread.cpp; path = ../../src/Store3Webdav/WebdavThread.cpp; sourceTree = "<group>"; };
 		34161499238484F800A65477 /* WebdavStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebdavStore.h; path = ../../src/Store3Webdav/WebdavStore.h; sourceTree = "<group>"; };
 		341A02B723BD702800F0FF48 /* SpellCheckAspell.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpellCheckAspell.cpp; path = ../../../../lgi/trunk/src/common/Text/SpellCheckAspell.cpp; sourceTree = "<group>"; };
-		341A787F2699058600872FEB /* DatePopup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DatePopup.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/DatePopup.cpp; sourceTree = "<group>"; };
-		3425DC6A23F788AE00BC025E /* SpellCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SpellCheck.h; path = ../../../../Lgi/trunk/include/lgi/common/SpellCheck.h; sourceTree = "<group>"; };
-		342BAE3A2588AFA8006EF16E /* TextConvert.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextConvert.cpp; path = ../../../../Lgi/trunk/src/common/Text/TextConvert.cpp; sourceTree = "<group>"; };
-		34364F8824CCE9FF00272F13 /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Themes; path = ../../Resources/Themes; sourceTree = "<group>"; };
-		34417D87205FB69E00D2E80C /* MailFlags.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MailFlags.c; path = ../../Utils/Tables/MailFlags.c; sourceTree = "<group>"; };
-		34417D88205FB69E00D2E80C /* Tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tables.h; path = ../../Utils/Tables/Tables.h; sourceTree = "<group>"; };
-		34417D8D205FD4A500D2E80C /* Ftp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Ftp.cpp; path = ../../../../Lgi/trunk/src/common/Net/Ftp.cpp; sourceTree = "<group>"; };
-		34417DBD205FD5B800D2E80C /* HorzRuleBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HorzRuleBlock.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp; sourceTree = "<group>"; };
+		341A787F2699058600872FEB /* DatePopup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DatePopup.cpp; path = ../../../../lgi/trunk/src/common/Widgets/DatePopup.cpp; sourceTree = "<group>"; };
+		3425DC6A23F788AE00BC025E /* SpellCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SpellCheck.h; path = ../../../../lgi/trunk/include/lgi/common/SpellCheck.h; sourceTree = "<group>"; };
+		342BAE3A2588AFA8006EF16E /* TextConvert.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextConvert.cpp; path = ../../../../lgi/trunk/src/common/Text/TextConvert.cpp; sourceTree = "<group>"; };
+		34364F8824CCE9FF00272F13 /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Themes; path = ../../resources/Themes; sourceTree = "<group>"; };
+		34417D87205FB69E00D2E80C /* MailFlags.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MailFlags.c; path = ../../utils/Tables/MailFlags.c; sourceTree = "<group>"; };
+		34417D88205FB69E00D2E80C /* Tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tables.h; path = ../../utils/Tables/Tables.h; sourceTree = "<group>"; };
+		34417D8D205FD4A500D2E80C /* Ftp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Ftp.cpp; path = ../../../../lgi/trunk/src/common/Net/Ftp.cpp; sourceTree = "<group>"; };
+		34417DBD205FD5B800D2E80C /* HorzRuleBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HorzRuleBlock.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp; sourceTree = "<group>"; };
 		34452C8A2AD4A23C00AE820D /* libbzip2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbzip2.dylib; path = "../../libs/build-release/lib/libbzip2.dylib"; sourceTree = SOURCE_ROOT; };
 		34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libaspell-dist-0.60.dylib"; path = "../../libs/build-release/lib/libaspell-dist-0.60.dylib"; sourceTree = SOURCE_ROOT; };
 		34452C8E2AD4A26B00AE820D /* libchardet.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libchardet.dylib; path = "../../libs/build-release/lib/libchardet.dylib"; sourceTree = SOURCE_ROOT; };
-		3445E5721F1F40DF00D0A824 /* EmojiTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmojiTools.cpp; path = ../../../../Lgi/trunk/src/common/Text/Emoji/EmojiTools.cpp; sourceTree = "<group>"; };
-		3445E5741F1F413200D0A824 /* EmojiMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmojiMap.cpp; path = ../../../../Lgi/trunk/src/common/Text/Emoji/EmojiMap.cpp; sourceTree = "<group>"; };
+		3445E5721F1F40DF00D0A824 /* EmojiTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmojiTools.cpp; path = ../../../../lgi/trunk/src/common/Text/Emoji/EmojiTools.cpp; sourceTree = "<group>"; };
+		3445E5741F1F413200D0A824 /* EmojiMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmojiMap.cpp; path = ../../../../lgi/trunk/src/common/Text/Emoji/EmojiMap.cpp; sourceTree = "<group>"; };
 		3445E5761F1F416500D0A824 /* SpellCheckMac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SpellCheckMac.mm; path = ../../../../lgi/trunk/src/mac/cocoa/SpellCheckMac.mm; sourceTree = "<group>"; };
 		3445E5791F1F41AF00D0A824 /* GnuPG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GnuPG.cpp; path = ../../src/Encryption/GnuPG.cpp; sourceTree = "<group>"; };
 		3445E57A1F1F41AF00D0A824 /* GnuPG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GnuPG.h; path = ../../src/Encryption/GnuPG.h; sourceTree = "<group>"; };
-		3445E57E1F1F428400D0A824 /* BlockCursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlockCursor.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp; sourceTree = "<group>"; };
-		3445E57F1F1F428400D0A824 /* RichTextEdit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEdit.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp; sourceTree = "<group>"; };
-		3445E5801F1F428400D0A824 /* RichTextEditPriv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEditPriv.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp; sourceTree = "<group>"; };
-		3445E5811F1F428400D0A824 /* RichTextEditPriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RichTextEditPriv.h; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.h; sourceTree = "<group>"; };
-		3445E5821F1F428400D0A824 /* ImageBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ImageBlock.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp; sourceTree = "<group>"; };
-		3445E5831F1F428400D0A824 /* TextBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextBlock.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/Editor/TextBlock.cpp; sourceTree = "<group>"; };
+		3445E57E1F1F428400D0A824 /* BlockCursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlockCursor.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp; sourceTree = "<group>"; };
+		3445E57F1F1F428400D0A824 /* RichTextEdit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEdit.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp; sourceTree = "<group>"; };
+		3445E5801F1F428400D0A824 /* RichTextEditPriv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEditPriv.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp; sourceTree = "<group>"; };
+		3445E5811F1F428400D0A824 /* RichTextEditPriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RichTextEditPriv.h; path = ../../../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.h; sourceTree = "<group>"; };
+		3445E5821F1F428400D0A824 /* ImageBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ImageBlock.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp; sourceTree = "<group>"; };
+		3445E5831F1F428400D0A824 /* TextBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextBlock.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/TextBlock.cpp; sourceTree = "<group>"; };
 		3445E5891F1F42BA00D0A824 /* ObjectInspector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ObjectInspector.cpp; path = ../../src/ObjectInspector.cpp; sourceTree = "<group>"; };
 		345921031F2565D100098DFD /* BayesianFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BayesianFilter.h; path = ../../src/BayesianFilter.h; sourceTree = "<group>"; };
 		345921041F2565D100098DFD /* Calendar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Calendar.h; path = ../../src/Calendar.h; sourceTree = "<group>"; };
@@ -380,22 +378,22 @@
 		345921201F2565D100098DFD /* ScribeStatusPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeStatusPanel.h; path = ../../src/ScribeStatusPanel.h; sourceTree = "<group>"; };
 		345921211F2565D100098DFD /* ScribeUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeUtils.h; path = ../../src/ScribeUtils.h; sourceTree = "<group>"; };
 		345921221F2565D100098DFD /* Store3Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Store3Common.h; path = ../../src/Store3Common.h; sourceTree = "<group>"; };
-		345921261F2565EC00098DFD /* Mail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Mail.h; path = ../../../../Lgi/trunk/include/lgi/common/Mail.h; sourceTree = "<group>"; };
+		345921261F2565EC00098DFD /* Mail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Mail.h; path = ../../../../lgi/trunk/include/lgi/common/Mail.h; sourceTree = "<group>"; };
 		345C53CF23F163D30035E9CA /* Scribe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Scribe.entitlements; sourceTree = "<group>"; };
-		345F31451CC7A3B400656B8B /* Icons-16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icons-16.png"; path = "../../Resources/Icons-16.png"; sourceTree = "<group>"; };
-		345F314B1CC7A46B00656B8B /* xgate-icons-32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "xgate-icons-32.png"; path = "../../Resources/xgate-icons-32.png"; sourceTree = "<group>"; };
-		346E1A44231292C60019B4AA /* PreviewMail.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = PreviewMail.html; path = ../../Resources/PreviewMail.html; sourceTree = "<group>"; };
-		346E1A45231292C60019B4AA /* PreviewContact.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = PreviewContact.html; path = ../../Resources/PreviewContact.html; sourceTree = "<group>"; };
-		346E1A46231292C60019B4AA /* PreviewGroup.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = PreviewGroup.html; path = ../../Resources/PreviewGroup.html; sourceTree = "<group>"; };
-		346E1A4A231293570019B4AA /* tray_error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_error.png; path = ../../Resources/tray_error.png; sourceTree = "<group>"; };
-		346E1A4B231293570019B4AA /* tray_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_small.png; path = ../../Resources/tray_small.png; sourceTree = "<group>"; };
-		346E1A4C231293570019B4AA /* tray_mail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_mail.png; path = ../../Resources/tray_mail.png; sourceTree = "<group>"; };
+		345F31451CC7A3B400656B8B /* Icons-16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icons-16.png"; path = "../../resources/Icons-16.png"; sourceTree = "<group>"; };
+		345F314B1CC7A46B00656B8B /* xgate-icons-32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "xgate-icons-32.png"; path = "../../resources/xgate-icons-32.png"; sourceTree = "<group>"; };
+		346E1A44231292C60019B4AA /* PreviewMail.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = PreviewMail.html; path = ../../resources/PreviewMail.html; sourceTree = "<group>"; };
+		346E1A45231292C60019B4AA /* PreviewContact.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = PreviewContact.html; path = ../../resources/PreviewContact.html; sourceTree = "<group>"; };
+		346E1A46231292C60019B4AA /* PreviewGroup.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = PreviewGroup.html; path = ../../resources/PreviewGroup.html; sourceTree = "<group>"; };
+		346E1A4A231293570019B4AA /* tray_error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_error.png; path = ../../resources/tray_error.png; sourceTree = "<group>"; };
+		346E1A4B231293570019B4AA /* tray_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_small.png; path = ../../resources/tray_small.png; sourceTree = "<group>"; };
+		346E1A4C231293570019B4AA /* tray_mail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tray_mail.png; path = ../../resources/tray_mail.png; sourceTree = "<group>"; };
 		34723EA62A8EE5D200EC80E8 /* ScribeIpc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeIpc.cpp; path = ../../src/ScribeIpc.cpp; sourceTree = "<group>"; };
 		34723EB62A8EE5D200EC80E8 /* ScribeIpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeIpc.h; path = ../../src/ScribeIpc.h; sourceTree = "<group>"; };
-		34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LgiCocoa.xcodeproj; path = ../../../Lgi/trunk/src/mac/cocoa/LgiCocoa.xcodeproj; sourceTree = "<group>"; };
+		34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LgiCocoa.xcodeproj; path = ../../../lgi/trunk/src/mac/cocoa/LgiCocoa.xcodeproj; sourceTree = SOURCE_ROOT; };
 		3477C21E1CBEFD940028B84B /* Scribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scribe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3477C22C1CBEFD940028B84B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3477C3571CC1149F0028B84B /* LgiMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LgiMain.cpp; path = ../../../../Lgi/trunk/src/common/Lgi/LgiMain.cpp; sourceTree = "<group>"; };
+		3477C3571CC1149F0028B84B /* LgiMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LgiMain.cpp; path = ../../../../lgi/trunk/src/common/Lgi/LgiMain.cpp; sourceTree = "<group>"; };
 		3477C3611CC226450028B84B /* ScribeMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeMain.cpp; path = ../../src/ScribeMain.cpp; sourceTree = "<group>"; };
 		3477C3631CC227ED0028B84B /* AddressSelect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AddressSelect.cpp; path = ../../src/AddressSelect.cpp; sourceTree = "<group>"; };
 		3477C3651CC227ED0028B84B /* BayesDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BayesDlg.cpp; path = ../../src/BayesDlg.cpp; sourceTree = "<group>"; };
@@ -451,14 +449,14 @@
 		3477C3A91CC227ED0028B84B /* SecurityDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SecurityDlg.cpp; path = ../../src/SecurityDlg.cpp; sourceTree = "<group>"; };
 		3477C3AC1CC227ED0028B84B /* Store3Common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Store3Common.cpp; path = ../../src/Store3Common.cpp; sourceTree = "<group>"; };
 		3477C3AD1CC227ED0028B84B /* TitlePage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TitlePage.cpp; path = ../../src/TitlePage.cpp; sourceTree = "<group>"; };
-		3477C3FB1CC22E690028B84B /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Base64.cpp; path = ../../../../Lgi/trunk/src/common/Net/Base64.cpp; sourceTree = "<group>"; };
-		3477C3FD1CC22EF60028B84B /* MonthView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MonthView.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/MonthView.cpp; sourceTree = "<group>"; };
-		3477C3FE1CC22EF60028B84B /* YearView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = YearView.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/YearView.cpp; sourceTree = "<group>"; };
-		3477C4031CC22F680028B84B /* ExeCheck.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ExeCheck.cpp; path = ../../../../Lgi/trunk/src/common/General/ExeCheck.cpp; sourceTree = "<group>"; };
-		3477C4081CC2301F0028B84B /* GdcTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GdcTools.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Tools/GdcTools.cpp; sourceTree = "<group>"; };
-		3477C40C1CC230C30028B84B /* Mail.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mail.cpp; path = ../../../../Lgi/trunk/src/common/Net/Mail.cpp; sourceTree = "<group>"; };
+		3477C3FB1CC22E690028B84B /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Base64.cpp; path = ../../../../lgi/trunk/src/common/Net/Base64.cpp; sourceTree = "<group>"; };
+		3477C3FD1CC22EF60028B84B /* MonthView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MonthView.cpp; path = ../../../../lgi/trunk/src/common/Widgets/MonthView.cpp; sourceTree = "<group>"; };
+		3477C3FE1CC22EF60028B84B /* YearView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = YearView.cpp; path = ../../../../lgi/trunk/src/common/Widgets/YearView.cpp; sourceTree = "<group>"; };
+		3477C4031CC22F680028B84B /* ExeCheck.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ExeCheck.cpp; path = ../../../../lgi/trunk/src/common/General/ExeCheck.cpp; sourceTree = "<group>"; };
+		3477C4081CC2301F0028B84B /* GdcTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GdcTools.cpp; path = ../../../../lgi/trunk/src/common/Gdc2/Tools/GdcTools.cpp; sourceTree = "<group>"; };
+		3477C40C1CC230C30028B84B /* Mail.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mail.cpp; path = ../../../../lgi/trunk/src/common/Net/Mail.cpp; sourceTree = "<group>"; };
 		3477C40E1CC231190028B84B /* Imp_OutlookExpress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Imp_OutlookExpress.cpp; path = ../../src/Imp_OutlookExpress.cpp; sourceTree = "<group>"; };
-		3477C4101CC231470028B84B /* OpenSSLSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OpenSSLSocket.cpp; path = ../../../../Lgi/trunk/src/common/Net/OpenSSLSocket.cpp; sourceTree = "<group>"; };
+		3477C4101CC231470028B84B /* OpenSSLSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OpenSSLSocket.cpp; path = ../../../../lgi/trunk/src/common/Net/OpenSSLSocket.cpp; sourceTree = "<group>"; };
 		3477C4151CC231890028B84B /* ScribeImap_Attachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeImap_Attachment.cpp; path = ../../src/Store3Imap/ScribeImap_Attachment.cpp; sourceTree = "<group>"; };
 		3477C4161CC231890028B84B /* ScribeImap_Folder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeImap_Folder.cpp; path = ../../src/Store3Imap/ScribeImap_Folder.cpp; sourceTree = "<group>"; };
 		3477C4171CC231890028B84B /* ScribeImap_Mail.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeImap_Mail.cpp; path = ../../src/Store3Imap/ScribeImap_Mail.cpp; sourceTree = "<group>"; };
@@ -475,85 +473,85 @@
 		3477C4271CC2319B0028B84B /* Mail3Mail.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mail3Mail.cpp; path = ../../src/Store3Mail3/Mail3Mail.cpp; sourceTree = "<group>"; };
 		3477C4281CC2319B0028B84B /* Mail3Store.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mail3Store.cpp; path = ../../src/Store3Mail3/Mail3Store.cpp; sourceTree = "<group>"; };
 		3477C4311CC233980028B84B /* Imp_CsvContacts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Imp_CsvContacts.cpp; path = ../../src/Imp_CsvContacts.cpp; sourceTree = "<group>"; };
-		3477C4331CC233CF0028B84B /* Db-Csv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "Db-Csv.cpp"; path = "../../../../Lgi/trunk/src/common/Db/Db-Csv.cpp"; sourceTree = "<group>"; };
-		3477C4351CC234200028B84B /* Http.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Http.cpp; path = ../../../../Lgi/trunk/src/common/Net/Http.cpp; sourceTree = "<group>"; };
-		3477C43D1CC234C80028B84B /* TimePopup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TimePopup.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/TimePopup.cpp; sourceTree = "<group>"; };
-		3477C43F1CC234E60028B84B /* XmlTreeUi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlTreeUi.cpp; path = ../../../../Lgi/trunk/src/common/Text/XmlTreeUi.cpp; sourceTree = "<group>"; };
-		3477C4411CC235490028B84B /* FilterUi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FilterUi.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/FilterUi.cpp; sourceTree = "<group>"; };
-		3477C4431CC235810028B84B /* Html.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Html.cpp; path = ../../../../Lgi/trunk/src/common/Text/Html.cpp; sourceTree = "<group>"; };
-		3477C4441CC235810028B84B /* HtmlCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlCommon.cpp; path = ../../../../Lgi/trunk/src/common/Text/HtmlCommon.cpp; sourceTree = "<group>"; };
-		3477C4451CC235810028B84B /* HtmlParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlParser.cpp; path = ../../../../Lgi/trunk/src/common/Text/HtmlParser.cpp; sourceTree = "<group>"; };
-		3477C44B1CC235C60028B84B /* OptionsFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OptionsFile.cpp; path = ../../../Lgi/trunk/src/common/Lgi/OptionsFile.cpp; sourceTree = SOURCE_ROOT; };
-		3477C44D1CC2624B0028B84B /* ControlTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ControlTree.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/ControlTree.cpp; sourceTree = "<group>"; };
-		3477C44F1CC262670028B84B /* ColourSelect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColourSelect.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/ColourSelect.cpp; sourceTree = "<group>"; };
-		3477C4521CC262AF0028B84B /* LexCpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LexCpp.cpp; path = ../../../../Lgi/trunk/src/common/Coding/LexCpp.cpp; sourceTree = "<group>"; };
-		3477C4531CC262AF0028B84B /* ScriptCompiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScriptCompiler.cpp; path = ../../../../Lgi/trunk/src/common/Coding/ScriptCompiler.cpp; sourceTree = "<group>"; };
-		3477C4541CC262AF0028B84B /* ScriptLibrary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScriptLibrary.cpp; path = ../../../../Lgi/trunk/src/common/Coding/ScriptLibrary.cpp; sourceTree = "<group>"; };
-		3477C4551CC262AF0028B84B /* ScriptVM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScriptVM.cpp; path = ../../../../Lgi/trunk/src/common/Coding/ScriptVM.cpp; sourceTree = "<group>"; };
-		3477C45A1CC263560028B84B /* SharedMemory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SharedMemory.cpp; path = ../../../../Lgi/trunk/src/common/General/SharedMemory.cpp; sourceTree = "<group>"; };
-		3477C45C1CC26AAB0028B84B /* Mime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mime.cpp; path = ../../../../Lgi/trunk/src/common/Net/Mime.cpp; sourceTree = "<group>"; };
-		3477C45D1CC26AAB0028B84B /* MailImap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MailImap.cpp; path = ../../../../Lgi/trunk/src/common/Net/MailImap.cpp; sourceTree = "<group>"; };
-		3477C4601CC26AE00028B84B /* Growl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Growl.cpp; path = ../../../../Lgi/trunk/src/common/General/Growl.cpp; sourceTree = "<group>"; };
-		3477C4611CC26AE00028B84B /* SoftwareUpdate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoftwareUpdate.cpp; path = ../../../../Lgi/trunk/src/common/General/SoftwareUpdate.cpp; sourceTree = "<group>"; };
-		3477C4641CC26BBF0028B84B /* HttpTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HttpTools.cpp; path = ../../../../Lgi/trunk/src/common/Net/HttpTools.cpp; sourceTree = "<group>"; };
-		3477C4661CC26BF30028B84B /* DrawListSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DrawListSurface.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/DrawListSurface.cpp; sourceTree = "<group>"; };
-		3477C4681CC26C1C0028B84B /* vCard-vCal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "vCard-vCal.cpp"; path = "../../../../Lgi/trunk/src/common/Text/vCard-vCal.cpp"; sourceTree = "<group>"; };
-		3477C46A1CC26DAB0028B84B /* Path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Path.cpp; path = ../../../../Lgi/trunk/src/common/Gdc2/Path/Path.cpp; sourceTree = "<group>"; };
+		3477C4331CC233CF0028B84B /* Db-Csv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "Db-Csv.cpp"; path = "../../../../lgi/trunk/src/common/Db/Db-Csv.cpp"; sourceTree = "<group>"; };
+		3477C4351CC234200028B84B /* Http.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Http.cpp; path = ../../../../lgi/trunk/src/common/Net/Http.cpp; sourceTree = "<group>"; };
+		3477C43D1CC234C80028B84B /* TimePopup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TimePopup.cpp; path = ../../../../lgi/trunk/src/common/Widgets/TimePopup.cpp; sourceTree = "<group>"; };
+		3477C43F1CC234E60028B84B /* XmlTreeUi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlTreeUi.cpp; path = ../../../../lgi/trunk/src/common/Text/XmlTreeUi.cpp; sourceTree = "<group>"; };
+		3477C4411CC235490028B84B /* FilterUi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FilterUi.cpp; path = ../../../../lgi/trunk/src/common/Widgets/FilterUi.cpp; sourceTree = "<group>"; };
+		3477C4431CC235810028B84B /* Html.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Html.cpp; path = ../../../../lgi/trunk/src/common/Text/Html.cpp; sourceTree = "<group>"; };
+		3477C4441CC235810028B84B /* HtmlCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlCommon.cpp; path = ../../../../lgi/trunk/src/common/Text/HtmlCommon.cpp; sourceTree = "<group>"; };
+		3477C4451CC235810028B84B /* HtmlParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HtmlParser.cpp; path = ../../../../lgi/trunk/src/common/Text/HtmlParser.cpp; sourceTree = "<group>"; };
+		3477C44B1CC235C60028B84B /* OptionsFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OptionsFile.cpp; path = ../../../lgi/trunk/src/common/Lgi/OptionsFile.cpp; sourceTree = SOURCE_ROOT; };
+		3477C44D1CC2624B0028B84B /* ControlTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ControlTree.cpp; path = ../../../../lgi/trunk/src/common/Widgets/ControlTree.cpp; sourceTree = "<group>"; };
+		3477C44F1CC262670028B84B /* ColourSelect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColourSelect.cpp; path = ../../../../lgi/trunk/src/common/Widgets/ColourSelect.cpp; sourceTree = "<group>"; };
+		3477C4521CC262AF0028B84B /* LexCpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LexCpp.cpp; path = ../../../../lgi/trunk/src/common/Coding/LexCpp.cpp; sourceTree = "<group>"; };
+		3477C4531CC262AF0028B84B /* ScriptCompiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScriptCompiler.cpp; path = ../../../../lgi/trunk/src/common/Coding/ScriptCompiler.cpp; sourceTree = "<group>"; };
+		3477C4541CC262AF0028B84B /* ScriptLibrary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScriptLibrary.cpp; path = ../../../../lgi/trunk/src/common/Coding/ScriptLibrary.cpp; sourceTree = "<group>"; };
+		3477C4551CC262AF0028B84B /* ScriptVM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScriptVM.cpp; path = ../../../../lgi/trunk/src/common/Coding/ScriptVM.cpp; sourceTree = "<group>"; };
+		3477C45A1CC263560028B84B /* SharedMemory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SharedMemory.cpp; path = ../../../../lgi/trunk/src/common/General/SharedMemory.cpp; sourceTree = "<group>"; };
+		3477C45C1CC26AAB0028B84B /* Mime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mime.cpp; path = ../../../../lgi/trunk/src/common/Net/Mime.cpp; sourceTree = "<group>"; };
+		3477C45D1CC26AAB0028B84B /* MailImap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MailImap.cpp; path = ../../../../lgi/trunk/src/common/Net/MailImap.cpp; sourceTree = "<group>"; };
+		3477C4601CC26AE00028B84B /* Growl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Growl.cpp; path = ../../../../lgi/trunk/src/common/General/Growl.cpp; sourceTree = "<group>"; };
+		3477C4611CC26AE00028B84B /* SoftwareUpdate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoftwareUpdate.cpp; path = ../../../../lgi/trunk/src/common/General/SoftwareUpdate.cpp; sourceTree = "<group>"; };
+		3477C4641CC26BBF0028B84B /* HttpTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HttpTools.cpp; path = ../../../../lgi/trunk/src/common/Net/HttpTools.cpp; sourceTree = "<group>"; };
+		3477C4661CC26BF30028B84B /* DrawListSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DrawListSurface.cpp; path = ../../../../lgi/trunk/src/common/Gdc2/DrawListSurface.cpp; sourceTree = "<group>"; };
+		3477C4681CC26C1C0028B84B /* vCard-vCal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "vCard-vCal.cpp"; path = "../../../../lgi/trunk/src/common/Text/vCard-vCal.cpp"; sourceTree = "<group>"; };
+		3477C46A1CC26DAB0028B84B /* Path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Path.cpp; path = ../../../../lgi/trunk/src/common/Gdc2/Path/Path.cpp; sourceTree = "<group>"; };
 		3477C4DF1CC27C9F0028B84B /* Btree.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Btree.xcodeproj; path = ../../libs/Btree/Btree.xcodeproj; sourceTree = "<group>"; };
-		3477C4E61CC27D2B0028B84B /* MailHttp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MailHttp.cpp; path = ../../../../Lgi/trunk/src/common/Net/MailHttp.cpp; sourceTree = "<group>"; };
-		3477C4E81CC27D870028B84B /* Browser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Browser.cpp; path = ../../../../Lgi/trunk/src/common/Lgi/Browser.cpp; sourceTree = "<group>"; };
-		3477C4EA1CC27DC90028B84B /* Password.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Password.cpp; path = ../../../../Lgi/trunk/src/common/General/Password.cpp; sourceTree = "<group>"; };
-		3477C4EE1CC27F500028B84B /* ZoomView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ZoomView.cpp; path = ../../../../Lgi/trunk/src/common/Widgets/ZoomView.cpp; sourceTree = "<group>"; };
-		3477C51F1CC311A00028B84B /* Scribe.lr8 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = Scribe.lr8; path = ../../Resources/Scribe.lr8; sourceTree = "<group>"; };
+		3477C4E61CC27D2B0028B84B /* MailHttp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MailHttp.cpp; path = ../../../../lgi/trunk/src/common/Net/MailHttp.cpp; sourceTree = "<group>"; };
+		3477C4E81CC27D870028B84B /* Browser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Browser.cpp; path = ../../../../lgi/trunk/src/common/Lgi/Browser.cpp; sourceTree = "<group>"; };
+		3477C4EA1CC27DC90028B84B /* Password.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Password.cpp; path = ../../../../lgi/trunk/src/common/General/Password.cpp; sourceTree = "<group>"; };
+		3477C4EE1CC27F500028B84B /* ZoomView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ZoomView.cpp; path = ../../../../lgi/trunk/src/common/Widgets/ZoomView.cpp; sourceTree = "<group>"; };
+		3477C51F1CC311A00028B84B /* Scribe.lr8 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = Scribe.lr8; path = ../../resources/Scribe.lr8; sourceTree = "<group>"; };
 		3477C5221CC315FC0028B84B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /Users/matthew/Code/Lgi/trunk/src/mac/cocoa/../../../../../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		347CF82623F64FD00028F610 /* flags.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = flags.png; path = ../../Resources/flags.png; sourceTree = "<group>"; };
-		3481AAAA25DC8C820032ACB7 /* FileTransferProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileTransferProgress.h; path = ../../../../Lgi/trunk/include/lgi/common/FileTransferProgress.h; sourceTree = "<group>"; };
+		347CF82623F64FD00028F610 /* flags.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = flags.png; path = ../../resources/Flags.png; sourceTree = "<group>"; };
+		3481AAAA25DC8C820032ACB7 /* FileTransferProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileTransferProgress.h; path = ../../../../lgi/trunk/include/lgi/common/FileTransferProgress.h; sourceTree = "<group>"; };
 		3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UnitTests.cpp; path = ../../src/Test/UnitTests.cpp; sourceTree = "<group>"; };
 		348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = sqlite.xcodeproj; path = ../src/Sqlite/v3.50.1/sqlite.xcodeproj; sourceTree = "<group>"; };
-		34918093222F1C5F00944FC4 /* OAuth2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OAuth2.h; path = ../../../../Lgi/trunk/include/lgi/common/OAuth2.h; sourceTree = "<group>"; };
-		34918094222F1C6F00944FC4 /* OAuth2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OAuth2.cpp; path = ../../../../Lgi/trunk/src/common/Net/OAuth2.cpp; sourceTree = "<group>"; };
-		3497D5462399D260009FCC14 /* Mail Filters Menu.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Mail Filters Menu.script"; path = "../../Scripts/Mail Filters Menu.script"; sourceTree = "<group>"; };
-		3497D5472399D260009FCC14 /* Delete Attachments.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Delete Attachments.script"; path = "../../Scripts/Delete Attachments.script"; sourceTree = "<group>"; };
-		3497D5482399D260009FCC14 /* Add Senders To Contacts.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Add Senders To Contacts.script"; path = "../../Scripts/Add Senders To Contacts.script"; sourceTree = "<group>"; };
-		3497D5492399D260009FCC14 /* Delete Duplicate Messages.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Delete Duplicate Messages.script"; path = "../../Scripts/Delete Duplicate Messages.script"; sourceTree = "<group>"; };
-		3497D5532399D2A5009FCC14 /* resdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resdefs.h; path = ../../Resources/resdefs.h; sourceTree = "<group>"; };
-		349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "scribe-mac-icon.icns"; path = "../../Resources/scribe-mac-icon.icns"; sourceTree = "<group>"; };
+		34918093222F1C5F00944FC4 /* OAuth2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OAuth2.h; path = ../../../../lgi/trunk/include/lgi/common/OAuth2.h; sourceTree = "<group>"; };
+		34918094222F1C6F00944FC4 /* OAuth2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OAuth2.cpp; path = ../../../../lgi/trunk/src/common/Net/OAuth2.cpp; sourceTree = "<group>"; };
+		3497D5462399D260009FCC14 /* Mail Filters Menu.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Mail Filters Menu.script"; path = "../../scripts/Mail Filters Menu.script"; sourceTree = "<group>"; };
+		3497D5472399D260009FCC14 /* Delete Attachments.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Delete Attachments.script"; path = "../../scripts/Delete Attachments.script"; sourceTree = "<group>"; };
+		3497D5482399D260009FCC14 /* Add Senders To Contacts.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Add Senders To Contacts.script"; path = "../../scripts/Add Senders To Contacts.script"; sourceTree = "<group>"; };
+		3497D5492399D260009FCC14 /* Delete Duplicate Messages.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Delete Duplicate Messages.script"; path = "../../scripts/Delete Duplicate Messages.script"; sourceTree = "<group>"; };
+		3497D5532399D2A5009FCC14 /* resdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resdefs.h; path = ../../resources/resdefs.h; sourceTree = "<group>"; };
+		349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "scribe-mac-icon.icns"; path = "../../resources/scribe-mac-icon.icns"; sourceTree = "<group>"; };
 		34A66680237968A200ED0212 /* FolderCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FolderCalendarSource.cpp; path = ../../src/FolderCalendarSource.cpp; sourceTree = "<group>"; };
 		34A891DD2B0C177100D2930B /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.3.dylib; path = /opt/local/libexec/openssl3/lib/libcrypto.3.dylib; sourceTree = "<absolute>"; };
 		34A891E02B0C178000D2930B /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.3.dylib; path = /opt/local/libexec/openssl3/lib/libssl.3.dylib; sourceTree = "<absolute>"; };
-		34AB68E8275240B40045380B /* ScribeScripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeScripts.h; path = ../../Scripts/ScribeScripts.h; sourceTree = "<group>"; };
-		34C1BF71238CA23500658B99 /* calendar.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = calendar.html; path = ../../Help/calendar.html; sourceTree = "<group>"; };
-		34C1BF72238CA23500658B99 /* features.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = features.html; path = ../../Help/features.html; sourceTree = "<group>"; };
-		34C1BF73238CA23500658B99 /* email.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = email.html; path = ../../Help/email.html; sourceTree = "<group>"; };
-		34C1BF74238CA23500658B99 /* ui.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = ui.html; path = ../../Help/ui.html; sourceTree = "<group>"; };
-		34C1BF75238CA23500658B99 /* contacts.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = contacts.html; path = ../../Help/contacts.html; sourceTree = "<group>"; };
-		34C1BF76238CA23500658B99 /* install.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = install.html; path = ../../Help/install.html; sourceTree = "<group>"; };
-		34C1BF77238CA23500658B99 /* menu.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = menu.html; path = ../../Help/menu.html; sourceTree = "<group>"; };
-		34C1BF78238CA23600658B99 /* help.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = help.css; path = ../../Help/help.css; sourceTree = "<group>"; };
-		34C1BF79238CA23600658B99 /* intro.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = intro.html; path = ../../Help/intro.html; sourceTree = "<group>"; };
-		34C1BF7A238CA23600658B99 /* scripting.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = scripting.html; path = ../../Help/scripting.html; sourceTree = "<group>"; };
-		34C1BF7B238CA23600658B99 /* plugins.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = plugins.html; path = ../../Help/plugins.html; sourceTree = "<group>"; };
-		34C1BF7C238CA23600658B99 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = ../../Help/index.html; sourceTree = "<group>"; };
-		34C1BF7D238CA23600658B99 /* filters.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = filters.html; path = ../../Help/filters.html; sourceTree = "<group>"; };
-		34C1BF7E238CA23600658B99 /* import.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = import.html; path = ../../Help/import.html; sourceTree = "<group>"; };
-		34C1BF7F238CA23600658B99 /* print.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = print.html; path = ../../Help/print.html; sourceTree = "<group>"; };
-		34C9A7FC23C9615200129861 /* NoFace160.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NoFace160.png; path = ../../Resources/NoFace160.png; sourceTree = "<group>"; };
-		34C9A80A23C9615200129861 /* NoFace80.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NoFace80.png; path = ../../Resources/NoFace80.png; sourceTree = "<group>"; };
+		34AB68E8275240B40045380B /* ScribeScripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScribeScripts.h; path = ../../scripts/ScribeScripts.h; sourceTree = "<group>"; };
+		34C1BF71238CA23500658B99 /* calendar.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = calendar.html; path = ../../help/calendar.html; sourceTree = "<group>"; };
+		34C1BF72238CA23500658B99 /* features.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = features.html; path = ../../help/features.html; sourceTree = "<group>"; };
+		34C1BF73238CA23500658B99 /* email.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = email.html; path = ../../help/email.html; sourceTree = "<group>"; };
+		34C1BF74238CA23500658B99 /* ui.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = ui.html; path = ../../help/ui.html; sourceTree = "<group>"; };
+		34C1BF75238CA23500658B99 /* contacts.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = contacts.html; path = ../../help/contacts.html; sourceTree = "<group>"; };
+		34C1BF76238CA23500658B99 /* install.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = install.html; path = ../../help/install.html; sourceTree = "<group>"; };
+		34C1BF77238CA23500658B99 /* menu.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = menu.html; path = ../../help/menu.html; sourceTree = "<group>"; };
+		34C1BF78238CA23600658B99 /* help.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = help.css; path = ../../help/help.css; sourceTree = "<group>"; };
+		34C1BF79238CA23600658B99 /* intro.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = intro.html; path = ../../help/intro.html; sourceTree = "<group>"; };
+		34C1BF7A238CA23600658B99 /* scripting.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = scripting.html; path = ../../help/scripting.html; sourceTree = "<group>"; };
+		34C1BF7B238CA23600658B99 /* plugins.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = plugins.html; path = ../../help/plugins.html; sourceTree = "<group>"; };
+		34C1BF7C238CA23600658B99 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = ../../help/index.html; sourceTree = "<group>"; };
+		34C1BF7D238CA23600658B99 /* filters.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = filters.html; path = ../../help/filters.html; sourceTree = "<group>"; };
+		34C1BF7E238CA23600658B99 /* import.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = import.html; path = ../../help/import.html; sourceTree = "<group>"; };
+		34C1BF7F238CA23600658B99 /* print.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = print.html; path = ../../help/print.html; sourceTree = "<group>"; };
+		34C9A7FC23C9615200129861 /* NoFace160.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NoFace160.png; path = ../../resources/NoFace160.png; sourceTree = "<group>"; };
+		34C9A80A23C9615200129861 /* NoFace80.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NoFace80.png; path = ../../resources/NoFace80.png; sourceTree = "<group>"; };
 		34D2892E275B3EF5005961A8 /* RemoteCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RemoteCalendarSource.cpp; path = ../../src/RemoteCalendarSource.cpp; sourceTree = "<group>"; };
 		34DB5ADC2ACD8DE100321094 /* PostBuildStep.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = PostBuildStep.py; sourceTree = SOURCE_ROOT; };
-		34DD329423153AF000FA2B35 /* Title.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = Title.html; path = ../../Resources/Title.html; sourceTree = "<group>"; };
-		34DD329523153AF000FA2B35 /* About.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = About.html; path = ../../Resources/About.html; sourceTree = "<group>"; };
-		34DD329623153AF000FA2B35 /* Title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Title.png; path = ../../Resources/Title.png; sourceTree = "<group>"; };
-		34DD329B23153B2300FA2B35 /* About64px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = About64px.png; path = ../../Resources/About64px.png; sourceTree = "<group>"; };
-		34EE8BA02748A0F100F12915 /* ControlTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ControlTree.h; path = ../../../../Lgi/trunk/include/lgi/common/ControlTree.h; sourceTree = "<group>"; };
-		34EE8BAE2748A26800F12915 /* OpenSSLSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenSSLSocket.h; path = ../../../../Lgi/trunk/include/lgi/common/OpenSSLSocket.h; sourceTree = "<group>"; };
-		34EE8BAF2748A32C00F12915 /* Html.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Html.h; path = ../../../../Lgi/trunk/include/lgi/common/Html.h; sourceTree = "<group>"; };
-		34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HomoglyphsTable.cpp; path = ../../../../Lgi/trunk/src/common/Text/Homoglyphs/HomoglyphsTable.cpp; sourceTree = "<group>"; };
-		34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Homoglyphs.cpp; path = ../../../../Lgi/trunk/src/common/Text/Homoglyphs/Homoglyphs.cpp; sourceTree = "<group>"; };
+		34DD329423153AF000FA2B35 /* Title.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = Title.html; path = ../../resources/Title.html; sourceTree = "<group>"; };
+		34DD329523153AF000FA2B35 /* About.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = About.html; path = ../../resources/About.html; sourceTree = "<group>"; };
+		34DD329623153AF000FA2B35 /* Title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Title.png; path = ../../resources/Title.png; sourceTree = "<group>"; };
+		34DD329B23153B2300FA2B35 /* About64px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = About64px.png; path = ../../resources/About64px.png; sourceTree = "<group>"; };
+		34EE8BA02748A0F100F12915 /* ControlTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ControlTree.h; path = ../../../../lgi/trunk/include/lgi/common/ControlTree.h; sourceTree = "<group>"; };
+		34EE8BAE2748A26800F12915 /* OpenSSLSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenSSLSocket.h; path = ../../../../lgi/trunk/include/lgi/common/OpenSSLSocket.h; sourceTree = "<group>"; };
+		34EE8BAF2748A32C00F12915 /* Html.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Html.h; path = ../../../../lgi/trunk/include/lgi/common/Html.h; sourceTree = "<group>"; };
+		34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HomoglyphsTable.cpp; path = ../../../../lgi/trunk/src/common/Text/Homoglyphs/HomoglyphsTable.cpp; sourceTree = "<group>"; };
+		34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Homoglyphs.cpp; path = ../../../../lgi/trunk/src/common/Text/Homoglyphs/Homoglyphs.cpp; sourceTree = "<group>"; };
 		34F6152127E55CA700FE5B0C /* EventTargetThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EventTargetThread.h; path = ../../../../lgi/trunk/include/lgi/common/EventTargetThread.h; sourceTree = "<group>"; };
 		34FB9661237D07740039423C /* WebdavStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavStore.cpp; path = ../../src/Store3Webdav/WebdavStore.cpp; sourceTree = "<group>"; };
-		34FB968923835BB40039423C /* WebDav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebDav.cpp; path = ../../../../Lgi/trunk/src/common/Net/WebDav.cpp; sourceTree = "<group>"; };
-		34FB968B23835BE70039423C /* WebDav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDav.h; path = ../../../../Lgi/trunk/include/lgi/common/WebDav.h; sourceTree = "<group>"; };
+		34FB968923835BB40039423C /* WebDav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebDav.cpp; path = ../../../../lgi/trunk/src/common/Net/WebDav.cpp; sourceTree = "<group>"; };
+		34FB968B23835BE70039423C /* WebDav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDav.h; path = ../../../../lgi/trunk/include/lgi/common/WebDav.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -561,10 +559,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34C819D92FE0B0A700B39646 /* LgiCocoa.framework in Frameworks */,
 				348EBFEF2E07670300BFEBE0 /* libsqlite.a in Frameworks */,
 				34A891E12B0C178000D2930B /* libssl.3.dylib in Frameworks */,
 				3477C5231CC315FC0028B84B /* Cocoa.framework in Frameworks */,
-				34749B5F278B08B200C8197E /* LgiCocoa.framework in Frameworks */,
 				3474FC5F226DE0960064E0AD /* libBtree.a in Frameworks */,
 				34A891DF2B0C177100D2930B /* libcrypto.3.dylib in Frameworks */,
 				34452C8D2AD4A25500AE820D /* libaspell-dist-0.60.dylib in Frameworks */,
@@ -816,14 +814,6 @@
 			name = Spelling;
 			sourceTree = "<group>";
 		};
-		34749B40278B042500C8197E /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				34749B44278B042500C8197E /* LgiCocoa.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		3474FC4A226DCCDD0064E0AD /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1070,6 +1060,14 @@
 			name = Help;
 			sourceTree = "<group>";
 		};
+		34C6DFB92FE0AF9E008FC0C2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				34C6DFBD2FE0AF9F008FC0C2 /* LgiCocoa.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		34DED72923AC319E0049E01F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1114,8 +1112,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				34C819DB2FE0B0AE00B39646 /* PBXTargetDependency */,
 				348EBFEE2E0766F600BFEBE0 /* PBXTargetDependency */,
-				34749B5B278B06B900C8197E /* PBXTargetDependency */,
 				3474FC5C226DE08D0064E0AD /* PBXTargetDependency */,
 			);
 			name = Scribe;
@@ -1164,7 +1162,7 @@
 					ProjectRef = 3477C4DF1CC27C9F0028B84B /* Btree.xcodeproj */;
 				},
 				{
-					ProductGroup = 34749B40278B042500C8197E /* Products */;
+					ProductGroup = 34C6DFB92FE0AF9E008FC0C2 /* Products */;
 					ProjectRef = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
 				},
 				{
@@ -1180,13 +1178,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		34749B44278B042500C8197E /* LgiCocoa.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = LgiCocoa.framework;
-			remoteRef = 34749B43278B042500C8197E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		3474FC4E226DCCDD0064E0AD /* libBtree.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
@@ -1199,6 +1190,13 @@
 			fileType = archive.ar;
 			path = libsqlite.a;
 			remoteRef = 348EBFEB2E0766E400BFEBE0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34C6DFBD2FE0AF9F008FC0C2 /* LgiCocoa.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = LgiCocoa.framework;
+			remoteRef = 34C6DFBC2FE0AF9F008FC0C2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1396,11 +1394,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		34749B5B278B06B900C8197E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = LgiCocoa;
-			targetProxy = 34749B5A278B06B900C8197E /* PBXContainerItemProxy */;
-		};
 		3474FC5C226DE08D0064E0AD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Btree;
@@ -1410,6 +1403,11 @@
 			isa = PBXTargetDependency;
 			name = sqlite;
 			targetProxy = 348EBFED2E0766F600BFEBE0 /* PBXContainerItemProxy */;
+		};
+		34C819DB2FE0B0AE00B39646 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LgiCocoa;
+			targetProxy = 34C819DA2FE0B0AE00B39646 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1468,8 +1466,8 @@
 				HEADER_SEARCH_PATHS = (
 					../Code,
 					../Code/Sqlite,
-					../Resources,
-					../Utils/Tables,
+					../resources,
+					../utils/Tables,
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
@@ -1538,8 +1536,8 @@
 				HEADER_SEARCH_PATHS = (
 					../Code,
 					../Code/Sqlite,
-					../Resources,
-					../Utils/Tables,
+					../resources,
+					../utils/Tables,
 					../../libs/libchardet/include,
 					../../libs/libchardet/src,
 					"../../libs/aspell-0.60.6.1/interfaces/cc",
