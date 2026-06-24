@@ -3257,7 +3257,7 @@ bool ScribeWnd::LoadOptions()
 		
 		// SSL debug logging
 		//if (GetOptions()->GetValue(OPT_DebugSSL, v))
-		//	SslSocket::DebugLogging = v.CastInt32() != 0;
+		// 	SslSocket::DebugLogging = v.CastInt32() != 0;
 
 		// Growl
 		if (GetOptions()->GetValue(OPT_GrowlEnabled, v) &&

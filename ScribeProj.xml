@@ -277,12 +277,12 @@
 			<Node File="./src/AddressSelect.cpp" Type="2" Platforms="15" />
 			<Node File="./src/BayesDlg.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Widgets/ControlTree.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/include/lgi/common/ControlTree.h" Type="3" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/General/Growl.cpp" Type="2" Platforms="15" />
-			<Node File="./src/NewMailDlg.cpp" Type="2" Platforms="15" />
-			<Node File="./src/NewMailDlg.h" Type="3" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/ZoomView.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ManageMailStores.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ManageMailStores.h" Type="3" Platforms="15" />
+			<Node File="./src/NewMailDlg.cpp" Type="2" Platforms="15" />
+			<Node File="./src/NewMailDlg.h" Type="3" Platforms="15" />
 			<Node File="./src/ReplicateDlg.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ReplicateDlg.h" Type="3" Platforms="15" />
 			<Node File="./src/ScribeLangDlg.cpp" Type="2" Platforms="15" />
@@ -290,6 +290,7 @@
 			<Node File="./src/ScribeUi.cpp" Type="2" Platforms="15" />
 			<Node File="./src/SecurityDlg.cpp" Type="2" Platforms="15" />
 			<Node File="./src/TitlePage.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/src/common/Widgets/ZoomView.cpp" Type="2" Platforms="15" />
 		</Node>
 		<Node File="./src/Scribe.h" Type="3" Platforms="15" />
 		<Node File="./src/ScribeDefs.h" Type="3" Platforms="15" />
