@@ -436,17 +436,17 @@ class CalendarTodoItem : public LListItem
 	LListItemCheckBox *Done;
 
 	void SetTodo(Calendar *todo);
-	void OnColumnNotify(int Col, int64 Data);
+	void OnColumnNotify(int Col, int64 Data) override;
 	int Compare(LListItem *To, ssize_t Field) override;
 
 public:
 	CalendarTodoItem(ScribeWnd *app, Calendar *todo = NULL);
 	~CalendarTodoItem();
 
-	const char *GetText(int Col);
-	bool SetText(const char *s, int Col);
-	void OnPaint(ItemPaintCtx &Ctx);
-	void OnMouseClick(LMouse &m);
+	const char *GetText(int Col) override;
+	bool SetText(const char *s, int Col) override;
+	void OnPaint(ItemPaintCtx &Ctx) override;
+	void OnMouseClick(LMouse &m) override;
 	Calendar *GetTodo() { return Todo; }
 	void Resort();
 };
