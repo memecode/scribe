@@ -1521,10 +1521,18 @@ bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 			MsgBuf.Print(LLoadString(IDS_ERROR_NEED_INSTALL), Name);
 			Actions.Add(new LVariant(LLoadString(IDS_OPEN_WEBSITE)));
 		}
-		else if (stristr(Name, "SslCertError"))
+		else if (stristr(Name, SslSocket::CAPS_CERT_ERROR))
 		{
-			if (Param)
-				MsgBuf.Print(" - %s", Param);
+			LJson j(Param);
+			auto host = j.Get(SslSocket::JSON_HOST);
+			auto msg = j.Get(SslSocket::JSON_MESSAGE);
+			auto ref = j.Get(SslSocket::JSON_REF);
+			auto cert = j.Get(SslSocket::JSON_CERT);
+
+			MsgBuf.Print(" - %s: %s", host.Get(), msg.Get());
+			if (ref || cert)
+				MsgBuf.Print(" (%s, hasCert=%i)", ref.Get(), cert ? 1 : 0);
+
 			Actions.Add(new LVariant(LLoadString(IDS_ACCEPT_ONCE)));
 			Actions.Add(new LVariant(LLoadString(IDS_ACCEPT_ALWAYS)));
 			cBack = LColour::Orange;

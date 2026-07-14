@@ -93,7 +93,7 @@ ImapStore::ImapStore(LString host,
 		FilterIncoming = v.CastInt32() != 0;
 	}
 
-	Thread = new ImapThread(this, caps, log, SettingStore);
+	Thread = new ImapThread(this, caps, log, SettingStore, AccountId);
 }
 
 ImapStore::~ImapStore()

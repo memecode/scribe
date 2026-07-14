@@ -91,27 +91,27 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 	LCapabilityClient *Caps;
 	char Sep[4];
 	LString InboxPath;
+	int AccountId;
 
 	LAutoPtr<ImapMsg> Listing;
-	int64 ListingTime;
-	int Listings;
-	int Exists;
-	int FetchSeq;
+	int64 ListingTime = 0;
+	int Listings = 0;
+	int Exists = -1;
+	int FetchSeq = 1;
 
 	ImapThreadPrivate(	ImapThread *thread,
 						ImapStore *s,
 						LCapabilityClient *caps,
 						LStream *log,
-						ProtocolSettingStore *store) : LMutex("ImapThreadPrivate")
+						ProtocolSettingStore *store,
+						int accountId)
+		: LMutex("ImapThreadPrivate")
 	{
 		Sep[0] = 0;
 	    Caps = caps;
 	    SettingStore = store;
-		FetchSeq = 1;
-		Listings = 0;
-		Exists = -1;
+	    AccountId = accountId;
 		Log = log;
-		ListingTime = 0;
 		Thread = thread;
 		Store = s;
 		Cache = s->GetCache();
@@ -331,11 +331,11 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 	}
 };
 
-ImapThread::ImapThread(ImapStore *s, LCapabilityClient *caps, LStream *log, ProtocolSettingStore *store) :
+ImapThread::ImapThread(ImapStore *s, LCapabilityClient *caps, LStream *log, ProtocolSettingStore *store, int AccountId) :
 	LThread("ImapThread"),
 	LMutex("ImapThread.Mutex")
 {
-	if ((d = new ImapThreadPrivate(this, s, caps, log, store)))
+	if ((d = new ImapThreadPrivate(this, s, caps, log, store, AccountId)))
 	{
 		Run();
 	}
@@ -779,7 +779,10 @@ int ImapThread::Main()
 																				d->Store->DataProgress);
 					Sock = s;
 					if (s)
+					{
+						s->UserRef.Printf("accountId=%i", d->AccountId);
 						s->SetSslOnConnect(SslDirect);
+					}
 				}
 				else
 				{
@@ -788,7 +791,7 @@ int ImapThread::Main()
 														d->Store->GetLogger(),
 														d->Store->DataProgress);
 				}
-
+				
 				bool reqsOk = true;
 				LOAuth2::Params p = GetOAuth2Params(u.sHost, MAGIC_MAIL);
 				if (p.Provider != LOAuth2::Params::None)

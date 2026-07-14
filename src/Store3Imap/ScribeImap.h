@@ -263,7 +263,7 @@ class ImapThread : public LThread, public LMutex
 	void Log(LSocketI::SocketMsgType Type, const char *Fmt, ...);
 
 public:
-	ImapThread(ImapStore *s, LCapabilityClient *caps, LStream *log, ProtocolSettingStore *Store);
+	ImapThread(ImapStore *s, LCapabilityClient *caps, LStream *log, ProtocolSettingStore *Store, int AccountId);
 	~ImapThread();
 
 	void PostThread(ImapMsg *m, bool UiPriority);
