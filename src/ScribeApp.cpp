@@ -1524,14 +1524,14 @@ bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 		else if (stristr(Name, SslSocket::CAPS_CERT_ERROR))
 		{
 			LJson j(Param);
-			auto host = j.Get(SslSocket::JSON_HOST);
 			auto msg = j.Get(SslSocket::JSON_MESSAGE);
-			auto ref = j.Get(SslSocket::JSON_REF);
-			auto cert = j.Get(SslSocket::JSON_CERT);
+			d->SslCertHost = j.Get(SslSocket::JSON_HOST);
+			d->SslCertRef = j.Get(SslSocket::JSON_REF);
+			d->SslCertId = j.Get(SslSocket::JSON_CERT);
 
-			MsgBuf.Print(" - %s: %s", host.Get(), msg.Get());
-			if (ref || cert)
-				MsgBuf.Print(" (%s, hasCert=%i)", ref.Get(), cert ? 1 : 0);
+			MsgBuf.Print(" - %s: %s", d->SslCertHost.Get(), msg.Get());
+			if (d->SslCertRef || d->SslCertId)
+				MsgBuf.Print(" (%s, hasCert=%i)", d->SslCertRef.Get(), d->SslCertId ? 1 : 0);
 
 			Actions.Add(new LVariant(LLoadString(IDS_ACCEPT_ONCE)));
 			Actions.Add(new LVariant(LLoadString(IDS_ACCEPT_ALWAYS)));
@@ -2152,14 +2152,17 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 	}
 	else if (!Stricmp(Action.Str(), LLoadString(IDS_ACCEPT_ONCE)))
 	{
-		
+		d->AllowCert(SslAcceptOnce);
+		SaveOptions();
 	}
 	else if (!Stricmp(Action.Str(), LLoadString(IDS_ACCEPT_ALWAYS)))
 	{
+		d->AllowCert(SslAcceptAlways);
+		SaveOptions();
 	}	
 	else LAssert(!"Unknown action.");
 	
-	return NULL;
+	return nullptr;
 }
 
 HttpImageThread *ScribeWnd::GetImageLoader()
@@ -11783,6 +11786,132 @@ void ScribeWnd::OnPropChange(LDataStoreI *store, int Prop, LVariantType Type)
 			break;
 		}
 	}
+}
+
+// This checks the certificate store to see if the user has selected to ALLOW 
+// a specific certificate for a host name.
+//
+// The code that writes to that store is:
+// - ScribeWnd::NeedsCapability
+// - ScribeWnd::StartAction
+// - ScribeWndPrivate::AllowCert
+bool ScribeWnd::AllowSslCert(const char *certHost, LArray<uint8_t> *certId)
+{
+	THREAD_SAFE();
+	
+	if (!certHost || !certId)
+	{
+		LAssert(!"Param error");
+		return false;
+	}
+	
+	// Get the options and lock the cert info tag:
+	if (!d->Options)
+	{
+		LgiTrace("%s:%i - no options loaded?\n", _FL);
+		LAssert(!"No options");
+		return false;
+	}
+	
+	auto certIdHex = LHex(LString((const char*)certId->AddressOf(), certId->Length()));
+	bool status = false;
+	if (auto certOpts = d->Options->LockTag(OPT_SavedCerts, _FL))
+	{
+		for (auto t: certOpts->Children)
+		{
+			if (!t->IsTag(OPT_Cert))
+				continue;
+			
+			auto host = t->GetAttr(OPT_Host);
+			if (Stricmp(host, certHost))
+				continue;
+			
+			if (auto id = t->GetContent())
+			{
+				if (certIdHex.Equals(id))
+				{
+					switch ((TSslAccept)t->GetAsInt(OPT_Accept))
+					{
+						case SslAcceptOnce:
+						{
+							// Delete the entry but return true:
+							if (t->RemoveTag())
+								delete t;
+							status = true;
+							break;
+						}
+						case SslAcceptAlways:
+						{
+							status = true;
+							break;
+						}
+						default:
+							break;
+					}
+				}
+			}
+			
+			if (status)
+				break;
+		}
+		
+		d->Options->Unlock();
+	}
+
+	return status;
+}
+
+// This stores a certificate in the options along with is host and acceptable level.
+bool ScribeWndPrivate::AllowCert(TSslAccept accept)
+{
+	THREAD_SAFE();
+	
+	auto certOpts = Options->LockTag(OPT_SavedCerts, _FL);
+	if (!certOpts)
+	{
+		Options->CreateTag(OPT_SavedCerts);
+		certOpts = Options->LockTag(OPT_SavedCerts, _FL);
+	}
+	if (!certOpts)
+	{
+		LAssert(0);
+		return false;
+	}
+
+	LXmlTag *certTag = nullptr;
+	
+	for (auto t: certOpts->Children)
+	{
+		if (!t->IsTag(OPT_Cert))
+			continue;
+		
+		auto host = t->GetAttr(OPT_Host);
+		if (Stricmp(host, SslCertHost.Get()))
+			continue;
+			
+		certTag = t;
+		break;
+	}
+	
+	if (!certTag)
+	{
+		// Create a new cert tag...
+		certTag = new LXmlTag(OPT_Cert);
+		certOpts->InsertTag(certTag);
+	}
+
+	bool status = certTag != nullptr;
+	if (status)
+	{
+		certTag->SetAttr(OPT_Accept, (int64_t)accept);
+		certTag->SetAttr(OPT_Host, SslCertHost);
+		certTag->SetContent(SslCertId);
+	}
+	else LAssert(0);
+
+	Options->Unlock();
+	
+	return status;
 }
 
 void ScribeWnd::SetContext(const char *file, int line)

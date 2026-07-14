@@ -122,7 +122,7 @@ public:
 	LString ErrSource; // Script file that has an error.
 	Filter *ErrFilter = NULL; // Filter that has scripting error.
 
-							  // Load state
+    // Load state
 	bool			FoldersLoaded = false;	
 
 	// Bayesian filter
@@ -146,6 +146,12 @@ public:
 
 	// Unit tests
 	LAutoPtr<LUnitTestServer> UnitTestServer;
+
+	// SSL certificate handling:
+	LString SslCertRef;
+	LString SslCertHost;
+	LString SslCertId; // fingerprint of the cert..
+	bool AllowCert(TSslAccept accept);
 
 	class ScribeTextControlFactory : public LViewFactory
 	{

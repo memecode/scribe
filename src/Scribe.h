@@ -2599,6 +2599,7 @@ public:
 	void OnPropChange(LDataStoreI *store, int Prop, LVariantType Type) override;
 	bool Match(LDataStoreI *store, LDataPropI *Addr, int Type, LArray<LDom*> &Matches) override;
 	ContactGroup *FindGroup(char *Name);
+	bool AllowSslCert(const char *Host, LArray<uint8_t> *certId) override;
 
 	bool AddStore3EventHandler(LDataEventsI *callback);
 	bool RemoveStore3EventHandler(LDataEventsI *callback);

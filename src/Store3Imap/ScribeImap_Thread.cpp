@@ -782,6 +782,14 @@ int ImapThread::Main()
 					{
 						s->UserRef.Printf("accountId=%i", d->AccountId);
 						s->SetSslOnConnect(SslDirect);
+						s->SetCertCallback([this](auto host, auto *data)
+							{
+								if (d->Store->Callback)
+									return d->Store->Callback->AllowSslCert(host, data);
+								
+								LgiTrace("%s:%i - no callback to handler certs.\n", _FL);
+								return false;
+							});
 					}
 				}
 				else

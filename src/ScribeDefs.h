@@ -4,15 +4,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Options
-#define OPT_UserName				"UserName"		//(char*)
+#define OPT_UserName				"UserName"			//(char*)
 #define OPT_IsPortableInstall		"IsPortable"		//(bool)
+#define OPT_SavedCerts				"SavedCerts"		//(LXmlTag*)
+#define OPT_Cert					"Cert"				//(LXmlTag*)
+#define OPT_Host					"Host"				//(char*)
+#define OPT_Accept					"Accept"			//(TSslAccept)
 
 #define OPT_AccountName				"AccName"			//(char*)
 #define OPT_AccountDisabled			"AccDisable"		//(char*)
 #define OPT_AccountUID				"AccId"				//(int)
 #define OPT_AccountExpanded			"AccExpand"			//(bool)
 
-#define OPT_Accounts				"Accounts"			// (LXmlTag*)
+#define OPT_Accounts				"Accounts"			//(LXmlTag*)
 
 #define OPT_AccIdentName			"Identity.Name"
 #define OPT_AccIdentEmail			"Identity.Email"
@@ -314,6 +318,13 @@ enum SribeResourceType
 	ResToolbarFile,
 	ResIconsFile,
 	ResMax,
+};
+
+enum TSslAccept
+{
+	SslReject,
+	SslAcceptOnce,
+	SslAcceptAlways,
 };
 
 // File names
