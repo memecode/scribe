@@ -8,7 +8,7 @@
 
 //////////////////////////////////////////////////////////////////////
 WebdavThread::WebdavThread(WebdavStore *src, WebdavFolder *fld, LString Url) :
-	LThread("RemoteCal.Thread"),
+	LThread("RemoteCal.Th"),
 	LMutex("RemoteCal.Mutex")
 {
 	Src = src;

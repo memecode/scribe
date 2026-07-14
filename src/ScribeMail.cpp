@@ -2135,7 +2135,7 @@ bool MailUi::NeedsCapability(const char *Name, const char *Param)
 
 	if (!InThread())
     {
-        PostEvent(M_NEEDS_CAP, (LMessage::Param)NewStr(Name));
+        PostEvent(M_NEEDS_CAP, (LMessage::Param)new LString(Name), (LMessage::Param)(Param?new LString(Param):NULL));
     }
     else
     {
@@ -3954,8 +3954,9 @@ LMessage::Result MailUi::OnEvent(LMessage *Msg)
 		}
 		case M_NEEDS_CAP:
 		{
-			LAutoString c((char*)Msg->A());
-			NeedsCapability(c);
+			auto cap = Msg->AutoA<LString>();
+			auto msg = Msg->AutoB<LString>();
+			NeedsCapability(cap?cap->Get():nullptr, msg?msg->Get():nullptr);
 			return 0;
 		}
 		case M_RESIZE_IMAGE:

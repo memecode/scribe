@@ -337,7 +337,7 @@ enum ScribeMessages
 	M_SCRIBE_SET_MSG_FLAG,		// (Mail*)MsgA(m), Flag = MsgB(m)
 	M_SCRIBE_ACC_ONLINE_UPDATE,
 	M_SCRIBE_BAYES_RESULT,
-	M_NEEDS_CAP,				// (char*)MsgA(m)
+	M_NEEDS_CAP,				// (LString*)MsgA(capability), (LString*)MsgB(userMessage)
 	M_UPDATE,
 	M_NEW_CONSOLE_MSG,
 	M_GNUPG_KEY_INFO,			// LAutoPtr< LArray<GpgConnector::KeyInfo> > Inf( (LArray<GpgConnector::KeyInfo>*) Msg->B() )

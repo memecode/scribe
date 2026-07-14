@@ -1196,6 +1196,8 @@
 #define IDC_1631								1631
 #define IDC_1632								1632
 #define IDS_OPEN_WEBSITE						1637
+#define IDS_ACCEPT_ONCE							1638
+#define IDS_ACCEPT_ALWAYS						1639
 #define IDS_MBOX_SELECT_FOLDER					2000
 #define IDS_MBOX_READING						2001
 #define IDS_MBOX_EXPORT							2002

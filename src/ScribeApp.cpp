@@ -1471,7 +1471,7 @@ bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 		#if DEBUG_CAPABILITIES
 		LgiTrace("%s:%i - Posting M_NEEDS_CAP\n", _FL);
 		#endif
-		PostEvent(M_NEEDS_CAP, (LMessage::Param)NewStr(Name), (LMessage::Param)NewStr(Param));
+		PostEvent(M_NEEDS_CAP, (LMessage::Param)new LString(Name), (LMessage::Param)(Param?new LString(Param):NULL));
 	}
 	else
 	{
@@ -1487,6 +1487,7 @@ bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 		}
 
 		d->MissingCaps.Add(Name, true);
+		LColour cBack;
 
 		LStringPipe MsgBuf(256);
 		int i = 0;
@@ -1519,6 +1520,14 @@ bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 		{
 			MsgBuf.Print(LLoadString(IDS_ERROR_NEED_INSTALL), Name);
 			Actions.Add(new LVariant(LLoadString(IDS_OPEN_WEBSITE)));
+		}
+		else if (stristr(Name, "SslCertError"))
+		{
+			if (Param)
+				MsgBuf.Print(" - %s", Param);
+			Actions.Add(new LVariant(LLoadString(IDS_ACCEPT_ONCE)));
+			Actions.Add(new LVariant(LLoadString(IDS_ACCEPT_ALWAYS)));
+			cBack = LColour::Orange;
 		}
 		Actions.Add(new LVariant(LLoadString(IDS_OK)));
 		
@@ -1567,7 +1576,7 @@ bool ScribeWnd::NeedsCapability(const char *Name, const char *Param)
 				for (auto v : *Actions.Value.Lst)
 					Act.Add(v->Str());
 				
-				d->Bar = new MissingCapsBar(this, &d->MissingCaps, Msg, this, Act);
+				d->Bar = new MissingCapsBar(this, &d->MissingCaps, Msg, this, Act, cBack ? &cBack : nullptr);
 				AddView(d->Bar, 2);
 				AttachChildren();
 				OnPosChange();
@@ -2042,19 +2051,19 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 		}
 	}
 
-	if (!_stricmp(Action.Str(), LLoadString(IDS_OK)))
+	if (!Stricmp(Action.Str(), LLoadString(IDS_OK)))
 	{
 		// Do nothing
 		d->MissingCaps.Empty();
 	}
-	else if (!_stricmp(Action.Str(), LLoadString(IDS_DONT_SHOW_AGAIN)))
+	else if (!Stricmp(Action.Str(), LLoadString(IDS_DONT_SHOW_AGAIN)))
 	{
 		// Turn off registering as a client.
 		LVariant No(false);
 		GetOptions()->SetValue(OPT_RegisterWindowsClient, No);
 		GetOptions()->SetValue(OPT_CheckDefaultEmail, No);
 	}
-	else if (!_stricmp(Action.Str(), LLoadString(IDS_OPEN_WEBSITE)))
+	else if (!Stricmp(Action.Str(), LLoadString(IDS_OPEN_WEBSITE)))
 	{
 		for (auto c: *Components)
 		{
@@ -2062,7 +2071,7 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 				LExecute("https://github.com/FiloSottile/mkcert");
 		}
 	}
-	else if (!_stricmp(Action.Str(), LLoadString(IDS_INSTALL)))
+	else if (!Stricmp(Action.Str(), LLoadString(IDS_INSTALL)))
 	{
 		#ifdef WINDOWS
 		bool IsSsl = false;
@@ -2097,11 +2106,11 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 
 		return CapabilityInstaller::StartAction(Bar, Components, Action.Str());
 	}
-	else if (!_stricmp(Action.Str(), LLoadString(IDS_SHOW_CONSOLE)))
+	else if (!Stricmp(Action.Str(), LLoadString(IDS_SHOW_CONSOLE)))
 	{
 		ShowScriptingConsole();
 	}
-	else if (!_stricmp(Action.Str(), LLoadString(IDS_OPEN_SOURCE)))
+	else if (!Stricmp(Action.Str(), LLoadString(IDS_OPEN_SOURCE)))
 	{
 		if (d->ErrSource)
 			LExecute(d->ErrSource);
@@ -2133,6 +2142,13 @@ InstallProgress *ScribeWnd::StartAction(MissingCapsBar *Bar, LCapabilityTarget::
 		else
 			LgiTrace("%s:%i - No spell thread.\n", _FL);
 	}
+	else if (!Stricmp(Action.Str(), LLoadString(IDS_ACCEPT_ONCE)))
+	{
+		
+	}
+	else if (!Stricmp(Action.Str(), LLoadString(IDS_ACCEPT_ALWAYS)))
+	{
+	}	
 	else LAssert(!"Unknown action.");
 	
 	return NULL;
@@ -6148,9 +6164,9 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 		}
 		case M_NEEDS_CAP:
 		{
-			auto c = Msg->AutoA<char, true>();
-			auto param = Msg->AutoB<char, true>();
-			NeedsCapability(c, param);
+			auto cap = Msg->AutoA<LString>();
+			auto param = Msg->AutoB<LString>();
+			NeedsCapability(cap?cap->Get():nullptr, param?param->Get():nullptr);
 			return 0;
 			break;
 		}

@@ -57,11 +57,11 @@ class MissingCapsBar : public LLayout
 {
 	struct MissingCapsBarPriv *d;
 
-    CapabilityInstaller *Installer = NULL;
-    LCapabilityTarget::CapsHash *Caps = NULL;
-    LProgressView *ProgCtrl = NULL;
-    InstallProgress *Progress = NULL;
-    LCapabilityTarget *Owner = NULL;
+    CapabilityInstaller *Installer = nullptr;
+    LCapabilityTarget::CapsHash *Caps = nullptr;
+    LProgressView *ProgCtrl = nullptr;
+    InstallProgress *Progress = nullptr;
+    LCapabilityTarget *Owner = nullptr;
 
     LArray<LButton*> Btns;
     LArray<LString> Actions;
