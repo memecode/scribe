@@ -85,7 +85,7 @@ LanguageDlg::LanguageDlg(ScribeWnd *app)
 	LResources *Res = LgiGetResObj(false, NULL, false);
 	if (Res)
 	{
-		char *File = Res->GetFileName();
+		auto File = Res->GetFileName();
 		if (File)
 		{
 			LFile f;
