@@ -480,7 +480,7 @@ ScribeWnd *Accountlet::GetApp()
 
 LSocketI *Accountlet::CreateSocket(bool Sending, LCapabilityClient *Caps, bool RawLFCheck)
 {
-	LSocketI *Socket = 0;
+	LSocketI *Socket = nullptr;
 	LVariant File;
 	LVariant Socks5Proxy;
 	LVariant UseSocks;
@@ -492,6 +492,7 @@ LSocketI *Accountlet::CreateSocket(bool Sending, LCapabilityClient *Caps, bool R
 	int SslMode = UseSSL();
 	if (SslMode > 0)
 	{
+		LAssert(Caps);
 		Socket = new SslSocket(this, Caps, SslMode == SSL_DIRECT, RawLFCheck);
 	}
 	else if (	GetApp()->GetOptions()->GetValue(OPT_UseSocks, UseSocks) &&
@@ -576,7 +577,7 @@ ssize_t Accountlet::Write(const void *buf, ssize_t size, int flags)
 	if (!Account->GetApp())
 		return 0;
 
-	LColour col = SocketMsgTypeToColour((LSocketI::SocketMsgType)flags);
+	auto col = SocketMsgTypeToColour((LSocketI::SocketMsgType)flags);
 	I Lck = Lock(_FL);
 	if (Lck)
 	{
