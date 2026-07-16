@@ -49,6 +49,7 @@
 #include "lgi/common/Charset.h"
 #include "lgi/common/RefCount.h"
 #include "lgi/common/PopupNotification.h"
+#include "lgi/common/Base64.h"
 
 #include "ScribePrivate.h"
 #include "PreviewPanel.h"

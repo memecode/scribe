@@ -41,6 +41,7 @@
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/Printer.h"
 #include "lgi/common/SubProcess.h"
+#include "lgi/common/Base64.h"
 
 #include "../src/common/Coding/ScriptingPriv.h"
 #include "PrintPreview.h"

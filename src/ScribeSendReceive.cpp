@@ -1863,6 +1863,15 @@ if (DebugTrace) LgiTrace("Receive(%i) starting, %i\n", Account->GetIndex(), Time
 				return;
 			}
 		}
+
+		if (Client)
+		{
+			// Map the allow ssl cert callback through to the app instance:
+			Client->sslCertCallback = [this](auto certHost, auto certId)
+				{
+					return GetApp()->AllowSslCert(certHost, certId);
+				};
+		}
 	}
 
 if (DebugTrace) LgiTrace("Receive(%i) protocol=%i client=%p, time=%i\n", Account->GetIndex(), MailSourceType, Client, TimeDelta());

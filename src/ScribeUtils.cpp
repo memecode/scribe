@@ -9,6 +9,7 @@
 #include "lgi/common/OpenSSLSocket.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/Json.h"
+#include "lgi/common/Base64.h"
 
 #include "ScribeUtils.h"
 #include "ScribeDefs.h"
