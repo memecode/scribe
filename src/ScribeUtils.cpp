@@ -466,11 +466,11 @@ HttpImageThread::~HttpImageThread()
 
 void HttpImageThread::DoJob(LThreadJob *j)
 {
-	LDocumentEnv::LoadJob *Job = dynamic_cast<LDocumentEnv::LoadJob*>(j);
+	auto Job = dynamic_cast<LDocumentEnv::LoadJob*>(j);
 	if (!Job)
 		return;
 
-	char *d = strrchr(Job->Uri, '/');
+	auto d = strrchr(Job->Uri, '/');
 	if (!d)
 	{
 		Job->Status = LDocumentEnv::LoadJob::JobErr_Uri;
@@ -512,7 +512,21 @@ void HttpImageThread::DoJob(LThreadJob *j)
 		if (f.Open(CachedFile, O_READWRITE))
 		{
 			LUri Prox(Proxy);			
-			bool r = LGetUri(this, &f, &Job->Error, Job->Uri, InHeaders, Proxy ? &Prox : NULL);
+			bool r = LGetUri(this,
+							&f,
+							&Job->Error,
+							Job->Uri,
+							InHeaders,
+							Proxy ? &Prox : nullptr
+							#if 0
+							, [this](auto host, auto certId)
+							{
+								if (!App)
+									return false;
+								return App->AllowSslCert(host, certId);
+							}
+							#endif
+						);
 			f.Close();
 			if (!r)
 			{
@@ -2034,7 +2048,19 @@ ScriptDownloadContentThread::ScriptDownloadContentThread(ScribeWnd *app, LString
 
 int ScriptDownloadContentThread::Main()
 {
-	bool Result = LGetUri(this, &Out, &Err, Uri);
+	bool Result = LGetUri(	this,
+							&Out,
+							&Err,
+							Uri,
+							nullptr
+							#if 0
+							, nullptr
+							, [this](auto host, auto certId)
+							{
+								return App->AllowSslCert(host, certId);
+							}
+							#endif
+						);
 
 	App->RunCallback([this, Result]()
 		{
