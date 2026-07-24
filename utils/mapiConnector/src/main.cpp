@@ -3,6 +3,7 @@
 #include "lgi/common/Store3.h"
 #include "lgi/common/Net.h"
 #include "lgi/common/Json.h"
+#include "lgi/common/Base64.h"
 #include "../common/StringClass.h"
 
 const char *appName = "mapiConnector";
