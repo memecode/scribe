@@ -810,6 +810,7 @@ class LMapiStore : public LDataStoreI, public LLibrary
 	// LMapiAdviseSink *Notify = nullptr;
 	LString::Array availableProfiles;
 	bool MapiInitialized = false;
+	LStream *Log = nullptr;
 
 	LPMAPISESSION				Session = nullptr;
 	IMsgStore					*MsgStore = nullptr;
@@ -827,18 +828,22 @@ class LMapiStore : public LDataStoreI, public LLibrary
 	IConverterSession *CreateConverterSession();
 	
 public:
+	enum TLogMsg { LogMsg, LogErr };
+
 	LMapiStore(	const char *Server,
 				const char *Username,
 				const char *Password,
 				uint64 accountId,
-				LDataEventsI *callback);
+				LDataEventsI *callback,
+				LStream *log);
 	~LMapiStore();
 
 	const char* GetClass() override { return "LMapiStore"; }
+	void LOG(const char *Fmt, ...);
+	bool ERR(const char *Fmt, ...);
 
 	// Util
 	IMsgStore *Handle() { return MsgStore; }
-	bool Error(const char *Fmt, ...);
 	ULONG OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications);
 
 	// MAPI API

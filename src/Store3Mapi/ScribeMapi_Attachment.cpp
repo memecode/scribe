@@ -28,7 +28,7 @@ LPATTACH LMapiAttachment::Handle()
 	{
 		HRESULT res = Mail->Handle()->OpenAttach(AttachNum, NULL, MAPI_BEST_ACCESS, &MapiAttach);
 		if (FAILED(res))
-				Kit->Error("%s:%i - OpenAttach failed with 0x%x\n", _FL, res);
+				Kit->ERR("%s:%i - OpenAttach failed with 0x%x\n", _FL, res);
 	}
 	
 	return MapiAttach;

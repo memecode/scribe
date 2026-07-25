@@ -242,7 +242,7 @@ LPMAPIFOLDER LMapiFolder::Handle()
 
 			if (FAILED(res) || !MapiFolder)
 			{
-				Store->Error("%s:%i - OpenEntry failed with 0x%x\n", _FL, res);
+				Store->ERR("%s:%i - OpenEntry failed with 0x%x\n", _FL, res);
 			}
 		}
 		else LAssert(!"No parent MAPI folders.");
@@ -466,7 +466,7 @@ LDataIterator<LDataFolderI*> &LMapiFolder::SubFolders()
 				}
 			}			
 		}
-		else Store->Error("%s:%i - GetHierarchyTable failed with %x\n", _FL, res);
+		else Store->ERR("%s:%i - GetHierarchyTable failed with %x\n", _FL, res);
 
 		Sub.State = Store3Loaded;
 	}
@@ -501,7 +501,7 @@ LDataIterator<LDataI*> &LMapiFolder::Children()
 				else LAssert("store couldn't create object?");
 			}
 		}
-		else Store->Error("%s:%i - GetContentsTable failed with %x\n", _FL, res);
+		else Store->ERR("%s:%i - GetContentsTable failed with %x\n", _FL, res);
 
 		Items.State = Store3Loaded;
 	}

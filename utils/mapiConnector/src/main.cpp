@@ -1,10 +1,10 @@
 #include "lgi/common/Lgi.h"
 #include "lgi/common/Thread.h"
-#include "lgi/common/Store3.h"
 #include "lgi/common/Net.h"
-#include "lgi/common/Json.h"
 #include "lgi/common/Base64.h"
+
 #include "../common/StringClass.h"
+#include "smtpServer.h"
 
 const char *appName = "mapiConnector";
 
@@ -15,590 +15,554 @@ struct PrintLog : public LStream
 		printf("%.*s", (int)Size, (const char*)Ptr);
 		return Size;
 	}
-};
+}	mainLog;
 
-struct FolderMeta
+FolderMeta::FolderMeta(LString fullPath, LStream *logger) :
+	log(logger),
+	path(fullPath),
+	uidMap(0, INVALID)
 {
-	LStream *log = nullptr;
+}
 
-	// Storage:
-	LString path;
-	bool dirty = false;
-
-	// Map the message ID's to UID's
-	constexpr static int INVALID = -1;
-	int nextUid = 0;
-	LHashTbl<ConstStrKey<char>, int> uidMap;
-
-	FolderMeta(LString fullPath, LStream *logger) :
-		log(logger),
-		path(fullPath),
-		uidMap(0, INVALID)
-	{
-	}
-
-	~FolderMeta()
-	{
-		save();
-	}
-
-	void save()
-	{
-		if (dirty)
-		{
-			if (serialize(true))
-				dirty = false;
-		}
-	}
-
-	bool serialize(bool write)
-	{
-		LFile f(path, write ? O_WRITE : O_READ);
-		if (write)
-		{
-			for (auto p: uidMap)
-				f.Print("uid,%s,%i\n", p.key, p.value);
-			log->Print("Wrote %i msg->uid maps to '%s'\n", (int)uidMap.Length(), path.Get());
-		}
-		else
-		{
-			uidMap.Empty();
-			nextUid = 0;
-
-			if (!f)
-				return false;
-
-			auto lines = f.Read().SplitDelimit("\n");
-			for (auto &l: lines)
-			{
-				auto p = l.SplitDelimit(",");
-				if (p[0].Equals("uid"))
-				{
-					if (p.Length() == 3)
-					{
-						auto uid = (int)p[2].Int();
-						uidMap.Add(p[1], uid);
-						nextUid = MAX(uid, nextUid);
-					}
-					else LAssert(!"invalid token count");
-				}
-			}
-
-			log->Print("Read %i msg->uid maps from '%s'\n", (int)uidMap.Length(), path.Get());
-		}
-		return true;
-	}
-
-	int getUid(const char *msgId)
-	{
-		auto uid = uidMap.Find(msgId);
-		if (uid == INVALID)
-		{
-			uid = ++nextUid;
-			uidMap.Add(msgId, uid);
-			dirty = true;
-		}
-		return uid;
-	}
-};
-
-struct Context
+FolderMeta::~FolderMeta()
 {
-	constexpr static const char *OptMapiProfile = "profile";
-	constexpr static const char *OptMapiUser = "mapiUser";
+	save();
+}
 
-	constexpr static const char *OptImapUser = "imapUser";
-	constexpr static const char *OptImapPass = "imapPass";
-	constexpr static const char *OptImapPort = "imapPort";
-
-	LJson options;
-	LString optionsPath;
-	const char *sep = ".";
-	LAutoPtr<LDataStoreI> store;
-	PrintLog log;
-	LDataFolderI *root = nullptr;
-	LHashTbl<PtrKey<LDataFolderI*>, FolderMeta*> folderMetaData;
-
-	LString fullPath(LDataFolderI *f)
+void FolderMeta::save()
+{
+	if (dirty)
 	{
-		LString::Array p;
-		while (f)
-		{
-			p.Add(f->GetStr(FIELD_FOLDER_NAME));
-			f = dynamic_cast<LDataFolderI*>(f->GetObj(FIELD_PARENT));
-		}
-		return LString(sep).Join(p.Reverse().Slice(1, -1)) + ".csv";
+		if (serialize(true))
+			dirty = false;
 	}
+}
 
-	FolderMeta *getMeta(LDataFolderI *f)
+bool FolderMeta::serialize(bool write)
+{
+	LFile f(path, write ? O_WRITE : O_READ);
+	if (write)
 	{
+		for (auto p: uidMap)
+			f.Print("uid,%s,%i\n", p.key, p.value);
+		log->Print("Wrote %i msg->uid maps to '%s'\n", (int)uidMap.Length(), path.Get());
+	}
+	else
+	{
+		uidMap.Empty();
+		nextUid = 0;
+
 		if (!f)
-			return nullptr;
-		auto m = folderMetaData.Find(f);
-		if (m)
-			return m;
-
-		LFile::Path inst(LSP_APP_INSTALL);
-		auto full = fullPath(f);
-		LAssert(full);
-
-		m = new FolderMeta((inst / full).GetFull(), &log);
-		m->serialize(false);
-		folderMetaData.Add(f, m);
-
-		return m;
-	}
-
-	Context()
-	{
-		LFile::Path p(LSP_APP_INSTALL);
-		optionsPath = p / "options.json";
-		if (LFileExists(optionsPath))
-			options.SetJson(LReadFile(optionsPath));
-		validateOptions();
-	}
-
-	~Context()
-	{
-	}
-
-	bool saveOptions()
-	{
-		LFile out(optionsPath, O_WRITE);
-		if (out)
-			out.Write(options.GetJson());
-		else
 			return false;
-		return true;
-	}
 
-	bool validateOptions()
-	{
-		bool modified = false;
-		auto chkOpt = [&](const char *name, const char *defVal) {
-			if (!options.Get(name))
-			{
-				options.Set(name, defVal);
-				modified = true;
-			}
-		};
-
-		chkOpt(OptMapiProfile, "Outlook");
-		chkOpt(OptMapiUser, "----");
-
-		chkOpt(OptImapUser, "----");
-		chkOpt(OptImapPass, "----");
-		chkOpt(OptImapPort, LString::Fmt("%i", IMAP_PORT));
-
-		if (modified)
-			saveOptions();
-		return false;
-	}
-
-	LDataFolderI *GetFolder(LString path)
-	{
-		auto parts = path.SplitDelimit(sep);
-		LDataFolderI *f = root;
-		for (auto &p: parts)
+		auto lines = f.Read().SplitDelimit("\n");
+		for (auto &l: lines)
 		{
-			// find 'p' in the children of 'f'
-			LDataFolderI *match = nullptr;
-			auto &it = f->SubFolders();
-			if (it.GetState() != Store3Loaded)
-				continue;
-			for (auto c = it.First(); c; c = it.Next())
+			auto p = l.SplitDelimit(",");
+			if (p[0].Equals("uid"))
 			{
-				if (auto cFolder = dynamic_cast<LDataFolderI*>(c))
+				if (p.Length() == 3)
 				{
-					auto name = cFolder->GetStr(FIELD_FOLDER_NAME);
-					if (p.Equals(name))
-					{
-						match = cFolder;
-						break;
-					}
+					auto uid = (int)p[2].Int();
+					uidMap.Add(p[1], uid);
+					nextUid = MAX(uid, nextUid);
 				}
+				else LAssert(!"invalid token count");
 			}
-			if (match)
-				f = match;
-			else
-				return nullptr;
 		}
 
-		return f;
+		log->Print("Read %i msg->uid maps from '%s'\n", (int)uidMap.Length(), path.Get());
 	}
+	return true;
+}
 
-	struct FolderInfo {
-		LDataFolderI *folder = nullptr;
-		LString name;
-		LString::Array full;
-		int subFolders = 0;
-		int depth = 0;
+int FolderMeta::getUid(const char *msgId)
+{
+	auto uid = uidMap.Find(msgId);
+	if (uid == INVALID)
+	{
+		uid = ++nextUid;
+		uidMap.Add(msgId, uid);
+		dirty = true;
+	}
+	return uid;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+LString Context::fullPath(LDataFolderI *f)
+{
+	LString::Array p;
+	while (f)
+	{
+		p.Add(f->GetStr(FIELD_FOLDER_NAME));
+		f = dynamic_cast<LDataFolderI*>(f->GetObj(FIELD_PARENT));
+	}
+	return LString(sep).Join(p.Reverse().Slice(1, -1)) + ".csv";
+}
+
+FolderMeta *Context::getMeta(LDataFolderI *f)
+{
+	if (!f)
+		return nullptr;
+	auto m = folderMetaData.Find(f);
+	if (m)
+		return m;
+
+	LFile::Path inst(LSP_APP_INSTALL);
+	auto full = fullPath(f);
+	LAssert(full);
+
+	m = new FolderMeta((inst / full).GetFull(), &log);
+	m->serialize(false);
+	folderMetaData.Add(f, m);
+
+	return m;
+}
+
+Context::Context()
+	: log(mainLog)
+{
+	LFile::Path p(LSP_APP_INSTALL);
+	optionsPath = p / "options.json";
+	if (LFileExists(optionsPath))
+		options.SetJson(LReadFile(optionsPath));
+	validateOptions();
+}
+
+Context::~Context()
+{
+}
+
+bool Context::saveOptions()
+{
+	LFile out(optionsPath, O_WRITE);
+	if (out)
+		out.Write(options.GetJson());
+	else
+		return false;
+	return true;
+}
+
+bool Context::validateOptions()
+{
+	bool modified = false;
+	auto chkOpt = [&](const char *name, const char *defVal) {
+		if (!options.Get(name))
+		{
+			options.Set(name, defVal);
+			modified = true;
+		}
 	};
 
-	void ForAllFolders(LArray<FolderInfo> &info, LDataFolderI *f, LString::Array path, int depth = 0)
-	{
-		LAssert(path.Length() == depth);
+	chkOpt(OptMapiProfile, "Outlook");
+	chkOpt(OptMapiUser, "----");
 
-		size_t idx = info.Length();
-		{
-			auto &i = info.New();
-			i.folder = f;
-			i.name = f->GetStr(FIELD_FOLDER_NAME);
-			i.full = path;
-			i.full.Add(i.name);
-			i.depth = depth;
-		}
-		
+	chkOpt(OptImapUser, "----");
+	chkOpt(OptImapPass, "----");
+	chkOpt(OptImapPort, LString::Fmt("%i", IMAP_PORT));
+
+	chkOpt(OptSmtpPort, LString::Fmt("%i", SMTP_PORT));
+
+	if (modified)
+		saveOptions();
+	return false;
+}
+
+LDataFolderI *Context::GetFolder(LString path)
+{
+	auto parts = path.SplitDelimit(sep);
+	LDataFolderI *f = root;
+	for (auto &p: parts)
+	{
+		// find 'p' in the children of 'f'
+		LDataFolderI *match = nullptr;
 		auto &it = f->SubFolders();
-		if (it.GetState() == Store3Loaded)
-			for (auto c = it.First(); c; c = it.Next())
+		if (it.GetState() != Store3Loaded)
+			continue;
+		for (auto c = it.First(); c; c = it.Next())
+		{
+			if (auto cFolder = dynamic_cast<LDataFolderI*>(c))
 			{
-				if (auto cFolder = dynamic_cast<LDataFolderI*>(c))
+				auto name = cFolder->GetStr(FIELD_FOLDER_NAME);
+				if (p.Equals(name))
 				{
-					auto &i = info[idx];
-					ForAllFolders(info, cFolder, i.full, depth + 1);
-					i.subFolders++;
+					match = cFolder;
+					break;
 				}
 			}
-	}
-
-	void SegToStructure(LStringPipe &p, LDataPropI *seg, int depth = 0)
-	{
-		if (!seg)
-			return;
-		auto children = seg->GetList(FIELD_MIME_SEG);
-		bool hasChild = children->Length() > 0;
-
-		if (hasChild || depth == 0)
-			p.Print("(");
-
-		for (auto child = children->First(); child; child = children->Next())
-		{
-			SegToStructure(p, child, depth + 1);
-			p.Print(" ");
 		}
-
-		auto mimeType = seg->GetStr(FIELD_MIME_TYPE);
-		auto mimeParts = LString(mimeType).SplitDelimit("/");
-		auto multi = mimeParts[0].Equals("multipart");
-		if (multi)
-		{
-			LString hdrs = seg->GetStr(FIELD_INTERNET_HEADER);
-			auto contentType = LGetHeaderField(hdrs, "Content-Type");
-			auto boundary = LGetSubField(contentType, "boundary");
-
-			p.Print("\"%s\" (\"boundary\" \"%s\")  NIL NIL NIL", mimeParts[1].Get(), boundary.Get());
-		}
-		else // single
-		{
-			p.Print("(\"%s\" \"%s\"", mimeParts[0].Get(), mimeParts[1].Get());
-
-			// figure out what fields to print
-			LString::Array fields;
-			if (auto charSet = seg->GetStr(FIELD_CHARSET))
-				fields.New().Printf("\"charset\" \"%s\"", charSet);
-			if (auto name = seg->GetStr(FIELD_NAME))
-				fields.New().Printf("\"name\" \"%s\"", name);
-
-			if (fields.Length())
-				p.Print(" (%s)", LString(" ").Join(fields).Get());
-			else
-				p.Print(" NIL");
-
-			if (auto contentId = seg->GetStr(FIELD_CONTENT_ID))
-				p.Print(" \"%s\"", contentId);
-			else
-				p.Print(" NIL");
-
-			p.Print(" NIL"); // Content description
-
-			// FIXME:
-			p.Print(" NIL"); // Content-Transfer-Encoding
-
-			auto size = seg->GetInt(FIELD_SIZE);
-			p.Print(" " LPrintfSizeT ")", size);
-		}
-
-		if (hasChild || depth == 0)
-			p.Print(")");
-	}
-
-	LString BodyStructure(LDataI *mail)
-	{
-		LStringPipe p;
-		
-		if (auto root = mail->GetObj(FIELD_MIME_SEG))
-			SegToStructure(p, root);
+		if (match)
+			f = match;
 		else
-			LAssert(!"no seg?");
-
-		return p.NewLStr();
+			return nullptr;
 	}
 
-	LArray<FolderInfo> FolderList()
+	return f;
+}
+
+void Context::ForAllFolders(LArray<FolderInfo> &info, LDataFolderI *f, LString::Array path, int depth)
+{
+	LAssert(path.Length() == depth);
+
+	size_t idx = info.Length();
 	{
-		LArray<FolderInfo> a;
-		LString::Array full;
-		if (root)
-			ForAllFolders(a, root, full);
-		return a;
+		auto &i = info.New();
+		i.folder = f;
+		i.name = f->GetStr(FIELD_FOLDER_NAME);
+		i.full = path;
+		i.full.Add(i.name);
+		i.depth = depth;
 	}
-
-	LString::Array Fetch(LDataFolderI *folder, bool isUid, LString arg, LString fieldSpec)
-	{
-		auto argRange = arg.SplitDelimit(":");
-		LString::Array a;
-		if (!folder)
+		
+	auto &it = f->SubFolders();
+	if (it.GetState() == Store3Loaded)
+		for (auto c = it.First(); c; c = it.Next())
 		{
-			log.Print("%s:%i - error: no folder.\n", _FL);
-			return a;
-		}
-
-		auto meta = getMeta(folder);
-		if (!meta)
-		{
-			log.Print("%s:%i - error: no meta.\n", _FL);
-			return a;
-		}
-
-		LAssert(isUid); // don't support not UID yet...
-
-		int maxUid = 0;
-		auto fields = fieldSpec.Strip("()").SplitDelimit();
-		auto &it = folder->Children();
-		for (auto i = it.First(); i; i = it.Next())
-		{
-			if (i->Type() != MAGIC_MAIL)
-				continue;
-
-			if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
+			if (auto cFolder = dynamic_cast<LDataFolderI*>(c))
 			{
-				auto uid = meta->getUid(msgId);
-				maxUid = MAX(maxUid, uid);
-
-				if (uid != FolderMeta::INVALID)
-				{
-					// is the UID in range?
-					bool match = false;
-					if (argRange.Length() == 2)
-					{
-						match = (argRange[0].Equals("*") || uid >= argRange[0].Int())
-								&&
-								(argRange[1].Equals("*") || uid <= argRange[1].Int());
-					}
-					else if (argRange.Length() == 1)
-					{
-						match = argRange[0].Int() == uid;
-					}
-					else LAssert(!"unexpected arg range count");
-
-					if (!match)
-						continue;
-
-					// Create a result record...
-					LStringPipe record;
-					record.Print("* %i FETCH (", uid);
-
-					int idx = 0;
-					for (auto &fld: fields)
-					{
-						auto space = idx++ ? " " : "";
-						if (fld.Equals("FLAGS"))
-						{
-							auto flags = i->GetInt(FIELD_FLAGS);
-							LString::Array imapFlags;
-							if (flags & MAIL_READ)
-								imapFlags.Add("/Seen");
-							record.Print("%sFLAGS (%s)", space, LString(" ").Join(imapFlags).Get());
-						}
-						else if (fld.Equals("UID"))
-						{
-							record.Print("%sUID %i", space, uid);
-						}
-						else if (fld.Equals("RFC822.SIZE"))
-						{
-							auto sz = i->GetInt(FIELD_SIZE);
-							record.Print("%sRFC822.SIZE " LPrintfInt64, space, sz);
-						}
-						else if (fld.Equals("BODYSTRUCTURE"))
-						{
-							// FIXME
-							record.Print("%sBODYSTRUCTURE %s", space, BodyStructure(i).Get());
-						}
-						else if (fld.Equals("BODY.PEEK[HEADER]"))
-						{
-							auto inetHdr = i->GetStr(FIELD_INTERNET_HEADER);
-							auto len = Strlen(inetHdr);
-							record.Print("%sBODY.PEEK[HEADER] {" LPrintfInt64 "}\r\n%s", space, len, inetHdr);
-						}
-						else if (fld.Equals("BODY.PEEK[]"))
-						{
-							if (auto rfc822 = i->GetStream(_FL))
-							{
-								auto len = rfc822->GetSize();
-								record.Print("%sBODY[] {" LPrintfInt64 "}\r\n", space, len);
-								LCopyStreamer copy;
-								copy.Copy(rfc822, &record);
-							}
-							else
-								LAssert(0);
-						}
-						else
-						{
-							LAssert(!"not implemented");
-						}
-					}
-
-					record.Print(")\r\n");
-					a.Add(record.NewLStr());
-				}
+				auto &i = info[idx];
+				ForAllFolders(info, cFolder, i.full, depth + 1);
+				i.subFolders++;
 			}
 		}
+}
 
-		meta->save();
+void Context::SegToStructure(LStringPipe &p, LDataPropI *seg, int depth)
+{
+	if (!seg)
+		return;
+	auto children = seg->GetList(FIELD_MIME_SEG);
+	bool hasChild = children->Length() > 0;
 
-		if (a.Length() == 0)
-		{
-			log.Print("Warn: fetched no records '%s', '%s', maxUid=%i\n",
-				arg.Get(),
-				fieldSpec.Get(),
-				maxUid);
-		}
+	if (hasChild || depth == 0)
+		p.Print("(");
 
+	for (auto child = children->First(); child; child = children->Next())
+	{
+		SegToStructure(p, child, depth + 1);
+		p.Print(" ");
+	}
+
+	auto mimeType = seg->GetStr(FIELD_MIME_TYPE);
+	auto mimeParts = LString(mimeType).SplitDelimit("/");
+	auto multi = mimeParts[0].Equals("multipart");
+	if (multi)
+	{
+		LString hdrs = seg->GetStr(FIELD_INTERNET_HEADER);
+		auto contentType = LGetHeaderField(hdrs, "Content-Type");
+		auto boundary = LGetSubField(contentType, "boundary");
+
+		p.Print("\"%s\" (\"boundary\" \"%s\")  NIL NIL NIL", mimeParts[1].Get(), boundary.Get());
+	}
+	else // single
+	{
+		p.Print("(\"%s\" \"%s\"", mimeParts[0].Get(), mimeParts[1].Get());
+
+		// figure out what fields to print
+		LString::Array fields;
+		if (auto charSet = seg->GetStr(FIELD_CHARSET))
+			fields.New().Printf("\"charset\" \"%s\"", charSet);
+		if (auto name = seg->GetStr(FIELD_NAME))
+			fields.New().Printf("\"name\" \"%s\"", name);
+
+		if (fields.Length())
+			p.Print(" (%s)", LString(" ").Join(fields).Get());
+		else
+			p.Print(" NIL");
+
+		if (auto contentId = seg->GetStr(FIELD_CONTENT_ID))
+			p.Print(" \"%s\"", contentId);
+		else
+			p.Print(" NIL");
+
+		p.Print(" NIL"); // Content description
+
+		// FIXME:
+		p.Print(" NIL"); // Content-Transfer-Encoding
+
+		auto size = seg->GetInt(FIELD_SIZE);
+		p.Print(" " LPrintfSizeT ")", size);
+	}
+
+	if (hasChild || depth == 0)
+		p.Print(")");
+}
+
+LString Context::BodyStructure(LDataI *mail)
+{
+	LStringPipe p;
+		
+	if (auto root = mail->GetObj(FIELD_MIME_SEG))
+		SegToStructure(p, root);
+	else
+		LAssert(!"no seg?");
+
+	return p.NewLStr();
+}
+
+LArray<Context::FolderInfo> Context::FolderList()
+{
+	LArray<FolderInfo> a;
+	LString::Array full;
+	if (root)
+		ForAllFolders(a, root, full);
+	return a;
+}
+
+LString::Array Context::Fetch(LDataFolderI *folder, bool isUid, LString arg, LString fieldSpec)
+{
+	auto argRange = arg.SplitDelimit(":");
+	LString::Array a;
+	if (!folder)
+	{
+		log.Print("%s:%i - error: no folder.\n", _FL);
 		return a;
 	}
 
-	// e.g. A0861 UID STORE 875 FLAGS (\seen)
-	LString::Array Store(LDataFolderI *folder, bool isUid, LArray<LString> params)
+	auto meta = getMeta(folder);
+	if (!meta)
 	{
-		LString::Array a;
-		if (!folder)
+		log.Print("%s:%i - error: no meta.\n", _FL);
+		return a;
+	}
+
+	LAssert(isUid); // don't support not UID yet...
+
+	int maxUid = 0;
+	auto fields = fieldSpec.Strip("()").SplitDelimit();
+	auto &it = folder->Children();
+	for (auto i = it.First(); i; i = it.Next())
+	{
+		if (i->Type() != MAGIC_MAIL)
+			continue;
+
+		if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
 		{
-			log.Print("%s:%i - error: no folder.\n", _FL);
-			return a;
-		}
+			auto uid = meta->getUid(msgId);
+			maxUid = MAX(maxUid, uid);
 
-		auto meta = getMeta(folder);
-		if (!meta)
-		{
-			log.Print("%s:%i - error: no meta.\n", _FL);
-			return a;
-		}
-
-		LAssert(isUid); // don't support not UID yet...
-
-		if (params.Length() != 3)
-		{
-			log.Print("%s:%i - error: unexpected arg count: %s.\n",
-				_FL, LString(",").Join(params).Get());
-			return a;
-		}
-
-		auto storeUids = params[0].SplitDelimit(",");
-		auto &storeField = params[1];
-		auto &storeValue = params[2];
-
-		auto &it = folder->Children();
-		for (auto i = it.First(); i; i = it.Next())
-		{
-			if (i->Type() != MAGIC_MAIL)
-				continue;
-
-			if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
+			if (uid != FolderMeta::INVALID)
 			{
-				auto uid = meta->getUid(msgId);
+				// is the UID in range?
 				bool match = false;
-				for (auto &u: storeUids)
-					if (u.Int() == uid)
-						match = true;
+				if (argRange.Length() == 2)
+				{
+					match = (argRange[0].Equals("*") || uid >= argRange[0].Int())
+							&&
+							(argRange[1].Equals("*") || uid <= argRange[1].Int());
+				}
+				else if (argRange.Length() == 1)
+				{
+					match = argRange[0].Int() == uid;
+				}
+				else LAssert(!"unexpected arg range count");
+
 				if (!match)
 					continue;
 
-				log.Print("%s:%i STORE on msgId='%s' uid=%u\n", _FL, msgId, uid);
+				// Create a result record...
+				LStringPipe record;
+				record.Print("* %i FETCH (", uid);
 
-				if (storeField.Equals("FLAGS"))
+				int idx = 0;
+				for (auto &fld: fields)
 				{
-					auto flags = storeValue.Strip("()").SplitDelimit();
-					auto curFlags = i->GetInt(FIELD_FLAGS);
-					int64_t newFlags = curFlags & (~MAIL_READ);
-					for (auto &f: flags)
-					{
-						if (f.Equals("\\seen"))
-							newFlags = MAIL_READ;
-						else
-							log.Print("%s:%i - unsupported store flag '%s'\n", _FL, f.Get());
-					}
-
-					if (newFlags != curFlags)
-						i->SetInt(FIELD_FLAGS, newFlags);
-				}
-				else
-				{
-					log.Print("%s:%i - unsupported store field '%s'\n", _FL, storeField.Get());
-					LAssert(!"unsupported field");
-				}
-			}
-		}
-
-		return a;
-	}
-
-	LString::Array Search(LDataFolderI *folder, bool isUid, LArray<LString> params)
-	{
-		LString::Array a;
-		if (!folder)
-		{
-			log.Print("%s:%i - error: no folder.\n", _FL);
-			return a;
-		}
-
-		auto meta = getMeta(folder);
-		if (!meta)
-		{
-			log.Print("%s:%i - error: no meta.\n", _FL);
-			return a;
-		}
-
-		LAssert(isUid); // don't support not UID yet...
-
-		auto &it = folder->Children();
-		for (auto i = it.First(); i; i = it.Next())
-		{
-			if (i->Type() != MAGIC_MAIL)
-				continue;
-
-			if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
-			{
-				auto uid = meta->getUid(msgId);
-				if (uid != FolderMeta::INVALID)
-					continue;
-			
-				// Does 'i' match the search params?
-				bool match = false;
-				for (auto &p: params)
-				{
-					if (p.Equals("RECENT"))
+					auto space = idx++ ? " " : "";
+					if (fld.Equals("FLAGS"))
 					{
 						auto flags = i->GetInt(FIELD_FLAGS);
-						if (!(flags & MAIL_READ))
+						LString::Array imapFlags;
+						if (flags & MAIL_READ)
+							imapFlags.Add("/Seen");
+						record.Print("%sFLAGS (%s)", space, LString(" ").Join(imapFlags).Get());
+					}
+					else if (fld.Equals("UID"))
+					{
+						record.Print("%sUID %i", space, uid);
+					}
+					else if (fld.Equals("RFC822.SIZE"))
+					{
+						auto sz = i->GetInt(FIELD_SIZE);
+						record.Print("%sRFC822.SIZE " LPrintfInt64, space, sz);
+					}
+					else if (fld.Equals("BODYSTRUCTURE"))
+					{
+						// FIXME
+						record.Print("%sBODYSTRUCTURE %s", space, BodyStructure(i).Get());
+					}
+					else if (fld.Equals("BODY.PEEK[HEADER]"))
+					{
+						auto inetHdr = i->GetStr(FIELD_INTERNET_HEADER);
+						auto len = Strlen(inetHdr);
+						record.Print("%sBODY.PEEK[HEADER] {" LPrintfInt64 "}\r\n%s", space, len, inetHdr);
+					}
+					else if (fld.Equals("BODY.PEEK[]"))
+					{
+						if (auto rfc822 = i->GetStream(_FL))
 						{
-							match = true;
+							auto len = rfc822->GetSize();
+							record.Print("%sBODY[] {" LPrintfInt64 "}\r\n", space, len);
+							LCopyStreamer copy;
+							copy.Copy(rfc822, &record);
 						}
+						else
+							LAssert(0);
 					}
 					else
 					{
-						LAssert(!"Impl support for field");
+						LAssert(!"not implemented");
 					}
 				}
 
-				if (match)
-					a.New().Printf("* SEARCH %i\r\n", uid);
+				record.Print(")\r\n");
+				a.Add(record.NewLStr());
 			}
 		}
+	}
 
+	meta->save();
+
+	if (a.Length() == 0)
+	{
+		log.Print("Warn: fetched no records '%s', '%s', maxUid=%i\n",
+			arg.Get(),
+			fieldSpec.Get(),
+			maxUid);
+	}
+
+	return a;
+}
+
+// e.g. A0861 UID STORE 875 FLAGS (\seen)
+LString::Array Context::Store(LDataFolderI *folder, bool isUid, LArray<LString> params)
+{
+	LString::Array a;
+	if (!folder)
+	{
+		log.Print("%s:%i - error: no folder.\n", _FL);
 		return a;
 	}
-};
+
+	auto meta = getMeta(folder);
+	if (!meta)
+	{
+		log.Print("%s:%i - error: no meta.\n", _FL);
+		return a;
+	}
+
+	LAssert(isUid); // don't support not UID yet...
+
+	if (params.Length() != 3)
+	{
+		log.Print("%s:%i - error: unexpected arg count: %s.\n",
+			_FL, LString(",").Join(params).Get());
+		return a;
+	}
+
+	auto storeUids = params[0].SplitDelimit(",");
+	auto &storeField = params[1];
+	auto &storeValue = params[2];
+
+	auto &it = folder->Children();
+	for (auto i = it.First(); i; i = it.Next())
+	{
+		if (i->Type() != MAGIC_MAIL)
+			continue;
+
+		if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
+		{
+			auto uid = meta->getUid(msgId);
+			bool match = false;
+			for (auto &u: storeUids)
+				if (u.Int() == uid)
+					match = true;
+			if (!match)
+				continue;
+
+			log.Print("%s:%i STORE on msgId='%s' uid=%u\n", _FL, msgId, uid);
+
+			if (storeField.Equals("FLAGS"))
+			{
+				auto flags = storeValue.Strip("()").SplitDelimit();
+				auto curFlags = i->GetInt(FIELD_FLAGS);
+				int64_t newFlags = curFlags & (~MAIL_READ);
+				for (auto &f: flags)
+				{
+					if (f.Equals("\\seen"))
+						newFlags = MAIL_READ;
+					else
+						log.Print("%s:%i - unsupported store flag '%s'\n", _FL, f.Get());
+				}
+
+				if (newFlags != curFlags)
+					i->SetInt(FIELD_FLAGS, newFlags);
+			}
+			else
+			{
+				log.Print("%s:%i - unsupported store field '%s'\n", _FL, storeField.Get());
+				LAssert(!"unsupported field");
+			}
+		}
+	}
+
+	return a;
+}
+
+LString::Array Context::Search(LDataFolderI *folder, bool isUid, LArray<LString> params)
+{
+	LString::Array a;
+	if (!folder)
+	{
+		log.Print("%s:%i - error: no folder.\n", _FL);
+		return a;
+	}
+
+	auto meta = getMeta(folder);
+	if (!meta)
+	{
+		log.Print("%s:%i - error: no meta.\n", _FL);
+		return a;
+	}
+
+	LAssert(isUid); // don't support not UID yet...
+
+	auto &it = folder->Children();
+	for (auto i = it.First(); i; i = it.Next())
+	{
+		if (i->Type() != MAGIC_MAIL)
+			continue;
+
+		if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
+		{
+			auto uid = meta->getUid(msgId);
+			if (uid != FolderMeta::INVALID)
+				continue;
+			
+			// Does 'i' match the search params?
+			bool match = false;
+			for (auto &p: params)
+			{
+				if (p.Equals("RECENT"))
+				{
+					auto flags = i->GetInt(FIELD_FLAGS);
+					if (!(flags & MAIL_READ))
+					{
+						match = true;
+					}
+				}
+				else
+				{
+					LAssert(!"Impl support for field");
+				}
+			}
+
+			if (match)
+				a.New().Printf("* SEARCH %i\r\n", uid);
+		}
+	}
+
+	return a;
+}
 
 struct ImapConnection : public LSocket
 {
@@ -650,7 +614,12 @@ struct ImapConnection : public LSocket
 				auto optPass = ctx->options.Get(Context::OptImapPass);
 				auto authOk = optUser == user && optPass == pass;
 				if (!authOk)
+				{
+					printf("%s:%i - auth failed:\n", _FL);
+					printf("	optUser='%s' user='%s'\n", optUser.Get(), user.Get());
+					printf("	optPass='%s' pass='%s'\n", optPass.Get(), pass.Get());
 					return ImapErr("AUTHENTICATIONFAILED", "Authentication failed");
+				}
 
 				auto w = LString::Fmt(	"* CAPABILITY IMAP4rev1\r\n"
 										"%s OK Logged in\r\n",
@@ -839,23 +808,27 @@ class MapiConnector :
 	public Context
 {
 	LArray<int> dirtyProps;
-	LArray<ImapConnection*> connections;
+	LArray<ImapConnection*> imapConnections;
 
 public:
 	MapiConnector() :
 		LThread("MapiConnector")
 	{
-		log.Print("MapiConnector starting...\n");
+		log.Print("MapiConnector starting, reading options: %s\n", optionsPath.Get());
 
 		// create the store and log in:
 		auto mapiProfile = options.Get(OptMapiProfile);
 		auto mapiUser = options.Get(OptMapiUser);
 
+		log.Print("mapiProfile: %s\n", mapiProfile.Get());
+		log.Print("mapiUser: %s\n", mapiUser.Get());
+
 		if (!store.Reset(OpenMapiStore(	mapiProfile,
 										mapiUser,
 										"",
 										0,
-										this)))
+										this,
+										&log)))
 		{
 			log.Print("Error: alloc failed.\n");
 			LCloseApp();
@@ -994,9 +967,9 @@ public:
 		}
 
 		// Set up server:
-		LSocket listen;
-		auto serverPort = options.Get(OptImapPort);
-		auto status = listen.Listen(serverPort ? (int)serverPort.Int() : IMAP_PORT);
+		LSocket imapListen, smtpListen;
+		auto imapPort = options.Get(OptImapPort);
+		auto status = imapListen.Listen(imapPort ? (int)imapPort.Int() : IMAP_PORT);
 		if (!status)
 		{
 			log.Print("Error: failed to listen on IMAP port\n");
@@ -1007,24 +980,24 @@ public:
 		log.Print("Starting main loop...\n");
 		while (!IsCancelled())
 		{
-			if (listen.IsReadable(50))
+			if (imapListen.IsReadable(50))
 			{
 				log.Print("Listen: readable...\n");
 
 				if (auto c = new ImapConnection(this))
 				{
-					if (listen.Accept(c))
+					if (imapListen.Accept(c))
 					{
 						log.Print("Listen: accepted...\n");
-						connections.Add(c);
+						imapConnections.Add(c);
 					}
 					else log.Print("Error: accept failed\n");
 				}
 			}
-			else if (connections.Length() > 0)
+			else if (imapConnections.Length() > 0)
 			{
 				LSelect select;
-				for (auto c: connections)
+				for (auto c: imapConnections)
 					select += c;
 
 				auto readable = select.Readable(10);
@@ -1038,7 +1011,7 @@ public:
 							if (!c->Readable())
 							{
 								// clean up closed connection:
-								auto del = connections.Delete(c);
+								auto del = imapConnections.Delete(c);
 								LAssert(del);
 								log.Print("Deleting closed connection..\n");
 								delete c;

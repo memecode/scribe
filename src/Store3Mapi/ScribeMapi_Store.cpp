@@ -75,7 +75,18 @@ public:
 */
 
 /////////////////////////////////////////////////////////////////////////////
-LMapiStore::LMapiStore(const char *profile, const char *username, const char *password, uint64 accountId, LDataEventsI *callback)
+LMapiStore::LMapiStore(	const char *profile,
+						const char *username,
+						const char *password,
+						uint64 accountId,
+						LDataEventsI *callback,
+						LStream *log) :
+	Profile(profile),
+	Username(username),
+	Password(password),
+	AccountId(accountId),
+	Callback(callback),
+	Log(log)
 {
 	Profile = profile;
 	Username = username;
@@ -92,7 +103,7 @@ LMapiStore::LMapiStore(const char *profile, const char *username, const char *pa
 	
 	if (!Load("mapi32.dll"))
 	{
-		Error("%s:%i - Failed to load \"mapi32.dll\".\n", _FL);
+		ERR("%s:%i - Failed to load \"mapi32.dll\".\n", _FL);
 	}
 	
 	MAPIInitialize				= (MAPIINITIALIZE*)				GetAddress("MAPIInitialize");
@@ -112,7 +123,9 @@ LMapiStore::LMapiStore(const char *profile, const char *username, const char *pa
 		);
 	}
 
-	if (Login())
+	if (!Login())
+		LOG("%s:%i - Login failed.\n", _FL);
+	else
 	{
 		ScribeMsgStores Stores(this, Session);
 
@@ -140,7 +153,13 @@ LMapiStore::LMapiStore(const char *profile, const char *username, const char *pa
 				Stores.Delete(toOpen);
 				EntryRef.Reset(toOpen);
 			}
+			else
+			{
+				LOG("%s:%i - OpenMsgStore failed with 0x%x.\n", _FL, res);
+				Stores.Delete(toOpen);
+			}
 		}
+		else LOG("%s:%i - No profile found for '%s'.\n", _FL, Username.Get());
 
 		if (MsgStore)
 		{
@@ -176,7 +195,7 @@ LMapiStore::LMapiStore(const char *profile, const char *username, const char *pa
 				}
 				#endif
 			}
-			else Error("%s:%i - GetReceiveFolder failed (0x%x).\n", _FL, res);
+			else ERR("%s:%i - GetReceiveFolder failed (0x%x).\n", _FL, res);
 		}
 	}
 }
@@ -189,6 +208,30 @@ LMapiStore::~LMapiStore()
 	if (MapiInitialized && MAPIUninitialize)
 		MAPIUninitialize();
 }
+
+void LMapiStore::LOG(const char *Fmt, ...)
+{
+	if (!Log)
+		return;
+
+	va_list arg;
+	va_start(arg, Fmt);
+	LStreamPrintf(Log, LogMsg, Fmt, arg);
+	va_end(arg);
+}
+
+bool LMapiStore::ERR(const char *Fmt, ...)
+{
+	va_list arg;
+	va_start(arg, Fmt);
+	if (Log)
+		LStreamPrintf(Log, LogErr, Fmt, arg);
+	else
+		LgiTrace("%s", Fmt);
+	va_end(arg);
+	return false;
+}
+
 
 ULONG LMapiStore::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications)
 {
@@ -255,18 +298,6 @@ ULONG LMapiStore::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications)
 	return S_OK;
 }
 
-bool LMapiStore::Error(const char *Fmt, ...)
-{
-	va_list arg;
-	va_start(arg, Fmt);
-	char buffer[256];
-	int ch = vsprintf_s(buffer, sizeof(buffer), Fmt, arg);
-	va_end(arg);
-	if (ch > 0)
-		LgiTrace("%s", buffer);
-	return false;
-}
-
 bool LMapiStore::Login()
 {
     char16 Cur[MAX_PATH_LEN];
@@ -278,14 +309,14 @@ bool LMapiStore::Login()
 		!MAPIAllocateBuffer ||
 		!MAPIFreeBuffer)
 	{
-		Error("%s:%i - Missing address of MAPI functions.\n", _FL);
+		ERR("%s:%i - Missing address of MAPI functions.\n", _FL);
 		return false;
 	}
 	
 	auto res = MAPIInitialize(NULL);
 	if (FAILED(res))
 	{
-		Error("%s:%i - MAPIInitialize failed with 0x%x.\n", _FL, res);
+		ERR("%s:%i - MAPIInitialize failed with 0x%x.\n", _FL, res);
 		return false;
 	}
 	
@@ -307,7 +338,7 @@ bool LMapiStore::Login()
 		if (MAPIUninitialize)
 			MAPIUninitialize();
 
-		Error("%s:%i - MAPILogonEx failed (0x%x).\n", _FL, res);
+		ERR("%s:%i - MAPILogonEx failed (0x%x).\n", _FL, res);
 		return false;
 	}
 
@@ -365,14 +396,14 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 	{
 		if (!MAPIInitialize)
 		{
-			LgiTrace("%s:%i - no MAPIInitialize fn\n", _FL);
+			ERR("%s:%i - no MAPIInitialize fn\n", _FL);
 			return false;
 		}
 		
 		auto hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		if (FAILED(hr))
 		{
-			LgiTrace("%s:%i - CoInitializeEx failed with: 0x%x\n", _FL, hr);
+			ERR("%s:%i - CoInitializeEx failed with: 0x%x\n", _FL, hr);
 			return false;
 		}
 
@@ -380,7 +411,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 		hr = MAPIInitialize(&mapiInit);
 		if (FAILED(hr))
 		{
-			LgiTrace("%s:%i - MAPIInitialize failed with: 0x%x\n", _FL, hr);
+			ERR("%s:%i - MAPIInitialize failed with: 0x%x\n", _FL, hr);
 			return false;
 		}
 
@@ -421,7 +452,7 @@ Store3Status LMapiStore::SetInt(int id, int64 i)
 					HRESULT res = Session->Logoff(Ui, 0, 0);
 					if (FAILED(res))
 					{
-						Error("%s:%i - Session->Logoff failed with %x\n", _FL, res);
+						ERR("%s:%i - Session->Logoff failed with %x\n", _FL, res);
 					}
 					
 					ULONG r = Session->Release();
@@ -497,7 +528,7 @@ LDataI *LMapiStore::Create(int Type)
 			return new LMapiContact(this);
 		default:
 			LAssert(!"Unsupport item type.");
-			Error("%s:%i - Unsupported create type 0x%x\n", _FL, Type);
+			ERR("%s:%i - Unsupported create type 0x%x\n", _FL, Type);
 			break;
 	}
 	
@@ -506,12 +537,20 @@ LDataI *LMapiStore::Create(int Type)
 
 LDataFolderI *LMapiStore::GetRoot(bool create)
 {
-	if (Session && !Root)
+	if (!Session)
+		ERR("%s:%i - Session is NULL.\n", _FL);
+	else if (!Root)
 	{
-		if (EntryRef)
+		if (!EntryRef)
+			ERR("%s:%i - EntryRef is NULL.\n", _FL);
+		else
 		{
 			IMAPIFolder *r = NULL;
-			if (EntryRef->OpenRoot(Session, Ui, &MsgStore, &r))
+			if (!EntryRef->OpenRoot(Session, Ui, &MsgStore, &r))
+				ERR("%s:%i - OpenRoot failed.\n", _FL);
+			else if (!r)
+				ERR("%s:%i - OpenRoot returned NULL.\n", _FL);
+			else
 			{
 				if ((Root = new LMapiFolder(this)))
 				{
@@ -587,7 +626,7 @@ Store3Status LMapiStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 	if (FAILED(res))
 	{
 		LAssert(!"CopyMessages failed.");
-		Error("%s:%i - CopyMessages failed with 0x%x\n", _FL, res);
+		ERR("%s:%i - CopyMessages failed with 0x%x\n", _FL, res);
 		return Store3Error;
 	}
 	
@@ -617,7 +656,7 @@ Store3Status LMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 	if (Items.Length() == 0)
 		return Store3Error;
 
-	LMapiFolder *Trash = ToTrash ? FindSystemFolder(Store3SystemTrash) : NULL;
+	auto Trash = ToTrash ? FindSystemFolder(Store3SystemTrash) : NULL;
 	if (Trash)
 	{
 	    LArray<LDataI*> MoveItems;
@@ -711,7 +750,7 @@ Store3Status LMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 					}
 					else
 					{
-						Error("%s:%i - DeleteMessages failed with 0x%x\n", _FL, Status);
+						ERR("%s:%i - DeleteMessages failed with 0x%x\n", _FL, Status);
 						s = Store3Error;
 					}
 				}
@@ -751,7 +790,7 @@ Store3Status LMapiStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 					);
 					if (FAILED(res))
 					{
-						Error("%s:%i - Failed to delete folder '%s', err=0x%x\n", _FL, f->Name.Get(), res);
+						ERR("%s:%i - Failed to delete folder '%s', err=0x%x\n", _FL, f->Name.Get(), res);
 						s = Store3Error;
 						break;
 					}
@@ -856,7 +895,13 @@ bool MapiEntryRef::OpenRoot(LPMAPISESSION Session, UI_TYPE UiHnd, IMsgStore **Ms
 {
 	bool Status = false;
 
-	if (Session && MsgStore && RootFolder)
+	if (!Session)
+		Store->ERR("%s:%i - Session is NULL.\n", _FL);
+	else if (!MsgStore)
+		Store->ERR("%s:%i - MsgStore is NULL.\n", _FL);
+	else if (!RootFolder)
+		Store->ERR("%s:%i - RootFolder is NULL.\n", _FL);
+	else
 	{
 		if (!*MsgStore)
 		{
@@ -868,14 +913,16 @@ bool MapiEntryRef::OpenRoot(LPMAPISESSION Session, UI_TYPE UiHnd, IMsgStore **Ms
 												MsgStore);
 			if (FAILED(res))
 			{
-				Store->Error("%s:%i - OpenMsgStore failed with 0x%x\n", _FL, res);
+				Store->ERR("%s:%i - OpenMsgStore failed with 0x%x\n", _FL, res);
 			}
 		}
 		
 		if (*MsgStore)
 		{
-			SPropValue *SubTree = MapiGetProp(*MsgStore, PR_IPM_SUBTREE_ENTRYID);
-			if (SubTree)
+			auto SubTree = MapiGetProp(*MsgStore, PR_IPM_SUBTREE_ENTRYID);
+			if (!SubTree)
+				Store->ERR("%s:%i - Failed to get PR_IPM_SUBTREE_ENTRYID.\n", _FL);
+			else
 			{
 				ULONG ObjType;
 				HRESULT res = (*MsgStore)->OpenEntry(SubTree->Value.bin.cb,
@@ -891,9 +938,9 @@ bool MapiEntryRef::OpenRoot(LPMAPISESSION Session, UI_TYPE UiHnd, IMsgStore **Ms
 				else
 				{
 					(*MsgStore)->Release();
-					*MsgStore = 0;
+					*MsgStore = nullptr;
 					
-					return Store->Error("%s:%i - OpenEntry failed with 0x%x\n", _FL, res);
+					return Store->ERR("%s:%i - OpenEntry failed with 0x%x\n", _FL, res);
 				}
 			}
 		}
@@ -907,7 +954,8 @@ LDataStoreI *OpenMapiStore(	const char *Profile,
 							const char *Username,
 							const char *Password,
 							uint64 AccountId,
-							LDataEventsI *Callback)
+							LDataEventsI *Callback,
+							LStream *Log)
 {
-	return new LMapiStore(Profile, Username, Password, AccountId, Callback);
+	return new LMapiStore(Profile, Username, Password, AccountId, Callback, Log);
 }
