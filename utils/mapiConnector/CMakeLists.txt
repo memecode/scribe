@@ -37,6 +37,8 @@ set(STORE_MAPI_FILES
 
 add_executable(mapiConnector
     src/main.cpp
+    src/Context.cpp
+    src/FolderMeta.cpp
     src/smtpServer.cpp
     src/smtpServer.h
     src/context.h
