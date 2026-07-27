@@ -85,6 +85,11 @@ struct LMapiEntry : public LArray<uint8_t>
 		Add((uint8_t*)o.lpEntryID, o.cbEntryID);
 		return *this;
 	}
+
+	operator LPENTRYID()
+	{
+		return (LPENTRYID)AddressOf();
+	}
 };
 
 class LMapiBase
@@ -131,6 +136,12 @@ public:
 		{
 			if (Tags == 1)
 			{
+				if (PROP_TYPE(OutTag->ulPropTag) == PT_ERROR)
+				{
+					LgiTrace("%s:%i - MapiGetProp err: 0x%x\n", _FL, OutTag->Value.err);
+					return nullptr;
+				}
+
 				return OutTag;
 			}
 		}
@@ -660,12 +671,10 @@ class LMapiList : public LMapiBase
 public:
 	LMapiList(LPMAPITABLE list, bool release = true)
 	{
-		List = list;
 		ReleaseList = release;
-
-		if (List)
+		if ((List = list))
 		{
-			HRESULT res = List->GetRowCount(0, &Rows);
+			auto res = List->GetRowCount(0, &Rows);
 			if (SUCCEEDED(res) && Rows)
 			{
 				res = List->SeekRow(BOOKMARK_BEGINNING, 0, NULL);
@@ -681,9 +690,7 @@ public:
 	~LMapiList()
 	{
 		if (List && ReleaseList)
-		{
 			List->Release();
-		}
 	}
 
 	int Index() { return i; }

@@ -4,6 +4,7 @@
 #if _MSC_VER < _MSC_VER_VS2013
 #include <MAPIguid.h>
 #endif
+#include <tchar.h>
 #include "ScribeMapi.h"
 #include "lgi/common/Com.h"
 
@@ -451,8 +452,33 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 			#endif
 		}
 
+		LComPtr<IMAPIFolder> inboxFolder;
+		ULONG cbInboxEID = 0;
+		LPENTRYID lpInboxEID = nullptr;
+		auto hr = MsgStore->GetReceiveFolder(_T("IPM.Note"), 0, &cbInboxEID, &lpInboxEID, nullptr);
+		if (SUCCEEDED(hr) && lpInboxEID)
+		{
+			ULONG objType = 0;
+			auto hr = MsgStore->OpenEntry(	cbInboxEID,
+											lpInboxEID,
+											NULL,
+											MAPI_BEST_ACCESS,
+											&objType,
+											inboxFolder.Unknown());
+			if (FAILED(hr) || !inboxFolder)
+			{
+				ERR("%s:%i - sendMessage failed: OpenEntry(inbox) hr=0x%x\n", _FL, hr);
+				return false;
+			}
+		}
+		else
+		{
+			ERR("%s:%i - sendMessage failed: no GetReceiveFolder\n", _FL);
+			return false;
+		}
+
 		LComPtr<IMAPIFolder> draftsFolder;
-		if (auto entry = mapi.MapiGetProp(MsgStore, PR_IPM_DRAFTS_ENTRYID))
+		if (auto entry = mapi.MapiGetProp(inboxFolder, PR_IPM_DRAFTS_ENTRYID))
 		{
 			ULONG objType = 0;
 			auto hr = MsgStore->OpenEntry(	entry->Value.bin.cb,
@@ -460,10 +486,10 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 											NULL,
 											MAPI_BEST_ACCESS,
 											&objType,
-											(IUnknown**)draftsFolder.Set());
+											draftsFolder.Unknown());
 			if (FAILED(hr) || !draftsFolder)
 			{
-				ERR("%s:%i - sendMessage failed: OpenEntry(outbox) hr=0x%x\n", _FL, hr);
+				ERR("%s:%i - sendMessage failed: OpenEntry(drafts) hr=0x%x\n", _FL, hr);
 				return false;
 			}
 		}
@@ -482,7 +508,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 											NULL,
 											MAPI_BEST_ACCESS,
 											&objType,
-											(IUnknown**)outboxFolder.Set());
+											outboxFolder.Unknown());
 			if (FAILED(hr) || !outboxFolder)
 			{
 				ERR("%s:%i - sendMessage failed: OpenEntry(outbox) hr=0x%x\n", _FL, hr);
@@ -640,8 +666,8 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 		if (body)
 		{
-			if (!mapi.MapiSetPropStr(msg, PR_BODY_A, body))
-				LOG("%s:%i - sendMessage warning: failed to set PR_BODY_A\n", _FL);
+			if (!mapi.MapiSetPropStr(msg, PR_BODY, body))
+				LOG("%s:%i - sendMessage warning: failed to set PR_BODY\n", _FL);
 		}
 
 		LDateTime submitNow;
@@ -662,10 +688,36 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 			createdMsgEntry = msgEntry;
 			LOG("%s:%i - sendMessage message entry created, cb=%u\n", _FL, (unsigned)msgEntry->Value.bin.cb);
 
+			LMapiEntry searchKey = mapi.MapiGetProp(msg, PR_SEARCH_KEY);
+
 			ENTRYLIST eList = { 1, &msgEntry->Value.bin };
 			auto hr = draftsFolder->CopyMessages(&eList, NULL, outboxFolder, NULL, NULL, MESSAGE_MOVE);
 			if (FAILED(hr))
 				ERR("%s:%i - sendMessage failed: CopyMessages hr=0x%x\n", _FL, hr);
+
+			createdMsgEntry.Empty(); // no longer valid, the 'CopyMessages' deleted it...
+
+			// Find the newly created message via the search key...
+			LPMAPITABLE tbl = nullptr;
+			hr = outboxFolder->GetContentsTable(0, &tbl);
+			if (SUCCEEDED(hr) && tbl)
+			{
+				for (LMapiList contents(tbl); contents.More(); contents.Next())
+				{
+					LMapiEntry search = contents.GetField(PR_SEARCH_KEY);
+					if (search == searchKey)
+					{
+						createdMsgEntry = contents.GetField(PR_ENTRYID);
+						break;
+					}
+				}
+			}
+
+			if (!createdMsgEntry.Length())
+			{
+				ERR("%s:%i - sendMessage failed: failed to find message in outbox after CopyMessages.\n", _FL);
+				return false;
+			}
 		}
 		else
 		{
@@ -673,78 +725,31 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 			return false;
 		}
 
+		// Find the new message pointer...
+		msg.Release();
+		{
+			ULONG objType = 0;
+			hr = MsgStore->OpenEntry(	createdMsgEntry.Length(),
+										createdMsgEntry,
+										NULL,
+										MAPI_BEST_ACCESS,
+										&objType,
+										msg.Unknown());
+			if (FAILED(hr) || !msg)
+			{
+				ERR("%s:%i - sendMessage failed: failed to open message hr=0x%x\n", _FL, hr);
+				return false;
+			}
+		}
 
 		// Use normal submission path; FORCE_SUBMIT can bypass normal client flow.
 		ULONG submitFlags = 0;
-		auto submitHr = msg->SubmitMessage(submitFlags);
-		msg.Release();
-		if (FAILED(submitHr))
+		hr = msg->SubmitMessage(submitFlags);
+		if (FAILED(hr))
 		{
-			ERR("%s:%i - sendMessage failed: SubmitMessage hr=0x%x flags=0x%x\n", _FL, submitHr, submitFlags);
+			ERR("%s:%i - sendMessage failed: SubmitMessage hr=0x%x flags=0x%x\n", _FL, hr, submitFlags);
 			return false;
 		}
-
-		LOG("%s:%i - sendMessage SubmitMessage returned hr=0x%x flags=0x%x\n", _FL, submitHr, submitFlags);
-
-		/*
-		if (createdMsgEntry.Length() > 0)
-		{
-			ULONG submittedObjType = 0;
-			IUnknown *submittedObj = nullptr;
-			auto openSubmittedHr = MsgStore->OpenEntry((ULONG)createdMsgEntry.Length(),
-														(LPENTRYID)&createdMsgEntry[0],
-														NULL,
-														MAPI_BEST_ACCESS,
-														&submittedObjType,
-														&submittedObj);
-			LOG("%s:%i - sendMessage post-submit OpenEntry(created-msg) hr=0x%x objType=%u\n", _FL, openSubmittedHr, (unsigned)submittedObjType);
-			if (submittedObj)
-				submittedObj->Release();
-		}
-
-		auto logFolderRows = [&](ULONG folderPropTag, const char *folderName)
-		{
-			auto folderEntry = mapi.MapiGetProp(MsgStore, folderPropTag);
-			if (!folderEntry)
-			{
-				LOG("%s:%i - sendMessage post-submit %s entry prop missing\n", _FL, folderName);
-				return;
-			}
-
-			IMAPIFolder *folder = nullptr;
-			ULONG folderObjType = 0;
-			auto openFolderHr = MsgStore->OpenEntry(folderEntry->Value.bin.cb,
-													(LPENTRYID)folderEntry->Value.bin.lpb,
-													NULL,
-													MAPI_BEST_ACCESS,
-													&folderObjType,
-													(IUnknown**)&folder);
-			if (FAILED(openFolderHr) || !folder)
-			{
-				LOG("%s:%i - sendMessage post-submit open %s hr=0x%x\n", _FL, folderName, openFolderHr);
-				return;
-			}
-
-			LPMAPITABLE tbl = nullptr;
-			auto tblHr = folder->GetContentsTable(0, &tbl);
-			if (SUCCEEDED(tblHr) && tbl)
-			{
-				ULONG rows = 0;
-				auto rowHr = tbl->GetRowCount(0, &rows);
-				LOG("%s:%i - sendMessage post-submit %s rows hr=0x%x rows=%u\n", _FL, folderName, rowHr, (unsigned)rows);
-				tbl->Release();
-			}
-			else
-			{
-				LOG("%s:%i - sendMessage post-submit %s GetContentsTable hr=0x%x\n", _FL, folderName, tblHr);
-			}
-
-			folder->Release();
-		};
-
-		logFolderRows(PR_IPM_OUTBOX_ENTRYID, "Outbox");
-		logFolderRows(PR_IPM_SENTMAIL_ENTRYID, "SentItems");
-		*/
 
 		LOG("%s:%i - sendMessage succeeded: from='%s' to='%s'\n", _FL, mailFrom.Get(), LString(",").Join(rcptTo).Get());
 		return true;
@@ -766,13 +771,6 @@ Store3Status LMapiStore::SetInt(int id, int64 i)
 					Root->ReleaseHandle();
 				
 				EntryRef.Reset();
-				/*
-				if (Notify)
-				{
-					ULONG r = Notify->Release();
-					Notify = NULL;
-				}
-				*/
 				if (MsgStore)
 				{
 					ULONG r = MsgStore->Release();

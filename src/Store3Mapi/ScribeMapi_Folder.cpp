@@ -96,9 +96,9 @@ ULONG LMapiFolder::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
 					auto hr = MapiFolder->GetContentsTable(0, &tbl);
 					if (SUCCEEDED(hr) && tbl)
 					{
-						hr = tbl->SeekRow(BOOKMARK_BEGINNING, 0, nullptr);
-
-						for (LMapiList contents(tbl); contents.More(); contents.Next())
+						for (LMapiList contents(tbl)/* this owns the table*/;
+							contents.More();
+							contents.Next())
 						{
 							auto entryProp = contents.GetField(PR_ENTRYID);
 							LMapiEntry entry = entryProp;
