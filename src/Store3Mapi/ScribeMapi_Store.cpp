@@ -5,6 +5,7 @@
 #include <MAPIguid.h>
 #endif
 #include "ScribeMapi.h"
+#include "lgi/common/Com.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /*
@@ -142,12 +143,14 @@ LMapiStore::LMapiStore(	const char *profile,
 
 		if (toOpen)
 		{
+			ULONG ulStoreFlags = MDB_WRITE | MAPI_BEST_ACCESS;
 			auto res = Session->OpenMsgStore(Ui,
 											(ULONG)toOpen->Entry.Length(),	// entry bytes
 											(LPENTRYID)&toOpen->Entry[0],	// ptr to entry
 											NULL,						// default interface: IMsgStore
-											MAPI_BEST_ACCESS,
+											ulStoreFlags,
 											&MsgStore);
+			
 			if (SUCCEEDED(res))
 			{
 				Stores.Delete(toOpen);
@@ -313,7 +316,8 @@ bool LMapiStore::Login()
 		return false;
 	}
 	
-	auto res = MAPIInitialize(NULL);
+	MAPIINIT_0 mapiInit = { MAPI_INIT_VERSION, MAPI_MULTITHREAD_NOTIFICATIONS };
+	auto res = MAPIInitialize(&mapiInit);
 	if (FAILED(res))
 	{
 		ERR("%s:%i - MAPIInitialize failed with 0x%x.\n", _FL, res);
@@ -329,10 +333,10 @@ bool LMapiStore::Login()
 						wPassword,
 						MAPI_LOGON_UI |
 						MAPI_UNICODE |
-							MAPI_EXTENDED |
-							// Use shared Outlook session so transport/spooler behavior
-							// matches what users see in Outlook/OWA.
-							(wProfile ? MAPI_EXPLICIT_PROFILE : MAPI_USE_DEFAULT),
+						MAPI_EXTENDED |
+						MAPI_NEW_SESSION |  // Force a completely isolated session
+						MAPI_NO_MAIL |
+						(wProfile ? MAPI_EXPLICIT_PROFILE : 0),
 						&Session);
 	if (FAILED(res) || !Session)
 	{
@@ -420,7 +424,6 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 	}
 	else if (!Stricmp(MethodName, Method_sendMessage))
 	{
-		LMapiBase mapi;
 		LString mailFrom = Args.StringAt(SendMsg_MailFrom);
 		auto rcptTo = LString(Args.StringAt(SendMsg_RcptTo)).SplitDelimit(",");
 		LString data = Args.StringAt(SendMsg_Data);
@@ -438,49 +441,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 			return false;
 		}
 
-		IMsgStore *sendStore = MsgStore;
-		struct LStoreReleaseGuard
-		{
-			IMsgStore *Store = nullptr;
-			~LStoreReleaseGuard()
-			{
-				if (Store)
-					Store->Release();
-			}
-		} sendStoreGuard;
-
-		ScribeMsgStores stores(this, Session);
-		MapiEntryRef *defaultStore = nullptr;
-		for (auto e: stores)
-		{
-			if (e && e->IsDefault)
-			{
-				defaultStore = e;
-				break;
-			}
-		}
-		if (defaultStore)
-		{
-			IMsgStore *openedStore = nullptr;
-			auto openHr = Session->OpenMsgStore(Ui,
-													(ULONG)defaultStore->Entry.Length(),
-													(LPENTRYID)&defaultStore->Entry[0],
-													NULL,
-													MAPI_BEST_ACCESS,
-													&openedStore);
-			if (SUCCEEDED(openHr) && openedStore)
-			{
-				sendStore = openedStore;
-				sendStoreGuard.Store = openedStore;
-				LOG("%s:%i - sendMessage using default store '%s'\n", _FL, defaultStore->DisplayName.Get());
-			}
-			else
-			{
-				LOG("%s:%i - sendMessage warning: failed to open default store hr=0x%x, using selected store\n", _FL, openHr);
-			}
-		}
-
-		if (auto support = mapi.MapiGetProp(sendStore, PR_STORE_SUPPORT_MASK))
+		if (auto support = mapi.MapiGetProp(MsgStore, PR_STORE_SUPPORT_MASK))
 		{
 			auto mask = (ULONG)mapi.MapiCastInt(support);
 			LOG("%s:%i - sendMessage store support mask=0x%x\n", _FL, mask);
@@ -490,17 +451,39 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 			#endif
 		}
 
-		IMAPIFolder *outbox = nullptr;
-		if (auto outboxEntry = mapi.MapiGetProp(sendStore, PR_IPM_OUTBOX_ENTRYID))
+		LComPtr<IMAPIFolder> draftsFolder;
+		if (auto entry = mapi.MapiGetProp(MsgStore, PR_IPM_DRAFTS_ENTRYID))
 		{
 			ULONG objType = 0;
-			auto hr = sendStore->OpenEntry(	outboxEntry->Value.bin.cb,
-									(LPENTRYID)outboxEntry->Value.bin.lpb,
-									NULL,
-									MAPI_BEST_ACCESS,
-									&objType,
-									(IUnknown**)&outbox);
-			if (FAILED(hr) || !outbox)
+			auto hr = MsgStore->OpenEntry(	entry->Value.bin.cb,
+											(LPENTRYID)entry->Value.bin.lpb,
+											NULL,
+											MAPI_BEST_ACCESS,
+											&objType,
+											(IUnknown**)draftsFolder.Set());
+			if (FAILED(hr) || !draftsFolder)
+			{
+				ERR("%s:%i - sendMessage failed: OpenEntry(outbox) hr=0x%x\n", _FL, hr);
+				return false;
+			}
+		}
+		else
+		{
+			ERR("%s:%i - sendMessage failed: no PR_IPM_DRAFTS_ENTRYID\n", _FL);
+			return false;
+		}
+
+		LComPtr<IMAPIFolder> outboxFolder;
+		if (auto entry = mapi.MapiGetProp(MsgStore, PR_IPM_OUTBOX_ENTRYID))
+		{
+			ULONG objType = 0;
+			auto hr = MsgStore->OpenEntry(	entry->Value.bin.cb,
+											(LPENTRYID)entry->Value.bin.lpb,
+											NULL,
+											MAPI_BEST_ACCESS,
+											&objType,
+											(IUnknown**)outboxFolder.Set());
+			if (FAILED(hr) || !outboxFolder)
 			{
 				ERR("%s:%i - sendMessage failed: OpenEntry(outbox) hr=0x%x\n", _FL, hr);
 				return false;
@@ -512,11 +495,10 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 			return false;
 		}
 
-		LPMESSAGE msg = nullptr;
-		auto createHr = outbox->CreateMessage(nullptr, 0, &msg);
+		LComPtr<IMessage> msg;
+		auto createHr = draftsFolder->CreateMessage(nullptr, 0, msg.Set());
 		if (FAILED(createHr) || !msg)
 		{
-			outbox->Release();
 			ERR("%s:%i - sendMessage failed: CreateMessage hr=0x%x\n", _FL, createHr);
 			return false;
 		}
@@ -528,7 +510,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 		mapi.MapiSetPropBool(msg, PR_DELETE_AFTER_SUBMIT, false);
 
 		// Ensure a sent copy lands in Sent Items for visibility and troubleshooting.
-		if (auto sentEntry = mapi.MapiGetProp(sendStore, PR_IPM_SENTMAIL_ENTRYID))
+		if (auto sentEntry = mapi.MapiGetProp(MsgStore, PR_IPM_SENTMAIL_ENTRYID))
 		{
 			SPropValue sent = {};
 			sent.ulPropTag = PR_SENTMAIL_ENTRYID;
@@ -538,6 +520,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 			if (FAILED(sentHr))
 				LOG("%s:%i - sendMessage warning: failed to set PR_SENTMAIL_ENTRYID hr=0x%x\n", _FL, sentHr);
 		}
+		else LAssert(!"Failed to get PR_SENTMAIL_ENTRYID");
 
 		LString::Array recipients;
 		for (auto &r: rcptTo)
@@ -549,8 +532,6 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 		if (recipients.Length() == 0)
 		{
-			msg->Release();
-			outbox->Release();
 			ERR("%s:%i - sendMessage failed: no valid recipients\n", _FL);
 			return false;
 		}
@@ -559,8 +540,6 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 		auto allocHr = MAPIAllocateBuffer(CbNewADRLIST((ULONG)recipients.Length()), (void**)&adr);
 		if (allocHr != S_OK || !adr)
 		{
-			msg->Release();
-			outbox->Release();
 			ERR("%s:%i - sendMessage failed: ADRLIST alloc hr=0x%x\n", _FL, allocHr);
 			return false;
 		}
@@ -577,8 +556,6 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 				for (unsigned j = 0; j < i; j++)
 					MAPIFreeBuffer(adr->aEntries[j].rgPropVals);
 				MAPIFreeBuffer(adr);
-				msg->Release();
-				outbox->Release();
 				ERR("%s:%i - sendMessage failed: recipient props alloc hr=0x%x\n", _FL, oneHr);
 				return false;
 			}
@@ -628,8 +605,6 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 		MAPIFreeBuffer(adr);
 		if (FAILED(modHr))
 		{
-			msg->Release();
-			outbox->Release();
 			ERR("%s:%i - sendMessage failed: ModifyRecipients hr=0x%x\n", _FL, modHr);
 			return false;
 		}
@@ -649,14 +624,13 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 		}
 		else
 		{
-			msg->Release();
-			outbox->Release();
 			ERR("%s:%i - sendMessage failed: no boundary between headers and data\n", _FL);
 			return false;
 		}
 
 		if (headers)
 		{
+			mapi.MapiSetPropStr(msg, PR_TRANSPORT_MESSAGE_HEADERS, headers);
 			if (auto subj = LGetHeaderField(headers, "Subject"))
 			{
 				if (!mapi.MapiSetPropStr(msg, PR_SUBJECT_A, subj))
@@ -673,12 +647,11 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 		LDateTime submitNow;
 		submitNow.SetNow();
 		mapi.MapiSetPropDate(msg, PR_CLIENT_SUBMIT_TIME, submitNow);
+		mapi.MapiSetPropLong(msg, PR_MESSAGE_FLAGS, MSGFLAG_UNSENT);
 
-		auto saveHr = msg->SaveChanges(KEEP_OPEN_READWRITE);
+		auto saveHr = msg->SaveChanges(KEEP_OPEN_READWRITE | FORCE_SAVE);
 		if (FAILED(saveHr))
 		{
-			msg->Release();
-			outbox->Release();
 			ERR("%s:%i - sendMessage failed: SaveChanges hr=0x%x\n", _FL, saveHr);
 			return false;
 		}
@@ -688,13 +661,23 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 		{
 			createdMsgEntry = msgEntry;
 			LOG("%s:%i - sendMessage message entry created, cb=%u\n", _FL, (unsigned)msgEntry->Value.bin.cb);
+
+			ENTRYLIST eList = { 1, &msgEntry->Value.bin };
+			auto hr = draftsFolder->CopyMessages(&eList, NULL, outboxFolder, NULL, NULL, MESSAGE_MOVE);
+			if (FAILED(hr))
+				ERR("%s:%i - sendMessage failed: CopyMessages hr=0x%x\n", _FL, hr);
 		}
+		else
+		{
+			ERR("%s:%i - sendMessage failed: no msg entry\n", _FL);
+			return false;
+		}
+
 
 		// Use normal submission path; FORCE_SUBMIT can bypass normal client flow.
 		ULONG submitFlags = 0;
 		auto submitHr = msg->SubmitMessage(submitFlags);
-		msg->Release();
-		outbox->Release();
+		msg.Release();
 		if (FAILED(submitHr))
 		{
 			ERR("%s:%i - sendMessage failed: SubmitMessage hr=0x%x flags=0x%x\n", _FL, submitHr, submitFlags);
@@ -703,16 +686,17 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 		LOG("%s:%i - sendMessage SubmitMessage returned hr=0x%x flags=0x%x\n", _FL, submitHr, submitFlags);
 
+		/*
 		if (createdMsgEntry.Length() > 0)
 		{
 			ULONG submittedObjType = 0;
 			IUnknown *submittedObj = nullptr;
-			auto openSubmittedHr = sendStore->OpenEntry((ULONG)createdMsgEntry.Length(),
-													(LPENTRYID)&createdMsgEntry[0],
-													NULL,
-													MAPI_BEST_ACCESS,
-													&submittedObjType,
-													&submittedObj);
+			auto openSubmittedHr = MsgStore->OpenEntry((ULONG)createdMsgEntry.Length(),
+														(LPENTRYID)&createdMsgEntry[0],
+														NULL,
+														MAPI_BEST_ACCESS,
+														&submittedObjType,
+														&submittedObj);
 			LOG("%s:%i - sendMessage post-submit OpenEntry(created-msg) hr=0x%x objType=%u\n", _FL, openSubmittedHr, (unsigned)submittedObjType);
 			if (submittedObj)
 				submittedObj->Release();
@@ -720,7 +704,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 		auto logFolderRows = [&](ULONG folderPropTag, const char *folderName)
 		{
-			auto folderEntry = mapi.MapiGetProp(sendStore, folderPropTag);
+			auto folderEntry = mapi.MapiGetProp(MsgStore, folderPropTag);
 			if (!folderEntry)
 			{
 				LOG("%s:%i - sendMessage post-submit %s entry prop missing\n", _FL, folderName);
@@ -729,7 +713,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 			IMAPIFolder *folder = nullptr;
 			ULONG folderObjType = 0;
-			auto openFolderHr = sendStore->OpenEntry(folderEntry->Value.bin.cb,
+			auto openFolderHr = MsgStore->OpenEntry(folderEntry->Value.bin.cb,
 													(LPENTRYID)folderEntry->Value.bin.lpb,
 													NULL,
 													MAPI_BEST_ACCESS,
@@ -760,6 +744,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 
 		logFolderRows(PR_IPM_OUTBOX_ENTRYID, "Outbox");
 		logFolderRows(PR_IPM_SENTMAIL_ENTRYID, "SentItems");
+		*/
 
 		LOG("%s:%i - sendMessage succeeded: from='%s' to='%s'\n", _FL, mailFrom.Get(), LString(",").Join(rcptTo).Get());
 		return true;
@@ -1252,12 +1237,19 @@ bool MapiEntryRef::OpenRoot(LPMAPISESSION Session, UI_TYPE UiHnd, IMsgStore **Ms
 	{
 		if (!*MsgStore)
 		{
+			ULONG ulStoreFlags = MDB_WRITE | MDB_ONLINE | MAPI_BEST_ACCESS;
 			HRESULT res = Session->OpenMsgStore(UiHnd,
 												(ULONG)Entry.Length(),			// entry bytes
 												(LPENTRYID)&Entry[0],	// ptr to entry
 												NULL,					// default interface: IMsgStore
-												MAPI_BEST_ACCESS,
+												ulStoreFlags,
 												MsgStore);
+			if (res == MAPI_E_UNKNOWN_FLAGS && (ulStoreFlags & MDB_ONLINE))
+			{
+				ulStoreFlags &= ~MDB_ONLINE; // Strip the flag and try again
+				res = Session->OpenMsgStore(UiHnd, Entry.Length(), (LPENTRYID)&Entry[0], NULL, ulStoreFlags, MsgStore);
+			}
+
 			if (FAILED(res))
 			{
 				Store->ERR("%s:%i - OpenMsgStore failed with 0x%x\n", _FL, res);

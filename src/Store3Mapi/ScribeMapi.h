@@ -118,27 +118,24 @@ public:
 	SPropValue *MapiGetProp(IMAPIProp *Props, int Field)
 	{
 		if (!Props)
-			return NULL;
+			return nullptr;
 			
 		SPropTagArray InTag;
 		InTag.cValues = 1;
 		InTag.aulPropTag[0] = Field;
 
-		SPropValue *OutTag = 0;
+		SPropValue *OutTag = nullptr;
 		ULONG Tags = 0;
-		if (Props)
+		auto res = Props->GetProps(&InTag, 0, &Tags, &OutTag);
+		if (SUCCEEDED(res))
 		{
-			HRESULT res = Props->GetProps(&InTag, 0, &Tags, &OutTag);
-			if (SUCCEEDED(res))
+			if (Tags == 1)
 			{
-				if (Tags == 1)
-				{
-					return OutTag;
-				}
+				return OutTag;
 			}
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	int64 MapiCastInt(SPropValue *Val)
@@ -337,27 +334,6 @@ public:
 		return false;
 	}
 };
-
-/*
-class LMapiAddr : public LDataPropI
-{
-	LMapiStore *Store;
-
-public:
-	int CC = 0, Status = 0;
-	LString Name, Email;
-
-	LMapiAddr(LMapiStore *store);
-
-	Store3CopyDecl;
-
-	const char *GetClass() override { return "LMapiAddr"; }
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
-};
-*/
 
 class LMapiThing : public LDataI, public LMapiBase
 {
@@ -834,7 +810,9 @@ public:
 	}
 };
 
-class LMapiStore : public LDataStoreI, public LLibrary
+class LMapiStore :
+	public LDataStoreI,
+	public LLibrary
 {
 	friend class LMapiFolder;
 	friend class LMapiThing;
@@ -852,6 +830,7 @@ class LMapiStore : public LDataStoreI, public LLibrary
 	LString::Array availableProfiles;
 	bool MapiInitialized = false;
 	LStream *Log = nullptr;
+	LMapiBase mapi;
 
 	LPMAPISESSION				Session = nullptr;
 	IMsgStore					*MsgStore = nullptr;
