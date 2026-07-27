@@ -20,7 +20,7 @@ class SmtpServer
     struct SmtpServerImpl *d = nullptr;
 
 public:
-	SmtpServer(Context &ctx, SmtpOnMessage onMessage = SmtpOnMessage());
+	SmtpServer(Context &ctx);
     ~SmtpServer();
 
 	void SetOnMessage(SmtpOnMessage onMessage);

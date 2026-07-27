@@ -56,6 +56,7 @@ target_link_libraries(mapiConnector
 target_include_directories(mapiConnector
     PRIVATE
         ../../src
+        ../../src/Store3Mapi
         ../../resources
         ../../../libs/mapi
         ../../../libs/build-x64/include

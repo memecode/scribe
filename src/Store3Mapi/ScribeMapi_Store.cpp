@@ -330,7 +330,8 @@ bool LMapiStore::Login()
 						MAPI_LOGON_UI |
 						MAPI_UNICODE |
 							MAPI_EXTENDED |
-							MAPI_NEW_SESSION |
+							// Use shared Outlook session so transport/spooler behavior
+							// matches what users see in Outlook/OWA.
 							(wProfile ? MAPI_EXPLICIT_PROFILE : MAPI_USE_DEFAULT),
 						&Session);
 	if (FAILED(res) || !Session)
@@ -392,7 +393,7 @@ LMapiFolder *LMapiStore::FindSystemFolder(Store3SystemFolder Type)
 
 bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 {
-	if (!Stricmp(MethodName, "init"))
+	if (!Stricmp(MethodName, Method_init))
 	{
 		if (!MAPIInitialize)
 		{
@@ -415,6 +416,352 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 			return false;
 		}
 
+		return true;
+	}
+	else if (!Stricmp(MethodName, Method_sendMessage))
+	{
+		LMapiBase mapi;
+		LString mailFrom = Args.StringAt(SendMsg_MailFrom);
+		auto rcptTo = LString(Args.StringAt(SendMsg_RcptTo)).SplitDelimit(",");
+		LString data = Args.StringAt(SendMsg_Data);
+		if (mailFrom.IsEmpty() ||
+			rcptTo.Length() == 0 ||
+			data.IsEmpty())
+		{
+			ERR("%s:%i - sendMessage missing required args\n", _FL);
+			return false;
+		}
+
+		if (!Session || !MsgStore)
+		{
+			ERR("%s:%i - sendMessage failed: not logged in\n", _FL);
+			return false;
+		}
+
+		IMsgStore *sendStore = MsgStore;
+		struct LStoreReleaseGuard
+		{
+			IMsgStore *Store = nullptr;
+			~LStoreReleaseGuard()
+			{
+				if (Store)
+					Store->Release();
+			}
+		} sendStoreGuard;
+
+		ScribeMsgStores stores(this, Session);
+		MapiEntryRef *defaultStore = nullptr;
+		for (auto e: stores)
+		{
+			if (e && e->IsDefault)
+			{
+				defaultStore = e;
+				break;
+			}
+		}
+		if (defaultStore)
+		{
+			IMsgStore *openedStore = nullptr;
+			auto openHr = Session->OpenMsgStore(Ui,
+													(ULONG)defaultStore->Entry.Length(),
+													(LPENTRYID)&defaultStore->Entry[0],
+													NULL,
+													MAPI_BEST_ACCESS,
+													&openedStore);
+			if (SUCCEEDED(openHr) && openedStore)
+			{
+				sendStore = openedStore;
+				sendStoreGuard.Store = openedStore;
+				LOG("%s:%i - sendMessage using default store '%s'\n", _FL, defaultStore->DisplayName.Get());
+			}
+			else
+			{
+				LOG("%s:%i - sendMessage warning: failed to open default store hr=0x%x, using selected store\n", _FL, openHr);
+			}
+		}
+
+		if (auto support = mapi.MapiGetProp(sendStore, PR_STORE_SUPPORT_MASK))
+		{
+			auto mask = (ULONG)mapi.MapiCastInt(support);
+			LOG("%s:%i - sendMessage store support mask=0x%x\n", _FL, mask);
+			#ifdef STORE_SUBMIT_OK
+			if ((mask & STORE_SUBMIT_OK) == 0)
+				LOG("%s:%i - sendMessage warning: STORE_SUBMIT_OK not set\n", _FL);
+			#endif
+		}
+
+		IMAPIFolder *outbox = nullptr;
+		if (auto outboxEntry = mapi.MapiGetProp(sendStore, PR_IPM_OUTBOX_ENTRYID))
+		{
+			ULONG objType = 0;
+			auto hr = sendStore->OpenEntry(	outboxEntry->Value.bin.cb,
+									(LPENTRYID)outboxEntry->Value.bin.lpb,
+									NULL,
+									MAPI_BEST_ACCESS,
+									&objType,
+									(IUnknown**)&outbox);
+			if (FAILED(hr) || !outbox)
+			{
+				ERR("%s:%i - sendMessage failed: OpenEntry(outbox) hr=0x%x\n", _FL, hr);
+				return false;
+			}
+		}
+		else
+		{
+			ERR("%s:%i - sendMessage failed: no PR_IPM_OUTBOX_ENTRYID\n", _FL);
+			return false;
+		}
+
+		LPMESSAGE msg = nullptr;
+		auto createHr = outbox->CreateMessage(nullptr, 0, &msg);
+		if (FAILED(createHr) || !msg)
+		{
+			outbox->Release();
+			ERR("%s:%i - sendMessage failed: CreateMessage hr=0x%x\n", _FL, createHr);
+			return false;
+		}
+
+		if (!mapi.MapiSetPropStr(msg, PR_MESSAGE_CLASS_A, "IPM.Note"))
+			LOG("%s:%i - sendMessage warning: failed to set PR_MESSAGE_CLASS_A\n", _FL);
+		// Let the active MAPI profile stamp sender identity and transport flags.
+		// Forcing sender/representing props can cause server-side rejection.
+		mapi.MapiSetPropBool(msg, PR_DELETE_AFTER_SUBMIT, false);
+
+		// Ensure a sent copy lands in Sent Items for visibility and troubleshooting.
+		if (auto sentEntry = mapi.MapiGetProp(sendStore, PR_IPM_SENTMAIL_ENTRYID))
+		{
+			SPropValue sent = {};
+			sent.ulPropTag = PR_SENTMAIL_ENTRYID;
+			sent.Value.bin.cb = sentEntry->Value.bin.cb;
+			sent.Value.bin.lpb = sentEntry->Value.bin.lpb;
+			auto sentHr = msg->SetProps(1, &sent, nullptr);
+			if (FAILED(sentHr))
+				LOG("%s:%i - sendMessage warning: failed to set PR_SENTMAIL_ENTRYID hr=0x%x\n", _FL, sentHr);
+		}
+
+		LString::Array recipients;
+		for (auto &r: rcptTo)
+		{
+			auto to = r.Strip();
+			if (to)
+				recipients.Add(to);
+		}
+
+		if (recipients.Length() == 0)
+		{
+			msg->Release();
+			outbox->Release();
+			ERR("%s:%i - sendMessage failed: no valid recipients\n", _FL);
+			return false;
+		}
+
+		ADRLIST *adr = nullptr;
+		auto allocHr = MAPIAllocateBuffer(CbNewADRLIST((ULONG)recipients.Length()), (void**)&adr);
+		if (allocHr != S_OK || !adr)
+		{
+			msg->Release();
+			outbox->Release();
+			ERR("%s:%i - sendMessage failed: ADRLIST alloc hr=0x%x\n", _FL, allocHr);
+			return false;
+		}
+
+		adr->cEntries = (ULONG)recipients.Length();
+		for (unsigned i = 0; i < adr->cEntries; i++)
+		{
+			auto &entry = adr->aEntries[i];
+			entry.cValues = 5;
+			entry.ulReserved1 = 0;
+			auto oneHr = MAPIAllocateBuffer(sizeof(SPropValue) * entry.cValues, (void**)&entry.rgPropVals);
+			if (oneHr != S_OK || !entry.rgPropVals)
+			{
+				for (unsigned j = 0; j < i; j++)
+					MAPIFreeBuffer(adr->aEntries[j].rgPropVals);
+				MAPIFreeBuffer(adr);
+				msg->Release();
+				outbox->Release();
+				ERR("%s:%i - sendMessage failed: recipient props alloc hr=0x%x\n", _FL, oneHr);
+				return false;
+			}
+
+			// Keep recipient backing storage alive until ModifyRecipients returns.
+			const LString &to = recipients[i];
+			SPropValue *p = entry.rgPropVals;
+
+			p[0].ulPropTag = PR_RECIPIENT_TYPE;
+			p[0].Value.l = MAPI_TO;
+			p[0].dwAlignPad = 0;
+
+			p[1].ulPropTag = PR_ADDRTYPE_A;
+			p[1].Value.lpszA = (LPSTR)"SMTP";
+			p[1].dwAlignPad = 0;
+
+			p[2].ulPropTag = PR_DISPLAY_NAME_A;
+			p[2].Value.lpszA = (LPSTR)to.Get();
+			p[2].dwAlignPad = 0;
+
+			p[3].ulPropTag = PR_EMAIL_ADDRESS_A;
+			p[3].Value.lpszA = (LPSTR)to.Get();
+			p[3].dwAlignPad = 0;
+
+			p[4].ulPropTag = PR_SEND_RICH_INFO;
+			p[4].Value.b = false;
+			p[4].dwAlignPad = 0;
+		}
+
+		LPADRBOOK addrBook = nullptr;
+		auto abHr = Session->OpenAddressBook(0, nullptr, AB_NO_DIALOG, &addrBook);
+		if (SUCCEEDED(abHr) && addrBook)
+		{
+			auto resolveHr = addrBook->ResolveName(Ui, 0, nullptr, adr);
+			if (FAILED(resolveHr))
+				LOG("%s:%i - sendMessage warning: ResolveName hr=0x%x (continuing with SMTP props)\n", _FL, resolveHr);
+			addrBook->Release();
+		}
+		else
+		{
+			LOG("%s:%i - sendMessage warning: OpenAddressBook hr=0x%x\n", _FL, abHr);
+		}
+
+		auto modHr = msg->ModifyRecipients(MODRECIP_ADD, adr);
+		for (unsigned i = 0; i < adr->cEntries; i++)
+			MAPIFreeBuffer(adr->aEntries[i].rgPropVals);
+		MAPIFreeBuffer(adr);
+		if (FAILED(modHr))
+		{
+			msg->Release();
+			outbox->Release();
+			ERR("%s:%i - sendMessage failed: ModifyRecipients hr=0x%x\n", _FL, modHr);
+			return false;
+		}
+
+		LString headers, body;
+		auto splitPos = data.Find("\r\n\r\n");
+		auto sepLen = 4;
+		if (splitPos < 0)
+		{
+			splitPos = data.Find("\n\n");
+			sepLen = 2;
+		}
+		if (splitPos >= 0)
+		{
+			headers = data(0, splitPos);
+			body = data(splitPos + sepLen, -1);
+		}
+		else
+		{
+			msg->Release();
+			outbox->Release();
+			ERR("%s:%i - sendMessage failed: no boundary between headers and data\n", _FL);
+			return false;
+		}
+
+		if (headers)
+		{
+			if (auto subj = LGetHeaderField(headers, "Subject"))
+			{
+				if (!mapi.MapiSetPropStr(msg, PR_SUBJECT_A, subj))
+					LOG("%s:%i - sendMessage warning: failed to set PR_SUBJECT_A\n", _FL);
+			}
+		}
+
+		if (body)
+		{
+			if (!mapi.MapiSetPropStr(msg, PR_BODY_A, body))
+				LOG("%s:%i - sendMessage warning: failed to set PR_BODY_A\n", _FL);
+		}
+
+		LDateTime submitNow;
+		submitNow.SetNow();
+		mapi.MapiSetPropDate(msg, PR_CLIENT_SUBMIT_TIME, submitNow);
+
+		auto saveHr = msg->SaveChanges(KEEP_OPEN_READWRITE);
+		if (FAILED(saveHr))
+		{
+			msg->Release();
+			outbox->Release();
+			ERR("%s:%i - sendMessage failed: SaveChanges hr=0x%x\n", _FL, saveHr);
+			return false;
+		}
+
+		LMapiEntry createdMsgEntry;
+		if (auto msgEntry = mapi.MapiGetProp(msg, PR_ENTRYID))
+		{
+			createdMsgEntry = msgEntry;
+			LOG("%s:%i - sendMessage message entry created, cb=%u\n", _FL, (unsigned)msgEntry->Value.bin.cb);
+		}
+
+		// Use normal submission path; FORCE_SUBMIT can bypass normal client flow.
+		ULONG submitFlags = 0;
+		auto submitHr = msg->SubmitMessage(submitFlags);
+		msg->Release();
+		outbox->Release();
+		if (FAILED(submitHr))
+		{
+			ERR("%s:%i - sendMessage failed: SubmitMessage hr=0x%x flags=0x%x\n", _FL, submitHr, submitFlags);
+			return false;
+		}
+
+		LOG("%s:%i - sendMessage SubmitMessage returned hr=0x%x flags=0x%x\n", _FL, submitHr, submitFlags);
+
+		if (createdMsgEntry.Length() > 0)
+		{
+			ULONG submittedObjType = 0;
+			IUnknown *submittedObj = nullptr;
+			auto openSubmittedHr = sendStore->OpenEntry((ULONG)createdMsgEntry.Length(),
+													(LPENTRYID)&createdMsgEntry[0],
+													NULL,
+													MAPI_BEST_ACCESS,
+													&submittedObjType,
+													&submittedObj);
+			LOG("%s:%i - sendMessage post-submit OpenEntry(created-msg) hr=0x%x objType=%u\n", _FL, openSubmittedHr, (unsigned)submittedObjType);
+			if (submittedObj)
+				submittedObj->Release();
+		}
+
+		auto logFolderRows = [&](ULONG folderPropTag, const char *folderName)
+		{
+			auto folderEntry = mapi.MapiGetProp(sendStore, folderPropTag);
+			if (!folderEntry)
+			{
+				LOG("%s:%i - sendMessage post-submit %s entry prop missing\n", _FL, folderName);
+				return;
+			}
+
+			IMAPIFolder *folder = nullptr;
+			ULONG folderObjType = 0;
+			auto openFolderHr = sendStore->OpenEntry(folderEntry->Value.bin.cb,
+													(LPENTRYID)folderEntry->Value.bin.lpb,
+													NULL,
+													MAPI_BEST_ACCESS,
+													&folderObjType,
+													(IUnknown**)&folder);
+			if (FAILED(openFolderHr) || !folder)
+			{
+				LOG("%s:%i - sendMessage post-submit open %s hr=0x%x\n", _FL, folderName, openFolderHr);
+				return;
+			}
+
+			LPMAPITABLE tbl = nullptr;
+			auto tblHr = folder->GetContentsTable(0, &tbl);
+			if (SUCCEEDED(tblHr) && tbl)
+			{
+				ULONG rows = 0;
+				auto rowHr = tbl->GetRowCount(0, &rows);
+				LOG("%s:%i - sendMessage post-submit %s rows hr=0x%x rows=%u\n", _FL, folderName, rowHr, (unsigned)rows);
+				tbl->Release();
+			}
+			else
+			{
+				LOG("%s:%i - sendMessage post-submit %s GetContentsTable hr=0x%x\n", _FL, folderName, tblHr);
+			}
+
+			folder->Release();
+		};
+
+		logFolderRows(PR_IPM_OUTBOX_ENTRYID, "Outbox");
+		logFolderRows(PR_IPM_SENTMAIL_ENTRYID, "SentItems");
+
+		LOG("%s:%i - sendMessage succeeded: from='%s' to='%s'\n", _FL, mailFrom.Get(), LString(",").Join(rcptTo).Get());
 		return true;
 	}
 	else LAssert(!"not impl");

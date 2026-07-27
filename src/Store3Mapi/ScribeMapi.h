@@ -89,7 +89,16 @@ struct LMapiEntry : public LArray<uint8_t>
 
 class LMapiBase
 {
+	LArray<char16*> UnicodeMem;
+
 public:
+	virtual ~LMapiBase()
+	{
+		for (auto &p: UnicodeMem)
+			delete[] p;
+		UnicodeMem.Empty();
+	}
+
 	SPropValue *MapiGetField(SRow *Row, int Field)
 	{
 		if (!Row)
@@ -229,23 +238,40 @@ public:
 		return false;
 	}
 
-	bool MapiSetPropStr(IMAPIProp *Props, int Field, const char *Str, bool Unicode = false)
+	bool MapiSetPropStr(IMAPIProp *Props, int Field, const char *Str)
 	{
-		if (Props && Str)
+		if (!Props || !Str)
 		{
-			LAssert(PROP_TYPE(Field) == PT_STRING8);
-
-			SPropValue p;
-			LString n;
-			p.ulPropTag = Field;
-			if (Unicode)
-				p.Value.lpszA = n = LToNativeCp(Str);
-			else
-				p.Value.lpszA = (LPSTR)Str;
-			
-			HRESULT res = Props->SetProps(1, &p, 0);
-			return SUCCEEDED(res);
+			LAssert(!"invalid param");
+			return false;
 		}
+
+		auto propType = PROP_TYPE(Field);
+		SPropValue p;
+		if (propType == PT_STRING8)
+		{
+			p.ulPropTag = Field;
+			// if (Unicode)
+			// p.Value.lpszA = n = LToNativeCp(Str);
+			p.Value.lpszA = (LPSTR)Str;
+		}
+		else if (propType == PT_UNICODE)
+		{
+			auto w = Utf8ToWide(Str);
+			UnicodeMem.Add(w);
+			p.ulPropTag = Field;
+			p.Value.lpszW = w;
+		}
+		else
+		{
+			LAssert(!"unexpected type.");
+			return false;
+		}
+			
+		HRESULT res = Props->SetProps(1, &p, 0);
+		if (SUCCEEDED(res))
+			return true;
+		LAssert(!"SetProps failed.");
 
 		return false;
 	}
@@ -357,15 +383,15 @@ public:
 	virtual void ReleaseHandle();
 	void SetDirty();
 
-	uint32_t Type() { LAssert(0); return MAGIC_NONE; }
-	bool IsOnDisk() { LAssert(0); return false; }
-	bool IsOrphan() { LAssert(0); return false; }
-	uint64 Size() { LAssert(0); return 0; }
-	Store3Status Save(LDataI *Parent = 0) { LAssert(0); return Store3Error; }
-	Store3Status Delete(bool ToTrash = true) { LAssert(0); return Store3Error; }
-	LDataStoreI *GetStore();
-	LAutoStreamI GetStream(const char *file, int line) { LAssert(0); LAutoStreamI s; return s; }
-	Store3Status SetRfc822(LStreamI *m) { LAssert(0); return Store3Error; }
+	uint32_t Type() override { LAssert(0); return MAGIC_NONE; }
+	bool IsOnDisk() override { LAssert(0); return false; }
+	bool IsOrphan() override { LAssert(0); return false; }
+	uint64 Size() override { LAssert(0); return 0; }
+	Store3Status Save(LDataI *Parent = 0) override { LAssert(0); return Store3Error; }
+	Store3Status Delete(bool ToTrash = true) override { LAssert(0); return Store3Error; }
+	LDataStoreI *GetStore() override;
+	LAutoStreamI GetStream(const char *file, int line) override { LAssert(0); LAutoStreamI s; return s; }
+	Store3Status SetRfc822(LStreamI *m) override { LAssert(0); return Store3Error; }
 };
 
 class LMapiAttachment :
@@ -398,19 +424,19 @@ public:
 
 	Store3CopyDecl;
 
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
 
-	uint32_t Type();
-	bool IsOnDisk();
-	bool IsOrphan();
-	uint64 Size();
-	Store3Status Save(LDataI *Parent = NULL);
-	Store3Status Delete(bool ToTrash = false);
-	LAutoStreamI GetStream(const char *file, int line);
-	void OnSave();
+	uint32_t Type() override;
+	bool IsOnDisk() override;
+	bool IsOrphan() override;
+	uint64 Size() override;
+	Store3Status Save(LDataI *Parent = NULL) override;
+	Store3Status Delete(bool ToTrash = false) override;
+	LAutoStreamI GetStream(const char *file, int line) override;
+	void OnSave() override;
 };
 
 class LMapiMail : public LMapiThing
@@ -436,30 +462,30 @@ public:
 	LMapiMail(LMapiStore *store);
 	~LMapiMail();
 
-	void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst);
-	LPMESSAGE Handle();
+	void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst) override;
+	LPMESSAGE Handle() override;
 
 	// LDataPropI API
 	Store3CopyDecl;
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
-	const LDateTime *GetDate(int id);
-	Store3Status SetDate(int id, const LDateTime *i);
-	LDataPropI *GetObj(int id);
-	Store3Status SetObj(int id, LDataPropI *i);
-	LDataIt GetList(int id);
-	Store3Status SetRfc822(LStreamI *m);
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
+	const LDateTime *GetDate(int id) override;
+	Store3Status SetDate(int id, const LDateTime *i) override;
+	LDataPropI *GetObj(int id) override;
+	Store3Status SetObj(int id, LDataPropI *i) override;
+	LDataIt GetList(int id) override;
+	Store3Status SetRfc822(LStreamI *m) override;
 
 	// LDataI API
-	uint32_t Type() { return MAGIC_MAIL; }
-	bool IsOnDisk() { return true; }
-	bool IsOrphan() { return false; }
-	uint64 Size();
-	Store3Status Save(LDataI *Parent);
-	Store3Status Delete(bool ToTrash = true);
-	LAutoStreamI GetStream(const char *file, int line);
+	uint32_t Type() override { return MAGIC_MAIL; }
+	bool IsOnDisk() override { return true; }
+	bool IsOrphan() override { return false; }
+	uint64 Size() override;
+	Store3Status Save(LDataI *Parent) override;
+	Store3Status Delete(bool ToTrash = true) override;
+	LAutoStreamI GetStream(const char *file, int line) override;
 };
 
 class LMapiCalendar : public LMapiThing
@@ -526,29 +552,29 @@ public:
 	LMapiContact(LMapiStore *store);	
 	~LMapiContact();
 
-	void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst);	
-	LPMESSAGE Handle();
+	void Set(SPropValue *entry, LMapiFolder *parent, LMapiList *lst) override;
+	LPMESSAGE Handle() override;
 
 	// LDataPropI API
 	LDataPropI &operator =(LDataPropI &p);
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
-	const LDateTime *GetDate(int id);
-	Store3Status SetDate(int id, const LDateTime *i);
-	LDataPropI *GetObj(int id);
-	LDataIt GetList(int id);
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
+	const LDateTime *GetDate(int id) override;
+	Store3Status SetDate(int id, const LDateTime *i) override;
+	LDataPropI *GetObj(int id) override;
+	LDataIt GetList(int id) override;
 	const LVariant *GetVar(int id) override;
 
 	// LDataI API
 	LDataI &operator =(LDataI &p);
-	uint32_t Type();
-	bool IsOnDisk();
-	bool IsOrphan();
-	uint64 Size();
-	Store3Status Save(LDataI *Parent);
-	Store3Status Delete(bool ToTrash = true);
+	uint32_t Type() override;
+	bool IsOnDisk() override;
+	bool IsOrphan() override;
+	uint64 Size() override;
+	Store3Status Save(LDataI *Parent) override;
+	Store3Status Delete(bool ToTrash = true) override;
 };
 
 class LMapiFolderField : public LDataPropI
@@ -566,15 +592,15 @@ public:
 
 	// LDataPropI API
 	LDataPropI &operator =(LDataPropI &p);
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
-	const LDateTime *GetDate(int id);
-	Store3Status SetDate(int id, const LDateTime *i);
-	LDataPropI *GetObj(int id);
-	LDataIt GetList(int id);
-	Store3Status SetRfc822(LStreamI *m);
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
+	const LDateTime *GetDate(int id) override;
+	Store3Status SetDate(int id, const LDateTime *i) override;
+	LDataPropI *GetObj(int id) override;
+	LDataIt GetList(int id) override;
+	Store3Status SetRfc822(LStreamI *m) override;
 };
 
 class LMapiFolder : public LDataFolderI, public LMapiBase
@@ -616,34 +642,34 @@ public:
 
 	// LDataPropI API
 	Store3CopyDecl;
-	const char *GetStr(int id);
-	Store3Status SetStr(int id, const char *str);
-	int64 GetInt(int id);
-	Store3Status SetInt(int id, int64 i);
-	const LDateTime *GetDate(int id);
-	Store3Status SetDate(int id, const LDateTime *i);
-	LDataPropI *GetObj(int id);
-	LDataIt GetList(int id);
-	Store3Status SetRfc822(LStreamI *m);
+	const char *GetStr(int id) override;
+	Store3Status SetStr(int id, const char *str) override;
+	int64 GetInt(int id) override;
+	Store3Status SetInt(int id, int64 i) override;
+	const LDateTime *GetDate(int id) override;
+	Store3Status SetDate(int id, const LDateTime *i) override;
+	LDataPropI *GetObj(int id) override;
+	LDataIt GetList(int id) override;
+	Store3Status SetRfc822(LStreamI *m) override;
 
 	// LDataI API
-	uint32_t Type();
-	bool IsOnDisk();
-	bool IsOrphan();
-	uint64 Size();
-	Store3Status Save(LDataI *Parent);
-	Store3Status Delete(bool ToTrash = true);
-	LDataStoreI *GetStore();
-	LAutoStreamI GetStream(const char *file, int line);
+	uint32_t Type() override;
+	bool IsOnDisk() override;
+	bool IsOrphan() override;
+	uint64 Size() override;
+	Store3Status Save(LDataI *Parent) override;
+	Store3Status Delete(bool ToTrash = true) override;
+	LDataStoreI *GetStore() override;
+	LAutoStreamI GetStream(const char *file, int line) override;
 
 	// LDataFolderI API
-	LDataIterator<LDataFolderI*> &SubFolders();
-	LDataIterator<LDataI*> &Children();
-	LDataIterator<LDataPropI*> &Fields();
-	Store3Status DeleteAllChildren();
-	Store3Status FreeChildren();
-	void OnSelect(bool s);
-	void OnCommand(const char *Name);
+	LDataIterator<LDataFolderI*> &SubFolders() override;
+	LDataIterator<LDataI*> &Children() override;
+	LDataIterator<LDataPropI*> &Fields() override;
+	Store3Status DeleteAllChildren() override;
+	Store3Status FreeChildren() override;
+	void OnSelect(bool s) override;
+	void OnCommand(const char *Name) override;
 };
 
 class LMapiList : public LMapiBase
@@ -732,6 +758,7 @@ class MapiEntryRef : public LMapiBase
 public:
 	LString DisplayName;
 	LMapiEntry Entry;
+	bool IsDefault = false;
 
 	MapiEntryRef(LMapiStore *store)
 	{
@@ -771,6 +798,20 @@ public:
 					if (Ref)
 					{
 						Ref->DisplayName = MapiCastString(DisplayName);
+
+						auto def = Lst.GetField(PR_DEFAULT_STORE);
+						if (def)
+						{
+							switch (PROP_TYPE(def->ulPropTag))
+							{
+								case PT_BOOLEAN:
+									Ref->IsDefault = def->Value.b != 0;
+									break;
+								case PT_LONG:
+									Ref->IsDefault = def->Value.l != 0;
+									break;
+							}
+						}
 
 						void *p = NULL;
 						int s = 0;
@@ -849,7 +890,14 @@ public:
 	// MAPI API
 	bool Login();
 
-	// LDom API
+	// LDom API, supported methods:
+	constexpr static const char *Method_init = "init";
+	constexpr static const char *Method_sendMessage = "sendMessage";
+		enum MSendMsgArgs {
+			SendMsg_MailFrom,
+			SendMsg_RcptTo,
+			SendMsg_Data,
+		};
 	bool CallMethod(const char *MethodName, LScriptArguments &Args) override;
 
 	// LDataPropI API

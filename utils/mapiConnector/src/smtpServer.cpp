@@ -73,10 +73,9 @@ struct SmtpServerImpl :
     Context &ctx;
     SmtpOnMessage onMessage;
 
-    SmtpServerImpl(Context &c, SmtpOnMessage cb)
+    SmtpServerImpl(Context &c)
         : LThread("smtpServer.Th")
         , ctx(c)
-        , onMessage(cb)
     {
         Run();
     }
@@ -148,9 +147,8 @@ struct SmtpServerImpl :
 
             while (rdBuf.Find("\n") >= 0)
             {
-                auto rawLine = rdBuf.Pop().Replace("\r");
-                auto line = rawLine.Strip();
-                if (!line)
+                auto line = rdBuf.Pop().Replace("\r");
+                if (!inData && !line)
                     continue;
 
                 if (authState != AuthNone)
@@ -424,8 +422,8 @@ struct SmtpServerImpl :
     }
 };
     
-SmtpServer::SmtpServer(Context &ctx, SmtpOnMessage onMessage)
-    : d(new SmtpServerImpl(ctx, onMessage))
+SmtpServer::SmtpServer(Context &ctx)
+    : d(new SmtpServerImpl(ctx))
 {
 }
 

@@ -4,6 +4,7 @@
 #include "lgi/common/Base64.h"
 
 #include "../common/StringClass.h"
+#include "ScribeMapi.h"
 #include "smtpServer.h"
 
 const char *appName = "mapiConnector";
@@ -245,14 +246,19 @@ class MapiConnector :
 	public LDataEventsI,
 	public LThread,
 	public LCancel,
-	public Context
+	public Context,
+	public LMutex
 {
 	LArray<int> dirtyProps;
 	LArray<ImapConnection*> imapConnections;
+	SmtpServer smtp;
+	LArray<SmtpMessage> sendQueue;
 
 public:
 	MapiConnector() :
-		LThread("MapiConnector")
+		LThread("MapiConn.Th"),
+		LMutex("MapiConn.Lck"),
+		smtp(*this)
 	{
 		log.Print("MapiConnector starting, reading options: %s\n", optionsPath.Get());
 
@@ -275,6 +281,12 @@ public:
 		}
 		else
 		{
+			smtp.SetOnMessage([this](auto &msg)
+				{
+					LMutex::Auto Lck(this, _FL);
+					sendQueue.New() = msg;
+					return true;
+				});
 			Run();
 		}
 	}
@@ -370,7 +382,7 @@ public:
 	{
 		// COM
 		LScriptArguments args(nullptr);
-		auto initOk = store->CallMethod("init", args);
+		auto initOk = store->CallMethod(LMapiStore::Method_init, args);
 		LAssert(initOk);
 
 		// got log in status:
@@ -408,17 +420,6 @@ public:
 
 		// Set up server:
 		LSocket imapListen;
-		SmtpServer smtp(*this, [this](const SmtpMessage &msg)
-		{
-			log.Print("SMTP message received: from='%s', rcptCount=%i, bytes=%i\n",
-				msg.mailFrom.Get(),
-				(int)msg.rcptTo.Length(),
-				(int)msg.data.Length());
-
-			// Hook point for real message delivery into MAPI/store.
-			return true;
-		});
-
 		auto imapPort = options.Get(OptImapPort);
 		auto status = imapListen.Listen(imapPort ? (int)imapPort.Int() : IMAP_PORT);
 		if (!status)
@@ -473,6 +474,28 @@ public:
 							log.Print("Error: not a valid object?\n");
 						}
 					}
+				}
+			}
+
+			{
+				LMutex::Auto Lck(this, _FL);
+				if (sendQueue.Length())
+				{
+					for (auto &msg: sendQueue)
+					{
+						log.Print("Sending SMTP message to %s\n", LString(",").Join(msg.rcptTo).Get());
+
+						#if 1
+							LScriptArguments Args(nullptr);
+							Args[LMapiStore::SendMsg_MailFrom] = new LVariant(msg.mailFrom);
+							Args[LMapiStore::SendMsg_RcptTo] = new LVariant(LString(",").Join(msg.rcptTo));
+							Args[LMapiStore::SendMsg_Data] = new LVariant(msg.data);
+							store->CallMethod("SendMessage", Args);
+						#else
+							printf("msg.data:\n%s\n", msg.data.Get());
+						#endif
+					}
+					sendQueue.Empty();
 				}
 			}
 
