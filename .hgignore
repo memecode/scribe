@@ -23,6 +23,9 @@ x64Release*
 x64Debug*
 Debug*
 Release*
+build
+scribe
+scribe.txt
 
 test\Html\*.html
 test\Html\*.jpg
