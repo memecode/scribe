@@ -34,3 +34,8 @@ test\Html\*.gif
 
 Help\scripting\*.html
 Help\scripting\*.css
+
+utils\mapiConnector\build
+utils\mapiConnector\buildSln
+win\socket*
+win\scribe-setup

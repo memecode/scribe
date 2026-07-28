@@ -107,7 +107,7 @@ LPMESSAGE LMapiMail::Handle()
 				LgiTrace("HandleLoads = %i\n", HandleLoads);
 			}
 		}
-		else Store->Error("%s:%i - OpenEntry failed with 0x%x\n", _FL, e);
+		else Store->ERR("%s:%i - OpenEntry failed with 0x%x\n", _FL, e);
 	}
 	
 	return MapiMsg;
@@ -255,7 +255,7 @@ Store3Status LMapiMail::SetInt(int id, int64 i)
 			{
 				HRESULT res = MapiMsg->SetReadFlag(Flags & MAIL_READ ? 0 : CLEAR_READ_FLAG);
 				if (FAILED(res))
-					Store->Error("%s:%i - SetReadFlag failed with %x\n", _FL, res);
+					Store->ERR("%s:%i - SetReadFlag failed with %x\n", _FL, res);
 			}
 			break;
 		}

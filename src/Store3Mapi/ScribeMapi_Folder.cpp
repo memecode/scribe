@@ -96,9 +96,9 @@ ULONG LMapiFolder::OnNotify(ULONG cNotif, LPNOTIFICATION lpNotif)
 					auto hr = MapiFolder->GetContentsTable(0, &tbl);
 					if (SUCCEEDED(hr) && tbl)
 					{
-						hr = tbl->SeekRow(BOOKMARK_BEGINNING, 0, nullptr);
-
-						for (LMapiList contents(tbl); contents.More(); contents.Next())
+						for (LMapiList contents(tbl)/* this owns the table*/;
+							contents.More();
+							contents.Next())
 						{
 							auto entryProp = contents.GetField(PR_ENTRYID);
 							LMapiEntry entry = entryProp;
@@ -242,7 +242,7 @@ LPMAPIFOLDER LMapiFolder::Handle()
 
 			if (FAILED(res) || !MapiFolder)
 			{
-				Store->Error("%s:%i - OpenEntry failed with 0x%x\n", _FL, res);
+				Store->ERR("%s:%i - OpenEntry failed with 0x%x\n", _FL, res);
 			}
 		}
 		else LAssert(!"No parent MAPI folders.");
@@ -466,7 +466,7 @@ LDataIterator<LDataFolderI*> &LMapiFolder::SubFolders()
 				}
 			}			
 		}
-		else Store->Error("%s:%i - GetHierarchyTable failed with %x\n", _FL, res);
+		else Store->ERR("%s:%i - GetHierarchyTable failed with %x\n", _FL, res);
 
 		Sub.State = Store3Loaded;
 	}
@@ -501,7 +501,7 @@ LDataIterator<LDataI*> &LMapiFolder::Children()
 				else LAssert("store couldn't create object?");
 			}
 		}
-		else Store->Error("%s:%i - GetContentsTable failed with %x\n", _FL, res);
+		else Store->ERR("%s:%i - GetContentsTable failed with %x\n", _FL, res);
 
 		Items.State = Store3Loaded;
 	}

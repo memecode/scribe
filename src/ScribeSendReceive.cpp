@@ -125,39 +125,6 @@ int MakeOpenFlags(ScribeAccount *a, bool Send)
 	return OpenFlags;
 }
 
-/*
-class LProtocolLogger : public LStreamI
-{
-	LViewI *Wnd;
-	int Msg;
-	List<LogEntry> *Log;
-
-public:
-	LProtocolLogger(LViewI *wnd, int msg, List<LogEntry> *log)
-	{
-		Wnd = wnd;
-		Msg = msg;
-		Log = log;
-	}
-
-	ssize_t Read(void *Buffer, ssize_t Size, int Flags = 0)
-	{
-		return -1;
-	}
-	
-	ssize_t Write(const void *b, ssize_t len, int f = 0)
-	{
-		LogEntry *l = new LogEntry(SocketMsgTypeToColour((GSocketI::SocketMsgType)f));
-		if (l)
-		{
-			l->Add((const char*)b, len);
-            Wnd->PostEvent(Msg, (LMessage::Param)Log, (LMessage::Param)l);
-		}
-		return len;
-	}
-};
-*/
-
 void MakeTempPath(char *Path, int PathSize)
 {
 	// Create unique temporary filename
@@ -678,8 +645,7 @@ bool Accountlet::Connect(LView *p, bool quiet)
     						Root->App = Account->GetApp();
     						Root->SetLoadOnDemand();
 
-						    LDataFolderI *r = DataStore->GetRoot();
-							if (r)
+							if (auto r = DataStore->GetRoot())
     							Root->SetObject(r, false, _FL);
 
     						Wnd->Tree->Insert(Root);
