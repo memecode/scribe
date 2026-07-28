@@ -630,7 +630,7 @@ template <class T>
 class ImapLogSocket : public T
 {
 	LAutoPtr<LFile> File;
-	MailProtocolProgress *Prog;
+	MailProtocolProgress *Prog = nullptr;
 
 public:
 	ImapLogSocket(char *file, LCapabilityClient *caps, LStreamI *logger, MailProtocolProgress *prog) :
@@ -653,7 +653,13 @@ public:
 		if (File)
 			File->ChangeThread();
 	}
-	
+
+	void OnDisconnect() override
+	{
+		if (auto log = dynamic_cast<LStream*>(T::GetLog()))
+			log->Print("Disconnected.\n");
+	}
+
 	ssize_t Read(void *ptr, ssize_t size, int flags)
 	{
         memset(ptr, 0, size);
@@ -780,6 +786,7 @@ int ImapThread::Main()
 					Sock = s;
 					if (s)
 					{
+						// Set up cert callback stuff:
 						s->UserRef.Printf("accountId=%i", d->AccountId);
 						s->SetSslOnConnect(SslDirect);
 						s->SetCertCallback([this](auto host, auto *data)
@@ -801,7 +808,7 @@ int ImapThread::Main()
 				}
 				
 				bool reqsOk = true;
-				LOAuth2::Params p = GetOAuth2Params(u.sHost, MAGIC_MAIL);
+				auto p = GetOAuth2Params(u.sHost, MAGIC_MAIL);
 				if (p.Provider != LOAuth2::Params::None)
 				{
 					// Check any requirements:
