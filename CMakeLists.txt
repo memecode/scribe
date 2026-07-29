@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 3.18)
 project(scribe)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (APPLE)
+
 	set(CMAKE_OSX_ARCHITECTURES "x86_64;ARM64")
 	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version")
 elseif (UNIX)
@@ -24,7 +26,8 @@ if (NOT DEFINED LGI_DIR)
     message(FATAL_ERROR "Lgi should be defining LGI_DIR")
 endif()
 
-get_filename_component(ASPELL_DIR ${CMAKE_CURRENT_LIST_DIR}/../libs/aspell-0.60.6.1 ABSOLUTE)
+get_filename_component(SCRIBE_LIBS ${CMAKE_CURRENT_LIST_DIR}/../libs ABSOLUTE)
+set(ASPELL_DIR "${SCRIBE_LIBS}/aspell-0.60.6.1")
 if (NOT EXISTS ${ASPELL_DIR})
     message(FATAL_ERROR "Missing ASPELL_DIR=${ASPELL_DIR}")
 endif()
@@ -43,7 +46,7 @@ elseif (APPLE)
 	set(APP_TYPE MACOSX_BUNDLE)
     set(SPELL_CHECK ${LGI_DIR}/src/mac/cocoa/SpellCheckMac.mm)
 elseif (LINUX)
-	set(APP_ICON Resources/About64px.png)
+	set(APP_ICON resources/About64px.png)
     set(SPELL_CHECK)
 endif()
 
@@ -104,101 +107,103 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Widgets/MonthView.cpp
     ${LGI_DIR}/src/common/Widgets/YearView.cpp
     ${SPELL_CHECK}
-    Code/AddressSelect.cpp
-    Code/BayesDlg.cpp
-    Code/BayesianFilter.cpp
-    Code/Calendar.cpp
-    Code/CalendarView.cpp
-    Code/Components.cpp
-    Code/Encryption/GnuPG.cpp
-    Code/Exp_Scribe.cpp
-    Code/FolderCalendarSource.cpp
-    Code/GBTreeWordStore.cpp
-    Code/GNewMailDlg.cpp
-    Code/RemoteCalendarSource.cpp
-    Code/SearchView.cpp
-    Code/HtmlToText.cpp
-    Code/ImpExp_Mbox.cpp
-    Code/Imp_CsvContacts.cpp
-    Code/Imp_Eml.cpp
-    Code/Imp_Eudora.cpp
-    Code/Imp_Mozilla.cpp
-    Code/Imp_NetscapeContacts.cpp
-    Code/Imp_OutlookExpress.cpp
-    Code/ManageMailStores.cpp
-    Code/MContainer.cpp
-    Code/ObjectInspector.cpp
-    Code/OptionsDlg.cpp
-    Code/PreviewPanel.cpp
-    Code/PrintContext.cpp
-    Code/PrintPreview.cpp
-    Code/ReplicateDlg.cpp
-    Code/ScribeAbout.cpp
-    Code/ScribeAccount.cpp
-    Code/ScribeAccountPreview.cpp
-    Code/ScribeAccountUI.cpp
-    Code/ScribeApp.cpp
-    Code/ScribeAttachment.cpp
-    Code/ScribeContact.cpp
-    Code/ScribeFilter.cpp
-    Code/ScribeFinder.cpp
-    Code/ScribeFolder.cpp
-    Code/ScribeFolderDlg.cpp
-    Code/ScribeFolderProp.cpp
-    Code/ScribeFolderSelect.cpp
-    Code/ScribeFolderTree.cpp
-    Code/ScribeGroup.cpp
-    Code/ScribeItemList.cpp
-    Code/ScribeLangDlg.cpp
-    Code/ScribeListAddr.cpp
-    Code/ScribeMail.cpp
-    Code/ScribeMain.cpp
-    Code/ScribePageSetup.cpp
-    Code/ScribePassword.cpp
-    Code/ScribeSendReceive.cpp
-    Code/ScribeSockets.cpp
-    Code/ScribeStatusPanel.cpp
-    Code/ScribeThing.cpp
-    Code/ScribeUi.cpp
-    Code/ScribeUtils.cpp
-    Code/Scripting.cpp
-    Code/SecurityDlg.cpp
-    Code/Sqlite/v3.6.14/sqlite3.c
-    Code/Store3Common.cpp
-    Code/Store3Imap/ScribeImap_Attachment.cpp
-    Code/Store3Imap/ScribeImap_Folder.cpp
-    Code/Store3Imap/ScribeImap_Mail.cpp
-    Code/Store3Imap/ScribeImap_Store.cpp
-    Code/Store3Imap/ScribeImap_Thread.cpp
-    Code/Store3Mail3/Mail3Attachment.cpp
-    Code/Store3Mail3/Mail3Calendar.cpp
-    Code/Store3Mail3/Mail3Contact.cpp
-    Code/Store3Mail3/Mail3Filter.cpp
-    Code/Store3Mail3/Mail3Folder.cpp
-    Code/Store3Mail3/Mail3Group.cpp
-    Code/Store3Mail3/Mail3Mail.cpp
-    Code/Store3Mail3/Mail3Store.cpp
-    Code/Store3Webdav/WebdavCalendar.cpp
-    Code/Store3Webdav/WebdavContact.cpp
-    Code/Store3Webdav/WebdavFolder.cpp
-    Code/Store3Webdav/WebdavStore.cpp
-    Code/Store3Webdav/WebdavThread.cpp
-    Code/TitlePage.cpp
-    Utils/Tables/MailFlags.c
+    src/AddressSelect.cpp
+    src/BayesDlg.cpp
+    src/BayesianFilter.cpp
+    src/Calendar.cpp
+    src/CalendarView.cpp
+    src/Components.cpp
+    src/Encryption/GnuPG.cpp
+    src/Exp_Scribe.cpp
+    src/FolderCalendarSource.cpp
+    src/GBTreeWordStore.cpp
+    src/NewMailDlg.cpp
+    src/RemoteCalendarSource.cpp
+    src/SearchView.cpp
+    src/HtmlToText.cpp
+    src/ImpExp_Mbox.cpp
+    src/Imp_CsvContacts.cpp
+    src/Imp_Eml.cpp
+    src/Imp_Eudora.cpp
+    src/Imp_Mozilla.cpp
+    src/Imp_NetscapeContacts.cpp
+    src/Imp_OutlookExpress.cpp
+    src/ManageMailStores.cpp
+    src/MContainer.cpp
+    src/ObjectInspector.cpp
+    src/OptionsDlg.cpp
+    src/PreviewPanel.cpp
+    src/PrintContext.cpp
+    src/PrintPreview.cpp
+    src/ReplicateDlg.cpp
+    src/ScribeAbout.cpp
+    src/ScribeAccount.cpp
+    src/ScribeAccountPreview.cpp
+    src/ScribeAccountUI.cpp
+    src/ScribeApp.cpp
+    src/ScribeAttachment.cpp
+    src/ScribeContact.cpp
+    src/ScribeFilter.cpp
+    src/ScribeFinder.cpp
+    src/ScribeFolder.cpp
+    src/ScribeFolderDlg.cpp
+    src/ScribeFolderProp.cpp
+    src/ScribeFolderSelect.cpp
+    src/ScribeFolderTree.cpp
+    src/ScribeGroup.cpp
+    src/ScribeItemList.cpp
+    src/ScribeLangDlg.cpp
+    src/ScribeListAddr.cpp
+    src/ScribeMail.cpp
+    src/ScribeMain.cpp
+    src/ScribePageSetup.cpp
+    src/ScribePassword.cpp
+    src/ScribeSendReceive.cpp
+    src/ScribeSockets.cpp
+    src/ScribeStatusPanel.cpp
+    src/ScribeThing.cpp
+    src/ScribeUi.cpp
+    src/ScribeUtils.cpp
+    src/Scripting.cpp
+    src/SecurityDlg.cpp
+    src/StrToDom.cpp
+    src/ScribeIpc.cpp
+    src/Sqlite/v3.50.1/sqlite3.c
+    src/Store3Common.cpp
+    src/Store3Imap/ScribeImap_Attachment.cpp
+    src/Store3Imap/ScribeImap_Folder.cpp
+    src/Store3Imap/ScribeImap_Mail.cpp
+    src/Store3Imap/ScribeImap_Store.cpp
+    src/Store3Imap/ScribeImap_Thread.cpp
+    src/Store3Mail3/Mail3Attachment.cpp
+    src/Store3Mail3/Mail3Calendar.cpp
+    src/Store3Mail3/Mail3Contact.cpp
+    src/Store3Mail3/Mail3Filter.cpp
+    src/Store3Mail3/Mail3Folder.cpp
+    src/Store3Mail3/Mail3Group.cpp
+    src/Store3Mail3/Mail3Mail.cpp
+    src/Store3Mail3/Mail3Store.cpp
+    src/Store3Webdav/WebdavCalendar.cpp
+    src/Store3Webdav/WebdavContact.cpp
+    src/Store3Webdav/WebdavFolder.cpp
+    src/Store3Webdav/WebdavStore.cpp
+    src/Store3Webdav/WebdavThread.cpp
+    src/TitlePage.cpp
+    utils/Tables/MailFlags.c
     )
 
 if (WIN32)
 
     target_sources(scribe PRIVATE
-        Code/Store3Mapi/ScribeMapi_Attachment.cpp
-        Code/Store3Mapi/ScribeMapi_Calendar.cpp
-        Code/Store3Mapi/ScribeMapi_Contact.cpp
-        Code/Store3Mapi/ScribeMapi_Folder.cpp
-        Code/Store3Mapi/ScribeMapi_Mail.cpp
-        Code/Store3Mapi/ScribeMapi_Store.cpp
-        Code/Store3Mapi/ScribeMapi_Thing.cpp
-        Code/ImpExp_Outlook.cpp
-        Code/Resource.rc
+        src/Store3Mapi/ScribeMapi_Attachment.cpp
+        src/Store3Mapi/ScribeMapi_Calendar.cpp
+        src/Store3Mapi/ScribeMapi_Contact.cpp
+        src/Store3Mapi/ScribeMapi_Folder.cpp
+        src/Store3Mapi/ScribeMapi_Mail.cpp
+        src/Store3Mapi/ScribeMapi_Store.cpp
+        src/Store3Mapi/ScribeMapi_Thing.cpp
+        src/ImpExp_Outlook.cpp
+        src/Resource.rc
         ${LGI_DIR}/src/common/Coding/ExternCall.asm
         )
 
@@ -213,12 +218,10 @@ endif()
 
 target_include_directories(scribe
     PRIVATE
-        Code
-        Code/Sqlite
-        Resources
-        Utils/Tables
-        $<TARGET_PROPERTY:libpng16,INCLUDE_DIRECTORIES>
-        $<TARGET_PROPERTY:libjpeg9a,INCLUDE_DIRECTORIES>
+        src
+        src/Sqlite
+        resources
+        utils/Tables
         ${LGI_DIR}/private/common
         ${ASPELL_DIR}/interfaces/cc
         ${OPENSSL_INCLUDE_DIR})
@@ -227,8 +230,6 @@ target_link_libraries(scribe
     PRIVATE
         lgi
         chardet
-        libjpeg9a
-        libpng16
         bzip2
         btree
         ntlm)
@@ -243,9 +244,22 @@ if (APPLE)
 
 elseif (LINUX)
     
+    target_include_directories(scribe
+        PRIVATE
+            $<$<CONFIG:Debug>:${LGI_DEPS_DEBUG}/include>
+            $<$<NOT:$<CONFIG:Debug>>:${LGI_DEPS_RELEASE}/include>
+            $<$<CONFIG:Debug>:${SCRIBE_LIBS}/build-x64-debug/include>
+            $<$<NOT:$<CONFIG:Debug>>:${SCRIBE_LIBS}/build-x64-release/include>
+            )
+
     target_link_libraries(scribe
         PRIVATE
             dl)
+
+    target_link_directories(scribe
+        PRIVATE
+            $<$<CONFIG:Debug>:${LGI_DEPS_DEBUG}/lib>
+            $<$<NOT:$<CONFIG:Debug>>:${LGI_DEPS_RELEASE}/lib>)
 
     add_dependencies(scribe crash-handler)
 
@@ -254,12 +268,12 @@ elseif (LINUX)
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:crash-handler>" "${CMAKE_CURRENT_BINARY_DIR}"
         )
 
-    set(DEPLOY ${CODELIB}/appimagetool-x86_64.AppImage)
+    get_filename_component(DEPLOY "~/apps/appimagetool-x86_64.AppImage" ABSOLUTE)
     if (NOT EXISTS ${DEPLOY})
         message(WARNING "No appimage tool at '${DEPLOY}', skipping 'dist' target.")
     else()
 
-        execute_process(COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/Utils/getversion.py
+        execute_process(COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/utils/getversion.py
             OUTPUT_VARIABLE VERSION
             RESULT_VARIABLE result
             OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -275,6 +289,31 @@ elseif (LINUX)
         set(LIBDIR ${APPDIR}/usr/lib)
         set(RESDIR ${APPDIR}/usr/share/applications)
 
+        # we're building libpng here, because for linux putting it in the Lgi deps breaks
+        # things for linux (if you put that lib folder in the path)
+        include(FetchContent)
+        FetchContent_Declare(zlib
+            GIT_REPOSITORY https://github.com/madler/zlib.git
+            GIT_TAG        v1.3.2)
+        FetchContent_Declare(libpng
+            GIT_REPOSITORY https://github.com/pnggroup/libpng.git
+            GIT_TAG        v1.6.58)
+
+        # Make zlib available first, then force libpng to find this zlib.
+        FetchContent_MakeAvailable(zlib)
+
+        # Use FindZLIB module mode (not ZLIBConfig.cmake), because the build-tree
+        # config package can reference export files that are not always generated.
+        unset(ZLIB_DIR CACHE)
+        set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
+        set(ZLIB_ROOT "${zlib_BINARY_DIR}" CACHE PATH "Path to fetched zlib build" FORCE)
+        set(ZLIB_INCLUDE_DIR "${zlib_SOURCE_DIR}" CACHE PATH "Fetched zlib include dir" FORCE)
+        set(ZLIB_LIBRARY "${zlib_BINARY_DIR}/libz.so" CACHE FILEPATH "Fetched zlib library" FORCE)
+        set(ZLIB_LIBRARY_RELEASE "${zlib_BINARY_DIR}/libz.so" CACHE FILEPATH "Fetched zlib release library" FORCE)
+        set(ZLIB_LIBRARY_DEBUG "${zlib_BINARY_DIR}/libz.so" CACHE FILEPATH "Fetched zlib debug library" FORCE)
+
+        FetchContent_MakeAvailable(libpng)
+
         add_custom_target(dist-linux
             COMMAND rm -rf ${APPDIR}
             COMMAND echo "Building AppDir..."
@@ -283,58 +322,58 @@ elseif (LINUX)
             COMMAND mkdir -p ${RESDIR}
             COMMAND echo "Copying binaries..."
             # executables:
-            COMMAND cp $<TARGET_FILE:scribe>        ${BINDIR}
-            COMMAND cp $<TARGET_FILE:crash-handler> ${BINDIR}
+            COMMAND cp $<TARGET_FILE:scribe>                    ${BINDIR}
+            COMMAND cp $<TARGET_FILE:crash-handler>             ${BINDIR}
             # libraries:
-            COMMAND cp $<TARGET_FILE:lgi>           ${LIBDIR}
-            COMMAND cp $<TARGET_FILE:aspell>        ${LIBDIR}
-            COMMAND cp $<TARGET_FILE:chardet>       ${LIBDIR}
-            COMMAND cp $<TARGET_FILE:libpng16>      ${LIBDIR}
-            COMMAND ln -s ./$<TARGET_FILE_NAME:libpng16> ${LIBDIR}/libpng16.so 
-            COMMAND cp $<TARGET_FILE:zlib>          ${LIBDIR}
-            COMMAND cp $<TARGET_FILE:libjpeg9a>     ${LIBDIR}
+            COMMAND cp $<TARGET_FILE:lgi>                       ${LIBDIR}
+            COMMAND cp $<TARGET_FILE:aspell>                    ${LIBDIR}
+            COMMAND cp $<TARGET_FILE:chardet>                   ${LIBDIR}
+            COMMAND cp $<TARGET_FILE:png_shared>                ${LIBDIR}
+            COMMAND ln -s ./$<TARGET_FILE_NAME:png_shared>      ${LIBDIR}/libpng.so 
+            COMMAND cp $<TARGET_FILE:zlib>                      ${LIBDIR}
+            COMMAND cp ${LGI_DEPS_RELEASE}/lib/libjpeg.so       ${LIBDIR}
+            COMMAND cp ${LGI_DEPS_RELEASE}/lib/libplutovg.so.1  ${LIBDIR}
             # Resources:
             COMMAND echo "Copy resources..."
-            COMMAND chmod 700 ${CMAKE_CURRENT_LIST_DIR}/Resources/AppRun
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/AppRun               ${APPDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Linux/scribe.desktop ${APPDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/About64px.png        ${APPDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Scribe.lr8           ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Flags.png            ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Icons-16.png         ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/xgate-icons-32.png   ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/About.html           ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/About64px.png        ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Title.html           ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Title.png            ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/NoFace*.png          ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/EmojiMap.png         ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/Preview*.html        ${RESDIR}
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/tray_*.png           ${RESDIR}
+            COMMAND chmod 700 ${CMAKE_CURRENT_LIST_DIR}/resources/AppRun
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/AppRun               ${APPDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/Linux/scribe.desktop ${APPDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/About64px.png        ${APPDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/Scribe.lr8           ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/Flags.png            ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/Icons-16.png         ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/xgate-icons-32.png   ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/About.html           ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/About64px.png        ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/Title.html           ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/Title.png            ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/NoFace*.png          ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/EmojiMap.png         ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/Preview*.html        ${RESDIR}
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/tray_*.png           ${RESDIR}
             # Help and scripting:
             COMMAND echo "Creating DOM documentation..."
-            COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/Code/Py/DomScan.py > ${RESDIR}/Dom.txt
-            COMMAND mkdir -p ${RESDIR}/Help/scripting
+            COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/src/Py/DomScan.py > ${RESDIR}/Dom.txt
+            COMMAND mkdir -p ${RESDIR}/help/scripting
             COMMAND echo "Help files..."
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Help/*.html                    ${RESDIR}/Help
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Help/*.css                     ${RESDIR}/Help
-            COMMAND cp ${LGI_DIR}/docs/scripting/*.html                         ${RESDIR}/Help/scripting
-            COMMAND cp ${LGI_DIR}/docs/scripting/*.css                          ${RESDIR}/Help/scripting
-            COMMAND mkdir -p ${RESDIR}/Scripts
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Scripts/*.script               ${RESDIR}/Scripts
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Scripts/ScribeScripts.h        ${RESDIR}/Scripts
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/resdefs.h            ${RESDIR}/Scripts
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/help/*.html                    ${RESDIR}/help
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/help/*.css                     ${RESDIR}/help
+            COMMAND cp ${LGI_DIR}/docs/scripting/*.html                         ${RESDIR}/help/scripting
+            COMMAND cp ${LGI_DIR}/docs/scripting/*.css                          ${RESDIR}/help/scripting
+            COMMAND mkdir -p ${RESDIR}/scripts
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/scripts/*.script               ${RESDIR}/scripts
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/scripts/ScribeScripts.h        ${RESDIR}/scripts
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/resdefs.h            ${RESDIR}/scripts
             # Spell check:
-            COMMAND mkdir -p ${RESDIR}/Aspell/data
-            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/Resources/aspell-languages.csv ${RESDIR}/Aspell
-            COMMAND cp ${ASPELL_DIR}/data/*.cmap ${RESDIR}/Aspell/data
-            COMMAND cp ${ASPELL_DIR}/data/*.cset ${RESDIR}/Aspell/data
-            COMMAND cp ${ASPELL_DIR}/data/*.kbd ${RESDIR}/Aspell/data
+            COMMAND mkdir -p ${RESDIR}/aspell/data
+            COMMAND cp ${CMAKE_CURRENT_LIST_DIR}/resources/aspell-languages.csv ${RESDIR}/aspell
+            COMMAND cp ${ASPELL_DIR}/data/*.cmap                                ${RESDIR}/aspell/data
+            COMMAND cp ${ASPELL_DIR}/data/*.cset                                ${RESDIR}/aspell/data
+            COMMAND cp ${ASPELL_DIR}/data/*.kbd                                 ${RESDIR}/aspell/data
             # Output appimage:
-            COMMAND @echo "Building AppImage..."
-            COMMAND ${DEPLOY} ${APPDIR}
+            COMMAND echo "Building AppImage..."
+            COMMAND "${DEPLOY}" "${APPDIR}"
         )
-
 
     endif()
 
@@ -363,14 +402,14 @@ elseif (WIN32)
     else()
 
         # Copy in the files that the installer will reference:
-        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Utils/Store DESTINATION ${CMAKE_BINARY_DIR}/Utils)
-        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Code/Py DESTINATION ${CMAKE_BINARY_DIR}/Code)
-        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Resources DESTINATION ${CMAKE_BINARY_DIR})
-        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Scripts DESTINATION ${CMAKE_BINARY_DIR})
-        file(COPY ${CMAKE_CURRENT_LIST_DIR}/Help DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/utils/Store DESTINATION ${CMAKE_BINARY_DIR}/Utils)
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/src/Py DESTINATION ${CMAKE_BINARY_DIR}/Code)
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/scripts DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${CMAKE_CURRENT_LIST_DIR}/help DESTINATION ${CMAKE_BINARY_DIR})
         
         # Generate the installer:
-        set(NSI_IN "${CMAKE_CURRENT_LIST_DIR}/Windows/Installer-64bit.nsi.in")
+        set(NSI_IN "${CMAKE_CURRENT_LIST_DIR}/win/Installer-64bit.nsi.in")
         if (NOT EXISTS ${NSI_IN})
             message(FATAL_ERROR "Expecting to see ${NSI_IN}")
         endif()
@@ -390,8 +429,8 @@ if (NOT APPLE)
 
     add_custom_command(TARGET scribe POST_BUILD
         COMMENT "Copy resource files."
-        COMMAND cp -R "${CMAKE_CURRENT_LIST_DIR}/Resources" "${CMAKE_CURRENT_BINARY_DIR}"
-        COMMAND cp -R "${CMAKE_CURRENT_LIST_DIR}/Scripts" "${CMAKE_CURRENT_BINARY_DIR}"
+        COMMAND cp -R "${CMAKE_CURRENT_LIST_DIR}/resources" "${CMAKE_CURRENT_BINARY_DIR}"
+        COMMAND cp -R "${CMAKE_CURRENT_LIST_DIR}/scripts" "${CMAKE_CURRENT_BINARY_DIR}"
         )
 
 endif()

@@ -16,8 +16,9 @@ def scan(path):
 			scan(full)
 		else:		
 			ext = f.lower().split(".")[-1]
-			if f.find("Html2.cpp") >= 0:
+			if f.find("Html2.cpp") >= 0 or ext == "o" or ext == "idx":
 				continue
+
 			if ext == "h" or f.find("Variant.cpp") >= 0:
 				# put headers first, we need the OPT_ defs before we parse the Contacts
 				src = [full] + src
