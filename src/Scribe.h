@@ -1705,57 +1705,33 @@ class ScribeClass Accountlet : public LStream
 	friend class AccountThread;
 
 public:
-	struct AccountletPriv
+	struct AccountletLog
 	{
 		LArray<LogEntry*> Log;
 	};
 
-	class AccountletLock
-	{
-		LMutex *l;
-
-	public:
-		bool Locked;
-		AccountletPriv *d;
-
-		AccountletLock(AccountletPriv *data, LMutex *lck, const char *file, int line)
-		{
-			d = data;
-			l = lck;
-			Locked = lck->Lock(file, line);
-		}
-
-		~AccountletLock()
-		{
-			if (Locked)
-				l->Unlock();
-		}
-	};
-
-	typedef LAutoPtr<AccountletLock> I;
-
 private:
-	AccountletPriv d;
-	LMutex PrivLock;
+	AccountletLog _log;
+	LThreadSafeInterface<AccountletLog> d;
 
 protected:
 	// Data
-	ScribeAccount *Account = NULL;
+	ScribeAccount *Account = nullptr;
 	LAutoPtr<AccountThread> Thread;
 	LError err;
-	MailProtocol *Client = NULL;
+	MailProtocol *Client = nullptr;
 	uint64 LastOnline = 0;
 	LString TempPsw;
 	bool Quiet = false;
-	LView *Parent = NULL;
+	LView *Parent = nullptr;
 
 	// Pointers
-	ScribeFolder *Root = NULL;
-	LDataStoreI *DataStore = NULL;
-	LMailStore *MailStore = NULL; // this memory is owned by ScribeWnd
+	ScribeFolder *Root = nullptr;
+	LDataStoreI *DataStore = nullptr;
+	LMailStore *MailStore = nullptr; // this memory is owned by ScribeWnd
 
 	// Options
-	const char *OptPassword = NULL;
+	const char *OptPassword = nullptr;
 
 	// Members
 	LSocketI *CreateSocket(bool Sending, LCapabilityClient *Caps, bool RawLFCheck);
@@ -1780,12 +1756,9 @@ public:
 		return *this;
 	}
 
-	I Lock(const char *File, int Line)
+	LThreadSafeInterface<AccountletLog>::Locked Lock(const char *File, int Line)
 	{
-		I a(new AccountletLock(&d, &PrivLock, File, Line));
-		if (!a->Locked)
-			a.Reset();
-		return a;
+		return d.Lock(File, Line);
 	}
 
 	// Methods
@@ -1845,8 +1818,8 @@ public:
 	virtual void OnBeforeDelete();
 
 	// LDom impl
-	bool GetVariant(const char *Name, LVariant &Value, const char *Array = NULL);
-	bool SetVariant(const char *Name, LVariant &Value, const char *Array = NULL);
+	bool GetVariant(const char *Name, LVariant &Value, const char *Array = nullptr);
+	bool SetVariant(const char *Name, LVariant &Value, const char *Array = nullptr);
 
 	// Virtuals
 	virtual void Main(AccountletThread *Thread) = 0;

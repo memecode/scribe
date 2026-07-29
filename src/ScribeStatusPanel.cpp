@@ -39,17 +39,15 @@ class LAccountLog : public LAccountLogParent
 	LString sEmpty;
 
 public:
-	LogEntry *Prev;
+	LogEntry *Prev = nullptr;
 
 	LAccountLog() : LAccountLogParent(-1)
 	{
-		Prev = NULL;
 		SetPourLargest(true);
 		SetWrapType(L_WRAP_NONE);
 		sEmpty.Printf("(%s)", LLoadString(IDS_EMPTY));
 
-		LFont *f = new LFont;
-		if (f)
+		if (auto f = new LFont)
 		{
 			*f = *LSysFont;
 			f->PointSize(f->PointSize() - 1);
@@ -59,17 +57,16 @@ public:
 
 	void Empty()
 	{
-		Name(NULL);
-		Rgb.Length(0);
+		Name(nullptr);
+		Rgb.Empty();
 	}
 
 	void AddText(char16 *Txt, size_t Chars, LColour &c)
 	{
-		for (size_t i=0; i<Chars; i++)
-		{
-			if (Txt[i] == '\n')
+		auto end = Txt + Chars;
+		for (auto *p = Txt; p < end; p++)
+			if (*p == '\n')
 				Rgb.Add(c.c32());
-		}
 		
 		LAccountLogParent::Add(Txt, Chars);
 	}
@@ -631,7 +628,7 @@ void AccountStatusPanel::OnAccountSelect(AccountStatusItem *Item)
 
 			if (Current)
 			{
-				Accountlet *Lets[2] =
+				Accountlet *accountlets[2] =
 				{
 					&Current->Send,
 					&Current->Receive
@@ -639,72 +636,76 @@ void AccountStatusPanel::OnAccountSelect(AccountStatusItem *Item)
 
 				for (int i=0; i<CountOf(Ctrls); i++)
 				{
-					LAccountLog *al;
+					LAccountLog *al; // text log view
 					if (Log->GetViewById(Ctrls[i], al))
 					{
-						auto Priv = Lets[i]->Lock(_FL);
-						if (Priv)
+						auto logs = accountlets[i]->Lock(_FL);
+						if (!logs)
+							continue;
+
+						auto &l = logs->Log;
+						if (l.Length())
 						{
-							auto &l = Priv->d->Log;
-							if (l.Length())
+							if (!al->Prev ||
+								al->Prev != l[0])
 							{
-								if (!al->Prev ||
-									al->Prev != l[0])
-								{
-									// Changed content
-									al->Empty();
-									al->Prev = l[0];
-								}
+								// Changed content
+								al->Empty();
+								al->Prev = l[0];
+							}
 
-								auto StartTs = LCurrentTime();
-								size_t pos = 0;
-								for (unsigned i=0; i<l.Length(); i++)
+							auto StartTs = LCurrentTime();
+							size_t pos = 0;
+							bool addTimeout = false;
+							for (auto &e: l)
+							{
+								auto existingLen = al->LAccountLogParent::Length();
+								size_t end = pos + e->Txt.Length();
+								if (end > existingLen)
 								{
-									LogEntry *e = l[i];
-
-									size_t end = pos + e->Txt.Length();
-									size_t ch = al->LAccountLogParent::Length();
-									if (end > ch)
+									// Hasn't been added (fully)
+									ssize_t offset = 0;
+									size_t len = e->Txt.Length();
+									if (existingLen > pos)
 									{
-										ssize_t offset = 0;
-										size_t len = e->Txt.Length();
-										if (al->LAccountLogParent::Length() > pos)
-										{
-											offset = al->LAccountLogParent::Length() - pos;
-											len -= offset;
-										}
-
-										LColour c = e->GetColour();
-										al->AddText(e->Txt.AddressOf(offset), len, c);
+										// Partial add:
+										offset = existingLen - pos;
+										len -= offset;
 									}
-									pos += e->Txt.Length();
 
-									auto CurTs = LCurrentTime();
-									if (CurTs - StartTs >= 1000)
-										break;
+									auto col = e->GetColour();
+									al->AddText(e->Txt.AddressOf(offset), len, col);
 								}
+								pos += e->Txt.Length();
 
-								auto Taken = LCurrentTime() - StartTs;
-								if (Taken > 200)
+								auto CurTs = LCurrentTime();
+								if (CurTs - StartTs >= 200)
 								{
-									al->Empty();
-									
-									// Delete the first 1/3 of the log...
-									LRange r(0, (ssize_t)(l.Length() * 0.33));
-									if (r.Len == 0)
-										r.Len++;
-
-									LgiTrace("%s:%i - Log processing blocking (" LPrintfInt64 "ms), removing " LPrintfSizeT " oldest items.\n",
-											_FL, Taken, r.Len);
-
-									l.DeleteRange(r);
-									al->Prev = l[0];
+									LgiTrace("%s:%i - adding log entries timeout.\n", _FL);
+									addTimeout = true;
+									break;
 								}
 							}
-							else if (!al->Length())
+
+							if (addTimeout)
 							{
 								al->Empty();
+								
+								// Delete the first 1/3 of the log...
+								LRange r(0, (ssize_t)(l.Length() * 0.33));
+								if (r.Len == 0)
+									r.Len++;
+
+								LgiTrace("%s:%i - Log processing blocking, removing " LPrintfSizeT " oldest items.\n",
+										_FL, r.Len);
+
+								l.DeleteRange(r);
+								al->Prev = l[0];
 							}
+						}
+						else if (!al->Length())
+						{
+							al->Empty();
 						}
 					}
 				}

@@ -344,6 +344,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/include/lgi/common/Net.h \
 	../../lgi/trunk/include/lgi/common/Notifications.h \
 	../../lgi/trunk/include/lgi/common/OAuth2.h \
+	../../lgi/trunk/include/lgi/common/OpenSSLSocket.h \
 	../../lgi/trunk/include/lgi/common/OptionsFile.h \
 	../../lgi/trunk/include/lgi/common/Palette.h \
 	../../lgi/trunk/include/lgi/common/Panel.h \

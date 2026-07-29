@@ -323,7 +323,8 @@ LList *MailTransferEvent::GetList()
 }
 
 ////////////////////////////////////////////////////////////////////////////
-Accountlet::Accountlet(ScribeAccount *a) : PrivLock("Accountlet")
+Accountlet::Accountlet(ScribeAccount *a)
+	: d(&_log, "Accountlet.Logs")
 {
 	Account = a;
 	State = ThreadIdle;
@@ -346,12 +347,8 @@ Accountlet::Accountlet(ScribeAccount *a) : PrivLock("Accountlet")
 
 Accountlet::~Accountlet()
 {
-	I Lck = Lock(_FL);
-	if (Lck)
-	{
-		Lck->d->Log.DeleteObjects();
-		Lck.Reset();
-	}
+	if (auto Lck = Lock(_FL))
+		Lck->Log.DeleteObjects();
 	DeleteObj(Root);
 	DeleteObj(DataStore);
 }
@@ -545,11 +542,10 @@ ssize_t Accountlet::Write(const void *buf, ssize_t size, int flags)
 		return 0;
 
 	auto col = SocketMsgTypeToColour((LSocketI::SocketMsgType)flags);
-	I Lck = Lock(_FL);
-	if (Lck)
+	if (auto Lck = Lock(_FL))
 	{
 		bool Match = false;
-		LArray<LogEntry*> &Log = Lck->d->Log;
+		auto &Log = Lck->Log;
 		if (Log.Length() > 0)
 			Match = Log.Last()->GetColour() == col;
 
@@ -586,12 +582,8 @@ bool Accountlet::Connect(LView *p, bool quiet)
 {
 	bool Status = false;
 
-	I Lck = Lock(_FL);
-	if (Lck)
-	{
-		Lck->d->Log.DeleteObjects();
-		Lck.Reset();
-	}
+	if (auto Lck = Lock(_FL))
+		Lck->Log.DeleteObjects();
 
 	if (Lock())
 	{
@@ -692,12 +684,8 @@ bool Accountlet::Connect(LView *p, bool quiet)
 				// Setup
 				Enabled(false);
 
-				I Lck = Lock(_FL);
-				if (Lck)
-				{
-					Lck->d->Log.DeleteObjects();
-					Lck.Reset();
-				}
+				if (auto Lck = Lock(_FL))
+					Lck->Log.DeleteObjects();
 
 				auto StartThread = [this]()
 				{
