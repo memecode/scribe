@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 3.18)
 project(scribe)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 17)
 
 if (APPLE)
 
@@ -13,7 +14,6 @@ elseif (WIN32)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 endif()
-set(CMAKE_CXX_STANDARD 14)
 
 # Get all the libs we need:
 add_subdirectory(../../lgi/trunk lgi)
