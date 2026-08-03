@@ -4389,7 +4389,7 @@ bool Mail::OnMenu(LDocView *View, int Id, void *Context)
 			if (Id >= IDM_CHARSET_BASE)
 			{
 				int n=0;
-				LCharset *c;
+				const LCharset *c;
 				for (c = LGetCsList(); c->Charset; c++, n++)
 				{
 					if (Id - IDM_CHARSET_BASE == n)
@@ -4882,7 +4882,7 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 
     // Attach control
 	Owner->SetDoc(View, MimeType);
-	LCharset *CsInfo = LGetCsInfo(Charset);
+	auto CsInfo = LGetCsInfo(Charset);
 
 	// Check for render scripts
 	LArray<LScriptCallback*> Renderers;

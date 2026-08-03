@@ -453,7 +453,8 @@ protected:
 	// The only exception to this is when a new email is being appended to the mailbox,
 	// In that case it'll exist (with a temporary filename and no UID) in the Mail store
 	// for a little while until the thread responds with an IMAP_APPEND msg.
-	LHashTbl<IntKey<uint32_t>,ImapMail::IMeta> UidMap;
+	constexpr static int INVALID_UID = 0;
+	LHashTbl<IntKey<uint32_t,INVALID_UID>,ImapMail::IMeta> UidMap;
 	DIterator<LDataI, ImapMail, ImapStore> Mail;
 
 	void Swap(ImapFolderData &s)
