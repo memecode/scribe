@@ -40,6 +40,7 @@
 		3445E58A1F1F42BA00D0A824 /* ObjectInspector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5891F1F42BA00D0A824 /* ObjectInspector.cpp */; };
 		345F31461CC7A3B400656B8B /* Icons-16.png in Resources */ = {isa = PBXBuildFile; fileRef = 345F31451CC7A3B400656B8B /* Icons-16.png */; };
 		345F314C1CC7A46B00656B8B /* xgate-icons-32.png in Resources */ = {isa = PBXBuildFile; fileRef = 345F314B1CC7A46B00656B8B /* xgate-icons-32.png */; };
+		346227583009124100FDBD85 /* LgiCocoa.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 34C6DFBD2FE0AF9F008FC0C2 /* LgiCocoa.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		346E1A47231292C60019B4AA /* PreviewMail.html in Resources */ = {isa = PBXBuildFile; fileRef = 346E1A44231292C60019B4AA /* PreviewMail.html */; };
 		346E1A48231292C60019B4AA /* PreviewContact.html in Resources */ = {isa = PBXBuildFile; fileRef = 346E1A45231292C60019B4AA /* PreviewContact.html */; };
 		346E1A49231292C60019B4AA /* PreviewGroup.html in Resources */ = {isa = PBXBuildFile; fileRef = 346E1A46231292C60019B4AA /* PreviewGroup.html */; };
@@ -166,6 +167,7 @@
 		3497D5522399D288009FCC14 /* Mail Filters Menu.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5462399D260009FCC14 /* Mail Filters Menu.script */; };
 		3497D5542399D2AB009FCC14 /* resdefs.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5532399D2A5009FCC14 /* resdefs.h */; };
 		349AB0C0217B3D9500573982 /* scribe-mac-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */; };
+		34A32EAE30107AF1000939B2 /* StrToDom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A32EAD30107AF1000939B2 /* StrToDom.cpp */; };
 		34A66681237968A200ED0212 /* FolderCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A66680237968A200ED0212 /* FolderCalendarSource.cpp */; };
 		34A891DF2B0C177100D2930B /* libcrypto.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A891DD2B0C177100D2930B /* libcrypto.3.dylib */; };
 		34A891E12B0C178000D2930B /* libssl.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A891E02B0C178000D2930B /* libssl.3.dylib */; };
@@ -255,6 +257,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				346227583009124100FDBD85 /* LgiCocoa.framework in Copy Files */,
 				340AE3832E2CA7A3009F705F /* libjpeg.62.4.0.dylib in Copy Files */,
 				340AE3822E2CA79E009F705F /* libpng16.16.45.git.dylib in Copy Files */,
 				34A891E32B0C17B900D2930B /* libcrypto.3.dylib in Copy Files */,
@@ -516,6 +519,7 @@
 		3497D5492399D260009FCC14 /* Delete Duplicate Messages.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Delete Duplicate Messages.script"; path = "../../scripts/Delete Duplicate Messages.script"; sourceTree = "<group>"; };
 		3497D5532399D2A5009FCC14 /* resdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resdefs.h; path = ../../resources/resdefs.h; sourceTree = "<group>"; };
 		349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "scribe-mac-icon.icns"; path = "../../resources/scribe-mac-icon.icns"; sourceTree = "<group>"; };
+		34A32EAD30107AF1000939B2 /* StrToDom.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StrToDom.cpp; sourceTree = "<group>"; };
 		34A66680237968A200ED0212 /* FolderCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FolderCalendarSource.cpp; path = ../../src/FolderCalendarSource.cpp; sourceTree = "<group>"; };
 		34A891DD2B0C177100D2930B /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.3.dylib; path = /opt/local/libexec/openssl3/lib/libcrypto.3.dylib; sourceTree = "<absolute>"; };
 		34A891E02B0C178000D2930B /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.3.dylib; path = /opt/local/libexec/openssl3/lib/libssl.3.dylib; sourceTree = "<absolute>"; };
@@ -896,6 +900,7 @@
 		3477C35F1CC226370028B84B /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				34A32EAD30107AF1000939B2 /* StrToDom.cpp */,
 				340AE3862E2CBC87009F705F /* LoadMailStoreState.h */,
 				34723EA62A8EE5D200EC80E8 /* ScribeIpc.cpp */,
 				34723EB62A8EE5D200EC80E8 /* ScribeIpc.h */,
@@ -1355,6 +1360,7 @@
 				3477C4E71CC27D2B0028B84B /* MailHttp.cpp in Sources */,
 				3477C3DB1CC227ED0028B84B /* ScribeContact.cpp in Sources */,
 				3477C4EF1CC27F500028B84B /* ZoomView.cpp in Sources */,
+				34A32EAE30107AF1000939B2 /* StrToDom.cpp in Sources */,
 				3477C4581CC262AF0028B84B /* ScriptLibrary.cpp in Sources */,
 				3477C3B21CC227ED0028B84B /* BayesianFilter.cpp in Sources */,
 				3445E5881F1F428400D0A824 /* TextBlock.cpp in Sources */,
@@ -1579,8 +1585,8 @@
 					"../../../lgi/deps/build-debug/include",
 					../../../lgi/trunk/include/lgi/mac/cocoa,
 					/opt/local/include,
-					/opt/local/libexec/openssl3/include,
 					/opt/local/libexec/jpeg/include,
+					/opt/local/libexec/openssl3/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1632,8 +1638,8 @@
 					"../../../lgi/deps/build-debug/include",
 					../../../lgi/trunk/include/lgi/mac/cocoa,
 					/opt/local/include,
-					/opt/local/libexec/openssl3/include,
 					/opt/local/libexec/jpeg/include,
+					/opt/local/libexec/openssl3/include,
 				);
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
