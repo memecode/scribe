@@ -1910,7 +1910,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 	return Status;
 }
 
-int CsCmp(LCharset **a, LCharset **b)
+int CsCmp(const LCharset **a, const LCharset **b)
 {
 	return _stricmp((*a)->Charset, (*b)->Charset);
 }
@@ -2210,8 +2210,8 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		{
 			LSubMenu s;
 
-			LArray<LCharset*> Cs;
-			for (LCharset *c = LGetCsList(); c->Charset; c++)
+			LArray<const LCharset*> Cs;
+			for (auto c = LGetCsList(); c->Charset; c++)
 			{
 				Cs.Add(c);
 			}

@@ -4346,7 +4346,7 @@ bool Mail::AppendItems(LSubMenu *Menu, const char *Param, int Base)
 		if (Charset)
 		{
 			int n=0;
-			for (LCharset *c = LGetCsList(); c->Charset; c++, n++)
+			for (auto c = LGetCsList(); c->Charset; c++, n++)
 				Charset->AppendItem(c->Charset, IDM_CHARSET_BASE + n, c->IsAvailable());
 		}
 	}
