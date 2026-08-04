@@ -853,6 +853,10 @@ struct ImapFolderLoadThread :
 
 		auto startTs = LCurrentTime();
 		ssize_t pos = 0;
+		
+		// The main thread doesn't have access to this, we've swapped it out.
+		UidMap.ownThread = LCurrentThreadId();
+		
 		for (auto it: UidMap)
 		{
 			#if IMAP_PROTOBUF
@@ -978,6 +982,7 @@ void ImapFolder::OnLoadMail(bool Threaded)
 	{
 		// Return all the data to the main folder
 		ImapFolderData::Swap(*LoadThread.Get());
+		UidMap.ownThread = LCurrentThreadId();
 
 		// NULL out the data pointers
 		for (auto m: Mail.a)
@@ -1807,14 +1812,14 @@ void ImapFolder::Swap(ImapFolder &f)
 	f.SetParent(p1);
 
 	#if IMAP_PROTOBUF
-	LSwap(ThreadView, f.ThreadView);
-	LSwap(PermRead, f.PermRead);
-	LSwap(PermWrite, f.PermWrite);
-	LSwap(SortField, f.SortField);
-	LSwap(Expanded, f.Expanded);
-	LSwap(UnreadCount, f.UnreadCount);
+		LSwap(ThreadView, f.ThreadView);
+		LSwap(PermRead, f.PermRead);
+		LSwap(PermWrite, f.PermWrite);
+		LSwap(SortField, f.SortField);
+		LSwap(Expanded, f.Expanded);
+		LSwap(UnreadCount, f.UnreadCount);
 	#else
-	Meta.Swap(f.Meta);
+		Meta.Swap(f.Meta);
 	#endif
 	RootName.Swap(f.RootName);
 	Folders.Swap(f.Folders);

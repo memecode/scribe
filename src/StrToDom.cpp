@@ -1,7 +1,8 @@
 #include "Scribe.h"
 
-static LHashTbl<ConstStrKey<char,false>, ScribeDomType> Scribe_StrToDom(0, SdNone);
-static LHashTbl<IntKey<int,SdNone>, const char *> Scribe_DomToStr;
+// Static tables: don't require locking.
+static LHashTbl<ConstStrKey<char,false>, ScribeDomType, true> Scribe_StrToDom(0, SdNone);
+static LHashTbl<IntKey<int,SdNone>, const char *, true> Scribe_DomToStr;
 
 void InitStrToDom()
 {
