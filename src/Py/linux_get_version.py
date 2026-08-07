@@ -52,7 +52,7 @@ if (not inc):
 	print "Error: failed to open ScribeInc.h"
 	sys.exit(-1)
 
-ProductName = "i.Scribe"
+ProductName = "Scribe"
 s = inc.read().split("\n")
 for i,line in enumerate(s):
 	parts = line.split()
@@ -61,8 +61,6 @@ for i,line in enumerate(s):
 			ScribeVer = parts[2].strip("\"").split(".")
 		elif (parts[1] == "ScribeTag"):
 			ScribeTag = parts[2].strip("\"")
-		elif (parts[1] == "InScribe"):
-			ProductName = "InScribe"
 
 ScribeTagNum = ""
 for i,ch in enumerate(ScribeTag):

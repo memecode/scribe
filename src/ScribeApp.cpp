@@ -489,7 +489,6 @@ const char OptionsFileName[] = "ScribeOptions";
 const char AuthorEmailAddr[] = "fret@memecode.com";
 const char AuthorHomepage[] = "http://www.memecode.com";
 const char ApplicationHomepage[] = "http://www.memecode.com/scribe.php";
-const char CommercialHomepage[] = "http://www.memecode.com/inscribe.php";
 const char FaqHomepage[] = "http://www.memecode.com/scribe/faq.php";
 
 const char *DefaultFolderNames[16];
@@ -1204,7 +1203,6 @@ void ScribeWnd::Construct3()
 			SetMenuIcon(IDM_MEMECODE, ICON_LINK);
 			SetMenuIcon(IDM_HOMEPAGE, ICON_LINK);
 			SetMenuIcon(IDM_SCRIBE_FAQ, ICON_LINK);
-			SetMenuIcon(IDM_INSCRIBE_LINK, ICON_LINK);
 			SetMenuIcon(IDM_VERSION_HISTORY, ICON_LINK);
 			SetMenuIcon(IDM_DEBUG_INFO, ICON_LINK);
 			SetMenuIcon(IDM_TUTORIALS, ICON_LINK);
@@ -8416,11 +8414,6 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		case IDM_TUTORIALS:
 		{
 			LExecute("http://www.memecode.com/scribe/tutorials");
-			break;
-		}
-		case IDM_INSCRIBE_LINK:
-		{
-			LExecute(CommercialHomepage);
 			break;
 		}
 		case IDM_SCRIBE_FAQ:

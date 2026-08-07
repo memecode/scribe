@@ -177,7 +177,6 @@
 #define IDC_SUB_FOLDERS							275
 #define IDM_FEEDBACK							287
 #define IDM_SCRIBE_LINK							291
-#define IDM_INSCRIBE_LINK						292
 #define IDM_FAQ									293
 #define IDC_READ								316
 #define IDD_SUB_FOLDERS							317
