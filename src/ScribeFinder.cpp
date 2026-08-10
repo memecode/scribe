@@ -18,11 +18,12 @@
 #include "lgi/common/Button.h"
 #include "lgi/common/CheckBox.h"
 #include "lgi/common/Combo.h"
-#include "resdefs.h"
 #include "lgi/common/DragAndDrop.h"
 #include "lgi/common/TableLayout.h"
 #include "lgi/common/LgiRes.h"
+#include "lgi/common/PopupNotification.h"
 
+#include "resdefs.h"
 #define IDC_RESULTS 90
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -746,6 +747,7 @@ class FindWnd :
 	{
 		for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
 		{
+			printf("%s:%i - child: %s\n", _FL, c->GetText());
 			folders.Add(c);
 			AddSubFolders(c);
 		}
@@ -1068,6 +1070,7 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 		}
 		case IDOK:
 		{
+			printf("idok...\n");
 			if (!Results || !FolderEdit)
 			{
 				LAssert(!"missing params");
@@ -1081,6 +1084,13 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 			}
 				
 			Results->Empty();
+
+			// Reset per-search state so each run starts from the selected root.
+			searchText.Length(0);
+			folders.Length(0);
+			curFolder = -1;
+			curItem = 0;
+			curFolderPath.Empty();
 
 			mailField = -1;
 			contactField = -1;
@@ -1105,7 +1115,8 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 				}
 			}
 			
-			if (auto Root = App->GetFolder(FolderEdit->Name()))
+			LString path = FolderEdit->Name();
+			if (auto Root = App->GetFolder(path))
 			{
 				auto it = Root->Items.begin();
 
@@ -1142,6 +1153,7 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 				itemsSearched = 0;
 				
 				folders.Add(Root);
+				printf("deep:%i\n", deep);
 				if (deep)
 					AddSubFolders(Root);
 
@@ -1183,6 +1195,7 @@ int FindWnd::OnNotify(LViewI *Col, const LNotification &n)
 				startTs = LCurrentTime();
 				OnSearch(true);
 			}
+			else LPopupNotification::Message(this, LString::Fmt("Failed to get folder '%s'", path.Get()));
 			break;
 		}
 	}

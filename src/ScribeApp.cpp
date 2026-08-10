@@ -8922,9 +8922,9 @@ bool ScribeWnd::OnMailStore(LMailStore **MailStore, bool Add)
 
 LMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 {
-	THREAD_UNSAFE(NULL);
+	THREAD_UNSAFE(nullptr);
 	if (!Path)
-		return NULL;
+		return nullptr;
 
 	auto t = LString(Path).SplitDelimit("/");
 	if (t.Length() > 0)
@@ -8932,20 +8932,25 @@ LMailStore *ScribeWnd::GetMailStoreForPath(const char *Path)
 		const char *First = t[0];
 		
 		// Find the mail store that that t[0] refers to
-		for (unsigned i=0; i<Folders.Length(); i++)
+		for (auto &f: Folders)
 		{
-			if (Folders[i].IsOk())
+			if (!f.IsOk())
 			{
-				const char *RootStr = Folders[i].GetRoot()->GetText();
-				if (RootStr && !_stricmp(RootStr, First))
-				{
-					return &Folders[i];
-				}
+				printf("%s:%i - folder not ok.\n", _FL);
+				continue;
 			}
+			
+			if (auto r = f.GetRoot())
+			{
+				auto rootStr = r->GetText();
+				if (!Stricmp(rootStr, First))
+					return &f;
+			}
+			else printf("%s:%i - no root folder?\n", _FL);
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 ScribeFolder *ScribeWnd::GetFolder(const char *Name, LMailStore *s)
@@ -9013,11 +9018,11 @@ ScribeFolder *ScribeWnd::GetFolder(const char *Name, LMailStore *s)
 		s = GetDefaultMailStore();
 	}
 
-	if (s && Name)
+	if (s)
 	{
-		if (_stricmp(Name, "/") == 0)
+		if (!Name || Stricmp(Name, "/") == 0)
 			return s->GetRoot();
-	
+		
 		Folder = s->GetRoot() ? s->GetRoot()->GetSubFolder(Name) : NULL;
 	}
 
