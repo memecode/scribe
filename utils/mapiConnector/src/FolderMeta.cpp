@@ -52,7 +52,7 @@ bool FolderMeta::serialize(bool write)
 					uidMap.Add(p[1], uid);
 					nextUid = MAX(uid, nextUid);
 				}
-				else LAssert(!"invalid token count");
+				else LgiTrace("%s:%i - invalid token count: %s\n", _FL, l.Get());
 			}
 		}
 
