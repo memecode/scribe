@@ -1144,8 +1144,7 @@ bool Contact::GetVariant(const char *Name, LVariant &Value, const char *Array)
 				{
 					if (Bin->Type == GV_BINARY)
 					{
-						auto Png = LFilterFactory::New("name.png", O_WRITE, NULL);
-						if (Png)
+						if (auto Png = LFilterFactory::New("name.png", O_WRITE, nullptr))
 						{
 							if (!d->Image)
 							{

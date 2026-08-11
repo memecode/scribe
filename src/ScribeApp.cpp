@@ -20,6 +20,7 @@
 #define TRAY_MAIL_BASE				10000
 
 // Includes
+#include <cstddef>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -2328,8 +2329,7 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 {
 	THREAD_UNSAFE(false);
 
-	ScribeDomType Fld = StrToDom(Name);
-	switch (Fld)
+	switch (StrToDom(Name))
 	{
 		case SdQuote: // Type: String
 		{
@@ -2391,14 +2391,19 @@ bool ScribeWnd::GetVariant(const char *Name, LVariant &Value, const char *Array)
 				lastUpdate = now;
 				
 				// Due to the asyncronous nature of SummaryOfToday, it maybe waiting for network calendars....
+				auto selectedFolder = Tree ? Tree->Selection() : nullptr;
 				Calendar::SummaryOfToday(this,
-					[this](auto s)
+					[this, selectedFolder](auto s)
 					{
 						// This is called sometime after the value is returned to the caller...
 						d->CalendarSummary = s;
 						
-						// But we can refresh the display, with the new value:
-						LoadTitleListPane();
+						auto curFolder = Tree ? Tree->Selection() : nullptr;
+						if (curFolder == selectedFolder)
+						{
+							// But we can refresh the display, with the new value:
+							LoadTitleListPane();
+						}
 					});
 			}
 
