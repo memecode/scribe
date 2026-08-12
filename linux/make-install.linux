@@ -63,9 +63,6 @@ BTREE_SO="$LIBS/libbtree.so"
 
 # lgi libs:
 LGI_SO="$LGI/$BUILD/liblgi-gtk3$TAG.so"
-LIBPNG="$LGI_DEPS/libpng*.so*"
-# ZLIB="$LGI_DEPS/libz*.so*"
-LIBJPEG="$LGI_DEPS/libjpeg*.so*"
 LIBNTLM="$LGI_DEPS/libntlm.so"
 ICONV="$LGI_DEPS/libiconv.so"
 
@@ -89,9 +86,9 @@ cp $BTREE_SO   $LIBDIR
 
 cp $LGI/src/linux/CrashHandler/crash-handler $BINDIR
 cp $LGI_SO     $LIBDIR
-cp -av --preserve=links $LIBPNG     $LIBDIR
-# cp -av --preserve=links $ZLIB       $LIBDIR
-cp -av --preserve=links $LIBJPEG    $LIBDIR
+cp -av --preserve=links $LGI_DEPS/libpng*-lgi.so*       $LIBDIR
+cp -av --preserve=links $LGI_DEPS/libz*-lgi.so*         $LIBDIR
+cp -av --preserve=links $LGI_DEPS/libjpeg*.so*          $LIBDIR  
 cp $LIBNTLM    $LIBDIR
 cp $ICONV      $LIBDIR
 
@@ -135,5 +132,3 @@ cp ../../libs/aspell-0.60.6.1/data/*.kbd $RESDIR/Aspell/data
 
 echo "Building AppImage..."
 $DEPLOY $APPDIR
-
-
