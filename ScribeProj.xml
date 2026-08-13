@@ -6,7 +6,7 @@
 			<Node File="./haiku/makefile.haiku" Type="9" Platforms="15" />
 		</Node>
 		<Node File="./build.py" Type="8" Platforms="15" />
-		<Node File="./linux/make-install.linux" Type="7" Platforms="0" />
+		<Node File="./linux/make-install.linux" Type="7" Platforms="2" />
 		<Node File="./linux/make-zip.linux" Type="8" Platforms="15" />
 		<Node File="./linux/Makefile.linux" Type="9" Platforms="15" />
 	</Node>
@@ -434,11 +434,9 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 				<Linux>
 					<Debug>../../lgi/trunk/include/lgi/linux/Gtk
 ../../lgi/trunk/include/lgi/linux
-../../../../codelib/openssl/include
 </Debug>
 					<Release>../../lgi/trunk/include/lgi/linux/Gtk
 ../../lgi/trunk/include/lgi/linux
-../../../../codelib/openssl/include
 </Release>
 				</Linux>
 				<Haiku>
