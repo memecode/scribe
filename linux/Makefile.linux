@@ -43,7 +43,8 @@ ifeq ($(Build),Debug)
 		-L../../lgi/trunk/$(BuildDir) \
 		-L$(LGI_GTK3_DIR)/../deps/build-x64-debug/lib \
 		-Wl,-rpath-link,$(LGI_GTK3_DIR)/../deps/build-x64-debug/lib \
-		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/$(LGI_GTK3_DIR)/../deps/build-x64-debug/lib'
+		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/$(LGI_GTK3_DIR)/../deps/build-x64-debug/lib' \
+		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/$(LGI_GTK3_DIR)/$(BuildDir)'
 	Inc =  \
 		-I../../lgi/deps/build-x64-debug/include \
 		-I../../lgi/trunk/include \
@@ -79,7 +80,8 @@ else
 		-L../../lgi/trunk/$(BuildDir) \
 		-L$(LGI_GTK3_DIR)/../deps/build-x64-release/lib \
 		-Wl,-rpath-link,$(LGI_GTK3_DIR)/../deps/build-x64-release/lib \
-		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/$(LGI_GTK3_DIR)/../deps/build-x64-release/lib'
+		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/$(LGI_GTK3_DIR)/../deps/build-x64-release/lib' \
+		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/$(LGI_GTK3_DIR)/$(BuildDir)'
 	Inc =  \
 		-I../../lgi/deps/build-x64-release/include \
 		-I../../lgi/trunk/include \
