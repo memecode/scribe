@@ -18,7 +18,6 @@ BuildDir = $(Build)
 CFlags = -MMD -MP -fPIC -fno-inline
 CppFlags = $(CFlags) -fpermissive -std=c++17
 LGI_GTK3_DIR=../../lgi/trunk
-SCRIBEPROJ_DIR=../libs/build-x64-debug/lib
 
 ifeq ($(Build),Debug)
 	CFlags += -g3 -ggdb3 -fno-optimize-sibling-calls -fno-omit-frame-pointer -Wno-format-truncation
@@ -26,19 +25,16 @@ ifeq ($(Build),Debug)
 	Tag = d
 	Defs = -D_DEBUG -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
-		-L../libs/build-x64-debug/libchardet \
-		-L../libs/build-x64-debug/bzip2-1.0.6 \
+		-L../libs/build-x64-debug/lib \
 		-lchardet \
 		-lbzip2 \
 		-lpthread \
 		-ldl \
-		-lpng \
-		-ljpeg \
-		-lz \
+		-lz-lgi \
 		`pkg-config --libs gtk+-3.0` \
-		-L$(SCRIBEPROJ_DIR)//home/matthew/code/scribe/libs/build-x64-debug/lib \
-		-Wl,-rpath-link,$(SCRIBEPROJ_DIR)//home/matthew/code/scribe/libs/build-x64-debug/lib \
-		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/$(SCRIBEPROJ_DIR)//home/matthew/code/scribe/libs/build-x64-debug/lib' \
+		-L../libs/build-x64-debug/lib \
+		-Wl,-rpath-link,../libs/build-x64-debug/lib \
+		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/../libs/build-x64-debug/lib' \
 		-llgi-gtk3$(Tag) \
 		-L../../lgi/trunk/$(BuildDir) \
 		-L$(LGI_GTK3_DIR)/../deps/build-x64-debug/lib \
@@ -63,19 +59,16 @@ else
 	CppFlags += -g -Os -Wno-format-truncation
 	Defs = -DLINUX -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DPOSIX -DSCRIBE_APP -DLIBPNG_SHARED=1 -DLIBJPEG_SHARED=1 -DLIBPNG_VERSION=\"1.5\" -DPOSIX
 	Libs =  \
-		-L../libs/build-x64-release/libchardet \
-		-L../libs/build-x64-release/bzip2-1.0.6 \
+		-L../libs/build-x64-release/lib \
 		-lchardet \
 		-lbzip2 \
 		-lpthread \
 		-ldl \
-		-lpng \
-		-ljpeg \
-		-lz \
+		-lz-lgi \
 		`pkg-config --libs gtk+-3.0` \
-		-L$(SCRIBEPROJ_DIR)//home/matthew/code/scribe/libs/build-x64-release/lib \
-		-Wl,-rpath-link,$(SCRIBEPROJ_DIR)//home/matthew/code/scribe/libs/build-x64-release/lib \
-		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/$(SCRIBEPROJ_DIR)//home/matthew/code/scribe/libs/build-x64-release/lib' \
+		-L../libs/build-x64-release/lib \
+		-Wl,-rpath-link,../libs/build-x64-release/lib \
+		-Wl,--disable-new-dtags,-rpath,'$$ORIGIN/../libs/build-x64-release/lib' \
 		-llgi-gtk3$(Tag) \
 		-L../../lgi/trunk/$(BuildDir) \
 		-L$(LGI_GTK3_DIR)/../deps/build-x64-release/lib \
