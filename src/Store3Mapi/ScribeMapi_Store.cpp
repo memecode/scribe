@@ -729,7 +729,7 @@ bool LMapiStore::CallMethod(const char *MethodName, LScriptArguments &Args)
 		msg.Release();
 		{
 			ULONG objType = 0;
-			hr = MsgStore->OpenEntry(	createdMsgEntry.Length(),
+			hr = MsgStore->OpenEntry(	(ULONG)createdMsgEntry.Length(),
 										createdMsgEntry,
 										NULL,
 										MAPI_BEST_ACCESS,
@@ -1245,7 +1245,7 @@ bool MapiEntryRef::OpenRoot(LPMAPISESSION Session, UI_TYPE UiHnd, IMsgStore **Ms
 			if (res == MAPI_E_UNKNOWN_FLAGS && (ulStoreFlags & MDB_ONLINE))
 			{
 				ulStoreFlags &= ~MDB_ONLINE; // Strip the flag and try again
-				res = Session->OpenMsgStore(UiHnd, Entry.Length(), (LPENTRYID)&Entry[0], NULL, ulStoreFlags, MsgStore);
+				res = Session->OpenMsgStore(UiHnd, (ULONG)Entry.Length(), (LPENTRYID)&Entry[0], NULL, ulStoreFlags, MsgStore);
 			}
 
 			if (FAILED(res))

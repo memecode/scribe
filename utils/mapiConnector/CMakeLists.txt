@@ -17,6 +17,7 @@ set(LGI_FILES
     ${LGI_DIR}/src/common/Net/Mime.cpp
     ${LGI_DIR}/src/common/Net/OAuth2.cpp
     ${LGI_DIR}/src/common/Net/OpenSSLSocket.cpp
+    ${LGI_DIR}/include/lgi/common/OpenSSLSocket.h
     ${LGI_DIR}/src/common/Net/Http.cpp)
 
 set(STORE_MAPI_FILES
@@ -52,6 +53,11 @@ source_group("Source Files\\Mapi" FILES ${STORE_MAPI_FILES})
 target_link_libraries(mapiConnector
     PRIVATE
         lgi)
+
+add_custom_command(TARGET mapiConnector POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:lgi>
+        $<TARGET_FILE_DIR:mapiConnector>)
 
 target_include_directories(mapiConnector
     PRIVATE
