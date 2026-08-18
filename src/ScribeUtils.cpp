@@ -1766,6 +1766,28 @@ const char *ToString(ScribeProtocol p)
 	return NULL;
 }
 
+const char *toString(THtmlViewCtrl ctrl)
+{
+	switch (ctrl)
+	{
+		case TLgiHtml1: return "LgiHtml1";
+		case TLgiHtml2: return "LgiHtml2";
+		case TLiteHtmlView: return "LiteHtmlView";
+	}
+	return nullptr;
+}
+
+const char *toString(TSoftwareUpdateTime v)
+{
+	switch (v)
+	{
+		case TUpdateWeekly: return LLoadString(IDS_WEEK);
+		case TUpdateMonthly: return LLoadString(IDS_MONTH);
+		case TUpdateYearly: return LLoadString(IDS_YEAR);
+	}
+	return nullptr;
+}
+
 /////////////////////////////////////////////////////////////////
 void PatternBox(LSurface *pDC, const LRect &r)
 {

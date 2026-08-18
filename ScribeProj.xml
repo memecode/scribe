@@ -93,12 +93,23 @@
 			<Node File="../../lgi/trunk/src/common/Gdc2/Font/EmojiFont.cpp" Type="2" Platforms="15" />
 		</Node>
 		<Node Name="Html" Type="1" Platforms="15" Open="0" Id="12">
-			<Node File="../../lgi/trunk/src/common/Text/Html.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/include/lgi/common/Html.h" Type="3" Platforms="15" />
+			<Node Name="LiteHtml" Type="1" Platforms="15" Id="1">
+				<Node File="../../lgi/trunk/src/common/LiteHtml/LiteHtmlView.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/include/lgi/common/LiteHtmlView.h" Type="3" Platforms="15" />
+			</Node>
+			<Node Name="Html2" Type="1" Platforms="15" Id="2">
+				<Node File="../../lgi/trunk/src/common/Text/Html2.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/include/lgi/common/Html2.h" Type="3" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Text/HtmlPriv2.h" Type="3" Platforms="15" />
+			</Node>
 			<Node File="../../lgi/trunk/src/common/Text/HtmlCommon.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Text/HtmlParser.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/include/lgi/common/HtmlParser.h" Type="3" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Text/HtmlPriv.h" Type="3" Platforms="15" />
+			<Node Name="Html1" Type="1" Platforms="15" Id="3">
+				<Node File="../../lgi/trunk/src/common/Text/Html.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/include/lgi/common/Html.h" Type="3" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Text/HtmlPriv.h" Type="3" Platforms="15" />
+			</Node>
 		</Node>
 		<Node Name="RichTextEdit" Type="1" Platforms="15" Open="0" Id="13">
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp" Type="2" Platforms="15" />
@@ -404,8 +415,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>./scribe</Release>
 				</Haiku>
 			</Executable>
-			<CCrossCompiler />
-			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -472,9 +481,13 @@ network</Release>
 				</Haiku>
 				<All>
 					<Debug>chardet
-bzip2</Debug>
+bzip2
+litehtml
+gumbo</Debug>
 					<Release>chardet
-bzip2</Release>
+bzip2
+litehtml
+gumbo</Release>
 				</All>
 			</Libraries>
 			<Defines>
@@ -511,21 +524,18 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 </Debug>
 					<Release>../libs/build-x64-release/lib</Release>
 				</All>
-				<Linux />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
 					<Debug>scribe</Debug>
 					<Release>scribe</Release>
 				</Haiku>
-				<Linux />
 			</TargetName>
 			<Options>
 				<Linux>
 					<Debug>-Wno-format-truncation</Debug>
 					<Release>-Wno-format-truncation</Release>
 				</Linux>
-				<All />
 			</Options>
 			<ApplicationIcon>
 				<Haiku>./resources/scribe.hvif</Haiku>
@@ -544,31 +554,15 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
-			<CommentFile />
-			<CommentFunction />
 		</Editor>
-		<Advanced>
-			<PostBuildCommands>
-				<Linux />
-			</PostBuildCommands>
-			<OtherMakefileRules />
-		</Advanced>
+		<Advanced />
 		<Debug>
-			<Arguments>
-				<All />
-			</Arguments>
-			<Environment>
-				<All>LD_LIBRARY_PATH=/home/matthew/gtk3/build/gtk:/home/matthew/gtk3/build/gdk</All>
-			</Environment>
 			<DebugAdmin>
 				<All>0</All>
 			</DebugAdmin>
-			<InitialDir />
-			<Debugger />
+			<Environment>
+				<All>LD_LIBRARY_PATH=/home/matthew/gtk3/build/gtk:/home/matthew/gtk3/build/gdk</All>
+			</Environment>
 		</Debug>
-		<Remote>
-			<RemoteUri />
-			<RemotePass />
-		</Remote>
 	</Settings>
 </Project>

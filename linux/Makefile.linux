@@ -28,6 +28,8 @@ ifeq ($(Build),Debug)
 		-L../libs/build-x64-debug/lib \
 		-lchardet \
 		-lbzip2 \
+		-llitehtml \
+		-lgumbo \
 		-lpthread \
 		-ldl \
 		-lz-lgi \
@@ -62,6 +64,8 @@ else
 		-L../libs/build-x64-release/lib \
 		-lchardet \
 		-lbzip2 \
+		-llitehtml \
+		-lgumbo \
 		-lpthread \
 		-ldl \
 		-lz-lgi \
@@ -106,6 +110,7 @@ Source =	../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			../../lgi/trunk/src/common/General/Tnef.cpp \
 			../../lgi/trunk/src/common/Lgi/Browser.cpp \
 			../../lgi/trunk/src/common/Lgi/LgiMain.cpp \
+			../../lgi/trunk/src/common/LiteHtml/LiteHtmlView.cpp \
 			../../lgi/trunk/src/common/Net/Ftp.cpp \
 			../../lgi/trunk/src/common/Net/Http.cpp \
 			../../lgi/trunk/src/common/Net/HttpTools.cpp \
@@ -121,6 +126,7 @@ Source =	../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			../../lgi/trunk/src/common/Text/Homoglyphs/Homoglyphs.cpp \
 			../../lgi/trunk/src/common/Text/Homoglyphs/HomoglyphsTable.cpp \
 			../../lgi/trunk/src/common/Text/Html.cpp \
+			../../lgi/trunk/src/common/Text/Html2.cpp \
 			../../lgi/trunk/src/common/Text/HtmlCommon.cpp \
 			../../lgi/trunk/src/common/Text/HtmlParser.cpp \
 			../../lgi/trunk/src/common/Text/SpellCheckAspell.cpp \
@@ -595,6 +601,7 @@ VPATH=$(BuildDir) \
 	../../lgi/trunk/src/common/Text/Emoji \
 	../../lgi/trunk/src/common/Text \
 	../../lgi/trunk/src/common/Net \
+	../../lgi/trunk/src/common/LiteHtml \
 	../../lgi/trunk/src/common/Lgi \
 	../../lgi/trunk/src/common/General \
 	../../lgi/trunk/src/common/Gdc2/Font \

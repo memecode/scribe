@@ -4769,12 +4769,12 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 	auto HtmlBody = GetHtml();
 	auto HtmlCharset = GetHtmlCharset();
 
-	const char *CtrlType = NULL;
+	const char *CtrlType = nullptr;
 
 	if (!MimeType)
 	{
-		bool TextValid = TextBody != NULL;
-		bool HtmlValid = HtmlBody != NULL;
+		bool TextValid = TextBody != nullptr;
+		bool HtmlValid = HtmlBody != nullptr;
 
 		if (TextValid && HtmlValid)
 			MimeType = DefAlt.CastInt32() ? sTextHtml : sTextPlain;
@@ -4788,7 +4788,7 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 			if (rootSeg)
 				MimeType = rootSeg->GetStr(FIELD_MIME_TYPE);
 			if (!MimeType)
-				return NULL;
+				return nullptr;
 
 			// This is the 'multipart/encrypted' case here...
 			TextMem.Printf("'%s' content.", MimeType.Get());
@@ -4841,7 +4841,7 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 	}
 
 	if (!View)
-		return NULL;
+		return nullptr;
 
 	// Control setup
 	View->Sunken(Sunken);

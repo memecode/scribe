@@ -109,7 +109,7 @@
 #define OPT_LogFile					"LogFile"			//(char*)
 #define OPT_LogFormat				"LogFmt"			//(int)
 #define OPT_SoftwareUpdate			"SoftwareUpdate"
-#define OPT_SoftwareUpdateTime		"SoftwareUpdateTime"
+#define OPT_SoftwareUpdateTime		"SoftwareUpdateTime" // (TSoftwareUpdateTime)
 #define OPT_SoftwareUpdateLast		"SoftwareUpdateLast"
 #define OPT_SoftwareUpdateIncBeta	"SoftwareUpdateIncBeta"
 #define OPT_AdjustDateTz			"AdjustDateTz"
@@ -120,6 +120,7 @@
 #define OPT_CheckForDialUp			"CheckDialUp"		//(bool)(int)
 #define OPT_EditorFont				"EditorFont"		//(binary)
 #define OPT_HtmlFont				"HtmlFont"			//(binary)
+#define OPT_HtmlViewCtrl			"HtmlViewCtrl"		//(THtmlViewCtrl)
 #define OPT_WrapAtColumn			"WrapAtColumn"		//(int)
 #define OPT_SoftwareKey				"SoftwareKey"		//(char*)
 #define OPT_NewMailSoundFile		"NewMailSound"		//(char*)
@@ -326,6 +327,22 @@ enum TSslAccept
 	SslAcceptOnce,
 	SslAcceptAlways,
 };
+
+enum THtmlViewCtrl
+{
+	TLgiHtml1,
+	TLgiHtml2,
+	TLiteHtmlView,
+};
+extern const char *toString(THtmlViewCtrl ctrl);
+
+enum TSoftwareUpdateTime
+{
+	TUpdateWeekly,
+	TUpdateMonthly,
+	TUpdateYearly,
+};
+extern const char *toString(TSoftwareUpdateTime v);
 
 // File names
 #define ABOUT_IMG_FILE				"About.png"

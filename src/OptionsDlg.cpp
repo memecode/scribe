@@ -331,6 +331,8 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 	LControlTree *Ct;
 	if (GetViewById(IDC_ADVANCED, Ct))
 	{
+		#define EnumValue(name) Enum->New().Set(toString(name), name);
+
 		Ct->SetPourLargest(true);
 		auto ci = Ct->Find(OPT_LogFormat);
 		if (ci)
@@ -338,46 +340,47 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 			LAutoPtr<LControlTree::Item::EnumArr> Enum(new LControlTree::Item::EnumArr);
 			if (Enum)
 			{
-				Enum->New().Set(LLoadString(IDS_NO_LOG), NET_LOG_NONE);
-				Enum->New().Set(LLoadString(IDS_HEX_LOG), NET_LOG_HEX_DUMP);
-				Enum->New().Set(LLoadString(IDS_BYTE_LOG), NET_LOG_ALL_BYTES);
-
+				EnumValue(NET_LOG_NONE);
+				EnumValue(NET_LOG_HEX_DUMP);
+				EnumValue(NET_LOG_ALL_BYTES);
 				ci->SetEnum(Enum);
 			}
 		}
 
-		LSpellCheck *SpellThread = App->GetSpellThread(true);
-		if (SpellThread)
+		if (auto SpellThread = App->GetSpellThread(true))
 		{
 			if (!SpellThread->EnumLanguages(SinkHnd))
 				LgiTrace("%s:%i - Failed to EnumLanguages.\n", _FL);
 
 			LVariant Lang;
 			if (App->GetOptions()->GetValue(OPT_SpellCheckLanguage, Lang))
+			{
 				SpellThread->EnumDictionaries(SinkHnd, Lang.Str());
-			else
-				LgiTrace("%s:%i - Failed to EnumDictionaries.\n", _FL);
+			}
+			else LgiTrace("%s:%i - Failed to EnumDictionaries.\n", _FL);
 		}
-		else
-			LgiTrace("%s:%i - Failed to get spell thread.\n", _FL);
+		else LgiTrace("%s:%i - Failed to get spell thread.\n", _FL);
 			
 		if ((ci = Ct->Find(OPT_SoftwareUpdateTime)))
 		{
 			LAutoPtr<LControlTree::Item::EnumArr> Enum(new LControlTree::Item::EnumArr);
 			if (Enum)
 			{
-				LControlTree::EnumValue *v = &Enum->New();
-				v->Name = (char*)LLoadString(IDS_WEEK);
-				v->Value = 0;
+				EnumValue(TUpdateWeekly);
+				EnumValue(TUpdateMonthly);
+				EnumValue(TUpdateYearly);
+				ci->SetEnum(Enum);
+			}
+		}
 
-				v = &Enum->New();
-				v->Name = (char*)LLoadString(IDS_MONTH);
-				v->Value = 1;
-
-				v = &Enum->New();
-				v->Name = (char*)LLoadString(IDS_YEAR);
-				v->Value = 2;
-
+		if ((ci = Ct->Find(OPT_HtmlViewCtrl)))
+		{
+			LAutoPtr<LControlTree::Item::EnumArr> Enum(new LControlTree::Item::EnumArr);
+			if (Enum)
+			{
+				EnumValue(TLgiHtml1);
+				EnumValue(TLgiHtml2);
+				EnumValue(TLiteHtmlView);
 				ci->SetEnum(Enum);
 			}
 		}
