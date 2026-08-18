@@ -3532,6 +3532,16 @@ bool ScribeWnd::SaveOptions()
 	return Status;
 }
 
+const char *ScribeWnd::toString(CmdLineEvent e)
+{
+	switch (e)
+	{
+		case CmdLineEvent::IpcEvent: return "IpcEvent";
+		case CmdLineEvent::StartupEvent: return "StartupEvent";
+	}
+	return nullptr;
+}
+
 void ScribeWnd::OnCommandLineEvent(CmdLineEvent event)
 {
 	THREAD_UNSAFE();
@@ -3546,12 +3556,12 @@ void ScribeWnd::OnCommandLineEvent(CmdLineEvent event)
 		
 		if (d->CmdLineEvents == AllFlags)
 		{
-			LgiTrace("%s:%i - OnCommandLineEvent(%i) has all flags: calling OnCommandLine.\n", _FL, (int)event);
+			LgiTrace("%s:%i - OnCommandLineEvent(%s) has all flags: calling OnCommandLine.\n", _FL, toString(event));
 			OnCommandLine();
 		}
-		else LgiTrace("%s:%i - OnCommandLineEvent(%i) hasn't got all flags yet.\n", _FL, (int)event);
+		else LgiTrace("%s:%i - OnCommandLineEvent(%s) hasn't got all flags yet.\n", _FL, toString(event));
 	}
-	else LgiTrace("%s:%i - OnCommandLineEvent(%i): flag %x already set?\n", _FL, (int)event, flag);
+	else LgiTrace("%s:%i - OnCommandLineEvent(%s): flag %x already set?\n", _FL, toString(event), flag);
 }
 
 //

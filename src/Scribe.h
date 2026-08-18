@@ -2359,6 +2359,7 @@ protected:
 		StartupEvent
 	};
 	void			OnCommandLineEvent(CmdLineEvent event);
+	const char 		*toString(CmdLineEvent e);
 
 public:
 	ScribeWnd();

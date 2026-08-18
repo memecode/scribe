@@ -86,6 +86,8 @@ LString GetUtfArgs()
 
 struct ScribeIpcPriv
 {
+	bool onLoadCalled = false;
+
 	virtual ~ScribeIpcPriv() {}
 
 	virtual void OnLoad(const char *FileName, LString *MulPassword, std::function<void(bool)> Callback) = 0;
@@ -676,6 +678,10 @@ ScribeIpc::~ScribeIpc()
 
 void ScribeIpc::OnLoad(const char *FileName, LString *MulPassword, std::function<void(bool)> Callback)
 {
+	if (d->onLoadCalled)
+		return;
+
+	d->onLoadCalled = true;
 	d->OnLoad(FileName, MulPassword, Callback);
 }
 

@@ -4866,7 +4866,7 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 	App->GetOptions()->GetValue(OPT_HtmlLoadImages, LoadImages);
 	bool AppLoadImages = LoadImages.CastInt32() != 0;
 	bool MailLoadImages = TestFlag(GetFlags(), MAIL_SHOW_IMAGES);
-	const char *SenderAddr = GetFrom() ? GetFrom()->GetStr(FIELD_EMAIL) : NULL;
+	auto SenderAddr = GetFrom() ? GetFrom()->GetStr(FIELD_EMAIL) : nullptr;
 	auto SenderStatus = App->RemoteContent_GetSenderStatus(SenderAddr);
 		
 	View->SetLoadImages
@@ -4882,7 +4882,7 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 
     // Attach control
 	Owner->SetDoc(View, MimeType);
-	auto CsInfo = LGetCsInfo(Charset);
+	auto CsInfo = Charset ? LGetCsInfo(Charset) : nullptr;
 
 	// Check for render scripts
 	LArray<LScriptCallback*> Renderers;
