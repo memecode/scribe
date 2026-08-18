@@ -17,6 +17,8 @@
 #include "lgi/common/TextView3.h"
 #include "lgi/common/Html.h"
 #include "lgi/common/Scripting.h"
+#include "lgi/common/LiteHtmlView.h"
+#include "lgi/common/Html2.h"
 
 #include "Scribe.h"
 #include "PreviewPanel.h"
@@ -45,22 +47,22 @@
 class LPreviewPanelPrivate : public LDocumentEnv, public LScriptContext
 {
 public:
-	LPreviewPanel *Panel;
-	ScribeWnd *App;
-	LDocView *TextCtrl;
-	Thing *Item;
-	Thing *Pulse;
+	LPreviewPanel *Panel = nullptr;
+	ScribeWnd *App = nullptr;
+	LDocView *TextCtrl = nullptr;
+	Thing *Item = nullptr;
+	Thing *Pulse = nullptr;
 	LRect TxtPos;
-	int Time;
+	int Time = -1;
 	LCapabilityTarget::CapsHash MissingCaps;
-	MissingCapsBar *Bar;
-	bool IgnoreShowImgNotify;
-	Contact *CtxMenuContact;
+	MissingCapsBar *Bar = nullptr;
+	bool IgnoreShowImgNotify = false;
+	Contact *CtxMenuContact = nullptr;
 
 	// Dynamic header content
-	Html1::LHtml *Header;
-	int HeaderY;
-	ScribeDom *HeaderDom;
+	Html1::LHtml *Header = nullptr;
+	int HeaderY = 88;
+	ScribeDom *HeaderDom = nullptr;
 	LString HeaderMailFile;
 	LString HeaderMailTemplate;
 	LString HeaderContactFile;
@@ -74,17 +76,6 @@ public:
 	// Methods
 	LPreviewPanelPrivate(LPreviewPanel *p) : Panel(p)
 	{
-		HeaderY = 88;
-		Header = 0;
-		HeaderDom = 0;
-		Bar = 0;
-		IgnoreShowImgNotify = false;
-		CtxMenuContact = NULL;
-
-		Item = 0;
-		Pulse = 0;
-		TextCtrl = 0;
-		Time = -1;
 		TxtPos.ZOff(-1, -1);
 	}
 
@@ -477,7 +468,7 @@ bool LPreviewPanel::SetDoc(LDocView *v, const char *MimeType)
         DeleteObj(d->TextCtrl);
         if ((d->TextCtrl = v))
         {
-			LCapabilityClient *cc = dynamic_cast<LCapabilityClient*>(d->TextCtrl);
+			auto cc = dynamic_cast<LCapabilityClient*>(d->TextCtrl);
 			if (cc)
 				cc->Register(this);
 
@@ -614,10 +605,9 @@ void LPreviewPanel::OnThing(Thing *item, bool ChangeEvent)
 		d->TextCtrl->IsDirty() &&
 		!dynamic_cast<Html1::LHtml*>(d->TextCtrl))
 	{
-		Mail *m = d->Item->IsMail();
-		if (m)
+		if (auto m = d->Item->IsMail())
 		{
-			MailUi *Ui = dynamic_cast<MailUi*>(m->GetUI());
+			auto Ui = dynamic_cast<MailUi*>(m->GetUI());
 			bool AlreadyDirty = Ui ? Ui->IsDirty() : false;
 			if (AlreadyDirty)
 			{

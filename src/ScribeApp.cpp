@@ -46,11 +46,12 @@
 #include "lgi/common/SpellCheck.h"
 #include "lgi/common/SubProcess.h"
 #include "lgi/common/CssTools.h"
-#include "lgi/common/Map.h"
 #include "lgi/common/Charset.h"
 #include "lgi/common/RefCount.h"
 #include "lgi/common/PopupNotification.h"
 #include "lgi/common/Base64.h"
+#include "lgi/common/Html2.h"
+#include "lgi/common/LiteHtmlView.h"
 
 #include "ScribePrivate.h"
 #include "PreviewPanel.h"
@@ -776,17 +777,17 @@ ScribeWnd::ScribeWnd() :
 	}
 
 	#ifdef HAIKU
-	// The event loop for this window won't start till the constructor finishes...
-	// And that is needed for the load mail stores state, so start the thread here:
-	if (WindowHandle()->Thread() < 0 &&
-		WindowHandle()->Lock())
-	{
-		WindowHandle()->Run();
-		WindowHandle()->Unlock();
-	}
-	PostEvent(M_CONSTRUCT_0, (LMessage::Param)Type);
+		// The event loop for this window won't start till the constructor finishes...
+		// And that is needed for the load mail stores state, so start the thread here:
+		if (WindowHandle()->Thread() < 0 &&
+			WindowHandle()->Lock())
+		{
+			WindowHandle()->Run();
+			WindowHandle()->Unlock();
+		}
+		PostEvent(M_CONSTRUCT_0, (LMessage::Param)Type);
 	#else
-	Construct0(Type);
+		Construct0(Type);
 	#endif
 }
 
@@ -1358,6 +1359,10 @@ void ScribeWnd::SetLanguage()
 		ScribeState = ScribeExiting;
 		LCloseApp();
 	}
+	
+	setString(NET_LOG_NONE, LLoadString(IDS_NO_LOG));
+	setString(NET_LOG_HEX_DUMP, LLoadString(IDS_HEX_LOG));
+	setString(NET_LOG_ALL_BYTES, LLoadString(IDS_BYTE_LOG));
 }
 
 LString ScribeWnd::GetResourceFile(SribeResourceType Type)
@@ -10050,7 +10055,7 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 	else
 	{
 		// Create a view only control for the mime type:
-		LDocView *HtmlCtrl = NULL;
+		LDocView *HtmlCtrl = nullptr;
 		if (!MimeType ||
 			!Stricmp(MimeType, sTextPlain) ||
 			!Stricmp(MimeType, sMultipartEncrypted))
@@ -10059,7 +10064,27 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 		}
 		else
 		{
-			HtmlCtrl = Ctrl = new Html1::LHtml(Id, 0, 0, 200, 200);
+			LVariant htmlViewCtrl;
+			GetOptions()->GetValue(OPT_HtmlViewCtrl, htmlViewCtrl);
+
+			THtmlViewCtrl ctrlType =
+				!htmlViewCtrl.IsNull() ?
+				(THtmlViewCtrl)htmlViewCtrl.CastInt32() :
+				TLgiHtml1;
+
+			switch (ctrlType)
+			{
+				default:
+				case TLgiHtml1:
+					HtmlCtrl = Ctrl = new Html1::LHtml(Id, 0, 0, 200, 200);
+					break;
+				case TLgiHtml2:
+					HtmlCtrl = Ctrl = new Html2::LHtml(Id, 0, 0, 200, 200);
+					break;
+				case TLiteHtmlView:
+					HtmlCtrl = Ctrl = new LiteHtmlView(Id);
+					break;
+			}
 		}
 		
 		if (HtmlCtrl && UseFont)

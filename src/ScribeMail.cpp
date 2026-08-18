@@ -4821,7 +4821,7 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 	App->GetOptions()->GetValue(OPT_NoEmoji, NoEmoji);
 
 	// Check if the control needs changing
-	LDocView *View = Owner->GetDoc(MimeType);
+	auto View = Owner->GetDoc(MimeType);
 	if (View)
 	{
 		const char *ViewMimeType = View->GetMimeType();
