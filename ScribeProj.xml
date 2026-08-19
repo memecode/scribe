@@ -93,11 +93,11 @@
 			<Node File="../../lgi/trunk/src/common/Gdc2/Font/EmojiFont.cpp" Type="2" Platforms="15" />
 		</Node>
 		<Node Name="Html" Type="1" Platforms="15" Open="0" Id="12">
-			<Node Name="LiteHtml" Type="1" Platforms="15" Id="1">
+			<Node Name="LiteHtml" Type="1" Platforms="15" Id="13">
 				<Node File="../../lgi/trunk/src/common/LiteHtml/LiteHtmlView.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/include/lgi/common/LiteHtmlView.h" Type="3" Platforms="15" />
 			</Node>
-			<Node Name="Html2" Type="1" Platforms="15" Id="2">
+			<Node Name="Html2" Type="1" Platforms="15" Id="14">
 				<Node File="../../lgi/trunk/src/common/Text/Html2.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/include/lgi/common/Html2.h" Type="3" Platforms="15" />
 				<Node File="../../lgi/trunk/src/common/Text/HtmlPriv2.h" Type="3" Platforms="15" />
@@ -105,13 +105,13 @@
 			<Node File="../../lgi/trunk/src/common/Text/HtmlCommon.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Text/HtmlParser.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/include/lgi/common/HtmlParser.h" Type="3" Platforms="15" />
-			<Node Name="Html1" Type="1" Platforms="15" Id="3">
+			<Node Name="Html1" Type="1" Platforms="15" Id="15">
 				<Node File="../../lgi/trunk/src/common/Text/Html.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/include/lgi/common/Html.h" Type="3" Platforms="15" />
 				<Node File="../../lgi/trunk/src/common/Text/HtmlPriv.h" Type="3" Platforms="15" />
 			</Node>
 		</Node>
-		<Node Name="RichTextEdit" Type="1" Platforms="15" Open="0" Id="13">
+		<Node Name="RichTextEdit" Type="1" Platforms="15" Open="0" Id="16">
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp" Type="2" Platforms="15" />
@@ -134,7 +134,7 @@
 		<Node File="../../lgi/trunk/include/lgi/common/TextConvert.h" Type="3" Platforms="15" />
 		<Node File="../../lgi/trunk/src/common/Text/XmlTreeUi.cpp" Type="2" Platforms="15" />
 	</Node>
-	<Node Name="Resource Files" Type="1" Open="0" Platforms="7" Id="14">
+	<Node Name="Resource Files" Type="1" Open="0" Platforms="7" Id="17">
 		<Node File="./resources/Icons/app.ico" Type="6" Platforms="7" />
 		<Node File="./resources/Icons/Blank.ico" Type="6" Platforms="7" />
 		<Node File="./resources/Icons/calender.ico" Type="6" Platforms="7" />
@@ -146,8 +146,8 @@
 		<Node File="./resources/Scribe.lr8" Type="5" Platforms="7" />
 		<Node File="./resources/Icons/Small.ico" Type="6" Platforms="7" />
 	</Node>
-	<Node Name="Scribe" Type="1" Open="1" Platforms="7" Id="15">
-		<Node Name="Accounts" Type="1" Open="0" Platforms="7" Id="16">
+	<Node Name="Scribe" Type="1" Open="1" Platforms="7" Id="18">
+		<Node Name="Accounts" Type="1" Open="0" Platforms="7" Id="19">
 			<Node File="./src/ScribeAccount.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeAccountPreview.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeAccountPreview.h" Type="3" Platforms="15" />
@@ -156,7 +156,7 @@
 			<Node File="./src/ScribeStatusPanel.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeStatusPanel.h" Type="3" Platforms="15" />
 		</Node>
-		<Node Name="Application" Type="1" Open="0" Platforms="7" Id="17">
+		<Node Name="Application" Type="1" Open="0" Platforms="7" Id="20">
 			<Node File="./resources/About.html" Type="3" Platforms="15" />
 			<Node File="./src/DomType.h" Type="3" Platforms="15" />
 			<Node File="./src/DomTypeValues.h" Type="3" Platforms="15" />
@@ -175,11 +175,11 @@
 			<Node File="./src/StrToDom.cpp" Type="2" Platforms="15" />
 			<Node File="./resources/Title.html" Type="3" Platforms="15" />
 		</Node>
-		<Node Name="Components" Type="1" Platforms="15" Open="0" Id="18">
+		<Node Name="Components" Type="1" Platforms="15" Open="0" Id="21">
 			<Node File="./src/Components.cpp" Type="2" Platforms="15" />
 			<Node File="./src/Components.h" Type="3" Platforms="15" />
 		</Node>
-		<Node Name="Import / Export" Type="1" Open="0" Platforms="7" Id="19">
+		<Node Name="Import / Export" Type="1" Open="0" Platforms="7" Id="22">
 			<Node File="..\..\lgi\trunk\src\common\Db\Db-Csv.cpp" Type="2" Platforms="15" />
 			<Node File="..\..\lgi\trunk\include\lgi\common\Db.h" Type="3" Platforms="15" />
 			<Node File=".\src\Exp_Scribe.cpp" Type="2" Platforms="15" />
@@ -194,9 +194,9 @@
 			<Node File=".\src\ImpExp_Mbox.cpp" Type="2" Platforms="15" />
 			<Node File=".\src\ImpExp_Outlook.cpp" Type="2" Platforms="1" />
 		</Node>
-		<Node Name="Objects" Type="1" Open="0" Platforms="7" Id="20">
-			<Node Name="Calendar" Type="1" Open="0" Platforms="7" Id="21">
-				<Node Name="Controls" Type="1" Open="1" Platforms="7" Id="22">
+		<Node Name="Objects" Type="1" Open="0" Platforms="7" Id="23">
+			<Node Name="Calendar" Type="1" Open="0" Platforms="7" Id="24">
+				<Node Name="Controls" Type="1" Open="1" Platforms="7" Id="25">
 					<Node File="../../lgi/trunk/src/common/Widgets/DatePopup.cpp" Type="2" Platforms="15" />
 					<Node File="../../lgi/trunk/src/common/Widgets/TimePopup.cpp" Type="2" Platforms="15" />
 					<Node File="../../lgi/trunk/src/common/Widgets/MonthView.cpp" Type="2" Platforms="15" />
@@ -209,17 +209,17 @@
 				<Node File="./src/CalendarView.h" Type="3" Platforms="15" />
 				<Node File="./src/RemoteCalendarSource.cpp" Type="2" Platforms="15" />
 			</Node>
-			<Node Name="Filters" Type="1" Open="0" Platforms="7" Id="23">
+			<Node Name="Filters" Type="1" Open="0" Platforms="7" Id="26">
 				<Node File="./src/BayesianFilter.cpp" Type="2" Platforms="15" />
 				<Node File="./src/BayesianFilter.h" Type="3" Platforms="15" />
 				<Node File="../../lgi/trunk/src/common/Widgets/FilterUi.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/include/lgi/common/FilterUi.h" Type="3" Platforms="15" />
 			</Node>
-			<Node Name="Printing" Type="1" Platforms="15" Open="0" Id="24">
+			<Node Name="Printing" Type="1" Platforms="15" Open="0" Id="27">
 				<Node File="./src/PrintContext.cpp" Type="2" Platforms="15" />
 				<Node File="./src/PrintContext.h" Type="3" Platforms="15" />
 			</Node>
-			<Node Name="vCard-vCal" Type="1" Open="0" Platforms="7" Id="25">
+			<Node Name="vCard-vCal" Type="1" Open="0" Platforms="7" Id="28">
 				<Node File="../../lgi/trunk/src/common/Text/vCard-vCal.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/include/lgi/common/vCard-vCal.h" Type="3" Platforms="15" />
 			</Node>
@@ -234,7 +234,7 @@
 			<Node File="./src/ScribeItemList.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeMail.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node Name="Shared" Type="1" Open="0" Platforms="7" Id="26">
+		<Node Name="Shared" Type="1" Open="0" Platforms="7" Id="29">
 			<Node File="./src/ScribeFolderDlg.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeFolderDlg.h" Type="3" Platforms="15" />
 			<Node File="./src/ScribeFolderSelect.cpp" Type="2" Platforms="15" />
@@ -244,32 +244,32 @@
 			<Node File="./src/ScribePageSetup.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribePageSetup.h" Type="3" Platforms="15" />
 		</Node>
-		<Node Name="Spelling" Type="1" Platforms="15" Open="0" Id="27">
+		<Node Name="Spelling" Type="1" Platforms="15" Open="0" Id="30">
 			<Node File="../../lgi/trunk/include/lgi/common/SpellCheck.h" Type="3" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Text/SpellCheckAspell.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node Name="SSL" Type="1" Platforms="7" Open="0" Id="28">
+		<Node Name="SSL" Type="1" Platforms="7" Open="0" Id="31">
 			<Node File="../../lgi/trunk/src/common/Net/OpenSSLSocket.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/include/lgi/common/OpenSSLSocket.h" Type="3" Platforms="15" />
 		</Node>
-		<Node Name="Tables" Type="1" Platforms="15" Id="29">
+		<Node Name="Tables" Type="1" Platforms="15" Id="32">
 			<Node File=".\utils\Tables\MailFlags.c" Type="2" Platforms="15" />
 			<Node File=".\utils\Tables\MailFlags.txt" Type="8" Platforms="0" />
 			<Node File=".\utils\Tables\Tables.h" Type="3" Platforms="15" />
 		</Node>
-		<Node Name="Ui" Type="1" Open="0" Platforms="7" Id="30">
-			<Node Name="Colour" Type="1" Open="0" Platforms="7" Id="31">
+		<Node Name="Ui" Type="1" Open="0" Platforms="7" Id="33">
+			<Node Name="Colour" Type="1" Open="0" Platforms="7" Id="34">
 				<Node File="../../lgi/trunk/src/common/Widgets/ColourSelect.cpp" Type="2" Platforms="15" />
 			</Node>
-			<Node Name="Find" Type="1" Open="0" Platforms="7" Id="32">
+			<Node Name="Find" Type="1" Open="0" Platforms="7" Id="35">
 				<Node File="./src/SearchView.cpp" Type="2" Platforms="15" />
 				<Node File="./src/SearchView.h" Type="3" Platforms="15" />
 				<Node File="./src/ScribeFinder.cpp" Type="2" Platforms="15" />
 			</Node>
-			<Node Name="Folder Properties" Type="1" Open="0" Platforms="7" Id="33">
+			<Node Name="Folder Properties" Type="1" Open="0" Platforms="7" Id="36">
 				<Node File="./src/ScribeFolderProp.cpp" Type="2" Platforms="15" />
 			</Node>
-			<Node Name="Item Preview" Type="1" Open="0" Platforms="7" Id="34">
+			<Node Name="Item Preview" Type="1" Open="0" Platforms="7" Id="37">
 				<Node File="./src/PreviewPanel.cpp" Type="2" Platforms="15" />
 				<Node File="./src/PreviewPanel.h" Type="3" Platforms="15" />
 				<Node File="./src/PrintPreview.cpp" Type="2" Platforms="15" />
@@ -278,11 +278,11 @@
 				<Node File="./resources/PreviewGroup.html" Type="7" Platforms="15" />
 				<Node File="./resources/PreviewContact.html" Type="7" Platforms="15" />
 			</Node>
-			<Node Name="Object Inspector" Type="1" Platforms="15" Open="0" Id="35">
+			<Node Name="Object Inspector" Type="1" Platforms="15" Open="0" Id="38">
 				<Node File="./src/ObjectInspector.cpp" Type="2" Platforms="15" />
 				<Node File="./src/ObjectInspector.h" Type="3" Platforms="15" />
 			</Node>
-			<Node Name="Options" Type="1" Platforms="15" Open="0" Id="36">
+			<Node Name="Options" Type="1" Platforms="15" Open="0" Id="39">
 				<Node File="./src/OptionsDlg.cpp" Type="2" Platforms="15" />
 			</Node>
 			<Node File="./src/AddressSelect.cpp" Type="2" Platforms="15" />
@@ -308,8 +308,8 @@
 		<Node File="./src/ScribeInc.h" Type="3" Platforms="15" />
 		<Node File="./src/ScribePrivate.h" Type="3" Platforms="15" />
 	</Node>
-	<Node Name="Scripting" Type="1" Platforms="7" Open="0" Id="37">
-		<Node Name="Scripts" Type="1" Platforms="15" Open="0" Id="38">
+	<Node Name="Scripting" Type="1" Platforms="7" Open="0" Id="40">
+		<Node Name="Scripts" Type="1" Platforms="15" Open="0" Id="41">
 			<Node File="./scripts/Add Senders To Contacts.script" Type="3" Platforms="7" />
 			<Node File="./scripts/Delete Attachments.script" Type="3" Platforms="7" />
 			<Node File="./scripts/Delete Duplicate Messages.script" Type="3" Platforms="7" />
@@ -324,8 +324,8 @@
 		<Node File="./src/Scripting.cpp" Type="2" Platforms="15" />
 		<Node File="../../lgi/trunk/src/common/Coding/Instructions.h" Type="3" Platforms="15" />
 	</Node>
-	<Node Name="Storage" Type="1" Platforms="7" Open="0" Id="39">
-		<Node Name="Imap" Type="1" Platforms="7" Open="0" Id="41">
+	<Node Name="Storage" Type="1" Platforms="7" Open="0" Id="42">
+		<Node Name="Imap" Type="1" Platforms="7" Open="0" Id="44">
 			<Node File="../../lgi/trunk/src/common/Net/Mime.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/include/lgi/common/Mime.h" Type="3" Platforms="15" />
 			<Node File="./src/Store3Imap/ScribeImap.h" Type="3" Platforms="15" />
@@ -335,8 +335,8 @@
 			<Node File="./src/Store3Imap/ScribeImap_Store.cpp" Type="2" Platforms="15" />
 			<Node File="./src/Store3Imap/ScribeImap_Thread.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node Name="Mail3" Type="1" Platforms="7" Open="0" Id="42">
-			<Node Name="Sqlite" Type="1" Platforms="7" Open="1" Id="44">
+		<Node Name="Mail3" Type="1" Platforms="7" Open="0" Id="45">
+			<Node Name="Sqlite" Type="1" Platforms="7" Open="1" Id="46">
 				<Node File="./src/Sqlite/v3.50.1/sqlite3.c" Type="2" Platforms="15" />
 				<Node File="./src/Sqlite/v3.50.1/sqlite3.h" Type="3" Platforms="15" />
 				<Node File="./src/Sqlite/v3.50.1/sqlite3ext.h" Type="3" Platforms="15" />
@@ -351,7 +351,7 @@
 			<Node File="./src/Store3Mail3/Mail3Mail.cpp" Type="2" Platforms="15" />
 			<Node File="./src/Store3Mail3/Mail3Store.cpp" Type="2" Platforms="15" />
 		</Node>
-		<Node Name="Webdav" Type="1" Platforms="15" Id="45">
+		<Node Name="Webdav" Type="1" Platforms="15" Id="47">
 			<Node File="./src/FolderCalendarSource.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Net/WebDav.cpp" Type="2" Platforms="15" />
 			<Node File="./src/Store3Webdav/WebdavCalendar.cpp" Type="2" Platforms="15" />
@@ -368,7 +368,7 @@
 		<Node File="../../lgi/trunk/include/lgi/common/Store3Defs.h" Type="3" Platforms="15" />
 		<Node File="../../lgi/trunk/include/lgi/common/Store3MimeTree.h" Type="3" Platforms="15" />
 	</Node>
-	<Node Name="Testing" Type="1" Platforms="15" Id="46">
+	<Node Name="Testing" Type="1" Platforms="15" Id="48">
 		<Node File="./src/Test/UnitTests.cpp" Type="2" Platforms="15" />
 	</Node>
 	<Node File="../../lgi/trunk/Lgi.xml" Type="4" Platforms="15" LinkAgainst="1" />
@@ -415,6 +415,8 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>./scribe</Release>
 				</Haiku>
 			</Executable>
+			<CCrossCompiler />
+			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -524,18 +526,21 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 </Debug>
 					<Release>../libs/build-x64-release/lib</Release>
 				</All>
+				<Linux />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
 					<Debug>scribe</Debug>
 					<Release>scribe</Release>
 				</Haiku>
+				<Linux />
 			</TargetName>
 			<Options>
 				<Linux>
 					<Debug>-Wno-format-truncation</Debug>
 					<Release>-Wno-format-truncation</Release>
 				</Linux>
+				<All />
 			</Options>
 			<ApplicationIcon>
 				<Haiku>./resources/scribe.hvif</Haiku>
@@ -554,8 +559,15 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
+			<CommentFile />
+			<CommentFunction />
 		</Editor>
-		<Advanced />
+		<Advanced>
+			<OtherMakefileRules />
+			<PostBuildCommands>
+				<Linux />
+			</PostBuildCommands>
+		</Advanced>
 		<Debug>
 			<DebugAdmin>
 				<All>0</All>
@@ -563,6 +575,15 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<Environment>
 				<All>LD_LIBRARY_PATH=/home/matthew/gtk3/build/gtk:/home/matthew/gtk3/build/gdk</All>
 			</Environment>
+			<Arguments>
+				<All />
+			</Arguments>
+			<InitialDir />
+			<Debugger />
 		</Debug>
+		<Remote>
+			<RemoteUri />
+			<RemotePass />
+		</Remote>
 	</Settings>
 </Project>

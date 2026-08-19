@@ -4923,21 +4923,21 @@ LDocView *Mail::CreateView(	MailViewOwner *Owner,
 	{
 		// Send the data to the control
 		size_t ContentLen = Content ? strlen(Content) : 0;
-		Html1::LHtml *Html = dynamic_cast<Html1::LHtml*>(View);
+		auto DocView = dynamic_cast<LDocView*>(View);
 		if (MimeType.Equals(sTextHtml))
 		{
 			if (CsInfo)
 			{
 				int OverideDocCharset = *Charset == '>' ? 1 : 0;
 				View->SetCharset(Charset + OverideDocCharset);
-				if (Html)
-					Html->SetOverideDocCharset(OverideDocCharset != 0);
+				if (DocView)
+					DocView->SetOverideDocCharset(OverideDocCharset != 0);
 			}
 			else
 			{
-				View->SetCharset(0);
-				if (Html)
-					Html->SetOverideDocCharset(0);
+				View->SetCharset(nullptr);
+				if (DocView)
+					DocView->SetOverideDocCharset(false);
 			}
 
 			View->Name(Content);

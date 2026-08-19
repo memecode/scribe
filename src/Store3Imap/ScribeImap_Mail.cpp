@@ -648,16 +648,21 @@ const char *ImapMail::GetStr(int id)
 		{
 			LArray<ImapAttachment*> Results;
 			if (FindSegs("text/html", Results))
-				return Results[0]->GetStr(FIELD_CHARSET);
+			{
+				auto cs = Results[0]->GetStr(FIELD_CHARSET);
+				printf("%s:%i - cs=%s\n", _FL, cs);
+				return cs;
+			}
+			else printf("%s:%i - no html seg\n", _FL);
 			break;
 		}
 		case FIELD_ALTERNATE_HTML:
 		{
 			LArray<ImapAttachment*> Results;
-			if (!HtmlCache && FindSegs("text/html", Results))
+			if (!HtmlCache &&
+				FindSegs("text/html", Results))
 			{
-				LAutoStreamI s = Results[0]->GetStream(_FL);
-				if (s)
+				if (auto s = Results[0]->GetStream(_FL))
 				{
 					auto Size = s->GetSize();
 					if (Size > 0)

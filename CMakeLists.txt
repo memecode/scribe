@@ -84,6 +84,8 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Text/Homoglyphs/Homoglyphs.cpp
     ${LGI_DIR}/src/common/Text/Homoglyphs/HomoglyphsTable.cpp
     ${LGI_DIR}/src/common/Text/Html.cpp
+    ${LGI_DIR}/src/common/Text/Html2.cpp
+    ${LGI_DIR}/src/common/LiteHtml/LiteHtmlView.cpp
     ${LGI_DIR}/src/common/Text/HtmlCommon.cpp
     ${LGI_DIR}/src/common/Text/HtmlParser.cpp
     ${LGI_DIR}/src/common/Text/XmlTreeUi.cpp
@@ -232,7 +234,8 @@ target_link_libraries(scribe
         chardet
         bzip2
         btree
-        ntlm)
+        ntlm
+        litehtml)
 
 target_compile_definitions(scribe
     PRIVATE

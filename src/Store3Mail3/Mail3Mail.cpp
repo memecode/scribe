@@ -872,37 +872,38 @@ const char *LMail3Mail::GetStr(int id)
 				int64 Total = 0;
 				for (unsigned i=0; i<Results.Length(); i++)
 				{
-					if (!Results[i]->GetStr(FIELD_NAME))
+					if (Results[i]->GetStr(FIELD_NAME))
+						continue;
+
+					if (auto s = Results[i]->GetStream(_FL))
 					{
-						LAutoStreamI s = Results[i]->GetStream(_FL);
-						if (s)
+						int64 Size = s->GetSize();
+						if (Size > 0)
 						{
-							int64 Size = s->GetSize();
-							if (Size > 0)
+							auto Charset = Results[i]->GetStr(FIELD_CHARSET);
+						
+							char *Buf = new char[(size_t)Size+1];
+							ssize_t Rd = s->Read(Buf, (int)Size);
+							if (Rd > 0)
 							{
-								auto Charset = Results[i]->GetStr(FIELD_CHARSET);
-							
-								char *Buf = new char[(size_t)Size+1];
-								ssize_t Rd = s->Read(Buf, (int)Size);
-								if (Rd > 0)
+								Buf[Rd] = 0;
+								
+								/*
+								if (Charset && _stricmp("utf-8", Charset) != 0)
 								{
-									Buf[Rd] = 0;
-									
-									if (Charset && _stricmp("utf-8", Charset) != 0)
+									char *Tmp = (char*)LNewConvertCp("utf-8", Buf, Charset, (int)Size);
+									if (Tmp)
 									{
-										char *Tmp = (char*)LNewConvertCp("utf-8", Buf, Charset, (int)Size);
-										if (Tmp)
-										{
-											DeleteArray(Buf);
-											Buf = Tmp;
-											Size = strlen(Tmp);
-										}
+										DeleteArray(Buf);
+										Buf = Tmp;
+										Size = strlen(Tmp);
 									}
-									
-									Blocks.Write(Buf, (int)Size);
-									Total += Size;
-									DeleteArray(Buf);
 								}
+								*/
+								
+								Blocks.Write(Buf, (int)Size);
+								Total += Size;
+								DeleteArray(Buf);
 							}
 						}
 					}
