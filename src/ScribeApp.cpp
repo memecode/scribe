@@ -1607,7 +1607,7 @@ LAutoString ScribeWnd::GetDataFolder()
 	GetOptions()->GetValue(OPT_IsPortableInstall, v);
 	
 	char p[MAX_PATH_LEN];
-	if (LGetSystemPath(v.CastInt32() ? LSP_APP_INSTALL : LSP_APP_ROOT, p, sizeof(p)))
+	if (LGetSystemPath(v.CastInt32() ? LSP_APP_INSTALL : LSP_APP_DATA, p, sizeof(p)))
 	{
 		if (!LDirExists(p))
 			FileDev->CreateFolder(p);
@@ -3143,11 +3143,11 @@ bool ScribeWnd::LoadOptions()
 		LgiTrace("Selecting portable mode based on options file path.\n");
 	}
 	
-	// Look in the app root
+	// Look in the app's config folder:
 	if
 	(
 		!d->Options &&
-		ScanForOptionsFiles(Files, LSP_APP_ROOT)
+		ScanForOptionsFiles(Files, LSP_APP_CONFIG)
 	)
 	{
 		// Desktop mode
@@ -3411,9 +3411,9 @@ bool ScribeWnd::SaveOptions()
 				GetOptions()->SetValue(OPT_IsPortableInstall, v = false);
 			}
 
-			if (!LGetSystemPath(LSP_APP_ROOT, Path, sizeof(Path)))
+			if (!LGetSystemPath(LSP_APP_DATA, Path, sizeof(Path)))
 			{
-				Log.Print("Error: LgiGetSystemPath(LSP_APP_ROOT) failed.\n");
+				Log.Print("Error: LgiGetSystemPath(LSP_APP_DATA) failed.\n");
 			}
 			else
 			{

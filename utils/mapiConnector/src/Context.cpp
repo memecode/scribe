@@ -48,7 +48,7 @@ FolderMeta *Context::getMeta(LDataFolderI *f)
 Context::Context()
 	: log(mainLog)
 {
-	LFile::Path p(LSP_APP_ROOT);
+	LFile::Path p(LSP_APP_DATA);
 	optionsPath = p / "options.json";
 	if (LFileExists(optionsPath))
 		options.SetJson(LReadFile(optionsPath));

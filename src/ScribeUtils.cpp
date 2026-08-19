@@ -124,7 +124,7 @@ LString::Array ScribeThemePaths()
 	if (ro.Exists())
 		r.Add(ro.GetFull());
 	
-	LFile::Path rw(LSP_APP_ROOT);
+	LFile::Path rw(LSP_APP_DATA);
 	rw += "Themes";
 	if (rw.Exists())
 		r.Add(rw.GetFull());
@@ -602,22 +602,15 @@ char *ScribeTempPath()
 
 	if (Tmp[0] == 0)
 	{
-		#if LINUX
-		if (LGetSystemPath(LSP_APP_ROOT, Tmp, sizeof(Tmp)))
+		if (LGetSystemPath(LSP_APP_CACHE, Tmp, sizeof(Tmp)))
 		{
-			// Make a temp folder under the user's home
+			// Make a temp folder under the user's cache
 			LMakePath(Tmp, sizeof(Tmp), Tmp, "tmp");
 		}
-		#else
-		if (LGetSystemPath(LSP_TEMP, Tmp, sizeof(Tmp)))
-		{
-			LMakePath(Tmp, sizeof(Tmp), Tmp, "Scribe");
-		}
-		#endif
 		else
 		{
-			LgiTrace("%s:%i - LgiGetSystemPath(LSP_TEMP) failed.\n", _FL);
-			return NULL;
+			LgiTrace("%s:%i - LGetSystemPath(LSP_APP_CACHE) failed.\n", _FL);
+			return nullptr;
 		}
 	}
 
@@ -627,7 +620,7 @@ char *ScribeTempPath()
 		if (!FileDev->CreateFolder(Tmp, true, &Err))
 		{
 			LgiTrace("%s:%i - CreateFolder(%s) failed with %i\n", _FL, Tmp, Err.GetCode());
-			return NULL;
+			return nullptr;
 		}
 	}
 

@@ -274,7 +274,7 @@ char *ImapStore::GetCache()
 		if (Portable.CastInt32())
 			LGetSystemPath(LSP_APP_INSTALL, s, sizeof(s));
 		else
-			LGetSystemPath(LSP_APP_ROOT, s, sizeof(s));
+			LGetSystemPath(LSP_APP_CACHE, s, sizeof(s));
 		
 		if (!CheckCreateFolder(s, Log))
 		{

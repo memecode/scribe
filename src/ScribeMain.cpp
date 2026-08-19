@@ -108,6 +108,8 @@ int LgiMain(OsAppArguments &AppArgs)
 			LFontSystem::Inst()->AddFont(f);
 		#endif
 
+		printf("Paths:\n%s\n", LFile::Path::PrintAll().Get());
+
 		ScribeWnd *Wnd = NULL;
 		if (App.GetOption("help"))
 		{
