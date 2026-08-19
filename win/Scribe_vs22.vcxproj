@@ -203,6 +203,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SharedMemory.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\SoftwareUpdate.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\General\Tnef.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\LiteHtml\LiteHtmlView.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Mime.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\HttpTools.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Ftp.cpp" />
@@ -221,6 +222,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\Homoglyphs.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Homoglyphs\HomoglyphsTable.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Html.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Text\Html2.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlCommon.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlParser.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\SpellCheckAspell.cpp" />
@@ -375,10 +377,12 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Graph.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Homoglyphs.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Html.h" />
+    <ClInclude Include="..\..\..\lgi\trunk\include\lgi\common\Html2.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HtmlCommon.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HtmlParser.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Http.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HttpTools.h" />
+    <ClInclude Include="..\..\..\lgi\trunk\include\lgi\common\LiteHtmlView.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Mail.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Mime.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OAuth2.h" />
@@ -400,6 +404,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\ZoomView.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\src\common\Coding\Instructions.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptingPriv.h" />
+    <ClInclude Include="..\..\..\lgi\trunk\src\common\Text\HtmlPriv2.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.h" />
     <ClInclude Include="..\..\libs\Btree\btree.h" />
     <ClInclude Include="..\..\libs\Btree\btree_header.h" />

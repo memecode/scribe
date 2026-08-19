@@ -202,9 +202,6 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\MonthView.cpp">
       <Filter>Calendar</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Html.cpp">
-      <Filter>Controls/UI\Html</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\HtmlCommon.cpp">
       <Filter>Controls/UI\Html</Filter>
     </ClCompile>
@@ -496,6 +493,15 @@
     <ClCompile Include="..\src\StrToDom.cpp">
       <Filter>Application</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\Html.cpp">
+      <Filter>Controls/UI\Html\1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Text\Html2.cpp">
+      <Filter>Controls/UI\Html\2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\LiteHtml\LiteHtmlView.cpp">
+      <Filter>Controls/UI\Html\LiteHtml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\Btree\btree.h">
@@ -669,9 +675,6 @@
     <ClInclude Include="..\..\..\Lgi\trunk\include\common\ZlibWrapper.h">
       <Filter>Lgi</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Html.h">
-      <Filter>Controls/UI\Html</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\HtmlCommon.h">
       <Filter>Controls/UI\Html</Filter>
     </ClInclude>
@@ -803,6 +806,18 @@
     </ClInclude>
     <ClInclude Include="..\src\BZip2File.h">
       <Filter>SpellCheck</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Html.h">
+      <Filter>Controls/UI\Html\1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lgi\trunk\src\common\Text\HtmlPriv2.h">
+      <Filter>Controls/UI\Html\2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lgi\trunk\include\lgi\common\Html2.h">
+      <Filter>Controls/UI\Html\2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lgi\trunk\include\lgi\common\LiteHtmlView.h">
+      <Filter>Controls/UI\Html\LiteHtml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1066,6 +1081,15 @@
     </Filter>
     <Filter Include="Testing\Email">
       <UniqueIdentifier>{a1a4d9a6-dba2-4699-8d31-fc77816706cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI\Html\1">
+      <UniqueIdentifier>{3dc04a98-3dfd-4974-8f86-66a860e5518e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI\Html\2">
+      <UniqueIdentifier>{b1cf3701-1356-4892-8f81-969f90465c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI\Html\LiteHtml">
+      <UniqueIdentifier>{b20ca692-bc22-4959-9c4b-c2b305d82b42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
