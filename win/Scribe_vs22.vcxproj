@@ -90,13 +90,15 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>true</SupportJustMyCode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <PreLinkEvent>
       <Command>
       </Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64d.lib;..\litehtml\Debug\litehtml.lib;..\litehtml\src\gumbo\Debug\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -124,6 +126,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MinSpace</Optimization>
       <SupportJustMyCode>true</SupportJustMyCode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <PreLinkEvent>
       <Command>cd ..\src\Py
@@ -134,7 +138,7 @@ rc Resource.rc
 copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;..\litehtml\Release\litehtml.lib;..\litehtml\src\gumbo\Release\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -163,6 +167,8 @@ copy Resource.res ..\win\$(OutDir)</Command>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MinSpace</Optimization>
       <SupportJustMyCode>true</SupportJustMyCode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <PreLinkEvent>
       <Command>cd ..\src\Py
@@ -173,7 +179,7 @@ rc Resource.rc
 copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64.lib;..\litehtml\Release\litehtml.lib;..\litehtml\src\gumbo\Release\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
