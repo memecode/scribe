@@ -104,7 +104,9 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 			cb(b);
 		}
 
-		delete this;
+		// Defer the delete: OnStatus can be called from a dialog callback nested inside
+		// Iterate(), which still touches members after the callback returns.
+		LAppInst->RunCallback([this]() { delete this; }, _FL);
 
 		return b;
 	}
@@ -403,14 +405,17 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 		Options->DeleteValue(OPT_CreateFoldersIfMissing);
 
 		// Set system folders
-		ScribeFolder *f = App->GetFolder(FOLDER_INBOX);
-		if (f) f->SetSystemFolderType(Store3SystemInbox);
-		f = App->GetFolder(FOLDER_OUTBOX);
-		if (f) f->SetSystemFolderType(Store3SystemOutbox);
-		f = App->GetFolder(FOLDER_SENT);
-		if (f) f->SetSystemFolderType(Store3SystemSent);
-		f = App->GetFolder(FOLDER_SPAM);
-		if (f) f->SetSystemFolderType(Store3SystemSpam);
+		if (auto f = App->GetFolder(FOLDER_INBOX))
+			f->SetSystemFolderType(Store3SystemInbox);
+		
+		if (auto f = App->GetFolder(FOLDER_OUTBOX))
+			f->SetSystemFolderType(Store3SystemOutbox);
+		
+		if (auto f = App->GetFolder(FOLDER_SENT))
+			f->SetSystemFolderType(Store3SystemSent);
+
+		if (auto f = App->GetFolder(FOLDER_SPAM))
+			f->SetSystemFolderType(Store3SystemSpam);
 
 		return OnStatus(Status);
 	}

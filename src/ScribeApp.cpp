@@ -779,11 +779,12 @@ ScribeWnd::ScribeWnd() :
 	#ifdef HAIKU
 		// The event loop for this window won't start till the constructor finishes...
 		// And that is needed for the load mail stores state, so start the thread here:
-		if (WindowHandle()->Thread() < 0 &&
-			WindowHandle()->Lock())
+		auto w = WindowHandle();
+		if (w->Thread() < 0 &&
+			w->Lock())
 		{
-			WindowHandle()->Run();
-			WindowHandle()->Unlock();
+			w->Run();
+			w->Unlock();
 		}
 		PostEvent(M_CONSTRUCT_0, (LMessage::Param)Type);
 	#else
@@ -3016,9 +3017,16 @@ OnError:
 }
 
 #define DEBUG_OPTS_SCAN		0
-bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, LSystemPath PathType)
+
+bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, const char *BasePath)
 {
-	LString Root = LGetSystemPath(PathType);
+	if (!BasePath)
+		return false;
+
+	LFile::Path Root(BasePath);
+	if (Root[0].Equals("~"))
+		Root = Root.Absolute();
+	
 	LDirectory Dir;
 	char p[MAX_PATH_LEN];
 
@@ -3119,6 +3127,11 @@ bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, LSystemPath Path
 	return d->Options != NULL;
 }
 
+bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, LSystemPath PathType)
+{
+	return ScanForOptionsFiles(Files, LGetSystemPath(PathType));
+}
+
 bool ScribeWnd::IsUnitTest = false;
 
 bool ScribeWnd::LoadOptions()
@@ -3133,8 +3146,164 @@ bool ScribeWnd::LoadOptions()
 		d->UnitTestServer.Reset(new LUnitTestServer(this));
 	}
 
-	// Now look in the application install folder
 	LArray<OptionsInfo> Files;
+
+	#ifdef LINUX
+	// in 2026 the default location for the options file moved from ~/.Scribe to ~/.config/Scribe
+	// check for the old location and move it....
+	const char *OldPath = "~/.Scribe";
+	const char *DontMigrate = ".dont-migrate";
+	if (!d->Options &&
+		ScanForOptionsFiles(Files, OldPath))
+	{
+		auto NewConfig = LGetSystemPath(LSP_APP_CONFIG);
+		auto NewData   = LGetSystemPath(LSP_APP_DATA);
+		auto NewCache  = LGetSystemPath(LSP_APP_CACHE);
+		LFile::Path DontMigratePath(OldPath, DontMigrate);		
+		if (!DontMigratePath.Exists())
+		{	
+			// Ask the user to migrate:
+			auto msg = LString::Fmt("Can I migrate the settings and folders from the old location?"
+									"	%s\n"
+									"\n"
+									"to these new locations:\n"
+									"	config: %s\n"
+									"	data:   %s\n"
+									"	cache:  %s\n"
+									"\n"
+									"This better reflects where Linux apps would normally store data.",
+									OldPath,
+									NewConfig.Get(),
+									NewData.Get(),
+									NewCache.Get());
+			auto dlg = new LAlert(nullptr, AppName, msg, "Yes", "No", "Don't Ask Again");
+			auto gtkWnd = GtkCast(dlg->WindowHandle(), gtk_window, GtkWindow);
+			auto gtkDlg = GtkCast(dlg->WindowHandle(), gtk_dialog, GtkDialog);
+			
+			// This moves the dialog to the center of the screen, rather than the top-left:
+			gtk_window_set_modal(gtkWnd, true);
+			
+			int dlgCode = -1;
+			dlg->DoModal([	this,
+							NewConfig,
+							NewData,
+							NewCache,
+							OldPath,
+							ptr=&dlgCode](auto Dlg, auto Code)
+				{
+					*ptr = Code;
+				});
+				
+			// Run the dialog and get the response...
+			gtk_dialog_run(gtkDlg);
+			printf("dlgCode=%i\n", dlgCode);
+			switch (dlgCode)
+			{
+				case 3: // Don't ask
+				{
+					LFile f(DontMigratePath, O_WRITE);
+					f.SetSize(0);
+					f.Write("user asked not to migrate");
+					break;
+				}
+				case 2: // No
+					break;
+				case 1: // Yes
+				{
+					LDirectory inDir;
+					int errors = 0;
+					LStringPipe errLog;
+					for (auto b=inDir.First(LFile::Path(OldPath).Absolute()); b; b=inDir.Next())
+					{
+						LString outDir;
+						auto name = inDir.GetName();
+						if (!Strnicmp(name, "ScribeOptions", 13))
+						{
+							// Options file -> config
+							outDir = NewConfig;
+						}
+						else if (MatchStr("*.idx", name))
+						{
+							// Index file -> config
+							outDir = NewConfig;
+						}
+						else if (inDir.IsDir() &&
+							(
+								MatchStr("*.mail3", name) ||
+								!Stricmp("Aspell", name)
+							))
+						{
+							// Mail folders|Aspell -> data
+							outDir = NewData;
+						}
+						else if (!Stricmp(name, "tmp") ||
+								 !Stricmp(name, "ImapCache") ||
+								 !Stricmp(name, "scribe.txt"))
+						{
+							// Cache folders
+							outDir = NewCache;
+						}
+						else printf("%s: %s\n", inDir.IsDir()?"dir":"file", name);
+						
+						if (outDir)
+						{
+							LFile::Path outPath(outDir);
+							outPath += name;
+							printf("attempt to move:\n"
+								"\t%s\n"
+								"\t%s\n",
+								inDir.FullPath(),
+								outPath.GetFull().Get());
+								
+							// what if the file / dir exists at the destination?
+							LError err;
+							if (outPath.Exists())
+							{
+								if (LgiMsg(nullptr, "Overwrite '%s'?", AppName, MB_OK, outPath.GetFull().Get()) != IDYES)
+									continue;
+								
+								// delete the dest...
+								if (outPath.IsFolder())
+								{
+									if (!FileDev->RemoveFolder(outPath, true, &err))
+									{
+										errLog.Print("Can't remove dir '%s': %s\n", outPath.GetFull().Get(), err.ToString().Get());
+										errors++;
+									}
+								}
+								else
+								{
+									if (!FileDev->Delete(outPath, &err))
+									{
+										errLog.Print("Can't delete file '%s': %s\n", outPath.GetFull().Get(), err.ToString().Get());
+										errors++;
+									}
+								}
+							}
+
+							if (!FileDev->Move(inDir.FullPath(), outPath, &err))
+							{
+								errLog.Print("Can't move '%s' to '%s': %s\n",
+									inDir.FullPath(),
+									outPath.GetFull().Get(),
+									err.ToString().Get());
+								errors++;
+							}
+						}
+					}	// dir loop
+					
+					if (errors > 0)
+					{
+						LgiMsg(nullptr, "There were %i errors:\n\n%s", AppName, MB_OK, errors, errLog.NewLStr().Get());
+					}
+					
+				}	// case 1
+			}	// switch
+		}	// DontMigratePath.Exists
+	}
+	#endif
+
+	// Now look in the application install folder
 	if (!d->Options &&
 		ScanForOptionsFiles(Files, LSP_APP_INSTALL))
 	{
