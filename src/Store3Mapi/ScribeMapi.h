@@ -365,6 +365,11 @@ protected:
 	LMapiFolder *Parent = nullptr;
 	bool IsDirty = false;
 
+	bool MapiGetNamedPropLong(IMAPIProp *props, const GUID &guid, LONG dispid, LONG &value);
+	bool MapiSetNamedPropLong(IMAPIProp *props, const GUID &guid, LONG dispid, LONG value);
+	bool MapiGetNamedPropBinary(IMAPIProp *props, const GUID &guid, LONG dispid, LString &value);
+	bool MapiSetNamedPropBinary(IMAPIProp *props, const GUID &guid, LONG dispid, const void *data, ULONG size);
+
 public:
 	LMapiStore *Store;
 
@@ -486,7 +491,7 @@ public:
 class LMapiCalendar : public LMapiThing
 {
 	LDateTime StartDt, EndDt;
-	LString Subject, Location, Notes;
+	LString Subject, Location, Notes, Uid;
 	CalendarShowTimeAs ShowAs;
 	CalendarPrivacyType Priv;
 	LString TimeZone;
@@ -879,6 +884,11 @@ public:
 
 	// Util
 	IMsgStore *Handle() { return MsgStore; }
+	void FreeMapiBuffer(void *ptr)
+	{
+		if (MAPIFreeBuffer && ptr)
+			MAPIFreeBuffer(ptr);
+	}
 	ULONG OnNotify(ULONG cNotif, LPNOTIFICATION lpNotifications);
 
 	// MAPI API

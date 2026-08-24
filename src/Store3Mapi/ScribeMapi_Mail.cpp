@@ -15,6 +15,16 @@
 #define NOTEIVERB_REPLYTOSENDER ((ULONG)102)
 #endif
 
+static bool MapiDeleteProp(IMAPIProp *props, ULONG propTag)
+{
+	if (!props)
+		return false;
+
+	SizedSPropTagArray(1, tags) = { 1, { propTag } };
+	auto res = props->DeleteProps((LPSPropTagArray)&tags, nullptr);
+	return SUCCEEDED(res);
+}
+
 LMapiMail::LMapiMail(LMapiStore *store) :
 	LMapiThing(store),
 	From(store),
@@ -55,18 +65,21 @@ void LMapiMail::Set(SPropValue *entry, LMapiFolder *parent, LMapiList *Lst)
 	MsgId = MapiCastString(Lst->GetField(PR_INTERNET_MESSAGE_ID));
 
 	auto f = MapiCastInt(Lst->GetField(PR_MESSAGE_FLAGS));
+	Flags = 0;
 	if (f & (MSGFLAG_SUBMIT | MSGFLAG_UNSENT) && !Post)
+	{
 		Flags |= MAIL_CREATED;
+		if (f & MSGFLAG_FROMME)
+			Flags |= MAIL_SENT;
+	}
 	else
+	{
 		Flags |= MAIL_RECEIVED;	
-	if (f & MSGFLAG_SUBMIT)
-		Flags |= MAIL_READY_TO_SEND;
+	}
 	if (f & MSGFLAG_HASATTACH)
 		Flags |= MAIL_ATTACHMENTS;
 	if (f & MSGFLAG_READ)
 		Flags |= MAIL_READ;
-	if (f & MSGFLAG_FROMME)
-		Flags |= MAIL_SENT;
 	if (f & (MSGFLAG_RN_PENDING | MSGFLAG_NRN_PENDING))
 		Flags |= MAIL_READ_RECEIPT;
 	
@@ -297,7 +310,9 @@ Store3Status LMapiMail::SetInt(int id, int64 i)
 					}
 					else
 					{
-						if (!MapiSetPropLong(MapiMsg, PR_LAST_VERB_EXECUTED, 0))
+						bool ok = MapiSetPropLong(MapiMsg, PR_LAST_VERB_EXECUTED, 0);
+						ok &= MapiDeleteProp(MapiMsg, PR_LAST_VERB_EXECUTION_TIME);
+						if (!ok)
 							Store->ERR("%s:%i - failed to clear replied flag\n", _FL);
 					}
 				}
@@ -319,10 +334,23 @@ const LDateTime *LMapiMail::GetDate(int id)
 	switch (id)
 	{
 		case FIELD_DATE_RECEIVED:
-		case FIELD_DATE_SENT:
-			if (Date.Year() == 0)
-				MapiGetPropDate(Date, Handle(), PR_CLIENT_SUBMIT_TIME);
+		{
+			if (Handle())
+			{
+				if (!MapiGetPropDate(Date, Handle(), PR_MESSAGE_DELIVERY_TIME))
+					MapiGetPropDate(Date, Handle(), PR_CLIENT_SUBMIT_TIME);
+			}
 			return &Date;
+		}
+		case FIELD_DATE_SENT:
+		{
+			if (Handle())
+			{
+				if (!MapiGetPropDate(Date, Handle(), PR_CLIENT_SUBMIT_TIME))
+					MapiGetPropDate(Date, Handle(), PR_MESSAGE_DELIVERY_TIME);
+			}
+			return &Date;
+		}
 		default:
 			LAssert(0);
 			break;
@@ -336,6 +364,9 @@ Store3Status LMapiMail::SetDate(int id, const LDateTime *i)
 	switch (id)
 	{
 		case FIELD_DATE_RECEIVED:
+			if (MapiSetPropDate(Handle(), PR_MESSAGE_DELIVERY_TIME, *i))
+				return Store3Success;
+			break;
 		case FIELD_DATE_SENT:
 			if (MapiSetPropDate(Handle(), PR_CLIENT_SUBMIT_TIME, *i))
 				return Store3Success;
@@ -436,6 +467,8 @@ LDataIt LMapiMail::GetList(int id)
 					for (LMapiList Lst(Recipients); Lst.More(); Lst.Next())
 					{
 						auto Name   = Lst.GetField(PR_DISPLAY_NAME_W);
+						auto Type   = Lst.GetField(PR_RECIPIENT_TYPE);
+						auto AddrTy = Lst.GetField(PR_ADDRTYPE);
 						auto Email1 = Lst.GetField(PR_EMAIL_ADDRESS);
 						auto Email2 = Lst.GetField(PR_SMTP_ADDRESS);
 
@@ -443,19 +476,30 @@ LDataIt LMapiMail::GetList(int id)
 						if ((Name || Email1 || Email2) && a)
 						{
 							a->Name = MapiCastString(Name);
-							if (strchr(MapiCastString(Email1), '@'))
-								a->Addr = MapiCastString(Email1);
+
+							auto addrType = MapiCastString(AddrTy);
+							auto addr1 = MapiCastString(Email1);
+							auto addr2 = MapiCastString(Email2);
+
+							if (strchr(addr2, '@'))
+								a->Addr = addr2;
+							else if (strchr(addr1, '@'))
+								a->Addr = addr1;
+							else if (addrType.Equals("SMTP") && addr1)
+								a->Addr = addr1;
+							else if (addr2)
+								a->Addr = addr2;
 							else
-								a->Addr = MapiCastString(Email2);
+								a->Addr = addr1;
 							
-							if (auto Type = Lst.GetField(PR_RECIPIENT_TYPE))
+							if (Type)
 							{
-								int64 Flags = MapiCastInt(Type);
-								if (Flags & MAPI_TO)
+								auto rcptType = MapiCastInt(Type);
+								if (rcptType == MAPI_TO)
 									a->CC = MAIL_ADDR_TO;
-								else if (Flags & MAPI_CC)
+								else if (rcptType == MAPI_CC)
 									a->CC = MAIL_ADDR_CC;
-								else if (Flags & MAPI_BCC)
+								else if (rcptType == MAPI_BCC)
 									a->CC = MAIL_ADDR_BCC;
 							}
 							
