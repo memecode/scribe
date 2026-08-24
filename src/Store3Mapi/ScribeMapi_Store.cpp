@@ -163,7 +163,11 @@ LMapiStore::LMapiStore(	const char *profile,
 				Stores.Delete(toOpen);
 			}
 		}
-		else LOG("%s:%i - No profile found for '%s'.\n", _FL, Username.Get());
+		else
+		{
+			LOG("%s:%i - No profile found for '%s'.\n", _FL, Username.Get());
+			LOG("	Available: %s\n", LString(",").Join(availableProfiles).Get());
+		}
 
 		if (MsgStore)
 		{

@@ -367,11 +367,12 @@ LString::Array Context::Fetch(LDataFolderI *folder, bool isUid, LString arg, LSt
 }
 
 // e.g. A0861 UID STORE 875 FLAGS (\\seen)
-LString::Array Context::Store(LDataFolderI *folder, bool isUid, LArray<LString> params)
+LString::Array Context::Store(LDataFolderI *folder, bool isUid, LArray<LString> params, LError &err)
 {
 	LString::Array a;
 	if (!folder)
 	{
+		err.Set(LErrorInvalidParam, "no folder");
 		log.Print("%s:%i - error: no folder.\n", _FL);
 		return a;
 	}
@@ -379,6 +380,7 @@ LString::Array Context::Store(LDataFolderI *folder, bool isUid, LArray<LString> 
 	auto meta = getMeta(folder);
 	if (!meta)
 	{
+		err.Set(LErrorInvalidParam, "no meta");
 		log.Print("%s:%i - error: no meta.\n", _FL);
 		return a;
 	}
@@ -387,6 +389,7 @@ LString::Array Context::Store(LDataFolderI *folder, bool isUid, LArray<LString> 
 
 	if (params.Length() != 3)
 	{
+		err.Set(LErrorInvalidParam, "invalid arg count");
 		log.Print("%s:%i - error: unexpected arg count: %s.\n",
 			_FL, LString(",").Join(params).Get());
 		return a;
@@ -396,12 +399,13 @@ LString::Array Context::Store(LDataFolderI *folder, bool isUid, LArray<LString> 
 	auto &storeField = params[1];
 	auto &storeValue = params[2];
 
+	bool foundObj = false;
 	auto &it = folder->Children();
 	for (auto i = it.First(); i; i = it.Next())
 	{
 		if (i->Type() != MAGIC_MAIL)
 			continue;
-
+		
 		if (auto msgId = i->GetStr(FIELD_MESSAGE_ID))
 		{
 			auto uid = meta->getUid(msgId);
@@ -413,39 +417,59 @@ LString::Array Context::Store(LDataFolderI *folder, bool isUid, LArray<LString> 
 				continue;
 
 			log.Print("%s:%i STORE on msgId='%s' uid=%u\n", _FL, msgId, uid);
+			foundObj = true;
 
 			if (storeField.Equals("FLAGS"))
 			{
 				auto flags = storeValue.Strip("()").SplitDelimit();
 				auto curFlags = i->GetInt(FIELD_FLAGS);
 				int64_t newFlags = curFlags & (~MAIL_READ);
+				bool deleteFlag = false;
 				for (auto &f: flags)
 				{
 					if (f.Equals("\\seen"))
 						newFlags = MAIL_READ;
+					else if (f.Equals("\\deleted"))
+						deleteFlag = true;
 					else
 						log.Print("%s:%i - unsupported store flag '%s'\n", _FL, f.Get());
 				}
 
-				if (newFlags != curFlags)
+				if (deleteFlag)
+				{
+					log.Print("%s:%i - deleting message '%s' uid=%u\n", _FL, msgId, uid);
+					auto status = i->Delete();
+					log.Print("%s:%i - delete status=%i\n", _FL, status);
+				}
+				else if (newFlags != curFlags)
+				{
 					i->SetInt(FIELD_FLAGS, newFlags);
+				}
 			}
 			else
 			{
+				err.Set(LErrorInvalidParam, "unsupported store field");
 				log.Print("%s:%i - unsupported store field '%s'\n", _FL, storeField.Get());
 				LAssert(!"unsupported field");
 			}
 		}
 	}
 
+	if (!foundObj)
+	{
+		err.Set(LErrorPathNotFound, "message not found");
+		log.Print("%s:%i STORE failed to find '%s'\n", _FL, params[0].Get());
+	}
+
 	return a;
 }
 
-LString::Array Context::Search(LDataFolderI *folder, bool isUid, LArray<LString> params)
+LString::Array Context::Search(LDataFolderI *folder, bool isUid, LArray<LString> params, LError &err)
 {
 	LString::Array a;
 	if (!folder)
 	{
+		err.Set(LErrorInvalidParam, "no folder");
 		log.Print("%s:%i - error: no folder.\n", _FL);
 		return a;
 	}
@@ -453,6 +477,7 @@ LString::Array Context::Search(LDataFolderI *folder, bool isUid, LArray<LString>
 	auto meta = getMeta(folder);
 	if (!meta)
 	{
+		err.Set(LErrorInvalidParam, "no meta");
 		log.Print("%s:%i - error: no meta.\n", _FL);
 		return a;
 	}
@@ -485,6 +510,7 @@ LString::Array Context::Search(LDataFolderI *folder, bool isUid, LArray<LString>
 				}
 				else
 				{
+					err.Set(LErrorNotSupported, "field not supported");
 					LAssert(!"Impl support for field");
 				}
 			}

@@ -36,6 +36,39 @@ struct ImapConnection : public LSocket
 		Write(w);
 	}
 
+	#if 1
+	void LogData(bool write, const char *data, ssize_t len)
+	{
+		LStringPipe p(16 << 10);
+		p.Print("	" LPrintfSock ".wr:", Handle());
+		for (int i=0; i<len; i++)
+		{
+			auto c = (uint8_t)data[i];
+			if (c == '\n')
+				p.Print("\\n\n\t");
+			else if (c == '\r')
+				p.Print("\\r");
+			else if (c < ' ')
+				p.Print("\\x%02.2x", (uint8_t)data[i]);
+			else
+				p.Print("%c", c);
+			
+		}
+		auto str = p.NewLStr().RStrip() + "\n";
+		ctx.log.Write(str);
+	}
+
+	void OnRead(char *Data, ssize_t Len)
+	{
+		LogData(false, Data, Len);
+	}
+
+	void OnWrite(const char *Data, ssize_t Len)
+	{
+		LogData(true, Data, Len);
+	}
+	#endif
+
 	void DoRead()
 	{
 		auto pos = rdBuf.Find("\n");
@@ -189,13 +222,17 @@ struct ImapConnection : public LSocket
 				if (!selectFolder)
 					return ImapErr("UNAVAILABLE", "no folder selected");
 
-				auto resp = ctx.Search(selectFolder, isUid, parts.Slice(3, -1));
+				LError err;
+				auto resp = ctx.Search(selectFolder, isUid, parts.Slice(3, -1), err);
 				for (auto &r: resp)
 				{
 					ctx.log.Print("Search: %s\n", r.Get());
 					Write(r);
 				}
-				Write(LString::Fmt("%s OK Search completed\r\n", cmdRef.Get()));
+				if (err)
+					Write(LString::Fmt("%s BAD Search %s\r\n", cmdRef.Get(), err.GetMsg().Get()));
+				else
+					Write(LString::Fmt("%s OK Search completed\r\n", cmdRef.Get()));
 			}
 			else if (cmd.Equals("IDLE"))
 			{
@@ -207,13 +244,17 @@ struct ImapConnection : public LSocket
 				if (!selectFolder)
 					return ImapErr("UNAVAILABLE", "no folder selected");
 
-				auto resp = ctx.Store(selectFolder, isUid, parts.Slice(3, -1));
+				LError err;
+				auto resp = ctx.Store(selectFolder, isUid, parts.Slice(3, -1), err);
 				for (auto &r: resp)
 				{
 					ctx.log.Print("Search: %s\n", r.Get());
 					Write(r);
 				}
-				Write(LString::Fmt("%s OK Store completed\r\n", cmdRef.Get()));
+				if (err)
+					Write(LString::Fmt("%s BAD Store %s\r\n", cmdRef.Get(), err.GetMsg().Get()));
+				else
+					Write(LString::Fmt("%s OK Store completed\r\n", cmdRef.Get()));
 			}
 			else
 			{
@@ -269,12 +310,16 @@ public:
 		log.Print("mapiProfile: %s\n", mapiProfile.Get());
 		log.Print("mapiUser: %s\n", mapiUser.Get());
 
-		if (!store.Reset(OpenMapiStore(	mapiProfile,
-										mapiUser,
-										"",
-										0,
-										this,
-										&log)))
+		if (mapiUser.Equals("----"))
+		{
+			log.Print("%s:%i - not starting MAPI, user not configure.\n", _FL);
+		}
+		else if (!store.Reset(OpenMapiStore(mapiProfile,
+											mapiUser,
+											"",
+											0,
+											this,
+											&log)))
 		{
 			log.Print("Error: alloc failed.\n");
 			LCloseApp();

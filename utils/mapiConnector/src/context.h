@@ -71,6 +71,6 @@ struct Context
 	LString::Array Fetch(LDataFolderI *folder, bool isUid, LString arg, LString fieldSpec);
 
 	// e.g. A0861 UID STORE 875 FLAGS (\seen)
-	LString::Array Store(LDataFolderI *folder, bool isUid, LArray<LString> params);
-	LString::Array Search(LDataFolderI *folder, bool isUid, LArray<LString> params);
+	LString::Array Store(LDataFolderI *folder, bool isUid, LArray<LString> params, LError &err);
+	LString::Array Search(LDataFolderI *folder, bool isUid, LArray<LString> params, LError &err);
 };
