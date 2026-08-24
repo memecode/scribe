@@ -3,6 +3,18 @@
 #include "lgi/common/Com.h"
 #include "lgi/common/Library.h"
 
+#ifndef PR_LAST_VERB_EXECUTED
+#define PR_LAST_VERB_EXECUTED PROP_TAG(PT_LONG, 0x1081)
+#endif
+
+#ifndef PR_LAST_VERB_EXECUTION_TIME
+#define PR_LAST_VERB_EXECUTION_TIME PROP_TAG(PT_SYSTIME, 0x1082)
+#endif
+
+#ifndef NOTEIVERB_REPLYTOSENDER
+#define NOTEIVERB_REPLYTOSENDER ((ULONG)102)
+#endif
+
 LMapiMail::LMapiMail(LMapiStore *store) :
 	LMapiThing(store),
 	From(store),
@@ -47,10 +59,16 @@ void LMapiMail::Set(SPropValue *entry, LMapiFolder *parent, LMapiList *Lst)
 		Flags |= MAIL_CREATED;
 	else
 		Flags |= MAIL_RECEIVED;	
+	if (f & MSGFLAG_SUBMIT)
+		Flags |= MAIL_READY_TO_SEND;
 	if (f & MSGFLAG_HASATTACH)
 		Flags |= MAIL_ATTACHMENTS;
 	if (f & MSGFLAG_READ)
 		Flags |= MAIL_READ;
+	if (f & MSGFLAG_FROMME)
+		Flags |= MAIL_SENT;
+	if (f & (MSGFLAG_RN_PENDING | MSGFLAG_NRN_PENDING))
+		Flags |= MAIL_READ_RECEIPT;
 	
 	MsgSize = MapiCastInt(Lst->GetField(PR_MESSAGE_SIZE));
 	TxtBody = MapiCastString(Lst->GetField(PR_BODY));
@@ -249,13 +267,40 @@ Store3Status LMapiMail::SetInt(int id, int64 i)
 	{
 		case FIELD_FLAGS:
 		{
-			bool ReadChange = ((i & MAIL_READ) != 0) ^ ((Flags & MAIL_READ) != 0);
-			Flags = i;			
-			if (ReadChange && Handle())
+			if (Flags == i)
+				return Store3Success;
+
+			auto readChange = (Flags & MAIL_READ) != (i & MAIL_READ);
+			auto replyChange = (Flags & MAIL_REPLIED) != (i & MAIL_REPLIED);
+			
+			Flags = i;
+
+			if (Handle())
 			{
-				HRESULT res = MapiMsg->SetReadFlag(Flags & MAIL_READ ? 0 : CLEAR_READ_FLAG);
-				if (FAILED(res))
-					Store->ERR("%s:%i - SetReadFlag failed with %x\n", _FL, res);
+				if (readChange)
+				{
+					auto res = MapiMsg->SetReadFlag(Flags & MAIL_READ ? 0 : CLEAR_READ_FLAG);
+					if (FAILED(res))
+						Store->ERR("%s:%i - SetReadFlag failed with %x\n", _FL, res);
+				}
+
+				if (replyChange)
+				{
+					if (Flags & MAIL_REPLIED)
+					{
+						bool ok = MapiSetPropLong(MapiMsg, PR_LAST_VERB_EXECUTED, NOTEIVERB_REPLYTOSENDER);
+						LDateTime now;
+						now.SetNow();
+						ok &= MapiSetPropDate(MapiMsg, PR_LAST_VERB_EXECUTION_TIME, now);
+						if (!ok)
+							Store->ERR("%s:%i - failed to persist replied flag\n", _FL);
+					}
+					else
+					{
+						if (!MapiSetPropLong(MapiMsg, PR_LAST_VERB_EXECUTED, 0))
+							Store->ERR("%s:%i - failed to clear replied flag\n", _FL);
+					}
+				}
 			}
 			break;
 		}

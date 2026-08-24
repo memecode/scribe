@@ -428,7 +428,13 @@ LString::Array Context::Store(LDataFolderI *folder, bool isUid, LArray<LString> 
 				for (auto &f: flags)
 				{
 					if (f.Equals("\\seen"))
-						newFlags = MAIL_READ;
+						newFlags |= MAIL_READ;
+					else if (f.Equals("\\answered"))
+						newFlags |= MAIL_REPLIED;
+					else if (f.Equals("\\recent"))
+						newFlags |= MAIL_NEW;
+					else if (f.Equals("\\draft"))
+						newFlags |= MAIL_CREATED;
 					else if (f.Equals("\\deleted"))
 						deleteFlag = true;
 					else

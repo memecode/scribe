@@ -287,7 +287,10 @@ public:
 	bool MapiSetPropLong(IMAPIProp *Props, int Field, ULONG lng)
 	{
 		if (!Props)
+		{
+			LAssert(!"invalid param");
 			return false;
+		}
 
 		SPropValue p;
 		p.ulPropTag = Field;
@@ -302,47 +305,52 @@ public:
 
 	bool MapiSetPropBool(IMAPIProp *Props, int Field, bool b)
 	{
-		if (Props)
+		if (!Props)
 		{
-			SPropValue p;
-			p.ulPropTag = Field;
-			p.Value.b = b;
-			
-			HRESULT res = Props->SetProps(1, &p, 0);
-			return SUCCEEDED(res);
+			LAssert(!"invalid param");
+			return false;
 		}
 
-		return false;
+		SPropValue p;
+		p.ulPropTag = Field;
+		p.Value.b = b;
+		
+		HRESULT res = Props->SetProps(1, &p, 0);
+		return SUCCEEDED(res);
 	}
 
 	bool MapiSetPropDate(IMAPIProp *Props, int Field, const LDateTime &d, bool AdjustTz = true)
 	{
-		if (d.Year())
+		if (!d.Year())
 		{
-			// Set sent date
-			SPropValue Prop;
-			Prop.ulPropTag = Field;
-
-			LDateTime a = d;
-			if (AdjustTz)
-				a.ToUtc();
-
-			SYSTEMTIME st;
-			st.wDay = a.Day();
-			st.wMonth = a.Month();
-			st.wYear = a.Year();
-			st.wMinute = a.Minutes();
-			st.wHour = a.Hours();
-			st.wSecond = a.Seconds();
-			st.wMilliseconds = 0;
-			if (SystemTimeToFileTime(&st, &Prop.Value.ft))
-			{
-				HRESULT res = Props->SetProps(1, &Prop, 0);
-				return SUCCEEDED(res);
-			}
+			LAssert(!"invalid date");
+			return false;
 		}
 
-		return false;
+		// Set sent date
+		SPropValue Prop;
+		Prop.ulPropTag = Field;
+
+		LDateTime a = d;
+		if (AdjustTz)
+			a.ToUtc();
+
+		SYSTEMTIME st;
+		st.wDay = a.Day();
+		st.wMonth = a.Month();
+		st.wYear = a.Year();
+		st.wMinute = a.Minutes();
+		st.wHour = a.Hours();
+		st.wSecond = a.Seconds();
+		st.wMilliseconds = 0;
+		if (!SystemTimeToFileTime(&st, &Prop.Value.ft))
+		{
+			LAssert(!"SystemTimeToFileTime failed");
+			return false;
+		}
+
+		HRESULT res = Props->SetProps(1, &Prop, 0);
+		return SUCCEEDED(res);
 	}
 };
 
