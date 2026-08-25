@@ -545,6 +545,18 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ApplicationIcon>
 				<Haiku>./resources/scribe.hvif</Haiku>
 			</ApplicationIcon>
+			<RPath>
+				<Linux>
+					<Debug>../libs/build-x64-debug/lib</Debug>
+					<Release>../libs/build-x64-release/lib</Release>
+				</Linux>
+			</RPath>
+			<RPathLink>
+				<Linux>
+					<Debug>../libs/build-x64-debug/lib</Debug>
+					<Release>../libs/build-x64-release/lib</Release>
+				</Linux>
+			</RPathLink>
 		</Build>
 		<Editor>
 			<TabSize>

@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdarg.h>
-#include <memory>
 
 #include "Scribe.h"
 
@@ -68,7 +67,6 @@
 #include "ReplicateDlg.h"
 #include "ScribeAccountPreview.h"
 #include "Encryption/GnuPG.h"
-#include "Store3Webdav/WebdavStore.h"
 #include "resdefs.h"
 #include "ScribeIpc.h"
 #include "DynamicHtml.h"
@@ -89,28 +87,13 @@
 #define SUNKEN_CTRL					true
 #endif
 
-#if LGI_CARBON
-
-#define TRAY_ICON_NONE				-1
-#define TRAY_ICON_NORMAL			-1
-#define TRAY_ICON_MAIL				0
-#define TRAY_ICON_ERROR				1
-
-#elif defined(WIN32)
-
-#define TRAY_ICON_NORMAL			0
-#define TRAY_ICON_ERROR				1
-#define TRAY_ICON_MAIL				2
-#define TRAY_ICON_NONE				3
-
-#else
-
-#define TRAY_ICON_NONE				-1
-#define TRAY_ICON_NORMAL			0
-#define TRAY_ICON_ERROR				1
-#define TRAY_ICON_MAIL				2
-
-#endif
+enum TrayIconIndex
+{
+	TRAY_ICON_NORMAL = 0,
+	TRAY_ICON_ERROR,
+	TRAY_ICON_MAIL,
+	TRAY_ICON_NONE
+};
 
 #if LINUX
 const char ScribeThingList[] = "application/x-scribe-thing-list";
@@ -4585,7 +4568,9 @@ void ScribeWnd::OnPulseSecond()
 		LVariant Blink;
 		if (GetOptions()->GetValue(OPT_BlinkNewMail, Blink) && Blink.CastInt32())
 		{
-			d->TrayIcon->Value((d->TrayIcon->Value() == TRAY_ICON_MAIL) ? TRAY_ICON_NONE : TRAY_ICON_MAIL);
+			d->TrayIcon->Value((d->TrayIcon->Value() == TRAY_ICON_MAIL) ?
+								TRAY_ICON_NONE :
+								TRAY_ICON_MAIL);
 		}
 	}
 	else
