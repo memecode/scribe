@@ -30,6 +30,11 @@
 #define TRANSFER_WAIT_TIMEOUT		SECONDS(30)
 #define DEFAULT_SOCKET_TIMEOUT		SECONDS(15)
 
+// Cap how big a single merged log entry can grow to, so that a socket
+// spamming the same message (e.g. repeated disconnects) can't build up
+// one giant string that later hangs the UI when it's inserted in one go.
+#define LOG_ENTRY_MAX_CHARS			(128*1024)
+
 LColour SocketMsgTypeToColour(LSocketI::SocketMsgType flags)
 {
 	LColour col;
@@ -547,7 +552,8 @@ ssize_t Accountlet::Write(const void *buf, ssize_t size, int flags)
 		bool Match = false;
 		auto &Log = Lck->Log;
 		if (Log.Length() > 0)
-			Match = Log.Last()->GetColour() == col;
+			Match = Log.Last()->GetColour() == col &&
+					Log.Last()->Txt.Length() < LOG_ENTRY_MAX_CHARS;
 
 		if (Match)
 		{
