@@ -37,7 +37,7 @@ then
     exit -1
 fi
 
-DEPLOY=appimagetool
+DEPLOY=~/apps/appimagetool-x86_64.AppImage
 
 if ! command -v $DEPLOY >/dev/null 2>&1
 then
@@ -88,7 +88,9 @@ cp $LGI/src/linux/CrashHandler/crash-handler $BINDIR
 cp $LGI_SO     $LIBDIR
 cp -av --preserve=links $LGI_DEPS/libpng*-lgi.so*       $LIBDIR
 cp -av --preserve=links $LGI_DEPS/libz*-lgi.so*         $LIBDIR
-cp -av --preserve=links $LGI_DEPS/libjpeg*.so*          $LIBDIR  
+cp -av --preserve=links $LGI_DEPS/libjpeg*.so*          $LIBDIR
+cp -av --preserve=links $LGI_DEPS/liblunasvg*.so*       $LIBDIR
+cp -av --preserve=links $LGI_DEPS/libplutovg*.so*       $LIBDIR
 cp $LIBNTLM    $LIBDIR
 cp $ICONV      $LIBDIR
 

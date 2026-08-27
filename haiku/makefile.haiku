@@ -207,7 +207,7 @@ Source =	src/ScribeUi.cpp \
 			src/Store3Mail3/Mail3Filter.cpp \
 			src/Store3Mail3/Mail3Contact.cpp \
 			src/Store3Mail3/Mail3Group.cpp \
-			src/Sqlite/v3.6.14/sqlite3.c \
+			src/Sqlite/v3.50.1/sqlite3.c \
 			src/ScribeFolderSelect.cpp \
 			src/RemoteCalendarSource.cpp \
 			src/Imp_OutlookExpress.cpp \
