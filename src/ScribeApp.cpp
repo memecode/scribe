@@ -3117,23 +3117,13 @@ bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, LSystemPath Path
 
 bool ScribeWnd::IsUnitTest = false;
 
-bool ScribeWnd::LoadOptions()
+#ifdef LINUX
+// in 2026 the default location for the options file moved from ~/.Scribe to ~/.config/Scribe
+// check for the old location and move it....
+bool ScribeWnd::LinuxMigrate()
 {
-	bool Load = false;
-	
-	THREAD_UNSAFE(false);
-
-	// Check if we are running unit tests...
-	if ((IsUnitTest = LAppInst->GetOption("unittest")))
-	{
-		d->UnitTestServer.Reset(new LUnitTestServer(this));
-	}
-
 	LArray<OptionsInfo> Files;
 
-	#ifdef LINUX
-	// in 2026 the default location for the options file moved from ~/.Scribe to ~/.config/Scribe
-	// check for the old location and move it....
 	const char *OldPath = "~/.Scribe";
 	const char *DontMigrate = ".dont-migrate";
 	if (!d->Options &&
@@ -3284,6 +3274,27 @@ bool ScribeWnd::LoadOptions()
 			}	// switch
 		}	// DontMigratePath.Exists
 	}
+
+	return true;
+}
+#endif
+
+bool ScribeWnd::LoadOptions()
+{
+	bool Load = false;
+	
+	THREAD_UNSAFE(false);
+
+	// Check if we are running unit tests...
+	if ((IsUnitTest = LAppInst->GetOption("unittest")))
+	{
+		d->UnitTestServer.Reset(new LUnitTestServer(this));
+	}
+
+	LArray<OptionsInfo> Files;
+
+	#ifdef LINUX
+	LinuxMigrate();
 	#endif
 
 	// Now look in the application install folder
@@ -11794,6 +11805,7 @@ void ScribeWnd::OnNew
 		cb->OnNew(Parent, NewItems, Pos, IsNew, FilterIncoming);
 
 	List<Mail> NewMail;
+	List<LListItem> ToInsert;
 	for (auto Item: NewItems)
 	{
 		if (Item->Type() == MAGIC_FOLDER)
@@ -11875,10 +11887,10 @@ void ScribeWnd::OnNew
 					// Existing thing...
 					t->SetFieldArray(Fld->GetFieldArray());
 
-					ThingFilter *Filter = GetThingFilter();
+					auto Filter = GetThingFilter();
 					if (!Filter || Filter->TestThing(t))
 					{
-						MailList->Insert(t, -1, false);
+						ToInsert.Insert(t);
 					}
 				}
 
@@ -11905,6 +11917,9 @@ void ScribeWnd::OnNew
 			}
 		}
 	}
+
+	if (ToInsert.Length())
+		MailList->Insert(ToInsert, -1, false);
 
 	if (UnreadDiff)
 		Fld->OnUpdateUnRead(UnreadDiff, false);

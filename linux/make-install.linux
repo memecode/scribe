@@ -121,10 +121,11 @@ cp ../help/*.css $RESDIR/help
 cp $LGI/docs/scripting/*.html $RESDIR/help/scripting
 cp $LGI/docs/scripting/*.css $RESDIR/help/scripting
 
-mkdir -p $RESDIR/scripts
-cp ../scripts/*.script $RESDIR/scripts
-cp ../scripts/ScribeScripts.h $RESDIR/scripts
-cp $RES/resdefs.h $RESDIR/scripts
+SCRIPTS=$RESDIR/../scripts
+mkdir -p $SCRIPTS
+cp ../scripts/*.script $SCRIPTS
+cp ../scripts/ScribeScripts.h $SCRIPTS
+cp $RES/resdefs.h $SCRIPTS
 
 mkdir -p $RESDIR/Aspell/data
 cp $RES/aspell-languages.csv $RESDIR/Aspell

@@ -2557,6 +2557,9 @@ public:
 	LOptionsFile	*GetOptions(bool Create = false) override;
 	bool			ScanForOptionsFiles(LArray<OptionsInfo> &Files, LSystemPath PathType);
 	bool			ScanForOptionsFiles(LArray<OptionsInfo> &Files, const char *Path);
+	#ifdef LINUX
+	bool			LinuxMigrate();
+	#endif
 	bool			LoadOptions();
 	bool			SaveOptions();
 	bool			IsSending() { return false; }

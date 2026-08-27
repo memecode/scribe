@@ -986,8 +986,7 @@ void ImapStore::OnEvent(void *Param)
 					break;
 				}
 
-				ImapFolder *f = Root->Find(0, m->Fld[0].Remote);
-				if (f)
+				if (auto f = Root->Find(0, m->Fld[0].Remote))
 					f->OnListing(m);
 				else
 					LAssert(!"No folder");

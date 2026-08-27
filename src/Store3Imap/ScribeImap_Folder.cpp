@@ -992,7 +992,10 @@ void ImapFolder::OnLoadMail(bool Threaded)
 	}
 	else LAssert(!"Where is the thread?");
 
-	if (_Parent)
+	// Use IsRoot() rather than '_Parent' here: '_Parent' is only set once the
+	// async IMAP_ON_NEW/SetParent dance completes (it races with this load
+	// when there's no local cache yet), whereas IsRoot() is known synchronously.
+	if (!IsRoot())
 	{
 		if (auto m = new ImapMsg(IMAP_FOLDER_LISTING, _FL))
 		{
@@ -1014,13 +1017,12 @@ void ImapFolder::OnLoadMail(bool Threaded)
 		cb(Store3Delayed);
 	OnLoad.Empty();
 
-	if (Threaded)
-	{
-		// Tell the UI thread about this... it'll need to update the screen
-		LArray<LDataI*> Items;
-		Items.Add(this);
-		Store->OnChange(_FL, Items, FIELD_STATUS);
-	}
+	// Always tell the UI thread about this, even when we finished the load
+	// synchronously (Threaded==false): otherwise the folder view never gets
+	// told to repaint and stays empty until the user hits F5.
+	LArray<LDataI*> Items;
+	Items.Add(this);
+	Store->OnChange(_FL, Items, FIELD_STATUS);
 }
 
 Store3Status ImapFolder::WhenLoaded(std::function<void(Store3Status)> cb)
@@ -1501,7 +1503,7 @@ void ImapFolder::OnListing(ImapMsg *m)
 	LgiTrace("OnListing(%s)\n", Remote.Get());
 	#endif
 	
-	ImapFolderInfo &Fld = m->Fld[0];
+	auto &Fld = m->Fld[0];
 	bool Unclean = false;
 
 	// Go through the incoming list of mail...
@@ -1845,7 +1847,7 @@ int ImapFolder::GetLastUid()
 
 void ImapFolder::OnSelect(bool b)
 {
-	if (Mail.State == Store3Loaded)
+	auto DoSelect = [this]()
 	{
 		ImapMsg *m = new ImapMsg(IMAP_SELECT_FOLDER, _FL);
 		if (m)
@@ -1856,7 +1858,14 @@ void ImapFolder::OnSelect(bool b)
 			i.LastUid = GetLastUid();
 			Store->PostThread(m, false);
 		}
-	}
+	};
+
+	if (Mail.State == Store3Loaded)
+		DoSelect();
+	else
+		// Mail isn't loaded yet (e.g. no local cache): defer the SELECT/FETCH
+		// until it is, otherwise it silently never happens.
+		WhenLoaded([DoSelect](auto) { DoSelect(); });
 }
 
 void ImapFolder::OnDeleteComplete()
