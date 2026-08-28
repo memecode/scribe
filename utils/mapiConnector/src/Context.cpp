@@ -306,7 +306,7 @@ LString::Array Context::Fetch(LDataFolderI *folder, bool isUid, LString arg, LSt
 						auto flags = i->GetInt(FIELD_FLAGS);
 						LString::Array imapFlags;
 						if (flags & MAIL_READ)
-							imapFlags.Add("/Seen");
+							imapFlags.Add("\\Seen");
 						record.Print("%sFLAGS (%s)", space, LString(" ").Join(imapFlags).Get());
 					}
 					else if (fld.Equals("UID"))
@@ -326,6 +326,8 @@ LString::Array Context::Fetch(LDataFolderI *folder, bool isUid, LString arg, LSt
 					else if (fld.Equals("BODY.PEEK[HEADER]"))
 					{
 						auto inetHdr = i->GetStr(FIELD_INTERNET_HEADER);
+						if (!inetHdr)
+							inetHdr = "";
 						auto len = Strlen(inetHdr);
 						record.Print("%sBODY.PEEK[HEADER] {" LPrintfInt64 "}\r\n%s", space, len, inetHdr);
 					}
