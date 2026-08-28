@@ -359,10 +359,11 @@ LString::Array Context::Fetch(LDataFolderI *folder, bool isUid, LString arg, LSt
 
 	if (a.Length() == 0)
 	{
-		log.Print("Warn: fetched no records '%s', '%s', maxUid=%i\n",
+		log.Print("Warn: fetched no records '%s', '%s', maxUid=%i, sz=" LPrintfSizeT "\n",
 			arg.Get(),
 			fieldSpec.Get(),
-			maxUid);
+			maxUid,
+			folder->Children().Length());
 	}
 
 	return a;
