@@ -26,7 +26,8 @@ LString HtmlToText(const char *InputHtml, const char *CharSet)
 				Html.SetCharset(CharSet);
 		}
 	}
-	Html.Name(InputHtml);
+	if (!Html.Name(InputHtml))
+		LgiTrace("%s:%i - HtmlToText parse error: %s\n", _FL, Html.Error.ToString().Get());
 	
 	LString Out;
 	Html.GetFormattedContent("text/plain", Out, NULL);
