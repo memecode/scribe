@@ -11,6 +11,8 @@
 #define TIMEOUT_UPDATE_REBUILD	SECONDS(2)
 #define TIMEOUT_BAYES_IDLE		(50) // ms, out of 100ms idle timer.
 
+#define MAX_MAIL_LOADS			100
+
 #define WHITELIST_MY_EMAIL		0
 #define WHITELIST_CONTACTS		0
 #define STORE_SIZE				16
@@ -21,6 +23,13 @@
 static const char HamWordsFile[]  = "hamwords.idx";
 static const char SpamWordsFile[] = "spamwords.idx";
 static const char WhiteListFile[] = "whitelist.idx";
+
+struct LScopedFlag
+{
+	bool &f;
+	LScopedFlag(bool &flag) : f(flag) { f = true; }
+	~LScopedFlag() { f = false; }
+};
 
 void ProcessWords(LString Words, std::function<void(const char*)> Callback)
 {
@@ -798,11 +807,12 @@ struct BayesEvent
 class BuildSpamDB
 {
 	int FolderLoads = 0;
-	int MailLoads = 0;
+	uint64_t LastLoadTs = 0;
+	bool InProcess = false;
 
 public:
-	ScribeWnd *App;
-	BayesianFilter *Filter;
+	ScribeWnd *App = nullptr;
+	BayesianFilter *Filter = nullptr;
 	LAutoPtr<LProgressDlg> Prog;
 	bool DebugLog = false;
 
@@ -825,6 +835,9 @@ public:
 		}
 	};
 	LArray<BuildItem> Items;
+
+	// Mail that we've asked the store to load, and are waiting on:
+	LArray<BuildItem> Loading;
 
 	int HamCount = 0;
 	int SpamCount = 0;
@@ -894,7 +907,6 @@ BuildSpamDB::BuildSpamDB(ScribeWnd *app) : App(app), Filter(app)
 	b.Reset(new BayesianThread::Build(true));
 	if (Prog.Reset(new LProgressDlg(App)))
 		Prog->SetDescription("Scanning folders...");
-
 }
 
 BuildSpamDB::~BuildSpamDB()
@@ -913,19 +925,37 @@ BuildSpamDB::~BuildSpamDB()
 void BuildSpamDB::AbortProcess()
 {
 	Folders.Length(0);
+	for (auto &i: Items)
+		i.m->DecRef();
 	Items.Length(0);
+	for (auto &i: Loading)
+		i.m->DecRef();
+	Loading.Length(0);
 }
 
 bool BuildSpamDB::Process()
 {
+	// A modal dialog (eg an assert) pumps the message loop, which re-enters the
+	// idle handler. Without this the failure recurses until the stack blows.
+	if (InProcess)
+		return false;
+	LScopedFlag reentry(InProcess);
+
 	if (IsCancelled())
+	{
+		DEBUG_LOG("%s:%i - Process cancelled\n", _FL);
 		AbortProcess();
+	}
 
 	// This should execute for only a small time slice...
+	DEBUG_LOG("%s:%i - folders=%i loads=%i\n", _FL, (int)Folders.Length(), FolderLoads);
 	if (Folders.Length() || FolderLoads)
 	{
 		if (!Folders.Length())
+		{
+			DEBUG_LOG("%s:%i - waiting for loads...\n", _FL);
 			return false; // Just wait for them...
+		}
 
 		auto f = Folders[0];
 		Folders.DeleteAt(0);
@@ -964,7 +994,7 @@ bool BuildSpamDB::Process()
 			}
 			else
 			{
-				// LgiTrace("%s:%i - Unknown folder '%s'\n", _FL, Path.Get());
+				DEBUG_LOG("%s:%i - Unknown folder '%s'\n", _FL, Path.Get());
 				(*Prog)++;
 			}
 		}
@@ -974,46 +1004,97 @@ bool BuildSpamDB::Process()
 			Prog->SetDescription("Processing mail...");
 			Prog->SetRange(Items.Length());
 			Prog->Value(0);
+			LastLoadTs = LCurrentTime();
 		}
 		return false;
 	}
 
-	if (Items.Length() || MailLoads)
+	// Collect any mail that finished loading since the last idle...
+	for (size_t n=0; n<Loading.Length(); n++)
 	{
-		if (Items.Length() && MailLoads < 100)
+		auto &i = Loading[n];
+		if (i.m->GetObject())
 		{
-			auto Start = LCurrentTime();
-			while (	(LCurrentTime() - Start) < TIMEOUT_BAYES_IDLE &&
-					Items.Length())
-			{	
-				// Process mail items...
-				auto &i = Items[0];
-		
-				// Operate on read mail only...
-				auto flags = i.m->GetFlags();
-				if (TestFlag(flags, MAIL_READ))
-				{
-					MailLoads++;
+			if (i.m->GetLoaded() < Store3Loaded)
+				continue;
 
-					// auto loaded = i.m->GetLoaded();
-
-					i.m->WhenLoaded(_FL, [this, mail = i.m, type = i.type](auto status)
-					{
-						ProcessMail(mail, type);
-						MailLoads--;
-						(*Prog)++;
-					});
-
-					i.m->SetLoaded();
-				}
-
-				Items.DeleteAt(0);
-			}
+			ProcessMail(i.m, i.type);
 		}
+		else
+		{
+			// The mail was deleted or unloaded out from under us...
+			LoadFailures++;
+			i.m->DecRef();
+		}
+
+		Loading.DeleteAt(n--);
+		LastLoadTs = LCurrentTime();
+		(*Prog)++;
+	}
+
+	DEBUG_LOG("%s:%i - items=%i loading=%i\n", _FL, (int)Items.Length(), (int)Loading.Length());
+	if (Items.Length() || Loading.Length())
+	{
+		auto Start = LCurrentTime();
+		while (	(LCurrentTime() - Start) < TIMEOUT_BAYES_IDLE &&
+				Items.Length() &&
+				Loading.Length() < MAX_MAIL_LOADS)
+		{	
+			auto i = Items[0];
+			Items.DeleteAt(0);
+
+			// Operate on loaded, read mail only...
+			if (!i.m->GetObject())
+			{
+				LoadFailures++;
+				i.m->DecRef(); // Balances the IncRef in BuildItem::Set
+				(*Prog)++;
+				continue;
+			}
+
+			if (!TestFlag(i.m->GetFlags(), MAIL_READ))
+			{
+				i.m->DecRef();
+				(*Prog)++;
+				continue;
+			}
+
+			if (i.m->GetLoaded() < Store3Loaded)
+			{
+				i.m->GetBody(); // Kicks off the load, which may be async
+				if (i.m->GetLoaded() < Store3Loaded)
+				{
+					i.loading = true;
+					Loading.Add(i);
+					continue;
+				}
+			}
+
+			ProcessMail(i.m, i.type);
+			LastLoadTs = LCurrentTime();
+			(*Prog)++;
+		}
+
+		if (Loading.Length() &&
+			LCurrentTime() - LastLoadTs > TIMEOUT_BAYES_LOAD)
+		{
+			// These loads are never going to complete, don't block the build on them.
+			LgiTrace("%s:%i - Bayes build dropping %i stalled mail loads.\n", _FL, (int)Loading.Length());
+			for (auto &i: Loading)
+			{
+				LoadFailures++;
+				i.m->DecRef();
+				(*Prog)++;
+			}
+			Loading.Length(0);
+			LastLoadTs = LCurrentTime();
+		}
+
 		return false;
 	}
 
 	// We're done...
+	DEBUG_LOG("%s:%i - Done\n", _FL);
 	return true;
 }
 
@@ -1208,14 +1289,14 @@ bool BayesianFilter::BuildSpamDb()
 	// Recurse over the folders
 	for (auto &s: App->GetStorageFolders())
 	{
-		if (s.GetRoot())
-			AddFolderToSpamDb(s.GetRoot());
+		if (auto f = s.GetRoot())
+			AddFolderToSpamDb(f);
 	}
 		
 	for (auto a : *App->GetAccounts())
 	{
-		if (a->Receive.GetRootFolder())
-			AddFolderToSpamDb(a->Receive.GetRootFolder());
+		if (auto f = a->Receive.GetRootFolder())
+			AddFolderToSpamDb(f);
 	}
 
 	d->Build->Prog->SetRange(d->Build->Folders.Length());

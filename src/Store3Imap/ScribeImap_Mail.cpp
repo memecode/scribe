@@ -650,7 +650,7 @@ const char *ImapMail::GetStr(int id)
 			if (FindSegs("text/html", Results))
 			{
 				auto cs = Results[0]->GetStr(FIELD_CHARSET);
-				printf("%s:%i - cs=%s\n", _FL, cs);
+				// printf("%s:%i - cs=%s\n", _FL, cs);
 				return cs;
 			}
 			else printf("%s:%i - no html seg\n", _FL);
