@@ -73,26 +73,31 @@ function GetAllGroups()
 {
 	Items = New("List");
 	Folders = GetSourceFolders(SystemFolderGroups);
-	for (f=0; f<Folders.length; f++)
+	if (!Folders)
 	{
-		Groups = Folders[f];
-		for (i = 0; grp = Groups.Item[i]; i++)
-		{
-			Items.Add(grp);
-		}
-	}
-
-	if (Items.Length)
-	{
-		Items.Sort("-UsedTs");
+		Print("GetAllGroups: No SystemFolderGroups=", SystemFolderGroups, "\n");
 	}
 	else
 	{
-		Print("GetAllGroups: No groups folder.\n");
+		for (f=0; f<Folders.length; f++)
+		{
+			Groups = Folders[f];
+			for (i = 0; grp = Groups.Item[i]; i++)
+			{
+				Items.Add(grp);
+			}
+		}
+
+		if (Items.Length)
+		{
+			Items.Sort("-UsedTs");
+		}
+		// No items is not an error...
 	}
 	
 	return Items;
 }
+
 
 function AddFromToFilter(App, Thing, CallbackId)
 {
