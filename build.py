@@ -12,7 +12,7 @@ isMac = platform.system() == "Darwin"
 isWin = platform.system() == "Windows"
 isLinux = platform.system() == "Linux"
 isHaiku = platform.system() == "Haiku"
-buildDebug = False # ie build the Release build by default
+buildDebug = True # ie build the Debug build by default
 
 print("Build paths:")
 trunk = os.path.abspath(os.path.join(__file__, ".."))
@@ -23,9 +23,6 @@ scribeLibs = os.path.join(scribe, "libs")
 print("    scribeLibs:", scribeLibs)
 code = os.path.abspath(os.path.join(scribe, ".."))
 print("    code:      ", code)
-codeLib = os.path.abspath(os.path.join(code, "../codelib"))
-openssl = os.path.join(codeLib, "openssl")
-print("    codeLib:   ", codeLib)
 lgi = os.path.abspath(os.path.join(code, "lgi/trunk"))
 print("    lgi:       ", lgi)
 lgiDeps = os.path.abspath(os.path.join(code, "lgi/deps"))
@@ -92,7 +89,7 @@ if missingReqPackage:
 
 def Clone(repo, folder):
 	if not os.path.exists(folder):
-		args = ["hg", "clone", repo, folder]
+		args = ["git", "clone", repo, folder]
 		print("    Cloning:", repo)
 		p = subprocess.run(args,
 			stdout=subprocess.PIPE,
@@ -186,8 +183,6 @@ def Openssl(repo, folder):
 
 if len(sys.argv) > 1 and sys.argv[1].lower() == "clean":
 	print("\nCleaning folders...")
-	if os.path.exists(codeLib):
-		shutil.rmtree(codeLib)
 	if os.path.exists(lgi):
 		shutil.rmtree(lgi)
 	if os.path.exists(scribeLibs):
@@ -196,9 +191,9 @@ if len(sys.argv) > 1 and sys.argv[1].lower() == "clean":
 	sys.exit(0)
 
 print("\nChecking repos:")
-Clone("https://phab.mallen.id.au/diffusion/15/scribelibs/", scribeLibs)
-Clone("https://phab.mallen.id.au/source/lgi/", lgi)
-Openssl("https://github.com/openssl/openssl.git", openssl)
+Clone("https://github.com/memecode/scribe_libs.git", scribeLibs)
+Clone("https://github.com/memecode/lgi.git", lgi)
+# Openssl("https://github.com/openssl/openssl.git", openssl)
 
 print("\nBuilding lgi dependencies:")
 if os.path.exists(lgiDeps):
