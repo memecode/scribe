@@ -2118,8 +2118,8 @@ const char *ToString(ScribeMailType t)
 	switch (t)
 	{
 		case BayesMailUnknown: return "BayesMailUnknown";
-		case BayesMailHam: return "BayesMailHam";
-		case BayesMailSpam: return "BayesMailSpam";
+		case BayesMailHam:     return "BayesMailHam";
+		case BayesMailSpam:    return "BayesMailSpam";
 	}
 	return "Invalid";
 }

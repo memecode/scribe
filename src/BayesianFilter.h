@@ -12,8 +12,12 @@ class BayesianFilter
 	// Rebuilding the spam DB.
     void AddFolderToSpamDb(ScribeFolder *f);
 
+	// Array of all storage and account folder roots:
+	LArray<ScribeFolder*> RootFolders();
+
 protected:
 	void BuildStats();
+	void CheckFolders();
     
 public:
     BayesianFilter(ScribeWnd *app);

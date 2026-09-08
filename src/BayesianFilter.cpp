@@ -822,7 +822,7 @@ public:
 	// Processing part 2... convert the mail to words:
 	struct BuildItem
 	{
-		Mail *m = NULL;
+		Mail *m = nullptr;
 		bool loading = false;
 		ScribeMailType type = BayesMailUnknown;
 
@@ -1273,6 +1273,46 @@ void BayesianFilter::BuildStats()
 	inbox->LoadThings();
 }
 
+void BayesianFilter::CheckFolders()
+{
+	LgiTrace("CheckFolders:\n");
+
+	auto check = [&](auto& self, auto *f) -> void
+	{
+		for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
+		{
+			auto path = c->GetPath();
+			auto type = BayesTypeFromPath(path);
+			LgiTrace("\t%s: %s\n", ToString(type), path.Get());
+			
+			self(self, c);
+		}
+	};
+	
+	for (auto root: RootFolders())
+		check(check, root);
+}
+
+LArray<ScribeFolder*> BayesianFilter::RootFolders()
+{
+	LArray<ScribeFolder*> a;
+	
+	// Recurse over the folders
+	for (auto &s: App->GetStorageFolders())
+	{
+		if (auto f = s.GetRoot())
+			a.Add(f);
+	}
+		
+	for (auto account: *App->GetAccounts())
+	{
+		if (auto f = account->Receive.GetRootFolder())
+			a.Add(f);
+	}
+	
+	return a;
+}
+
 bool BayesianFilter::BuildSpamDb()
 {
 	if (!d->GetThread())
@@ -1287,18 +1327,9 @@ bool BayesianFilter::BuildSpamDb()
 		return false;
 
 	// Recurse over the folders
-	for (auto &s: App->GetStorageFolders())
-	{
-		if (auto f = s.GetRoot())
-			AddFolderToSpamDb(f);
-	}
+	for (auto f: RootFolders())
+		AddFolderToSpamDb(f);
 		
-	for (auto a : *App->GetAccounts())
-	{
-		if (auto f = a->Receive.GetRootFolder())
-			AddFolderToSpamDb(f);
-	}
-
 	d->Build->Prog->SetRange(d->Build->Folders.Length());
 	return true;
 }

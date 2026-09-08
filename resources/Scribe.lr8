@@ -12,7 +12,7 @@
 		<String Ref="13" Cid="985" Define="IDC_CONFIGURE_REMOTE_CONTENT" en="..." />
 		<String Ref="15" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="17" Cid="1165" Define="IDC_TABLE" />
-		<String Ref="22" Cid="335" Define="IDC_SET_FILTERS" en="..." uk="Тільки цією мовою:" />
+		<String Ref="22" Cid="1213" Define="IDC_SUB_FOLDER_BTNS" />
 		<String Ref="33" Cid="2016" Define="IDD_NEW_MAIL_NOTIFY" fr="Notification de nouveau courriel" en="New Mail Notification" cs="Oznámení nové zprávy" nl="Melding bij nieuwe post" es="Notificación de Nuevo Correo" pt_br="Notificação de nova mensagem" ru="Извещение о новом сообщении" pt="Notificação de nova mensagem" pl="Powiadomienie o nowej poczcie" it="Notifica nuovi messaggi" vi="Cảnh báo thư mới" zh_tw="新郵件通知" ja="新規メール通知" sr="Obaveštenje o novoprispeloj pošti" no="Varsel om ny epost" lt="Pranešimas apie naują laišką" fa="اعلام وصول نامه جدید" de="&apos;Neue E-Mail&apos; Benachrichtigung" da="Varsel om ny mail" sv="Meddelande om ny e-post" lg="Okukumanyisa ku baluwa empya" tr="Yeni E-postanız Var" hu="Új üzenet értesítés" ko="새로운 메일 알림" uk="Повідомлення про нову пошту" />
 		<String Ref="34" Cid="2017" Define="IDC_NEW_MAIL" pt="Nova mensagem" />
 		<String Ref="35" Cid="2021" Define="IDS_36" en="From" fr="Expediteur" cs="Od" nl="Van" es="De" pt_br="De" ru="От:" pt="De" pl="Od" vi="Người gửi" zh_tw="來自" ja="差出人" sr="Od" no="Fra" lt="Siuntėjas" fa="از" de="Von" da="Fra" sv="Från" lg="Okuva eri" tr="Kimden" hu="Feladó" ko="보낸사람" uk="Від:" />
@@ -65,7 +65,7 @@
 		<String Ref="84" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="85" Cid="-1" Define="IDC_STATIC" en="Search:" fr="Chercher:" it="Cerca:" cs="Hledat:" es="Buscar:" de="Suche:" nl="Zoek:" pt_br="Procurar:" ru="Поиск:" pt="Procurar:" pl="Szukaj:" vi="Tìm:" zh_tw="搜尋:" ja="検索:" sr="Pretraži:" no="Søk:" lt="Ieškoti:" fa="جستجو" da="Søg:" sv="Sök:" lg="Noonya:" tr="Ara:" hu="Keresés:" ko="탐색:" uk="Пошук:" />
 		<String Ref="86" Cid="2045" Define="IDD_FOLDER_NAME" en="Folder Name" fr="Nom de dossier" it="Nome Cartella" cs="Jméno složky" es="Nombre de la Carpeta" de="Ordnername" nl="Naam van map" pt_br="Nome da pasta" ru="Имя папки" pt="Nome da pasta" pl="Nazwa folderu" vi="Tên danh mục" zh_tw="資料夾名稱" ja="フォルダ名" sr="Ime omotnice" no="Mappenavn" lt="Aplanko vardo keitimas" fa="نام پوشه" da="Mappenavn" sv="Mappnamn" lg="Erinnya lya Kabada" tr="Klasör Adı" hu="Mappa neve" ko="폴더 이름" uk="Ім`я теки" />
-		<String Ref="87" Cid="1165" Define="IDC_TABLE" />
+		<String Ref="87" Cid="1222" Define="IDC_HELP" en="Help" />
 		<String Ref="88" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" pt="Cancelar" ja="キャンセル" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="89" Cid="1002" Define="IDC_NAME" />
 		<String Ref="90" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
@@ -73,16 +73,16 @@
 		<String Ref="92" Cid="1556" Define="IDC_BTNS_TABLE" />
 		<String Ref="93" Cid="1011" Define="IDC_QUOTE_STR" />
 		<String Ref="94" Cid="-1" Define="IDC_STATIC" en="Reply format:" pt_br="Modelo de resposta:" nl="Beantwoord:" cs="Formát odpovědi:" ru="Формат ответа:" ja="返信:" pt="Responder:" pl="Format odpowiedzi:" it="Risposte:" vi="Trả lời:" zh_tw="回覆:" sr="Format odgovora:" es="Formato al Responder:" no="Svarformat:" lt="Atsakymo šablonas:" fa="قالب جواب ها" de="Antwort-Format:" da="Svarformat:" sv="Svarsformat:" lg="Ebbago ly&apos;Okudamu:" tr="Yanıt formatı:" hu="Válasz formátum:" ko="회신 형식:" uk="Формат відповіді:" fr="Format de réponse:" />
-		<String Ref="96" Cid="2014" Define="IDC_SET_CALENDER" en="..." />
+		<String Ref="96" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="97" Cid="-1" Define="IDC_STATIC" en="Reading Email:" cs="Čtení zpráv" nl="Weergave van epost" pt_br="Lendo mensagens" ru="Чтение сообщений" ja="メール表示" pt="A ler e-mail" pl="Czytanie poczty" it="Lettura email" vi="Đọc thư" zh_tw="郵件讀取中" sr="Čitanje pošte" es="En la lectura de Correo" no="Lese epost" lt="Laiškų skaitymas" fa="خواندن نامه ها" de="Lesen von E-Mails" da="Læser epost" sv="Läsa e-post" lg="Obubaka busomebwa" tr="E-posta Okuma Ayarları" hu="Levél olvasása" ko="이메일 읽기:" uk="Читання електронної пошти:" fr="Lecture courriel:" />
-		<String Ref="98" Cid="936" Define="IDC_HAS_FILTERS" en="Filters:" fr="Filtres:" it="Filtri:" cs="Filtry:" es="Filtros:" de="Filter:" pt_br="Filtros:" pt="Filtros:" pl="Filtry:" vi="Bộ lọc" zh_tw="過濾器:" ja="フィルタ:" sr="Filteri:" no="Filtre:" lt="Filtrai:" fa="فيلترها" da="Filtre:" sv="Filter:" lg="Obusengeja:" tr="Filtreler (filters):" hu="Szűrők:" ru="Фильтры:" ko="필터:" uk="Фільтри:" />
+		<String Ref="98" Cid="1221" Define="IDC_AUTO" en="Auto" />
 		<String Ref="99" Cid="-1" Define="IDC_STATIC" en="Options requiring a restart:" cs="Nastavení vyžadující restart" ru="Опции, требующие перезапуск" nl="Opties actief na herstart programma" ja="再起動を要求するオプション" pt="Opções que requerem reinício" pl="Opcje wymagają restartu" it="Opzioni che richiedono il riavvio" vi="Tùy chọn (phải khởi động lại)" zh_tw="此操作必須重新啟動" sr="Opcije koje zahtevaju restart" es="Opciones que requieren reiniciar el programa" no="Alternativer som krever omstart" lt="Nuostatos, kurios įsigalios, programą paleidus iš naujo" fa="گزينه هاي که به راه اندازي مجدد نياز دارند" de="Diese Einstellungen erfordern Neustart" da="Optioner som kræver genstart" sv="Alternativ som kräver omstart:" pt_br="Opções que requerem um re-início do programa" lg="Eby&apos;Okweroboza ebyetagisa okutandiika kompyuta obuto" tr="Yeniden başlatma gerektiren ayarlar" hu="Beállítások újraindítást igényelnek" ko="재시작을 요구하는 옵션:" uk="Функції, що вимагають перезавантаження:" fr="Options qui requièrent un redémarage:" />
 		<String Ref="100" Cid="965" Define="IDC_DEF_REPLYALL_SETTING" />
 		<String Ref="101" Cid="189" Define="IDC_RESET_FORWARD" en="Reset" ko="리셋" uk="Скинути" de="Zurücksetzen" fr="Réinitialiser" />
 		<String Ref="102" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="105" Cid="736" Define="IDC_EDIT_FORWARD" en="..." />
 		<String Ref="106" Cid="735" Define="IDC_EDIT_REPLY" en="..." />
-		<String Ref="107" Cid="577" Define="IDC_CALENDER" lt="Kalendorius" pt="Calendário" />
+		<String Ref="107" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="108" Cid="1066" Define="IDC_WRAP" en="Wrap Lines at" fr="Couper lignes à" it="Vai a capo ogni" cs="Zalamovat řádky na" es="Autoajustar las líneas a" de="Zeilenumbruch nach" nl="Regels afbreken na" pt_br="Quebrar as linhas em" ru="Перенос строк больше" ja="ラインで囲む" pt="Ajustar as linhas a" pl="Łam wiersze co" vi="Xuống dòng tại" zh_tw="自動換行" sr="Završavaj redove u" no="Bryt linjer ved" lt="Laužti eilutę, ilgesnę kaip" fa="گروه بندي سطر ها به تعداد:" da="Bryd linier ved" sv="Radbryt vid" lg="Wumbawumbira layini ku" tr="Satırı böl" hu="Sortörés ennél" ko="자동 줄바꿈 위치" uk="Перенесення рядків більше" />
 		<String Ref="109" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="110" Cid="1051" Define="IDC_TRAY" en="&Minimize to tray icon" fr="&Minimiser dans zone de notification" it="Minimizza nella barra" cs="Minimalizovat do lišty" es="Minimizar en la barra de tareas" de="Zu Trayicon minimieren" nl="Verkleinen tot taakbalkpictogram" pt_br="Minimizar na bandeja" ru="Сворачивать в трей" ja="最小化時にタスクトレイに格納する" pt="Minimizar na bandeja" pl="Minimalizuj do zasobnika systemowego" vi="Thu gọn về khay hệ thống" zh_tw="縮小為圖示檔" sr="Minimiziraj u ikonu u treju" no="Minimer til tray ikon" lt="Mažinti iki piktogramos pranešimų srityje" fa="پنجره را به کنار ساعت کوچک کن" da="Minimer til tray ikon" sv="Minimera till meddelandefältet" lg="Ssa kafuuke akakooni" tr="Sistem bildirim alanına küçült (tray)" hu="Kicsinyítés tálcára" ko="트레이 아이콘으로 최소화" uk="Згорнути до трею в іконку" />
@@ -147,7 +147,7 @@
 		<String Ref="188" Cid="877" Define="IDC_TAB2" en="HTML" />
 		<String Ref="189" Cid="186" Define="IDC_RESET_REPLY" en="Reset" ko="리셋" uk="Скинути" de="Zurücksetzen" fr="Réinitialiser" />
 		<String Ref="190" Cid="1165" Define="IDC_TABLE" />
-		<String Ref="191" Cid="83" Define="IDC_COLOUR" />
+		<String Ref="191" Cid="1223" Define="IDC_COLOUR" />
 		<String Ref="193" Cid="-1" Define="IDC_STATIC" en="Server:" fr="Serveur:" es="Servidor:" pt_br="Servidor:" ru="Сервер:" ja="サーバー:" pt="Servidor:" pl="Serwer:" vi="Máy chủ:" zh_tw="伺服器:" no="Tjener:" lt="Serveris:" fa="سرور" lg="Saava:" tr="Sunucu:" hu="Kiszolgáló:" ko="서버:" uk="Сервер:" />
 		<String Ref="194" Cid="833" Define="IDC_SOCKS5_PASSWORD" />
 		<String Ref="196" Cid="-1" Define="IDC_STATIC" en="User Name:" fr="Nom d&apos;usager:" it="Nome utente:" cs="Jméno uživatele:" es="Usuario:" de="Benutzername:" nl="Gebruikersnaam:" pt_br="Nome de usuário::" ru="Пользователь:" ja="ユーザー名:" pt="Utilizador:" pl="Nazwa użytkownika:" vi="Tên người dùng:" zh_tw="用戶名稱:" sr="Korisničko ime:" no="Brukernavn:" lt="Abonento vardas:" fa="نام کاربري" da="Brugernavn:" sv="Användarnamn:" lg="Erinnya ly&apos;Omukozesa:" tr="Kullanıcı Adı:" hu="Felhasználó név:" ko="사용자 이름:" uk="Ім`я користувача:" />
@@ -183,25 +183,6 @@
 		<String Ref="286" Cid="-1" Define="IDC_STATIC" en="Source Files:" pl="Pliki źródłowe:" cs="Zdrojové soubory:" no="Kildefiler" pt="Importar de:" lt="Importuoti iš:" fa="فايل هاي مبدأ:" nl="Bronbestanden:" de="Quell-Dateien:" sr="Izvorna omotnica:" da="Kildefiler" vi="Tập tin nguồn:" sv="Källfiler:" es="Carpeta de Origen:" pt_br="Arquivos de Origem:" lg="Failo omunasowolwa" tr="Kaynak Dosyalar:" hu="Forrás fájl:" ru="Исходные файлы:" ko="소스 파일:" uk="Вихідні файли:" fr="Fichiers source:" />
 		<String Ref="316" Cid="1228" Define="IDC_STATUS" en="Status..." ko="상태..." uk="Стан..." fr="Statut..." />
 		<String Ref="317" Cid="317" Define="IDD_SUB_FOLDERS" en="Sub Folder Locations" fr="Emplacements des sous-dossier secondaires" it="Posizioni delle sottocartelle" cs="Umístění podsložek" es="Localización de SubCarpetas" de="Unterordner" nl="Mappen instellen" pt_br="Localização das sub-pastas" ru="Расположение подпапок" pt="Localização das sub-pastas" pl="Położenie podfolderu" vi="Vị trí danh mục con" zh_tw="子目錄位置" ja="サブフォルダの位置" sr="Lokacije podfoldera" no="Undermappe plassering" lt="Laiškų vieta, aplankų parinkimas" fa="محل زيرفهرست ها" da="Placering af undermapper" sv="Placering av undermappar" lg="Awaterekerwa bu Kabada" tr="Alt Klasör Konumları" hu="Almappák helye" ko="하위 폴더 위치" uk="Розташування підтек" />
-		<String Ref="318" Cid="-1" Define="IDC_STATIC" en="Outbox:" fr="Boite de départ:" it="Posta in uscita:" cs="K odeslání:" es="Bandeja de Salida:" de="Postausgang:" nl="Postvak Uit:" pt_br="Caixa de saída:" pt="A Enviar:" pl="Skrzynka nadawcza:" vi="Thư chưa gửi:" zh_tw="寄件夾:" ja="送信箱:" sr="Izlazna kutija:" no="Utboks:" lt="Siunčiami:" fa="آماده فرستادن" da="Udgang:" sv="Utkorg:" lg="Ezinasindikibwa:" tr="Gönderilecek (outbox):" hu="Kimenő:" ru="Исходящие:" ko="임시보관함:" uk="Вихідні:" />
-		<String Ref="319" Cid="-1" Define="IDC_STATIC" en="Sent Items:" fr="Eléments envoyés:" it="Posta inviata:" cs="Odeslané:" es="Elementos Enviados:" de="Gesendete E-Mails:" nl="Verzonden:" pt_br="Ítens enviados:" pt="Enviado:" pl="Elementy wysłane:" vi="Thư đã gửi" zh_tw="傳送項目:" ja="送信済みアイテム:" sr="Poslati objekti:" no="Sendte meldinger:" lt="Išsiųsti:" fa="فرستاده شده" da="Sendte meldinger:" sv="Skickade meddelanden:" lg="Ebisindikiddwa:" tr="Giden (sent):" hu="Elküldött elemek:" ru="Отправленные:" ko="보낸편지함:" uk="Відправлені:" />
-		<String Ref="320" Cid="-1" Define="IDC_STATIC" en="Trash:" fr="Corbeille:" it="Posta eliminata:" cs="Koš:" es="Elementos eliminados:" de="Papierkorb:" nl="Verwijderd:" pt_br="Lixeira:" pt="Apagado:" pl="Elementy usunięte:" vi="Thùng rác:" zh_tw="垃圾筒:" ja="ごみ箱:" sr="Smeće:" no="Slettede meldinger:" lt="Šiukšlinė:" fa="زباله دان" da="Slettede meldinger:" sv="Papperskorg:" lg="Ebisanguddwa:" tr="Çöp (trash):" hu="Kuka:" ru="Мусор:" ko="휴지통:" uk="Кошик:" />
-		<String Ref="321" Cid="-1" Define="IDC_STATIC" en="Contacts:" it="Contatti:" cs="Kontakty:" es="Contactos:" de="Kontakte:" nl="Contactpersonen:" pt_br="Contatos:" pt="Contactos:" pl="Kontakty:" vi="Liên hệ:" zh_tw="聯絡人:" ja="連絡先:" sr="Kontakti:" no="Kontakter:" lt="Asmenų adresai:" fa="دوستان" da="Kontakter:" sv="Kontakter:" lg="Endagiriro:" tr="İrtibatlar (contacts):" hu="Kapcsolatok:" ru="Контакты:" ko="연락처:" uk="Контакти:" />
-		<String Ref="322" Cid="322" Define="IDC_HAS_TEMPLATES" en="Templates:" fr="Modèles:" it="Bozze:" cs="Šablony:" es="Plantillas:" de="Vorlagen:" nl="Sjablonen:" pt_br="Modelos:" pt="Modelos:" pl="Szablony:" vi="Mẫu:" zh_tw="範本:" ja="テンプレート:" sr="Šabloni:" no="Maler:" lt="Šablonai:" fa="الگو ها" da="Forskrift:" sv="Mallar:" lg="Obutiba:" tr="Taslak (templates):" hu="Sablon:" ru="Шаблоны:" ko="템플릿:" uk="Шаблони:" />
-		<String Ref="323" Cid="324" Define="IDC_INBOX" pt="Recebido" />
-		<String Ref="324" Cid="325" Define="IDC_OUTBOX" pt="A Enviar" />
-		<String Ref="325" Cid="449" Define="IDC_SENT" pt="Enviado" />
-		<String Ref="326" Cid="327" Define="IDC_TRASH" pt="Apagado" />
-		<String Ref="327" Cid="328" Define="IDC_CONTACT_FLD" pt="Contactos" />
-		<String Ref="328" Cid="702" Define="IDC_GROUPS_FLD" lt="Filtrai" />
-		<String Ref="330" Cid="331" Define="IDC_SET_OUTBOX" en="..." />
-		<String Ref="331" Cid="332" Define="IDC_SET_SENT" en="..." />
-		<String Ref="332" Cid="333" Define="IDC_SET_TRASH" en="..." />
-		<String Ref="333" Cid="334" Define="IDC_SET_CONTACTS" en="..." />
-		<String Ref="334" Cid="703" Define="IDC_SET_GROUPS" en="..." />
-		<String Ref="335" Cid="-1" Define="IDC_STATIC" en="Inbox:" fr="Boite de réception:" it="Posta in arrivo:" cs="Příchozí:" es="Bandeja de Entrada:" de="Posteingang:" nl="Postvak In:" pt_br="Caixa de entrada:" pt="Recebido:" pl="Skrzynka odbiorcza:" vi="Hộp thư:" zh_tw="收件夾:" ja="受信箱:" sr="Dolazna kutija:" no="Innboks:" lt="Gauti:" fa="نامه هاي رسيده" da="Indgang:" sv="Inkorg:" lg="Eziyingidde:" tr="Gelen (inbox):" hu="Bejövő:" ru="Входящие:" ko="받은편지함:" uk="Вхідні:" />
-		<String Ref="336" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
-		<String Ref="337" Cid="330" Define="IDC_SET_INBOX" en="..." />
 		<String Ref="339" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="340" Cid="-1" Define="IDC_STATIC" en="columns" fr="colonnes" it="colonne" cs="znaků" es="columnas" de="Spalten" nl="tekens" pt_br="colunas" ru="символов" ja="列" pt="colunas" pl="kolumn" vi="cột" zh_tw="欄" sr="koloni" no="kolonner" lt="simb." fa="ستون " da="kolonner" sv="tecken" lg="emiwatwa" tr="kolonlar" hu="oszlopok" ko="행" uk="символів" />
 		<String Ref="341" Cid="-1" Define="IDC_STATIC" en="Default HTML Font:" pl="Domyślna czcionka HTML:" cs="Výchozí HTML Font:" no="Standard HTML skrifttype:" nl="Standaard HTML lettertype:" lt="Numatytasis HTML šriftas" pt="Fonte p/ HTML" fa="HTMLقلم پيشفرض براي " de="Standard HTML Schriftart:" sr="Podrazumevani HTML font:" da="Standard HTML skrifttype:" vi="Kiểu chữ HTML mặc định:" sv="Standard HTML-teckensnitt:" es="Fuente HTML por defecto:" pt_br="Fonte padrão para HTML:" lg="Omukono gw&apos;emiko ogw&apos;enkalakalira:" tr="Varsayılan HTML Yazı Tipi:" hu="Alapértelmezett HTML-betűtípus:" ru="Шрифт HTML по умолчанию:" ko="HTML 폰트 초기화:" uk="Шрифт HTML за замовчуванням:" fr="Police par défaut HTML:" />
@@ -213,8 +194,6 @@
 		<String Ref="350" Cid="1108" Define="IDC_WORK_SUBURB" />
 		<String Ref="351" Cid="351" Define="IDC_351" />
 		<String Ref="352" Cid="671" Define="IDS_671" en="Interface Font Size:" cs="Velikost písma rozhraní:" ru="Шрифт интерфейса:" nl="Lettergrootte:" ja="フォント表示サイズ" pt="Tamanho da fonte:" pl="Rozmiar czcionki interfejsu" it="Dimensione del carattere:" vi="Cỡ chữ giao diện:" zh_tw="介面字型大小:" sr="Veličina fonta interfejsa:" es="Tamaño de Fuente:" no="Grensesnitt skriftstørrelse:" lt="Sąsajos šrifto dydis:" fa="اندازه قلم رابط برنامه" de="Schriftgrösse der Oberfläche" da="Brugerflade skriftstørrelse:" sv="Storlek på teckensnitt för gränssnittet:" pt_br="Tamanho da Fonte da Interface" lg="Obunene bw&apos;Omukono kundabirwamu:" tr="Arayüz Yazı Boyutu:" hu="Felület betűmérete:" ko="인터페이스 폰트 크기:" uk="Шрифт інтерфейсу:" fr="Taille de police pour l&apos;interface:" />
-		<String Ref="357" Cid="357" Define="IDC_HAS_SPAM" en="Spam:" uk="Спам (небажана пошта):" de="SPAM:" fr="Pourriel" />
-		<String Ref="358" Cid="354" Define="IDC_FILTERS_FLD" lt="Filtrai" pt="Filtros" />
 		<String Ref="361" Cid="579" Define="IDC_KEYWORDS" />
 		<String Ref="362" Cid="677" Define="IDC_UI_FNT_SIZE" />
 		<String Ref="370" Cid="370" Define="IDC_STOP_FILTERING" en="Stop further processing of filters" pt="Interromper o processamento de filtros" nl="Niet verder doorgaan met filteren" cs="Nezpracovat dalšími filtry" pl="Do pasującej poczty nie używaj innych filtrów" it="Ferma il trattamento dei file" vi="Không tiếp tục sử dụng bộ lọc" zh_tw="停止執行過濾功能" ja="フィルタリングを停止する" sr="Zaustavi dalje procesuiranje filtera" es="Detener posterior procesamiento por Filtros" no="Stopp videre prosessering av filtre" lt="Sąlygai atitikus, kitų filtrų nenaudoti" fa="پردازش فيلتر ها را متوقف کن" de="Keine weiteren Filter ausführen" da="Stop videre udførelse af filtre" sv="Sluta filtrera" pt_br="Interromper o processamento dos filtros" lg="Komya Obusengeja" tr="Yeni filtre işlemeyi durdur" hu="Szűrők további feldolgozásának leállítása" ru="Остановить дальнейшую работу фильтров" ko="필터 진행 중지" uk="Зупинити подальшу обробку фільтрів" fr="Arrêter le traitement ultérieur des filtres" />
@@ -311,7 +290,7 @@
 		<String Ref="504" Cid="506" Define="IDC_BROWSE_EXISTING" en="..." />
 		<String Ref="505" Cid="655" Define="IDD_FIND" en="Find" fr="Trouver" cs="Najít" de="Suche" nl="Vind" es="Buscar" pt_br="Localizar" ru="Поиск" pt="Procurar" pl="Znajdź" it="Trova" vi="Tìm kiếm" zh_tw="尋找" ja="検索" sr="Pronadji" no="Finn" lt="Ieškoti" fa="جستجو" sv="Sök" lg="Nnoonya" tr="Arama" hu="Keres" ko="찾기" uk="Пошук" />
 		<String Ref="506" Cid="472" Define="IDS_472" en="Recently opened folders:" fr="Dossiers ouvert recement:" cs="Naposledy otevřené soubory" de="Kürzlich geöffnete Mail-Datenbanken:" nl="Laatst geopende mappen:" es="Carpetas abiertas recientemente:" pt_br="Pastas abertas recentemente:" ru="Последние открытые папки" pt="Pastas abertas recentemente:" pl="Ostatnio otwierane foldery:" it="Cartelle aperte di recente:" vi="Danh mục vừa mới mở:" zh_tw="最近開啟的資料夾:" ja="最近開いたフォルダ:" sr="Nedavno otvarane omotnice" no="Nylig åpnede mapper:" lt="Atverta rinkmenų:" fa=":پوشه هايي که به تازگي باز شده اند" da="Fornylig åbnede mapper:" sv="Senast öppnade mappar:" lg="Kabada ezagulwawo jjuuzi:" tr="Önceden açılan klasörler:" hu="Gyakran megnyitott mappák:" ko="최근 열었던 폴더" uk="Нещодавно відкриті теки:" />
-		<String Ref="508" Cid="83" Define="IDC_COLOUR" />
+		<String Ref="508" Cid="1223" Define="IDC_COLOUR" />
 		<String Ref="509" Cid="-1" Define="IDC_STATIC" en="Key words:" fr="Mots clés:" />
 		<String Ref="511" Cid="906" Define="IDS_1082" en="STARTTLS" lt="„STARTTLS“ būdu" cs="Pomocí STARTTLS" de="Mit STARTTLS" tr="STARTTLS ile" ru="Через STARTTLS" ko="STARTTLS를 통해" uk="Через STARTTLS" />
 		<String Ref="512" Cid="-1" Define="IDC_STATIC" en="User name:" fr="Nom d&apos;usager:" it="Nome utente:" cs="Jméno uživatele:" es="Nombre de Usuario:" de="Benutzername:" nl="Gebruikersnaam:" pt_br="Nome de usuário:" ru="Пользователь:" pt="Utilizador:" pl="Nazwa użytkownika:" vi="Tên người dùng:" zh_tw="用戶名稱:" ja="ユーザ名:" sr="Korisničko ime:" no="Brukernavn:" lt="Naudotojo vardas:" fa="نام کاربري" da="Brugernavn:" sv="Användarnamn:" lg="Erinnya ly&apos;Omukozesa:" tr="Kullanıcı adı:" hu="Felhasználó név:" ko="사용자 이름:" uk="Користувач:" />
@@ -421,7 +400,7 @@
 		<String Ref="666" Cid="-1" Define="IDC_STATIC" en="Colour:" cs="Barva:" nl="Kleur:" pt_br="Cor:" ru="Цвет:" ja="色" pt="Cor:" pl="Kolor:" it="Colore:" vi="Màu sắc:" zh_tw="顏色:" sr="Boja:" es="Color:" no="Farge:" lt="Spalva:" fa=":رنگ" de="Farbe:" da="Farve:" sv="Färg:" lg="Langi:" tr="Renk:" hu="Szín:" ko="색상:" uk="Колір:" fr="Couleur:" />
 		<String Ref="667" Cid="668" Define="IDC_RECEIVED_DATE" />
 		<String Ref="668" Cid="-1" Define="IDC_STATIC" en="Sent Date:" fr="Date d&apos;envoie:" it="Data invio:" cs="Odeslána:" es="Enviado el:" de="Sendedatum:" nl="Verzenddatum" pt_br="Enviado em:" ru="Отправлено:" ja="送信日時" pt="Enviado em:" pl="Data wysłania:" vi="Ngày gửi:" zh_tw="傳送的資料:" sr="Datum slanja:" no="Sendt dato:" lt="Išsiuntimo data:" fa=":تاريخ ارسال" da="Sendt dato:" sv="Sänt datum:" lg="Ebiro kweyasindikirwa:" tr="Gönderilme Tarihi:" hu="Küldés dátuma:" ko="보낸 날짜:" uk="Відправлено:" />
-		<String Ref="669" Cid="83" Define="IDC_COLOUR" />
+		<String Ref="669" Cid="1223" Define="IDC_COLOUR" />
 		<String Ref="670" Cid="-1" Define="IDC_STATIC" en="If you use a SOCKS5 proxy server to gain access to the internet then enter the server address here. Otherwise leave it blank." fr="Si vous employez un proxy server SOCKS5 pour accéder à l&apos;Internet écrivez ici l&apos;adresse" cs="Používáte-li SOCKS5 proxy server k získání přístupu na internet vyplňte adresu serveru. Jinak nechte prázdné." it="Se si usa un proxy server SOCKS5 specifica l&apos;indirizzo. Altrimenti lascia vuoto." es="Si emplea un servidor proxy SOCKS5 para acceder a Internet indique la dirección aquí. Si no lo emplea, déjelo en blanco." de="Wenn Sie einen SOCKS 5 Proxy Server für den Zugang ins Internet verwenden, tragen Sie den Server hier ein. Ansonsten lassen Sie die Felder leer." nl="Als u gebruik maakt van een Proxyserver voor internettoegang, vul dan hier het adres van de server in. Anders niets invullen." pt_br="Se você usa um servidor SOCKS5 para acessar a Internet, informe o endereço do servidor aqui. Se não usa, deixe em branco." ja="Socks5 Proxyサーバーを用いて接続する場合はここにアドレスを入力して下さい。使用しない場合は空白のままにしておいて下さい。" pt="Se usar um servidor SOCKS5 para aceder à Internet, indique o endereço do servidor aqui. Se não usa, deixe em branco." pl="Jeśli używasz serwera Proxy SOCKS5 wpisz tu jego adres. W przeciwnym razie zostaw to pole puste." vi="Nếu bạn dùng SOCKS5 proxy để truy cập internet thì hãy nhập địa chỉ máy chủ vào đây. Còn không thì hãy để trống." zh_tw="除非你有透過SOCKS5 代理伺服器上網否則不必填寫" sr="Ako koristite SOCKS5 proksi server da bi pristupili internetu unesite adresu servera ovde. U ostalim slučajevima ostavite prazno." no="Hvis du bruker en SOCKS5 proxy-tjener for tilkobling til Internet, legg til tjener-adresse her. Hvis ikke, la feltet være tomt." lt="Jeigu interneto ryšiui naudojate SOCKS5 serverį, čia įrašykite jo parametrus." fa="اگر از يک پروکسي سرور براي دسترسي به اينترنت استفاده مي کنيد آدرس سرور را اينجا وارد کنيد وگرنه آن را خالي بگذاريد." da="Hvis du bruger en SOCKS5 proxy-server for Internet forbindelsen, angiv server-adressen her. Hvis ikke, lad feltet være tomt." sv="Om du använder en SOCKS 5 proxyserver att kontakta Internet, skriv serverns adress här. Annars lämnar du fälten tomma." lg="Bwoba okozesa puloxi ya Soku 5 okweyunga ku kitimba, yingizamu endagiriro ya saava. Oba siwwo, lekawo nga werere." tr="Eğer bağlantınızı SOCKS5 sunucu üzerinden sağlıyorsanız bu alanları doldurun. Diğer durumlarda boş bırakınız." hu="Ha SOCKS5 proxy kiszolgálót használ az internet csatlakozáshoz, írja a kiszolgáló nevét ide. Különben hagyja üresen." ru="Если вы используете SOCKS5 сервер\nдля доступа к интернет, то можно\nввести параметры настройки сервера:" ko="인터넷 접속을 위해 SOCKS5 proxy server를 사용하고 있다면 여기 서버 주소를 입력하세요. 아닐 경우 빈칸으로 비워둡니다." uk="Якщо ви використовуєте SOCKS5 проксі-сервер, щоб отримати доступ до Інтернету, то введіть адресу сервера тут. В іншому випадку залиште це поле порожнім." />
 		<String Ref="671" Cid="347" Define="IDC_GRID_LINES" en="Draw grid lines in main item list" fr="dessiner la grille dans la liste générale" it="Mostra la griglia" cs="Vykreslit seznam zpráv jako tabulku" es="Mostrar el rayado en la lista principal" de="Gitterlinien in Liste anzeigen" nl="Lijnen tussen berichten weergeven" pt_br="Mostrar grade na lista principal" ja="メインアイテムリストのグリッド線を表示する" pt="Linhas separadoras nas mensagens" pl="Wyświetlaj siatkę" vi="Vẽ lưới trong danh sách mục chính" zh_tw="描繪格線於主物件列表" sr="Nacrtaj linije mreže u listi glavnih predmeta" no="Vis rutenett i hovedliste for meldinger" lt="Sąraše rodyti linijų tinklelį" fa="خطوط محيطي را در فهرست اصلي رسم کن" da="Vis separationslinjer i hovedliste for meldinger" sv="Visa rutnät i meddelandelistan" lg="Laga layini za guridi mu nkalala" tr="Listeyi çizgilerle bölmeli olarak göster" hu="Fő tétellistában rácssorok rajzolása" ru="Сетка в списке писем" ko="메인 아이템 목록에 격자 선 그리기" uk="Відображати сітку у списку листів" />
 		<String Ref="672" Cid="1100" Define="IDC_WORK_COUNTRY" />
@@ -469,7 +448,6 @@
 		<String Ref="750" Cid="-1" Define="IDC_STATIC" en="Use this filter on:" lt="Šį filtrą naudoti:" cs="Použít tento filtr na:" sv="Använd detta filter på:" de="Filter anwenden bei:" tr="Filtre kullanma koşulu:" hu="Használja ezt a szűrőt:" ru="Использовать с" pl="Zastosuj ten filtr względem:" ko="필터 적용:" uk="Використовувати цей фільтр з:" fr="Utiliser ce filtre sur:" />
 		<String Ref="751" Cid="752" Define="IDC_FILTER_DOWN" en="&Down" nl="Omlaag" cs="Dolů" pt="Abaixo" pl="Dół" it="Giù" vi="Xuống" zh_tw="下" ja="下" sr="Dole" es="Abajo" no="Ned" lt="Žemyn" fa="پايين" de="Runter" da="Ned" sv="Ner" pt_br="Abaixo" lg="Wansi" tr="Aşağı" hu="Le" ru="Вниз" ko="아래" uk="Униз" fr="Bas" />
 		<String Ref="752" Cid="750" Define="IDC_FILTER_INDEX" />
-		<String Ref="753" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="757" Cid="757" Define="IDC_BAYES_READ" en="Set spam to read when processing." fr="Configurez le spam à lire lors du traitement." />
 		<String Ref="758" Cid="-1" Define="IDC_STATIC" en="Theme:" fr="Thème:" />
 		<String Ref="759" Cid="1101" Define="IDC_WORK_PHONE" />
@@ -557,7 +535,7 @@
 		<String Ref="909" Cid="909" Define="IDD_SECURITY" en="Security" de="Sicherheit" pt="Segurança" pl="Bezpieczeństwo" it="Sicurezza" vi="Bảo mật" zh_tw="保全" ja="セキュリティ" nl="Veiligheid" sr="Bezbednost" es="Seguridad" cs="Zabezpečení" no="Sikkerhet" lt="Saugumas" fa="امنيت" da="Sikkerhed" sv="Säkerhet" pt_br="Segurança" tr="Güvenlik Ayarları" hu="Biztonság" ru="Безопасность" ko="보안" uk="Безпека" fr="Sécurité" />
 		<String Ref="910" Cid="1037" Define="IDC_DESCRIPTION" />
 		<String Ref="911" Cid="-1" Define="IDC_STATIC" en="&Event colour:" ko="일정 색상:" uk="Колір події:" de="Ereignisfarbe:" fr="Coul&eur de l&apos;événement:" />
-		<String Ref="912" Cid="83" Define="IDC_COLOUR" />
+		<String Ref="912" Cid="1223" Define="IDC_COLOUR" />
 		<String Ref="913" Cid="913" Define="IDC_913" />
 		<String Ref="914" Cid="692" Define="IDC_REMINDER_VALUE" />
 		<String Ref="915" Cid="738" Define="IDC_APW_ADMIN" en="Admin" pt="Administrador" zh_tw="管理員" ja="管理者" nl="Beheerder" sr="Administrator" es="Administrador" cs="Správce" lt="Admin." fa="مدير" de="Administrator" vi="Quản trị" sv="Administratör" pt_br="Administrador" lg="Alabirira" tr="Yönetici" ru="Администратор" ko="관리자" uk="Адміністратор" />
@@ -629,9 +607,6 @@
 		<String Ref="1007" Cid="586" Define="IDC_DIR" />
 		<String Ref="1008" Cid="1487" Define="IDC_MSG_DEL_ACTION" en="Message delete action" ko="메시지 삭제 기능" uk="Повідомлення про дії видалення" de="Aktion nach Löschen" fr="Action de suppression du message" />
 		<String Ref="1009" Cid="1082" Define="IDC_AVAILABLE" en="Available" ko="가능" uk="Доступний" de="Verfügbar" fr="Disponible" />
-		<String Ref="1010" Cid="1010" Define="IDC_HAS_CAL_EVENTS" en="Calender Events:" fr="Evènements calendrier" cs="Události kalendáře:" de="Kalender-Ereignisse:" nl="Agendapunten:" es="Eventos de la Agenda:" pt_br="Eventos do calendário:" pt="Calendário:" pl="Wydarzenia w kalendarzu:" it="Eventi agenda:" vi="Sự kiện:" zh_tw="月曆事件:" ja="予定表:" sr="Događaji kalendara:" no="Kalender hendelser:" lt="Žymos kalendoriuje:" fa="پيشامدهاي تقويم" da="Kalender hændelser:" sv="Kalenderaktiviteter:" lg="Ebinakolebwa ku Kalenda:" tr="Takvim İçeriği (calender):" hu="Napirend események:" ru="События:" ko="달력 일정:" uk="Календар подій:" />
-		<String Ref="1011" Cid="1084" Define="IDC_TEMPLATES" pt="Modelos" />
-		<String Ref="1012" Cid="350" Define="IDC_SET_TEMPLATES" en="..." />
 		<String Ref="1017" Cid="1027" Define="IDC_REC_CHECK" />
 		<String Ref="1018" Cid="-1" Define="IDC_STATIC" en="Assume ascii text is:" cs="Kódování ascii textu:" de="ASCII-Text annehmen als:" lt="Tarkime, kad ascii tekstas koduotas:" pt="Assumir texto ASCII como:" da="Antag ascii tekst er:" fa="را تبديل کن به ascii متن:" vi="Xem văn bản ascii như:" sv="Förutsätt att ASCII-text är:" es="Asumir texto ASCII como:" pt_br="Assumir que o texto ASCII é:" lg="Ebigambo bwebiba bya ASCII biba:" tr="Varsayılan ASCII text:" hu="ASCII szöveget átvesz:" ru="Принимать ascii текст как:" pl="Traktuj tekst ASCII jako:" ko="Ascii 문자를 다음으로 간주:" uk="Приймати ascii текст як:" fr="Supposons c&apos;est du texte ascii:" />
 		<String Ref="1019" Cid="627" Define="IDC_FOLDER_MSG" en="Searching..." fr="Recherche..." cs="Hledám..." nl="Bezig met zoeken..." es="Buscando..." pt_br="Procurando..." ru="Поиск..." pt="A procurar..." pl="Szukanie..." it="Sto cercando..." vi="Đang tìm..." zh_tw="搜尋中..." ja="検索中・・・" sr="Pretražujem..." no="Søker..." lt="Paieška..." fa="...درحال جستجو" de="Suche..." da="Søger..." sv="Söker..." lg="Okunoonyereza" tr="Aranıyor..." hu="Keresés..." ko="탐색 중..." uk="Пошук..." />
@@ -814,8 +789,6 @@
 		<String Ref="1317" Cid="1317" Define="IDC_CLOSE_MS" en="Close Mail Store" de="Mail-Datenbank schließen" pl="Zamknij magazyn" ko="메일 사서함 닫기" uk="Закрити поштову базу" fr="Fermer storage courriel" />
 		<String Ref="1318" Cid="1318" Define="IDC_CREATE_MS" en="Create Mail Store" fr="Créer &dossier" it="Crea &Cartelle" cs="&Vytvořit soubor zpráv" es="&Crear carpeta" de="Mail-Datenbank erzeugen" nl="&Nieuwe map" pt_br="&Criar local de correio" ru="Создать базу..." ja="フォルダの作成" pt="&Nova pasta..." pl="Utwórz magazyn" vi="&Tạo mới tập tin dữ liệu" zh_tw="建立資料夾(&F)" sr="Kreiraj o&motnice" no="&Lag mappe" lt="Sukurti &naują laiškų rinkmeną" fa="ايجاد مخزن نامه‌ها" id="Map Menciptakan" da="&Indret epost mappe" sv="Skapa pos&tlådefil..." tr="Posta Kutusu Yarat" hu="Levéltár &létrehozása" ko="메일 사서함 생성" uk="Створити поштову базу" />
 		<String Ref="1319" Cid="654" Define="IDC_COMPACT_MS" en="Compact Mail Store" fr="&Compacter dossier" it="Compatta &Cartelle" cs="Z&komprimovat soubor zpráv" de="Mail-Datenbank komprimieren" nl="Mappen &comprimeren" es="C&omprimir carpetas" pt_br="&Compactar correio" ru="Сжать раздел" ja="フォルダを圧縮" pt="&Compactar pastas" pl="Kompaktuj magazyn" vi="T&hu gọn tập tin dữ liệu" zh_tw="壓縮資料夾(&p)" sr="&Sabij omotnice" no="&Komprimer mappe" lt="&Suspausti laiškų rinkmeną" fa="فشرده سازي پوشه‌ها" id="Menge&cilkan Map" da="&Komprimer epost mappe" sv="&Komprimera mappar" tr="Dizinleri &Sıkıştır" hu="Levéltár &tömörítés" ko="메일 사서함 압축" uk="Стиснути поштову базу" />
-		<String Ref="1320" Cid="1198" Define="IDC_HAS_GROUPS" en="Contact Groups:" nl="Adressen van groepen:" pl="Grupy kontaktów:" de="Kontaktgruppen:" fa="گروه هاي دوستان" sr="Grupe kontakata:" lt="Adresatų grupės:" cs="Skupiny kontaktů:" da="Kontaktgrupper:" vi="Nhóm liên hệ:" sv="Kontaktgrupper:" es="Grupos de Contacto:" pt_br="Grupo de Contatos:" lg="Ebikoosi:" tr="İrtibat Grubu (groups):" hu="Kapcsolat csoportok:" ru="Группы контактов" ko="연락처 그룹:" uk="Групи контактів:" fr="Groupes de contacts:" />
-		<String Ref="1321" Cid="1200" Define="IDC_SPAM_FLD" lt="Filtrai" pt="Filtros" />
 		<String Ref="1322" Cid="2" Define="IDCANCEL" en="Cancel" de="Abbrechen" pl="Anuluj" ko="취소" uk="Скасувати" fr="Annuler" />
 		<String Ref="1323" Cid="1" Define="IDOK" en="Ok" ko="확인" uk="Так" />
 		<String Ref="1324" Cid="1324" Define="IDC_MAIL_STORES" />
@@ -890,7 +863,6 @@
 		<String Ref="1496" Cid="1157" Define="IDC_DEL" en="-" />
 		<String Ref="1498" Cid="-1" Define="IDC_STATIC" en="Mobile:" it="Cellulare:" cs="Mobil:" es="Tlf. Móvil:" de="Mobil:" nl="Mobiel:" pt_br="Celular:" ja="携帯電話" pt="Telemóvel:" pl="Komórkowy:" vi="Di động" zh_tw="手機:" sr="Mobilni:" no="Mobil:" lt="Mobilus tel.:" fa="تلفن همراه:" da="Mobil:" sv="Mobil:" lg="Akasimu:" tr="Mobil:" hu="Mobil:" ru="Мобильный:" ko="휴대폰:" uk="Стільниковий:" fr="Portable:" />
 		<String Ref="1499" Cid="1102" Define="IDC_WORK_MOBILE" />
-		<String Ref="1500" Cid="1201" Define="IDC_SET_SPAM" en="..." />
 		<String Ref="1502" Cid="518" Define="ID_BTN_TBL" />
 		<String Ref="1503" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="1504" Cid="855" Define="IDS_780" en="Destination Field" cs="Cílové pole" pt="Campo de destino" nl="Bestemming" pl="Folder docelowy" vi="Trường mô tả" zh_tw="目的範圍" ja="保存先のフィールド" sr="Odredišno polje" es="Campo de Destino" no="Mottaksfelt" lt="Į kurį lauką importuoti" fa="کادر مقصد" de="Ziel-Feld" da="Modtagelsesfelt" sv="Mottagarfält" pt_br="Campo de Destino" lg="Omuwatwa webiraga" tr="Hedef Alan" hu="Cél mező" ru="Поле назначения" ko="대상 필드" uk="Поле призначення" fr="Champ destination" />
@@ -969,6 +941,38 @@
 		<String Ref="1634" Cid="1124" Define="IDC_SAVE" en="Save" ko="저장" uk="Зберегти" de="Speichern" fr="Enregistrer" />
 		<String Ref="1635" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
 		<String Ref="1636" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" ja="キャンセル" pt="Cancelar" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Відмінити" />
+		<String Ref="1640" Cid="1640" Define="IDC_1640" />
+		<String Ref="1641" Cid="1165" Define="IDC_TABLE" />
+		<String Ref="1643" Cid="-1" Define="IDC_STATIC" en="Inbox:" fr="Boite de réception:" it="Posta in arrivo:" cs="Příchozí:" es="Bandeja de Entrada:" de="Posteingang:" nl="Postvak In:" pt_br="Caixa de entrada:" pt="Recebido:" pl="Skrzynka odbiorcza:" vi="Hộp thư:" zh_tw="收件夾:" ja="受信箱:" sr="Dolazna kutija:" no="Innboks:" lt="Gauti:" fa="نامه هاي رسيده" da="Indgang:" sv="Inkorg:" lg="Eziyingidde:" tr="Gelen (inbox):" hu="Bejövő:" ru="Входящие:" ko="받은편지함:" uk="Вхідні:" />
+		<String Ref="1645" Cid="324" Define="IDC_INBOX" pt="Recebido" />
+		<String Ref="1647" Cid="330" Define="IDC_SET_INBOX" en="..." />
+		<String Ref="1649" Cid="-1" Define="IDC_STATIC" en="Outbox:" fr="Boite de départ:" it="Posta in uscita:" cs="K odeslání:" es="Bandeja de Salida:" de="Postausgang:" nl="Postvak Uit:" pt_br="Caixa de saída:" pt="A Enviar:" pl="Skrzynka nadawcza:" vi="Thư chưa gửi:" zh_tw="寄件夾:" ja="送信箱:" sr="Izlazna kutija:" no="Utboks:" lt="Siunčiami:" fa="آماده فرستادن" da="Udgang:" sv="Utkorg:" lg="Ezinasindikibwa:" tr="Gönderilecek (outbox):" hu="Kimenő:" ru="Исходящие:" ko="임시보관함:" uk="Вихідні:" />
+		<String Ref="1651" Cid="325" Define="IDC_OUTBOX" pt="A Enviar" />
+		<String Ref="1653" Cid="331" Define="IDC_SET_OUTBOX" en="..." />
+		<String Ref="1655" Cid="-1" Define="IDC_STATIC" en="Sent Items:" fr="Eléments envoyés:" it="Posta inviata:" cs="Odeslané:" es="Elementos Enviados:" de="Gesendete E-Mails:" nl="Verzonden:" pt_br="Ítens enviados:" pt="Enviado:" pl="Elementy wysłane:" vi="Thư đã gửi" zh_tw="傳送項目:" ja="送信済みアイテム:" sr="Poslati objekti:" no="Sendte meldinger:" lt="Išsiųsti:" fa="فرستاده شده" da="Sendte meldinger:" sv="Skickade meddelanden:" lg="Ebisindikiddwa:" tr="Giden (sent):" hu="Elküldött elemek:" ru="Отправленные:" ko="보낸편지함:" uk="Відправлені:" />
+		<String Ref="1657" Cid="449" Define="IDC_SENT" pt="Enviado" />
+		<String Ref="1659" Cid="332" Define="IDC_SET_SENT" en="..." />
+		<String Ref="1661" Cid="-1" Define="IDC_STATIC" en="Trash:" fr="Corbeille:" it="Posta eliminata:" cs="Koš:" es="Elementos eliminados:" de="Papierkorb:" nl="Verwijderd:" pt_br="Lixeira:" pt="Apagado:" pl="Elementy usunięte:" vi="Thùng rác:" zh_tw="垃圾筒:" ja="ごみ箱:" sr="Smeće:" no="Slettede meldinger:" lt="Šiukšlinė:" fa="زباله دان" da="Slettede meldinger:" sv="Papperskorg:" lg="Ebisanguddwa:" tr="Çöp (trash):" hu="Kuka:" ru="Мусор:" ko="휴지통:" uk="Кошик:" />
+		<String Ref="1663" Cid="327" Define="IDC_TRASH" pt="Apagado" />
+		<String Ref="1665" Cid="333" Define="IDC_SET_TRASH" en="..." />
+		<String Ref="1667" Cid="-1" Define="IDC_STATIC" en="Contacts:" it="Contatti:" cs="Kontakty:" es="Contactos:" de="Kontakte:" nl="Contactpersonen:" pt_br="Contatos:" pt="Contactos:" pl="Kontakty:" vi="Liên hệ:" zh_tw="聯絡人:" ja="連絡先:" sr="Kontakti:" no="Kontakter:" lt="Asmenų adresai:" fa="دوستان" da="Kontakter:" sv="Kontakter:" lg="Endagiriro:" tr="İrtibatlar (contacts):" hu="Kapcsolatok:" ru="Контакты:" ko="연락처:" uk="Контакти:" />
+		<String Ref="1669" Cid="328" Define="IDC_CONTACT_FLD" pt="Contactos" />
+		<String Ref="1671" Cid="334" Define="IDC_SET_CONTACTS" en="..." />
+		<String Ref="1673" Cid="1198" Define="IDC_HAS_GROUPS" en="Contact Groups:" nl="Adressen van groepen:" pl="Grupy kontaktów:" de="Kontaktgruppen:" fa="گروه هاي دوستان" sr="Grupe kontakata:" lt="Adresatų grupės:" cs="Skupiny kontaktů:" da="Kontaktgrupper:" vi="Nhóm liên hệ:" sv="Kontaktgrupper:" es="Grupos de Contacto:" pt_br="Grupo de Contatos:" lg="Ebikoosi:" tr="İrtibat Grubu (groups):" hu="Kapcsolat csoportok:" ru="Группы контактов" ko="연락처 그룹:" uk="Групи контактів:" fr="Groupes de contacts:" />
+		<String Ref="1675" Cid="702" Define="IDC_GROUPS_FLD" lt="Filtrai" />
+		<String Ref="1677" Cid="703" Define="IDC_SET_GROUPS" en="..." />
+		<String Ref="1679" Cid="322" Define="IDC_HAS_TEMPLATES" en="Templates:" fr="Modèles:" it="Bozze:" cs="Šablony:" es="Plantillas:" de="Vorlagen:" nl="Sjablonen:" pt_br="Modelos:" pt="Modelos:" pl="Szablony:" vi="Mẫu:" zh_tw="範本:" ja="テンプレート:" sr="Šabloni:" no="Maler:" lt="Šablonai:" fa="الگو ها" da="Forskrift:" sv="Mallar:" lg="Obutiba:" tr="Taslak (templates):" hu="Sablon:" ru="Шаблоны:" ko="템플릿:" uk="Шаблони:" />
+		<String Ref="1681" Cid="1084" Define="IDC_TEMPLATES" pt="Modelos" />
+		<String Ref="1683" Cid="350" Define="IDC_SET_TEMPLATES" en="..." />
+		<String Ref="1685" Cid="1010" Define="IDC_HAS_CAL_EVENTS" en="Calender Events:" fr="Evènements calendrier" cs="Události kalendáře:" de="Kalender-Ereignisse:" nl="Agendapunten:" es="Eventos de la Agenda:" pt_br="Eventos do calendário:" pt="Calendário:" pl="Wydarzenia w kalendarzu:" it="Eventi agenda:" vi="Sự kiện:" zh_tw="月曆事件:" ja="予定表:" sr="Događaji kalendara:" no="Kalender hendelser:" lt="Žymos kalendoriuje:" fa="پيشامدهاي تقويم" da="Kalender hændelser:" sv="Kalenderaktiviteter:" lg="Ebinakolebwa ku Kalenda:" tr="Takvim İçeriği (calender):" hu="Napirend események:" ru="События:" ko="달력 일정:" uk="Календар подій:" />
+		<String Ref="1687" Cid="577" Define="IDC_CALENDER" lt="Kalendorius" pt="Calendário" />
+		<String Ref="1689" Cid="2014" Define="IDC_SET_CALENDER" en="..." />
+		<String Ref="1691" Cid="936" Define="IDC_HAS_FILTERS" en="Filters:" fr="Filtres:" it="Filtri:" cs="Filtry:" es="Filtros:" de="Filter:" pt_br="Filtros:" pt="Filtros:" pl="Filtry:" vi="Bộ lọc" zh_tw="過濾器:" ja="フィルタ:" sr="Filteri:" no="Filtre:" lt="Filtrai:" fa="فيلترها" da="Filtre:" sv="Filter:" lg="Obusengeja:" tr="Filtreler (filters):" hu="Szűrők:" ru="Фильтры:" ko="필터:" uk="Фільтри:" />
+		<String Ref="1693" Cid="354" Define="IDC_FILTERS_FLD" lt="Filtrai" pt="Filtros" />
+		<String Ref="1695" Cid="335" Define="IDC_SET_FILTERS" en="..." uk="Тільки цією мовою:" />
+		<String Ref="1697" Cid="357" Define="IDC_HAS_SPAM" en="Spam:" uk="Спам (небажана пошта):" de="SPAM:" fr="Pourriel" />
+		<String Ref="1699" Cid="1200" Define="IDC_SPAM_FLD" lt="Filtrai" pt="Filtros" />
+		<String Ref="1701" Cid="1201" Define="IDC_SET_SPAM" en="..." />
 	</string-group>
 	<string-group Name="General">
 		<String Ref="19" Cid="2000" Define="IDS_MBOX_SELECT_FOLDER" en="Select the input MBOX files and then a folder to import to:" fr="Sélectionner un dossier à importer au format unix MBOX" cs="Vyberte vstupní MBOX soubory a složku do které budou soubory importovány:" nl="Kies een map voor het importeren van het Unix MBOX formaat:" es="Seleccione una carpeta para importar del formato de unix MBOX:" pt_br="Selecione a pasta para importar o formato MBOX do Unix:" pt="Selecione a pasta para importar do formato MBOX do unix:" pl="Wybierz pliki wejściowe MBOX a następnie folder, do którego importować:" vi="Chọn danh mục để nhập từ định dạng MBOX" zh_tw="選擇資料夾以便匯入unix MBOX 格式:" ja="Unix MBOXフォーマットのフォルダからインポートするフォルダを選択してください" sr="Izaberite omotnicu iz koje uvozite unix MBOX format" no="Velg MBOX fil som skal leses, og så en mappe som det skal importeres til." lt="Pasirinkite MBOX rinkmeną, o vėliau ir aplanką importavimui:" fa="را انتخاب کنید unix MBOX formatپوشه مورد نظر برای وارد کردن" de="Wählen Sie die MBOX Datei und dann den Ordner in den importiert werden soll:" da="Vælg MBOX fil som skal læses, og så en mappe som den skal importeres til." sv="Välj MBOX-fil som skall läsas, samt en mapp att importera till:" lg="Londawo Etterekero, era ne Kabada ey&apos;okuttikuliramu ebiragirizidwa:" tr="Kaynak MBOX dosyasını ve içe aktarılacak klasörü seçiniz:" hu="Válassza ki a bejövő MBOX fájlt majd a mappát, ahova importálni akarja:" ru="Выберите входящие MBOX файлы и потом папку сохранения:" ko="입력 MBOX파일과 폴더를 선택한 후 다음 위치로 불러옵니다:" uk="Визначення" />
@@ -2109,7 +2113,7 @@
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<TableLayout pos="7,329,454,370" ref="92" Style="width: 100%;" CellStyle="width: 50%;" cols="0.500,0.500" rows="1.000">
+					<TableLayout pos="7,329,454,370" ref="92" Style="width: 100%;" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0" style="width: 50%;">
 								<Button Pos="7,8,69,28" toggle="0" ref="1564" />
@@ -4719,9 +4723,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4730,23 +4748,9 @@
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 						<Control Ref="1380" ControlType="enum" ControlTag="HtmlViewCtrl" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>
@@ -4832,122 +4836,138 @@
 			</Tab>
 		</TabView>
 	</Dialog>
-	<Dialog pos="7,7,506,407" ref="317">
-		<TableLayout pos="7,7,482,363" ref="87" cols="0.333,0.478,0.188" rows="0.091,0.091,0.091,0.091,0.091,0.091,0.091,0.091,0.091,0.091,0.091">
+	<Dialog pos="7,7,560,482" ref="317">
+		<TableLayout pos="7,7,538,447" ref="1640" cols="1.000" rows="0.859,0.141">
 			<tr>
 				<td addr="0,0">
-					<StaticText pos="0,0,48,13" ref="335" />
-				</td>
-				<td addr="1,0">
-					<EditBox Pos="154,0,300,20" ref="323" />
-				</td>
-				<td addr="2,0">
-					<Button Pos="376,0,396,20" toggle="0" ref="337" />
+					<TableLayout pos="0,0,475,356" ref="1641" cols="0.333,0.478,0.188" rows="0.100,0.100,0.100,0.100,0.100,0.100,0.100,0.100,0.100,0.100">
+						<tr>
+							<td addr="0,0">
+								<StaticText pos="0,0,48,13" ref="1643" />
+							</td>
+							<td addr="1,0">
+								<EditBox Pos="154,0,300,20" ref="1645" />
+							</td>
+							<td addr="2,0">
+								<Button Pos="376,0,396,20" toggle="0" ref="1647" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,1">
+								<StaticText pos="0,34,118,47" ref="1649" />
+							</td>
+							<td addr="1,1">
+								<EditBox Pos="154,34,300,54" ref="1651" />
+							</td>
+							<td addr="2,1">
+								<Button Pos="376,34,396,54" toggle="0" ref="1653" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,2">
+								<StaticText pos="0,68,118,81" ref="1655" />
+							</td>
+							<td addr="1,2">
+								<EditBox Pos="154,68,300,88" ref="1657" />
+							</td>
+							<td addr="2,2">
+								<Button Pos="376,68,396,88" toggle="0" ref="1659" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,3">
+								<StaticText pos="0,102,118,115" ref="1661" />
+							</td>
+							<td addr="1,3">
+								<EditBox Pos="154,102,300,122" ref="1663" />
+							</td>
+							<td addr="2,3">
+								<Button Pos="376,102,396,122" toggle="0" ref="1665" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,4">
+								<StaticText pos="0,136,118,149" ref="1667" />
+							</td>
+							<td addr="1,4">
+								<EditBox Pos="154,136,300,156" ref="1669" />
+							</td>
+							<td addr="2,4">
+								<Button Pos="376,136,396,156" toggle="0" ref="1671" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,5">
+								<CheckBox pos="7,174,125,194" ref="1673" />
+							</td>
+							<td addr="1,5">
+								<EditBox Pos="154,170,300,190" ref="1675" />
+							</td>
+							<td addr="2,5">
+								<Button Pos="376,170,396,190" toggle="0" ref="1677" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,6">
+								<CheckBox pos="7,212,125,225" ref="1679" />
+							</td>
+							<td addr="1,6">
+								<EditBox Pos="154,204,300,224" ref="1681" />
+							</td>
+							<td addr="2,6">
+								<Button Pos="376,204,396,224" toggle="0" ref="1683" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,7">
+								<CheckBox pos="7,245,132,258" ref="1685" />
+							</td>
+							<td addr="1,7">
+								<EditBox Pos="154,238,300,258" ref="1687" />
+							</td>
+							<td addr="2,7">
+								<Button Pos="376,238,396,258" toggle="0" ref="1689" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,8">
+								<CheckBox pos="7,278,90,291" ref="1691" />
+							</td>
+							<td addr="1,8">
+								<EditBox Pos="154,272,300,292" ref="1693" />
+							</td>
+							<td addr="2,8">
+								<Button Pos="376,272,396,292" toggle="0" ref="1695" />
+							</td>
+						</tr>
+						<tr>
+							<td addr="0,9">
+								<CheckBox pos="7,310,125,323" ref="1697" />
+							</td>
+							<td addr="1,9">
+								<EditBox Pos="154,306,300,326" MultiLine="1" ref="1699" />
+							</td>
+							<td addr="2,9">
+								<Button Pos="376,306,396,326" toggle="0" ref="1701" />
+							</td>
+						</tr>
+					</TableLayout>
 				</td>
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<StaticText pos="0,31,118,44" ref="318" />
-				</td>
-				<td addr="1,1">
-					<EditBox Pos="154,31,300,51" ref="324" />
-				</td>
-				<td addr="2,1">
-					<Button Pos="376,31,396,51" toggle="0" ref="330" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,2">
-					<StaticText pos="0,62,118,75" ref="319" />
-				</td>
-				<td addr="1,2">
-					<EditBox Pos="154,62,300,82" ref="325" />
-				</td>
-				<td addr="2,2">
-					<Button Pos="376,62,396,82" toggle="0" ref="331" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,3">
-					<StaticText pos="0,93,118,106" ref="320" />
-				</td>
-				<td addr="1,3">
-					<EditBox Pos="154,93,300,113" ref="326" />
-				</td>
-				<td addr="2,3">
-					<Button Pos="376,93,396,113" toggle="0" ref="332" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,4">
-					<StaticText pos="0,124,118,137" ref="321" />
-				</td>
-				<td addr="1,4">
-					<EditBox Pos="154,124,300,144" ref="327" />
-				</td>
-				<td addr="2,4">
-					<Button Pos="376,124,396,144" toggle="0" ref="333" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,5">
-					<CheckBox pos="7,159,125,179" ref="1320" />
-				</td>
-				<td addr="1,5">
-					<EditBox Pos="154,155,300,175" ref="328" />
-				</td>
-				<td addr="2,5">
-					<Button Pos="376,155,396,175" toggle="0" ref="334" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,6">
-					<CheckBox pos="7,194,125,207" ref="322" />
-				</td>
-				<td addr="1,6">
-					<EditBox Pos="154,186,300,206" ref="1011" />
-				</td>
-				<td addr="2,6">
-					<Button Pos="376,186,396,206" toggle="0" ref="1012" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,7">
-					<CheckBox pos="7,224,132,237" ref="1010" />
-				</td>
-				<td addr="1,7">
-					<EditBox Pos="154,217,300,237" ref="107" />
-				</td>
-				<td addr="2,7">
-					<Button Pos="376,217,396,237" toggle="0" ref="96" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,8">
-					<CheckBox pos="7,254,90,267" ref="98" />
-				</td>
-				<td addr="1,8">
-					<EditBox Pos="154,248,300,268" ref="358" />
-				</td>
-				<td addr="2,8">
-					<Button Pos="376,248,396,268" toggle="0" ref="22" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,9">
-					<CheckBox pos="7,283,125,296" ref="357" />
-				</td>
-				<td addr="1,9">
-					<EditBox Pos="154,279,300,299" ref="1321" />
-				</td>
-				<td addr="2,9">
-					<Button Pos="376,279,396,299" toggle="0" ref="1500" />
-				</td>
-			</tr>
-			<tr>
-				<td addr="0,10" colspan="3" align="Max">
-					<Button Pos="294,315,370,335" toggle="0" ref="753" />
-					<Button Pos="383,317,459,337" toggle="0" ref="336" />
+					<TableLayout pos="7,371,503,419" ref="22" cols="0.500,0.500" rows="1.000">
+						<tr>
+							<td addr="0,0">
+								<Button Pos="7,7,76,27" toggle="0" ref="87" />
+								<Button Pos="98,7,167,27" toggle="0" ref="98" />
+							</td>
+							<td addr="1,0" align="Max">
+								<Button Pos="273,7,349,27" toggle="0" ref="96" />
+								<Button Pos="385,7,461,27" toggle="0" ref="107" />
+							</td>
+						</tr>
+					</TableLayout>
 				</td>
 			</tr>
 		</TableLayout>
@@ -5127,11 +5147,12 @@
 			<String Ref="976" en="Advanced" />
 			<String Ref="1049" Cid="1063" Define="IDM_MENU_1063" />
 			<String Ref="1050" en="Advanced" />
-			<String Ref="1051" Cid="41118" Define="IDM_BUILD_BAYES_DB" en="&Rebuild Bayesian Word Lists" pl="Przebuduj listę słów Spamu" it="Ricostruisci la lista delle parole" vi="Xây dựng lại danh sách từ Bayes" pt="Reconstruir lista de palavras" zh_tw="重建 Bayesian Word 清單" ja="ベイズフィルタの単語リストを再構築" nl="Heropbouw Bayesiaanse &woordenlijst" sr="Ponovo izgradi Bayesian listu reči" es="&Rehacer el Listado Bayesiano" cs="Obnovit bayesovsou databázi" no="&Gjenoppbygg Bayesian ordliste" lt="Iš naujo &sudaryti Bayeso filtro žodžių sąrašą" fa="Bayesian Word Listsبازسازی" de="Bayes Wortlisten neu e&rstellen" da="&Genopbyg Bayesian ordliste" sv="&Bygg om bayesisk ordlista" pt_br="Reconstruir Lista Bayesiana de Palavras" tr="Bayesian Anahtar Kelimelerini Tekrar Oluştur" hu="Bayesian szólista újraépítése" ru="Перестроить список слов Баеса" ko="&베이지안 단어 목록 재건" uk="Перебудувати словник  Баеса" fr="&Reconstruire les listes de mots bayésiennes" />
-			<String Ref="1055" Cid="533" Define="IDM_BAYES_STATS" en="Bayes Stats" />
+			<String Ref="1051" Cid="1209" Define="ID_BUILD_BAYES_DB" en="Bayes: &Rebuild Word Lists" pl="Przebuduj listę słów Spamu" it="Ricostruisci la lista delle parole" vi="Xây dựng lại danh sách từ Bayes" pt="Reconstruir lista de palavras" zh_tw="重建 Bayesian Word 清單" ja="ベイズフィルタの単語リストを再構築" nl="Heropbouw Bayesiaanse &woordenlijst" sr="Ponovo izgradi Bayesian listu reči" es="&Rehacer el Listado Bayesiano" cs="Obnovit bayesovsou databázi" no="&Gjenoppbygg Bayesian ordliste" lt="Iš naujo &sudaryti Bayeso filtro žodžių sąrašą" fa="Bayesian Word Listsبازسازی" de="Bayes Wortlisten neu e&rstellen" da="&Genopbyg Bayesian ordliste" sv="&Bygg om bayesisk ordlista" pt_br="Reconstruir Lista Bayesiana de Palavras" tr="Bayesian Anahtar Kelimelerini Tekrar Oluştur" hu="Bayesian szólista újraépítése" ru="Перестроить список слов Баеса" ko="&베이지안 단어 목록 재건" uk="Перебудувати словник  Баеса" fr="&Reconstruire les listes de mots bayésiennes" />
+			<String Ref="1055" Cid="1210" Define="ID_BAYES_STATS" en="Bayes: Stats" />
 			<String Ref="1302" Cid="1195" Define="IDM_MENU_1195" />
 			<String Ref="1369" Cid="539" Define="IDM_UNIT_TESTS" en="Run Unit Tests" />
 			<String Ref="1501" Cid="1029" Define="IDM_CLEAR_REGISTRY" Tag="win" en="Clear Registry Settings" />
+			<String Ref="1465" Cid="1208" Define="ID_CHK_FOLDERS" en="Bayes: Check Folders" />
 		</string-group>
 		<submenu Ref="1464">
 			<menuitem Ref="1463" />
@@ -5196,6 +5217,7 @@
 			<submenu Ref="1050">
 				<menuitem Ref="1051" />
 				<menuitem Ref="1055" />
+				<menuitem Ref="1465" />
 			</submenu>
 		</submenu>
 		<submenu Ref="1419">

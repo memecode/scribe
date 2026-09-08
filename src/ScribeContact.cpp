@@ -810,8 +810,11 @@ Contact::Contact(ScribeWnd *app, LDataI *object) : Thing(app, object)
 		PropMap.Add("Type", FIELD_TYPE);
 		ForAllContactFields(Fld)
 		{
-			LAssert(Fld->FieldId > 0 && Fld->FieldId < FIELD_MAX);
-			// LgiTrace("AddProp %i, %s\n", Fld->FieldId, Fld->Option);
+			if (Fld->FieldId < 0 || Fld->FieldId >= FIELD_MAX)
+			{
+				LgiTrace("%s:%i - AddProp %i, '%s'\n", _FL, Fld->FieldId, Fld->Option);
+				LAssert(!"invalid field id");
+			}
 			PropMap.Add(Fld->Option, Fld->FieldId);
 		}
 	}

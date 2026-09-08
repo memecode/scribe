@@ -135,7 +135,6 @@
 #define FIELD_CAL_RECUR_END_COUNT				80
 #define FIELD_CAL_RECUR_END_TYPE				81
 #define FIELD_CAL_RECUR							82
-#define IDC_COLOUR								83
 #define FIELD_ATTENDEE_NAME						85
 #define FIELD_ATTENDEE_EMAIL					86
 #define FIELD_ATTENDEE_ATTENDENCE				87
@@ -1011,6 +1010,10 @@
 #define IDS_ERROR_SERVER_CONNECT				1205
 #define IDC_DST									1206
 #define IDS_ERR_COULDNT_MOVE_SPAM_FMT			1207
+#define ID_CHK_FOLDERS							1208
+#define ID_BUILD_BAYES_DB						1209
+#define ID_BAYES_STATS							1210
+#define IDC_SUB_FOLDER_BTNS						1213
 #define IDS_ERROR_PRINT_FAILED					1214
 #define IDS_ASK_ACCOUNT_PASSWORD				1215
 #define IDS_SELECT_IO							1216
@@ -1018,6 +1021,9 @@
 #define IDS_DONT_SHOW_AGAIN						1218
 #define IDS_INSTALL								1219
 #define IDC_1220								1220
+#define IDC_AUTO								1221
+#define IDC_HELP								1222
+#define IDC_COLOUR								1223
 #define IDS_EDIT_MAIL_STORES					1224
 #define IDS_ERROR_CANT_CREATE_FOLDER			1225
 #define IDS_ERROR_CANT_CREATE_DB				1226
@@ -1198,6 +1204,7 @@
 #define IDS_OPEN_WEBSITE						1637
 #define IDS_ACCEPT_ONCE							1638
 #define IDS_ACCEPT_ALWAYS						1639
+#define IDC_1640								1640
 #define IDS_MBOX_SELECT_FOLDER					2000
 #define IDS_MBOX_READING						2001
 #define IDS_MBOX_EXPORT							2002

@@ -8275,14 +8275,19 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			}			
 			break;
 		}
-		case IDM_BUILD_BAYES_DB:
+		case ID_BUILD_BAYES_DB:
 		{
 			BuildSpamDb();
 			break;
 		}
-		case IDM_BAYES_STATS:
+		case ID_BAYES_STATS:
 		{
 			BuildStats();
+			break;
+		}
+		case ID_CHK_FOLDERS:
+		{
+			CheckFolders();
 			break;
 		}
 		case IDM_BAYES_SETTINGS:
