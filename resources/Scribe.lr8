@@ -2109,14 +2109,14 @@
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<TableLayout pos="5,323,459,371" ref="92" Style="width: 100%;" cols="0.500,0.500" rows="1.000">
+					<TableLayout pos="7,329,454,370" ref="92" Style="width: 100%;" CellStyle="width: 50%;" cols="0.500,0.500" rows="1.000">
 						<tr>
-							<td addr="0,0" style="width: 99%;">
+							<td addr="0,0" style="width: 50%;">
 								<Button Pos="7,8,69,28" toggle="0" ref="1564" />
 							</td>
-							<td addr="1,0">
+							<td addr="1,0" align="Max" style="width: 50%;">
 								<Button Pos="315,7,377,27" toggle="0" ref="1556" />
-								<Button Pos="238,7,300,27" toggle="0" ref="1562" />
+								<Button Pos="235,7,297,27" toggle="0" ref="1562" />
 							</td>
 						</tr>
 					</TableLayout>
