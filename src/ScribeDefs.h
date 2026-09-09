@@ -225,7 +225,28 @@
 // Encryption options
 #define OPT_HideGnuPG				"HideGnuPG"			//(bool)
 
-// Folder opt's
+// System folder types
+//
+// If you edit anything here, also update 'scripts/ScribeScripts.h' so
+// that scripts can also use these definitions.
+enum TSystemFolder
+{
+	// Don't delete anything here, it's saved in the options file.
+	SystemFolderInbox = 0,
+	SystemFolderOutbox = 1,
+	SystemFolderSent = 2,
+	SystemFolderTrash = 3,
+	SystemFolderContacts = 4,
+	SystemFolderTemplates = 5,
+	SystemFolderFilters = 6,
+	SystemFolderCalendar = 7,
+	SystemFolderGroups = 8,
+	SystemFolderSpam = 9,
+
+	SystemFolderMax,
+};
+
+// Folder opt's (corresponding to TSystemFolder enum)
 #define OPT_Inbox					"Folder-0"
 #define OPT_Outbox					"Folder-1"
 #define OPT_Sent					"Folder-2"

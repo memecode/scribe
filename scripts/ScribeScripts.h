@@ -16,6 +16,8 @@
 #define ScribeItemGroup			(ScribeItemBase + 13)
 
 // System folder types
+// While these mirror 'TSystemFolder' in the C++, these should
+// stay here so that scripts can reference them.
 #define SystemFolderInbox		0
 #define SystemFolderOutbox		1
 #define SystemFolderSent		2

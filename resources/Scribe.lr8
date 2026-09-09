@@ -1969,13 +1969,13 @@
 			</tr>
 		</TableLayout>
 	</Dialog>
-	<Dialog pos="7,7,509,423" ref="649">
-		<TableLayout pos="7,7,496,391" ref="439" cols="1.000" rows="0.865,0.135">
+	<Dialog pos="7,7,509,461" ref="649">
+		<TableLayout pos="7,7,496,433" ref="439" cols="1.000" rows="0.865,0.135">
 			<tr>
 				<td addr="0,0">
-					<TabView pos="0,0,454,314" ref="163">
+					<TabView pos="0,0,454,342" ref="163">
 						<Tab ref="345">
-							<TableLayout pos="14,28,440,307" ref="522" cols="0.842,0.158" rows="0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077">
+							<TableLayout pos="14,28,440,328" ref="522" cols="0.842,0.158" rows="0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077">
 								<tr>
 									<td addr="0,0" colspan="2">
 										<StaticText pos="0,0,274,16" ref="842" />
@@ -1983,69 +1983,69 @@
 								</tr>
 								<tr>
 									<td addr="0,1" colspan="2">
-										<RadioBox pos="7,23,62,36" ref="897" />
+										<RadioBox pos="7,25,62,38" ref="897" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,2" colspan="2">
-										<RadioBox pos="7,40,321,53" ref="902" />
+										<RadioBox pos="7,44,321,57" ref="902" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,3" class="inset">
-										<EditBox Pos="42,60,293,73" ref="904" />
+										<EditBox Pos="49,70,300,83" ref="904" />
 									</td>
 									<td addr="1,3">
-										<Button Pos="390,61,410,77" toggle="0" ref="932" />
+										<Button Pos="390,67,410,83" toggle="0" ref="932" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,4" colspan="2">
-										<RadioBox pos="7,83,377,96" ref="933" />
+										<RadioBox pos="7,91,377,104" ref="933" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,5" class="inset">
-										<EditBox Pos="35,100,293,113" ref="953" />
+										<EditBox Pos="42,112,300,125" MultiLine="1" ref="953" />
 									</td>
 									<td addr="1,5">
-										<Button Pos="371,100,391,116" toggle="0" ref="954" />
+										<Button Pos="371,110,391,126" toggle="0" ref="954" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,6" colspan="2" class="inset">
-										<CheckBox pos="28,124,307,137" ref="934" />
+										<CheckBox pos="28,136,307,149" ref="934" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,7" colspan="2" class="inset">
-										<CheckBox pos="28,143,321,156" ref="936" />
+										<CheckBox pos="28,157,321,170" ref="936" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,8" colspan="2" valign="Center" class="spacer">
-										<StaticText pos="0,160,202,177" ref="947" />
+										<StaticText pos="0,176,202,193" ref="947" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,9" colspan="2" class="inset">
-										<EditBox Pos="133,180,195,197" ref="949" />
+										<EditBox Pos="133,198,195,215" ref="949" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,10" colspan="2">
-										<CheckBox pos="7,202,356,215" ref="950" />
+										<CheckBox pos="7,222,356,235" ref="950" />
 									</td>
 								</tr>
 								<tr>
 									<td addr="0,11">
-										<CheckBox pos="7,224,244,237" ref="757" />
+										<CheckBox pos="7,246,244,259" ref="757" />
 									</td>
 									<td addr="1,11" />
 								</tr>
 								<tr>
 									<td addr="0,12" colspan="2">
-										<CheckBox pos="7,240,356,253" ref="952" />
+										<CheckBox pos="7,264,356,277" ref="952" />
 									</td>
 								</tr>
 							</TableLayout>
@@ -2113,7 +2113,7 @@
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<TableLayout pos="7,329,454,370" ref="92" Style="width: 100%;" cols="0.500,0.500" rows="1.000">
+					<TableLayout pos="7,365,454,406" ref="92" Style="width: 100%;" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0" style="width: 50%;">
 								<Button Pos="7,8,69,28" toggle="0" ref="1564" />
@@ -4723,9 +4723,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4734,23 +4748,9 @@
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 						<Control Ref="1380" ControlType="enum" ControlTag="HtmlViewCtrl" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>
@@ -4956,7 +4956,7 @@
 			</tr>
 			<tr>
 				<td addr="0,1">
-					<TableLayout pos="7,371,503,419" ref="22" Style="width: 100%" CellStyle="width: 50%" cols="0.500,0.500" rows="1.000">
+					<TableLayout pos="7,371,503,419" ref="22" Style="width: 100%" cols="0.500,0.500" rows="1.000">
 						<tr>
 							<td addr="0,0" style="width: 50%">
 								<Button Pos="7,7,76,27" toggle="0" ref="87" />

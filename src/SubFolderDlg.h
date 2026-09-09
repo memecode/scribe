@@ -12,15 +12,27 @@ private:
 	LDom *OptionStore = nullptr;
 	TCallback FolderSelectCallback;
 
-	void FolderSelector(int OutputCtrl, int Limit)
+	void FolderSelector(int OutputCtrl, int Limit, bool multiplePaths = false)
 	{
 		if (!FolderSelectCallback)
 			LAssert(!"missing callback");
 		else
 			FolderSelectCallback(this, App, Limit,
-				[this, OutputCtrl](auto path)
+				[this, OutputCtrl, multiplePaths](auto path)
 				{
-					SetCtrlName(OutputCtrl, path);
+					if (multiplePaths)
+					{
+						LString input(GetCtrlName(OutputCtrl));
+						LString::Array paths = input.SplitDelimit("\n");
+						paths.SetFixedLength(false);
+						if (!paths.HasItem(path))
+							paths.Add(path);
+						SetCtrlName(OutputCtrl, LString("\n").Join(paths));
+					}
+					else
+					{
+						SetCtrlName(OutputCtrl, path);
+					}
 				});
 	}
 
@@ -103,7 +115,7 @@ public:
 				FolderSelector(IDC_GROUPS_FLD, MAGIC_GROUP);
 				break;
 			case IDC_SET_SPAM:
-				FolderSelector(IDC_SPAM_FLD, MAGIC_MAIL);
+				FolderSelector(IDC_SPAM_FLD, MAGIC_MAIL, true);
 				break;
 		}
 

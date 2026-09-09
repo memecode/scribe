@@ -1556,6 +1556,93 @@ bool ReceiveAccountlet::IsSpamId(const char *Id, bool Delete)
 	return Status;
 }
 
+ReceiveAccountlet::TPathHash ReceiveAccountlet::GetSubFolders()
+{
+	TPathHash paths;
+
+	auto optName = OptionName(OPT_ReceiveSubFolders);
+	auto options = GetApp()->GetOptions();
+	auto locked = options->LockTag(optName, _FL);
+	if (!locked)
+	{
+		options->CreateTag(optName);
+		locked = options->LockTag(optName, _FL);
+	}
+	if (!locked)
+	{
+		LAssert(!"failed to create/lock the option");
+	}
+	else
+	{
+		for (int i=0; SystemFolders[i].PathOption; i++)
+		{
+			auto &f = SystemFolders[i];
+			bool enabled = true;
+			if (f.HasOption)
+				// Check if the option is enabled
+				enabled = locked->GetAsInt(f.HasOption) != 0;
+			if (enabled)
+			{
+				if (auto path = locked->GetAttr(f.PathOption))
+					paths.Add(f.Type, path);
+			}
+		}
+	}
+
+	options->Unlock();
+	return paths;
+}
+
+bool ReceiveAccountlet::SetSubFolder(TSystemFolder type, LString path)
+{
+	// Find the system folder info for this type:
+	SystemFolderInfo *info = NULL;
+	for (int i=0; SystemFolders[i].PathOption; i++)
+	{
+		if (SystemFolders[i].Type == type)
+		{
+			info = &SystemFolders[i];
+			break;
+		}
+	}
+	if (!info)
+	{
+		LAssert(!"unknown system folder type");
+		return false;
+	}
+
+	auto optName = OptionName(OPT_ReceiveSubFolders);
+	auto options = GetApp()->GetOptions();
+	auto locked = options->LockTag(optName, _FL);
+	if (!locked)
+	{
+		options->CreateTag(optName);
+		locked = options->LockTag(optName, _FL);
+	}
+	if (!locked)
+	{
+		LAssert(!"failed to create/lock the option");
+		return false;
+	}
+
+	// An empty path clears the setting:
+	if (path)
+	{
+		locked->SetAttr(info->PathOption, path);
+		if (info->HasOption)
+			locked->SetAttr(info->HasOption, 1);
+	}
+	else
+	{
+		locked->DelAttr(info->PathOption);
+		if (info->HasOption)
+			locked->DelAttr(info->HasOption);
+	}
+
+	options->Unlock();
+	return true;
+}
+
 bool ReceiveAccountlet::SetActions(LArray<ReceiveAction> *a)
 {
 	bool Status = false;

@@ -216,17 +216,17 @@ uchar DateTimeFormats[] =
 
 SystemFolderInfo SystemFolders[] =
 {
-	{FOLDER_INBOX,		OPT_Inbox,		NULL},
-	{FOLDER_OUTBOX,		OPT_Outbox,		NULL},
-	{FOLDER_SENT,		OPT_Sent,		NULL},
-	{FOLDER_CONTACTS,	OPT_Contacts,	NULL},
-	{FOLDER_TRASH,		OPT_Trash,		NULL},
-	{FOLDER_CALENDAR,	OPT_Calendar,	OPT_HasCalendar},
-	{FOLDER_TEMPLATES,	OPT_Templates,	OPT_HasTemplates},
-	{FOLDER_FILTERS,	OPT_Filters,	OPT_HasFilters},
-	{FOLDER_GROUPS,		OPT_Groups,		OPT_HasGroups},
-	{FOLDER_SPAM,		OPT_SpamFolder,	OPT_HasSpam},
-	{-1, 0, 0}
+	{SystemFolderInbox,		FOLDER_INBOX,		OPT_Inbox,		NULL},
+	{SystemFolderOutbox,	FOLDER_OUTBOX,		OPT_Outbox,		NULL},
+	{SystemFolderSent,		FOLDER_SENT,		OPT_Sent,		NULL},
+	{SystemFolderContacts,	FOLDER_CONTACTS,	OPT_Contacts,	NULL},
+	{SystemFolderTrash,		FOLDER_TRASH,		OPT_Trash,		NULL},
+	{SystemFolderCalendar,	FOLDER_CALENDAR,	OPT_Calendar,	OPT_HasCalendar},
+	{SystemFolderTemplates,	FOLDER_TEMPLATES,	OPT_Templates,	OPT_HasTemplates},
+	{SystemFolderFilters,	FOLDER_FILTERS,		OPT_Filters,	OPT_HasFilters},
+	{SystemFolderGroups,	FOLDER_GROUPS,		OPT_Groups,		OPT_HasGroups},
+	{SystemFolderSpam,		FOLDER_SPAM,		OPT_SpamFolder,	OPT_HasSpam},
+	{SystemFolderMax,		IDC_STATIC,			nullptr,		nullptr}
 };
 
 ScribeBehaviour *ScribeBehaviour::New(ScribeWnd *app)
@@ -8304,22 +8304,25 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 				if (!GetOptions()->GetValue(OPT_BayesFilterMode, i))
 					return;
 
-				ScribeBayesianFilterMode m = ((ScribeBayesianFilterMode)i.CastInt32());
+				auto m = ((ScribeBayesianFilterMode)i.CastInt32());
 				if (m != BayesOff)
 				{
-					LVariant SpamPath, ProbablyPath;
-					GetOptions()->GetValue(OPT_SpamFolder, SpamPath);
+					LVariant SpamPaths, ProbablyPath;
+					GetOptions()->GetValue(OPT_SpamFolder, SpamPaths);
 					GetOptions()->GetValue(OPT_BayesMoveTo, ProbablyPath);
 											
 					if (m == BayesFilter)
 					{
-						auto Spam = GetFolder(SpamPath.Str());
-						if (!Spam)
-						{							
-							if (auto RelevantStore = GetMailStoreForPath(SpamPath.Str()))
+						ScribeFolder *Spam = nullptr;
+						for (auto SpamPath: LString(SpamPaths.Str()).SplitDelimit("\n"))
+						{
+							Spam = GetFolder(SpamPath);
+							if (Spam)
+								continue;
+
+							if (auto RelevantStore = GetMailStoreForPath(SpamPath))
 							{
-								LString p = SpamPath.Str();
-								auto a = p.SplitDelimit("/");
+								auto a = SpamPath.SplitDelimit("/");
 									
 								Spam = RelevantStore->GetRoot();
 								for (unsigned i=1; i<a.Length(); i++)
@@ -8329,6 +8332,8 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 										c = Spam->CreateSubFolder(a[i], MAGIC_MAIL);
 									Spam = c;
 								}
+
+								break;
 							}
 						}
 							

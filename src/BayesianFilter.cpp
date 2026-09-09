@@ -1693,16 +1693,18 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 
 	LArray<ScribeFolder*> spamFolders;
 	spamFolders.Add(App->GetFolder(FOLDER_SPAM));	
-	for (ScribeAccount *a: *App->GetAccounts())
+	for (auto a: *App->GetAccounts())
 	{
 		auto opt = a->Receive.OptionName(OPT_ReceiveSubFolders);
 		if (auto tag = App->GetOptions()->LockTag(opt, _FL))
 		{
 			if (auto spamPath = tag->GetAttr(OPT_SpamFolder))
 			{
-				if (auto f = a->GetFolder(spamPath))
+				auto paths = LString(spamPath).SplitDelimit("\n");
+				for (auto p: paths)
 				{
-					spamFolders.Add(f);
+					if (auto f = a->GetFolder(p))
+						spamFolders.Add(f);
 				}
 			}
 			App->GetOptions()->Unlock();

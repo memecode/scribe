@@ -83,8 +83,15 @@ int BayesDlg::OnNotify(LViewI *c, const LNotification &n)
 			auto fd = new FolderDlg(this, d->App, MAGIC_MAIL);
 			fd->DoModal([this, fd](auto dlg, auto ok)
 			{
-				if (ok)
-					SetCtrlName(IDC_SPAM_FOLDER, fd->Get());
+				if (!ok)
+					return;
+
+				LString in = GetCtrlName(IDC_SPAM_FOLDER);
+				auto paths = in.SplitDelimit("\n");
+				paths.SetFixedLength(false);
+				if (!paths.HasItem(fd->Get()))
+					paths.Add(fd->Get());
+				SetCtrlName(IDC_SPAM_FOLDER, LString("\n").Join(paths));
 			});
 			break;
 		}

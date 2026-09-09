@@ -2012,6 +2012,11 @@ public:
 	bool RemoveFromSpamIds(const char *Id);
 	bool IsSpamId(const char *Id, bool Delete = false);
 
+	// Subfolders
+	using TPathHash = LHashTbl<IntKey<int, -1>, LString>;
+	TPathHash GetSubFolders();
+	bool SetSubFolder(TSystemFolder type, LString path);
+
 	// Receive options
 	AccStrOption(Protocol, OPT_Pop3Protocol);
 	ScribeProtocol ProtocolType() { return ProtocolToEnum(Protocol().Str()); }

@@ -727,9 +727,10 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////
 struct SystemFolderInfo
 {
-	int Id;
-	const char *PathOption;
-	const char *HasOption;
+	TSystemFolder Type;
+	int Id; // UI control ID
+	const char *PathOption; // Options key 
+	const char *HasOption; // Option key indicating if the folder is enabled
 };
 
 extern SystemFolderInfo SystemFolders[];

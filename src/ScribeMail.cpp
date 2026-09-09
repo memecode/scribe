@@ -8059,18 +8059,33 @@ void Mail::DeleteAsSpam(LView *View)
 		return;
 	}
 
-	LString SpamPath, SpamLeaf = "Spam";
-	LVariant v;
-	if (App->GetOptions()->GetValue(OPT_SpamFolder, v))
+	LString SpamLeaf = "Spam";
+	LString::Array SpamPaths;
+
+	ScribeAccount *account = nullptr;
+	if (auto obj = GetObject())
 	{
-		SpamPath = v.Str();
-	}
-	else
-	{
-		SpamPath.Printf("/%s/%s", Parts[0].Get(), SpamLeaf.Get());
+		auto id = obj->GetInt(FIELD_ACCOUNT_ID);
+		if ((account = App->GetAccountById(id)))
+		{
+			auto s = account->Receive.GetSubFolders().Find(SystemFolderSpam);
+			if (s)
+				SpamPaths = s.SplitDelimit("\n");
+		}
 	}
 
-	auto Spam = App->GetFolder(SpamPath);
+	if (!account)
+	{
+		// Get the system wide spam folder setting.
+		LVariant v;
+		if (App->GetOptions()->GetValue(OPT_SpamFolder, v))
+			SpamPaths = v.LStr().SplitDelimit("\n");
+		
+		if (SpamPaths.Length() == 0)
+			SpamPaths.New().Printf("/%s/%s", Parts[0].Get(), SpamLeaf.Get());
+	}
+
+	auto Spam = App->GetFolder(SpamPaths[0]);
 	if (!Spam)
 	{
 		auto Ms = App->GetMailStoreForPath(FolderPath);
@@ -8088,7 +8103,7 @@ void Mail::DeleteAsSpam(LView *View)
 			}
 			else LgiMsg(View, LLoadString(IDS_ERR_GET_MAIL_STORE_FMT), AppName, MB_OK, FolderPath.Get());
 		}
-		else Spam = Ms->GetRoot()->CreateSubFolder("Spam", MAGIC_MAIL);
+		else Spam = Ms->GetRoot()->CreateSubFolder(SpamLeaf, MAGIC_MAIL);
 	}
 
 	if (Spam && Spam != GetFolder())
