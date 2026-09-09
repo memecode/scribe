@@ -611,6 +611,7 @@ public:
                             bool Append,
                             LStream *Debug = NULL)
     {
+	    Hash.ownThread = LCurrentThreadId();
 	    auto Items = Hash.Length();
 	    int64 Start = LCurrentTime();
 
