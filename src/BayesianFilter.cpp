@@ -1,9 +1,10 @@
 #include <functional>
 #include "Scribe.h"
-#include "resdefs.h"
-#include "BayesianFilter.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/SpellCheck.h"
+#include "lgi/common/WordStore.h"
+
+#include "resdefs.h"
 
 #define SECONDS(n)				((n) * 1000)
 #define TIMEOUT_BAYES_LOAD		SECONDS(10)

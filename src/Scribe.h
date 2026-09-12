@@ -7,6 +7,7 @@
 **      Copyright (C) 1998-2003 Matthew Allen
 **              fret@memecode.com
 */
+#pragma once
 
 // Includes
 #include <stdio.h>
@@ -16,8 +17,6 @@
 #include "lgi/common/DragAndDrop.h"
 #include "lgi/common/DateTime.h"
 #include "lgi/common/Password.h"
-#include "lgi/common/vCard-vCal.h"
-#include "lgi/common/WordStore.h"
 #include "lgi/common/XmlTreeUi.h"
 #include "lgi/common/Mime.h"
 #include "lgi/common/OptionsFile.h"
@@ -28,7 +27,6 @@
 #include "lgi/common/Printer.h"
 
 // Gui controls
-#include "lgi/common/Panel.h"
 #include "lgi/common/DocView.h"
 #include "lgi/common/List.h"
 #include "lgi/common/Tree.h"
@@ -718,7 +716,7 @@ public:
 	IoProgress Import(IoProgressFnArgs) override { return Store3Error; }
 	IoProgress Export(IoProgressFnArgs) override { return Store3Error; }
 
-	bool SaveTo(char *FileName, bool Quite = false, LView *Parent = NULL);
+	bool SaveTo(const char *FileName, bool Quite = false, LView *Parent = NULL);
 
 	const char *GetText(int i) override;
 	char *GetDropFileName() override;

@@ -1,5 +1,14 @@
 #pragma once
 
+#include "lgi/common/StringClass.h"
+#include "lgi/common/Store3Defs.h"
+#include "lgi/common/Message.h"
+#include "ScribeDefs.h"
+
+class ScribeWnd;
+class ScribeFolder;
+class Mail;
+
 class BayesianFilter
 {
 	friend class BuildSpamDB;

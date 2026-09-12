@@ -1625,7 +1625,6 @@ bool ReceiveAccountlet::SetSubFolder(TSystemFolder type, LString path)
 		return false;
 	}
 
-	// An empty path clears the setting:
 	if (path)
 	{
 		locked->SetAttr(info->PathOption, path);
@@ -1634,6 +1633,7 @@ bool ReceiveAccountlet::SetSubFolder(TSystemFolder type, LString path)
 	}
 	else
 	{
+		// An empty path clears the setting:
 		locked->DelAttr(info->PathOption);
 		if (info->HasOption)
 			locked->DelAttr(info->HasOption);

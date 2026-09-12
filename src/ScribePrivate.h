@@ -17,6 +17,7 @@
 #include "lgi/common/CheckBox.h"
 #include "lgi/common/TabView.h"
 #include "lgi/common/RadioGroup.h"
+#include "lgi/common/Panel.h"
 
 // Defines
 #define SCRIBE_TOOLBAR_BORDER_SPACING_PX	3

@@ -645,7 +645,7 @@ void Attachment::OnDeleteAttachment(LView *Parent, bool Ask)
 	}
 }
 
-bool Attachment::SaveTo(char *FileName, bool Quite, LView *Parent)
+bool Attachment::SaveTo(const char *FileName, bool Quite, LView *Parent)
 {
 	bool Status = false;
 	if (FileName)
@@ -738,8 +738,11 @@ bool Attachment::SaveTo(char *FileName, bool Quite, LView *Parent)
 
 void Attachment::DoSave(LFileSelect *Select, const LArray<LListItem*> Files)
 {
-	char Dir[MAX_PATH_LEN];
-	strcpy_s(Dir, sizeof(Dir), Select->Name());
+	if (!Select)
+	{
+		LAssert(!"Select is null.");
+		return;
+	}
 
 	if (Files.Length() > 1)
 	{
@@ -757,8 +760,8 @@ void Attachment::DoSave(LFileSelect *Select, const LArray<LListItem*> Files)
 				}
 				if (d)
 				{
-					sprintf_s(Path, sizeof(Path), "%s%s%s", Dir, DIR_STR, d.Get());
-					a->SaveTo(Path);
+					LFile::Path path(Select->Name(), d.Get());
+					a->SaveTo(path.GetFull());
 				}
 			}
 		}
@@ -768,7 +771,7 @@ void Attachment::DoSave(LFileSelect *Select, const LArray<LListItem*> Files)
 		// Write the file
 		auto a = dynamic_cast<Attachment*>(Files.ItemAt(0));
 		if (a)
-			a->SaveTo(Dir, false, Parent);
+			a->SaveTo(Select->Name(), false, Parent);
 	}
 }
 

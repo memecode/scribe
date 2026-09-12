@@ -1771,7 +1771,7 @@ Store3Status LMail3Store::CheckTable(const char *Name, LMail3Def *Flds)
 bool LMail3Store::UpdateTable(const char *Name, LMail3Def *Flds, Store3Status Check)
 {
 	LStatement st(this);
-	LAutoString TempTable;
+	LString TempTable;
 	TableDefn Defs;
 
 	if (Check == Store3UpgradeRequired)
@@ -1782,13 +1782,10 @@ bool LMail3Store::UpdateTable(const char *Name, LMail3Def *Flds, Store3Status Ch
 			return false;
 		}
 
-		char Tmp[256];
-		sprintf_s(Tmp, sizeof(Tmp), "%s_tmp", Name);
-		TempTable.Reset(NewStr(Tmp));
+		TempTable = LString::Fmt("%s_tmp", Name);
 
-		char AlterSql[256];
-		sprintf_s(AlterSql, sizeof(AlterSql), "alter table %s rename to %s", Name, Tmp);
-
+		auto AlterSql = LString::Fmt("alter table %s rename to %s", Name, TempTable.Get());
+		
 		LStatement Alter(this, AlterSql);
 		if (!Alter.Exec())
 		{
