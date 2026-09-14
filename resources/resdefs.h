@@ -499,7 +499,6 @@
 #define IDC_PREVIEW_READ						694
 #define IDS_ASK_USER_PASS						695
 #define IDD_FILTER_SAVE_ATTACH					696
-#define IDM_HELP								697
 #define IDC_TYPES								698
 #define IDC_OTHER_TABLE							699
 #define IDC_BROWSE_DIR							700
@@ -1022,7 +1021,7 @@
 #define IDS_INSTALL								1219
 #define IDC_1220								1220
 #define IDC_AUTO								1221
-#define IDC_HELP								1222
+#define ID_HELP									1222
 #define IDC_COLOUR								1223
 #define IDS_EDIT_MAIL_STORES					1224
 #define IDS_ERROR_CANT_CREATE_FOLDER			1225

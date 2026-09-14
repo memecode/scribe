@@ -65,7 +65,7 @@
 		<String Ref="84" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="85" Cid="-1" Define="IDC_STATIC" en="Search:" fr="Chercher:" it="Cerca:" cs="Hledat:" es="Buscar:" de="Suche:" nl="Zoek:" pt_br="Procurar:" ru="Поиск:" pt="Procurar:" pl="Szukaj:" vi="Tìm:" zh_tw="搜尋:" ja="検索:" sr="Pretraži:" no="Søk:" lt="Ieškoti:" fa="جستجو" da="Søg:" sv="Sök:" lg="Noonya:" tr="Ara:" hu="Keresés:" ko="탐색:" uk="Пошук:" />
 		<String Ref="86" Cid="2045" Define="IDD_FOLDER_NAME" en="Folder Name" fr="Nom de dossier" it="Nome Cartella" cs="Jméno složky" es="Nombre de la Carpeta" de="Ordnername" nl="Naam van map" pt_br="Nome da pasta" ru="Имя папки" pt="Nome da pasta" pl="Nazwa folderu" vi="Tên danh mục" zh_tw="資料夾名稱" ja="フォルダ名" sr="Ime omotnice" no="Mappenavn" lt="Aplanko vardo keitimas" fa="نام پوشه" da="Mappenavn" sv="Mappnamn" lg="Erinnya lya Kabada" tr="Klasör Adı" hu="Mappa neve" ko="폴더 이름" uk="Ім`я теки" />
-		<String Ref="87" Cid="1222" Define="IDC_HELP" en="Help" />
+		<String Ref="87" Cid="1222" Define="ID_HELP" en="Help" />
 		<String Ref="88" Cid="2" Define="IDCANCEL" en="Cancel" fr="Annuler" it="Annulla" cs="Storno" es="Cancelar" de="Abbrechen" nl="Annuleren" pt_br="Cancelar" ru="Отмена" pt="Cancelar" ja="キャンセル" pl="Anuluj" vi="Hủy" zh_tw="取消" sr="Odustani" no="Avbryt" lt="Atšaukti" fa="لغو" da="Afbryd" sv="Avbryt" lg="Sazaamu" tr="İptal" hu="Mégse" ko="취소" uk="Скасувати" />
 		<String Ref="89" Cid="1002" Define="IDC_NAME" />
 		<String Ref="90" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
@@ -4723,23 +4723,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4748,9 +4734,23 @@
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 						<Control Ref="1380" ControlType="enum" ControlTag="HtmlViewCtrl" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>
@@ -5125,7 +5125,7 @@
 			<String Ref="1387" Cid="41148" Define="IDM_CRASH" en="Crash Scribe Now" cs="Zhroutit Scribe právě teď" lt="Imituoti programos sutrikimą" nl="Laat Scribe nu vastlopen" pl="Wywołaj &apos;awarię&apos; programu" pt="Provocar Erro Agora" de="Scribe jetzt crashen" sr="Obori Scribe sada" da="Crash Scribe nu" ja="今衝突" vi="Làm treo Scribe ngay bây giờ" sv="&Krascha Scribe nu" pt_br="Provocar Erro Agora" es="Forzar trazado ahora" tr="Scribe&apos;ı şimdi çökert (crash)" ru="Сообщить о сбое" ko="Scribe 종료하기" uk="Повідомити про збій" fr="Plantage de Scribe maintenant" />
 			<String Ref="1386" Cid="41159" Define="IDM_DUMP_MEM" en="Dump Memory Usage" lt="Perrašyti informaciją apie atminties panaudojimą į diską (Dump Memory Usage)" cs="Vypsat použití paměti" sv="&Dumpa minnesanvändning" de="Speicherabbild erstellen" tr="Hafıza Kullanımını Dump Et" ru="Сохранять использование памяти" pl="Pokaż wykorzystanie pamięci" ko="메모리 사용량 비우기" uk="Дамп використання пам&apos;яті" fr="Utilisation de la mémoire" />
 			<String Ref="1385" en="&Help" fr="&Aide" it="&Aiuto" cs="Nápo&věda" es="&Ayuda" de="&Hilfe" pt_br="Aj&uda" ru="Помощь" nl="&Hulp" ja="ヘルプ(&H)" pt="Aj&uda" pl="Pomo&c" vi="&Giúp " zh_tw="說明(&H)" sr="&Pomoć" no="&Hjelp" lt="Pa&galba" fa="راهنما" id="&Bantuan" da="&Hjælp" sv="&Hjälp" tr="&Yardım" hu="Súgó" ko="&도움말" uk="&Допомога" />
-			<String Ref="1384" Cid="697" Define="IDM_HELP" en="&Help" fr="&Aide" it="&Aiuto" cs="&Nápověda" es="&Ayuda" de="&Hilfe" pt_br="Aj&uda" ru="Помощь" nl="&Hulp" ja="ヘルプ(&H)" pt="Aj&uda" pl="&Pomoc" vi="&Giúp đỡ" zh_tw="說明(&H)" sr="&Pomoć" no="&Hjelp" lt="Ži&nynas" fa="راهنما" id="&Bantuan" da="&Hjælp" sv="&Hjälp" tr="Yardım" hu="Súgó" ko="&도움말" uk="Допомога" />
+			<String Ref="1384" Cid="1222" Define="ID_HELP" en="&Help" fr="&Aide" it="&Aiuto" cs="&Nápověda" es="&Ayuda" de="&Hilfe" pt_br="Aj&uda" ru="Помощь" nl="&Hulp" ja="ヘルプ(&H)" pt="Aj&uda" pl="&Pomoc" vi="&Giúp đỡ" zh_tw="說明(&H)" sr="&Pomoć" no="&Hjelp" lt="Ži&nynas" fa="راهنما" id="&Bantuan" da="&Hjælp" sv="&Hjälp" tr="Yardım" hu="Súgó" ko="&도움말" uk="Допомога" />
 			<String Ref="1383" Cid="41152" Define="IDM_MEMECODE" Tag="!xgate" en="Memecode.com" pt="www.memecode.com" nl="www.&memecode.com" sv="&www.memecode.com (på engelska)" pt_br="www.memecode.com" uk="На сторінку Memecode.com" />
 			<String Ref="1382" Cid="846" Define="IDM_HOMEPAGE" en="Homepage" cs="Domovská stránka" nl="&Startpagina" pt_br="&Página" ja="ホームページ" pt="Página Web" pl="Strona domowa" vi="Trang chủ" zh_tw="網頁" sr="glavna strana" lt="tinklalapis" fa="صفحه اصلي" sv="hemsida (på engelska)" es="Página Web" tr="Ana Sayfası" hu="Honlap" ru="Домашняя страница" ko="홈페이지" uk="На домашню сторінку" fr="Page d&apos;accueil" />
 			<String Ref="1381" Cid="1008" Define="IDM_SCRIBE_FAQ" Tag="!xgate" en="Scribe FAQ" cs="Často kladené dotazy" de="FAQs zu Scribe" nl="Scribe &VGV&apos;en" pt_br="Perguntas e Respostas sobre o Scribe" pt="Perguntas e Respostas (FAQ)" vi="Những câu hỏi thường gặp về Scribe" lt="&Atsakymai į dažnus klausimus" fa="سؤالات معمول" sv="&Vanliga frågor om Scribe (på engelska)" es="Preguntas Frecuentes FAQ" tr="Scribe Sıkça Sorulan Sorular (FAQ)" hu="Scribe GYIK" ru="Scribe ЧАВО" uk="Scribe часті запитання" fr="FAQ Scribe" />
@@ -5297,7 +5297,7 @@
 			<String Ref="1014" Cid="41165" Define="IDM_EXPORT" en="Export" pl="Eksportuj" ko="내보내기" uk="Експорт" fr="Exporter" />
 			<String Ref="985" Cid="758" Define="IDM_DELETE" en="&Delete" fr="&Supprimer" it="&Elimina" cs="&Smazat" es="&Eliminar" de="&Löschen" nl="&Verwijderen" pt_br="&Excluir" ru="Удалить" ja="削除(&D)" pt="&Apagar" pl="&Usuń" vi="&Xóa" zh_tw="刪除(&D)" sr="&Briši" no="Sl&ett" lt="&Pašalinti" fa="پاک کردن" id="&Hapus" da="Sl&et" sv="&Ta bort" tr="Sil" hu="&Törlés" ko="&삭제" uk="Видалити" />
 			<String Ref="894" en="&Help" fr="&Aide" it="&Aiuto" cs="Nápo&věda" es="&Ayuda" de="&Hilfe" pt_br="Aj&uda" ru="Помощь" nl="&Hulp" ja="ヘルプ(&H)" pt="Aj&uda" pl="Pomoc" vi="&Giúp " zh_tw="說明(&H)" sr="&Pomoć" no="&Hjelp" lt="Pa&galba" fa="راهنما" id="&Bantuan" da="&Hjælp" sv="&Hjälp" tr="&Yardım" hu="Súgó" ko="&도움말" uk="Допомога" />
-			<String Ref="935" Cid="697" Define="IDM_HELP" en="&Help" fr="&Aide" it="&Aiuto" cs="Nápo&věda" es="&Ayuda" de="&Hilfe" pt_br="Aj&uda" ru="Помощь" nl="&Hulp" ja="ヘルプ(&H)" pt="Aj&uda" pl="Pomoc" vi="&Giúp " zh_tw="說明(&H)" sr="&Pomoć" no="&Hjelp" lt="Pa&galba" fa="راهنما" id="&Bantuan" da="&Hjælp" sv="&Hjälp" tr="&Yardım" hu="Súgó" ko="&도움말" uk="Допомога" />
+			<String Ref="935" Cid="1222" Define="ID_HELP" en="&Help" fr="&Aide" it="&Aiuto" cs="Nápo&věda" es="&Ayuda" de="&Hilfe" pt_br="Aj&uda" ru="Помощь" nl="&Hulp" ja="ヘルプ(&H)" pt="Aj&uda" pl="Pomoc" vi="&Giúp " zh_tw="說明(&H)" sr="&Pomoć" no="&Hjelp" lt="Pa&galba" fa="راهنما" id="&Bantuan" da="&Hjælp" sv="&Hjälp" tr="&Yardım" hu="Súgó" ko="&도움말" uk="Допомога" />
 		</string-group>
 		<submenu Ref="1198">
 			<menuitem Ref="1016" Shortcut="Ctrl+S" />

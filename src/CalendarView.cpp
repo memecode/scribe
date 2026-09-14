@@ -3092,7 +3092,7 @@ CalendarViewWnd::CalendarViewWnd(ScribeFolder *folder)
 		ToolBar->AppendButton(RemoveAmp(LLoadString(IDS_TODO)), IDM_TODO, TBT_TOGGLE, true, IMG_CAL_TODO);
 		// ToolBar->AppendButton(RemoveAmp(LLoadString(IDS_CONFIGURE)), IDM_CONFIG, TBT_PUSH, true, IMG_CAL_CONFIG);
 		ToolBar->AppendButton(RemoveAmp(LLoadString(IDS_PRINT)), IDM_PRINT, TBT_PUSH, true, IMG_PRINT);
-		ToolBar->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), IDM_HELP, TBT_PUSH, true, IMG_HELP);
+		ToolBar->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), ID_HELP, TBT_PUSH, true, IMG_HELP);
 	}
 		
 	// Month control
@@ -3308,7 +3308,7 @@ int CalendarViewWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			OnPrint();
 			break;
 		}
-		case IDM_HELP:
+		case ID_HELP:
 		{
 			App->LaunchHelp("calendar.html");
 			break;

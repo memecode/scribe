@@ -1185,7 +1185,7 @@ void ScribeWnd::Construct3()
 			SetMenuIcon(IDM_DEBUG_INFO, ICON_LINK);
 			SetMenuIcon(IDM_TUTORIALS, ICON_LINK);
 			SetMenuIcon(IDM_FEEDBACK, ICON_UNREAD_MAIL);
-			SetMenuIcon(IDM_HELP, ICON_HELP);
+			SetMenuIcon(ID_HELP, ICON_HELP);
 
 			LMenuItem *mi;
 			if

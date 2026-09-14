@@ -2035,7 +2035,7 @@ void ScribeWnd::SetupUi()
 		d->ShowConsoleBtn = Commands->AppendButton(RemoveAmp(LLoadString(IDS_SHOW_CONSOLE)), IDM_SHOW_CONSOLE, TBT_PUSH, true, IMG_CONSOLE_NOMSG);
 		Commands->AppendSeparator();
 
-		Commands->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), IDM_HELP, TBT_PUSH, true, IMG_HELP);
+		Commands->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), ID_HELP, TBT_PUSH, true, IMG_HELP);
 
 		Commands->Customizable(GetOptions(), OPT_ScribeWndToolbar);
 		if (d->ScriptToolbar.Reset(new LScriptUi(Commands)))
@@ -4743,7 +4743,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		}
 
 		// Help menu
-		case IDM_HELP:
+		case ID_HELP:
 		{
 			LaunchHelp("index.html");
 			// LgiMsg(this, LLoadString(IDS_ERROR_NO_HELP), AppName, MB_OK);

@@ -1604,16 +1604,14 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 		case ACTION_PRINT:
 		{
 			LPrinter Info;
-
-	        #ifdef _MSC_VER
-			#pragma message ("Warning: ACTION_PRINT not implemented.")
-	        #endif
-			/* FIXME
-			if (Info.Serialize(Arg1, false))
+			LString a1 = Arg1;
+			if (Info.Serialize(a1, false))
 			{
-				App->ThingPrint(m, &Info);
+				App->ThingPrint(NULL, m, &Info);
+				Status = true;
 			}
-			*/
+			else if (Log)
+				Log->Print("\tACTION_PRINT(%s) failed: no printer configured.\n", Arg1.Get());
 			break;
 		}
 		case ACTION_PLAY_SOUND:
@@ -2115,16 +2113,16 @@ void FilterAction::Browse(ScribeWnd *App, LView *Parent)
 		case ACTION_PRINT:
 		{
 			LPrinter Info;
-			#ifdef _MSC_VER
-			#pragma message ("Warning: ACTION_PRINT not implemented.")
-			#endif
-			/*
-			Info.Serialize(Arg1, false);
-			if (Info.Browse(Parent))
+			LString a1 = Arg1;
+			Info.Serialize(a1, false);
+			if (Info.Browse(Parent, LPrinter::PoDefault))
 			{
-				Info.Serialize(Arg1, true);
+				if (Info.Serialize(a1, true))
+				{
+					Arg1 = a1;
+					OnNotify(Btn, LNotification(LNotifyValueChanged));
+				}
 			}
-			*/
 			break;
 		}
 		case ACTION_PLAY_SOUND:
@@ -3641,7 +3639,7 @@ FilterUi::FilterUi(Filter *item) :
 			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_SAVE)), IDM_SAVE, TBT_PUSH, true, IMG_SAVE);
 			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_SAVE_CLOSE)), IDM_SAVE_CLOSE, TBT_PUSH, true, IMG_SAVE_AND_CLOSE);
 			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_DELETE)), IDM_DELETE, TBT_PUSH, true, IMG_TRASH);
-			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), IDM_HELP, TBT_PUSH, true, IMG_HELP);
+			d->Commands.Toolbar->AppendButton(RemoveAmp(LLoadString(IDS_HELP)), ID_HELP, TBT_PUSH, true, IMG_HELP);
 			d->Commands.SetupCallbacks(GetItem()->App, this, GetItem(), LThingUiToolbar);
 		}
 
@@ -4321,7 +4319,7 @@ int FilterUi::OnCommand(int Cmd, int Event, OsView Window)
 		    Quit();
 		    break;
 		}
-		case IDM_HELP:
+		case ID_HELP:
 		{
 			App->LaunchHelp("filters.html");
 			break;
