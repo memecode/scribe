@@ -331,6 +331,10 @@
     <ClCompile Include="..\src\ScribeApp.cpp">
       <Filter>Application</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ScribeAppAccounts.cpp"><Filter>Application</Filter></ClCompile>
+    <ClCompile Include="..\src\ScribeAppUi.cpp"><Filter>Application</Filter></ClCompile>
+    <ClCompile Include="..\src\ScribeAppMail.cpp"><Filter>Application</Filter></ClCompile>
+    <ClCompile Include="..\src\ScribeAppEvents.cpp"><Filter>Application</Filter></ClCompile>
     <ClCompile Include="..\src\RemoteCalendarSource.cpp">
       <Filter>Calendar</Filter>
     </ClCompile>

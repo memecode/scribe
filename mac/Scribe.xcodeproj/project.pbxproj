@@ -77,7 +77,11 @@
 		3477C3D51CC227ED0028B84B /* ScribeAccount.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3891CC227ED0028B84B /* ScribeAccount.cpp */; };
 		3477C3D61CC227ED0028B84B /* ScribeAccountPreview.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C38A1CC227ED0028B84B /* ScribeAccountPreview.cpp */; };
 		3477C3D71CC227ED0028B84B /* ScribeAccountUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C38B1CC227ED0028B84B /* ScribeAccountUI.cpp */; };
-		3477C3D91CC227ED0028B84B /* ScribeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C38D1CC227ED0028B84B /* ScribeApp.cpp */; };
+		100000000000000000000001 /* ScribeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* ScribeApp.cpp */; };
+		100000000000000000000002 /* ScribeAppAccounts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* ScribeAppAccounts.cpp */; };
+		100000000000000000000003 /* ScribeAppUi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000008 /* ScribeAppUi.cpp */; };
+		100000000000000000000004 /* ScribeAppMail.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000009 /* ScribeAppMail.cpp */; };
+		100000000000000000000005 /* ScribeAppEvents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000000A /* ScribeAppEvents.cpp */; };
 		3477C3DA1CC227ED0028B84B /* ScribeAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C38E1CC227ED0028B84B /* ScribeAttachment.cpp */; };
 		3477C3DB1CC227ED0028B84B /* ScribeContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C38F1CC227ED0028B84B /* ScribeContact.cpp */; };
 		3477C3DC1CC227ED0028B84B /* ScribeFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3477C3901CC227ED0028B84B /* ScribeFilter.cpp */; };
@@ -424,7 +428,11 @@
 		3477C3891CC227ED0028B84B /* ScribeAccount.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeAccount.cpp; path = ../../src/ScribeAccount.cpp; sourceTree = "<group>"; };
 		3477C38A1CC227ED0028B84B /* ScribeAccountPreview.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeAccountPreview.cpp; path = ../../src/ScribeAccountPreview.cpp; sourceTree = "<group>"; };
 		3477C38B1CC227ED0028B84B /* ScribeAccountUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeAccountUI.cpp; path = ../../src/ScribeAccountUI.cpp; sourceTree = "<group>"; };
-		3477C38D1CC227ED0028B84B /* ScribeApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeApp.cpp; path = ../../src/ScribeApp.cpp; sourceTree = "<group>"; };
+		100000000000000000000006 /* ScribeApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeApp.cpp; path = ../../src/ScribeApp.cpp; sourceTree = "<group>"; };
+		100000000000000000000007 /* ScribeAppAccounts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeAppAccounts.cpp; path = ../../src/ScribeAppAccounts.cpp; sourceTree = "<group>"; };
+		100000000000000000000008 /* ScribeAppUi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeAppUi.cpp; path = ../../src/ScribeAppUi.cpp; sourceTree = "<group>"; };
+		100000000000000000000009 /* ScribeAppMail.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeAppMail.cpp; path = ../../src/ScribeAppMail.cpp; sourceTree = "<group>"; };
+		10000000000000000000000A /* ScribeAppEvents.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeAppEvents.cpp; path = ../../src/ScribeAppEvents.cpp; sourceTree = "<group>"; };
 		3477C38E1CC227ED0028B84B /* ScribeAttachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeAttachment.cpp; path = ../../src/ScribeAttachment.cpp; sourceTree = "<group>"; };
 		3477C38F1CC227ED0028B84B /* ScribeContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeContact.cpp; path = ../../src/ScribeContact.cpp; sourceTree = "<group>"; };
 		3477C3901CC227ED0028B84B /* ScribeFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScribeFilter.cpp; path = ../../src/ScribeFilter.cpp; sourceTree = "<group>"; };
@@ -910,7 +918,11 @@
 				3477C3741CC227ED0028B84B /* HtmlToText.cpp */,
 				3477C3811CC227ED0028B84B /* MContainer.cpp */,
 				3477C3891CC227ED0028B84B /* ScribeAccount.cpp */,
-				3477C38D1CC227ED0028B84B /* ScribeApp.cpp */,
+				100000000000000000000006 /* ScribeApp.cpp */,
+				100000000000000000000007 /* ScribeAppAccounts.cpp */,
+				100000000000000000000008 /* ScribeAppUi.cpp */,
+				100000000000000000000009 /* ScribeAppMail.cpp */,
+				10000000000000000000000A /* ScribeAppEvents.cpp */,
 				3477C3611CC226450028B84B /* ScribeMain.cpp */,
 				3477C3A01CC227ED0028B84B /* ScribeRepair.cpp */,
 				3477C3AC1CC227ED0028B84B /* Store3Common.cpp */,
@@ -1308,7 +1320,11 @@
 				3477C3D31CC227ED0028B84B /* ReplicateDlg.cpp in Sources */,
 				3477C4651CC26BBF0028B84B /* HttpTools.cpp in Sources */,
 				3477C42B1CC2319B0028B84B /* Mail3Calendar.cpp in Sources */,
-				3477C3D91CC227ED0028B84B /* ScribeApp.cpp in Sources */,
+				100000000000000000000001 /* ScribeApp.cpp in Sources */,
+				100000000000000000000002 /* ScribeAppAccounts.cpp in Sources */,
+				100000000000000000000003 /* ScribeAppUi.cpp in Sources */,
+				100000000000000000000004 /* ScribeAppMail.cpp in Sources */,
+				100000000000000000000005 /* ScribeAppEvents.cpp in Sources */,
 				3477C3CC1CC227ED0028B84B /* ManageMailStores.cpp in Sources */,
 				3477C3E51CC227ED0028B84B /* ScribeLangDlg.cpp in Sources */,
 				3477C3ED1CC227ED0028B84B /* ScribeSendReceive.cpp in Sources */,

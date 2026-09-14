@@ -163,6 +163,10 @@
 			<Node File="./src/LoadMailStoreState.h" Type="3" Platforms="15" />
 			<Node File="./src/ScribeAbout.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeApp.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeAppAccounts.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeAppUi.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeAppMail.cpp" Type="2" Platforms="15" />
+			<Node File="./src/ScribeAppEvents.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeIpc.cpp" Type="2" Platforms="15" />
 			<Node File="./src/ScribeIpc.h" Type="3" Platforms="15" />
 			<Node File="./src/ScribeMain.cpp" Type="2" Platforms="15" />

@@ -18,14 +18,21 @@
 #include "lgi/common/TabView.h"
 #include "lgi/common/RadioGroup.h"
 #include "lgi/common/Panel.h"
+#include "lgi/common/SoftwareUpdate.h"
 
 // Defines
 #define SCRIBE_TOOLBAR_BORDER_SPACING_PX	3
 
 // Externs
+class ScribeWnd;
 extern const char *AppName;
 extern char HelpFile[];
 extern const char *DefaultFolderNames[];
+extern const char AuthorEmailAddr[];
+extern const char AuthorHomepage[];
+extern const char ApplicationHomepage[];
+extern const char FaqHomepage[];
+extern Store3ItemTypes DefaultFolderTypes[];
 extern const char *DefaultRfXml;
 extern int DefaultFilterFields[];
 extern char MailToStr[];
@@ -33,6 +40,29 @@ extern char SubjectStr[];
 extern char ContentTypeDefault[];
 extern bool OptionSizeInKiB;
 extern bool ShowRelativeDates;
+extern uchar DateTimeFormats[7];
+
+enum SoftwareStatus
+{
+	SwError,
+	SwCancel,
+	SwOutOfDate,
+	SwUpToDate
+};
+
+extern void SetRecipients(ScribeWnd *App, char *Start, LDataIt l, EmailAddressType CC);
+extern void IsSoftwareUpToDate(ScribeWnd *Parent,
+								bool WithUI,
+								bool IncBetas,
+								std::function<void(SoftwareStatus, LSoftwareUpdate::UpdateInfo*)> callback);
+extern void UpgradeSoftware(const LSoftwareUpdate::UpdateInfo *Info,
+								ScribeWnd *Parent,
+								bool WithUI,
+								std::function<void(bool)> Callback);
+extern void SoftwareUpdate(ScribeWnd *Parent,
+								bool WithUI,
+								bool IncBetas,
+								std::function<void(bool goingToUpdate)> callback);
 
 // Mime types
 extern char sMimeVCard[];

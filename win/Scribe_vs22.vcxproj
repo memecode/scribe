@@ -307,6 +307,10 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\src\ScribeAccountPreview.cpp" />
     <ClCompile Include="..\src\ScribeAccountUI.cpp" />
     <ClCompile Include="..\src\ScribeApp.cpp" />
+    <ClCompile Include="..\src\ScribeAppAccounts.cpp" />
+    <ClCompile Include="..\src\ScribeAppUi.cpp" />
+    <ClCompile Include="..\src\ScribeAppMail.cpp" />
+    <ClCompile Include="..\src\ScribeAppEvents.cpp" />
     <ClCompile Include="..\src\ScribeAttachment.cpp" />
     <ClCompile Include="..\src\ScribeContact.cpp" />
     <ClCompile Include="..\src\ScribeFilter.cpp" />
