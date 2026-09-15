@@ -18,6 +18,7 @@ sysLibs = [
     "gdiplus.dll",
     "iphlpapi.dll",
     "netapi32.dll",
+    "crypt32.dll"
 ]
 
 basePaths = [
