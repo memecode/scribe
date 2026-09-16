@@ -21,7 +21,7 @@ public:
 
 	/// DoModal returns TRUE on select, FALSE on cancel
 	int OnNotify(LViewI *Ctrl, const LNotification &n) override;
-	bool OnViewKey(LView *v, LKey &k);
+	bool OnViewKey(LView *v, LKey &k) override;
 };
 
 #endif
