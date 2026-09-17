@@ -8066,7 +8066,7 @@ void Mail::DeleteAsSpam(LView *View)
 	if (auto obj = GetObject())
 	{
 		auto id = obj->GetInt(FIELD_ACCOUNT_ID);
-		if ((account = App->GetAccountById(id)))
+		if ((account = App->GetAccountById((int)id)))
 		{
 			auto s = account->Receive.GetSubFolders().Find(SystemFolderSpam);
 			if (s)

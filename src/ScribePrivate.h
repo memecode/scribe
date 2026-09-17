@@ -18,14 +18,21 @@
 #include "lgi/common/TabView.h"
 #include "lgi/common/RadioGroup.h"
 #include "lgi/common/Panel.h"
+#include "lgi/common/SoftwareUpdate.h"
 
 // Defines
 #define SCRIBE_TOOLBAR_BORDER_SPACING_PX	3
 
 // Externs
+class ScribeWnd;
 extern const char *AppName;
 extern char HelpFile[];
 extern const char *DefaultFolderNames[];
+extern const char AuthorEmailAddr[];
+extern const char AuthorHomepage[];
+extern const char ApplicationHomepage[];
+extern const char FaqHomepage[];
+extern Store3ItemTypes DefaultFolderTypes[];
 extern const char *DefaultRfXml;
 extern int DefaultFilterFields[];
 extern char MailToStr[];
@@ -33,6 +40,29 @@ extern char SubjectStr[];
 extern char ContentTypeDefault[];
 extern bool OptionSizeInKiB;
 extern bool ShowRelativeDates;
+extern uchar DateTimeFormats[7];
+
+enum SoftwareStatus
+{
+	SwError,
+	SwCancel,
+	SwOutOfDate,
+	SwUpToDate
+};
+
+extern void SetRecipients(ScribeWnd *App, char *Start, LDataIt l, EmailAddressType CC);
+extern void IsSoftwareUpToDate(ScribeWnd *Parent,
+								bool WithUI,
+								bool IncBetas,
+								std::function<void(SoftwareStatus, LSoftwareUpdate::UpdateInfo*)> callback);
+extern void UpgradeSoftware(const LSoftwareUpdate::UpdateInfo *Info,
+								ScribeWnd *Parent,
+								bool WithUI,
+								std::function<void(bool)> Callback);
+extern void SoftwareUpdate(ScribeWnd *Parent,
+								bool WithUI,
+								bool IncBetas,
+								std::function<void(bool goingToUpdate)> callback);
 
 // Mime types
 extern char sMimeVCard[];
@@ -196,18 +226,18 @@ public:
 
 	const char *GetClass() override { return "AddressList"; }
 
-	void OnCreate();
-	bool OnKey(LKey &k);
+	void OnCreate() override;
+	bool OnKey(LKey &k) override;
 	void OnInit(LDataIt l);
 	void OnSave(LDataStoreI *store, LDataIt l);
-	void OnItemClick(LListItem *Item, LMouse &m);
+	void OnItemClick(LListItem *Item, LMouse &m) override;
 
 	void Copy();
 	void Paste();
 
 	// D'n'd support
-	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState);
-	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState);
+	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState) override;
+	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState) override;
 };
 
 struct BrowseItem
@@ -387,8 +417,8 @@ public:
 	ThingList(ScribeWnd *wnd);
 	~ThingList();
 
-	const char *GetClass() { return "ThingList"; }
-	LRect &GetClient(bool ClientSpace = true);
+	const char *GetClass() override { return "ThingList"; }
+	LRect &GetClient(bool ClientSpace = true) override;
 
 	bool SetSort(SortParam sort, bool reorderItems = true, bool setMark = true) override;
 	void Sort() override;
@@ -409,22 +439,22 @@ public:
 	ScribeFolder *GetContainer() { return Container; }
 	void SetContainer(ScribeFolder *c) { Container = c; }
 
-	LFont *GetFont();
-	void OnPaint(LSurface *pDC);
-	void OnColumnClick(int Col, LMouse &m);
-	void OnItemClick(LListItem *Item, LMouse &m);
-	void OnItemSelect(LArray<LListItem*> &Item);
-	bool OnKey(LKey &k);
-	void OnColumnDrag(int Col, LMouse &m);
-	bool OnColumnReindex(LItemColumn *Col, int OldIndex, int NewIndex);
+	LFont *GetFont() override;
+	void OnPaint(LSurface *pDC) override;
+	void OnColumnClick(int Col, LMouse &m) override;
+	void OnItemClick(LListItem *Item, LMouse &m) override;
+	void OnItemSelect(LArray<LListItem*> &Item) override;
+	bool OnKey(LKey &k) override;
+	void OnColumnDrag(int Col, LMouse &m) override;
+	bool OnColumnReindex(LItemColumn *Col, int OldIndex, int NewIndex) override;
 	void OnCreate() override;
 
 	List<Thing> PlaceHolders;
 	void DeletePlaceHolders();
 
 	// Dnd
-	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState);
-	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState);
+	int WillAccept(LDragFormats &Formats, LPoint Pt, int KeyState) override;
+	int OnDrop(LArray<LDragData> &Data, LPoint Pt, int KeyState) override;
 };
 
 // this is the tree view on the left hand side
@@ -450,9 +480,9 @@ public:
 	void OnCreateSubDirectory(ScribeFolder *Item);
 	void OnDelete(ScribeFolder *Item, bool Force);
 	void OnProperties(ScribeFolder *Item);
-	void OnItemClick(LTreeItem *Item, LMouse &m);
-	void OnItemSelect(LTreeItem *Item);
-	LMessage::Result OnEvent(LMessage *Msg);
+	void OnItemClick(LTreeItem *Item, LMouse &m) override;
+	void OnItemSelect(LTreeItem *Item) override;
+	LMessage::Result OnEvent(LMessage *Msg) override;
 };
 
 //////////////////////////////////////////////////////////////

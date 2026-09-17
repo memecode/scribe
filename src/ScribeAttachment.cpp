@@ -749,10 +749,8 @@ void Attachment::DoSave(LFileSelect *Select, const LArray<LListItem*> Files)
 		// Loop through all the files and write them to that directory
 		for (unsigned idx=0; idx<Files.Length(); idx++)
 		{
-			auto a = dynamic_cast<Attachment*>(Files.ItemAt(idx));
-			if (a)
+			if (auto a = dynamic_cast<Attachment*>(Files.ItemAt(idx)))
 			{
-				char Path[MAX_PATH_LEN];
 				auto d = StripPath(a->GetName());
 				if (!d)
 				{

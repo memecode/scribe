@@ -133,7 +133,7 @@
       <Command>cd ..\src\Py
 "C:\Program Files\Python312\python.exe"  win32_pre_build_step.py
 cd ..
-call "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+call "C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvars64.bat"
 rc Resource.rc
 copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
@@ -172,9 +172,9 @@ copy Resource.res ..\win\$(OutDir)</Command>
     </ClCompile>
     <PreLinkEvent>
       <Command>cd ..\src\Py
-"C:\Program Files\Python312\python.exe"  win32_pre_build_step.py
+"C:\Program Files\Python314\python.exe"  win32_pre_build_step.py
 cd ..
-call "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+call "C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvars64.bat"
 rc Resource.rc
 copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
@@ -307,6 +307,10 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\src\ScribeAccountPreview.cpp" />
     <ClCompile Include="..\src\ScribeAccountUI.cpp" />
     <ClCompile Include="..\src\ScribeApp.cpp" />
+    <ClCompile Include="..\src\ScribeAppAccounts.cpp" />
+    <ClCompile Include="..\src\ScribeAppUi.cpp" />
+    <ClCompile Include="..\src\ScribeAppMail.cpp" />
+    <ClCompile Include="..\src\ScribeAppEvents.cpp" />
     <ClCompile Include="..\src\ScribeAttachment.cpp" />
     <ClCompile Include="..\src\ScribeContact.cpp" />
     <ClCompile Include="..\src\ScribeFilter.cpp" />

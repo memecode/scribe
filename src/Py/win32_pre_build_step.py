@@ -23,43 +23,45 @@ def ReplaceValue(s, var, value):
 	return s
 
 # get the current revision of the code
-if os.path.exists("C:\\Program Files\\TortoiseHg\\hg.exe"):
-	hgbin = "C:\\Program Files\\TortoiseHg\\hg.exe"
+if os.path.exists("C:\\Program Files\\Git\\cmd\\git.exe"):
+	gitBin = "C:\\Program Files\\Git\\cmd\\git.exe"
 else:
-	hgbin = "hg"
+	gitBin = "git"
 
-hg = None
+git = None
 
 def process_timeout():
-	print("Waiting for svn to start...")
-	while hg is None:
+	print("Waiting for git to start...")
+	while git is None:
 		time.sleep(0.05)
-	print("Waiting for hg to finish...")
+	print("Waiting for git to finish...")
 	start = time.time()
-	while hg.poll() is None:
+	while git.poll() is None:
 		time.sleep(0.05)
 		if (time.time() - start) > 10:
-			print("Svn timeout... kill...")
-			hg.terminate()
+			print("Git timeout... kill...")
+			git.terminate()
 			return
 	
-	print("Hg finished...")
+	print("Git finished...")
 	return
 
 # updates to get the latest revision number
-print("Starting hg... ("+hgbin+")")
+print("Starting git... ("+gitBin+")")
 
 # now do an "info"
-revision = subprocess.Popen([hgbin,"identify","--num","-r","."], stdout=subprocess.PIPE).communicate()[0].decode("utf-8").strip()
+revision = subprocess.Popen([gitBin,"rev-list","--count","HEAD"], stdout=subprocess.PIPE).communicate()[0].decode("utf-8").strip()
 if (not revision):
-	print("Error: couldn't run hg")
+	print("Error: couldn't run git")
 	sys.exit(-1)
 
-if (not revision):
-	print("Error: failed to get hg revision")
+# the short commit hash, for embedding in the human readable version strings
+gitHash = subprocess.Popen([gitBin,"rev-parse","--short=8","HEAD"], stdout=subprocess.PIPE).communicate()[0].decode("utf-8").strip()
+if (not gitHash):
+	print("Error: failed to get git hash")
 	sys.exit(-1)
 
-#print("Revision:", revision)
+#print("Revision:", revision, "Hash:", gitHash)
 
 # get the current build details from the header
 print ("Cwd:", os.getcwd())
@@ -81,7 +83,10 @@ print("ScribeVer:",ScribeVer)
 
 # construct the new full build version
 Full = "%i,%i,%i" % (int(ScribeVer[0]),int(ScribeVer[1]),int(revision))
-print("Full version:",Full)
+# the numeric FILEVERSION/PRODUCTVERSION fields can't hold a hash, so the git hash
+# only gets appended to the human readable FileVersion/ProductVersion strings below
+FullWithHash = "%s (%s)" % (Full, gitHash)
+print("Full version:",Full,"Hash:",gitHash)
 
 rc = open("../Resource.rc", "rb")
 if (not rc):
@@ -92,8 +97,8 @@ res = rc.read().decode("windows-1252")
 res = ReplaceSetting(res, "FILEVERSION", Full)
 res = ReplaceSetting(res, "PRODUCTVERSION", Full)
 res = ReplaceValue(res, "ProductName", ProductName)
-res = ReplaceValue(res, "FileVersion", Full)
-res = ReplaceValue(res, "ProductVersion", Full)
+res = ReplaceValue(res, "FileVersion", FullWithHash)
+res = ReplaceValue(res, "ProductVersion", FullWithHash)
 
 if (1):
 	rc = open("../Resource.rc", "w+b")

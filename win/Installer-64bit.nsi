@@ -21,9 +21,11 @@
 ; Lgi deps
 !system "copy ..\..\..\lgi\deps\build-x64\bin\jpeg62.dll scribe-setup"   = 0
 !system "copy ..\..\..\lgi\deps\build-x64\bin\libpng16.dll scribe-setup" = 0
-!system "copy ..\..\..\lgi\deps\build-x64\bin\z.dll scribe-setup"     = 0
+!system "copy ..\..\..\lgi\deps\build-x64\bin\libz.dll scribe-setup"     = 0
 !system "copy ..\..\..\lgi\deps\build-x64\bin\libiconv.dll scribe-setup" = 0
 !system "copy ..\..\..\lgi\deps\build-x64\bin\libntlm.dll scribe-setup"  = 0
+!system "copy ..\..\..\lgi\deps\build-x64\bin\lunasvg.dll scribe-setup"  = 0
+!system "copy ..\..\..\lgi\deps\build-x64\bin\plutovg.dll scribe-setup"  = 0
 
 !system "copy ..\..\..\lgi\trunk\lib\Lgi22nop.dll scribe-setup" = 0
 !system "copy ..\..\..\lgi\trunk\utils\Updater\x64Release22\Updater.exe scribe-setup" = 0

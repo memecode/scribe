@@ -143,6 +143,10 @@ add_executable(scribe ${APP_TYPE}
     src/ScribeAccountPreview.cpp
     src/ScribeAccountUI.cpp
     src/ScribeApp.cpp
+    src/ScribeAppAccounts.cpp
+    src/ScribeAppUi.cpp
+    src/ScribeAppMail.cpp
+    src/ScribeAppEvents.cpp
     src/ScribeAttachment.cpp
     src/ScribeContact.cpp
     src/ScribeFilter.cpp
