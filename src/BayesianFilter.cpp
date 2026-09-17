@@ -779,6 +779,7 @@ public:
 					{
 						auto i = WhiteList->GetWordCount(c->Str);
 						WhiteList->SetWordCount(c->Str, i + 1);
+						LgiTrace("%s:%i - WhiteList increment '%s' -> %i\n", _FL, c->Str.Get(), (int)(i + 1));
 					}
 				}
 		    }

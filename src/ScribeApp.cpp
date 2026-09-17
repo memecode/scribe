@@ -12079,59 +12079,6 @@ bool ScribeWnd::AllowSslCert(const char *certHost, LArray<uint8_t> *certId)
 	return status;
 }
 
-// This stores a certificate in the options along with is host and acceptable level.
-bool ScribeWndPrivate::AllowCert(TSslAccept accept)
-{
-	THREAD_SAFE();
-	
-	auto certOpts = Options->LockTag(OPT_SavedCerts, _FL);
-	if (!certOpts)
-	{
-		Options->CreateTag(OPT_SavedCerts);
-		certOpts = Options->LockTag(OPT_SavedCerts, _FL);
-	}
-	if (!certOpts)
-	{
-		LAssert(0);
-		return false;
-	}
-
-	LXmlTag *certTag = nullptr;
-	
-	for (auto t: certOpts->Children)
-	{
-		if (!t->IsTag(OPT_Cert))
-			continue;
-		
-		auto host = t->GetAttr(OPT_Host);
-		if (Stricmp(host, SslCertHost.Get()))
-			continue;
-			
-		certTag = t;
-		break;
-	}
-	
-	if (!certTag)
-	{
-		// Create a new cert tag...
-		certTag = new LXmlTag(OPT_Cert);
-		certOpts->InsertTag(certTag);
-	}
-
-	bool status = certTag != nullptr;
-	if (status)
-	{
-		certTag->SetAttr(OPT_Accept, (int64_t)accept);
-		certTag->SetAttr(OPT_Host, SslCertHost);
-		certTag->SetContent(SslCertId);
-	}
-	else LAssert(0);
-
-	Options->Unlock();
-	
-	return status;
-}
-
 void ScribeWnd::SetContext(const char *file, int line)
 {
 	THREAD_UNSAFE();
@@ -13003,3 +12950,57 @@ ScribeWndPrivate::~ScribeWndPrivate()
 	DeleteObj(LScribeScript::Inst);
 	DeleteObj(htmlStatic);
 }
+
+// This stores a certificate in the options along with is host and acceptable level.
+bool ScribeWndPrivate::AllowCert(TSslAccept accept)
+{
+	THREAD_SAFE();
+	
+	auto certOpts = Options->LockTag(OPT_SavedCerts, _FL);
+	if (!certOpts)
+	{
+		Options->CreateTag(OPT_SavedCerts);
+		certOpts = Options->LockTag(OPT_SavedCerts, _FL);
+	}
+	if (!certOpts)
+	{
+		LAssert(0);
+		return false;
+	}
+
+	LXmlTag *certTag = nullptr;
+	
+	for (auto t: certOpts->Children)
+	{
+		if (!t->IsTag(OPT_Cert))
+			continue;
+		
+		auto host = t->GetAttr(OPT_Host);
+		if (Stricmp(host, SslCertHost.Get()))
+			continue;
+			
+		certTag = t;
+		break;
+	}
+	
+	if (!certTag)
+	{
+		// Create a new cert tag...
+		certTag = new LXmlTag(OPT_Cert);
+		certOpts->InsertTag(certTag);
+	}
+
+	bool status = certTag != nullptr;
+	if (status)
+	{
+		certTag->SetAttr(OPT_Accept, (int64_t)accept);
+		certTag->SetAttr(OPT_Host, SslCertHost);
+		certTag->SetContent(SslCertId);
+	}
+	else LAssert(0);
+
+	Options->Unlock();
+	
+	return status;
+}
+
