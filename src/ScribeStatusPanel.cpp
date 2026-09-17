@@ -725,10 +725,6 @@ int AccountStatusPanel::AccountStatus(Accountlet *a)
 	}
 	
 	auto ico = a->GetStatusIcon();
-	if (ico == STATUS_ERROR)
-	{
-		int asd=0;
-	}
 	return ico;
 }
 

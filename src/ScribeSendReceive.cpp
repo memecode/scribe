@@ -1709,6 +1709,8 @@ bool ReceiveAccountlet::IsPersistant()
 		case ProtocolMapi:
 		#endif
 			return true;
+		default:
+			break;
 	}
 
 	return false;

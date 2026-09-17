@@ -421,7 +421,7 @@ bool ThingList::SetSort(SortParam sort, bool reorderItems, bool setMark)
 	sortParam = sort;
 	Container->SetSort(sort);
 	
-	auto fieldSort = GetFieldSort();
+	// auto fieldSort = GetFieldSort();
 	Sort();
 	
 	if (auto Sel = GetSelected())

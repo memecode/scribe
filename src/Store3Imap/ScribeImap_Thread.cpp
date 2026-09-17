@@ -660,7 +660,7 @@ public:
 			log->Print("Disconnected.\n");
 	}
 
-	ssize_t Read(void *ptr, ssize_t size, int flags)
+	ssize_t Read(void *ptr, ssize_t size, int flags) override
 	{
         memset(ptr, 0, size);
 		ssize_t r = T::Read(ptr, size, flags);
@@ -674,7 +674,7 @@ public:
 		return r;
 	}
 
-	ssize_t Write(const void *ptr, ssize_t size, int flags)
+	ssize_t Write(const void *ptr, ssize_t size, int flags) override
 	{
 		if (Prog)
 			Prog->Value += size;

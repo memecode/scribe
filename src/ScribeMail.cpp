@@ -1557,7 +1557,7 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 				
 		auto createTbl = [&](int id)
 			{
-				if (tbl = new LTableLayout(id))
+				if ((tbl = new LTableLayout(id)))
 				{
 					if (auto css = tbl->GetCss(true))
 					{
@@ -7768,9 +7768,9 @@ int Mail::Compare(LListItem *t, ssize_t Field)
 				}
 				else
 				{
-					auto diff = v1.CastInt64() - v2.CastInt64();
-					if (diff < 0) return -1;
-					return diff > 1;
+					auto uid1 = v1.CastInt64();
+					auto uid2 = v2.CastInt64();
+					return uid1 < uid2 ? -1 : uid1 > uid2 ? 1 : 0;
 				}
 			}
 			default:

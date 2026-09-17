@@ -122,7 +122,7 @@ public:
 		{
 			inFolders.Add(f);
 
-			if (rootInfo = new LFolderInfo)
+			if ((rootInfo = new LFolderInfo))
 			{
 				rootInfo->SetText(".");
 				infoMap.Add(f, rootInfo);
@@ -314,7 +314,7 @@ public:
 		}
 	}
 
-	void OnPulse()
+	void OnPulse() override
 	{
 		auto startTs = LCurrentTime();
 		#define IN_TIMESLICE() ((LCurrentTime() - startTs) < (TIMESLICE * 0.8))
