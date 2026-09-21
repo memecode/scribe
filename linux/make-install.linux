@@ -46,7 +46,9 @@ then
     exit 1
 fi
 
-VERSION=$(python3 ../utils/getversion.py)
+
+
+VERSION=$(../utils/getversion.py)
 APPIMG=$VERSION.AppImage
 APPDIR=$VERSION.AppDir
 BINDIR=$APPDIR/usr/bin
@@ -54,6 +56,9 @@ LIBDIR=$APPDIR/usr/lib
 RESDIR=$APPDIR/usr/share/applications
 BUILD=Release
 TAG=
+
+# Strip binaries in $BINDIR and $LIBDIR before packaging.
+STRIP=${STRIP:-on}
 
 # scribe libs:
 ASPELL_SO="$LIBS/libaspell-dist-0.60$TAG.so"
@@ -97,6 +102,12 @@ cp $ICONV      $LIBDIR
 chmod 755 $BINDIR/*
 chmod 755 $LIBDIR/*
 
+if [ "$STRIP" = "on" ]
+then
+    echo "Stripping binaries..."
+    strip --strip-unneeded $BINDIR/* $LIBDIR/*
+fi
+
 echo "Copy resources..."
 chmod 700 $RES/AppRun
 cp $RES/AppRun $APPDIR
@@ -134,4 +145,4 @@ cp ../../libs/aspell-0.60.6.1/data/*.cset $RESDIR/Aspell/data
 cp ../../libs/aspell-0.60.6.1/data/*.kbd $RESDIR/Aspell/data
 
 echo "Building AppImage..."
-$DEPLOY $APPDIR
+$DEPLOY $APPDIR $APPIMG

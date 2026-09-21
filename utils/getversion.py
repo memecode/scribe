@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 
@@ -18,4 +19,4 @@ if ver is None:
 	print("Error: no ver")
 	sys.exit(2)
 
-print(name+"-linux-"+ver)
+print(name+"-linux-v"+ver)
