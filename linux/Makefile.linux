@@ -203,9 +203,9 @@ Source =	../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			src/ScribeAccountUI.cpp \
 			src/ScribeApp.cpp \
 			src/ScribeAppAccounts.cpp \
-			src/ScribeAppUi.cpp \
-			src/ScribeAppMail.cpp \
 			src/ScribeAppEvents.cpp \
+			src/ScribeAppMail.cpp \
+			src/ScribeAppUi.cpp \
 			src/ScribeAttachment.cpp \
 			src/ScribeContact.cpp \
 			src/ScribeFilter.cpp \
@@ -524,7 +524,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Net/Uri.cpp \
 	../../lgi/trunk/src/common/Resource/LgiRes.cpp \
 	../../lgi/trunk/src/common/Resource/Res.cpp \
-	../../lgi/trunk/src/common/Skins/Gel/Gel.cpp \
+	../../lgi/trunk/src/common/Skins/plutovg/plutoVg.cpp \
 	../../lgi/trunk/src/common/Text/DocView.cpp \
 	../../lgi/trunk/src/common/Text/String.cpp \
 	../../lgi/trunk/src/common/Text/TextConvert.cpp \
