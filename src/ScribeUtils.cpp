@@ -2143,6 +2143,8 @@ bool ProtocolSettingStore::CallMethod(const char *MethodName, LScriptArguments &
 				
 			return true;
 		}
+		default:
+			break;
 	}
 	
 	return false;
