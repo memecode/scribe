@@ -169,6 +169,7 @@
 		3497D5512399D288009FCC14 /* Delete Duplicate Messages.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5492399D260009FCC14 /* Delete Duplicate Messages.script */; };
 		3497D5522399D288009FCC14 /* Mail Filters Menu.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5462399D260009FCC14 /* Mail Filters Menu.script */; };
 		3497D5542399D2AB009FCC14 /* resdefs.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5532399D2A5009FCC14 /* resdefs.h */; };
+		3499BB013068EBC500ADBE3E /* libffi.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3499BB003068EBC500ADBE3E /* libffi.tbd */; };
 		349AB0C0217B3D9500573982 /* scribe-mac-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */; };
 		34A32EAE30107AF1000939B2 /* StrToDom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A32EAD30107AF1000939B2 /* StrToDom.cpp */; };
 		34A66681237968A200ED0212 /* FolderCalendarSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34A66680237968A200ED0212 /* FolderCalendarSource.cpp */; };
@@ -528,6 +529,7 @@
 		3497D5482399D260009FCC14 /* Add Senders To Contacts.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Add Senders To Contacts.script"; path = "../../scripts/Add Senders To Contacts.script"; sourceTree = "<group>"; };
 		3497D5492399D260009FCC14 /* Delete Duplicate Messages.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Delete Duplicate Messages.script"; path = "../../scripts/Delete Duplicate Messages.script"; sourceTree = "<group>"; };
 		3497D5532399D2A5009FCC14 /* resdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resdefs.h; path = ../../resources/resdefs.h; sourceTree = "<group>"; };
+		3499BB003068EBC500ADBE3E /* libffi.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libffi.tbd; path = usr/lib/libffi.tbd; sourceTree = SDKROOT; };
 		349AB0BF217B3D9500573982 /* scribe-mac-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "scribe-mac-icon.icns"; path = "../../resources/scribe-mac-icon.icns"; sourceTree = "<group>"; };
 		34A32EAD30107AF1000939B2 /* StrToDom.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = StrToDom.cpp; path = ../src/StrToDom.cpp; sourceTree = SOURCE_ROOT; };
 		34A66680237968A200ED0212 /* FolderCalendarSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FolderCalendarSource.cpp; path = ../../src/FolderCalendarSource.cpp; sourceTree = "<group>"; };
@@ -578,6 +580,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3499BB013068EBC500ADBE3E /* libffi.tbd in Frameworks */,
 				34C819D92FE0B0A700B39646 /* LgiCocoa.framework in Frameworks */,
 				348EBFEF2E07670300BFEBE0 /* libsqlite.a in Frameworks */,
 				34F32181305AC7020073C5E7 /* libgumbo.a in Frameworks */,
@@ -1100,6 +1103,7 @@
 		34DED72923AC319E0049E01F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3499BB003068EBC500ADBE3E /* libffi.tbd */,
 				348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */,
 				34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */,
 				3477C4DF1CC27C9F0028B84B /* Btree.xcodeproj */,
