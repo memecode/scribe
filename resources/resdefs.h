@@ -180,7 +180,9 @@
 #define IDC_READ								316
 #define IDD_SUB_FOLDERS							317
 #define IDC_318									318
-#define IDC_HAS_TEMPLATES						322
+#define IDC_319									319
+#define ID_FLD_CHK_TBL							320
+#define ID_FOLDER_CAT							322
 #define IDC_INBOX								324
 #define IDC_OUTBOX								325
 #define IDM_PAGE_SETUP							326
@@ -459,6 +461,7 @@
 #define IDC_APW_USER							653
 #define IDC_COMPACT_MS							654
 #define IDD_FIND								655
+#define IDC_HAS_TEMPLATES						656
 #define IDC_TOOLBAR_TEXT						657
 #define IDS_ADD									658
 #define IDM_SAVEAS								659

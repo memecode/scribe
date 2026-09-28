@@ -184,6 +184,10 @@
 		<String Ref="316" Cid="1228" Define="IDC_STATUS" en="Status..." ko="상태..." uk="Стан..." fr="Statut..." />
 		<String Ref="317" Cid="317" Define="IDD_SUB_FOLDERS" en="Sub Folder Locations" fr="Emplacements des sous-dossier secondaires" it="Posizioni delle sottocartelle" cs="Umístění podsložek" es="Localización de SubCarpetas" de="Unterordner" nl="Mappen instellen" pt_br="Localização das sub-pastas" ru="Расположение подпапок" pt="Localização das sub-pastas" pl="Położenie podfolderu" vi="Vị trí danh mục con" zh_tw="子目錄位置" ja="サブフォルダの位置" sr="Lokacije podfoldera" no="Undermappe plassering" lt="Laiškų vieta, aplankų parinkimas" fa="محل زيرفهرست ها" da="Placering af undermapper" sv="Placering av undermappar" lg="Awaterekerwa bu Kabada" tr="Alt Klasör Konumları" hu="Almappák helye" ko="하위 폴더 위치" uk="Розташування підтек" />
 		<String Ref="318" Cid="318" Define="IDC_318" en="Default Send" />
+		<String Ref="319" Cid="319" Define="IDC_319" en="Check Folders" />
+		<String Ref="320" Cid="320" Define="ID_FLD_CHK_TBL" />
+		<String Ref="321" Cid="-1" Define="IDC_STATIC" en="Check that all the folders are categorized correctly:\nRight click to change." />
+		<String Ref="322" Cid="322" Define="ID_FOLDER_CAT" />
 		<String Ref="339" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="340" Cid="-1" Define="IDC_STATIC" en="columns" fr="colonnes" it="colonne" cs="znaků" es="columnas" de="Spalten" nl="tekens" pt_br="colunas" ru="символов" ja="列" pt="colunas" pl="kolumn" vi="cột" zh_tw="欄" sr="koloni" no="kolonner" lt="simb." fa="ستون " da="kolonner" sv="tecken" lg="emiwatwa" tr="kolonlar" hu="oszlopok" ko="행" uk="символів" />
 		<String Ref="341" Cid="-1" Define="IDC_STATIC" en="Default HTML Font:" pl="Domyślna czcionka HTML:" cs="Výchozí HTML Font:" no="Standard HTML skrifttype:" nl="Standaard HTML lettertype:" lt="Numatytasis HTML šriftas" pt="Fonte p/ HTML" fa="HTMLقلم پيشفرض براي " de="Standard HTML Schriftart:" sr="Podrazumevani HTML font:" da="Standard HTML skrifttype:" vi="Kiểu chữ HTML mặc định:" sv="Standard HTML-teckensnitt:" es="Fuente HTML por defecto:" pt_br="Fonte padrão para HTML:" lg="Omukono gw&apos;emiko ogw&apos;enkalakalira:" tr="Varsayılan HTML Yazı Tipi:" hu="Alapértelmezett HTML-betűtípus:" ru="Шрифт HTML по умолчанию:" ko="HTML 폰트 초기화:" uk="Шрифт HTML за замовчуванням:" fr="Police par défaut HTML:" />
@@ -960,7 +964,7 @@
 		<String Ref="1673" Cid="1198" Define="IDC_HAS_GROUPS" en="Contact Groups:" nl="Adressen van groepen:" pl="Grupy kontaktów:" de="Kontaktgruppen:" fa="گروه هاي دوستان" sr="Grupe kontakata:" lt="Adresatų grupės:" cs="Skupiny kontaktů:" da="Kontaktgrupper:" vi="Nhóm liên hệ:" sv="Kontaktgrupper:" es="Grupos de Contacto:" pt_br="Grupo de Contatos:" lg="Ebikoosi:" tr="İrtibat Grubu (groups):" hu="Kapcsolat csoportok:" ru="Группы контактов" ko="연락처 그룹:" uk="Групи контактів:" fr="Groupes de contacts:" />
 		<String Ref="1675" Cid="702" Define="IDC_GROUPS_FLD" lt="Filtrai" />
 		<String Ref="1677" Cid="703" Define="IDC_SET_GROUPS" en="..." />
-		<String Ref="1679" Cid="322" Define="IDC_HAS_TEMPLATES" en="Templates:" fr="Modèles:" it="Bozze:" cs="Šablony:" es="Plantillas:" de="Vorlagen:" nl="Sjablonen:" pt_br="Modelos:" pt="Modelos:" pl="Szablony:" vi="Mẫu:" zh_tw="範本:" ja="テンプレート:" sr="Šabloni:" no="Maler:" lt="Šablonai:" fa="الگو ها" da="Forskrift:" sv="Mallar:" lg="Obutiba:" tr="Taslak (templates):" hu="Sablon:" ru="Шаблоны:" ko="템플릿:" uk="Шаблони:" />
+		<String Ref="1679" Cid="656" Define="IDC_HAS_TEMPLATES" en="Templates:" fr="Modèles:" it="Bozze:" cs="Šablony:" es="Plantillas:" de="Vorlagen:" nl="Sjablonen:" pt_br="Modelos:" pt="Modelos:" pl="Szablony:" vi="Mẫu:" zh_tw="範本:" ja="テンプレート:" sr="Šabloni:" no="Maler:" lt="Šablonai:" fa="الگو ها" da="Forskrift:" sv="Mallar:" lg="Obutiba:" tr="Taslak (templates):" hu="Sablon:" ru="Шаблоны:" ko="템플릿:" uk="Шаблони:" />
 		<String Ref="1681" Cid="1084" Define="IDC_TEMPLATES" pt="Modelos" />
 		<String Ref="1683" Cid="350" Define="IDC_SET_TEMPLATES" en="..." />
 		<String Ref="1685" Cid="1010" Define="IDC_HAS_CAL_EVENTS" en="Calender Events:" fr="Evènements calendrier" cs="Události kalendáře:" de="Kalender-Ereignisse:" nl="Agendapunten:" es="Eventos de la Agenda:" pt_br="Eventos do calendário:" pt="Calendário:" pl="Wydarzenia w kalendarzu:" it="Eventi agenda:" vi="Sự kiện:" zh_tw="月曆事件:" ja="予定表:" sr="Događaji kalendara:" no="Kalender hendelser:" lt="Žymos kalendoriuje:" fa="پيشامدهاي تقويم" da="Kalender hændelser:" sv="Kalenderaktiviteter:" lg="Ebinakolebwa ku Kalenda:" tr="Takvim İçeriği (calender):" hu="Napirend események:" ru="События:" ko="달력 일정:" uk="Календар подій:" />
@@ -1972,7 +1976,7 @@
 		<TableLayout pos="7,7,496,433" ref="439" cols="1.000" rows="0.865,0.135">
 			<tr>
 				<td addr="0,0">
-					<TabView pos="0,0,454,342" ref="163">
+					<TabView pos="7,7,461,349" ref="163">
 						<Tab ref="345">
 							<TableLayout pos="14,28,440,328" ref="522" cols="0.842,0.158" rows="0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077,0.077">
 								<tr>
@@ -2045,6 +2049,20 @@
 								<tr>
 									<td addr="0,12" colspan="2">
 										<CheckBox pos="7,264,356,277" ref="952" />
+									</td>
+								</tr>
+							</TableLayout>
+						</Tab>
+						<Tab ref="319">
+							<TableLayout pos="14,28,447,335" ref="320" cols="1.000" rows="0.225,0.775">
+								<tr>
+									<td addr="0,0">
+										<StaticText pos="14,14,363,34" ref="321" />
+									</td>
+								</tr>
+								<tr>
+									<td addr="0,1">
+										<TreeView pos="14,77,398,286" ref="322" />
 									</td>
 								</tr>
 							</TableLayout>
@@ -4713,23 +4731,9 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4738,9 +4742,23 @@
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 						<Control Ref="1380" ControlType="enum" ControlTag="HtmlViewCtrl" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
 					</Control>
 				</ControlTree>
 			</Tab>

@@ -5210,10 +5210,10 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 
 	if (GetOptions()->GetValue(KeyName, FolderName))
 	{
-		if (ValidStr(FolderName.Str()) &&
-			strlen(FolderName.Str()) > 0)
+		auto paths = LString(FolderName.Str()).SplitDelimit("\n");
+		if (paths.Length() > 0)
 		{
-			if (auto c = GetFolder(FolderName.Str(), Store))
+			if (auto c = GetFolder(paths[0], Store))
 			{
 				return c;
 			}
@@ -5257,7 +5257,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool ScribeWnd::OnMailStore(LMailStore **MailStore, bool Add)
