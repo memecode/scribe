@@ -968,7 +968,10 @@ void ScribeWnd::Send(ssize_t Which, bool Quiet)
 	{
 		LVariant v;
 		if (GetOptions()->GetValue(OPT_DefaultSendAccount, v))
-			Which = v.CastInt32();
+		{
+			if (auto account = GetAccountById(v.CastInt64()))
+				Which = account->GetIndex();
+		}
 	}
 
 	LArray<ScribeFolder*> Outboxes;

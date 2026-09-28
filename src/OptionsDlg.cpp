@@ -27,6 +27,7 @@
 #include "lgi/common/EventTargetThread.h"
 #include "lgi/common/TextView3.h"
 #include "lgi/common/FileSelect.h"
+#include "lgi/common/ListItemRadioBtn.h"
 
 #include "Scribe.h"
 #include "ScribePrivate.h"
@@ -79,20 +80,32 @@ class AccountItem : public LListItem
 public:
 	ScribeAccount *Account = nullptr;
 	LListItemCheckBox *Disable = nullptr;
+	LListItemRadioBtn *DefSend = nullptr;
 
 	AccountItem(OptionsDlg *d, ScribeAccount *a)
 	{
 		Dlg = d;
 		Account = a;
 		Account->Views.Add(this);
-		Disable = 0;
 		Disable = new LListItemCheckBox(this, 3, a->Send.Disabled() > 0);
+		SetupDefSend();
 	}
 
 	~AccountItem()
 	{
 		LAssert(Account->Views.HasItem(this));
 		Account->Views.Delete(this);
+	}
+	
+	void SetupDefSend()
+	{
+		DeleteObj(DefSend);
+		if (Disable->Value() == 0 &&
+			Account->Send.IsConfigured())
+			DefSend = new LListItemRadioBtn(this, 4, LListItemRadioBtn::ListExclusive);
+		Update();
+		if (GetList())
+			GetList()->SendNotify(LNotifyItemChange);
 	}
 
 	ScribeAccount *GetAccount()
@@ -113,7 +126,9 @@ public:
 					Account->InitUI(Parent, 0, [this](auto status)
 					{
 						if (status)
-							Update();
+						{
+							SetupDefSend();
+						}
 					});
 				}
 			});
@@ -126,7 +141,9 @@ public:
 	{
 		if (Disable && Col == 3)
 		{
+			printf("%s:%i - OnColumnNotify %i, %i\n", __FILE__, __LINE__, Col, (int)Data);
 			Dlg->OnAccountEnable(Account, !Data);
+			SetupDefSend();
 		}
 		LListItem::OnColumnNotify(Col, Data);
 	}
@@ -255,6 +272,26 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 				return a->Compare(b);
 			});
 
+		LVariant DefaultSendUid;
+		if (App->GetOptions()->GetValue(OPT_DefaultSendAccount, DefaultSendUid))
+		{
+			int64 uid = DefaultSendUid.CastInt64();
+			LArray<AccountItem*> all;
+			AccountLst->GetAll(all);
+			for (auto item: all)
+			{
+				if (item->DefSend &&
+					item->Disable &&
+					!item->Disable->Value() &&
+					item->Account->Receive.Id() == uid)
+				{
+					item->DefSend->Value(true);
+					break;
+				}
+			}
+		}
+		UpdateDefaultSendAccounts();
+
 		LArray<AccountItem*> all;
 		AccountLst->GetAll(all);
 		for (int i=0; i<all.Length(); i++)
@@ -273,7 +310,6 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 	Map(OPT_UserName, IDC_NAME, GV_STRING);
 
 	// Accounts tab
-	Map(OPT_DefaultSendAccount, IDC_DEF_SEND, GV_INT32);
 	Map(OPT_ExtraHeaders, IDC_EXTRA_HEADERS, GV_STRING);
 	Map(OPT_HideId, IDC_HIDE_ID, GV_BOOL);
 
@@ -550,42 +586,31 @@ OptionsDlg::~OptionsDlg()
 
 void OptionsDlg::UpdateDefaultSendAccounts()
 {
-	LCombo *c;
-	if (GetViewById(IDC_DEF_SEND, c))
+	LList *AccountLst;
+	if (!GetViewById(IDC_ACCOUNTS, AccountLst))
+		return;
+
+	LArray<AccountItem*> Items;
+	AccountLst->GetAll(Items);
+
+	for (auto item: Items)
 	{
-		bool ResetDefault = false;
-		int64 CurIdx = c->Value();
-		while (c->Delete((size_t)0));
-		int FirstValid = -1;
+		if (item->DefSend &&
+			item->Disable &&
+			!item->Disable->Value() &&
+			item->DefSend->Value())
+			return;
+	}
 
-		int i = 0;
-		for (auto a: *App->GetAccounts())
+	for (auto item: Items)
+	{
+		if (item->DefSend &&
+			item->Disable &&
+			!item->Disable->Value())
 		{
-			LVariant Server = a->Send.Server();
-			int Disabled = a->Send.Disabled();
-			if (Server.Str() && !Disabled)
-			{
-				LVariant v = a->Send.Name();
-				c->Insert(v.Str());
-				if (FirstValid < 0)
-					FirstValid = i;
-			}
-			else
-			{
-				c->Insert("----");
-				if (i == CurIdx)
-					ResetDefault = true;
-			}
-			i++;
+			item->DefSend->Value(true);
+			return;
 		}
-
-		if (ResetDefault)
-		{
-			if (FirstValid >= 0)
-				c->Value(FirstValid);
-		}
-		else
-			c->Value(CurIdx);
 	}
 }
 
@@ -887,6 +912,11 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 					ReindexAccounts();
 					break;
 				}
+				case LNotifyItemChange:
+				{
+					UpdateDefaultSendAccounts();
+					break;
+				}
 			}
 			break;
 		}
@@ -1057,10 +1087,24 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 			{
 				List<AccountItem> a;
 				ACtrl->GetAll(a);
+				int64 DefaultSendUid = -1;
 				for (auto ai: a)
 				{
 					ai->Account->Send.Disabled(ai->Disable->Value() != 0);
+					if (ai->DefSend &&
+						ai->Disable &&
+						!ai->Disable->Value() &&
+						ai->DefSend->Value())
+						DefaultSendUid = ai->Account->Receive.Id();
 				}
+
+				if (DefaultSendUid >= 0)
+				{
+					LVariant value = DefaultSendUid;
+					Opts->SetValue(OPT_DefaultSendAccount, value);
+				}
+				else
+					Opts->DeleteValue(OPT_DefaultSendAccount);
 			}
 
 			LVariant Cur[2], New[2], v;

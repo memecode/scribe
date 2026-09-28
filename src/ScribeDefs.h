@@ -138,7 +138,7 @@
 #define OPT_DefCodePage				"DefCodePage"		//(int)
 #define OPT_ConfirmDelete			"ConfirmDel"		//(bool)
 #define OPT_DelDirection			"DelDirection"		//(ScribeDeleteAction)
-#define OPT_DefaultSendAccount		"DefSend"			//(int)
+#define OPT_DefaultSendAccount		"DefSend"			//(int)UID of the default sending account
 #define OPT_NewMailNotify			"NewMailNotify"		//(bool)
 #define OPT_CurrentIdentity			"CurId"				//(int)	
 #define OPT_DefaultAlternative		"DefAlt"			//(int) 0=text/plain, 1=text/html

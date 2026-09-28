@@ -183,6 +183,7 @@
 		<String Ref="286" Cid="-1" Define="IDC_STATIC" en="Source Files:" pl="Pliki źródłowe:" cs="Zdrojové soubory:" no="Kildefiler" pt="Importar de:" lt="Importuoti iš:" fa="فايل هاي مبدأ:" nl="Bronbestanden:" de="Quell-Dateien:" sr="Izvorna omotnica:" da="Kildefiler" vi="Tập tin nguồn:" sv="Källfiler:" es="Carpeta de Origen:" pt_br="Arquivos de Origem:" lg="Failo omunasowolwa" tr="Kaynak Dosyalar:" hu="Forrás fájl:" ru="Исходные файлы:" ko="소스 파일:" uk="Вихідні файли:" fr="Fichiers source:" />
 		<String Ref="316" Cid="1228" Define="IDC_STATUS" en="Status..." ko="상태..." uk="Стан..." fr="Statut..." />
 		<String Ref="317" Cid="317" Define="IDD_SUB_FOLDERS" en="Sub Folder Locations" fr="Emplacements des sous-dossier secondaires" it="Posizioni delle sottocartelle" cs="Umístění podsložek" es="Localización de SubCarpetas" de="Unterordner" nl="Mappen instellen" pt_br="Localização das sub-pastas" ru="Расположение подпапок" pt="Localização das sub-pastas" pl="Położenie podfolderu" vi="Vị trí danh mục con" zh_tw="子目錄位置" ja="サブフォルダの位置" sr="Lokacije podfoldera" no="Undermappe plassering" lt="Laiškų vieta, aplankų parinkimas" fa="محل زيرفهرست ها" da="Placering af undermapper" sv="Placering av undermappar" lg="Awaterekerwa bu Kabada" tr="Alt Klasör Konumları" hu="Almappák helye" ko="하위 폴더 위치" uk="Розташування підтек" />
+		<String Ref="318" Cid="318" Define="IDC_318" en="Default Send" />
 		<String Ref="339" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="340" Cid="-1" Define="IDC_STATIC" en="columns" fr="colonnes" it="colonne" cs="znaků" es="columnas" de="Spalten" nl="tekens" pt_br="colunas" ru="символов" ja="列" pt="colunas" pl="kolumn" vi="cột" zh_tw="欄" sr="koloni" no="kolonner" lt="simb." fa="ستون " da="kolonner" sv="tecken" lg="emiwatwa" tr="kolonlar" hu="oszlopok" ko="행" uk="символів" />
 		<String Ref="341" Cid="-1" Define="IDC_STATIC" en="Default HTML Font:" pl="Domyślna czcionka HTML:" cs="Výchozí HTML Font:" no="Standard HTML skrifttype:" nl="Standaard HTML lettertype:" lt="Numatytasis HTML šriftas" pt="Fonte p/ HTML" fa="HTMLقلم پيشفرض براي " de="Standard HTML Schriftart:" sr="Podrazumevani HTML font:" da="Standard HTML skrifttype:" vi="Kiểu chữ HTML mặc định:" sv="Standard HTML-teckensnitt:" es="Fuente HTML por defecto:" pt_br="Fonte padrão para HTML:" lg="Omukono gw&apos;emiko ogw&apos;enkalakalira:" tr="Varsayılan HTML Yazı Tipi:" hu="Alapértelmezett HTML-betűtípus:" ru="Шрифт HTML по умолчанию:" ko="HTML 폰트 초기화:" uk="Шрифт HTML за замовчуванням:" fr="Police par défaut HTML:" />
@@ -261,7 +262,6 @@
 		<String Ref="472" Cid="487" Define="IDC_FOLDER_HISTORY" />
 		<String Ref="473" Cid="-1" Define="IDC_STATIC" en="&Name:" fr="Nom:" it="Nome:" cs="Jméno:" es="Nombre:" nl="Naam:" pt_br="Nome:" ru="Имя:" pt="Nome:" pl="Nazwa:" vi="Tên:" zh_tw="名稱:" ja="名前:" sr="Ime:" no="Navn:" lt="Vardas:" fa="نام" da="Navn:" sv="Namn:" lg="Erinnya:" tr="İsim:" hu="Név:" ko="이름:" uk="Ім`я" />
 		<String Ref="474" Cid="1" Define="IDOK" en="Ok" vi="Đồng ý" sr="U redu" lt="Gerai" fa="خيلي خوب" es="Aceptar" lg="Yee" tr="Tamam" hu="OK" ru="Да" ko="확인" uk="Так" />
-		<String Ref="475" Cid="1119" Define="IDC_DEF_SEND_TXT" en="Default send account:" fr="Compte d&apos;envoi par defaut" cs="Výchozí účet odesílání:" nl="Standaard verzender" es="Cuenta de envío por defecto:" pt_br="Conta padrão para envio:" ru="Запись по умолчанию:" ja="ディフォルトは\n記述を送る:" pt="Conta de envio\npor defeito" pl="Domyślne dla wysyłki:" it="Account di default:" vi="Gửi thư mặc định bằng:" zh_tw="預設接收 帳號" sr="Podrazumevaninalog za slanje" no="Standard send konto:" lt="Numatytoji paskyra:" fa="حساب اصلي براي فرستادن" de="Standard Sende-\nE-Mail-Konto:" da="Standard send konto:" sv="Standard avsändar-\nkonto:" lg="Akawunta esindikirwako\ney&apos;enkalakalira" tr="Varsayılan gönderim hesabı:" hu="Alapértelmezett küldő fiók:" ko="기본 전송 계정:" uk="Встановити за замовчуванням :" />
 		<String Ref="476" Cid="477" Define="IDC_ACCOUNT_NAME" />
 		<String Ref="477" Cid="903" Define="IDC_SEND_TABLE" />
 		<String Ref="480" Cid="845" Define="IDC_SEND_AUTH_TYPE" />
@@ -572,7 +572,6 @@
 		<String Ref="956" Cid="934" Define="IDS_934" en="Whitelist" pt="excepções" pl="Biała lista" zh_tw="通過安全檢查者的名單" ja="ホワイトリスト" nl="Witlijst" sr="Bela lista" es="Lista Blanca" cs="Bílá listina (povolené výjimky)" no="Hviteliste" lt="Patikimųjų siuntėjų sąrašas (Whitelist)" fa="ليست سفيد" de="Weiße Liste" da="Hvidliste" vi="Danh sách tin cậy" sv="Vitlista" pt_br="Lista Branca" lg="Olukalala olweru" tr="Hariç Tutulanlar" hu="WhiteList" ru="Белый список" ko="화이트리스트" uk="Білий список" fr="Liste blanche" />
 		<String Ref="957" Cid="905" Define="IDC_TEMPLATE" />
 		<String Ref="960" Cid="764" Define="IDC_HIDE_ID" Tag="!xgate" en="Don&apos;t send platform information in X-Mailer header." no="Ikke send plattform-informasjon i X-Mailer epost-hode." lt="Nesiųsti laiško antraštėse informacijos apie jūsų operacinę sistemą" nl="Geen informatie over het systeem meezenden in de koptekst van bericht." pt="Outros cabeçalhos a anexar às mensagens:" cs="Nezasílat informace o platformě v hlavičce X-Mailer" pl="W nagłówku X-Mailer nie wysyłaj wiadomości o platformie." de="Keine Plattforminformationen in X-Mailer Header mitschicken." sr="Nemoj da šalješ informacije o platformi u X-Mail zaglavlju." da="Ikke send plattform-information i X-Mailer epost-hoved." fa="ارسال نکن X-Mailer اطلاعات سيستم عامل را در سرخط" vi="Không gửi thông tin hệ thống trong phần đầu X-Mail" sv="Sänd inte information om plattform i X-Mailer-rubrik." es="No enviar información del sistema en cabecera X-Mailer" pt_br="Não enviar informações sobre o sistema no cabeçalho X-Mailer." lg="Emitwe egigatwa ku bubaka obufuluma:" tr="Başlık (header) alanında platform bilgisini gönderme" hu="Ne küldj platform információt az X-Mailer fejlécben." ru="Не указывать платформу в заголовке X-Mailer." ko="X-Mailer 헤더에서 플랫폼 정보 보내지 않음." uk="Не відправляти відомості про платформу в заголовку X-Mailer." fr="N&apos;envoyez pas d&apos;informations sur la plate-forme dans l&apos;en-tête X-Mailer." />
-		<String Ref="961" Cid="656" Define="IDC_DEF_SEND" />
 		<String Ref="964" Cid="1076" Define="IDC_SOCKS5_USER" />
 		<String Ref="965" Cid="831" Define="IDC_PREVIEW_SECONDS" />
 		<String Ref="969" Cid="969" Define="IDC_969" />
@@ -4308,8 +4307,8 @@
 			</tr>
 		</TableLayout>
 	</Dialog>
-	<Dialog pos="7,7,478,621" ref="787">
-		<TabView pos="7,7,461,531" ref="788">
+	<Dialog pos="7,7,529,621" ref="787">
+		<TabView pos="7,7,510,531" ref="788">
 			<Tab ref="789">
 				<TableLayout pos="14,28,412,97" ref="889" cols="0.500,0.500" rows="1.000">
 					<tr>
@@ -4323,58 +4322,49 @@
 				</TableLayout>
 			</Tab>
 			<Tab ref="791">
-				<TableLayout pos="7,28,440,510" ref="1150" cols="0.709,0.291" rows="0.099,0.108,0.131,0.124,0.116,0.124,0.099,0.099,0.099">
+				<TableLayout pos="7,28,496,510" ref="1150" cols="0.778,0.222" rows="0.130,0.142,0.173,0.163,0.130,0.130,0.130">
 					<tr>
-						<td addr="0,0" rowspan="6">
-							<ListView pos="7,7,272,314" ref="165">
-								<Column ref="1151" width="94" />
-								<Column ref="1165" width="50" />
-								<Column ref="1168" width="55" />
-								<Column ref="1169" width="50" />
+						<td addr="0,0" rowspan="4">
+							<ListView pos="14,7,328,265" ref="165">
+								<Column ref="1151" width="69" />
+								<Column ref="1165" width="43" />
+								<Column ref="1168" width="61" />
+								<Column ref="1169" width="56" />
+								<Column ref="318" width="50" />
 							</ListView>
 						</td>
 						<td addr="1,0">
-							<Button Pos="299,0,382,24" toggle="0" ref="1154" />
+							<Button Pos="372,0,455,24" toggle="0" ref="1154" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="1,1">
-							<Button Pos="299,46,375,70" toggle="0" ref="166" />
+							<Button Pos="372,61,448,85" toggle="0" ref="166" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="1,2">
-							<Button Pos="299,96,375,119" toggle="0" ref="470" />
+							<Button Pos="372,128,448,151" toggle="0" ref="470" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="1,3">
-							<StaticText pos="299,155,403,174" ref="475" />
+							<StaticText pos="374,221,464,241" ref="1611" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="1,4">
-							<ComboBox pos="299,218,368,245" ref="961" />
+						<td addr="0,4" colspan="2">
+							<StaticText pos="14,294,306,316" ref="146" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="1,5">
-							<StaticText pos="308,281,398,301" ref="1611" />
+						<td addr="0,5" colspan="2">
+							<EditBox Pos="7,358,167,378" MultiLine="1" ref="877" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,6" colspan="2">
-							<StaticText pos="14,336,306,358" ref="146" />
-						</td>
-					</tr>
-					<tr>
-						<td addr="0,7" colspan="2">
-							<EditBox Pos="7,385,167,405" MultiLine="1" ref="877" />
-						</td>
-					</tr>
-					<tr>
-						<td addr="0,8" colspan="2">
-							<CheckBox pos="7,427,279,440" ref="960" />
+							<CheckBox pos="7,415,279,428" ref="960" />
 						</td>
 					</tr>
 				</TableLayout>
@@ -4723,9 +4713,23 @@
 						<Control Ref="1372" ControlType="null" ControlTag="SpellCheckDict" />
 						<Control Ref="1618" ControlType="bool" ControlTag="PrefAspell" />
 					</Control>
-					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
-						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
-						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
+					<Control Ref="1338" ControlType="" ControlTag="">
+						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
+						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
+						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
+						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
+						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					</Control>
+					<Control Ref="150" ControlType="" ControlTag="">
+						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
+					</Control>
+					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
+						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
+						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
+						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
+					</Control>
+					<Control Ref="1485" ControlType="" ControlTag="">
+						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
 					</Control>
 					<Control Ref="733" ControlType="" ControlTag="">
 						<Control Ref="1333" ControlType="bool" ControlTag="RelativeDates" />
@@ -4734,38 +4738,24 @@
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
 						<Control Ref="1380" ControlType="enum" ControlTag="HtmlViewCtrl" />
 					</Control>
-					<Control Ref="1485" ControlType="" ControlTag="">
-						<Control Ref="1486" ControlType="bool" ControlTag="GrowlEnabled" />
-					</Control>
-					<Control Ref="1277" ControlType="bool" ControlTag="ResizeImgAttach">
-						<Control Ref="1357" ControlType="int" ControlTag="ResizeJpegQual" />
-						<Control Ref="1522" ControlType="int" ControlTag="ResizeMaxPx" />
-						<Control Ref="1524" ControlType="int" ControlTag="ResizeMaxSize" />
-					</Control>
-					<Control Ref="150" ControlType="" ControlTag="">
-						<Control Ref="419" ControlType="bool" ControlTag="HideGnuPG" />
-					</Control>
-					<Control Ref="1338" ControlType="" ControlTag="">
-						<Control Ref="1339" ControlType="enum" ControlTag="LogFmt" />
-						<Control Ref="1340" ControlType="file" ControlTag="LogFile" />
-						<Control Ref="1341" ControlType="bool" ControlTag="DbgTrc" />
-						<Control Ref="1528" ControlType="bool" ControlTag="DebugSSL" />
-						<Control Ref="1609" ControlType="bool" ControlTag="ScriptDebugger" />
+					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
+						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />
+						<Control Ref="946" ControlType="bool" ControlTag="SoftwareUpdateIncBeta" />
 					</Control>
 				</ControlTree>
 			</Tab>
 		</TabView>
-		<TableLayout pos="7,539,461,587" ref="518" cols="0.250,0.250,0.250,0.250" rows="1.000">
+		<TableLayout pos="7,539,510,587" ref="518" cols="0.250,0.250,0.250,0.250" rows="1.000">
 			<tr>
 				<td addr="0,0">
 					<Button Pos="0,0,62,20" toggle="0" ref="1484" />
 				</td>
 				<td addr="1,0" style="width: auto;" />
 				<td addr="2,0">
-					<Button Pos="220,0,296,20" toggle="0" ref="533" />
+					<Button Pos="246,0,322,20" toggle="0" ref="533" />
 				</td>
 				<td addr="3,0">
-					<Button Pos="330,0,406,20" toggle="0" ref="971" />
+					<Button Pos="369,0,445,20" toggle="0" ref="971" />
 				</td>
 			</tr>
 		</TableLayout>

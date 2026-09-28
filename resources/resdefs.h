@@ -179,6 +179,7 @@
 #define IDM_FAQ									293
 #define IDC_READ								316
 #define IDD_SUB_FOLDERS							317
+#define IDC_318									318
 #define IDC_HAS_TEMPLATES						322
 #define IDC_INBOX								324
 #define IDC_OUTBOX								325
@@ -458,7 +459,6 @@
 #define IDC_APW_USER							653
 #define IDC_COMPACT_MS							654
 #define IDD_FIND								655
-#define IDC_DEF_SEND							656
 #define IDC_TOOLBAR_TEXT						657
 #define IDS_ADD									658
 #define IDM_SAVEAS								659
@@ -920,7 +920,6 @@
 #define IDC_PROPERTIES							1116
 #define IDD_OUTLOOK_ADD_FLD						1117
 #define IDS_ASK_FOLDER_PASS						1118
-#define IDC_DEF_SEND_TXT						1119
 #define IDS_ERROR_SCRIPT_COMPILE				1120
 #define IDS_ANY									1121
 #define IDS_ERROR_NOTHING_TO_UPGRADE			1122

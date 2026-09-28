@@ -5720,18 +5720,20 @@ ThingFilter *ScribeWnd::GetThingFilter()
 ScribeAccount *ScribeWnd::GetSendAccount()
 {
 	THREAD_UNSAFE(NULL);
-	LVariant DefSendAcc = 0;
+	LVariant DefSendAcc;
 
-	if (!GetOptions()->GetValue(OPT_DefaultSendAccount, DefSendAcc))
+	if (GetOptions()->GetValue(OPT_DefaultSendAccount, DefSendAcc))
 	{
-		for (auto a : Accounts)
-			if (a->Send.Server().Str())
-				return a;
+		if (auto account = GetAccountById(DefSendAcc.CastInt64()))
+		{
+			if (account->Send.Server().Str())
+				return account;
+		}
 	}
 
-	ScribeAccount *i = Accounts.ItemAt(DefSendAcc.CastInt32());
-	if (i && i->Send.Server().Str())
-		return i;
+	for (auto account: Accounts)
+		if (account->Send.Server().Str())
+			return account;
 
 	return NULL;
 }

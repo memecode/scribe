@@ -924,7 +924,7 @@ bool SendAccountlet::InitMenus()
 			LVariant Default;
 			const char *ShortCut = nullptr;
 			GetApp()->GetOptions()->GetValue(OPT_DefaultSendAccount, Default);
-			if (Default.CastInt32() == Account->GetIndex())
+			if (Default.CastInt64() == Account->Receive.Id())
 			{
 				ShortCut = "Ctrl+S";
 			}
