@@ -121,10 +121,10 @@ void ScribeWnd::OnCommandLineEvent(CmdLineEvent event)
 		
 		if (d->CmdLineEvents == AllFlags)
 		{
-			LgiTrace("%s:%i - OnCommandLineEvent(%s) has all flags: calling OnCommandLine.\n", _FL, toString(event));
+			// LgiTrace("%s:%i - OnCommandLineEvent(%s) has all flags: calling OnCommandLine.\n", _FL, toString(event));
 			OnCommandLine();
 		}
-		else LgiTrace("%s:%i - OnCommandLineEvent(%s) hasn't got all flags yet.\n", _FL, toString(event));
+		// else LgiTrace("%s:%i - OnCommandLineEvent(%s) hasn't got all flags yet.\n", _FL, toString(event));
 	}
 	else LgiTrace("%s:%i - OnCommandLineEvent(%s): flag %x already set?\n", _FL, toString(event), flag);
 }

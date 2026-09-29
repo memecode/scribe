@@ -3327,7 +3327,7 @@ bool ScribeWnd::LoadOptions()
 					&d->MulPassword,
 					[this](auto status)
 					{
-						LgiTrace("%s:%i - Ipc.OnLoad=%i\n", _FL, status);
+						// LgiTrace("%s:%i - Ipc.OnLoad=%i\n", _FL, status);
 						if (status)
 						{
 							Visible(true);
