@@ -26,7 +26,6 @@ class BayesianFilter
 
 protected:
 	void BuildStats();
-	void CheckFolders();
     
 public:
     BayesianFilter(ScribeWnd *app);

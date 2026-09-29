@@ -1276,26 +1276,6 @@ void BayesianFilter::BuildStats()
 	inbox->LoadThings();
 }
 
-void BayesianFilter::CheckFolders()
-{
-	LgiTrace("CheckFolders:\n");
-
-	auto check = [&](auto& self, auto *f) -> void
-	{
-		for (auto c = f->GetChildFolder(); c; c = c->GetNextFolder())
-		{
-			auto path = c->GetPath();
-			auto type = BayesTypeFromPath(path);
-			LgiTrace("\t%s: %s\n", ToString(type), path.Get());
-			
-			self(self, c);
-		}
-	};
-	
-	for (auto root: RootFolders())
-		check(check, root);
-}
-
 LArray<ScribeFolder*> BayesianFilter::RootFolders()
 {
 	LArray<ScribeFolder*> a;

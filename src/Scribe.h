@@ -2355,6 +2355,7 @@ protected:
 	const char*		DomToStr(ScribeDomType p) { return ::DomToStr(p); }
 	void			LoadImageResources();
 	void			DoOnTimer(LScriptCallback *c);
+	void BayesDlgHandler(bool accepted);
 
 	enum CmdLineEvent
 	{

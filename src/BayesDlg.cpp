@@ -279,7 +279,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////
-BayesDlg::BayesDlg(ScribeWnd *app) // : TabDialog(IDC_TABS, IDC_LAUNCH_HELP)
+BayesDlg::BayesDlg(ScribeWnd *app, int tab) // : TabDialog(IDC_TABS, IDC_LAUNCH_HELP)
 {
 	d = new BayesDlgPrivate;
 	d->App = app;
@@ -306,6 +306,7 @@ BayesDlg::BayesDlg(ScribeWnd *app) // : TabDialog(IDC_TABS, IDC_LAUNCH_HELP)
 	{
 		MoveToCenter();
 		Convert(app->GetOptions(), this, true);
+		SetCtrlValue(IDC_TABS, tab);
 
 		int Spam = (int) GetCtrlValue(IDC_SPAM);
 		int FalseNeg = (int) GetCtrlValue(IDC_FALSE_NEG);

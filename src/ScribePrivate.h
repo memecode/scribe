@@ -724,7 +724,7 @@ class BayesDlg : public LDialog, public LXmlTreeUi
 	class BayesDlgPrivate *d;
 	
 public:
-	BayesDlg(ScribeWnd *app);
+	BayesDlg(ScribeWnd *app, int tab = 0);
 	~BayesDlg();
 
 	int OnNotify(LViewI *c, const LNotification &n) override;
