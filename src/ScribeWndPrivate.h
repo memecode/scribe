@@ -89,6 +89,7 @@ public:
 	int				LastLayout = 0;
 	LMenuItem		*DisableUserFilters = NULL;
 	LAutoPtr<LOptionsFile> Options;
+	bool			OptionsLoaded = false;
 	HttpImageThread	*ImageLoader = NULL;
 	int				LastMinute = -1, LastHour = -1;
 	LArray<LDataEventsI*> Store3EventCallbacks;

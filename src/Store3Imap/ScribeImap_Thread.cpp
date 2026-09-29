@@ -207,7 +207,7 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 		}
 	}
 
-	using TStrMap = LHashTbl<ConstStrKey<char,false>,bool>;
+	using TStrMap = LHashTbl<ConstStrKey<char,true>,bool>;
 	
 	void CollectSubFolders(TStrMap &t, const char *Path)
 	{

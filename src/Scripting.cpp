@@ -1005,7 +1005,6 @@ LScriptConsole::LScriptConsole(ScribeWnd *app, ConsoleClosingCallback callback, 
 
 LScriptConsole::~LScriptConsole()
 {
-	printf("%p::~LScriptConsole() %p\n", this, Callback);
 	if (Callback)
 		Callback(this, CallbackData);
 }

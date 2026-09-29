@@ -804,7 +804,8 @@ void ScribeWnd::Construct1()
 		ScribeState = ScribeExiting;
 		return;
 	}
-	LoadOptions();
+	if (!d->OptionsLoaded)
+		LoadOptions();
 	ScribeOptionsDefaults(d->Options);
 
 	#ifdef LINUX
@@ -1386,7 +1387,7 @@ void ScribeWnd::LoadImageResources()
 		auto dpi = GetDpiScale();
 		auto idealPx = dpi.x < 1.5f ? 16 : 32;
 
-		LgiTrace("%s:%i - Loading resource folder '%s'\n", _FL, p.Get());
+		// LgiTrace("%s:%i - Loading resource folder '%s'\n", _FL, p.Get());
 		for (auto b = Dir.First(p); b; b = Dir.Next())
 		{
 			if (Dir.IsDir())
@@ -3359,6 +3360,7 @@ bool ScribeWnd::LoadOptions()
 		Load = Opts->SerializeFile(false);
 		if (Load)
 		{
+			d->OptionsLoaded = true;
 			LVariant v = d->GetInstallMode() == LOptionsFile::PortableMode;
 			GetOptions()->SetValue(OPT_IsPortableInstall, v);
 			LgiTrace("LoadOptions(%s)\n", d->Options->GetFile());
