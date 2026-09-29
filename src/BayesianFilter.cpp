@@ -1695,16 +1695,34 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 		return BayesMailUnknown;
 
 	LString::Array spamPaths;
+	spamPaths.SetFixedLength(false, false);
 	LVariant v;
 	if (App->GetOptions()->GetValue(OPT_SpamFolder, v))
-		spamPaths += LString(v.Str()).SplitDelimit("\n");
+	{
+		auto a = LString(v.Str()).SplitDelimit("\n");
+		spamPaths += a;
+	}
 	for (auto a: *App->GetAccounts())
 	{
+		auto root = a->Receive.GetRootFolder();
+		auto rootPath = root ? root->GetPath() : LString();
+
 		auto opt = a->Receive.OptionName(OPT_ReceiveSubFolders);
 		if (auto tag = App->GetOptions()->LockTag(opt, _FL))
 		{
 			if (auto value = tag->GetAttr(OPT_SpamFolder))
-				spamPaths += LString(value).SplitDelimit("\n");
+			{
+				// These are all relative to the root folder of the IMAP account..
+				auto subFolders = LString(value).SplitDelimit("\n");
+
+				// Convert them to an absolute path
+				for (auto s: subFolders)
+				{
+					auto full = LString::Fmt("%s/%s", rootPath.Get(), s.Get());
+					spamPaths.New() = full;
+					// printf("%s:%i - full=%s\n", _FL, full.Get());
+				}
+			}
 			App->GetOptions()->Unlock();
 		}
 	}

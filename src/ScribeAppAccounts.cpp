@@ -5658,7 +5658,7 @@ bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 					// Most likely the user has renamed something and broken the
 					// path. Lets just error out instead of creating the wrong folder
 					return false;
-				}			
+				}
 			}
 		}
 		
@@ -5677,7 +5677,7 @@ bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 		if (folder)
 			folder->SetDefaultFields();
 		else
-			errors++;			
+			errors++;
 	}
 	
 	

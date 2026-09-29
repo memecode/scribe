@@ -2065,6 +2065,8 @@ int64 ImapFolder::GetInt(int id)
 			return Mail.State == Store3Loaded;
 		case FIELD_FOLDER_INDEX:
 			return -1;
+		case FIELD_ACCOUNT_ID:
+			return Store->GetInt(id);
 	}
 
 	LAssert(0);

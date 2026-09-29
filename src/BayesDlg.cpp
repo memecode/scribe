@@ -1,5 +1,8 @@
 #include "Scribe.h"
+
 #include "lgi/common/Store3Defs.h"
+#include "lgi/common/PopupNotification.h"
+
 #include "resdefs.h"
 
 ///////////////////////////////////////////////////////////////////////
@@ -15,6 +18,33 @@ class BayesFolderItem : public LTreeItem
 	ScribeFolder *Folder;
 	LString Type;
 	LColour Colour;
+
+	LString HandlePath(LString inPaths, ScribeMailType type, LString path)
+	{
+		LString sep = "\n";
+		auto paths = inPaths.SplitDelimit(sep);
+		paths.SetFixedLength(false);
+		
+		if (type == ScribeMailType::BayesMailSpam)
+		{
+			// If the folder path is not already in the list, add it.
+			if (!paths.HasItem(path))
+				paths.Add(path);
+		}
+		else
+		{
+			// Remove it..
+			for (ssize_t i = (ssize_t)paths.Length() - 1; i >= 0; i--)
+			{
+				if (paths[i] == path)
+					paths.DeleteAt(i, true);
+			}
+		}
+
+		auto newPaths = sep.Join(paths);
+		printf("New paths: %s\n", newPaths.Get());
+		return newPaths;
+	}
 
 public:
 	BayesFolderItem(ScribeFolder *folder) : Folder(folder)
@@ -55,36 +85,16 @@ public:
 			case Store3Sqlite:
 			{
 				// Write to global option OPT_SpamFolder.
-				LString sep = "\n";
 				LVariant v;
 				opts->GetValue(OPT_SpamFolder, v);
-				auto paths = LString(v.Str()).SplitDelimit(sep);
-				paths.SetFixedLength(false);
-				auto path = Folder->GetPath();
-				if (cat == ScribeMailType::BayesMailSpam)
-				{
-					// If the folder path is not already in the list, add it.
-					if (!paths.HasItem(path))
-						paths.Add(path);
-				}
-				else
-				{
-					// Remove it..
-					for (ssize_t i = (ssize_t)paths.Length() - 1; i >= 0; i--)
-					{
-						if (paths[i] == path)
-							paths.DeleteAt(i, true);
-					}
-				}
-
-				auto newPaths = sep.Join(paths);
-				printf("New paths: %s\n", newPaths.Get());
+				auto newPaths = HandlePath(v.Str(), cat, Folder->GetPath());
 				if (!opts->SetValue
 					(
 						OPT_SpamFolder,
 						v = newPaths.Get()
 					))
 					printf("Failed to set new spam folder paths\n");
+				opts->SetValue(OPT_HasSpam, v = newPaths.Length() > 0);
 
 				// Also need to set the IDC_SPAM in the parent dialog..
 				if (auto t = GetTree())
@@ -93,12 +103,36 @@ public:
 					else printf("%s:%i - no wnd?\n", _FL);
 				else printf("%s:%i - no tree?\n", _FL);
 
-				opts->SerializeFile(true);
 				break;
 			}
 			case Store3Imap:
 			{
+				LString folderSep = "/";
+
 				// Write to OPT_SpamFolder for IMAP store.
+				auto accountId = obj->GetInt(FIELD_ACCOUNT_ID);
+				if (auto account = app->GetAccountById(accountId))
+				{
+					auto opt = account->Receive.OptionName(OPT_ReceiveSubFolders);
+					if (auto tag = opts->LockTag(opt, _FL))
+					{
+						// This will have the mail store as the first path segment...
+						auto path = Folder->GetPath();
+
+						// Strip that out...
+						auto parts = path.SplitDelimit(folderSep);
+						path = folderSep.Join(parts.Slice(1));
+
+						auto oldPaths = tag->GetAttr(OPT_SpamFolder);
+						auto newPaths = HandlePath(oldPaths, cat, path);
+						printf("%s:%i - newPaths=%s\n", _FL, newPaths.Get());
+						tag->SetAttr(OPT_SpamFolder, newPaths);
+						tag->SetAttr(OPT_HasSpam, newPaths.Length() > 0);
+						
+						opts->Unlock();
+					}
+				}
+				else LPopupNotification::Message(GetTree()->GetWindow(), "Couldn't get account by id.");
 				break;
 			}
 			default:
@@ -107,6 +141,8 @@ public:
 				break;
 			}
 		}
+
+		opts->SerializeFile(true);
 	}
 
 	const char *GetText(int i = 0) override
