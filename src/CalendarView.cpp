@@ -614,6 +614,9 @@ CalendarView::CalendarView(ScribeFolder *folder, int id, LRect *pos, const char 
 
 CalendarView::~CalendarView()
 {
+	if (GetEvents)
+		GetEvents->Detach();
+
 	LVariant v;
 	App->GetOptions()->SetValue(OPT_CalendarViewMode, v = (int)Mode);
 	CalendarViews.Delete(this);
@@ -3691,7 +3694,16 @@ CalendarSourceGetEvents::CalendarSourceGetEvents(ScribeWnd *app,
 
 CalendarSourceGetEvents::~CalendarSourceGetEvents()
 {
-	*Owner = nullptr;
+	if (Owner)
+		*Owner = nullptr;
+}
+
+void CalendarSourceGetEvents::Detach()
+{
+	if (Owner)
+		*Owner = nullptr;
+	Owner = nullptr;
+	Callback = nullptr;
 }
 
 void CalendarSourceGetEvents::OnState()

@@ -324,6 +324,7 @@ public:
 	~CalendarSourceGetEvents();
 
 	const char *GetClass() { return "CalendarSourceGetEvents"; }
+	void Detach();
 	void OnState();
 	LMessage::Result OnEvent(LMessage *Msg);
 };
