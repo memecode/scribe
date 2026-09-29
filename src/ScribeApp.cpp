@@ -249,8 +249,14 @@ void ScribeOptionsDefaults(LOptionsFile *f)
 
 	#define DefaultIntOption(opt, def) { LVariant v; if (!f->GetValue(opt, v)) \
 											f->SetValue(opt, v = (int)def); }
-	#define DefaultStrOption(opt, def) { LVariant v; if (!f->GetValue(opt, v)) \
-											f->SetValue(opt, v = def); }
+	#define DefaultStrOption(opt, def) { \
+		LVariant v; \
+		if (!f->GetValue(opt, v)) \
+		{ \
+			LgiTrace("%s:%i - Setting '%s' to '%s'\n", _FL, opt, def); \
+			f->SetValue(opt, v = def); \
+		} \
+	}
 	DefaultIntOption(OPT_DefaultAlternative, 1);
 	DefaultIntOption(OPT_BoldUnread, 1);
 	DefaultIntOption(OPT_PreviewLines, 1);

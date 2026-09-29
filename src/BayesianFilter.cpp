@@ -1694,81 +1694,39 @@ ScribeMailType BayesianFilter::BayesTypeFromPath(LString Path)
 	if (!Path)
 		return BayesMailUnknown;
 
-	LArray<ScribeFolder*> spamFolders;
-	spamFolders.Add(App->GetFolder(FOLDER_SPAM));	
+	LString::Array spamPaths;
+	LVariant v;
+	if (App->GetOptions()->GetValue(OPT_SpamFolder, v))
+		spamPaths += LString(v.Str()).SplitDelimit("\n");
 	for (auto a: *App->GetAccounts())
 	{
 		auto opt = a->Receive.OptionName(OPT_ReceiveSubFolders);
 		if (auto tag = App->GetOptions()->LockTag(opt, _FL))
 		{
-			if (auto spamPath = tag->GetAttr(OPT_SpamFolder))
-			{
-				auto paths = LString(spamPath).SplitDelimit("\n");
-				for (auto p: paths)
-				{
-					if (auto f = a->GetFolder(p))
-						spamFolders.Add(f);
-				}
-			}
+			if (auto value = tag->GetAttr(OPT_SpamFolder))
+				spamPaths += LString(value).SplitDelimit("\n");
 			App->GetOptions()->Unlock();
 		}
 	}
 	
-	auto folder = App->GetFolder(Path);
-	if (spamFolders.Length() && folder)
-	{
-		if (spamFolders.HasItem(folder))
-			return BayesMailSpam;
+	if (spamPaths.HasItem(Path))
+		return BayesMailSpam;
 
-		// If folder is a child of the spam folder, it's NOT ham but "unknown".
-		// Typically a staging ground for "possible" spam. So it should not contribute to
-		// Bayes word counts.
-		for (auto p = folder->GetParent(); p; p = p->GetParent())
-		{
-			auto ParentFolder = dynamic_cast<ScribeFolder*>(p);
-			if (ParentFolder && spamFolders.HasItem(ParentFolder))
-				return BayesMailUnknown;
-		}
-	}
-	else
+	auto stripPath = [](LString p) -> LString
 	{
-		LVariant v;
-		if (App->GetOptions()->GetValue(OPT_SpamFolder, v))
-		{
-			auto spamPath = LString(v.Str()).SplitDelimit("/");
-			auto inPath = Path.SplitDelimit("/");
-			unsigned matching = 1;
-			while (matching < spamPath.Length() &&
-				   matching < inPath.Length())
-			{
-				if (spamPath[matching] == inPath[matching])
-					matching++;
-				else
-					break;
-			}
-			
-			if (matching > 1)
-				return matching == inPath.Length() ? BayesMailSpam : BayesMailUnknown;
-				
+		ptrdiff_t last = p.RFind("/");
+		if (last > 0)
+			return p(0, last);
+		return LString();
+	};
+
+	// If folder is a child of the spam folder, it's NOT ham but "unknown".
+	// Typically a staging ground for "possible" spam. So it should not contribute to
+	// Bayes word counts.
+	for (auto p = stripPath(Path); p; p = stripPath(p))
+	{
+		if (spamPaths.HasItem(p))
 			return BayesMailUnknown;
-		}
-		else
-		{
-			// This code should never run anymore, it's deprecated...
-			LAssert(!"Dont use old hard coding spam name.");
-			
-			auto t = Path.SplitDelimit("/");
-			ssize_t spamIdx = -1;
-			for (size_t i=0; i<t.Length(); i++)
-				if (t[i].Equals("Spam"))
-				{
-					spamIdx = i;
-					break;
-				}
-
-			if (spamIdx == 0 || spamIdx == 1)
-				return (ssize_t)t.Length() > spamIdx + 1 ? BayesMailUnknown : BayesMailSpam;
-		}
 	}
 
 	return BayesMailHam;

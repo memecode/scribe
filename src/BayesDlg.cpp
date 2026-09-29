@@ -41,63 +41,70 @@ public:
 				break;
 		}
 
-		if (writeOpts)
+		if (!writeOpts)
+			return;
+
+		auto app = Folder->App;
+		auto opts = app->GetOptions();
+		auto obj = Folder->GetFldObj();
+		if (!obj)
+			return;
+		auto type = (Store3Backend) obj->GetInt(FIELD_STORE_TYPE);
+		switch (type)
 		{
-			auto app = Folder->App;
-			auto opts = app->GetOptions();
-			auto obj = Folder->GetFldObj();
-			if (!obj)
-				return;
-			auto type = (Store3Backend) obj->GetInt(FIELD_STORE_TYPE);
-			switch (type)
+			case Store3Sqlite:
 			{
-				case Store3Sqlite:
+				// Write to global option OPT_SpamFolder.
+				LString sep = "\n";
+				LVariant v;
+				opts->GetValue(OPT_SpamFolder, v);
+				auto paths = LString(v.Str()).SplitDelimit(sep);
+				paths.SetFixedLength(false);
+				auto path = Folder->GetPath();
+				if (cat == ScribeMailType::BayesMailSpam)
 				{
-					// Write to global option OPT_SpamFolder.
-					LString sep = "\n";
-					LVariant v;
-					opts->GetValue(OPT_SpamFolder, v);
-					auto paths = LString(v.Str()).SplitDelimit(sep);
-					paths.SetFixedLength(false);
-					auto path = Folder->GetPath();
-					if (cat == ScribeMailType::BayesMailSpam)
+					// If the folder path is not already in the list, add it.
+					if (!paths.HasItem(path))
+						paths.Add(path);
+				}
+				else
+				{
+					// Remove it..
+					for (ssize_t i = (ssize_t)paths.Length() - 1; i >= 0; i--)
 					{
-						// If the folder path is not already in the list, add it.
-						if (!paths.HasItem(path))
-							paths.Add(path);
+						if (paths[i] == path)
+							paths.DeleteAt(i, true);
 					}
-					else
-					{
-						// Remove it..
-						for (ssize_t i = (ssize_t)paths.Length() - 1; i >= 0; i--)
-						{
-							if (paths[i] == path)
-								paths.DeleteAt(i, true);
-						}
-					}
+				}
 
-					auto newPaths = sep.Join(paths);
-					printf("New paths: %s\n", newPaths.Get());
-					if (!opts->SetValue
-						(
-							OPT_SpamFolder,
-							v = newPaths.Get()
-						))
-						printf("Failed to set new spam folder paths\n");
+				auto newPaths = sep.Join(paths);
+				printf("New paths: %s\n", newPaths.Get());
+				if (!opts->SetValue
+					(
+						OPT_SpamFolder,
+						v = newPaths.Get()
+					))
+					printf("Failed to set new spam folder paths\n");
 
-					opts->GetValue(OPT_SpamFolder, v);
-					printf("Current paths: %s\n", v.Str());
-					break;
-				}
-				case Store3Imap:
-				{
-					// Write to OPT_SpamFolder for IMAP store.
-				}
-				default:
-				{
-					LAssert(!"Unknown store type");
-					break;
-				}
+				// Also need to set the IDC_SPAM in the parent dialog..
+				if (auto t = GetTree())
+					if (auto w = t->GetWindow())
+						w->SetCtrlName(IDC_SPAM, newPaths);
+					else printf("%s:%i - no wnd?\n", _FL);
+				else printf("%s:%i - no tree?\n", _FL);
+
+				opts->SerializeFile(true);
+				break;
+			}
+			case Store3Imap:
+			{
+				// Write to OPT_SpamFolder for IMAP store.
+				break;
+			}
+			default:
+			{
+				LAssert(!"Unknown store type");
+				break;
 			}
 		}
 	}

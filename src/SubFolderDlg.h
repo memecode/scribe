@@ -1,5 +1,10 @@
 #pragma once
 
+#include "lgi/common/Dialog.h"
+#include "lgi/common/XmlTreeUi.h"
+
+#include "resdefs.h"
+
 ////////////////////////////////////////////////////////////////////////////////////////
 class SubFolderDlg : public LDialog, public LXmlTreeUi
 {
@@ -15,25 +20,28 @@ private:
 	void FolderSelector(int OutputCtrl, int Limit, bool multiplePaths = false)
 	{
 		if (!FolderSelectCallback)
+		{
 			LAssert(!"missing callback");
-		else
-			FolderSelectCallback(this, App, Limit,
-				[this, OutputCtrl, multiplePaths](auto path)
+			return;
+		}
+
+		FolderSelectCallback(this, App, Limit,
+			[this, OutputCtrl, multiplePaths](auto path)
+			{
+				if (multiplePaths)
 				{
-					if (multiplePaths)
-					{
-						LString input(GetCtrlName(OutputCtrl));
-						LString::Array paths = input.SplitDelimit("\n");
-						paths.SetFixedLength(false);
-						if (!paths.HasItem(path))
-							paths.Add(path);
-						SetCtrlName(OutputCtrl, LString("\n").Join(paths));
-					}
-					else
-					{
-						SetCtrlName(OutputCtrl, path);
-					}
-				});
+					LString input(GetCtrlName(OutputCtrl));
+					LString::Array paths = input.SplitDelimit("\n");
+					paths.SetFixedLength(false);
+					if (!paths.HasItem(path))
+						paths.Add(path);
+					SetCtrlName(OutputCtrl, LString("\n").Join(paths));
+				}
+				else
+				{
+					SetCtrlName(OutputCtrl, path);
+				}
+			});
 	}
 
 public:

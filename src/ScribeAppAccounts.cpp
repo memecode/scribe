@@ -5124,7 +5124,7 @@ int ScribeWnd::GetFolderType(ScribeFolder *f)
 		}
 		if (Check)
 		{		
-			ScribeFolder *c = GetFolder(fi->Id);
+			auto c = GetFolder(fi->Id);
 			if (c == f)
 				return fi->Id;
 		}
@@ -5625,57 +5625,63 @@ bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 	char OptName[32];
 	sprintf_s(OptName, sizeof(OptName), "Folder-%i", Id);
 	
-	LVariant Path;
-	if (!GetOptions()->GetValue(OptName, Path))
+	LString sep("/");
+	LVariant v;
+	if (!GetOptions()->GetValue(OptName, v))
 	{
-		char Opt[256];
-		sprintf_s(Opt, sizeof(Opt), "/%s", DefaultFolderNames[Id]);
-		GetOptions()->SetValue(OptName, Path = Opt);
+		auto path = LString::Fmt("%s%s", sep.Get(), DefaultFolderNames[Id]);
+		GetOptions()->SetValue(OptName, v = path.Get());
 	}
 	
-	// If the path name has the store name at the start, strip that off...
-	LString Sep("/");
-	LString::Array Parts = LString(Path.Str()).Split(Sep);
-	if (Parts.Length() > 1)
-	{
-		if (Parts[0].Equals(s->Name))
+	int errors = 0;
+	auto paths = LString(v.Str()).SplitDelimit("\n");
+	for (auto &path: paths)
+	{	
+		// If the path name has the store name at the start, strip that off...
+		auto Parts = path.Split(sep);
+		if (Parts.Length() > 1)
 		{
-			Parts.DeleteAt(0, true);
-			Path = Sep.Join(Parts);
-		}
-		else
-		{
-			LMailStore *ms = GetMailStoreForPath(Path.Str());
-			if (ms)
+			if (Parts[0].Equals(s->Name))
 			{
-				s = ms;
+				Parts.DeleteAt(0, true);
+				path = sep.Join(Parts);
 			}
 			else
 			{
-				// Most likely the user has renamed something and broken the
-				// path. Lets just error out instead of creating the wrong folder
-				return false;
-			}			
+				auto ms = GetMailStoreForPath(path);
+				if (ms)
+				{
+					s = ms;
+				}
+				else
+				{
+					// Most likely the user has renamed something and broken the
+					// path. Lets just error out instead of creating the wrong folder
+					return false;
+				}			
+			}
 		}
-	}
-	
-	// Now resolve the path...
-	ScribeFolder *Folder = GetFolder(Path.Str(), s);
-	if (!Folder)
-	{
-		char *p = Path.Str();
-		if (_strnicmp(p, "/IMAP ", 6) != 0)
+		
+		// Now resolve the path...
+		auto folder = GetFolder(path, s);
+		if (!folder)
 		{
-			LAssert(DefaultFolderTypes[Id] != MAGIC_NONE);
-			Folder = s->GetRoot()->CreateSubFolder(*p=='/'?p+1:p, DefaultFolderTypes[Id]);
+			auto p = path.Get();
+			if (_strnicmp(p, "/IMAP ", 6) != 0)
+			{
+				LAssert(DefaultFolderTypes[Id] != MAGIC_NONE);
+				folder = s->GetRoot()->CreateSubFolder(*p=='/'?p+1:p, DefaultFolderTypes[Id]);
+			}
 		}
+		
+		if (folder)
+			folder->SetDefaultFields();
+		else
+			errors++;			
 	}
 	
-	if (!Folder)
-		return false;
-
-	Folder->SetDefaultFields();
-	return true;
+	
+	return errors == 0;
 }
 
 void ScribeWnd::Validate(LMailStore *s)
