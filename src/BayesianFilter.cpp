@@ -2012,18 +2012,22 @@ bool BayesianFilter::UnitTests(ScribeWnd *app)
 	*/
 
 	BayesianFilter inst(app);
-	ScribeMailType prob, none;
-	auto spam = inst.BayesTypeFromPath("/Folders1/Spam");
-	if (spam == BayesMailHam)
-		goto OnError; // BayesMailUnknown is ok on first startup
-	
-	prob = inst.BayesTypeFromPath("/Folders1/Spam/Probably");
-	if (prob != BayesMailUnknown)
-		goto OnError;
-		
-	none = inst.BayesTypeFromPath("/Folders1/Inbox");
-	if (none == BayesMailSpam)
-		goto OnError;
+	LVariant configuredSpamPaths;
+	if (app->GetOptions()->GetValue(OPT_SpamFolder, configuredSpamPaths))
+	{
+		for (auto spamPath: LString(configuredSpamPaths.Str()).SplitDelimit("\n"))
+		{
+			if (!spamPath)
+				continue;
+
+			if (inst.BayesTypeFromPath(spamPath) != BayesMailSpam)
+				goto OnError;
+
+			auto probablePath = LString::Fmt("%s/Probably", spamPath.Get());
+			if (inst.BayesTypeFromPath(probablePath) != BayesMailUnknown)
+				goto OnError;
+		}
+	}
 		
 	return true;
 	
