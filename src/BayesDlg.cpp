@@ -46,40 +46,25 @@ class BayesFolderItem : public LTreeItem
 		return newPaths;
 	}
 
-public:
-	BayesFolderItem(ScribeFolder *folder) : Folder(folder)
+	bool WriteOpts(ScribeMailType cat)
 	{
-		SetType(Folder->App->BayesTypeFromPath(Folder->GetPath()), false);
-	}
-
-	void SetType(ScribeMailType cat, bool writeOpts)
-	{
-		switch (cat)
-		{
-			case ScribeMailType::BayesMailHam:
-				Type = "Ham";
-				Colour = LColour(0, 0, 255);
-				break;
-			case ScribeMailType::BayesMailSpam:
-				Type = "Spam";
-				Colour = LColour(224, 96, 85); // Pink for Spam
-				break;
-			default:
-			case ScribeMailType::BayesMailUnknown:
-				Type = "Unknown";
-				Colour = LColour(128, 128, 128); // Gray for Unknown
-				break;
-		}
-
-		if (!writeOpts)
-			return;
+		if (!Folder)
+			return false;
 
 		auto app = Folder->App;
+		if (!app)
+			return false;
+
 		auto opts = app->GetOptions();
+		if (!opts)
+			return false;
+
 		auto obj = Folder->GetFldObj();
 		if (!obj)
-			return;
+			return false;
+
 		auto type = (Store3Backend) obj->GetInt(FIELD_STORE_TYPE);
+		printf("%s:%i - type=%i\n", _FL, type);
 		switch (type)
 		{
 			case Store3Sqlite:
@@ -96,10 +81,10 @@ public:
 					printf("Failed to set new spam folder paths\n");
 				opts->SetValue(OPT_HasSpam, v = newPaths.Length() > 0);
 
-				// Also need to set the IDC_SPAM in the parent dialog..
+				// Also need to set the IDC_SPAM_FOLDER in the parent dialog..
 				if (auto t = GetTree())
 					if (auto w = t->GetWindow())
-						w->SetCtrlName(IDC_SPAM, newPaths);
+						w->SetCtrlName(IDC_SPAM_FOLDER, newPaths);
 					else printf("%s:%i - no wnd?\n", _FL);
 				else printf("%s:%i - no tree?\n", _FL);
 
@@ -138,11 +123,66 @@ public:
 			default:
 			{
 				LAssert(!"Unknown store type");
-				break;
+				return false;
 			}
 		}
 
-		opts->SerializeFile(true);
+		return opts->SerializeFile(true);
+	}
+
+	bool IsMailFolder()
+	{
+		return Folder && MAGIC_MAIL == Folder->GetItemType();
+	}
+
+public:
+	BayesFolderItem(ScribeFolder *folder) : Folder(folder)
+	{
+		if (IsMailFolder())
+			SetType(Folder->App->BayesTypeFromPath(Folder->GetPath()), false);
+	}
+
+	bool SetType(ScribeMailType cat, bool writeOpts)
+	{
+		if (writeOpts && !WriteOpts(cat))
+			return false;
+
+		// Update UI
+		switch (cat)
+		{
+			case ScribeMailType::BayesMailHam:
+				Type = "Ham";
+				Colour = LColour(0, 0, 255);
+				break;
+			case ScribeMailType::BayesMailSpam:
+				Type = "Spam";
+				Colour = LColour(224, 96, 85); // Pink for Spam
+				break;
+			default:
+			case ScribeMailType::BayesMailUnknown:
+				Type = "Unknown";
+				Colour = LColour(128, 128, 128); // Gray for Unknown
+				break;
+		}
+
+		// Child folder types depend on whether an ancestor is a spam folder.
+		if (writeOpts)
+			UpdateChildTypes();
+
+		return true;
+	}
+
+	void UpdateChildTypes()
+	{
+		for (auto c = GetChild(); c; c = c->GetNext())
+		{
+			if (auto item = dynamic_cast<BayesFolderItem*>(c))
+			{
+				if (item->IsMailFolder())
+					item->SetType(item->Folder->App->BayesTypeFromPath(item->Folder->GetPath()), false);
+				item->UpdateChildTypes();
+			}
+		}
 	}
 
 	const char *GetText(int i = 0) override
@@ -162,7 +202,7 @@ public:
 		LColour old = Ctx.Fore;
 		LColour oldBack = Ctx.Back;
 		LColour oldTxtBack = Ctx.TxtBack;
-		if (i == 1)
+		if (i == 1 && IsMailFolder())
 		{
 			Ctx.Fore = Colour;
 			Ctx.Back = Ctx.Back.Mix(Colour, BackMix);
@@ -176,12 +216,11 @@ public:
 
 	void OnMouseClick(LMouse &m) override
 	{
-		m.Trace("BayesFolderItem");
-		if (!m.Down() || !m.IsContextMenu())
-		{
-			printf("Not a context menu click or mouse button not down\n");
+		if (!IsMailFolder())
 			return;
-		}
+
+		if (!m.Down() || !m.IsContextMenu())
+			return;
 
 		LSubMenu menu;
 		menu.AppendItem("Ham", MenuHam, true);

@@ -2377,7 +2377,7 @@ public:
 
 	const char *GetClass() override { return "ScribeWnd"; }
 	void DoDebug(char *s);
-	void Validate(LMailStore *s);
+	void Validate();
 
 	// Unit testing.
 	static bool IsUnitTest;

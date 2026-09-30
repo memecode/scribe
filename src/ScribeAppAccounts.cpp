@@ -1287,15 +1287,10 @@ bool ScribeWnd::ProcessFolder(LDataStoreI *Store, int StoreIdx, char *StoreName)
 		// Show the tree
 		Folder->Expanded(Folders[StoreIdx].Expanded);
 
-		// Checks the folders for a number of required objects
-		// and creates them if required
-		auto StoreType = Store->GetInt(FIELD_STORE_TYPE);
-		if (StoreType == Store3Sqlite)
-			Validate(&Folders[StoreIdx]);
-		else if (StoreType < 0)
+		// System folder validation is deferred to Validate() after all stores load.
+		if (Store->GetInt(FIELD_STORE_TYPE) < 0)
 			LAssert(!"Make sure you impl the FIELD_STORE_TYPE field in the store.");
 
-					
 		// FIXME
 		// AddFolderToMru(Full);
 	}
@@ -5693,25 +5688,33 @@ bool ScribeWnd::ValidateFolder(LMailStore *s, int Id)
 	return errors == 0;
 }
 
-void ScribeWnd::Validate(LMailStore *s)
+void ScribeWnd::Validate()
 {
 	THREAD_UNSAFE();
 	// Check for all the basic folders
 
-	int Errors = 0;	
-	for (SystemFolderInfo *fi = SystemFolders; fi->PathOption; fi++)
+	int Errors = 0;
+	for (auto &ms: Folders)
 	{
-		bool Check = true;
-		if (fi->HasOption)
+		if (!ms.Store ||
+			!ms.GetRoot() ||
+			ms.Store->GetInt(FIELD_STORE_TYPE) != Store3Sqlite)
+			continue;
+
+		for (SystemFolderInfo *fi = SystemFolders; fi->PathOption; fi++)
 		{
-			LVariant v;
-			if (GetOptions()->GetValue(fi->HasOption, v))
-				Check = v.CastInt32() != 0;
-		}
-		if (Check)
-		{
-			if (!ValidateFolder(s, fi->Id))
-				Errors++;
+			bool Check = true;
+			if (fi->HasOption)
+			{
+				LVariant v;
+				if (GetOptions()->GetValue(fi->HasOption, v))
+					Check = v.CastInt32() != 0;
+			}
+			if (Check)
+			{
+				if (!ValidateFolder(&ms, fi->Id))
+					Errors++;
+			}
 		}
 	}
 

@@ -355,6 +355,10 @@ struct LoadMailStoreState : public LView::ViewEventTarget
 
 	bool PostIterate()
 	{
+		// Checks the folders for a number of required objects and creates them if required.
+		if (Status && App->ScribeState != ScribeWnd::ScribeExiting)
+			App->Validate();
+
 		if (Status)
 		{
 			// Force load some folders...
