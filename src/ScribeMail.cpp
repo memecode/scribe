@@ -341,7 +341,7 @@ class ImageResizeThread : public LEventTargetThread
 public:
 	class Job
 	{
-		#ifdef __GTK_H__
+		#if !LGI_VIEW_HANDLE
 		/* This object may not exist when the worker is finished.
 			However LAppInst->PostEvent can handle that so we'll allow
 			it, so long as it's never used in the Sink->PostEvent form.	*/
@@ -365,7 +365,7 @@ public:
 
 		bool PostEvent(int Msg, LMessage::Param a = 0, LMessage::Param b = 0)
 		{
-			#ifdef __GTK_H__
+			#if !LGI_VIEW_HANDLE
 			return LAppInst->PostEvent(Sink, Msg, a, b);
 			#else
 			return LPostEvent(Sink, Msg, a, b);

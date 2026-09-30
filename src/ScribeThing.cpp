@@ -863,9 +863,11 @@ bool ThingUi::OnViewKey(LView *v, LKey &k)
 
 	bool IsPopup = false;
 	#ifdef __GTK_H__
-	OsView Hnd = GtkCast(GetWindow()->WindowHandle(), gtk_widget, GtkWidget);
+	auto Hnd = GtkCast(GetWindow()->WindowHandle(), gtk_widget, GtkWidget);
+	#elif LGI_VIEW_HANDLE
+	auto Hnd = Handle();
 	#else
-	OsView Hnd = Handle();
+	auto WndId = AddDispatch();
 	#endif
 	for (LViewI *p = v; p; p = p->GetParent())
 	{
@@ -888,7 +890,11 @@ bool ThingUi::OnViewKey(LView *v, LKey &k)
 		k.Down() &&
 		k.vkey == LK_ESCAPE)
 	{
+		#if LGI_VIEW_HANDLE
 		LPostEvent(Hnd, M_CLOSE);
+		#else
+		#warning "FIXME!!"
+		#endif
 		return false;
 	}
 

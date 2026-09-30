@@ -3993,7 +3993,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 						if (HasMailToSend)
 						{
 							PostEvent(M_COMMAND, IDM_SEND_MAIL,
-								#ifndef __GTK_H__
+								#if LGI_VIEW_HANDLE
 								(LMessage::Param)Handle()
 								#else
 								0
