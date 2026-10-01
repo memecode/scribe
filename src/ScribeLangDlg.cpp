@@ -4,6 +4,32 @@
 #include "resdefs.h"
 #include "lgi/common/LgiRes.h"
 
+enum LIconIndex
+{
+	LIconEnglish = 0,
+	LIconPortugueseBrazil = 1,
+	LIconSpanish = 2,
+	LIconSwedish = 3,
+	LIconCzech = 4,
+	LIconLithuanian = 5,
+	LIconGerman = 6,
+	LIconPortuguese = 8,
+	LIconDutch = 9,
+	LIconSerbian = 10,
+	LIconPolish = 11,
+	LIconNorwegian = 12,
+	LIconJapanese = 13,
+	LIconChineseTraditional = 14,
+	LIconRussian = 15,
+	LIconFrench = 16,
+	LIconItalian = 17,
+	LIconDanish = 18,
+	LIconIndonesian = 19,
+	LIconTurkish = 20,
+	LIconVietnamese = 21,
+	LIconUkraine = 22,
+};
+
 class LanguageDlgPrivate
 {
 public:
@@ -81,33 +107,27 @@ LanguageDlg::LanguageDlg(ScribeWnd *app)
 	d->App = app;
 
 	LHashTbl<ConstStrKey<char,false>,char*> LangNames;
-	LXmlTag *LangData = 0;
-	LResources *Res = LgiGetResObj(false, NULL, false);
-	if (Res)
+	LXmlTag *LangData = nullptr;
+	if (auto Res = LgiGetResObj(false, NULL, false))
 	{
-		auto File = Res->GetFileName();
-		if (File)
+		if (auto File = Res->GetFileName())
 		{
 			LFile f;
 			if (f.Open(File, O_READ))
 			{
 				LXmlTree t;
-				LangData = new LXmlTag;
-				if (LangData)
+				if (LangData = new LXmlTag)
 				{
 					if (t.Read(LangData, &f, 0))
 					{
-						LXmlTag *Lang = FindLangTag(LangData);
-						if (Lang)
+						if (auto Lang = FindLangTag(LangData))
 						{
-							for (unsigned i=0; i<Lang->Attr.Length(); i++)
+							for (auto &a: Lang->Attr)
 							{
-								LXmlAttr &a = Lang->Attr[i];
-
-								char *Name = a.GetName();
-								if (_stricmp(Name, "Ref") != 0 &&
-									_stricmp(Name, "Cid") != 0 &&
-									_stricmp(Name, "Define") != 0)
+								auto Name = a.GetName();
+								if (Stricmp(Name, "Ref") != 0 &&
+									Stricmp(Name, "Cid") != 0 &&
+									Stricmp(Name, "Define") != 0)
 								{
 									LangNames.Add(Name, a.GetValue());
 								}
@@ -147,37 +167,37 @@ LanguageDlg::LanguageDlg(ScribeWnd *app)
 					LLanguage *Lang = LFindLang(i);
 					if (Lang)
 					{
-						LListItem *i = new LangItem;
-						if (i)
+						if (auto i = new LangItem)
 						{
-							char *Name = LangNames.Find(Lang->Id);
+							auto Name = LangNames.Find(Lang->Id);
 
 							i->SetText(Name ? Name : Lang->Name, 0);
 							i->SetText(Lang->Id, 1);
 
 							#define MatchIcon(lang, img) if (_stricmp(Lang->Id, lang) == 0) i->SetImage(img);
-							MatchIcon("en", 0);
-							MatchIcon("pt_br", 1);
-							MatchIcon("es", 2);
-							MatchIcon("sv", 3);
-							MatchIcon("cs", 4);
-							MatchIcon("lt", 5);
-							MatchIcon("de", 6);
+							MatchIcon("en", LIconEnglish);
+							MatchIcon("pt_br", LIconPortugueseBrazil);
+							MatchIcon("es", LIconSpanish);
+							MatchIcon("sv", LIconSwedish);
+							MatchIcon("cs", LIconCzech);
+							MatchIcon("lt", LIconLithuanian);
+							MatchIcon("de", LIconGerman);
 							
-							MatchIcon("pt", 8);
-							MatchIcon("nl", 9);
-							MatchIcon("sr", 10);
-							MatchIcon("pl", 11);
-							MatchIcon("no", 12);
-							MatchIcon("ja", 13);
-							MatchIcon("zh_tw", 14);
-							MatchIcon("ru", 15);
-							MatchIcon("fr", 16);
-							MatchIcon("it", 17);
-							MatchIcon("da", 18);
-							MatchIcon("id", 19);
-							MatchIcon("tr", 20);
-							MatchIcon("vi", 21);
+							MatchIcon("pt", LIconPortuguese);
+							MatchIcon("nl", LIconDutch);
+							MatchIcon("sr", LIconSerbian);
+							MatchIcon("pl", LIconPolish);
+							MatchIcon("no", LIconNorwegian);
+							MatchIcon("ja", LIconJapanese);
+							MatchIcon("zh_tw", LIconChineseTraditional);
+							MatchIcon("ru", LIconRussian);
+							MatchIcon("fr", LIconFrench);
+							MatchIcon("it", LIconItalian);
+							MatchIcon("da", LIconDanish);
+							MatchIcon("id", LIconIndonesian);
+							MatchIcon("tr", LIconTurkish);
+							MatchIcon("vi", LIconVietnamese);
+							MatchIcon("uk", LIconUkraine);
 
 							d->Lst->Insert(i);
 						}

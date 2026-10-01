@@ -621,7 +621,7 @@ LString GetFullAppName(bool Platform)
 		}
 		#endif
 		
-		LLanguage *CurLang = LGetLanguageId();
+		auto CurLang = LGetLanguageId();
 		if (CurLang)
 		{
 			s.Printf(", %s", CurLang->Id);
