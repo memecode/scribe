@@ -28,6 +28,10 @@ enum LIconIndex
 	LIconTurkish = 20,
 	LIconVietnamese = 21,
 	LIconUkraine = 22,
+	LIconPersian = 23,
+	LIconKorean = 24,
+	LIconHungarian = 25,
+	LIconLuganda = 26,
 };
 
 class LanguageDlgPrivate
@@ -175,29 +179,32 @@ LanguageDlg::LanguageDlg(ScribeWnd *app)
 							i->SetText(Lang->Id, 1);
 
 							#define MatchIcon(lang, img) if (_stricmp(Lang->Id, lang) == 0) i->SetImage(img);
-							MatchIcon("en", LIconEnglish);
-							MatchIcon("pt_br", LIconPortugueseBrazil);
-							MatchIcon("es", LIconSpanish);
-							MatchIcon("sv", LIconSwedish);
-							MatchIcon("cs", LIconCzech);
-							MatchIcon("lt", LIconLithuanian);
-							MatchIcon("de", LIconGerman);
-							
-							MatchIcon("pt", LIconPortuguese);
-							MatchIcon("nl", LIconDutch);
-							MatchIcon("sr", LIconSerbian);
-							MatchIcon("pl", LIconPolish);
-							MatchIcon("no", LIconNorwegian);
-							MatchIcon("ja", LIconJapanese);
-							MatchIcon("zh_tw", LIconChineseTraditional);
-							MatchIcon("ru", LIconRussian);
-							MatchIcon("fr", LIconFrench);
-							MatchIcon("it", LIconItalian);
-							MatchIcon("da", LIconDanish);
-							MatchIcon("id", LIconIndonesian);
-							MatchIcon("tr", LIconTurkish);
-							MatchIcon("vi", LIconVietnamese);
-							MatchIcon("uk", LIconUkraine);
+							MatchIcon("en", LIconEnglish)
+							MatchIcon("pt_br", LIconPortugueseBrazil)
+							MatchIcon("es", LIconSpanish)
+							MatchIcon("sv", LIconSwedish)
+							MatchIcon("cs", LIconCzech)
+							MatchIcon("lt", LIconLithuanian)
+							MatchIcon("de", LIconGerman)
+							MatchIcon("pt", LIconPortuguese)
+							MatchIcon("nl", LIconDutch)
+							MatchIcon("sr", LIconSerbian)
+							MatchIcon("pl", LIconPolish)
+							MatchIcon("no", LIconNorwegian)
+							MatchIcon("ja", LIconJapanese)
+							MatchIcon("zh_tw", LIconChineseTraditional)
+							MatchIcon("ru", LIconRussian)
+							MatchIcon("fr", LIconFrench)
+							MatchIcon("it", LIconItalian)
+							MatchIcon("da", LIconDanish)
+							MatchIcon("id", LIconIndonesian)
+							MatchIcon("tr", LIconTurkish)
+							MatchIcon("vi", LIconVietnamese)
+							MatchIcon("uk", LIconUkraine)
+							MatchIcon("fa", LIconPersian)
+							MatchIcon("ko", LIconKorean)
+							MatchIcon("hu", LIconHungarian)
+							MatchIcon("lg", LIconLuganda)
 
 							d->Lst->Insert(i);
 						}
