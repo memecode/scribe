@@ -890,10 +890,10 @@ bool ThingUi::OnViewKey(LView *v, LKey &k)
 		k.Down() &&
 		k.vkey == LK_ESCAPE)
 	{
-		#if LGI_VIEW_HANDLE
+		#if LGI_VIEW_HANDLE || defined(__GTK_H__)
 		LPostEvent(Hnd, M_CLOSE);
 		#else
-		#warning "FIXME!!"
+		PostThreadEvent(WndId, M_CLOSE);
 		#endif
 		return false;
 	}
