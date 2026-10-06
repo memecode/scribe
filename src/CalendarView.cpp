@@ -2973,7 +2973,9 @@ void LMonthView::OnPaint(LSurface *pDC)
 	pDC->Colour(L_WORKSPACE);
 	pDC->Rectangle();
 		
-	Cell = LView::X() / MonthView::X();
+	auto cellX = LView::X() / MonthView::X();
+	auto cellY = LView::Y() / (MonthView::Y() + 1/*titlerow*/);
+	Cell = std::min(cellX, cellY);
 	LSysFont->Colour(L_TEXT, L_WORKSPACE);
 	LSysFont->Transparent(false);
 		
