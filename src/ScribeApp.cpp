@@ -329,6 +329,9 @@ static const char SoftwareUpdateUri[] = "http://www.memecode.com/update.php";
 
 static LString ExtractVer(const char *s)
 {
+	if (!s)
+		return LString();
+
 	char Buf[256], *Out = Buf;
 	for (auto In = s; *In && Out < Buf + sizeof(Buf) - 1; In++)
 	{
@@ -352,7 +355,7 @@ void IsSoftwareUpToDate(ScribeWnd *Parent,
 	auto Update = new LSoftwareUpdate(AppName, SoftwareUpdateUri, Proxy);
 
 	Update->CheckForUpdate(
-		[WithUI, Parent, callback, Update](auto Info, auto errorMsg)
+		[WithUI, Parent, callback, Update](auto Info, auto error)
 		{
 			if (Info)
 			{
@@ -400,9 +403,7 @@ void IsSoftwareUpToDate(ScribeWnd *Parent,
 			}
 			else if (WithUI)
 			{
-				if (callback)
-					callback(SwCancel, NULL);
-				LgiMsg(Parent, LLoadString(IDS_ERROR_SOFTWARE_UPDATE), AppName, MB_OK, errorMsg);
+				LgiMsg(Parent, LLoadString(IDS_ERROR_SOFTWARE_UPDATE), AppName, MB_OK, error.ToString().Get());
 			}
 
 			if (callback)
