@@ -1342,11 +1342,6 @@ void Calendar::OnPaintView(LSurface *pDC, LFont *Font, LRect *Pos, TimePeriod *P
 	else
 		p.Inset(scale.sx(1), scale.sy(1));
 
-	if (pDC->IsPrint())
-	{
-		int asd=0;
-	}
-
 	LFontCache fntCache(Font, pDC);
 	LCss textStyle;
 	textStyle.Color(text);

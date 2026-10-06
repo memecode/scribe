@@ -5205,6 +5205,45 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LDataI *s)
 	return GetFolder(Id);
 }
 
+ScribeWnd::HasOption ScribeWnd::GetHasOption(int Id)
+{
+	HasOption ho;
+	
+	switch (Id)
+	{
+		case FOLDER_TEMPLATES:
+			ho.hasOption = OPT_HasTemplates;
+			ho.uiIdent = IDC_HAS_TEMPLATES;
+			break;
+		case FOLDER_GROUPS:
+			ho.hasOption = OPT_HasGroups;
+			ho.uiIdent = IDC_HAS_GROUPS;
+			break;
+		case FOLDER_CALENDAR:
+			ho.hasOption = OPT_HasCalendar;
+			ho.uiIdent = IDC_HAS_CAL_EVENTS;
+			break;
+		case FOLDER_FILTERS:
+			ho.hasOption = OPT_HasFilters;
+			ho.uiIdent = IDC_HAS_FILTERS;
+			break;
+		case FOLDER_SPAM:
+			ho.hasOption = OPT_HasSpam;
+			ho.uiIdent = IDC_HAS_SPAM;
+			break;
+		default:
+			return ho; // return empty struct
+	}
+	
+	ho.folderId = Id;
+
+	LVariant v;
+	if (GetOptions()->GetValue(ho.hasOption, v))
+		ho.hasValue = v.CastInt32() != 0;
+
+	return ho;
+}
+
 ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 {
 	char KeyName[64];
@@ -5233,6 +5272,7 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 		NoOption = true;
 	}
 
+	auto has = GetHasOption(Id);
 	switch (Id)
 	{
 		case FOLDER_INBOX:
@@ -5254,8 +5294,15 @@ ScribeFolder *ScribeWnd::GetFolder(int Id, LMailStore *Store, bool Quiet)
 			}
 			else if (NoOption)
 			{
-				auto p = c->GetPath();
-				GetOptions()->SetValue(KeyName, FolderName = p.Get());
+				if (has && has.hasValue)
+				{
+					auto p = c->GetPath();
+					GetOptions()->SetValue(KeyName, FolderName = p.Get());
+				}
+				else
+				{
+					LgiTrace("%s:%i - %s is false, ignoring...\n", _FL, has.hasOption);
+				}
 			}
 			return c;
 		}
@@ -5742,7 +5789,7 @@ ScribeAccount *ScribeWnd::GetSendAccount()
 
 	if (GetOptions()->GetValue(OPT_DefaultSendAccount, DefSendAcc))
 	{
-		if (auto account = GetAccountById(DefSendAcc.CastInt64()))
+		if (auto account = GetAccountById(DefSendAcc.CastInt32()))
 		{
 			if (account->Send.Server().Str())
 				return account;

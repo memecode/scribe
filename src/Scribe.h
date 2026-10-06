@@ -2478,6 +2478,20 @@ public:
 		const char *IdEmail = NULL
 	);
 	
+	struct HasOption
+	{
+		int folderId = -1;
+		const char *hasOption = nullptr;
+		bool hasValue = false;
+		int uiIdent = IDC_STATIC;
+		
+		operator bool() const
+		{
+			return folderId >= 0 &&
+				hasOption != nullptr;
+		}
+	};
+	HasOption		GetHasOption(int Id);
 	ScribeFolder	*GetFolder(int Id, LMailStore *s = NULL, bool Quiet = false);
 	ScribeFolder	*GetFolder(int Id, LDataI *s);
 	ScribeFolder	*GetFolder(const char *Name, LMailStore *s = NULL);
@@ -2559,6 +2573,7 @@ public:
 
 	// Options
 	LOptionsFile	*GetOptions(bool Create = false) override;
+	void			OptionsDefaults();
 	bool			ScanForOptionsFiles(LArray<OptionsInfo> &Files, LSystemPath PathType);
 	bool			ScanForOptionsFiles(LArray<OptionsInfo> &Files, const char *Path);
 	#ifdef LINUX

@@ -1073,9 +1073,9 @@ BuildMarkMenu(	LSubMenu *MarkMenu,
 		for (int i=0; i<CountOf(MarkColours32); i++)
 		{
 			auto s = LString::Fmt(" (%i, %i, %i)", R32(MarkColours32[i]), G32(MarkColours32[i]), B32(MarkColours32[i]));
-			if (Item = MarkMenu->AppendItem(s,
+			if ((Item = MarkMenu->AppendItem(s,
 											((Select) ? IDM_MARK_SELECT_BASE : IDM_MARK_BASE) + i,
-											(MarkState != 1) || (i != SelectedIndex)))
+											(MarkState != 1) || (i != SelectedIndex))))
 				Item->Icon(i);
 		}
 	}
@@ -1535,7 +1535,7 @@ MailUi::MailUi(Mail *item, MailContainer *container) :
 					#endif
 					);
 		ReplyChk->SetPos(pos);
-		int ReplyChkPx = ReplyChk ? ReplyChk->X() : 0;
+		// int ReplyChkPx = ReplyChk ? ReplyChk->X() : 0;
 		int PanelHeight = FontHeight + 16;
 		const char *firstColMinWidth = "5em";
 		const char *tableLeftMargin = "1em";

@@ -3405,6 +3405,8 @@ bool CalendarViewWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 			OnPrint();
 			break;
 		}
+		default:
+			break;
 	}
 
 	return false;

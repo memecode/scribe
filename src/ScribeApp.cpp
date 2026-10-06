@@ -234,62 +234,6 @@ ScribeBehaviour *ScribeBehaviour::New(ScribeWnd *app)
 	return NULL;
 }
 
-void ScribeOptionsDefaults(LOptionsFile *f)
-{
-	if (!f)
-		return;
-
-	f->CreateTag("Accounts");
-	f->CreateTag("CalendarUI");
-	f->CreateTag("CalendarUI.Sources");
-	f->CreateTag("MailUI");
-	f->CreateTag("ScribeUI");
-	f->CreateTag("Plugins");
-	f->CreateTag("Print");
-
-	#define DefaultIntOption(opt, def) { LVariant v; if (!f->GetValue(opt, v)) \
-											f->SetValue(opt, v = (int)def); }
-	#define DefaultStrOption(opt, def) { \
-		LVariant v; \
-		if (!f->GetValue(opt, v)) \
-		{ \
-			LgiTrace("%s:%i - Setting '%s' to '%s'\n", _FL, opt, def); \
-			f->SetValue(opt, v = def); \
-		} \
-	}
-	DefaultIntOption(OPT_DefaultAlternative, 1);
-	DefaultIntOption(OPT_BoldUnread, 1);
-	DefaultIntOption(OPT_PreviewLines, 1);
-	DefaultIntOption(OPT_AutoDeleteExe, 1);
-	DefaultIntOption(OPT_DefaultReplyAllSetting, MAIL_ADDR_BCC);
-	DefaultIntOption(OPT_BlinkNewMail, 1);
-	DefaultIntOption(OPT_MarkReadAfterSeconds, 5);
-	DefaultStrOption(OPT_BayesThreshold, "0.9");
-	DefaultIntOption(OPT_SoftwareUpdate, 1);
-	DefaultIntOption(OPT_ResizeImgAttachments, false);
-	DefaultIntOption(OPT_ResizeJpegQual, 80);
-	DefaultIntOption(OPT_ResizeMaxPx, 1024);
-	DefaultIntOption(OPT_ResizeMaxKb, 200);
-	DefaultIntOption(OPT_RegisterWindowsClient, 1);
-	DefaultIntOption(OPT_HasTemplates, 0);
-	DefaultIntOption(OPT_HasCalendar, 1);
-	DefaultIntOption(OPT_HasGroups, 1);
-	DefaultIntOption(OPT_HasFilters, 1);
-	DefaultIntOption(OPT_HasSpam, 0);
-
-	DefaultStrOption(OPT_Inbox,      LLoadString(IDS_FOLDER_INBOX, "Inbox"));
-	DefaultStrOption(OPT_Outbox,     LLoadString(IDS_FOLDER_OUTBOX, "Outbox"));
-	DefaultStrOption(OPT_Sent,       LLoadString(IDS_FOLDER_SENT, "Sent"));
-	DefaultStrOption(OPT_Trash,      LLoadString(IDS_FOLDER_TRASH, "Trash"));
-	DefaultStrOption(OPT_Contacts,   LLoadString(IDS_FOLDER_CONTACTS, "Contacts"));
-	DefaultStrOption(OPT_Templates,  LLoadString(IDS_FOLDER_TEMPLATES, "Templates"));
-	DefaultStrOption(OPT_Filters,    LLoadString(IDS_FOLDER_FILTERS, "Filters"));
-	DefaultStrOption(OPT_Calendar,   LLoadString(IDS_FOLDER_CALENDAR, "Calendar"));
-	DefaultStrOption(OPT_Groups,     LLoadString(IDS_FOLDER_GROUPS, "Groups"));
-	DefaultStrOption(OPT_SpamFolder, LLoadString(IDS_SPAM, "Spam"));
-}
-
-
 void SetRecipients(ScribeWnd *App, char *Start, LDataIt l, EmailAddressType CC)
 {
 	while (Start && *Start)
@@ -807,7 +751,7 @@ void ScribeWnd::Construct1()
 	}
 	if (!d->OptionsLoaded)
 		LoadOptions();
-	ScribeOptionsDefaults(d->Options);
+	OptionsDefaults();
 
 	#ifdef LINUX
 	LSetSystemPath(LSP_TEMP, ScribeTempPath());
@@ -2927,6 +2871,74 @@ bool ScribeWnd::CallMethod(const char *MethodName, LScriptArguments &Args)
 	return true;
 }
 
+void ScribeWnd::OptionsDefaults()
+{
+	auto f = GetOptions();
+	if (!f)
+		return;
+
+	f->CreateTag("Accounts");
+	f->CreateTag("CalendarUI");
+	f->CreateTag("CalendarUI.Sources");
+	f->CreateTag("MailUI");
+	f->CreateTag("ScribeUI");
+	f->CreateTag("Plugins");
+	f->CreateTag("Print");
+
+	#define DefaultIntOption(opt, def) { LVariant v; if (!f->GetValue(opt, v)) \
+											f->SetValue(opt, v = (int)def); }
+	#define DefaultStrOption(opt, def) { \
+		LVariant v; \
+		if (!f->GetValue(opt, v)) \
+		{ \
+			LgiTrace("%s:%i - Setting '%s' to '%s'\n", _FL, opt, def); \
+			f->SetValue(opt, v = def); \
+		} \
+	}
+	#define DefaultFolderOption(fld, opt, def) { \
+		auto has = GetHasOption(fld); \
+		LVariant v; \
+		if (has && !has.hasValue) \
+			; \
+		else if (!f->GetValue(opt, v)) \
+		{ \
+			LgiTrace("%s:%i - Setting '%s' to '%s'\n", _FL, opt, def); \
+			f->SetValue(opt, v = def); \
+		} \
+	}
+	DefaultIntOption(OPT_DefaultAlternative, 1);
+	DefaultIntOption(OPT_BoldUnread, 1);
+	DefaultIntOption(OPT_PreviewLines, 1);
+	DefaultIntOption(OPT_AutoDeleteExe, 1);
+	DefaultIntOption(OPT_DefaultReplyAllSetting, MAIL_ADDR_BCC);
+	DefaultIntOption(OPT_BlinkNewMail, 1);
+	DefaultIntOption(OPT_MarkReadAfterSeconds, 5);
+	DefaultStrOption(OPT_BayesThreshold, "0.9");
+	DefaultIntOption(OPT_SoftwareUpdate, 1);
+	DefaultIntOption(OPT_ResizeImgAttachments, false);
+	DefaultIntOption(OPT_ResizeJpegQual, 80);
+	DefaultIntOption(OPT_ResizeMaxPx, 1024);
+	DefaultIntOption(OPT_ResizeMaxKb, 200);
+	DefaultIntOption(OPT_RegisterWindowsClient, 1);
+	DefaultIntOption(OPT_HasTemplates, 0);
+	DefaultIntOption(OPT_HasCalendar, 1);
+	DefaultIntOption(OPT_HasGroups, 1);
+	DefaultIntOption(OPT_HasFilters, 1);
+	DefaultIntOption(OPT_HasSpam, 1);
+
+	DefaultStrOption(OPT_Inbox,      LLoadString(IDS_FOLDER_INBOX, "Inbox"));
+	DefaultStrOption(OPT_Outbox,     LLoadString(IDS_FOLDER_OUTBOX, "Outbox"));
+	DefaultStrOption(OPT_Sent,       LLoadString(IDS_FOLDER_SENT, "Sent"));
+	DefaultStrOption(OPT_Trash,      LLoadString(IDS_FOLDER_TRASH, "Trash"));
+	DefaultStrOption(OPT_Contacts,   LLoadString(IDS_FOLDER_CONTACTS, "Contacts"));
+	
+	DefaultFolderOption(FOLDER_TEMPLATES, OPT_Templates,  LLoadString(IDS_FOLDER_TEMPLATES, "Templates"));
+	DefaultFolderOption(FOLDER_FILTERS,   OPT_Filters,    LLoadString(IDS_FOLDER_FILTERS, "Filters"));
+	DefaultFolderOption(FOLDER_CALENDAR,  OPT_Calendar,   LLoadString(IDS_FOLDER_CALENDAR, "Calendar"));
+	DefaultFolderOption(FOLDER_GROUPS,    OPT_Groups,     LLoadString(IDS_FOLDER_GROUPS, "Groups"));
+	DefaultFolderOption(FOLDER_SPAM,      OPT_SpamFolder, LLoadString(IDS_SPAM, "Spam"));
+}
+
 LOptionsFile *ScribeWnd::GetOptions(bool Create)
 {
 	THREAD_SAFE();
@@ -3394,7 +3406,7 @@ bool ScribeWnd::LoadOptions()
 			d->Options->SetValue(OPT_IsPortableInstall, v);
 		}
 
-		ScribeOptionsDefaults(d->Options);
+		OptionsDefaults();
 
 		if (Load)
 		{

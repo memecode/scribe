@@ -95,7 +95,7 @@ class BayesFolderItem : public LTreeItem
 				LString folderSep = "/";
 
 				// Write to OPT_SpamFolder for IMAP store.
-				auto accountId = obj->GetInt(FIELD_ACCOUNT_ID);
+				auto accountId = (int) obj->GetInt(FIELD_ACCOUNT_ID);
 				if (auto account = app->GetAccountById(accountId))
 				{
 					auto opt = account->Receive.OptionName(OPT_ReceiveSubFolders);
@@ -427,6 +427,8 @@ int BayesDlg::OnNotify(LViewI *c, const LNotification &n)
 		}
 		case IDOK:
 		{
+			printf("%s:%i OK spam folder: %s\n", _FL, GetCtrlName(IDC_SPAM_FOLDER));
+		
 			Convert(d->App->GetOptions(), this, false);
 			// fall thru
 		}

@@ -120,7 +120,7 @@ LanguageDlg::LanguageDlg(ScribeWnd *app)
 			if (f.Open(File, O_READ))
 			{
 				LXmlTree t;
-				if (LangData = new LXmlTag)
+				if ((LangData = new LXmlTag))
 				{
 					if (t.Read(LangData, &f, 0))
 					{
