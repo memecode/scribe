@@ -1129,6 +1129,8 @@ Store3Status LMail3Mail::SetStr(int id, const char *str)
 		{
 			HtmlCache.Reset();
 			LArray<LMail3Attachment*> Results;
+			
+			LgiTrace("%s:%i - set html str: %p/'%s', Seg=%p, inet=%p\n", _FL, str, str, Seg, Seg?Seg->GetStr(FIELD_INTERNET_HEADER):nullptr);
 			if (FindSegs("text/html", Results, str != 0))
 			{
 				for (unsigned i=0; i<Results.Length(); i++)
@@ -1189,7 +1191,7 @@ Store3Status LMail3Mail::SetStr(int id, const char *str)
 			{
 				// This happens when the user re-sends an email and it creates
 				// a new empty email to copy the old sent email into.
-				LMail3Attachment *a = new LMail3Attachment(Store);
+				auto a = new LMail3Attachment(Store);
 				if (!a)
 				{
 					LAssert(0);

@@ -3039,13 +3039,13 @@ bool MailUi::AddRecipient(AddressDescriptor *Addr)
 
 	if (Addr && To)
 	{
-		ListAddr *La = dynamic_cast<ListAddr *>(Addr);
-		if (La)
+		if (auto La = dynamic_cast<ListAddr *>(Addr))
 		{
 			To->Insert(La);
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -3053,8 +3053,7 @@ bool MailUi::AddRecipient(Contact *c)
 {
 	THREAD_UNSAFE(false);
 
-	ListAddr *La = new ListAddr(c);
-	if (La)
+	if (auto La = new ListAddr(c))
 	{
 		To->Insert(La);
 		return true;
@@ -3067,8 +3066,7 @@ bool MailUi::AddRecipient(const char *Email, const char *Name)
 {
 	THREAD_UNSAFE(false);
 
-	ListAddr *La = new ListAddr(App, Email, Name);
-	if (La)
+	if (auto La = new ListAddr(App, Email, Name))
 	{
 		To->Insert(La);
 		return true;
@@ -5195,12 +5193,15 @@ bool Mail::Send(bool Now)
 			// Kick off send thread if relevant
 			LVariant Offline;
 			App->GetOptions()->GetValue(OPT_WorkOffline, Offline);
-			if (!Offline.CastInt32() && !IsInPublicFolder)
+			if (!Offline.CastInt32())
 			{
 				App->PostEvent(M_COMMAND, IDM_SEND_MAIL, (LMessage::Param)Handle());
 			}
+			else LgiTrace("%s:%i - not online.\n", _FL);
 		}
+		else LgiTrace("%s:%i - not sending now.\n", _FL);
 	}
+	else LgiTrace("%s:%i - in public folder.\n", _FL);
 
 	return true;
 }
@@ -5534,7 +5535,7 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 					Idx = -Idx;
 				}
 
-				LDataPropI *a = Idx < (int)To->Length() ? (*To)[Idx] : 0;
+				auto a = Idx < (int)To->Length() ? (*To)[Idx] : nullptr;
 				if (!a && Create)
 				{
 					if ((a = To->Create(GetObject()->GetStore())))
@@ -6078,6 +6079,11 @@ bool Mail::CallMethod(const char *MethodName, LScriptArguments &Args)
 			break;
 		case SdSend: // Type: ([Bool SendNow = true])
 		{
+			// Mark for sending...
+			auto flags = GetObject()->GetInt(FIELD_FLAGS);
+			GetObject()->SetInt(FIELD_FLAGS, flags | MAIL_READY_TO_SEND);
+		
+			// Send immediately?
 			bool Now = Args.Length() > 0 ? Args[0]->CastInt32() != 0 : true;
 			bool Result = Send(Now);
 			*Args.GetReturn() = Result;
@@ -6162,6 +6168,27 @@ bool Mail::CallMethod(const char *MethodName, LScriptArguments &Args)
 		{
 			DeleteAsSpam(App);
 			return true;
+		}
+		case SdAddTo: // Type: ([String Email[, String Name]])
+		{
+			// Add recipient and return to the called:
+			auto store = GetObject()->GetStore();
+			if (auto objTo = GetTo())
+			{
+				if (auto recip = objTo->Create(store))
+				{
+					if (auto email = Args.StringAt(0))
+						recip->SetStr(FIELD_EMAIL, email);
+					if (auto name = Args.StringAt(1))
+						recip->SetStr(FIELD_NAME, name);
+
+					objTo->Insert(recip);
+
+					*Args.GetReturn() = recip;
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 	
@@ -8716,7 +8743,7 @@ bool Mail::Save(ScribeFolder *Into)
 
 	if (Into)
 	{
-		ScribeFolder *Old = GetFolder();
+		auto Old = GetFolder();
 
         if (!GetFolder())
         {

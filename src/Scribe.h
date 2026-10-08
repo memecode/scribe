@@ -966,7 +966,7 @@ class ScribeClass Mail :
 	friend class ScribeWnd;
 
 private:
-	class MailPrivate *d = NULL;
+	class MailPrivate *d = nullptr;
 	static LHashTbl<ConstStrKey<char>,Mail*> MessageIdMap;
 
 	// List item preview
@@ -975,11 +975,11 @@ private:
 	
 	int64_t TotalSizeCache = 0;
 	int64_t FlagsCache = 0;
-	MailUi *Ui = NULL;
+	MailUi *Ui = nullptr;
 	int Cursor; // Stores the cursor position in reply/forward format until the UI needs it
-	Attachment *ParentFile = NULL;
+	Attachment *ParentFile = nullptr;
 	List<Attachment> Attachments;
-	Mail *PreviousMail = NULL; // the mail we are replying to / forwarding
+	Mail *PreviousMail = nullptr; // the mail we are replying to / forwarding
 
 	void _New();
 	void _Delete();

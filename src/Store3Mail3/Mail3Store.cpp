@@ -51,10 +51,8 @@ Store3Status LMail3Thing::Save(LDataI *Folder)
 
 			Parent = Fld;
 			ParentId = Fld->Id;
-			LAssert(Parent->Items.IndexOf(this, true) < 0);
-			
-			// LgiTrace("%s:%i - Saving %i to %s (%i items)\n", _FL, (int)Id, Parent->GetStr(FIELD_FOLDER_NAME), Parent->Items.Length());
-			Parent->Items.Insert(this, -1, true);
+			if (Parent->Items.IndexOf(this, true) < 0)
+				Parent->Items.Insert(this, -1, true);
 			
 			Create = true;
 
