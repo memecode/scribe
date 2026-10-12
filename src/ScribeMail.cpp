@@ -458,8 +458,8 @@ public:
 	}	
 };
 
-#include "lgi/common/RichTextEdit.h"
-#include "../src/common/Widgets/Editor/RichTextEditPriv.h"
+#include "lgi/common/RichTextEdit1.h"
+#include "../../src/common/Widgets/richText1/RichTextEditPriv1.h"
 
 class MailRendererScript : public LThread, public LCancel, public LDom
 {
@@ -2351,7 +2351,7 @@ bool MailUi::IsWorking(int Set)
 	}
 	
 	// Check rich text control as well...
-	auto Rte = dynamic_cast<LRichTextEdit*>(HtmlView);
+	auto Rte = dynamic_cast<Rte1::LRichTextEdit*>(HtmlView);
 	if (Rte)
 	{
 		if (Rte->IsBusy())

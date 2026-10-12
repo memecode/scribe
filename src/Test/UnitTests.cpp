@@ -2,7 +2,7 @@
 
 #include "lgi/common/Lgi.h"
 #include "lgi/common/SpellCheck.h"
-#include "lgi/common/RichTextEdit.h"
+#include "lgi/common/RichTextEdit1.h"
 #include "lgi/common/ZlibWrapper.h"
 
 #include "Scribe.h"
@@ -479,7 +479,7 @@ struct MimeTreeTest : public ScribeUnitTest
 					auto html = mailui->GetDoc(sTextHtml);
 					if (html)
 					{
-						auto edit = dynamic_cast<LRichTextEdit*>(html);
+						auto edit = dynamic_cast<Rte1::LRichTextEdit*>(html);
 						if (edit)
 							edit->Insert(0, htmlContent, StrlenW(htmlContent)); 
 					}

@@ -23,7 +23,7 @@
 #include "lgi/common/TabView.h"
 #include "lgi/common/SpellCheck.h"
 #include "lgi/common/LgiRes.h"
-#include "lgi/common/RichTextEdit.h"
+#include "lgi/common/RichTextEdit1.h"
 #include "lgi/common/EventTargetThread.h"
 #include "lgi/common/TextView3.h"
 #include "lgi/common/FileSelect.h"
@@ -63,7 +63,7 @@ class UtfEditor : public LDialog
 	LTabPage *TabText = nullptr, *TabHtml = nullptr;
 	LButton *Ok = nullptr, *Cancel = nullptr;
 	LTextView3 *Txt = nullptr;
-	LRichTextEdit *Html = nullptr;
+	Rte1::LRichTextEdit *Html = nullptr;
 	const char *TextOpt = nullptr, *HtmlOpt = nullptr;
 
 public:
@@ -1272,7 +1272,7 @@ UtfEditor::UtfEditor(ScribeWnd *app, LWindow *parent,
 		}
 		if ((TabHtml = Tabs->Append("Html")))
 		{
-			TabHtml->Append(Html = new LRichTextEdit(IDC_HTML_VIEW, 0, 0, 100, 100));
+			TabHtml->Append(Html = new Rte1::LRichTextEdit(IDC_HTML_VIEW, 0, 0, 100, 100));
 			Html->SetPourLargest(true);
 			Html->Sunken(true);
 		}

@@ -93,33 +93,36 @@
 			<Node File="../../lgi/trunk/src/common/Gdc2/Font/EmojiFont.cpp" Type="2" Platforms="15" />
 		</Node>
 		<Node Name="Html" Type="1" Platforms="15" Open="0" Id="12">
-			<Node Name="LiteHtml" Type="1" Platforms="15" Id="13">
-				<Node File="../../lgi/trunk/src/common/LiteHtml/LiteHtmlView.cpp" Type="2" Platforms="15" />
-				<Node File="../../lgi/trunk/include/lgi/common/LiteHtmlView.h" Type="3" Platforms="15" />
+			<Node Name="Html1" Type="1" Platforms="15" Id="15">
+				<Node File="../../lgi/trunk/src/common/Text/Html.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/include/lgi/common/Html.h" Type="3" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Text/HtmlPriv.h" Type="3" Platforms="15" />
 			</Node>
 			<Node Name="Html2" Type="1" Platforms="15" Id="14">
 				<Node File="../../lgi/trunk/src/common/Text/Html2.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/include/lgi/common/Html2.h" Type="3" Platforms="15" />
 				<Node File="../../lgi/trunk/src/common/Text/HtmlPriv2.h" Type="3" Platforms="15" />
 			</Node>
+			<Node Name="LiteHtml" Type="1" Platforms="15" Id="13">
+				<Node File="../../lgi/trunk/src/common/LiteHtml/LiteHtmlView.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/include/lgi/common/LiteHtmlView.h" Type="3" Platforms="15" />
+			</Node>
 			<Node File="../../lgi/trunk/src/common/Text/HtmlCommon.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Text/HtmlParser.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/include/lgi/common/HtmlParser.h" Type="3" Platforms="15" />
-			<Node Name="Html1" Type="1" Platforms="15" Id="15">
-				<Node File="../../lgi/trunk/src/common/Text/Html.cpp" Type="2" Platforms="15" />
-				<Node File="../../lgi/trunk/include/lgi/common/Html.h" Type="3" Platforms="15" />
-				<Node File="../../lgi/trunk/src/common/Text/HtmlPriv.h" Type="3" Platforms="15" />
-			</Node>
 		</Node>
 		<Node Name="RichTextEdit" Type="1" Platforms="15" Open="0" Id="16">
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/TextBlock.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/include/lgi/common/RichTextEdit.h" Type="3" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp" Type="2" Platforms="15" />
-			<Node File="../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.h" Type="3" Platforms="15" />
+			<Node Name="1" Type="1" Platforms="15" Id="1">
+				<Node File="../../lgi/trunk/src/common/Widgets/richText1/RichTextEditPriv1.h" Type="3" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Widgets/richText1/RichTextEditPriv1.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/include/lgi/common/RichTextEdit1.h" Type="3" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Widgets/richText1/RichTextEdit1.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Widgets/richText1/TextBlock1.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Widgets/richText1/ImageBlock1.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Widgets/richText1/HorzRuleBlock1.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Widgets/richText1/BlockCursor1.cpp" Type="2" Platforms="15" />
+			</Node>
+			<Node Name="2" Type="1" Platforms="15" Id="2" />
 		</Node>
 		<Node File="../../lgi/trunk/src/common/Lgi/Browser.cpp" Type="2" Platforms="15" />
 		<Node File="../../lgi/trunk/include/lgi/common/DocView.h" Type="3" Platforms="15" />
@@ -419,8 +422,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Release>./scribe</Release>
 				</Haiku>
 			</Executable>
-			<CCrossCompiler />
-			<CppCrossCompiler />
 		</General>
 		<Build>
 			<IncludePaths>
@@ -523,7 +524,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>`pkg-config --cflags gtk+-3.0`</Debug>
 					<Release>`pkg-config --cflags gtk+-3.0`</Release>
 				</Linux>
-				<Haiku />
 			</SystemIncludes>
 			<LibraryPaths>
 				<All>
@@ -531,7 +531,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 </Debug>
 					<Release>../libs/build-x64-release/lib</Release>
 				</All>
-				<Haiku />
 			</LibraryPaths>
 			<TargetName>
 				<Haiku>
@@ -544,8 +543,6 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>-Wno-format-truncation</Debug>
 					<Release>-Wno-format-truncation</Release>
 				</Linux>
-				<All />
-				<Haiku />
 			</Options>
 			<ApplicationIcon>
 				<Haiku>./resources/scribe.hvif</Haiku>
@@ -555,14 +552,12 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 					<Debug>../libs/build-x64-debug/lib</Debug>
 					<Release>../libs/build-x64-release/lib</Release>
 				</Linux>
-				<Haiku />
 			</RPath>
 			<RPathLink>
 				<Linux>
 					<Debug>../libs/build-x64-debug/lib</Debug>
 					<Release>../libs/build-x64-release/lib</Release>
 				</Linux>
-				<Haiku />
 			</RPathLink>
 		</Build>
 		<Editor>
@@ -578,14 +573,9 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<ShowWhiteSpace>
 				<All>0</All>
 			</ShowWhiteSpace>
-			<CommentFile />
-			<CommentFunction />
 		</Editor>
 		<Advanced>
-			<OtherMakefileRules />
-			<PostBuildCommands>
-				<Haiku />
-			</PostBuildCommands>
+			<PostBuildCommands />
 		</Advanced>
 		<Debug>
 			<DebugAdmin>
@@ -594,15 +584,8 @@ LIBPNG_VERSION=\&quot;1.5\&quot;</Release>
 			<Environment>
 				<All>LD_LIBRARY_PATH=/home/matthew/gtk3/build/gtk:/home/matthew/gtk3/build/gdk</All>
 			</Environment>
-			<Arguments>
-				<All />
-			</Arguments>
-			<InitialDir />
-			<Debugger />
+			<Arguments />
 		</Debug>
-		<Remote>
-			<RemoteUri />
-			<RemotePass />
-		</Remote>
+		<Remote />
 	</Settings>
 </Project>

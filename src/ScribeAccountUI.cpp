@@ -6,7 +6,7 @@
 #include "lgi/common/TableLayout.h"
 #include "lgi/common/Button.h"
 #include "lgi/common/LgiRes.h"
-#include "lgi/common/RichTextEdit.h"
+#include "lgi/common/RichTextEdit1.h"
 #include "lgi/common/Charset.h"
 
 #include "Scribe.h"
@@ -48,7 +48,7 @@ AccountDlg::AccountDlg(LView *p, ScribeWnd *app, ScribeAccount *a, int Tab) :
 	{
 		MoveToCenter();
 		
-		LRichTextEdit *Rte;
+		Rte1::LRichTextEdit *Rte;
 		if (GetViewById(IDC_SIG_HTML, Rte))
 			Rte->SetStylePrefix("Sig");
 

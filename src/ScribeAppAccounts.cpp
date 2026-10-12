@@ -37,7 +37,7 @@
 #include "lgi/common/SoftwareUpdate.h"
 #include "lgi/common/Html.h"
 #include "lgi/common/TextView3.h"
-#include "lgi/common/RichTextEdit.h"
+#include "lgi/common/RichTextEdit1.h"
 #include "lgi/common/Store3.h"
 #include "lgi/common/Edit.h"
 #include "lgi/common/Box.h"
@@ -6390,7 +6390,7 @@ public:
 	}
 };
 
-class ScribeRichTextEdit : public LRichTextEdit
+class ScribeRichTextEdit : public Rte1::LRichTextEdit
 {
 	ScribeWnd *App;
 
@@ -6443,7 +6443,7 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 		if (!Stricmp(MimeType, sTextHtml))
 		{		
 			// Use the built in html editor
-			LRichTextEdit *Rte;
+			Rte1::LRichTextEdit *Rte;
 			if ((Ctrl = Rte = new ScribeRichTextEdit(this, Id)))
 			{
 				if (UseFont)
