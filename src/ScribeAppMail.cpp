@@ -969,7 +969,7 @@ void ScribeWnd::Send(ssize_t Which, bool Quiet)
 		LVariant v;
 		if (GetOptions()->GetValue(OPT_DefaultSendAccount, v))
 		{
-			if (auto account = GetAccountById(v.CastInt64()))
+			if (auto account = GetAccountById((int)v.CastInt64()))
 				Which = account->GetIndex();
 		}
 	}

@@ -1093,8 +1093,8 @@ bool CalendarView::OnPrintPage(LPrintDC *pDC, int PageIndex)
 		double CmToInch = 0.393700787;
 		auto ScreenDpi = LScreenDpi();
 		auto DcDpi = pDC->GetDpi();
-		double ScaleX = (double)ScreenDpi.x / DcDpi.x;
-		double ScaleY = (double)ScreenDpi.y / DcDpi.y;
+		// double ScaleX = (double)ScreenDpi.x / DcDpi.x;
+		// double ScaleY = (double)ScreenDpi.y / DcDpi.y;
 
 		PrintMargin.x1 = (int) (Bx1.CastDouble() * CmToInch * DcDpi.x);
 		PrintMargin.y1 = (int) (By1.CastDouble() * CmToInch * DcDpi.y);

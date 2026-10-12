@@ -880,7 +880,7 @@ const char *LMail3Mail::GetStr(int id)
 						int64 Size = s->GetSize();
 						if (Size > 0)
 						{
-							auto Charset = Results[i]->GetStr(FIELD_CHARSET);
+							// auto Charset = Results[i]->GetStr(FIELD_CHARSET);
 						
 							char *Buf = new char[(size_t)Size+1];
 							ssize_t Rd = s->Read(Buf, (int)Size);

@@ -1,9 +1,11 @@
 #include "lgi/common/Lgi.h"
+#include "lgi/common/LgiRes.h"
+#include "lgi/common/FileSelect.h"
+#include "lgi/common/EventTargetThread.h"
+
 #include "Scribe.h"
 #include "resdefs.h"
 #include "Store3Imap/ScribeImap.h"
-#include "lgi/common/LgiRes.h"
-#include "lgi/common/FileSelect.h"
 
 /////////////////////////////////////////////////////////////////////////////////
 ThingType::ThingType()
