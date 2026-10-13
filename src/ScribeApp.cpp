@@ -1139,6 +1139,7 @@ void ScribeWnd::Construct3()
 			SetMenuIcon(IDM_FEEDBACK, ICON_UNREAD_MAIL);
 			SetMenuIcon(ID_HELP, ICON_HELP);
 
+			d->ViewCtrl.get();
 			d->EditCtrl.get();
 
 			Menu->SetPrefAndAboutItems(IDM_OPTIONS, IDM_ABOUT);

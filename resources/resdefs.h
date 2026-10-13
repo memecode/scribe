@@ -190,7 +190,7 @@
 #define IDC_CONTACT_FLD							328
 #define IDS_DEBUG								329
 #define IDC_SET_INBOX							330
-#define IDC_SET_OUTBOX							331
+#define IDC_VIEW_CONTROL						331
 #define IDC_SET_SENT							332
 #define IDC_SET_TRASH							333
 #define IDC_SET_CONTACTS						334
@@ -1037,6 +1037,7 @@
 #define IDS_SELECT_ACCOUNT						1229
 #define IDM_HTML2								1230
 #define IDM_LITE_HTML							1231
+#define IDC_SET_OUTBOX							1232
 #define IDS_1235								1235
 #define IDC_MONDAY								1238
 #define IDC_TUESDAY								1239
@@ -1114,7 +1115,6 @@
 #define IDS_MAILSTORE_UPGRADE_Q					1373
 #define IDS_ERROR_IMPORT						1374
 #define IDS_ERROR_REPLICATION_FAILED			1375
-#define ID_HTML_CTRL							1380
 #define IDS_ERROR_IMPORT_COUNT					1388
 #define IDS_GNUPG_ERR_NOT_INSTALLED				1458
 #define IDC_1459								1459

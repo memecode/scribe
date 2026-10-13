@@ -3949,9 +3949,11 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 						SslSocket::DebugLogging = i.CastInt32() != 0;
 					*/
 
-					// Html edit menu
+					// Update the menus with whatever was selected in the options:
+					if (GetOptions()->GetValue(OPT_HtmlViewCtrl, i))
+						d->ViewCtrl.set((THtmlViewCtrl) i.CastInt32());
 					if (GetOptions()->GetValue(OPT_EditControl, i))
-						SetEditCtrl((TRteEditCtrl)i.CastInt32());
+						d->EditCtrl.set((TRteEditCtrl) i.CastInt32());
 				}
 			});
 			break;
@@ -4487,38 +4489,38 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 		// RTE editor menu handling:
 		case IDM_EDIT_TEXT:
 		{
-			d->EditCtrl.set(EDIT_TEXT);
+			d->EditCtrl.set(EDIT_TEXT, true);
 			break;
 		}
 		case IDM_EDIT_RTE1:
 		{
-			d->EditCtrl.set(EDIT_RTE1);
+			d->EditCtrl.set(EDIT_RTE1, true);
 			break;
 		}
 		case IDM_EDIT_RTE2:
 		{
-			d->EditCtrl.set(EDIT_RTE2);
+			d->EditCtrl.set(EDIT_RTE2, true);
 			break;
 		}
 
 		// Html viewer menu handling:
 		case IDM_HTML1:
 		{
-			d->ViewCtrl.set(TLgiHtml1);
+			d->ViewCtrl.set(TLgiHtml1, true);
 			break;
 		}
 		case IDM_HTML2:
 		{
-			d->ViewCtrl.set(TLgiHtml2);
+			d->ViewCtrl.set(TLgiHtml2, true);
 			break;
 		}
 		case IDM_LITE_HTML:
 		{
-			d->ViewCtrl.set(TLiteHtmlView);
+			d->ViewCtrl.set(TLiteHtmlView, true);
 			break;
 		}
 
-		
+
 		case IDM_FILTERS_DISABLE:
 		{
 			if (d->DisableUserFilters)

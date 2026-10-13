@@ -188,6 +188,8 @@
 		<String Ref="320" Cid="320" Define="ID_FLD_CHK_TBL" />
 		<String Ref="321" Cid="-1" Define="IDC_STATIC" en="Check that all the folders are categorized correctly:\nRight click to change." />
 		<String Ref="322" Cid="322" Define="ID_FOLDER_CAT" />
+		<String Ref="330" Cid="-1" Define="IDC_STATIC" en="View control:" />
+		<String Ref="331" Cid="331" Define="IDC_VIEW_CONTROL" />
 		<String Ref="339" Cid="1165" Define="IDC_TABLE" />
 		<String Ref="340" Cid="-1" Define="IDC_STATIC" en="columns" fr="colonnes" it="colonne" cs="znaků" es="columnas" de="Spalten" nl="tekens" pt_br="colunas" ru="символов" ja="列" pt="colunas" pl="kolumn" vi="cột" zh_tw="欄" sr="koloni" no="kolonner" lt="simb." fa="ستون " da="kolonner" sv="tecken" lg="emiwatwa" tr="kolonlar" hu="oszlopok" ko="행" uk="символів" />
 		<String Ref="341" Cid="-1" Define="IDC_STATIC" en="Default HTML Font:" pl="Domyślna czcionka HTML:" cs="Výchozí HTML Font:" no="Standard HTML skrifttype:" nl="Standaard HTML lettertype:" lt="Numatytasis HTML šriftas" pt="Fonte p/ HTML" fa="HTMLقلم پيشفرض براي " de="Standard HTML Schriftart:" sr="Podrazumevani HTML font:" da="Standard HTML skrifttype:" vi="Kiểu chữ HTML mặc định:" sv="Standard HTML-teckensnitt:" es="Fuente HTML por defecto:" pt_br="Fonte padrão para HTML:" lg="Omukono gw&apos;emiko ogw&apos;enkalakalira:" tr="Varsayılan HTML Yazı Tipi:" hu="Alapértelmezett HTML-betűtípus:" ru="Шрифт HTML по умолчанию:" ko="HTML 폰트 초기화:" uk="Шрифт HTML за замовчуванням:" fr="Police par défaut HTML:" />
@@ -836,7 +838,6 @@
 		<String Ref="1371" Cid="1371" Define="IDS_SPELL_CHECK" en="Spell Check:" pl="Sprawdzanie pisowni:" ko="철자 체크:" uk="Перевірка орфографії:" de="Rechtschreibprüfung:" fr="Vérification d&apos;orthographe:" />
 		<String Ref="1372" Cid="1372" Define="IDS_SPELL_DICT" en="Dictionary:" pl="Słownik:" ko="사전:" uk="Словник:" de="Wörterbuch:" fr="Dictionnaire:" />
 		<String Ref="1376" Cid="-1" Define="IDC_STATIC" en="Start in folder:" pl="Rozpocznij w folderze:" pt="Localização das sub-pastas" nl="Begin in map:" sr="Počni u omotnici:" lt="Pradžios aplankas:" cs="Výchozí složka:" de="Start im Ordner:" da="Start i mappe:" fa="پوشه شروع:" vi="Bắt đầu trong danh mục:" sv="Starta i:" es="Iniciar en Carpeta:" pt_br="Começar na pasta:" lg="Salawo awaterekerwa bu kabada" tr="Başlangıç klasörü:" hu="Kezdő mappa" ru="Запускать в папке:" ko="시작 폴더:" uk="Запустити в теці:" fr="Débuter dans le dossier:" />
-		<String Ref="1380" Cid="1380" Define="ID_HTML_CTRL" en="Html control:" />
 		<String Ref="1459" Cid="1459" Define="IDC_1459" en="Control" />
 		<String Ref="1469" Cid="1469" Define="IDD_FOLDER_SELECT" en="Select Folder" ko="폴더 선택" uk="Вибір теки" de="Ordner auswählen" fr="Sélectionner dossier" />
 		<String Ref="1470" Cid="540" Define="IDC_LAYOUT" />
@@ -951,7 +952,7 @@
 		<String Ref="1647" Cid="330" Define="IDC_SET_INBOX" en="..." />
 		<String Ref="1649" Cid="-1" Define="IDC_STATIC" en="Outbox:" fr="Boite de départ:" it="Posta in uscita:" cs="K odeslání:" es="Bandeja de Salida:" de="Postausgang:" nl="Postvak Uit:" pt_br="Caixa de saída:" pt="A Enviar:" pl="Skrzynka nadawcza:" vi="Thư chưa gửi:" zh_tw="寄件夾:" ja="送信箱:" sr="Izlazna kutija:" no="Utboks:" lt="Siunčiami:" fa="آماده فرستادن" da="Udgang:" sv="Utkorg:" lg="Ezinasindikibwa:" tr="Gönderilecek (outbox):" hu="Kimenő:" ru="Исходящие:" ko="임시보관함:" uk="Вихідні:" />
 		<String Ref="1651" Cid="325" Define="IDC_OUTBOX" pt="A Enviar" />
-		<String Ref="1653" Cid="331" Define="IDC_SET_OUTBOX" en="..." />
+		<String Ref="1653" Cid="1232" Define="IDC_SET_OUTBOX" en="..." />
 		<String Ref="1655" Cid="-1" Define="IDC_STATIC" en="Sent Items:" fr="Eléments envoyés:" it="Posta inviata:" cs="Odeslané:" es="Elementos Enviados:" de="Gesendete E-Mails:" nl="Verzonden:" pt_br="Ítens enviados:" pt="Enviado:" pl="Elementy wysłane:" vi="Thư đã gửi" zh_tw="傳送項目:" ja="送信済みアイテム:" sr="Poslati objekti:" no="Sendte meldinger:" lt="Išsiųsti:" fa="فرستاده شده" da="Sendte meldinger:" sv="Skickade meddelanden:" lg="Ebisindikiddwa:" tr="Giden (sent):" hu="Elküldött elemek:" ru="Отправленные:" ko="보낸편지함:" uk="Відправлені:" />
 		<String Ref="1657" Cid="449" Define="IDC_SENT" pt="Enviado" />
 		<String Ref="1659" Cid="332" Define="IDC_SET_SENT" en="..." />
@@ -4576,7 +4577,7 @@
 				</TableLayout>
 			</Tab>
 			<Tab ref="794">
-				<TableLayout pos="14,28,433,517" ref="9" cols="0.333,0.333,0.333" rows="0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050,0.050">
+				<TableLayout pos="0,14,475,524" ref="9" CellClass="inset" cols="0.333,0.333,0.333" rows="0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.048,0.056,0.058,0.030">
 					<tr>
 						<td addr="0,0" colspan="3">
 							<StaticText pos="0,7,90,20" ref="200" />
@@ -4587,10 +4588,10 @@
 							<StaticText pos="0,23,132,36" ref="202" />
 						</td>
 						<td addr="1,1">
-							<EditBox Pos="134,23,266,43" Enabled="0" ref="831" />
+							<EditBox Pos="153,23,285,43" Enabled="0" ref="831" />
 						</td>
 						<td addr="2,1" align="Max">
-							<Button Pos="280,24,300,44" toggle="0" ref="1112" />
+							<Button Pos="318,23,338,43" toggle="0" ref="1112" />
 						</td>
 					</tr>
 					<tr>
@@ -4598,23 +4599,23 @@
 							<CheckBox pos="0,46,132,59" ref="108" />
 						</td>
 						<td addr="1,2">
-							<EditBox Pos="136,46,191,66" ref="201" />
+							<EditBox Pos="155,46,210,66" ref="201" />
 						</td>
 						<td addr="2,2">
-							<StaticText pos="272,46,390,59" ref="340" />
+							<StaticText pos="310,46,428,59" ref="340" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,3" class="inset">
-							<StaticText pos="0,69,132,82" ref="204" />
+							<StaticText pos="0,70,90,83" ref="204" />
 						</td>
 						<td addr="1,3" colspan="2">
-							<ComboBox pos="136,69,359,89" ref="211" />
+							<ComboBox pos="155,69,378,89" ref="211" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,4" colspan="3">
-							<StaticText pos="14,93,328,113" ref="97" />
+							<StaticText pos="14,92,328,112" ref="97" />
 						</td>
 					</tr>
 					<tr>
@@ -4622,10 +4623,10 @@
 							<StaticText pos="0,115,132,128" ref="341" />
 						</td>
 						<td addr="1,5">
-							<EditBox Pos="134,115,266,135" Enabled="0" ref="1272" />
+							<EditBox Pos="153,115,285,135" Enabled="0" ref="1272" />
 						</td>
 						<td addr="2,5" align="Max">
-							<Button Pos="273,115,293,135" toggle="0" ref="1273" />
+							<Button Pos="311,115,331,135" toggle="0" ref="1273" />
 						</td>
 					</tr>
 					<tr>
@@ -4633,93 +4634,101 @@
 							<StaticText pos="0,138,132,151" ref="1036" />
 						</td>
 						<td addr="1,6" colspan="2">
-							<ComboBox pos="136,138,303,158" ref="1037" />
+							<ComboBox pos="155,138,322,158" ref="1037" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,7" colspan="2" class="inset">
-							<CheckBox pos="7,161,230,174" ref="1278" />
+						<td addr="0,7" class="inset">
+							<StaticText pos="7,161,125,181" ref="330" />
 						</td>
-						<td addr="2,7" align="Max">
-							<Button Pos="273,161,293,181" toggle="0" ref="13" />
-						</td>
-					</tr>
-					<tr>
-						<td addr="0,8" colspan="3">
-							<StaticText pos="14,191,293,204" ref="99" />
+						<td addr="1,7" colspan="2">
+							<ComboBox pos="161,161,342,181" ref="331" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,9" class="inset">
-							<StaticText pos="0,207,132,220" ref="346" />
+						<td addr="0,8" colspan="2" class="inset">
+							<CheckBox pos="7,189,230,202" ref="1278" />
 						</td>
-						<td addr="1,9" colspan="2">
-							<ComboBox pos="136,207,303,227" ref="347" />
+						<td addr="2,8" align="Max">
+							<Button Pos="311,184,331,204" toggle="0" ref="13" />
+						</td>
+					</tr>
+					<tr>
+						<td addr="0,9" colspan="3">
+							<StaticText pos="14,214,293,227" ref="99" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,10" class="inset">
-							<StaticText pos="0,230,132,243" ref="352" />
+							<StaticText pos="0,230,132,243" ref="346" />
 						</td>
 						<td addr="1,10" colspan="2">
-							<ComboBox pos="136,230,303,250" ref="362" />
+							<ComboBox pos="155,230,322,250" ref="347" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,11" class="inset">
-							<StaticText pos="7,258,76,271" ref="1080" />
+							<StaticText pos="0,253,132,266" ref="352" />
 						</td>
 						<td addr="1,11" colspan="2">
-							<ComboBox pos="136,253,303,273" ref="1358" />
+							<ComboBox pos="155,253,322,273" ref="362" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,12" class="inset">
-							<StaticText pos="7,277,97,290" ref="758" />
+							<StaticText pos="7,281,76,294" ref="1080" />
 						</td>
-						<td addr="1,12">
-							<ComboBox pos="140,277,237,297" ref="776" />
-						</td>
-						<td addr="2,12" align="Max">
-							<Button Pos="280,277,307,297" toggle="0" ref="780" />
+						<td addr="1,12" colspan="2">
+							<ComboBox pos="155,276,322,296" ref="1358" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,13" colspan="3">
-							<CheckBox pos="0,299,363,312" ref="1359" />
+						<td addr="0,13" class="inset">
+							<StaticText pos="7,300,97,313" ref="758" />
+						</td>
+						<td addr="1,13">
+							<ComboBox pos="159,299,256,319" ref="776" />
+						</td>
+						<td addr="2,13" align="Max">
+							<Button Pos="318,299,345,319" toggle="0" ref="780" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,14" colspan="3">
-							<CheckBox pos="0,322,174,335" ref="10" />
+							<CheckBox pos="0,322,363,335" ref="1359" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,15" colspan="3">
-							<CheckBox pos="0,345,202,358" ref="11" />
+							<CheckBox pos="0,345,174,358" ref="10" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,16" colspan="3">
-							<CheckBox pos="0,369,202,382" ref="598" />
+							<CheckBox pos="0,368,202,381" ref="11" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,17" colspan="3">
-							<CheckBox pos="0,393,188,406" ref="671" />
+							<CheckBox pos="0,392,202,405" ref="598" />
 						</td>
 					</tr>
 					<tr>
 						<td addr="0,18" colspan="3">
-							<CheckBox pos="0,418,237,431" ref="677" />
+							<CheckBox pos="0,414,188,426" ref="671" />
 						</td>
 					</tr>
 					<tr>
-						<td addr="0,19" valign="Center">
-							<StaticText pos="7,448,83,468" ref="920" />
+						<td addr="0,19" colspan="3">
+							<CheckBox pos="0,441,237,454" ref="677" />
 						</td>
-						<td addr="1,19" colspan="2" valign="Center">
-							<ComboBox pos="147,448,328,468" ref="919" />
+					</tr>
+					<tr>
+						<td addr="0,20" valign="Center">
+							<StaticText pos="7,472,83,492" ref="920" />
+						</td>
+						<td addr="1,20" colspan="2" valign="Center">
+							<ComboBox pos="166,472,347,492" ref="919" />
 						</td>
 					</tr>
 				</TableLayout>
@@ -4754,7 +4763,6 @@
 						<Control Ref="840" ControlType="bool" ControlTag="AdjustDateTz" />
 						<Control Ref="1550" ControlType="bool" ControlTag="NoEmoji" />
 						<Control Ref="1617" ControlType="bool" ControlTag="SizeInKiB" />
-						<Control Ref="1380" ControlType="enum" ControlTag="HtmlViewCtrl" />
 					</Control>
 					<Control Ref="734" ControlType="bool" ControlTag="SoftwareUpdate">
 						<Control Ref="736" ControlType="enum" ControlTag="SoftwareUpdateTime" />

@@ -345,6 +345,7 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 
 	// Appearance/Look Tab
 	Map(OPT_EditControl, IDC_EDIT_CONTROL, GV_INT32);
+	Map(OPT_HtmlViewCtrl, IDC_VIEW_CONTROL, GV_INT32);
 	Map(OPT_WordWrap, IDC_WRAP, GV_BOOL);
 	Map(OPT_WrapAtColumn, IDC_WRAP_COLS, GV_INT32);
 	Map(OPT_DefaultAlternative, IDC_DEFAULT_ALT, GV_INT32);
@@ -471,7 +472,16 @@ OptionsDlg::OptionsDlg(ScribeWnd *window) :
 	if (GetViewById(IDC_EDIT_CONTROL, c))
 	{
 		c->Insert("text/plain");
-		c->Insert("text/html (experimental)");
+		c->Insert("text/html (RichTextEdit v1)");
+		c->Insert("text/html (RichTextEdit v2)");
+	}
+	else LAssert(!"GetViewById failed.");
+
+	if (GetViewById(IDC_VIEW_CONTROL, c))
+	{
+		c->Insert("Html1");
+		c->Insert("Html2");
+		c->Insert("LiteHtml");
 	}
 	else LAssert(!"GetViewById failed.");
 
@@ -1062,7 +1072,7 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		}
 		case IDOK:
 		{
-			LOptionsFile *Opts = App->GetOptions();
+			auto Opts = App->GetOptions();
 			
 			// Font
 			EditorFont.Serialize(Opts, OPT_EditorFont, true);
