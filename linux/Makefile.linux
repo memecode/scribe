@@ -148,6 +148,13 @@ Source =	../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			../../lgi/trunk/src/common/Widgets/richText1/RichTextEdit1.cpp \
 			../../lgi/trunk/src/common/Widgets/richText1/RichTextEditPriv1.cpp \
 			../../lgi/trunk/src/common/Widgets/richText1/TextBlock1.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/BlockCursor.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/HorzRuleBlock.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/ImageBlock.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/ListBlock.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/RichTextEdit.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/RichTextEditPriv.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/TextBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/TimePopup.cpp \
 			../../lgi/trunk/src/common/Widgets/YearView.cpp \
 			../../lgi/trunk/src/common/Widgets/ZoomView.cpp \
@@ -603,6 +610,7 @@ VPATH=$(BuildDir) \
 	./src/Encryption \
 	./src \
 	../libs/Btree \
+	../../lgi/trunk/src/common/Widgets/richText2 \
 	../../lgi/trunk/src/common/Widgets/richText1 \
 	../../lgi/trunk/src/common/Widgets \
 	../../lgi/trunk/src/common/Text/Homoglyphs \

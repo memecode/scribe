@@ -1297,7 +1297,9 @@ LMailStore &LMailStore::operator =(LMailStore &a)
 ScribeWndPrivate::ScribeWndPrivate(ScribeWnd *app) :
 	App(app),
 	TextControlFactory(app),
-	TrayIcon(new LTrayIcon(app))
+	TrayIcon(new LTrayIcon(app)),
+	EditCtrl(app, OPT_EditControl, {IDM_EDIT_TEXT, IDM_EDIT_RTE1, IDM_EDIT_RTE2}),
+	ViewCtrl(app, OPT_HtmlViewCtrl, {IDM_HTML1, IDM_HTML2, IDM_LITE_HTML})
 {
 	htmlStatic = new LHtmlStaticInst;
 	NoContact = new NoContactType(app);

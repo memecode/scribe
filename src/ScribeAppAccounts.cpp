@@ -3951,10 +3951,7 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 
 					// Html edit menu
 					if (GetOptions()->GetValue(OPT_EditControl, i))
-					{
-						auto mi = Menu->FindItem(IDM_HTML_EDITOR);
-						if (mi) mi->Checked(i.CastInt32() != 0);
-					}
+						SetEditCtrl((TRteEditCtrl)i.CastInt32());
 				}
 			});
 			break;
@@ -4486,18 +4483,42 @@ int ScribeWnd::OnCommand(int Cmd, int Event, OsView WndHandle)
 			}
 			break;
 		}
-		case IDM_HTML_EDITOR:
+
+		// RTE editor menu handling:
+		case IDM_EDIT_TEXT:
 		{
-			auto i = Menu->FindItem(IDM_HTML_EDITOR);
-			if (i)
-			{
-				i->Checked(!i->Checked());
-				
-				LVariant v;
-				GetOptions()->SetValue(OPT_EditControl, v = i->Checked() ? 1 : 0);
-			}
+			d->EditCtrl.set(EDIT_TEXT);
 			break;
 		}
+		case IDM_EDIT_RTE1:
+		{
+			d->EditCtrl.set(EDIT_RTE1);
+			break;
+		}
+		case IDM_EDIT_RTE2:
+		{
+			d->EditCtrl.set(EDIT_RTE2);
+			break;
+		}
+
+		// Html viewer menu handling:
+		case IDM_HTML1:
+		{
+			d->ViewCtrl.set(TLgiHtml1);
+			break;
+		}
+		case IDM_HTML2:
+		{
+			d->ViewCtrl.set(TLgiHtml2);
+			break;
+		}
+		case IDM_LITE_HTML:
+		{
+			d->ViewCtrl.set(TLiteHtmlView);
+			break;
+		}
+
+		
 		case IDM_FILTERS_DISABLE:
 		{
 			if (d->DisableUserFilters)

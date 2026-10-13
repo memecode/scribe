@@ -2200,6 +2200,35 @@ struct OptionsInfo
 	LAutoPtr<LOptionsFile> Load();
 };
 
+/// Map an enum value to a list of mutually exclusive menu item checkboxes:
+template<typename ENUM, ENUM DEFAULT>
+class MenuOption
+{
+	ScribeWnd *app = nullptr;
+	const char *optName = nullptr;
+	LArray<int> menuId;
+
+public:
+	MenuOption(ScribeWnd *App,
+		// The name of the integer option to persist the value:
+		const char *Optname,
+		// A variable list of menu item IDs:
+		std::initializer_list<int> Ids)
+		: app(App)
+		, optName(Optname)
+	{
+		if (menuId.Length(Ids.size()))
+		{
+			size_t n = 0;
+			for (auto i: Ids)
+				menuId[n++] = i;
+		}
+	}
+
+	ENUM get();
+	bool set(ENUM val, bool updateOption = false);
+};
+
 class ScribeClass ScribeWnd :
 	public LWindow,
 	public LDom,
@@ -2275,36 +2304,36 @@ public:
 	}
 
 protected:
-	class ScribeWndPrivate *d = NULL;
+	class ScribeWndPrivate *d = nullptr;
 	
 	// Ipc
-	class ScribeIpc *Ipc = NULL;
+	class ScribeIpc *Ipc = nullptr;
 
 	// Accounts
 	List<ScribeAccount> Accounts;
 
 	// New Mail stuff
-	class LNewMailDlg *NewMailDlg = NULL;
+	class LNewMailDlg *NewMailDlg = nullptr;
 
 	static AppState ScribeState;
 	DoEvery			Ticker;
 	int64			LastDrop = 0;
 
 	// Static 
-	LSubMenu		*File = NULL;
-	LSubMenu		*ContactsMenu = NULL;
-	LSubMenu		*Edit = NULL;
-	LSubMenu		*Help = NULL;
-	LToolBar		*Commands = NULL;
+	LSubMenu		*File = nullptr;
+	LSubMenu		*ContactsMenu = nullptr;
+	LSubMenu		*Edit = nullptr;
+	LSubMenu		*Help = nullptr;
+	LToolBar		*Commands = nullptr;
 
 	// Dynamic
-	LSubMenu		*IdentityMenu = NULL;
-	LMenuItem		*DefaultIdentityItem = NULL;
-	LSubMenu		*MailMenu = NULL;
-	LSubMenu		*SendMenu = NULL, *ReceiveMenu = NULL, *PreviewMenu = NULL;
-	LMenuItem		*SendItem = NULL, *ReceiveItem = NULL, *PreviewItem = NULL;
-	LSubMenu		*NewTemplateMenu = NULL;
-	LMenuItem		*WorkOffline = NULL;
+	LSubMenu		*IdentityMenu = nullptr;
+	LMenuItem		*DefaultIdentityItem = nullptr;
+	LSubMenu		*MailMenu = nullptr;
+	LSubMenu		*SendMenu = nullptr, *ReceiveMenu = nullptr, *PreviewMenu = nullptr;
+	LMenuItem		*SendItem = nullptr, *ReceiveItem = nullptr, *PreviewItem = nullptr;
+	LSubMenu		*NewTemplateMenu = nullptr;
+	LMenuItem		*WorkOffline = nullptr;
 
 	// Commands
 	LCommand		CmdSend;
@@ -2364,7 +2393,7 @@ protected:
 	};
 	void			OnCommandLineEvent(CmdLineEvent event);
 	const char 		*toString(CmdLineEvent e);
-
+	
 public:
 	ScribeWnd();
 	void Construct0(LOptionsFile::PortableType Type);
@@ -2443,6 +2472,10 @@ public:
 	void			OnTrayMenu(LSubMenu &m) override;
 	void			OnTrayMenuResult(int MenuId) override;
 	void			OnFolderSelect(ScribeFolder *f);
+
+	TRteEditCtrl GetEditCtrl();
+	void SetEditCtrl(TRteEditCtrl ctrl);
+
 
 	// This will be called for the first time when the following events have happened:
 	// - Startup of the application has completed
@@ -2629,6 +2662,46 @@ public:
 
 	void			OnScriptCompileError(const char *Source, Filter *f);
 };
+
+template<typename ENUM, ENUM DEFAULT>
+ENUM MenuOption<ENUM, DEFAULT>::get()
+{
+	// Check UI:
+	if (auto menu = app->GetMenu())
+		for (int i=0; i<menuId.Length(); i++)
+			if (auto item = menu->FindItem(menuId[i]))
+				if (item->Checked())
+					return (ENUM)i;
+	
+	// Check+load from options:
+	LVariant v;
+	if (app->GetOptions()->GetValue(optName, v))
+		set((ENUM)v.CastInt32());
+	
+	return DEFAULT;
+}
+
+template<typename ENUM, ENUM DEFAULT>
+bool MenuOption<ENUM, DEFAULT>::set(ENUM val, bool updateOption)
+{
+	bool found = false;
+	if (auto menu = app->GetMenu())
+		for (int i=0; i<menuId.Length(); i++)
+			if (auto item = menu->FindItem(menuId[i]))
+			{
+				if (i == (int)val) found = true;
+				item->Checked(i == (int)val);
+			}
+
+	if (updateOption)
+	{
+		LVariant v = (int)val;
+		if (!app->GetOptions()->SetValue(optName, v))
+			return false;
+	}
+
+	return found;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef SCRIBE_APP

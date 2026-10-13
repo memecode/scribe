@@ -1139,13 +1139,7 @@ void ScribeWnd::Construct3()
 			SetMenuIcon(IDM_FEEDBACK, ICON_UNREAD_MAIL);
 			SetMenuIcon(ID_HELP, ICON_HELP);
 
-			LMenuItem *mi;
-			if
-			(
-				GetOptions()->GetValue(OPT_EditControl, v) &&
-				(mi = Menu->FindItem(IDM_HTML_EDITOR))
-			)
-				mi->Checked(v.CastInt32() != 0);
+			d->EditCtrl.get();
 
 			Menu->SetPrefAndAboutItems(IDM_OPTIONS, IDM_ABOUT);
 		}
@@ -1250,14 +1244,14 @@ ScribeWnd::~ScribeWnd()
 	DeleteObj(d->SubSplit);
 	DeleteObj(Splitter);
 	ListPane.Reset();
-	MailList = NULL;
+	MailList = nullptr;
 
-	CmdSend.ToolButton = NULL;
-	CmdReceive.ToolButton = NULL;
-	CmdPreview.ToolButton = NULL;
-	CmdSend.MenuItem = NULL;
-	CmdReceive.MenuItem = NULL;
-	CmdPreview.MenuItem = NULL;
+	CmdSend.ToolButton = nullptr;
+	CmdReceive.ToolButton = nullptr;
+	CmdPreview.ToolButton = nullptr;
+	CmdSend.MenuItem = nullptr;
+	CmdReceive.MenuItem = nullptr;
+	CmdPreview.MenuItem = nullptr;
 
 	// This could be using the OpenSSL library for HTTPS connections. So
 	// close it before calling EndSSL.
@@ -1268,6 +1262,22 @@ ScribeWnd::~ScribeWnd()
 	EndSSL();
 
 	DeleteObj(d);
+}
+
+static int EditCtrlId[] = {
+	IDM_EDIT_TEXT,
+	IDM_EDIT_RTE1,
+	IDM_EDIT_RTE2
+};
+
+TRteEditCtrl ScribeWnd::GetEditCtrl()
+{
+	return d->EditCtrl.get();
+}
+
+void ScribeWnd::SetEditCtrl(TRteEditCtrl ctrl)
+{
+	d->EditCtrl.set(ctrl);
 }
 
 void ScribeWnd::SetLanguage()

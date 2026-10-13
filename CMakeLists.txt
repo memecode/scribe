@@ -93,12 +93,12 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Text/TextConvert.cpp
     ${LGI_DIR}/src/common/Text/vCard-vCal.cpp
     ${LGI_DIR}/src/common/Text/SpellCheckAspell.cpp
-    ${LGI_DIR}/src/common/Widgets/Editor/BlockCursor.cpp
-    ${LGI_DIR}/src/common/Widgets/Editor/RichTextEdit.cpp
-    ${LGI_DIR}/src/common/Widgets/Editor/RichTextEditPriv.cpp
-    ${LGI_DIR}/src/common/Widgets/Editor/HorzRuleBlock.cpp
-    ${LGI_DIR}/src/common/Widgets/Editor/ImageBlock.cpp
-    ${LGI_DIR}/src/common/Widgets/Editor/TextBlock.cpp
+    ${LGI_DIR}/src/common/Widgets/richText1/BlockCursor1.cpp
+    ${LGI_DIR}/src/common/Widgets/richText1/RichTextEdit1.cpp
+    ${LGI_DIR}/src/common/Widgets/richText1/RichTextEditPriv1.cpp
+    ${LGI_DIR}/src/common/Widgets/richText1/HorzRuleBlock1.cpp
+    ${LGI_DIR}/src/common/Widgets/richText1/ImageBlock1.cpp
+    ${LGI_DIR}/src/common/Widgets/richText1/TextBlock1.cpp
     ${LGI_DIR}/src/common/Widgets/ColourSelect.cpp
     ${LGI_DIR}/src/common/Widgets/ControlTree.cpp
     ${LGI_DIR}/src/common/Widgets/DatePopup.cpp

@@ -502,6 +502,7 @@
 #define IDC_PREVIEW_READ						694
 #define IDS_ASK_USER_PASS						695
 #define IDD_FILTER_SAVE_ATTACH					696
+#define IDM_EDIT_TEXT							697
 #define IDC_TYPES								698
 #define IDC_OTHER_TABLE							699
 #define IDC_BROWSE_DIR							700
@@ -923,6 +924,7 @@
 #define IDC_PROPERTIES							1116
 #define IDD_OUTLOOK_ADD_FLD						1117
 #define IDS_ASK_FOLDER_PASS						1118
+#define IDM_EDIT_RTE2							1119
 #define IDS_ERROR_SCRIPT_COMPILE				1120
 #define IDS_ANY									1121
 #define IDS_ERROR_NOTHING_TO_UPGRADE			1122
@@ -956,7 +958,7 @@
 #define IDS_1150								1150
 #define IDM_MENU_1151							1151
 #define IDS_TIME								1152
-#define IDM_HTML_EDITOR							1153
+#define IDM_EDIT_RTE1							1153
 #define IDS_ERROR_MAPI_INIT_FAILED				1154
 #define IDD_CAL_RECUR							1155
 #define IDS_WEEKS								1156
@@ -1014,6 +1016,8 @@
 #define ID_CHK_FOLDERS							1208
 #define ID_BUILD_BAYES_DB						1209
 #define ID_BAYES_STATS							1210
+#define IDM_VIEW								1211
+#define IDM_HTML1								1212
 #define IDC_SUB_FOLDER_BTNS						1213
 #define IDS_ERROR_PRINT_FAILED					1214
 #define IDS_ASK_ACCOUNT_PASSWORD				1215
@@ -1031,6 +1035,8 @@
 #define IDS_SHOW_CONSOLE						1227
 #define IDC_STATUS								1228
 #define IDS_SELECT_ACCOUNT						1229
+#define IDM_HTML2								1230
+#define IDM_LITE_HTML							1231
 #define IDS_1235								1235
 #define IDC_MONDAY								1238
 #define IDC_TUESDAY								1239

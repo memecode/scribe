@@ -87,7 +87,6 @@ public:
 	LBox			*SubSplit = NULL, *SearchSplit = NULL;
 	LArray<ScribeFolder*> ThingSources;
 	int				LastLayout = 0;
-	LMenuItem		*DisableUserFilters = NULL;
 	LAutoPtr<LOptionsFile> Options;
 	bool			OptionsLoaded = false;
 	HttpImageThread	*ImageLoader = NULL;
@@ -100,6 +99,11 @@ public:
 	LAutoPtr<class LTrayIcon> TrayIcon;
 	int				FontSizeAdjust = 0;
 	class LHtmlStaticInst *htmlStatic;
+
+	// Menu stuff
+	LMenuItem		*DisableUserFilters = NULL;
+	MenuOption<TRteEditCtrl,  EDIT_TEXT> EditCtrl;
+	MenuOption<THtmlViewCtrl, TLgiHtml1> ViewCtrl;
 
 	// These are for the LDataEventsI callbacks to store source context
 	// Mainly for debugging where various events came from.

@@ -116,7 +116,7 @@
 #define OPT_NoEmoji					"NoEmoji"			//(bool)
 #define OPT_MinimizeToTray			"MinToTray"			//(bool)(int)
 #define OPT_WordWrap				"WordWrap"			//(bool)(int)
-#define OPT_EditControl				"EditControl"		//(int)
+#define OPT_EditControl				"EditControl"		//(TRteEditCtrl)
 #define OPT_CheckForDialUp			"CheckDialUp"		//(bool)(int)
 #define OPT_EditorFont				"EditorFont"		//(binary)
 #define OPT_HtmlFont				"HtmlFont"			//(binary)
@@ -752,6 +752,15 @@ enum ScribeAccountletStatusIcon
 	STATUS_ERROR,
 
 	STATUS_MAX
+};
+
+enum TRteEditCtrl
+{
+	EDIT_TEXT,
+	EDIT_RTE1,
+	EDIT_RTE2,
+	
+	EDIT_MAX,
 };
 
 // Colours

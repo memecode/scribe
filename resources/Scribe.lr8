@@ -1675,7 +1675,7 @@
 									<Custom pos="21,35,363,230" ref="187" Ctrl="LTextView3" />
 								</Tab>
 								<Tab ref="188">
-									<Custom pos="14,28,370,237" ref="520" Ctrl="LRichTextEdit" />
+									<Custom pos="14,28,370,237" ref="520" Ctrl="LRichTextEdit1" />
 								</Tab>
 							</TabView>
 						</td>
@@ -5146,7 +5146,7 @@
 			<String Ref="1530" Cid="1131" Define="IDM_SCRIPTING_CONSOLE" en="Show Console" sv="Visa skriptkonsolen" lt="Rodyti scenarijų vykdymo ekraną" hu="Parancsfájl konzol mutatása" cs="Zobrazit skriptovací konzolu" de="Script Konsole anzeigen" tr="Kod Konsolunu Göster" ru="Показать консоль скриптов" pl="Pokaż konsolę skryptów" ko="스크립팅 콘솔 보여주기" uk="Показати консоль" fr="Afficher la console" />
 			<String Ref="892" Cid="1143" Define="IDM_SCRIPT_DEBUG" en="Script Debugger" uk="Скрипт відлагоджування" fr="Débogueur de script" />
 			<String Ref="1546" Cid="1151" Define="IDM_MENU_1151" />
-			<String Ref="1547" Cid="1153" Define="IDM_HTML_EDITOR" en="Use &HTML Editor" uk="Використовувати HTML редактор" de="HTML-Editor verwenden" fr="Utiliser  Editeur &HTML" />
+			<String Ref="1547" Cid="1153" Define="IDM_EDIT_RTE1" en="HTML editor: Rte&1" uk="Використовувати HTML редактор" de="HTML-Editor verwenden" fr="Utiliser  Editeur &HTML" />
 			<String Ref="1610" Cid="1017" Define="IDM_LAYOUT4" en="3 Columns" fr="3 Colonnes" />
 			<String Ref="1625" Cid="1019" Define="IDM_REFRESH" en="&Refresh" fr="&Rafraîchir" />
 			<String Ref="579" Cid="758" Define="IDM_DELETE" Tag="mac" en="&Delete" fr="&Supprimer" />
@@ -5161,6 +5161,12 @@
 			<String Ref="1369" Cid="539" Define="IDM_UNIT_TESTS" en="Run Unit Tests" />
 			<String Ref="1501" Cid="1029" Define="IDM_CLEAR_REGISTRY" Tag="win" en="Clear Registry Settings" />
 			<String Ref="1465" Cid="1208" Define="ID_CHK_FOLDERS" en="Bayes: Check Folders" />
+			<String Ref="323" Cid="697" Define="IDM_EDIT_TEXT" en="&Text editor" />
+			<String Ref="324" Cid="1119" Define="IDM_EDIT_RTE2" en="HTML editor: Rte&2" />
+			<String Ref="325" Cid="1211" Define="IDM_VIEW" en="&View" />
+			<String Ref="326" Cid="1212" Define="IDM_HTML1" en="Html&1" />
+			<String Ref="327" Cid="1230" Define="IDM_HTML2" en="Html&2" />
+			<String Ref="328" Cid="1231" Define="IDM_LITE_HTML" en="&LiteHtml" />
 		</string-group>
 		<submenu Ref="1464">
 			<menuitem Ref="1463" />
@@ -5189,7 +5195,14 @@
 			<menuitem Sep="1" />
 			<menuitem Ref="1445" Shortcut="CtrlCmd+F" />
 			<menuitem Sep="1" />
+			<menuitem Ref="323" />
 			<menuitem Ref="1547" Shortcut="CtrlCmd+Shift+E" />
+			<menuitem Ref="324" />
+		</submenu>
+		<submenu Ref="325">
+			<menuitem Ref="326" />
+			<menuitem Ref="327" />
+			<menuitem Ref="328" />
 		</submenu>
 		<submenu Ref="1444">
 			<menuitem Ref="1443" />
