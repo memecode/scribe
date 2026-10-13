@@ -33,22 +33,17 @@
 #include "lgi/common/TextLabel.h"
 #include "lgi/common/Button.h"
 #include "lgi/common/CheckBox.h"
-#include "lgi/common/OpenSSLSocket.h"
-#include "lgi/common/SoftwareUpdate.h"
 #include "lgi/common/Html.h"
 #include "lgi/common/TextView3.h"
 #include "lgi/common/RichTextEdit1.h"
+#include "lgi/common/RichTextEdit2.h"
 #include "lgi/common/Store3.h"
 #include "lgi/common/Edit.h"
 #include "lgi/common/Box.h"
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/SpellCheck.h"
-#include "lgi/common/SubProcess.h"
 #include "lgi/common/CssTools.h"
-#include "lgi/common/Charset.h"
-#include "lgi/common/RefCount.h"
 #include "lgi/common/PopupNotification.h"
-#include "lgi/common/Base64.h"
 #include "lgi/common/Html2.h"
 #include "lgi/common/LiteHtmlView.h"
 
@@ -60,13 +55,10 @@
 #include "Calendar.h"
 #include "CalendarView.h"
 #include "ScribeSpellCheck.h"
-#include "Store3Common.h"
 #include "PrintContext.h"
 #include "resource.h"
 #include "ManageMailStores.h"
 #include "ReplicateDlg.h"
-#include "ScribeAccountPreview.h"
-#include "Encryption/GnuPG.h"
 #include "resdefs.h"
 #include "ScribeIpc.h"
 #include "DynamicHtml.h"
@@ -6413,18 +6405,19 @@ public:
 	}
 };
 
-class ScribeRichTextEdit : public Rte1::LRichTextEdit
+template<typename Parent>
+class ScribeRichTextEdit : public Parent
 {
 	ScribeWnd *App;
 
 public:
 	ScribeRichTextEdit(ScribeWnd *app, int Id, LFontType *FontInfo = NULL) :
-		LRichTextEdit(Id, 0, 0, 100, 100, FontInfo),
+		Parent(Id, 0, 0, 100, 100, FontInfo),
 		App(app)
 	{
 	}
 
-	bool MaxImageFilter(ImgParams &params)
+	bool MaxImageFilter(typename Parent::ImgParams &params)
 	{
 		auto opts = App->GetOptions();
 		LVariant v;
@@ -6466,26 +6459,57 @@ LDocView *ScribeWnd::CreateTextControl(int Id, const char *MimeType, bool Editor
 		if (!Stricmp(MimeType, sTextHtml))
 		{		
 			// Use the built in html editor
-			Rte1::LRichTextEdit *Rte;
-			if ((Ctrl = Rte = new ScribeRichTextEdit(this, Id)))
+			switch (GetEditCtrl())
 			{
-				if (UseFont)
-					Ctrl->SetFont(FontType.Create(), true);
-				
-				// Give the control the speller settings:
-				LVariant Check, Lang, Dict;
-				if (GetOptions()->GetValue(OPT_SpellCheck, Check) &&
-					Check.CastInt32() != 0)
+				case EDIT_RTE1:
 				{
-					if (GetOptions()->GetValue(OPT_SpellCheckLanguage, Lang))
-						Rte->SetValue(LDomPropToString(SpellCheckLanguage), Lang);
-					if (GetOptions()->GetValue(OPT_SpellCheckDictionary, Dict))
-						Rte->SetValue(LDomPropToString(SpellCheckDictionary), Dict);
-					
-					
-					// Set the spell thread:
-					if (auto t = GetSpellThread())
-						Rte->SetSpellCheck(t);
+					Rte1::LRichTextEdit *Rte;
+					if ((Ctrl = Rte = new ScribeRichTextEdit<Rte1::LRichTextEdit>(this, Id)))
+					{
+						if (UseFont)
+							Ctrl->SetFont(FontType.Create(), true);
+						
+						// Give the control the speller settings:
+						LVariant Check, Lang, Dict;
+						if (GetOptions()->GetValue(OPT_SpellCheck, Check) &&
+							Check.CastInt32() != 0)
+						{
+							if (GetOptions()->GetValue(OPT_SpellCheckLanguage, Lang))
+								Rte->SetValue(LDomPropToString(SpellCheckLanguage), Lang);
+							if (GetOptions()->GetValue(OPT_SpellCheckDictionary, Dict))
+								Rte->SetValue(LDomPropToString(SpellCheckDictionary), Dict);
+							
+							// Set the spell thread:
+							if (auto t = GetSpellThread())
+								Rte->SetSpellCheck(t);
+						}
+					}
+					break;
+				}
+				case EDIT_RTE2:
+				{
+					Rte2::LRichTextEdit *Rte;
+					if ((Ctrl = Rte = new ScribeRichTextEdit<Rte2::LRichTextEdit>(this, Id)))
+					{
+						if (UseFont)
+							Ctrl->SetFont(FontType.Create(), true);
+						
+						// Give the control the speller settings:
+						LVariant Check, Lang, Dict;
+						if (GetOptions()->GetValue(OPT_SpellCheck, Check) &&
+							Check.CastInt32() != 0)
+						{
+							if (GetOptions()->GetValue(OPT_SpellCheckLanguage, Lang))
+								Rte->SetValue(LDomPropToString(SpellCheckLanguage), Lang);
+							if (GetOptions()->GetValue(OPT_SpellCheckDictionary, Dict))
+								Rte->SetValue(LDomPropToString(SpellCheckDictionary), Dict);
+							
+							// Set the spell thread:
+							if (auto t = GetSpellThread())
+								Rte->SetSpellCheck(t);
+						}
+					}
+					break;
 				}
 			}
 		}

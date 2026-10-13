@@ -7164,15 +7164,14 @@ void Mail::OnCreate()
 		LAssert(!"No identity selected");
 	}
 
-	LVariant EditCtrl;
-	App->GetOptions()->GetValue(OPT_EditControl, EditCtrl);
-	auto Sig = GetSig(EditCtrl.CastInt32() != 0, Ident);
-	if (!Sig && EditCtrl.CastInt32())
+	auto editCtrl = App->GetEditCtrl();
+	auto Sig = GetSig(editCtrl >= EDIT_RTE1, Ident);
+	if (!Sig && editCtrl >= EDIT_RTE1)
 	{
 		Sig = GetSig(false, Ident);
 		SetBody(Sig);
 	}
-	else if (EditCtrl.CastInt32())
+	else if (editCtrl >= EDIT_RTE1)
 	{
 		SetHtmlCharset("utf-8");
 		SetHtml(Sig);
@@ -9246,9 +9245,7 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 
 		LString Body = App->ProcessReplyForwardTemplate(m, this, Xml, Cursor, EditMimeType);
 		
-		LVariant EditCtrl;
-		if (App->GetOptions()->GetValue(OPT_EditControl, EditCtrl) &&
-			EditCtrl.CastInt32())
+		if (App->GetEditCtrl() >= EDIT_RTE1)
 		{
 			SetHtml(Body);
 		}
@@ -9390,9 +9387,7 @@ bool Mail::OnForward(Mail *m, bool MarkOriginal, int WithAttachments)
 		
 		LString Body = App->ProcessReplyForwardTemplate(m, this, Xml, Cursor, EditMimeType);
 		
-		LVariant EditCtrl;
-		if (App->GetOptions()->GetValue(OPT_EditControl, EditCtrl) &&
-			EditCtrl.CastInt32())
+		if (App->GetEditCtrl() >= EDIT_RTE1)
 		{
 			SetHtml(Body);
 		}
