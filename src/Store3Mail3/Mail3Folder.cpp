@@ -157,18 +157,22 @@ bool LMail3Folder::Serialize(LMail3Store::LStatement &s, bool Write)
 		sprintf_s(Sql, sizeof(Sql), "delete from '%s' where ParentId=" LPrintfInt64, MAIL3_TBL_FOLDER_FLDS, Id);
 
 		LDataStoreI::StoreTrans Trans = Store->StartTransaction();
-		Store->Check(sqlite3_exec(Store->GetDb(), Sql, 0, 0, 0), Sql);
+		if (!Store->Check(sqlite3_exec(Store->GetDb(), Sql, 0, 0, 0), Sql))
+			return false;
 		LMail3Store::LInsert s(Store, MAIL3_TBL_FOLDER_FLDS);
-		if (s.IsOk())
+		if (!s.IsOk())
+			return false;
+		else
 		{
 			for (unsigned i=0; i<Flds.Length(); i++)
 			{
 				Store3Field *f = Flds.a[i];
-				s.SetInt64(1, Id);
-				s.SetInt(2, f->Id);
-				s.SetInt(3, f->Width);
-				s.Exec();
-				s.Reset();
+				if (!s.SetInt64(1, Id) ||
+					!s.SetInt(2, f->Id) ||
+					!s.SetInt(3, f->Width) ||
+					!s.Exec() ||
+					!s.Reset())
+					return false;
 			}
 		}
 	}

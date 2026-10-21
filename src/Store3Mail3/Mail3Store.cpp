@@ -2,6 +2,8 @@
 #include "resdefs.h"
 #include "lgi/common/SubProcess.h"
 #include <wchar.h>
+#include <cerrno>
+#include <filesystem>
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/Thread.h"
 #include "lgi/common/Store3MimeTree.h"
@@ -430,7 +432,7 @@ LMail3Store::Mail3Trans::~Mail3Trans()
 LDataStoreI::StoreTrans LMail3Store::StartTransaction()
 {
 	StoreTrans t;
-	if (!Transaction)
+	if (!Transaction && sqlite3_get_autocommit(Db))
 	{
 		t.Reset(new Mail3Trans(this, &Transaction));
 	}
@@ -1937,6 +1939,399 @@ bool LMail3Store::DeleteImapMessage(int64 MailId)
 		s.Exec();
 }
 
+class ImapCacheIndex : public LXmlTree
+{
+	class RootTag : public LXmlTag
+	{
+	public:
+		RootTag() : LXmlTag("Folder") {}
+		LXmlAlloc *GetAllocator() { return Allocator; }
+	};
+
+public:
+	RootTag Root;
+
+	// LXmlTree::Read accepts unclosed elements; an import must not accept a partial index.
+	bool ReadIndex(LStreamI &Input)
+	{
+		auto Text = Input.Read();
+		if (!Text || Text.Length() != Input.GetSize() || strlen(Text.Get()) != Text.Length())
+			return false;
+
+		char *Cursor = Text.Get();
+		LXmlTag *Parent = NULL;
+		bool HasRoot = false;
+		while (Cursor && *Cursor)
+		{
+			bool NoChildren = true;
+			auto Tag = Parse(Root.GetAllocator(), Cursor, NoChildren, false);
+			if (!Tag)
+				break;
+			auto Name = Tag->GetTag();
+			if (!ValidStr(Name))
+				return false;
+			if (*Name == '/')
+			{
+				if (!Parent || Strcmp(Parent->GetTag(), Name + 1))
+					return false;
+				Parent = Parent->Parent;
+			}
+			else if (!HasRoot)
+			{
+				if (Strcmp(Name, "Folder"))
+					return false;
+				Root.Swap(*Tag);
+				HasRoot = true;
+				Parent = NoChildren ? NULL : &Root;
+			}
+			else
+			{
+				if (!Parent)
+					return false;
+				auto Child = Tag.Release();
+				Parent->InsertTag(Child);
+				if (!NoChildren)
+					Parent = Child;
+			}
+		}
+		return HasRoot && !Parent && Cursor && !*Cursor;
+	}
+};
+
+bool LMail3Store::ImportImapCache(int64 AccountId, const char *CachePath)
+{
+	LString Context = CachePath ? CachePath : "<missing cache path>";
+	bool ValidAttributes = true;
+	auto AttributeInt = [&](LXmlTag &Tag, const char *Name, int64 Default = 0) -> int64
+	{
+		auto Text = Tag.GetAttr(Name);
+		if (!Text)
+			return Default;
+		char *End = NULL;
+		errno = 0;
+		auto Value = strtoll(Text, &End, 10);
+		if (errno || End == Text || *End)
+			ValidAttributes = false;
+		return Value;
+	};
+	auto Fail = [&](const char *Reason)
+	{
+		ErrorMsg.Printf("IMAP cache import failed at '%s': %s", Context.Get(), Reason);
+		LgiTrace("%s\n", ErrorMsg.Get());
+		return false;
+	};
+	auto SourceFile = [&](const char *Path, bool &Exists)
+	{
+		std::error_code Error;
+		auto Status = std::filesystem::symlink_status(std::filesystem::u8path(Path), Error);
+		if (Error && Error != std::errc::no_such_file_or_directory)
+			return Fail("Cannot inspect the source file.");
+		Exists = std::filesystem::exists(Status);
+		if (Exists && !std::filesystem::is_regular_file(Status))
+			return Fail("Cache files must be regular files, not links or special files.");
+		return true;
+	};
+	if (!IsOk() || !InThread() || AccountId < 0 || AccountId > INT_MAX ||
+		!CachePath || !LDirExists(CachePath))
+		return Fail("An open Mail3 store, its owning thread and an existing cache directory are required.");
+	if (GetInt(FIELD_STATUS) != Store3Success || !sqlite3_get_autocommit(Db))
+		return Fail("Finish database upgrades and transactions before importing a cache.");
+
+	int64 RootId = -1;
+	{
+		LStatement RootQuery(this, "select Id from " MAIL3_TBL_FOLDER " where ParentId is null");
+		if (!RootQuery.IsOk() || !RootQuery.Row())
+			return Fail("The destination store has no root folder.");
+		RootId = RootQuery.GetInt64(0);
+	}
+	if (!Check(sqlite3_exec(Db, "savepoint ImapCacheImport", NULL, NULL, NULL), NULL))
+		return Fail("Cannot start the import transaction.");
+
+	std::function<bool(LString, LString, int64, unsigned)> ImportFolder;
+	ImportFolder = [&](LString Path, LString Remote, int64 ParentId, unsigned Depth)
+	{
+		Context = Path;
+		if (Depth > 64)
+			return Fail("The cache folder tree is too deep.");
+		std::error_code DirectoryError;
+		auto NativePath = std::filesystem::u8path(Path.Get());
+		auto DirectoryStatus = std::filesystem::symlink_status(NativePath, DirectoryError);
+		if (DirectoryError || !std::filesystem::is_directory(DirectoryStatus))
+			return Fail("Cannot read the cache directory, or it is a symbolic link.");
+
+		ImapCacheIndex Xml;
+		auto &Meta = Xml.Root;
+		LFile::Path MetadataPath(Path);
+		MetadataPath += "Folder.xml";
+		bool HasMetadata;
+		if (!SourceFile(MetadataPath, HasMetadata))
+			return false;
+		if (HasMetadata)
+		{
+			LFile Input;
+			if (!Input.Open(MetadataPath, O_READ) || !Xml.ReadIndex(Input))
+				return Fail("Cannot read the folder XML.");
+		}
+		LFile::Path ProtoPath(Path);
+		ProtoPath += "Folder.proto";
+		bool HasProto;
+		if (!SourceFile(ProtoPath, HasProto))
+			return false;
+		if (HasProto)
+			return Fail("Protobuf caches must be converted to XML before importing.");
+
+		int64 FolderId = -1, MailboxId = -1;
+		{
+			LStatement Find(this, "select Id, FolderId, UidValidity from " MAIL3_TBL_IMAP_MAILBOX
+				" where AccountId=? and RemoteName=?");
+			if (!Find.IsOk() || !Find.SetInt64(0, AccountId) || !Find.SetStr(1, Remote))
+				return Fail("Cannot look up the mailbox.");
+			auto Result = sqlite3_step(Find);
+			if (Result == SQLITE_ROW)
+			{
+				MailboxId = Find.GetInt64(0);
+				FolderId = Find.GetInt64(1);
+				if (Find.GetInt64(2) > 0)
+					return Fail("Cannot merge an unverified cache into a synchronized mailbox.");
+			}
+			else if (Result != SQLITE_DONE)
+				return Fail("Cannot read the mailbox mapping.");
+		}
+		if (MailboxId < 0)
+		{
+			LMail3Folder Folder(this);
+			Folder.ParentId = ParentId;
+			Folder.Name = Depth == 0
+				? LString::Fmt("IMAP cache (%" PRIi64 ")", AccountId)
+				: LString(LGetLeaf(Path));
+			Folder.Sort = (int)AttributeInt(Meta, "Sort");
+			Folder.Open = (int)AttributeInt(Meta, "Expanded");
+			Folder.Unread = (int)AttributeInt(Meta, "Unread");
+			Folder.Threaded = (int)AttributeInt(Meta, "Thread");
+			Folder.ReadPerm = (int16_t)AttributeInt(Meta, "ReadPerm");
+			Folder.WritePerm = (int16_t)AttributeInt(Meta, "WritePerm");
+			if (!ValidAttributes)
+				return Fail("Invalid integer folder metadata.");
+			if (!Folder.Write(MAIL3_TBL_FOLDER, true))
+				return Fail("Cannot create the canonical folder.");
+			FolderId = Folder.Id;
+
+			if (auto Fields = Meta.GetChildTag("Fields"))
+			{
+				for (auto Field: Fields->Children)
+				{
+					if (!Field->IsTag("Field"))
+						return Fail("Invalid display-field element in the folder XML.");
+					Folder.Flds.Insert(new Store3Field(this,
+						(int)AttributeInt(*Field, "Id"), (int)AttributeInt(*Field, "Width")), -1, true);
+				}
+			}
+			if (!ValidAttributes)
+				return Fail("Invalid integer display-field metadata.");
+			if (!Folder.Write(MAIL3_TBL_FOLDER, false))
+				return Fail("Cannot save the folder display settings.");
+
+			LMail3ImapMailbox Mailbox;
+			Mailbox.AccountId = AccountId;
+			Mailbox.FolderId = FolderId;
+			Mailbox.RemoteName = Remote;
+			if (!SaveImapMailbox(Mailbox))
+				return Fail("Cannot create the mailbox mapping.");
+			MailboxId = Mailbox.Id;
+		}
+		else
+		{
+			LStatement CheckFolder(this, "select Id from " MAIL3_TBL_FOLDER " where Id=? and ParentId=?");
+			if (!CheckFolder.IsOk() || !CheckFolder.SetInt64(0, FolderId) ||
+				!CheckFolder.SetInt64(1, ParentId) || !CheckFolder.Row())
+				return Fail("The imported folder was removed or reparented.");
+		}
+
+		LHashTbl<StrKey<char>, bool> IndexedFiles;
+		LHashTbl<IntKey<int64>, bool> Uids;
+		if (auto Emails = Meta.GetChildTag("Emails"))
+		{
+			for (auto Email: Emails->Children)
+			{
+				Context = Path;
+				if (!Email->IsTag("Mail"))
+					return Fail("Invalid message element in the folder XML.");
+				int64 Uid = 0;
+				auto UidText = Email->GetAttr("Uid");
+				if (!ValidStr(UidText))
+					return Fail("The message UID is missing from the folder XML.");
+				for (auto Digit = UidText; *Digit; Digit++)
+				{
+					if (*Digit < '0' || *Digit > '9')
+						return Fail("The message UID is not an unsigned decimal number.");
+					Uid = Uid * 10 + (*Digit - '0');
+					if (Uid > UINT32_MAX)
+						return Fail("The message UID exceeds the IMAP UID range.");
+				}
+				if (!Uid || Uids.Find(Uid))
+					return Fail("Invalid or duplicate message UID in the folder XML.");
+				Uids.Add(Uid, true);
+				LString Leaf = Email->GetContent();
+				if (!Leaf)
+					Leaf = LString::Fmt("%" PRIi64 ".eml", Uid);
+				Leaf = Leaf.Strip();
+				if (Leaf.Find("/") >= 0 || Leaf.Find("\\") >= 0 || Leaf == "." || Leaf == "..")
+					return Fail("Invalid cache message filename.");
+				IndexedFiles.Add(Leaf, true);
+				LFile::Path MessagePath(Path);
+				MessagePath += Leaf;
+				Context = MessagePath.GetFull();
+
+				LMail3Mail Mail(this);
+				bool Downloaded = false;
+				{
+					// Epoch zero is deliberately not a server UIDVALIDITY.
+					LStatement Find(this, "select MailId, Downloaded from " MAIL3_TBL_IMAP_MESSAGE
+						" where MailboxId=? and UidValidity=0 and Uid=?");
+					if (!Find.IsOk() || !Find.SetInt64(0, MailboxId) || !Find.SetInt64(1, Uid))
+						return Fail("Cannot look up the cached message.");
+					auto Result = sqlite3_step(Find);
+					if (Result == SQLITE_ROW)
+					{
+						Mail.Id = Find.GetInt64(0);
+						Downloaded = Find.GetBool(1);
+					}
+					else if (Result != SQLITE_DONE)
+						return Fail("Cannot read the message mapping.");
+				}
+				if (Mail.Id > 0)
+				{
+					LStatement Existing(this, "select * from " MAIL3_TBL_MAIL " where Id=?");
+					if (!Existing.IsOk() || !Existing.SetInt64(0, Mail.Id) ||
+						!Existing.Row() || !Mail.Serialize(Existing, false) || Mail.ParentId != FolderId)
+						return Fail("The imported mail row was removed or reparented.");
+					if (Downloaded)
+						continue;
+				}
+				bool HadMapping = Mail.Id > 0;
+				Mail.ParentId = FolderId;
+				Mail.AccountId = (int)AccountId;
+				ImapMailFlags Flags(Email->GetAttr("Flags"));
+				Mail.Flags = (int)AttributeInt(*Email, "Local",
+					(Flags.ImapSeen ? MAIL_READ : 0) | (Flags.ImapAnswered ? MAIL_REPLIED : 0));
+				Mail.Subject = Email->GetAttr("Subject");
+				Mail.Label = Email->GetAttr("Label");
+				Mail.MessageID = Email->GetAttr("MsgId");
+				Mail.MarkColour = (uint32_t)AttributeInt(*Email, "Colour");
+				Mail.MailSize = AttributeInt(*Email, "Size");
+				if (!ValidAttributes)
+					return Fail("Invalid integer message metadata.");
+				LVariant From = Email->GetAttr("From"), Reply = Email->GetAttr("ReplyTo");
+				Mail.From.SetValue("Text", From);
+				Mail.Reply.SetValue("Text", Reply);
+				Mail.DateSent.Set(Email->GetAttr("Date"));
+				Mail.DateReceived = Mail.DateSent;
+
+				bool HasContent;
+				if (!SourceFile(MessagePath, HasContent))
+					return false;
+				if (HasContent)
+				{
+					LFile Input;
+					if (!Input.Open(MessagePath, O_READ) || Mail.SetRfc822(&Input, true) != Store3Success)
+						return Fail("Cannot import the RFC822 image.");
+					if (!Mail.ParseHeaders())
+						return Fail("Cannot parse the cached message headers.");
+					Mail.MailSize = Input.GetSize();
+					auto Stored = Mail.GetStream(_FL);
+					if (!Stored || Stored->GetSize() != Input.GetSize())
+						return Fail("The stored RFC822 image has a different size.");
+					Input.SetPos(0);
+					Stored->SetPos(0);
+					char Original[8192], Copy[8192];
+					for (int64 Remaining = Input.GetSize(); Remaining > 0; )
+					{
+						auto Size = (ssize_t)MIN(Remaining, (int64)sizeof(Original));
+						ssize_t Copied = 0;
+						while (Copied < Size)
+						{
+							auto Read = Stored->Read(Copy + Copied, Size - Copied);
+							if (Read <= 0)
+								return Fail("Cannot read back the stored RFC822 image.");
+							Copied += Read;
+						}
+						if (Input.Read(Original, Size) != Size || memcmp(Original, Copy, Size))
+							return Fail("The stored RFC822 image differs from the cache.");
+						Remaining -= Size;
+					}
+					Downloaded = true;
+				}
+				if (!Mail.Write(MAIL3_TBL_MAIL, Mail.Id < 0))
+					return Fail("Cannot save canonical mail metadata.");
+
+				LStatement Mapping(this, HadMapping
+					? "update " MAIL3_TBL_IMAP_MESSAGE
+					  " set MailboxId=?, UidValidity=0, Uid=?, RemoteFlags=?, LocalFlags=?, Downloaded=? where MailId=?"
+					: "insert into " MAIL3_TBL_IMAP_MESSAGE
+					  " (MailboxId, UidValidity, Uid, RemoteFlags, LocalFlags, Downloaded, MailId)"
+					  " values (?, 0, ?, ?, ?, ?, ?)");
+				if (!Mapping.IsOk() || !Mapping.SetInt64(0, MailboxId) ||
+					!Mapping.SetInt64(1, Uid) || !Mapping.SetInt(2, Flags.All) ||
+					!Mapping.SetInt(3, Mail.Flags & ~MAIL_STORED_FLAT) ||
+					!Mapping.SetInt(4, Downloaded ? 1 : 0) || !Mapping.SetInt64(5, Mail.Id) ||
+					!Mapping.Exec())
+					return Fail("Cannot save the unverified UID mapping.");
+			}
+		}
+
+		std::filesystem::directory_iterator Directory(NativePath, DirectoryError), End;
+		for (; !DirectoryError && Directory != End; Directory.increment(DirectoryError))
+		{
+			LString Name = Directory->path().filename().u8string().c_str();
+			auto Status = Directory->symlink_status(DirectoryError);
+			if (DirectoryError)
+				return Fail("Cannot inspect a cache directory entry.");
+			if (std::filesystem::is_symlink(Status))
+			{
+				Context = Path + "/" + Name;
+				return Fail("Symbolic links are not supported in a cache import.");
+			}
+			if (std::filesystem::is_directory(Status))
+			{
+				LFile::Path Child(Path);
+				Child += Name;
+				LString ChildRemote = Remote == "/" ? Remote + Name : Remote + "/" + Name;
+				if (!ImportFolder(Child.GetFull(), ChildRemote, FolderId, Depth + 1))
+					return false;
+			}
+			else if (auto Extension = LGetExtension(Name))
+			{
+				if (!Stricmp(Extension, "eml") && !IndexedFiles.Find(Name))
+				{
+					Context = Path + "/" + Name;
+					return Fail("Unindexed or pending-APPEND mail must be recovered before importing.");
+				}
+			}
+		}
+		if (DirectoryError)
+		{
+			Context = Path;
+			return Fail("Cannot enumerate the cache directory.");
+		}
+		return true;
+	};
+
+	bool Imported = ImportFolder(CachePath, "/", RootId, 0);
+	if (!Imported)
+	{
+		Check(sqlite3_exec(Db, "rollback to ImapCacheImport", NULL, NULL, NULL), NULL);
+		Check(sqlite3_exec(Db, "release ImapCacheImport", NULL, NULL, NULL), NULL);
+		return false;
+	}
+	if (!Check(sqlite3_exec(Db, "release ImapCacheImport", NULL, NULL, NULL), NULL))
+	{
+		Check(sqlite3_exec(Db, "rollback to ImapCacheImport", NULL, NULL, NULL), NULL);
+		Check(sqlite3_exec(Db, "release ImapCacheImport", NULL, NULL, NULL), NULL);
+		return Fail("Cannot commit the imported cache.");
+	}
+	return true;
+}
+
 bool LMail3Store::ParseTableFormat(const char *Name, TableDefn &Defs)
 {
 	char Sql[256];
@@ -2236,7 +2631,8 @@ LProfile Prof("LMail3Obj::Write");
 	PROFILE("1");
 	if (s)
 	{
-		Serialize(*s, true);
+		if (!Serialize(*s, true))
+			return false;
 
 		PROFILE("2");
 

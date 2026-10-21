@@ -1,0 +1,17 @@
+.DEFAULT_GOAL := imap-storage-test
+
+include linux/Makefile.linux
+
+ImapTestObjects = $(filter-out $(BuildDir)/ScribeMain.o,$(Objects))
+ImapTestBinary = $(BuildDir)/imap-storage-test
+
+$(BuildDir)/ImapCacheMigration.o: unittests/ImapCacheMigration.cpp
+	mkdir -p $(@D)
+	$(CPP) $(Inc) $(CppFlags) $(Defs) -c $< -o $@
+
+$(ImapTestBinary): $(ImapTestObjects) $(BuildDir)/ImapCacheMigration.o
+	$(CPP) -o $@ $^ $(Libs)
+
+.PHONY: imap-storage-test
+imap-storage-test: $(ImapTestBinary)
+	LD_LIBRARY_PATH="$(abspath ../libs/build-x64-debug/lib):$(abspath ../../lgi/trunk/Debug):$(abspath ../../lgi/deps/build-x64-debug/lib):$$LD_LIBRARY_PATH" $(ImapTestBinary)

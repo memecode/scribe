@@ -1523,12 +1523,38 @@ public:
 
 Store3Status LMail3Mail::SetRfc822(LStreamI *m)
 {
+	return SetRfc822(m, false);
+}
+
+Store3Status LMail3Mail::SetRfc822(LStreamI *m, bool PreserveRaw)
+{
 	Store3Status Status = Store3Error;
 
 	if (!m)
 	{
 		ErrMsg = "No input stream.";
 		return Status;
+	}
+
+	if (PreserveRaw && (m->GetSize() < 0 ||
+		m->GetSize() > sqlite3_limit(Store->GetDb(), SQLITE_LIMIT_LENGTH, -1)))
+	{
+		ErrMsg = "The RFC822 image exceeds the database BLOB size limit.";
+		return Store3Error;
+	}
+
+	LString Hdrs = HeadersFromStream(m);
+	if (PreserveRaw)
+	{
+		char Separator[4];
+		if (!Hdrs || strlen(Hdrs.Get()) != Hdrs.Length() ||
+			m->SetPos(Hdrs.Length()) != Hdrs.Length() ||
+			m->Read(Separator, sizeof(Separator)) != sizeof(Separator) ||
+			memcmp(Separator, "\r\n\r\n", sizeof(Separator)))
+		{
+			ErrMsg = "Cannot preserve an RFC822 image without a valid CRLF header separator.";
+			return Store3Error;
+		}
 	}
 
 	// Save all the segments out
@@ -1574,11 +1600,12 @@ Store3Status LMail3Mail::SetRfc822(LStreamI *m)
 	First the headers of the root MIME node are read to see what the Content-Type is.
 	Then a decision about how to store the node is made.
 	*/
-	LString Hdrs = HeadersFromStream(m);
 	LAutoString Type(InetGetHeaderField(Hdrs, "Content-Type"));
 
 	Flags &= ~MAIL_STORED_FLAT;
-	if (Type)
+	if (PreserveRaw)
+		Flags |= MAIL_STORED_FLAT;
+	else if (Type)
 	{
 		LString s = Type.Get();
 		ptrdiff_t Colon = s.Find(";");

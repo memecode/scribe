@@ -2,6 +2,7 @@
 
 #include "ScribeImap.h"
 #include "ScribeUtils.h"
+#include "../Store3Mail3/Mail3.h"
 
 #if IMAP_PROTOBUF
 	#ifdef _DEBUG
@@ -95,6 +96,18 @@ ImapStore::ImapStore(LString host,
 		FilterIncoming = v.CastInt32() != 0;
 	}
 
+	if (Storage && LAppInst->GetOption("imap-import-cache"))
+	{
+		auto CachePath = GetCache();
+		if (!CachePath || !Storage->ImportImapCache(AccountId, CachePath))
+		{
+			ErrorMsg.Reset(NewStr(CachePath ? Storage->GetStr(FIELD_ERROR) : "Cannot locate the IMAP cache."));
+			if (Log)
+				Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
+			return;
+		}
+	}
+
 	Thread = new ImapThread(this, caps, log, SettingStore, AccountId);
 }
 
@@ -143,6 +156,8 @@ int64 ImapStore::GetInt(int id)
 {
 	switch (id)
 	{
+		case FIELD_STATUS:
+			return Thread ? Store3Success : Store3Error;
 		case FIELD_STORE_TYPE:
 			return Store3Imap;
 		case FIELD_VERSION:
@@ -1352,5 +1367,19 @@ LDataStoreI *OpenImapWithStorage(	LString Host,
 									LAutoPtr<ProtocolSettingStore> store,
 									LMail3Store *Storage)
 {
-	return new ImapStore(Host, Port, User, Pass, ConnectFlags, Callback, Caps, prog, Log, AccountId, store, Storage);
+	if (!Storage && LAppInst->GetOption("imap-import-cache"))
+	{
+		const char *Error = "IMAP cache import requires an already-loaded default Mail3 store.";
+		LgiTrace("%s\n", Error);
+		if (Log)
+			Log->Write(Error, strlen(Error), LSocketI::SocketMsgError);
+		return NULL;
+	}
+	auto Result = new ImapStore(Host, Port, User, Pass, ConnectFlags, Callback, Caps, prog, Log, AccountId, store, Storage);
+	if (Result->GetInt(FIELD_STATUS) != Store3Success)
+	{
+		delete Result;
+		return NULL;
+	}
+	return Result;
 }

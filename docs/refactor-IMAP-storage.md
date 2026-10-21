@@ -14,7 +14,9 @@ However there are a lot of risks too. Things like threading and ownership of dat
 
 ### Implementation progress
 
-The first implementation slice adds IMAP mailbox, message-mapping and operation-journal tables to the Mail3 schema upgrade path, with uniqueness indexes for mailbox identity and UID scope. `LMail3Store` now exposes typed mailbox and message-mapping load/save/delete methods, guarded by its existing owning-thread rule. Persistent IMAP account connections now receive a non-owning reference to the already-loaded default Mail3 backend; one-off IMAP connections remain unchanged. The IMAP runtime still reads and writes its existing filesystem cache; using the injected backend, operation-journal access and legacy-cache migration have not yet been implemented.
+The first implementation slice adds IMAP mailbox, message-mapping and operation-journal tables to the Mail3 schema upgrade path, with uniqueness indexes for mailbox identity and UID scope. `LMail3Store` now exposes typed mailbox and message-mapping load/save/delete methods, guarded by its existing owning-thread rule. Persistent IMAP account connections receive a non-owning reference to the already-loaded default Mail3 backend; one-off IMAP connections remain unchanged.
+
+A restartable staging importer now uses that injected backend to copy legacy XML folder indexes and cached RFC822 images into the canonical tables. This is opt-in, not a live-storage cutover: the IMAP runtime still reads and writes its existing filesystem cache. Protocol-result reconciliation, canonical-object adapters and operation-journal execution remain to be implemented.
 
 Use the existing `LMail3Store` database as the single local source of truth for both Mail3 and IMAP mail. Keep the IMAP protocol engine and its `LDataStoreI`-facing behavior, but make it a protocol adapter over the shared store rather than a second owner of cached messages and folders.
 
@@ -40,13 +42,33 @@ An SQLite transaction cannot include an IMAP server command. Do not implement cr
 
 For a move entirely within the local Mail3 store, update the existing mail row's parent inside a transaction; its MIME BLOBs remain unchanged. For a move involving an IMAP mailbox, keep the `Mail.Id` and MIME content where possible, but update or replace the IMAP mapping only when the server confirms the destination identity. Moving from a Mail3-only folder to IMAP requires an APPEND and creation of a new server UID mapping; moving from IMAP to a Mail3-only folder requires the configured server-side delete policy to be completed or recorded as pending.
 
-Retain the original RFC822 bytes for IMAP APPEND/retry where re-encoding the MIME tree could change message content. Before implementation, determine whether the current Mail3 segment representation can guarantee byte-for-byte preservation; otherwise add a narrowly scoped raw-message BLOB keyed by mail ID and define when it can be discarded.
+Retain the original RFC822 bytes for IMAP APPEND/retry where re-encoding the MIME tree could change message content. The staging importer uses Mail3's existing flat segment representation and verifies the reconstructed bytes. The live adapter must preserve that representation until any pending operations no longer need the original image.
 
 ### Search
 
 Add an SQLite FTS index for searchable text from both Mail3 and IMAP mail, indexed by canonical mail ID. Index headers/body text only, never attachment binary data. Keep the FTS row synchronized with message creation, update, move and deletion in the same transaction where supported; moving a message should not require reindexing its content. Check that the SQLite build used by all supported targets includes the selected FTS module, and provide a rebuild path for the derived index.
 
 ### Migration and rollout
+
+#### Current staging importer
+
+Start Scribe with `--imap-import-cache` and connect the persistent IMAP account to stage its cache in the already-loaded default Mail3 store. Import runs synchronously on the store-owning thread before that account's network worker starts. If no default Mail3 store is available, or import fails, the connection is refused with an error in the account log. Normal connections without the option and one-off IMAP connections are unchanged.
+
+`LMail3Store::ImportImapCache(AccountId, CachePath)` creates an `IMAP cache (<AccountId>)` subtree, preserving nested folders, display columns, sort/expanded/threading settings, permissions, message metadata and cached content. Each account import uses one SQLite savepoint: a failure rolls back its folder, mail, segment and mapping writes without altering existing mail. Source files are never rewritten or removed. Newly staged folders are not attached to the already-loaded UI tree or announced through normal new-mail notifications; reload the default store to inspect the subtree.
+
+Cached RFC822 images use Mail3's existing flat MIME-segment representation, including for unsigned messages. The importer reads the stored image back and compares its size and every byte before committing. This retains MIME boundaries, transfer encoding and attachment bytes rather than re-encoding the message. A missing indexed `.eml` creates a metadata-only message with `Downloaded=0`; re-running the importer after the file becomes available fills the same canonical mail row.
+
+Legacy XML does not contain UIDVALIDITY, and the current IMAP SELECT parser does not preserve it. Imported mailbox epochs therefore remain unset; staging message mappings use epoch zero, which the normal verified UID lookup/save API rejects. These UIDs must not drive server mutations or be treated as verified server identities. Import refuses to merge into a mailbox that already has a verified epoch. The next prerequisite for the live adapter is to retain SELECT's UIDVALIDITY/UIDNEXT and reconcile these provisional records against server state.
+
+Repeated imports retain the existing mail/folder IDs and do not duplicate completed content. They are resumable snapshots, not ongoing synchronization: already-imported metadata/content is not refreshed or removed to mirror subsequent cache changes. A corrupt RFC822 image, malformed or duplicate UID, unsupported Protobuf index, symbolic link, unindexed `.eml` (including a pending APPEND), unreadable source or database error aborts the account import explicitly. Recover unsupported/unindexed content before retrying; do not discard the old cache.
+
+Native fixture tests exercise the production importer, raw round trips, metadata-only upgrades, maximum unsigned UIDs, account/mailbox isolation, restart/idempotency and injected database failures. On Linux, from the repository root with the normal debug dependencies built:
+
+```sh
+GDK_BACKEND=x11 xvfb-run -a make -f unittests/Makefile.imap-storage -j2 imap-storage-test
+```
+
+#### Remaining rollout
 
 1. Define schema versioning and add the IMAP extension tables through the existing Mail3 database upgrade path. Migration must be restartable and must not discard legacy cache files.
 2. Import each account's existing folder metadata and cached `.eml` files into canonical folders, mail rows and MIME storage. Preserve server UIDs, UIDVALIDITY-related state, flags, folder display settings and any not-yet-downloaded message metadata. Make the importer idempotent and report corrupt or missing cache data explicitly.

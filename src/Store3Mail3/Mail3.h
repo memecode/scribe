@@ -403,6 +403,7 @@ public:
 	bool FindImapMessage(int64 MailboxId, int64 UidValidity, int64 Uid, LMail3ImapMessage &Message);
 	bool SaveImapMessage(const LMail3ImapMessage &Message);
 	bool DeleteImapMessage(int64 MailId);
+	bool ImportImapCache(int64 AccountId, const char *CachePath);
 	int64 GetInt(int id) override;
 	Store3Status SetInt(int id, int64 i) override;
 	const char *GetStr(int id) override;
@@ -687,6 +688,7 @@ public:
 	Store3Status SetObj(int id, LDataPropI *i) override;
 	LDataIt GetList(int id) override;
 	Store3Status SetRfc822(LStreamI *m) override;
+	Store3Status SetRfc822(LStreamI *m, bool PreserveRaw);
 };
 
 class LMail3Contact : public LMail3Thing
