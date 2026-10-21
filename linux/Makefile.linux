@@ -31,6 +31,7 @@ ifeq ($(Build),Debug)
 		-lbzip2 \
 		-llitehtml \
 		-lgumbo \
+		-lsqlite3 \
 		-lpthread \
 		-ldl \
 		-lz-lgi \
@@ -69,6 +70,7 @@ else
 		-lbzip2 \
 		-llitehtml \
 		-lgumbo \
+		-lsqlite3 \
 		-lpthread \
 		-ldl \
 		-lz-lgi \
@@ -241,7 +243,6 @@ Source =	../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			src/Scripting.cpp \
 			src/SearchView.cpp \
 			src/SecurityDlg.cpp \
-			src/Sqlite/v3.50.1/sqlite3.c \
 			src/Store3Common.cpp \
 			src/Store3Imap/ScribeImap_Attachment.cpp \
 			src/Store3Imap/ScribeImap_Folder.cpp \
@@ -482,6 +483,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Gdc2/Surface.cpp \
 	../../lgi/trunk/src/common/Gdc2/Tools/ColourReduce.cpp \
 	../../lgi/trunk/src/common/Gdc2/Tools/GdcTools.cpp \
+	../../lgi/trunk/src/common/Gdc2/Vector.cpp \
 	../../lgi/trunk/src/common/General/Containers.cpp \
 	../../lgi/trunk/src/common/General/DateTime.cpp \
 	../../lgi/trunk/src/common/General/ExeCheck.cpp \
@@ -606,7 +608,6 @@ VPATH=$(BuildDir) \
 	./src/Store3Webdav \
 	./src/Store3Mail3 \
 	./src/Store3Imap \
-	./src/Sqlite/v3.50.1 \
 	./src/Encryption \
 	./src \
 	../libs/Btree \

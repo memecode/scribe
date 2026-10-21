@@ -353,11 +353,6 @@
 			<Node File="./src/Store3Imap/ScribeImap_Thread.cpp" Type="2" Platforms="15" />
 		</Node>
 		<Node Name="Mail3" Type="1" Platforms="7" Open="0" Id="47">
-			<Node Name="Sqlite" Type="1" Platforms="7" Open="1" Id="48">
-				<Node File="./src/Sqlite/v3.50.1/sqlite3.c" Type="2" Platforms="15" />
-				<Node File="./src/Sqlite/v3.50.1/sqlite3.h" Type="3" Platforms="15" />
-				<Node File="./src/Sqlite/v3.50.1/sqlite3ext.h" Type="3" Platforms="15" />
-			</Node>
 			<Node File="./src/Store3Mail3/Mail3.h" Type="3" Platforms="15" />
 			<Node File="./src/Store3Mail3/Mail3Attachment.cpp" Type="2" Platforms="15" />
 			<Node File="./src/Store3Mail3/Mail3Calendar.cpp" Type="2" Platforms="15" />
@@ -502,11 +497,13 @@ network</Release>
 					<Debug>chardet
 bzip2
 litehtml
-gumbo</Debug>
+gumbo
+sqlite3</Debug>
 					<Release>chardet
 bzip2
 litehtml
-gumbo</Release>
+gumbo
+sqlite3</Release>
 				</All>
 			</Libraries>
 			<Defines>
