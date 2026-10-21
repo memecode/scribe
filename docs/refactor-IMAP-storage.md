@@ -12,6 +12,10 @@ However there are a lot of risks too. Things like threading and ownership of dat
 
 ## Plan for merging the backends to use the same Sqlite database
 
+### Implementation progress
+
+The first implementation slice adds IMAP mailbox, message-mapping and operation-journal tables to the Mail3 schema upgrade path, with uniqueness indexes for mailbox identity and UID scope. `LMail3Store` now exposes typed mailbox and message-mapping load/save/delete methods, guarded by its existing owning-thread rule. Persistent IMAP account connections now receive a non-owning reference to the already-loaded default Mail3 backend; one-off IMAP connections remain unchanged. The IMAP runtime still reads and writes its existing filesystem cache; using the injected backend, operation-journal access and legacy-cache migration have not yet been implemented.
+
 Use the existing `LMail3Store` database as the single local source of truth for both Mail3 and IMAP mail. Keep the IMAP protocol engine and its `LDataStoreI`-facing behavior, but make it a protocol adapter over the shared store rather than a second owner of cached messages and folders.
 
 Reuse the existing `Folder`, `Mail`, and `MailSegs` records for the local folder tree, message properties, and MIME content. A message has one local mail ID and one parent folder; moving it between local folders updates its parent reference instead of copying its MIME tree. Keep IMAP-only state in extension tables rather than overloading Mail3 fields:

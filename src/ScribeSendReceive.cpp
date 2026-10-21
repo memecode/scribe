@@ -17,6 +17,8 @@
 #include "Scribe.h"
 #include "lgi/common/OpenSSLSocket.h"
 #include "ScribePrivate.h"
+#include "Store3Imap/ScribeImap.h"
+#include "Store3Mail3/Mail3.h"
 #include "resdefs.h"
 #include "lgi/common/LgiRes.h"
 #include "ScribeAccountPreview.h"
@@ -623,8 +625,12 @@ bool Accountlet::Connect(LView *p, bool quiet)
 					MailProtocolProgress *Prog[2] = { &Group, &Item };
 					LAutoPtr<ProtocolSettingStore> Store;
 					Store.Reset(new ProtocolSettingStore(Account->GetApp(), Wnd->GetOptions(), OptionName(NULL)));
+					auto DefaultMailStore = Wnd->GetDefaultMailStore();
+					auto SharedStorage = DefaultMailStore
+						? dynamic_cast<LMail3Store*>(DefaultMailStore->Store.Get())
+						: NULL;
 					
-					DataStore = OpenImap(HostName,
+					DataStore = OpenImapWithStorage(HostName,
 										Receive->Port(),
 										UserName().Str(),
 										Password,
@@ -634,7 +640,8 @@ bool Accountlet::Connect(LView *p, bool quiet)
 										Prog,
 										this,
 										Id(),
-										Store);
+										Store,
+										SharedStorage);
 					if (DataStore)
 					{
    						DeleteObj(Root);

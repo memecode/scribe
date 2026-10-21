@@ -8,6 +8,51 @@
 
 #define SanityCheck() if (!IsOk()) return NULL;
 
+LMail3Def TblImapMailbox[] =
+{
+	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
+	{"AccountId",		"INTEGER NOT NULL"},
+	{"FolderId",		"INTEGER NOT NULL"},
+	{"RemoteName",		"TEXT NOT NULL"},
+	{"Delimiter",		"TEXT"},
+	{"UidValidity",		"INTEGER"},
+	{"UidNext",			"INTEGER"},
+	{"HighestModSeq",	"TEXT"},
+	{0, 0}
+};
+
+LMail3Def TblImapMessage[] =
+{
+	{"MailId",			"INTEGER PRIMARY KEY"},
+	{"MailboxId",		"INTEGER NOT NULL"},
+	{"UidValidity",		"INTEGER NOT NULL"},
+	{"Uid",				"INTEGER NOT NULL"},
+	{"RemoteFlags",		"INTEGER"},
+	{"LocalFlags",		"INTEGER"},
+	{"ModSeq",			"TEXT"},
+	{"Downloaded",		"INTEGER"},
+	{0, 0}
+};
+
+LMail3Def TblImapOperation[] =
+{
+	{"Id",						"INTEGER PRIMARY KEY AUTOINCREMENT"},
+	{"AccountId",				"INTEGER NOT NULL"},
+	{"OperationType",			"INTEGER NOT NULL"},
+	{"State",					"INTEGER NOT NULL"},
+	{"MailId",					"INTEGER"},
+	{"SourceMailboxId",			"INTEGER"},
+	{"DestinationMailboxId",	"INTEGER"},
+	{"SourceUidValidity",		"INTEGER"},
+	{"SourceUid",				"INTEGER"},
+	{"DestinationUidValidity",	"INTEGER"},
+	{"DestinationUid",			"INTEGER"},
+	{"Created",					"TEXT"},
+	{"Attempts",				"INTEGER"},
+	{"LastError",				"TEXT"},
+	{0, 0}
+};
+
 ///////////////////////////////////////////////////////////////////////////////////
 LMail3Thing::~LMail3Thing()
 {
@@ -135,6 +180,8 @@ LMail3Idx Mail3Indexes[] =
 	{"MailFolderIdx", MAIL3_TBL_MAIL, "ParentId"},
 	{"MailSegMailIdx", MAIL3_TBL_MAILSEGS, "MailId"},
 	{"MailSegParentIdx", MAIL3_TBL_MAILSEGS, "ParentId"},
+	{"ImapMessageMailboxIdx", MAIL3_TBL_IMAP_MESSAGE, "MailboxId"},
+	{"ImapOperationPendingIdx", MAIL3_TBL_IMAP_OPERATION, "AccountId, State, Id"},
 };
 
 LMail3Store::LMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool Create) :
@@ -157,6 +204,9 @@ LMail3Store::LMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool C
 	Fields.Add(MAIL3_TBL_FILTER, TblFilter);
 	Fields.Add(MAIL3_TBL_CALENDAR, TblCalendar);
 	Fields.Add(MAIL3_TBL_CALENDAR_FILES, TblCalendarFiles);
+	Fields.Add(MAIL3_TBL_IMAP_MAILBOX, TblImapMailbox);
+	Fields.Add(MAIL3_TBL_IMAP_MESSAGE, TblImapMessage);
+	Fields.Add(MAIL3_TBL_IMAP_OPERATION, TblImapOperation);
 
 	bool Exist = LDirExists(Mail3Folder);
 	if (!Create && !Exist)
@@ -259,6 +309,12 @@ bool LMail3Store::OpenDb()
 			{
 				s = Store3Success;
 			}
+			else if (s == Store3Missing)
+			{
+				OpenStatus = Store3Error;
+				ErrorMsg.Printf("Failed to create table '%s'.", it.key);
+				return false;
+			}
 
 			TableStatus.Add(it.key, s);
 			if (s == Store3Error ||
@@ -300,7 +356,33 @@ bool LMail3Store::OpenDb()
 					Mail3Indexes[i].Table,
 					Mail3Indexes[i].Column);
 			LStatement s(this, f);
-			s.Exec();
+			if (!s.Exec())
+			{
+				OpenStatus = Store3Error;
+				ErrorMsg.Printf("Failed to create index '%s'.", Mail3Indexes[i].IdxName);
+				return false;
+			}
+		}
+
+		const char *ImapUniqueIndexes[] =
+		{
+			"create unique index if not exists ImapMailboxAccountFolderIdx "
+				"on " MAIL3_TBL_IMAP_MAILBOX "(AccountId, FolderId)",
+			"create unique index if not exists ImapMailboxAccountRemoteIdx "
+				"on " MAIL3_TBL_IMAP_MAILBOX "(AccountId, RemoteName)",
+			"create unique index if not exists ImapMessageMailboxUidIdx "
+				"on " MAIL3_TBL_IMAP_MESSAGE "(MailboxId, UidValidity, Uid)",
+			NULL
+		};
+		for (const char **Sql = ImapUniqueIndexes; *Sql; Sql++)
+		{
+			LStatement s(this, *Sql);
+			if (!s.Exec())
+			{
+				OpenStatus = Store3Error;
+				ErrorMsg.Printf("Failed to create IMAP storage index: %s", *Sql);
+				return false;
+			}
 		}
 	}
 	
@@ -1653,6 +1735,206 @@ bool LMail3Store::IsOk()
 		this != 0 &&
 		#endif
 		Db != 0;
+}
+
+bool LMail3Store::LoadImapMailboxes(int64 AccountId, LArray<LMail3ImapMailbox> &Mailboxes)
+{
+	if (!IsOk() || !InThread() || AccountId < 0)
+		return false;
+
+	LStatement s(this,
+		"select Id, AccountId, FolderId, RemoteName, Delimiter, "
+		"UidValidity, UidNext, HighestModSeq "
+		"from " MAIL3_TBL_IMAP_MAILBOX " where AccountId=? order by Id");
+	if (!s.IsOk() || !s.SetInt64(0, AccountId))
+		return false;
+
+	Mailboxes.Length(0);
+	while (s.Row())
+	{
+		LMail3ImapMailbox &Mailbox = Mailboxes.New();
+		Mailbox.Id = s.GetInt64(0);
+		Mailbox.AccountId = s.GetInt64(1);
+		Mailbox.FolderId = s.GetInt64(2);
+		Mailbox.RemoteName = s.GetStr(3);
+		Mailbox.Delimiter = s.GetStr(4);
+		Mailbox.UidValidity = s.GetInt64(5);
+		Mailbox.UidNext = s.GetInt64(6);
+		Mailbox.HighestModSeq = s.GetStr(7);
+	}
+
+	return true;
+}
+
+bool LMail3Store::SaveImapMailbox(LMail3ImapMailbox &Mailbox)
+{
+	if (!IsOk() ||
+		!InThread() ||
+		Mailbox.AccountId < 0 ||
+		Mailbox.FolderId <= 0 ||
+		!ValidStr(Mailbox.RemoteName))
+		return false;
+
+	if (Mailbox.Id < 0)
+	{
+		LStatement Find(this,
+			"select Id from " MAIL3_TBL_IMAP_MAILBOX " "
+			"where AccountId=? and RemoteName=?");
+		if (!Find.IsOk() ||
+			!Find.SetInt64(0, Mailbox.AccountId) ||
+			!Find.SetStr(1, Mailbox.RemoteName))
+			return false;
+
+		if (Find.Row())
+			Mailbox.Id = Find.GetInt64(0);
+		if (!Find.Finalize())
+			return false;
+	}
+
+	if (Mailbox.Id >= 0)
+	{
+		LStatement Update(this,
+			"update " MAIL3_TBL_IMAP_MAILBOX " set "
+			"FolderId=?, RemoteName=?, Delimiter=?, UidValidity=?, "
+			"UidNext=?, HighestModSeq=? where AccountId=? and Id=?");
+		if (!Update.IsOk() ||
+			!Update.SetInt64(0, Mailbox.FolderId) ||
+			!Update.SetStr(1, Mailbox.RemoteName) ||
+			!Update.SetStr(2, Mailbox.Delimiter) ||
+			!Update.SetInt64(3, Mailbox.UidValidity) ||
+			!Update.SetInt64(4, Mailbox.UidNext) ||
+			!Update.SetStr(5, Mailbox.HighestModSeq) ||
+			!Update.SetInt64(6, Mailbox.AccountId) ||
+			!Update.SetInt64(7, Mailbox.Id) ||
+			!Update.Exec())
+			return false;
+
+		return sqlite3_changes(Db) == 1;
+	}
+
+	LStatement Insert(this,
+		"insert into " MAIL3_TBL_IMAP_MAILBOX " "
+		"(AccountId, FolderId, RemoteName, Delimiter, UidValidity, UidNext, HighestModSeq) "
+		"values (?, ?, ?, ?, ?, ?, ?)");
+	if (!Insert.IsOk() ||
+		!Insert.SetInt64(0, Mailbox.AccountId) ||
+		!Insert.SetInt64(1, Mailbox.FolderId) ||
+		!Insert.SetStr(2, Mailbox.RemoteName) ||
+		!Insert.SetStr(3, Mailbox.Delimiter) ||
+		!Insert.SetInt64(4, Mailbox.UidValidity) ||
+		!Insert.SetInt64(5, Mailbox.UidNext) ||
+		!Insert.SetStr(6, Mailbox.HighestModSeq) ||
+		!Insert.Exec())
+		return false;
+
+	Mailbox.Id = Insert.LastInsertId();
+	return Mailbox.Id > 0;
+}
+
+bool LMail3Store::LoadImapMessage(int64 MailId, LMail3ImapMessage &Message)
+{
+	if (!IsOk() || !InThread() || MailId <= 0)
+		return false;
+
+	LStatement s(this,
+		"select MailId, MailboxId, UidValidity, Uid, RemoteFlags, "
+		"LocalFlags, ModSeq, Downloaded from " MAIL3_TBL_IMAP_MESSAGE " "
+		"where MailId=?");
+	if (!s.IsOk() || !s.SetInt64(0, MailId) || !s.Row())
+		return false;
+
+	Message.MailId = s.GetInt64(0);
+	Message.MailboxId = s.GetInt64(1);
+	Message.UidValidity = s.GetInt64(2);
+	Message.Uid = s.GetInt64(3);
+	Message.RemoteFlags = s.GetInt(4);
+	Message.LocalFlags = s.GetInt(5);
+	Message.ModSeq = s.GetStr(6);
+	Message.Downloaded = s.GetBool(7);
+	return true;
+}
+
+bool LMail3Store::FindImapMessage(int64 MailboxId, int64 UidValidity, int64 Uid, LMail3ImapMessage &Message)
+{
+	if (!IsOk() ||
+		!InThread() ||
+		MailboxId <= 0 ||
+		UidValidity <= 0 ||
+		Uid <= 0)
+		return false;
+
+	LStatement s(this,
+		"select MailId, MailboxId, UidValidity, Uid, RemoteFlags, "
+		"LocalFlags, ModSeq, Downloaded from " MAIL3_TBL_IMAP_MESSAGE " "
+		"where MailboxId=? and UidValidity=? and Uid=?");
+	if (!s.IsOk() ||
+		!s.SetInt64(0, MailboxId) ||
+		!s.SetInt64(1, UidValidity) ||
+		!s.SetInt64(2, Uid) ||
+		!s.Row())
+		return false;
+
+	Message.MailId = s.GetInt64(0);
+	Message.MailboxId = s.GetInt64(1);
+	Message.UidValidity = s.GetInt64(2);
+	Message.Uid = s.GetInt64(3);
+	Message.RemoteFlags = s.GetInt(4);
+	Message.LocalFlags = s.GetInt(5);
+	Message.ModSeq = s.GetStr(6);
+	Message.Downloaded = s.GetBool(7);
+	return true;
+}
+
+bool LMail3Store::SaveImapMessage(const LMail3ImapMessage &Message)
+{
+	if (!IsOk() ||
+		!InThread() ||
+		Message.MailId <= 0 ||
+		Message.MailboxId <= 0 ||
+		Message.UidValidity <= 0 ||
+		Message.Uid <= 0)
+		return false;
+
+	LStatement Find(this,
+		"select MailId from " MAIL3_TBL_IMAP_MESSAGE " where MailId=?");
+	if (!Find.IsOk() || !Find.SetInt64(0, Message.MailId))
+		return false;
+
+	bool Exists = Find.Row();
+	if (!Find.Finalize())
+		return false;
+
+	LStatement Write(this, Exists
+		? "update " MAIL3_TBL_IMAP_MESSAGE " set "
+		  "MailboxId=?, UidValidity=?, Uid=?, RemoteFlags=?, LocalFlags=?, "
+		  "ModSeq=?, Downloaded=? where MailId=?"
+		: "insert into " MAIL3_TBL_IMAP_MESSAGE " "
+		  "(MailboxId, UidValidity, Uid, RemoteFlags, LocalFlags, ModSeq, Downloaded, MailId) "
+		  "values (?, ?, ?, ?, ?, ?, ?, ?)");
+	if (!Write.IsOk() ||
+		!Write.SetInt64(0, Message.MailboxId) ||
+		!Write.SetInt64(1, Message.UidValidity) ||
+		!Write.SetInt64(2, Message.Uid) ||
+		!Write.SetInt(3, Message.RemoteFlags) ||
+		!Write.SetInt(4, Message.LocalFlags) ||
+		!Write.SetStr(5, Message.ModSeq) ||
+		!Write.SetInt(6, Message.Downloaded ? 1 : 0) ||
+		!Write.SetInt64(7, Message.MailId) ||
+		!Write.Exec())
+		return false;
+
+	return sqlite3_changes(Db) == 1;
+}
+
+bool LMail3Store::DeleteImapMessage(int64 MailId)
+{
+	if (!IsOk() || !InThread() || MailId <= 0)
+		return false;
+
+	LStatement s(this, "delete from " MAIL3_TBL_IMAP_MESSAGE " where MailId=?");
+	return s.IsOk() &&
+		s.SetInt64(0, MailId) &&
+		s.Exec();
 }
 
 bool LMail3Store::ParseTableFormat(const char *Name, TableDefn &Defs)

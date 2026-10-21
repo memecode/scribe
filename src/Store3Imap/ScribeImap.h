@@ -182,6 +182,7 @@ extern char *TrimWhite(char *s);
 class ImapFolder;
 class ImapThread;
 class ImapMail;
+class LMail3Store;
 
 class ImapStore : public LDataStoreI
 {
@@ -199,6 +200,7 @@ class ImapStore : public LDataStoreI
 	int AccountId;
 	ImapThread *Thread = NULL;
 	LStream *Log;
+	LMail3Store *Storage = NULL;
 	ScribeAccountletStatusIcon Online = STATUS_OFFLINE;
 	LArray<ImapMsg*> Listing;
 	int64 LastPulse = 0;
@@ -226,10 +228,12 @@ public:
 				MailProtocolProgress *prog[2],
 				LStream *log,
 				int accoundid,
-				LAutoPtr<ProtocolSettingStore> store);
+				LAutoPtr<ProtocolSettingStore> store,
+				LMail3Store *storage = NULL);
 	~ImapStore();
 
 	const char *GetClass() override { return "ImapStore"; }
+	LMail3Store *GetStorage() { return Storage; }
 	void PostStore(ImapMsg *m) { Callback->Post(this, m); }
 	bool PostThread(ImapMsg *m, bool UiPriority);
 
@@ -590,5 +594,18 @@ public:
 	void OnExpunge();
 	bool OnRename(const char *NewRemote);
 };
+
+LDataStoreI *OpenImapWithStorage(	LString Host,
+									int Port,
+									LString User,
+									LString Pass,
+									int ConnectFlags,
+									LDataEventsI *Callback,
+									LCapabilityClient *Caps,
+									MailProtocolProgress *prog[2],
+									LStream *Log,
+									int AccountId,
+									LAutoPtr<ProtocolSettingStore> store,
+									LMail3Store *Storage);
 
 #endif

@@ -73,7 +73,8 @@ ImapStore::ImapStore(LString host,
 					MailProtocolProgress *prog[2],
 					LStream *log,
 					int accountid,
-					LAutoPtr<ProtocolSettingStore> store)
+					LAutoPtr<ProtocolSettingStore> store,
+					LMail3Store *storage)
 {
 	AccountId = accountid;
 	Host = host;
@@ -86,6 +87,7 @@ ImapStore::ImapStore(LString host,
 	ItemProgress = prog[0];
 	DataProgress = prog[1];
 	SettingStore = store;
+	Storage = storage;
 
 	LVariant v;
 	if (SettingStore && SettingStore->GetValue(OPT_ReceiveFilterIncoming, v))
@@ -1335,4 +1337,20 @@ LDataStoreI *OpenImap(	LString Host,
 						LAutoPtr<ProtocolSettingStore> store)
 {
 	return new ImapStore(Host, Port, User, Pass, ConnectFlags, Callback, Caps, prog, Log, AccoundId, store);
+}
+
+LDataStoreI *OpenImapWithStorage(	LString Host,
+									int Port,
+									LString User,
+									LString Pass,
+									int ConnectFlags,
+									LDataEventsI *Callback,
+									LCapabilityClient *Caps,
+									MailProtocolProgress *prog[2],
+									LStream *Log,
+									int AccountId,
+									LAutoPtr<ProtocolSettingStore> store,
+									LMail3Store *Storage)
+{
+	return new ImapStore(Host, Port, User, Pass, ConnectFlags, Callback, Caps, prog, Log, AccountId, store, Storage);
 }

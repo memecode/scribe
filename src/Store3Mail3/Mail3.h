@@ -19,6 +19,9 @@
 #define MAIL3_TBL_FILTER			"Filter"
 #define MAIL3_TBL_CALENDAR			"Calendar"
 #define MAIL3_TBL_CALENDAR_FILES	"CalendarFiles"
+#define MAIL3_TBL_IMAP_MAILBOX		"ImapMailbox"
+#define MAIL3_TBL_IMAP_MESSAGE		"ImapMessage"
+#define MAIL3_TBL_IMAP_OPERATION	"ImapOperation"
 
 class LMail3Store;
 class LMail3Mail;
@@ -41,6 +44,30 @@ struct LMail3Idx
 	const char *IdxName;
 	const char *Table;
 	const char *Column;
+};
+
+struct LMail3ImapMailbox
+{
+	int64 Id = -1;
+	int64 AccountId = -1;
+	int64 FolderId = -1;
+	LString RemoteName;
+	LString Delimiter;
+	int64 UidValidity = -1;
+	int64 UidNext = -1;
+	LString HighestModSeq;
+};
+
+struct LMail3ImapMessage
+{
+	int64 MailId = -1;
+	int64 MailboxId = -1;
+	int64 UidValidity = -1;
+	int64 Uid = -1;
+	int RemoteFlags = 0;
+	int LocalFlags = 0;
+	LString ModSeq;
+	bool Downloaded = false;
 };
 
 class Mail3BlobStream : public LStream
@@ -370,6 +397,12 @@ public:
 	bool OnIdle() override { return false; }
 	sqlite3 *GetDb() { return Db; }
 	bool IsOk();
+	bool LoadImapMailboxes(int64 AccountId, LArray<LMail3ImapMailbox> &Mailboxes);
+	bool SaveImapMailbox(LMail3ImapMailbox &Mailbox);
+	bool LoadImapMessage(int64 MailId, LMail3ImapMessage &Message);
+	bool FindImapMessage(int64 MailboxId, int64 UidValidity, int64 Uid, LMail3ImapMessage &Message);
+	bool SaveImapMessage(const LMail3ImapMessage &Message);
+	bool DeleteImapMessage(int64 MailId);
 	int64 GetInt(int id) override;
 	Store3Status SetInt(int id, int64 i) override;
 	const char *GetStr(int id) override;
