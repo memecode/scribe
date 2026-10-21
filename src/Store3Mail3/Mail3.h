@@ -3,7 +3,7 @@
 
 #include "lgi/common/Lgi.h"
 #include "Store3Common.h"
-#include "v3.50.1/sqlite3.h"
+#include "sqlite3.h"
 #include "Store3CalendarObj.h"
 
 // Debugging stuff

@@ -1109,8 +1109,6 @@ Store3Status LMail3Mail::SetStr(int id, const char *str)
 		}
 		case FIELD_CHARSET:
 		{
-			LgiTrace("%s:%i - FIELD_CHARSET set\n", _FL);
-
 			LArray<LMail3Attachment*> Results;
 			if (!FindSegs("text/plain", Results, str != 0))
 				break;
@@ -1130,7 +1128,6 @@ Store3Status LMail3Mail::SetStr(int id, const char *str)
 			HtmlCache.Reset();
 			LArray<LMail3Attachment*> Results;
 			
-			LgiTrace("%s:%i - set html str: %p/'%s', Seg=%p, inet=%p\n", _FL, str, str, Seg, Seg?Seg->GetStr(FIELD_INTERNET_HEADER):nullptr);
 			if (FindSegs("text/html", Results, str != 0))
 			{
 				for (unsigned i=0; i<Results.Length(); i++)
