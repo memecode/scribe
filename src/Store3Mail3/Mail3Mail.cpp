@@ -35,6 +35,12 @@ LMail3Def TblMail[] =
 
     // Other meta data
 		{"Size",    		"INTEGER"},
+		{"ImapUidValidity",	"INTEGER"},
+		{"ImapUid",			"INTEGER"},
+		{"ImapRemoteFlags",	"INTEGER"},
+		{"ImapLocalFlags",	"INTEGER"},
+		{"ImapModSeq",		"TEXT"},
+		{"ImapDownloaded",	"INTEGER"},
 
 	{0, 0}
 };
@@ -351,6 +357,12 @@ bool LMail3Mail::Serialize(LMail3Store::LStatement &s, bool Write)
 	SERIALIZE_DATE(DateSent, i++);
 
 	SERIALIZE_INT64(MailSize, i++);
+	SERIALIZE_INT64(ImapUidValidity, i++);
+	SERIALIZE_INT64(ImapUid, i++);
+	SERIALIZE_INT(ImapRemoteFlags, i++);
+	SERIALIZE_INT(ImapLocalFlags, i++);
+	SERIALIZE_LSTR(ImapModSeq, i++);
+	SERIALIZE_INT(ImapDownloaded, i++);
 
 	// Load the objects from the strings
 	if (!Write)

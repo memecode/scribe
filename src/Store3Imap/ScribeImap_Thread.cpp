@@ -33,6 +33,47 @@ static char OtherListingParts[]	= "FLAGS UID";
 
 bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void *UserData);
 
+bool FetchImapRebuild(MailIMap &Imap, const ImapFolderInfo &Folder, ImapMsg &Response, LString &Error)
+{
+	Response.SetType(IMAP_REBUILD_MAILBOX, _FL);
+	Response.Mail.Empty();
+	Response.Fld.Empty();
+	Response.Last = false;
+	Error.Empty();
+	MailIMap::StrMap Before, After;
+	if (!Imap.SelectFolder(Folder.Remote, &Before))
+	{
+		Error = "Cannot SELECT the mailbox for the server rebuild.";
+		return false;
+	}
+	auto Epoch = Before.Find("UIDVALIDITY");
+	auto Next = Before.Find("UIDNEXT");
+	auto Count = Before.Find("Exists");
+	if (!Epoch || Epoch.Int() <= 0 || Epoch.Int() > UINT32_MAX ||
+		!Next || Next.Int() <= 0 || Next.Int() > UINT32_MAX || !Count || Count.Int() < 0)
+	{
+		Error = "SELECT did not supply valid UIDVALIDITY, UIDNEXT and EXISTS.";
+		return false;
+	}
+	auto &Selected = Response.Fld.New();
+	Selected.Remote = Folder.Remote;
+	Selected.Sep = Folder.Sep;
+	Selected.LastUid = 0;
+	Selected.UidValidity = Epoch.Int();
+	Selected.UidNext = Next.Int();
+	if ((Count.Int() > 0 && !Imap.Fetch(true, "1:*", MailListingParts, ListingCallback, &Response, NULL)) ||
+		!Imap.SelectFolder(Folder.Remote, &After) ||
+		After.Find("UIDVALIDITY") != Epoch || After.Find("UIDNEXT") != Next ||
+		After.Find("Exists") != Count ||
+		(int64)Response.Mail.Length() != Count.Int())
+	{
+		Error = "Incomplete or changing server snapshot; rebuild not committed.";
+		return false;
+	}
+	Response.Last = true;
+	return true;
+}
+
 int FldCmp(MailImapFolder **a, MailImapFolder **b)
 {
 	char *sa = (*a)->GetPath();
@@ -160,7 +201,7 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 			return false;
 		}
 
-		if (!CurrentFolder || _stricmp(f, CurrentFolder))
+		if (!CurrentFolder || Strcmp(f, CurrentFolder.Get()))
 		{
 			MailIMap::StrMap Local;
 
@@ -244,6 +285,15 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 			for (unsigned i=0; i<Folders.Length(); i++)
 			{
 				auto f = Folders[i];
+				if (Store->IsServerRebuild() && !f->NoSelect)
+				{
+					auto Rebuild = new ImapMsg(IMAP_REBUILD_MAILBOX, _FL);
+					auto &Folder = Rebuild->Fld.New();
+					char Delimiter[] = { f->GetSep(), 0 };
+					Folder.Remote = LString("/") + LString("/").Join(LString(f->GetPath()).SplitDelimit(Delimiter));
+					Folder.Sep = f->GetSep();
+					Thread->PostThread(Rebuild, false);
+				}
 				if (Sep[0] == 0)
 				{
 					Sep[0] = f->GetSep();
@@ -421,6 +471,12 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 	auto Rfc822Size		= Parts.Find("RFC822.SIZE");
 	auto BodyStructure	= Parts.Find("BODYSTRUCTURE");
 	auto Header			= Parts.Find("BODY[HEADER]");
+	if (m->Type == IMAP_REBUILD_MAILBOX &&
+		(!Flags || !Rfc822Size.IsNumeric() || Rfc822Size.Int() < 0 || !Header))
+	{
+		LgiTrace("Incomplete metadata in the server rebuild FETCH response.\n");
+		return false;
+	}
 
 	#if DEBUG_INPUT_FETCHES
 	const char *k;
@@ -437,17 +493,24 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 		return true;
 	}
 
-    uint32_t uid = atoi(Uid);
+	auto Number = Uid.Int();
+	if (!Uid.IsNumeric() || Number <= 0 || Number > UINT32_MAX)
+	{
+		LgiTrace("Invalid UID in the server FETCH response: '%s'.\n", Uid.Get());
+		return false;
+	}
+	uint32_t uid = (uint32_t)Number;
 	#ifdef _DEBUG
-    for (unsigned n=0; n<m->Mail.Length(); n++)
-    {
-        if (m->Mail[n].Uid == uid)
-        {
-            LAssert(!"Duplicate UID.");
-            return true;
-        }
-    }
-    #endif
+	if (m->Type != IMAP_REBUILD_MAILBOX)
+		for (auto &Message: m->Mail)
+		{
+			if (Message.Uid == uid)
+			{
+				LAssert(!"Duplicate UID.");
+				return false;
+			}
+		}
+	#endif
 
 	if (m->Fld.Length() > 0 &&
 		uid <= m->Fld[0].LastUid)
@@ -460,7 +523,7 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 
 		i.Seq = Msg;
 		i.Flags.Set(Flags);
-		i.Uid = atoi(Uid);
+		i.Uid = uid;
 		i.Structure = BodyStructure;
 
 		if (Header)
@@ -936,6 +999,25 @@ int ImapThread::Main()
 			switch (m->Type)
 			{
 				default: break;
+				case IMAP_REBUILD_MAILBOX:
+				{
+					for (auto &Folder: m->Fld)
+					{
+						LAutoPtr<ImapMsg> Response(new ImapMsg(IMAP_REBUILD_MAILBOX, _FL));
+						LString Error;
+						d->CurrentFolder.Empty();
+						if (!FetchImapRebuild(*d->Imap, Folder, *Response, Error))
+						{
+							d->Error(_FL, "Server rebuild '%s': %s", Folder.Remote.Get(), Error.Get());
+							PostStore(new ImapMsg(IMAP_ERROR, _FL));
+							continue;
+						}
+						d->CurrentFolder = Folder.Remote;
+						d->Exists = (int)Response->Mail.Length();
+						PostStore(Response.Release());
+					}
+					break;
+				}
 				case IMAP_SELECT_FOLDER:
 				{
 					if (m->Fld.Length() == 1)

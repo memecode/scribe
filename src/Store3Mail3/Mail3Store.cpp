@@ -4,37 +4,15 @@
 #include <wchar.h>
 #include <cerrno>
 #include <filesystem>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/Thread.h"
 #include "lgi/common/Store3MimeTree.h"
 
 #define SanityCheck() if (!IsOk()) return NULL;
-
-LMail3Def TblImapMailbox[] =
-{
-	{"Id",				"INTEGER PRIMARY KEY AUTOINCREMENT"},
-	{"AccountId",		"INTEGER NOT NULL"},
-	{"FolderId",		"INTEGER NOT NULL"},
-	{"RemoteName",		"TEXT NOT NULL"},
-	{"Delimiter",		"TEXT"},
-	{"UidValidity",		"INTEGER"},
-	{"UidNext",			"INTEGER"},
-	{"HighestModSeq",	"TEXT"},
-	{0, 0}
-};
-
-LMail3Def TblImapMessage[] =
-{
-	{"MailId",			"INTEGER PRIMARY KEY"},
-	{"MailboxId",		"INTEGER NOT NULL"},
-	{"UidValidity",		"INTEGER NOT NULL"},
-	{"Uid",				"INTEGER NOT NULL"},
-	{"RemoteFlags",		"INTEGER"},
-	{"LocalFlags",		"INTEGER"},
-	{"ModSeq",			"TEXT"},
-	{"Downloaded",		"INTEGER"},
-	{0, 0}
-};
 
 LMail3Def TblImapOperation[] =
 {
@@ -52,6 +30,14 @@ LMail3Def TblImapOperation[] =
 	{"Created",					"TEXT"},
 	{"Attempts",				"INTEGER"},
 	{"LastError",				"TEXT"},
+	{0, 0}
+};
+
+LMail3Def TblImapLocalSettings[] =
+{
+	{"AccountId",		"INTEGER NOT NULL"},
+	{"RemoteName",		"TEXT NOT NULL"},
+	{"Settings",		"TEXT NOT NULL"},
 	{0, 0}
 };
 
@@ -182,7 +168,6 @@ LMail3Idx Mail3Indexes[] =
 	{"MailFolderIdx", MAIL3_TBL_MAIL, "ParentId"},
 	{"MailSegMailIdx", MAIL3_TBL_MAILSEGS, "MailId"},
 	{"MailSegParentIdx", MAIL3_TBL_MAILSEGS, "ParentId"},
-	{"ImapMessageMailboxIdx", MAIL3_TBL_IMAP_MESSAGE, "MailboxId"},
 	{"ImapOperationPendingIdx", MAIL3_TBL_IMAP_OPERATION, "AccountId, State, Id"},
 };
 
@@ -206,9 +191,8 @@ LMail3Store::LMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool C
 	Fields.Add(MAIL3_TBL_FILTER, TblFilter);
 	Fields.Add(MAIL3_TBL_CALENDAR, TblCalendar);
 	Fields.Add(MAIL3_TBL_CALENDAR_FILES, TblCalendarFiles);
-	Fields.Add(MAIL3_TBL_IMAP_MAILBOX, TblImapMailbox);
-	Fields.Add(MAIL3_TBL_IMAP_MESSAGE, TblImapMessage);
 	Fields.Add(MAIL3_TBL_IMAP_OPERATION, TblImapOperation);
+	Fields.Add(MAIL3_TBL_IMAP_SETTINGS, TblImapLocalSettings);
 
 	bool Exist = LDirExists(Mail3Folder);
 	if (!Create && !Exist)
@@ -349,45 +333,54 @@ bool LMail3Store::OpenDb()
 			}
 		}
 
-		LDataStoreI::StoreTrans Trn = StartTransaction();
-		for (int i=0; i<CountOf(Mail3Indexes); i++)
+		if (!CreateIndexes())
 		{
-			sprintf_s(f, sizeof(f),
-					"create index if not exists %s on %s(%s)",
-					Mail3Indexes[i].IdxName,
-					Mail3Indexes[i].Table,
-					Mail3Indexes[i].Column);
-			LStatement s(this, f);
-			if (!s.Exec())
-			{
-				OpenStatus = Store3Error;
-				ErrorMsg.Printf("Failed to create index '%s'.", Mail3Indexes[i].IdxName);
-				return false;
-			}
-		}
-
-		const char *ImapUniqueIndexes[] =
-		{
-			"create unique index if not exists ImapMailboxAccountFolderIdx "
-				"on " MAIL3_TBL_IMAP_MAILBOX "(AccountId, FolderId)",
-			"create unique index if not exists ImapMailboxAccountRemoteIdx "
-				"on " MAIL3_TBL_IMAP_MAILBOX "(AccountId, RemoteName)",
-			"create unique index if not exists ImapMessageMailboxUidIdx "
-				"on " MAIL3_TBL_IMAP_MESSAGE "(MailboxId, UidValidity, Uid)",
-			NULL
-		};
-		for (const char **Sql = ImapUniqueIndexes; *Sql; Sql++)
-		{
-			LStatement s(this, *Sql);
-			if (!s.Exec())
-			{
-				OpenStatus = Store3Error;
-				ErrorMsg.Printf("Failed to create IMAP storage index: %s", *Sql);
-				return false;
-			}
+			OpenStatus = Store3Error;
+			return false;
 		}
 	}
-	
+
+	return true;
+}
+
+bool LMail3Store::CreateIndexes()
+{
+	LDataStoreI::StoreTrans Trn = StartTransaction();
+	for (auto &Index: Mail3Indexes)
+	{
+		LString Sql = LString::Fmt("create index if not exists %s on %s(%s)",
+			Index.IdxName, Index.Table, Index.Column);
+		LStatement s(this, Sql);
+		if (!s.Exec())
+		{
+			ErrorMsg.Printf("Failed to create index '%s'.", Index.IdxName);
+			return false;
+		}
+	}
+	const struct
+	{
+		const char *Table;
+		const char *Sql;
+	} ImapUniqueIndexes[] =
+	{
+		{MAIL3_TBL_FOLDER, "create unique index if not exists FolderImapAccountRemoteIdx "
+			"on " MAIL3_TBL_FOLDER "(ImapAccountId, ImapRemoteName)"},
+		{MAIL3_TBL_MAIL, "create unique index if not exists MailImapFolderUidIdx "
+			"on " MAIL3_TBL_MAIL "(ParentId, ImapUidValidity, ImapUid)"},
+		{MAIL3_TBL_IMAP_SETTINGS, "create unique index if not exists ImapLocalSettingsAccountRemoteIdx "
+			"on " MAIL3_TBL_IMAP_SETTINGS "(AccountId, RemoteName)"}
+	};
+	for (auto &Index: ImapUniqueIndexes)
+	{
+		if (TableStatus.Find(Index.Table) != Store3Success)
+			continue;
+		LStatement s(this, Index.Sql);
+		if (!s.Exec())
+		{
+			ErrorMsg.Printf("Failed to create IMAP storage index: %s", Index.Sql);
+			return false;
+		}
+	}
 	return true;
 }
 
@@ -1127,8 +1120,16 @@ void LMail3Store::Upgrade(LViewI *Parent, LDataPropI *Props, std::function<void(
 				p.Print("Failed to upgrade %s\n", it.key);
 				Status = false;
 			}
+			else
+				TableStatus.Add(it.key, Store3Success);
 		}
 	}
+	if (Status && !CreateIndexes())
+	{
+		p.Print("%s\n", ErrorMsg.Get());
+		Status = false;
+	}
+	OpenStatus = Status ? Store3Success : Store3Error;
 
 	if (Props && !Status)
 	{
@@ -1745,27 +1746,27 @@ bool LMail3Store::LoadImapMailboxes(int64 AccountId, LArray<LMail3ImapMailbox> &
 		return false;
 
 	LStatement s(this,
-		"select Id, AccountId, FolderId, RemoteName, Delimiter, "
-		"UidValidity, UidNext, HighestModSeq "
-		"from " MAIL3_TBL_IMAP_MAILBOX " where AccountId=? order by Id");
+		"select Id, ImapAccountId, ImapRemoteName, ImapDelimiter, "
+		"ImapUidValidity, ImapUidNext, ImapHighestModSeq "
+		"from " MAIL3_TBL_FOLDER " where ImapAccountId=? and ImapRemoteName is not null order by Id");
 	if (!s.IsOk() || !s.SetInt64(0, AccountId))
 		return false;
 
 	Mailboxes.Length(0);
-	while (s.Row())
+	int Result;
+	while ((Result = sqlite3_step(s)) == SQLITE_ROW)
 	{
 		LMail3ImapMailbox &Mailbox = Mailboxes.New();
 		Mailbox.Id = s.GetInt64(0);
 		Mailbox.AccountId = s.GetInt64(1);
-		Mailbox.FolderId = s.GetInt64(2);
-		Mailbox.RemoteName = s.GetStr(3);
-		Mailbox.Delimiter = s.GetStr(4);
-		Mailbox.UidValidity = s.GetInt64(5);
-		Mailbox.UidNext = s.GetInt64(6);
-		Mailbox.HighestModSeq = s.GetStr(7);
+		Mailbox.RemoteName = s.GetStr(2);
+		Mailbox.Delimiter = s.GetStr(3);
+		Mailbox.UidValidity = s.GetInt64(4);
+		Mailbox.UidNext = s.GetInt64(5);
+		Mailbox.HighestModSeq = s.GetStr(6);
 	}
 
-	return true;
+	return Check(Result, NULL);
 }
 
 bool LMail3Store::SaveImapMailbox(LMail3ImapMailbox &Mailbox)
@@ -1773,64 +1774,34 @@ bool LMail3Store::SaveImapMailbox(LMail3ImapMailbox &Mailbox)
 	if (!IsOk() ||
 		!InThread() ||
 		Mailbox.AccountId < 0 ||
-		Mailbox.FolderId <= 0 ||
+		Mailbox.Id <= 0 ||
 		!ValidStr(Mailbox.RemoteName))
-		return false;
-
-	if (Mailbox.Id < 0)
 	{
-		LStatement Find(this,
-			"select Id from " MAIL3_TBL_IMAP_MAILBOX " "
-			"where AccountId=? and RemoteName=?");
-		if (!Find.IsOk() ||
-			!Find.SetInt64(0, Mailbox.AccountId) ||
-			!Find.SetStr(1, Mailbox.RemoteName))
-			return false;
-
-		if (Find.Row())
-			Mailbox.Id = Find.GetInt64(0);
-		if (!Find.Finalize())
-			return false;
+		ErrorMsg = "Saving IMAP mailbox state requires an existing canonical folder.";
+		LgiTrace("%s\n", ErrorMsg.Get());
+		return false;
 	}
 
-	if (Mailbox.Id >= 0)
-	{
-		LStatement Update(this,
-			"update " MAIL3_TBL_IMAP_MAILBOX " set "
-			"FolderId=?, RemoteName=?, Delimiter=?, UidValidity=?, "
-			"UidNext=?, HighestModSeq=? where AccountId=? and Id=?");
-		if (!Update.IsOk() ||
-			!Update.SetInt64(0, Mailbox.FolderId) ||
-			!Update.SetStr(1, Mailbox.RemoteName) ||
-			!Update.SetStr(2, Mailbox.Delimiter) ||
-			!Update.SetInt64(3, Mailbox.UidValidity) ||
-			!Update.SetInt64(4, Mailbox.UidNext) ||
-			!Update.SetStr(5, Mailbox.HighestModSeq) ||
-			!Update.SetInt64(6, Mailbox.AccountId) ||
-			!Update.SetInt64(7, Mailbox.Id) ||
-			!Update.Exec())
-			return false;
-
-		return sqlite3_changes(Db) == 1;
-	}
-
-	LStatement Insert(this,
-		"insert into " MAIL3_TBL_IMAP_MAILBOX " "
-		"(AccountId, FolderId, RemoteName, Delimiter, UidValidity, UidNext, HighestModSeq) "
-		"values (?, ?, ?, ?, ?, ?, ?)");
-	if (!Insert.IsOk() ||
-		!Insert.SetInt64(0, Mailbox.AccountId) ||
-		!Insert.SetInt64(1, Mailbox.FolderId) ||
-		!Insert.SetStr(2, Mailbox.RemoteName) ||
-		!Insert.SetStr(3, Mailbox.Delimiter) ||
-		!Insert.SetInt64(4, Mailbox.UidValidity) ||
-		!Insert.SetInt64(5, Mailbox.UidNext) ||
-		!Insert.SetStr(6, Mailbox.HighestModSeq) ||
-		!Insert.Exec())
+	LStatement Update(this,
+		"update " MAIL3_TBL_FOLDER " set "
+		"ImapAccountId=?, ImapRemoteName=?, ImapDelimiter=?, ImapUidValidity=?, "
+		"ImapUidNext=?, ImapHighestModSeq=? where Id=? and (ImapAccountId is null or ImapAccountId=?)");
+	if (!Update.IsOk() ||
+		!Update.SetInt64(0, Mailbox.AccountId) ||
+		!Update.SetStr(1, Mailbox.RemoteName) ||
+		!Update.SetStr(2, Mailbox.Delimiter) ||
+		!Update.SetInt64(3, Mailbox.UidValidity) ||
+		!Update.SetInt64(4, Mailbox.UidNext) ||
+		!Update.SetStr(5, Mailbox.HighestModSeq) ||
+		!Update.SetInt64(6, Mailbox.Id) ||
+		!Update.SetInt64(7, Mailbox.AccountId) ||
+		!Update.Exec())
 		return false;
-
-	Mailbox.Id = Insert.LastInsertId();
-	return Mailbox.Id > 0;
+	if (sqlite3_changes(Db) == 1)
+		return true;
+	ErrorMsg = "The IMAP folder was removed or belongs to another account.";
+	LgiTrace("%s\n", ErrorMsg.Get());
+	return false;
 }
 
 bool LMail3Store::LoadImapMessage(int64 MailId, LMail3ImapMessage &Message)
@@ -1839,9 +1810,9 @@ bool LMail3Store::LoadImapMessage(int64 MailId, LMail3ImapMessage &Message)
 		return false;
 
 	LStatement s(this,
-		"select MailId, MailboxId, UidValidity, Uid, RemoteFlags, "
-		"LocalFlags, ModSeq, Downloaded from " MAIL3_TBL_IMAP_MESSAGE " "
-		"where MailId=?");
+		"select Id, ParentId, ImapUidValidity, ImapUid, ImapRemoteFlags, "
+		"ImapLocalFlags, ImapModSeq, ImapDownloaded from " MAIL3_TBL_MAIL " "
+		"where Id=? and ImapUid is not null");
 	if (!s.IsOk() || !s.SetInt64(0, MailId) || !s.Row())
 		return false;
 
@@ -1866,9 +1837,9 @@ bool LMail3Store::FindImapMessage(int64 MailboxId, int64 UidValidity, int64 Uid,
 		return false;
 
 	LStatement s(this,
-		"select MailId, MailboxId, UidValidity, Uid, RemoteFlags, "
-		"LocalFlags, ModSeq, Downloaded from " MAIL3_TBL_IMAP_MESSAGE " "
-		"where MailboxId=? and UidValidity=? and Uid=?");
+		"select Id, ParentId, ImapUidValidity, ImapUid, ImapRemoteFlags, "
+		"ImapLocalFlags, ImapModSeq, ImapDownloaded from " MAIL3_TBL_MAIL " "
+		"where ParentId=? and ImapUidValidity=? and ImapUid=?");
 	if (!s.IsOk() ||
 		!s.SetInt64(0, MailboxId) ||
 		!s.SetInt64(1, UidValidity) ||
@@ -1897,35 +1868,29 @@ bool LMail3Store::SaveImapMessage(const LMail3ImapMessage &Message)
 		Message.Uid <= 0)
 		return false;
 
-	LStatement Find(this,
-		"select MailId from " MAIL3_TBL_IMAP_MESSAGE " where MailId=?");
-	if (!Find.IsOk() || !Find.SetInt64(0, Message.MailId))
-		return false;
-
-	bool Exists = Find.Row();
-	if (!Find.Finalize())
-		return false;
-
-	LStatement Write(this, Exists
-		? "update " MAIL3_TBL_IMAP_MESSAGE " set "
-		  "MailboxId=?, UidValidity=?, Uid=?, RemoteFlags=?, LocalFlags=?, "
-		  "ModSeq=?, Downloaded=? where MailId=?"
-		: "insert into " MAIL3_TBL_IMAP_MESSAGE " "
-		  "(MailboxId, UidValidity, Uid, RemoteFlags, LocalFlags, ModSeq, Downloaded, MailId) "
-		  "values (?, ?, ?, ?, ?, ?, ?, ?)");
+	LStatement Write(this,
+		"update " MAIL3_TBL_MAIL " set "
+		"ImapUidValidity=?, ImapUid=?, ImapRemoteFlags=?, ImapLocalFlags=?, "
+		"ImapModSeq=?, ImapDownloaded=? where Id=? and ParentId=? and exists"
+		" (select 1 from " MAIL3_TBL_FOLDER " F where F.Id=Mail.ParentId and F.ImapAccountId=Mail.AccountId"
+		" and F.ImapRemoteName is not null)");
 	if (!Write.IsOk() ||
-		!Write.SetInt64(0, Message.MailboxId) ||
-		!Write.SetInt64(1, Message.UidValidity) ||
-		!Write.SetInt64(2, Message.Uid) ||
-		!Write.SetInt(3, Message.RemoteFlags) ||
-		!Write.SetInt(4, Message.LocalFlags) ||
-		!Write.SetStr(5, Message.ModSeq) ||
-		!Write.SetInt(6, Message.Downloaded ? 1 : 0) ||
-		!Write.SetInt64(7, Message.MailId) ||
+		!Write.SetInt64(0, Message.UidValidity) ||
+		!Write.SetInt64(1, Message.Uid) ||
+		!Write.SetInt(2, Message.RemoteFlags) ||
+		!Write.SetInt(3, Message.LocalFlags) ||
+		!Write.SetStr(4, Message.ModSeq) ||
+		!Write.SetInt(5, Message.Downloaded ? 1 : 0) ||
+		!Write.SetInt64(6, Message.MailId) ||
+		!Write.SetInt64(7, Message.MailboxId) ||
 		!Write.Exec())
 		return false;
 
-	return sqlite3_changes(Db) == 1;
+	if (sqlite3_changes(Db) == 1)
+		return true;
+	ErrorMsg = "The IMAP message has no matching canonical mail row, parent folder or account.";
+	LgiTrace("%s\n", ErrorMsg.Get());
+	return false;
 }
 
 bool LMail3Store::DeleteImapMessage(int64 MailId)
@@ -1933,7 +1898,8 @@ bool LMail3Store::DeleteImapMessage(int64 MailId)
 	if (!IsOk() || !InThread() || MailId <= 0)
 		return false;
 
-	LStatement s(this, "delete from " MAIL3_TBL_IMAP_MESSAGE " where MailId=?");
+	LStatement s(this, "update " MAIL3_TBL_MAIL " set ImapUidValidity=null, ImapUid=null,"
+		" ImapRemoteFlags=null, ImapLocalFlags=null, ImapModSeq=null, ImapDownloaded=null where Id=?");
 	return s.IsOk() &&
 		s.SetInt64(0, MailId) &&
 		s.Exec();
@@ -1997,6 +1963,457 @@ public:
 		return HasRoot && !Parent && Cursor && !*Cursor;
 	}
 };
+
+class ImapRebuildTransaction
+{
+	LMail3Store *Store;
+	bool Active;
+
+public:
+	ImapRebuildTransaction(LMail3Store *store) : Store(store)
+	{
+		Active = Store->Check(sqlite3_exec(Store->GetDb(),
+			"savepoint ImapServerRebuild", NULL, NULL, NULL), NULL);
+	}
+	~ImapRebuildTransaction()
+	{
+		if (Active)
+		{
+			Store->Check(sqlite3_exec(Store->GetDb(), "rollback to ImapServerRebuild", NULL, NULL, NULL), NULL);
+			Store->Check(sqlite3_exec(Store->GetDb(), "release ImapServerRebuild", NULL, NULL, NULL), NULL);
+		}
+	}
+	bool IsOk() const { return Active; }
+	bool Commit()
+	{
+		if (!Active || !Store->Check(sqlite3_exec(Store->GetDb(),
+			"release ImapServerRebuild", NULL, NULL, NULL), NULL))
+			return false;
+		Active = false;
+		return true;
+	}
+};
+
+bool LMail3Store::ImportImapSettings(int64 AccountId, const char *CachePath)
+{
+	auto Fail = [&](const char *Reason)
+	{
+		ErrorMsg.Printf("IMAP settings recovery failed for account %" PRIi64 ": %s (%s)",
+			AccountId, Reason, CachePath ? CachePath : "no cache path");
+		LgiTrace("%s\n", ErrorMsg.Get());
+		return false;
+	};
+	if (!IsOk() || !InThread() || AccountId < 0 || AccountId > INT_MAX || !ValidStr(CachePath) ||
+		GetInt(FIELD_STATUS) != Store3Success || !sqlite3_get_autocommit(Db))
+		return Fail("An open, idle Mail3 store on its owning thread is required.");
+	ImapRebuildTransaction Transaction(this);
+	if (!Transaction.IsOk())
+		return Fail("Cannot start the settings transaction.");
+
+	std::function<bool(std::filesystem::path, LString, unsigned)> Visit;
+	Visit = [&](std::filesystem::path Path, LString Remote, unsigned Depth)
+	{
+		if (Depth > 64)
+			return Fail("The cache folder tree is too deep.");
+		std::error_code Error;
+		auto Status = std::filesystem::symlink_status(Path, Error);
+		if (Depth == 0 && Error == std::errc::no_such_file_or_directory)
+			return true;
+		if (Error || !std::filesystem::is_directory(Status))
+			return Fail("Cannot inspect a cache directory, or it is a symbolic link.");
+		auto XmlPath = Path / "Folder.xml";
+		Status = std::filesystem::symlink_status(XmlPath, Error);
+		if (Error && Error != std::errc::no_such_file_or_directory)
+			return Fail("Cannot inspect the folder index.");
+		if (std::filesystem::exists(Status))
+		{
+			if (!std::filesystem::is_regular_file(Status))
+				return Fail("The folder index must be a regular file.");
+			LFile Input;
+			ImapCacheIndex Index;
+			if (!Input.Open(XmlPath.u8string().c_str(), O_READ) || !Index.ReadIndex(Input))
+				return Fail("Cannot read the folder index.");
+
+			LXmlTag Settings("Folder");
+			for (auto Name: {"Sort", "Expanded", "Thread"})
+				if (auto Value = Index.Root.GetAttr(Name))
+					Settings.SetAttr(Name, Value);
+			if (auto Fields = Index.Root.GetChildTag("Fields"))
+			{
+				auto Recovered = Settings.GetChildTag("Fields", true);
+				for (auto Field: Fields->Children)
+				{
+					if (!Field->IsTag("Field"))
+						return Fail("Invalid display-field element in the folder index.");
+					auto Copy = new LXmlTag("Field");
+					Recovered->InsertTag(Copy);
+					for (auto Name: {"Id", "Width"})
+					{
+						auto Text = Field->GetAttr(Name);
+						char *End = NULL;
+						errno = 0;
+						auto Value = Text ? strtoll(Text, &End, 10) : 0;
+						if (!Text || errno || End == Text || *End || Value < INT_MIN || Value > INT_MAX)
+							return Fail("Invalid display-field settings in the folder index.");
+						Copy->SetAttr(Name, Text);
+					}
+				}
+			}
+			auto Emails = Settings.GetChildTag("Emails", true);
+			if (auto Source = Index.Root.GetChildTag("Emails"))
+				for (auto Mail: Source->Children)
+				{
+					if (!Mail->IsTag("Mail"))
+						return Fail("Invalid message element in the folder index.");
+					auto Copy = new LXmlTag("Mail");
+					for (auto Name: {"MsgId", "Label", "Colour"})
+						if (auto Value = Mail->GetAttr(Name))
+							Copy->SetAttr(Name, Value);
+					Emails->InsertTag(Copy);
+				}
+			LStringPipe Output;
+			LXmlTree Writer;
+			if (!Writer.Write(&Settings, &Output))
+				return Fail("Cannot serialize recovered settings.");
+			auto Text = Output.NewLStr();
+			LStatement Save(this, "insert into " MAIL3_TBL_IMAP_SETTINGS
+				" (AccountId, RemoteName, Settings) values (?,?,?)"
+				" on conflict(AccountId, RemoteName) do nothing");
+			if (!Save.SetInt64(0, AccountId) || !Save.SetStr(1, Remote) ||
+				!Save.SetStr(2, Text) || !Save.Exec())
+				return Fail("Cannot save recovered settings.");
+		}
+		else
+		{
+			auto Proto = std::filesystem::symlink_status(Path / "Folder.proto", Error);
+			if ((Error && Error != std::errc::no_such_file_or_directory) ||
+				std::filesystem::exists(Proto))
+				return Fail("Cannot recover settings from a Protobuf cache.");
+		}
+		std::filesystem::directory_iterator It(Path, Error), End;
+		for (; !Error && It != End; It.increment(Error))
+		{
+			auto Entry = It->symlink_status(Error);
+			if (Error || std::filesystem::is_symlink(Entry))
+				return Fail("Cannot inspect a cache entry, or it is a symbolic link.");
+			if (std::filesystem::is_directory(Entry))
+			{
+				LString Name = It->path().filename().u8string().c_str();
+				if (!Visit(It->path(), Remote == "/" ? Remote + Name : Remote + "/" + Name, Depth + 1))
+					return false;
+			}
+		}
+		return !Error || Fail("Cannot enumerate the cache directory.");
+	};
+	if (!Visit(std::filesystem::u8path(CachePath), "/", 0))
+		return false;
+	return Transaction.Commit() || Fail("Cannot commit recovered settings.");
+}
+
+bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LMail3ImapServerMessage> &Messages)
+{
+	auto Mailbox = ResultMailbox;
+	auto Fail = [&](const char *Reason)
+	{
+		ErrorMsg.Printf("IMAP server rebuild failed for '%s': %s",
+			Mailbox.RemoteName ? Mailbox.RemoteName.Get() : "<missing mailbox>", Reason);
+		LgiTrace("%s\n", ErrorMsg.Get());
+		return false;
+	};
+	if (!IsOk() || !InThread() || GetInt(FIELD_STATUS) != Store3Success ||
+		!sqlite3_get_autocommit(Db) || Mailbox.AccountId < 0 || Mailbox.AccountId > INT_MAX ||
+		!Mailbox.RemoteName || Mailbox.RemoteName.Get()[0] != '/' ||
+		Mailbox.RemoteName == "/" || Mailbox.UidValidity <= 0 || Mailbox.UidValidity > UINT32_MAX ||
+		(Mailbox.UidNext != -1 && (Mailbox.UidNext <= 0 || Mailbox.UidNext > UINT32_MAX)))
+		return Fail("A complete server listing with a valid SELECT epoch is required.");
+
+	std::set<int64> Uids;
+	std::map<std::string, unsigned> ServerIds;
+	for (auto &Message: Messages)
+	{
+		if (Message.Uid <= 0 || Message.Uid > UINT32_MAX || !Message.Headers || Message.Size < 0 ||
+			!Uids.insert(Message.Uid).second)
+			return Fail("The server listing contains missing headers or invalid/duplicate UIDs.");
+		auto Id = LGetHeaderField(Message.Headers, "Message-ID").Strip();
+		if (Id)
+			ServerIds[Id.Get()]++;
+	}
+	ImapRebuildTransaction Transaction(this);
+	if (!Transaction.IsOk())
+		return Fail("Cannot start the rebuild transaction.");
+	{
+		LStatement Pending(this, "select 1 from " MAIL3_TBL_IMAP_OPERATION " where AccountId=? limit 1");
+		if (!Pending.SetInt64(0, Mailbox.AccountId))
+			return Fail("Cannot inspect pending server operations.");
+		auto Result = sqlite3_step(Pending);
+		if (Result != SQLITE_DONE)
+			return Fail("Resolve the account's operation journal before rebuilding.");
+	}
+
+	LArray<LMail3ImapMailbox> Mailboxes;
+	if (!LoadImapMailboxes(Mailbox.AccountId, Mailboxes))
+		return Fail("Cannot load the account's mailbox mappings.");
+	int64 ParentId;
+	{
+		LStatement Root(this, "select Id from " MAIL3_TBL_FOLDER " where ParentId is null");
+		if (!Root.Row())
+			return Fail("The destination store has no root folder.");
+		ParentId = Root.GetInt64(0);
+	}
+	auto Components = Mailbox.RemoteName.SplitDelimit("/");
+	LString Remote = "/";
+	ImapCacheIndex LocalSettings;
+	for (size_t Depth = 0; Depth <= Components.Length(); Depth++)
+	{
+		if (Depth)
+			Remote = Depth == 1 ? Remote + Components[Depth-1] : Remote + "/" + Components[Depth-1];
+		LMail3ImapMailbox Current;
+		for (auto &Existing: Mailboxes)
+			if (Existing.RemoteName == Remote)
+				Current = Existing;
+		ImapCacheIndex Settings;
+		{
+			LStatement Query(this, "select Settings from " MAIL3_TBL_IMAP_SETTINGS " where AccountId=? and RemoteName=?");
+			if (!Query.SetInt64(0, Mailbox.AccountId) || !Query.SetStr(1, Remote))
+				return Fail("Cannot look up recovered folder settings.");
+			auto Result = sqlite3_step(Query);
+			if (Result == SQLITE_ROW)
+			{
+				LString Text = Query.GetStr(0);
+				LMemStream Input(Text.Get(), Text.Length());
+				if (!Settings.ReadIndex(Input))
+					return Fail("Cannot read recovered folder settings.");
+			}
+			else if (Result != SQLITE_DONE)
+				return Fail("Cannot read recovered folder settings.");
+		}
+		if (Current.Id < 0)
+		{
+			LMail3Folder Folder(this);
+			Folder.ParentId = ParentId;
+			Folder.Name = Depth ? Components[Depth-1] : LString::Fmt("IMAP (%" PRIi64 ")", Mailbox.AccountId);
+			for (auto Name: {"Sort", "Expanded", "Thread"})
+				if (auto Text = Settings.Root.GetAttr(Name))
+				{
+					char *End;
+					errno = 0;
+					auto Value = strtol(Text, &End, 10);
+					if (errno || End == Text || *End || Value < INT_MIN || Value > INT_MAX)
+						return Fail("Invalid recovered folder settings.");
+					if (!Strcmp(Name, "Sort")) Folder.Sort = (int)Value;
+					else if (!Strcmp(Name, "Expanded")) Folder.Open = (int)Value;
+					else Folder.Threaded = (int)Value;
+				}
+			if (!Folder.Write(MAIL3_TBL_FOLDER, true))
+				return Fail("Cannot create a server folder.");
+			if (auto Fields = Settings.Root.GetChildTag("Fields"))
+				for (auto Field: Fields->Children)
+					Folder.Flds.Insert(new Store3Field(this, Field->GetAsInt("Id"), Field->GetAsInt("Width")), -1, true);
+			if (!Folder.Write(MAIL3_TBL_FOLDER, false))
+				return Fail("Cannot save server folder display settings.");
+			Current.AccountId = Mailbox.AccountId;
+			Current.Id = Folder.Id;
+			Current.RemoteName = Remote;
+			Current.Delimiter = Mailbox.Delimiter;
+			if (!SaveImapMailbox(Current))
+				return Fail("Cannot save a server folder mapping.");
+		}
+		else
+		{
+			LStatement Folder(this, "select 1 from " MAIL3_TBL_FOLDER " where Id=? and ParentId=?");
+			if (!Folder.SetInt64(0, Current.Id) || !Folder.SetInt64(1, ParentId) || !Folder.Row())
+				return Fail("The mapped server folder was removed or reparented.");
+		}
+		ParentId = Current.Id;
+		if (Depth == Components.Length())
+		{
+			Mailbox.Id = Current.Id;
+			LocalSettings.Root.Swap(Settings.Root);
+		}
+	}
+
+	struct Customization
+	{
+		unsigned Count = 0;
+		LString Label;
+		uint32_t Colour = 0;
+	};
+	std::map<std::string, Customization> Recovered, ExistingSettings;
+	if (auto Emails = LocalSettings.Root.GetChildTag("Emails"))
+		for (auto Email: Emails->Children)
+		{
+			LString Id = Email->GetAttr("MsgId");
+			Id = Id.Strip();
+			if (!Id)
+				continue;
+			auto &Settings = Recovered[Id.Get()];
+			Settings.Count++;
+			Settings.Label = Email->GetAttr("Label");
+			if (auto Text = Email->GetAttr("Colour"))
+			{
+				char *End;
+				errno = 0;
+				auto Colour = strtoull(Text, &End, 10);
+				if (errno || End == Text || *End || Colour > UINT32_MAX)
+					return Fail("Invalid recovered message colour.");
+				Settings.Colour = (uint32_t)Colour;
+			}
+		}
+	std::map<int64, int64> ExistingIds;
+	LXmlTag ExistingRecords("Emails");
+	{
+		LStatement Query(this, "select Id, MessageID, Label, MarkColour, ImapUid, ImapUidValidity from "
+			MAIL3_TBL_MAIL " where ParentId=? and ImapUid is not null");
+		if (!Query.SetInt64(0, Mailbox.Id))
+			return Fail("Cannot inspect existing mail.");
+		int Result;
+		while ((Result = sqlite3_step(Query)) == SQLITE_ROW)
+		{
+			LString Id = Query.GetStr(1);
+			Id = Id.Strip();
+			if (Id)
+			{
+				auto &Settings = ExistingSettings[Id.Get()];
+				Settings.Count++;
+				Settings.Label = Query.GetStr(2);
+				Settings.Colour = (uint32_t)Query.GetInt64(3);
+				auto Record = new LXmlTag("Mail");
+				Record->SetAttr("MsgId", Id);
+				Record->SetAttr("Label", Settings.Label);
+				Record->SetAttr("Colour", (int64)Settings.Colour);
+				ExistingRecords.InsertTag(Record);
+			}
+			if (Query.GetInt64(5) == Mailbox.UidValidity)
+				ExistingIds[Query.GetInt64(4)] = Query.GetInt64(0);
+		}
+		if (Result != SQLITE_DONE)
+			return Fail("Cannot read existing mail.");
+	}
+	for (auto &Entry: ExistingSettings)
+		Recovered[Entry.first] = Entry.second;
+	if (!ExistingSettings.empty())
+	{
+		auto Emails = LocalSettings.Root.GetChildTag("Emails", true);
+		for (size_t Index = 0; Index < Emails->Children.Length(); )
+		{
+			auto Record = Emails->Children[Index];
+			LString Id = Record->GetAttr("MsgId");
+			Id = Id.Strip();
+			if (Id && ExistingSettings.count(Id.Get()))
+				delete Record;
+			else
+				Index++;
+		}
+		for (auto Record: ExistingRecords.Children)
+			Emails->InsertTag(new LXmlTag(*Record));
+		LStringPipe Output;
+		LXmlTree Writer;
+		if (!Writer.Write(&LocalSettings.Root, &Output))
+			return Fail("Cannot retain current local customizations.");
+		auto Text = Output.NewLStr();
+		LStatement Save(this, "insert into " MAIL3_TBL_IMAP_SETTINGS
+			" (AccountId, RemoteName, Settings) values (?,?,?)"
+			" on conflict(AccountId, RemoteName) do update set Settings=excluded.Settings");
+		if (!Save.SetInt64(0, Mailbox.AccountId) || !Save.SetStr(1, Mailbox.RemoteName) ||
+			!Save.SetStr(2, Text) || !Save.Exec())
+			return Fail("Cannot persist current local customizations.");
+	}
+
+	std::set<int64> Keep;
+	unsigned Restored = 0;
+	// Parse server metadata without creating dummy MIME content for undownloaded mail.
+	struct ServerMail : public LMail3Mail
+	{
+		LString Headers;
+		ServerMail(LMail3Store *Store, LString headers) : LMail3Mail(Store), Headers(headers) {}
+		const char *GetStr(int Field) override
+		{
+			return Field == FIELD_INTERNET_HEADER ? Headers.Get() : LMail3Mail::GetStr(Field);
+		}
+	};
+	for (auto &Message: Messages)
+	{
+		ServerMail Mail(this, Message.Headers);
+		auto Existing = ExistingIds.find(Message.Uid);
+		bool NewIdentity = Existing == ExistingIds.end();
+		if (!NewIdentity)
+		{
+			LStatement Query(this, "select * from " MAIL3_TBL_MAIL " where Id=?");
+			if (!Query.SetInt64(0, Existing->second) || !Query.Row() || !Mail.Serialize(Query, false))
+				return Fail("Cannot load an existing server message.");
+			LString PreviousId = Mail.MessageID.Str();
+			if (PreviousId.Strip() != LGetHeaderField(Message.Headers, "Message-ID").Strip())
+				return Fail("A server UID changed Message-ID without changing UIDVALIDITY.");
+		}
+		Mail.ParentId = Mailbox.Id;
+		Mail.AccountId = (int)Mailbox.AccountId;
+		ImapMailFlags Flags;
+		Flags.All = Message.RemoteFlags;
+		Mail.Flags = (Mail.Flags & ~(MAIL_READ | MAIL_REPLIED)) |
+			(Flags.ImapSeen ? MAIL_READ : 0) | (Flags.ImapAnswered ? MAIL_REPLIED : 0);
+		Mail.MailSize = Message.Size;
+		if (!Mail.ParseHeaders())
+			return Fail("Cannot parse server message headers.");
+		Mail.MessageID = LGetHeaderField(Message.Headers, "Message-ID").Strip();
+		if (NewIdentity && ValidStr(Mail.MessageID.Str()))
+		{
+			auto Key = std::string(Mail.MessageID.Str());
+			auto Settings = Recovered.find(Key);
+			if (ServerIds[Key] == 1 && Settings != Recovered.end() && Settings->second.Count == 1)
+			{
+				Mail.Label = Settings->second.Label;
+				Mail.MarkColour = Settings->second.Colour;
+				Restored++;
+			}
+		}
+		if (!Mail.Write(MAIL3_TBL_MAIL, NewIdentity))
+			return Fail("Cannot save refreshed server metadata.");
+		Keep.insert(Mail.Id);
+		LMail3ImapMessage Mapping;
+		if (!NewIdentity && !LoadImapMessage(Mail.Id, Mapping))
+			return Fail("Cannot load the verified UID mapping.");
+		Mapping.MailId = Mail.Id;
+		Mapping.MailboxId = Mailbox.Id;
+		Mapping.UidValidity = Mailbox.UidValidity;
+		Mapping.Uid = Message.Uid;
+		Mapping.RemoteFlags = Message.RemoteFlags;
+		Mapping.LocalFlags = Mail.Flags & ~MAIL_STORED_FLAT;
+		if (!SaveImapMessage(Mapping))
+			return Fail("Cannot save the verified UID mapping.");
+	}
+	std::vector<int64> Removed;
+	{
+		LStatement Query(this, "select Id from " MAIL3_TBL_MAIL " where ParentId=? and ImapUid is not null");
+		if (!Query.SetInt64(0, Mailbox.Id))
+			return Fail("Cannot find stale messages.");
+		int Result;
+		while ((Result = sqlite3_step(Query)) == SQLITE_ROW)
+			if (!Keep.count(Query.GetInt64(0)))
+				Removed.push_back(Query.GetInt64(0));
+		if (Result != SQLITE_DONE)
+			return Fail("Cannot enumerate stale messages.");
+	}
+	for (auto Id: Removed)
+	{
+		for (auto Sql: {
+			"delete from " MAIL3_TBL_MAILSEGS " where MailId=?",
+			"delete from " MAIL3_TBL_MAIL " where Id=?" })
+		{
+			LStatement Delete(this, Sql);
+			if (!Delete.SetInt64(0, Id) || !Delete.Exec())
+				return Fail("Cannot remove stale server state.");
+		}
+	}
+	if (!SaveImapMailbox(Mailbox))
+		return Fail("Cannot save SELECT state.");
+	if (!Transaction.Commit())
+		return Fail("Cannot commit the server rebuild.");
+	ResultMailbox = Mailbox;
+	LgiTrace("IMAP server rebuild '%s': %zu messages; %u uniquely matched customizations restored. "
+		"Unmatched customizations remain in the recovery settings and legacy cache.\n",
+		Mailbox.RemoteName.Get(), (size_t)Messages.Length(), Restored);
+	return true;
+}
 
 bool LMail3Store::ImportImapCache(int64 AccountId, const char *CachePath)
 {
@@ -2080,24 +2497,23 @@ bool LMail3Store::ImportImapCache(int64 AccountId, const char *CachePath)
 		if (HasProto)
 			return Fail("Protobuf caches must be converted to XML before importing.");
 
-		int64 FolderId = -1, MailboxId = -1;
+		int64 FolderId = -1;
 		{
-			LStatement Find(this, "select Id, FolderId, UidValidity from " MAIL3_TBL_IMAP_MAILBOX
-				" where AccountId=? and RemoteName=?");
+			LStatement Find(this, "select Id, ImapUidValidity from " MAIL3_TBL_FOLDER
+				" where ImapAccountId=? and ImapRemoteName=?");
 			if (!Find.IsOk() || !Find.SetInt64(0, AccountId) || !Find.SetStr(1, Remote))
 				return Fail("Cannot look up the mailbox.");
 			auto Result = sqlite3_step(Find);
 			if (Result == SQLITE_ROW)
 			{
-				MailboxId = Find.GetInt64(0);
-				FolderId = Find.GetInt64(1);
-				if (Find.GetInt64(2) > 0)
+				FolderId = Find.GetInt64(0);
+				if (Find.GetInt64(1) > 0)
 					return Fail("Cannot merge an unverified cache into a synchronized mailbox.");
 			}
 			else if (Result != SQLITE_DONE)
 				return Fail("Cannot read the mailbox mapping.");
 		}
-		if (MailboxId < 0)
+		if (FolderId < 0)
 		{
 			LMail3Folder Folder(this);
 			Folder.ParentId = ParentId;
@@ -2133,11 +2549,10 @@ bool LMail3Store::ImportImapCache(int64 AccountId, const char *CachePath)
 
 			LMail3ImapMailbox Mailbox;
 			Mailbox.AccountId = AccountId;
-			Mailbox.FolderId = FolderId;
+			Mailbox.Id = FolderId;
 			Mailbox.RemoteName = Remote;
 			if (!SaveImapMailbox(Mailbox))
 				return Fail("Cannot create the mailbox mapping.");
-			MailboxId = Mailbox.Id;
 		}
 		else
 		{
@@ -2186,9 +2601,9 @@ bool LMail3Store::ImportImapCache(int64 AccountId, const char *CachePath)
 				bool Downloaded = false;
 				{
 					// Epoch zero is deliberately not a server UIDVALIDITY.
-					LStatement Find(this, "select MailId, Downloaded from " MAIL3_TBL_IMAP_MESSAGE
-						" where MailboxId=? and UidValidity=0 and Uid=?");
-					if (!Find.IsOk() || !Find.SetInt64(0, MailboxId) || !Find.SetInt64(1, Uid))
+					LStatement Find(this, "select Id, ImapDownloaded from " MAIL3_TBL_MAIL
+						" where ParentId=? and ImapUidValidity=0 and ImapUid=?");
+					if (!Find.IsOk() || !Find.SetInt64(0, FolderId) || !Find.SetInt64(1, Uid))
 						return Fail("Cannot look up the cached message.");
 					auto Result = sqlite3_step(Find);
 					if (Result == SQLITE_ROW)
@@ -2208,7 +2623,6 @@ bool LMail3Store::ImportImapCache(int64 AccountId, const char *CachePath)
 					if (Downloaded)
 						continue;
 				}
-				bool HadMapping = Mail.Id > 0;
 				Mail.ParentId = FolderId;
 				Mail.AccountId = (int)AccountId;
 				ImapMailFlags Flags(Email->GetAttr("Flags"));
@@ -2261,20 +2675,12 @@ bool LMail3Store::ImportImapCache(int64 AccountId, const char *CachePath)
 					}
 					Downloaded = true;
 				}
+				Mail.ImapUidValidity = 0;
+				Mail.ImapUid = Uid;
+				Mail.ImapRemoteFlags = Flags.All;
+				Mail.ImapLocalFlags = Mail.Flags & ~MAIL_STORED_FLAT;
+				Mail.ImapDownloaded = Downloaded ? 1 : 0;
 				if (!Mail.Write(MAIL3_TBL_MAIL, Mail.Id < 0))
-					return Fail("Cannot save canonical mail metadata.");
-
-				LStatement Mapping(this, HadMapping
-					? "update " MAIL3_TBL_IMAP_MESSAGE
-					  " set MailboxId=?, UidValidity=0, Uid=?, RemoteFlags=?, LocalFlags=?, Downloaded=? where MailId=?"
-					: "insert into " MAIL3_TBL_IMAP_MESSAGE
-					  " (MailboxId, UidValidity, Uid, RemoteFlags, LocalFlags, Downloaded, MailId)"
-					  " values (?, 0, ?, ?, ?, ?, ?)");
-				if (!Mapping.IsOk() || !Mapping.SetInt64(0, MailboxId) ||
-					!Mapping.SetInt64(1, Uid) || !Mapping.SetInt(2, Flags.All) ||
-					!Mapping.SetInt(3, Mail.Flags & ~MAIL_STORED_FLAT) ||
-					!Mapping.SetInt(4, Downloaded ? 1 : 0) || !Mapping.SetInt64(5, Mail.Id) ||
-					!Mapping.Exec())
 					return Fail("Cannot save the unverified UID mapping.");
 			}
 		}

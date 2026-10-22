@@ -19,9 +19,8 @@
 #define MAIL3_TBL_FILTER			"Filter"
 #define MAIL3_TBL_CALENDAR			"Calendar"
 #define MAIL3_TBL_CALENDAR_FILES	"CalendarFiles"
-#define MAIL3_TBL_IMAP_MAILBOX		"ImapMailbox"
-#define MAIL3_TBL_IMAP_MESSAGE		"ImapMessage"
 #define MAIL3_TBL_IMAP_OPERATION	"ImapOperation"
+#define MAIL3_TBL_IMAP_SETTINGS	"ImapLocalSettings"
 
 class LMail3Store;
 class LMail3Mail;
@@ -48,9 +47,9 @@ struct LMail3Idx
 
 struct LMail3ImapMailbox
 {
+	// Canonical Folder.Id, not a separate mailbox row.
 	int64 Id = -1;
 	int64 AccountId = -1;
-	int64 FolderId = -1;
 	LString RemoteName;
 	LString Delimiter;
 	int64 UidValidity = -1;
@@ -61,6 +60,7 @@ struct LMail3ImapMailbox
 struct LMail3ImapMessage
 {
 	int64 MailId = -1;
+	// Canonical Mail.ParentId / Folder.Id.
 	int64 MailboxId = -1;
 	int64 UidValidity = -1;
 	int64 Uid = -1;
@@ -68,6 +68,14 @@ struct LMail3ImapMessage
 	int LocalFlags = 0;
 	LString ModSeq;
 	bool Downloaded = false;
+};
+
+struct LMail3ImapServerMessage
+{
+	int64 Uid = -1;
+	int RemoteFlags = 0;
+	int64 Size = 0;
+	LString Headers;
 };
 
 class Mail3BlobStream : public LStream
@@ -262,6 +270,7 @@ class LMail3Store : public LDataStoreI
 	bool UpdateTable(const char *Name, LMail3Def *Flds, Store3Status Check);
 	bool DeleteMailById(int64 Id);
 	bool OpenDb();
+	bool CreateIndexes();
 	bool CloseDb();
 	LMail3Folder *GetSystemFolder(int Type);
 
@@ -404,6 +413,8 @@ public:
 	bool SaveImapMessage(const LMail3ImapMessage &Message);
 	bool DeleteImapMessage(int64 MailId);
 	bool ImportImapCache(int64 AccountId, const char *CachePath);
+	bool ImportImapSettings(int64 AccountId, const char *CachePath);
+	bool RebuildImapMailbox(LMail3ImapMailbox &Mailbox, LArray<LMail3ImapServerMessage> &Messages);
 	int64 GetInt(int id) override;
 	Store3Status SetInt(int id, int64 i) override;
 	const char *GetStr(int id) override;
@@ -511,6 +522,9 @@ public:
 class LMail3Folder : public LDataFolderI, public LMail3Obj
 {
 public:
+	int64 ImapAccountId = -1;
+	LString ImapRemoteName, ImapDelimiter, ImapHighestModSeq;
+	int64 ImapUidValidity = -1, ImapUidNext = -1;
 	LVariant Name;
 	int Unread = 0;
 	int Open = true;
@@ -657,6 +671,10 @@ public:
 
 	LDateTime DateReceived;
 	LDateTime DateSent;
+
+	int64 ImapUidValidity = -1, ImapUid = -1;
+	int ImapRemoteFlags = -1, ImapLocalFlags = -1, ImapDownloaded = -1;
+	LString ImapModSeq;
 
 	LMail3Mail(LMail3Store *store);
 	~LMail3Mail();

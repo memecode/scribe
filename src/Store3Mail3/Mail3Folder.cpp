@@ -13,6 +13,12 @@ LMail3Def TblFolder[] =
 	{"Threaded",	"INTEGER"},
 	{"SortIndex",	"INTEGER"},
 	{"AccessPerm",	"INTEGER"},
+	{"ImapAccountId",	"INTEGER"},
+	{"ImapRemoteName",	"TEXT"},
+	{"ImapDelimiter",	"TEXT"},
+	{"ImapUidValidity",	"INTEGER"},
+	{"ImapUidNext",		"INTEGER"},
+	{"ImapHighestModSeq", "TEXT"},
 	{0, 0}
 };
 
@@ -150,6 +156,12 @@ bool LMail3Folder::Serialize(LMail3Store::LStatement &s, bool Write)
 	SERIALIZE_INT(Threaded, 7);
 	SERIALIZE_INT(SiblingIndex, 8);
 	SERIALIZE_INT(AccessPerms, 9);
+	SERIALIZE_INT64(ImapAccountId, 10);
+	SERIALIZE_LSTR(ImapRemoteName, 11);
+	SERIALIZE_LSTR(ImapDelimiter, 12);
+	SERIALIZE_INT64(ImapUidValidity, 13);
+	SERIALIZE_INT64(ImapUidNext, 14);
+	SERIALIZE_LSTR(ImapHighestModSeq, 15);
 
 	char Sql[256];
 	if (Write)

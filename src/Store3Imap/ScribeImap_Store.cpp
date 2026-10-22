@@ -19,6 +19,7 @@ const char *ImapMsgTypeNames[IMAP_MSG_MAX] =
 	// Connection
 	"IMAP_ONLINE",
 	"IMAP_OFFLINE",
+	"IMAP_ERROR",
 
 	// Lifespan events
 	"IMAP_ON_NEW",
@@ -31,6 +32,7 @@ const char *ImapMsgTypeNames[IMAP_MSG_MAX] =
 	"IMAP_DELETE_FOLDER",
 	"IMAP_EXPUNGE_FOLDER",
 	"IMAP_RENAME_FOLDER",
+	"IMAP_LOAD_FOLDER",
 
 	// Mail
 	"IMAP_FOLDER_SELECTED",
@@ -43,6 +45,7 @@ const char *ImapMsgTypeNames[IMAP_MSG_MAX] =
 	"IMAP_DELETE",
 	"IMAP_UNDELETE",
 	"IMAP_SET_FLAGS",
+	"IMAP_REBUILD_MAILBOX",
 };
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -96,10 +99,10 @@ ImapStore::ImapStore(LString host,
 		FilterIncoming = v.CastInt32() != 0;
 	}
 
-	if (Storage && LAppInst->GetOption("imap-import-cache"))
+	if (IsServerRebuild())
 	{
 		auto CachePath = GetCache();
-		if (!CachePath || !Storage->ImportImapCache(AccountId, CachePath))
+		if (!CachePath || !Storage->ImportImapSettings(AccountId, CachePath))
 		{
 			ErrorMsg.Reset(NewStr(CachePath ? Storage->GetStr(FIELD_ERROR) : "Cannot locate the IMAP cache."));
 			if (Log)
@@ -117,6 +120,11 @@ ImapStore::~ImapStore()
 	DeleteObj(Thread);
 	DeleteObj(Root);
 	DeleteArray(Cache);
+}
+
+bool ImapStore::IsServerRebuild() const
+{
+	return Storage && LAppInst->GetOption("imap-rebuild-cache");
 }
 
 bool ImapStore::OnIdle()
@@ -995,6 +1003,54 @@ void ImapStore::OnEvent(void *Param)
 				// LgiTrace("Ending IMAP_ON_DEL\n");
 				break;
 			}
+			case IMAP_REBUILD_MAILBOX:
+			{
+				if (m->Fld.Length() != 1)
+				{
+					ErrorMsg.Reset(NewStr("Invalid IMAP server rebuild response: expected one mailbox."));
+					LgiTrace("%s\n", ErrorMsg.Get());
+					if (Log)
+						Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
+					Online = STATUS_ERROR;
+					break;
+				}
+
+				if (IsServerRebuild())
+				{
+					auto &Folder = m->Fld[0];
+					LMail3ImapMailbox Mailbox;
+					Mailbox.AccountId = AccountId;
+					Mailbox.RemoteName = Folder.Remote;
+					Mailbox.Delimiter = LString::Fmt("%c", Folder.Sep);
+					Mailbox.UidValidity = Folder.UidValidity;
+					Mailbox.UidNext = Folder.UidNext;
+					LArray<LMail3ImapServerMessage> Messages;
+					for (auto &Info: m->Mail)
+					{
+						auto &Message = Messages.New();
+						Message.Uid = Info.Uid;
+						Message.RemoteFlags = Info.Flags.All;
+						Message.Size = Info.Size;
+						Message.Headers = Info.Headers;
+					}
+					const char *Error = NULL;
+					if (!m->Last || Folder.LastUid != 0)
+						Error = "The server rebuild requires a complete mailbox snapshot.";
+					else if (!Storage)
+						Error = "No shared Mail3 store for the server rebuild.";
+					else if (!Storage->RebuildImapMailbox(Mailbox, Messages))
+						Error = Storage->GetStr(FIELD_ERROR);
+					if (Error)
+					{
+						ErrorMsg.Reset(NewStr(Error));
+						if (Log && ErrorMsg)
+							Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
+						Online = STATUS_ERROR;
+						break;
+					}
+				}
+				break;
+			}
 			case IMAP_FOLDER_LISTING:
 			{
 				if (m->Fld.Length() != 1)
@@ -1002,7 +1058,6 @@ void ImapStore::OnEvent(void *Param)
 					LAssert(!"Not the right folder length.");
 					break;
 				}
-
 				if (auto f = Root->Find(0, m->Fld[0].Remote))
 					f->OnListing(m);
 				else
@@ -1367,9 +1422,17 @@ LDataStoreI *OpenImapWithStorage(	LString Host,
 									LAutoPtr<ProtocolSettingStore> store,
 									LMail3Store *Storage)
 {
-	if (!Storage && LAppInst->GetOption("imap-import-cache"))
+	if (LAppInst->GetOption("imap-import-cache"))
 	{
-		const char *Error = "IMAP cache import requires an already-loaded default Mail3 store.";
+		const char *Error = "Legacy IMAP cache import has been replaced by --imap-rebuild-cache.";
+		LgiTrace("%s\n", Error);
+		if (Log)
+			Log->Write(Error, strlen(Error), LSocketI::SocketMsgError);
+		return NULL;
+	}
+	if (!Storage && LAppInst->GetOption("imap-rebuild-cache"))
+	{
+		const char *Error = "IMAP server rebuild requires an already-loaded default Mail3 store.";
 		LgiTrace("%s\n", Error);
 		if (Log)
 			Log->Write(Error, strlen(Error), LSocketI::SocketMsgError);

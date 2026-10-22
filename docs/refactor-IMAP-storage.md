@@ -14,23 +14,27 @@ However there are a lot of risks too. Things like threading and ownership of dat
 
 ### Implementation progress
 
-The first implementation slice adds IMAP mailbox, message-mapping and operation-journal tables to the Mail3 schema upgrade path, with uniqueness indexes for mailbox identity and UID scope. `LMail3Store` now exposes typed mailbox and message-mapping load/save/delete methods, guarded by its existing owning-thread rule. Persistent IMAP account connections receive a non-owning reference to the already-loaded default Mail3 backend; one-off IMAP connections remain unchanged.
+IMAP mailbox and message state now lives directly in the canonical `Folder` and `Mail` tables, using a union of local and IMAP fields. The ordinary Mail3 schema upgrade path adds the nullable columns, with uniqueness indexes for mailbox identity and UID scope. There are no separate `ImapMailbox` or `ImapMessage` tables, and no migration from those unused experimental tables. `LMail3Store` exposes typed mailbox and message-state load/save/clear methods, guarded by its existing owning-thread rule. Persistent IMAP account connections receive a non-owning reference to the already-loaded default Mail3 backend; one-off IMAP connections remain unchanged.
 
-A restartable staging importer now uses that injected backend to copy legacy XML folder indexes and cached RFC822 images into the canonical tables. This is opt-in, not a live-storage cutover: the IMAP runtime still reads and writes its existing filesystem cache. Protocol-result reconciliation, canonical-object adapters and operation-journal execution remain to be implemented.
+The rollout now rebuilds staged SQLite mailbox contents from the server instead of importing legacy cached messages. An opt-in server refresh captures UIDVALIDITY/UIDNEXT from SELECT and fetches complete UID/flag/header listings. The old cache supplies only local customizations: labels, colours and folder display settings. This is still staging, not a live-storage cutover: the IMAP UI/runtime continues to use its existing filesystem backend. Canonical-object adapters, live SQLite body downloads and operation-journal execution remain to be implemented.
 
 Use the existing `LMail3Store` database as the single local source of truth for both Mail3 and IMAP mail. Keep the IMAP protocol engine and its `LDataStoreI`-facing behavior, but make it a protocol adapter over the shared store rather than a second owner of cached messages and folders.
 
-Reuse the existing `Folder`, `Mail`, and `MailSegs` records for the local folder tree, message properties, and MIME content. A message has one local mail ID and one parent folder; moving it between local folders updates its parent reference instead of copying its MIME tree. Keep IMAP-only state in extension tables rather than overloading Mail3 fields:
+Reuse the existing `Folder`, `Mail`, and `MailSegs` records for the local folder tree, message properties, and MIME content. A message has one local mail ID and one parent folder; moving it between local folders updates its parent reference instead of copying its MIME tree. The shared schema is:
 
-- `ImapMailbox`: one row per IMAP-backed folder, keyed to its local folder and account; stores the remote mailbox name, delimiter, UIDVALIDITY, UIDNEXT and other synchronization cursors as needed.
-- `ImapMessage`: one row per IMAP-backed message, keyed to its local mail ID; stores UID, remote flags, mod-sequence and pending local flag changes. Enforce UID uniqueness within the account/mailbox/UIDVALIDITY scope.
-- `ImapOperation`: a durable journal for operations that must be applied to the server, including cross-folder moves, appends, flag updates and deletes. Store enough state to retry and reconcile after a restart.
+- `Folder`: adds `ImapAccountId`, `ImapRemoteName`, `ImapDelimiter`, `ImapUidValidity`, `ImapUidNext` and `ImapHighestModSeq`. `Folder.Id` is also the mailbox identity; there is no duplicated `FolderId`. Enforce uniqueness on `(ImapAccountId, ImapRemoteName)`.
+- `Mail`: adds `ImapUidValidity`, `ImapUid`, `ImapRemoteFlags`, `ImapLocalFlags`, `ImapModSeq` and `ImapDownloaded`. Existing `AccountId` identifies the account and `ParentId` identifies the canonical mailbox folder. Enforce uniqueness on `(ParentId, ImapUidValidity, ImapUid)`; no separate `MailId` or `MailboxId` columns are needed. Clearing IMAP state leaves the canonical message and MIME content intact.
+- `MailSegs`: remains the canonical MIME storage, keyed to `Mail.Id`.
+- `ImapOperation`: remains a separate durable journal for operations that must be applied to the server, including cross-folder moves, appends, flag updates and deletes. Source/destination mailbox IDs refer directly to canonical `Folder.Id` values. Store enough state to retry and reconcile after a restart.
+- `ImapLocalSettings`: a recovery snapshot keyed by account and remote mailbox name. Contains only folder display settings and Message-ID/label/colour records, including duplicates so ambiguity is not lost. It contains no cached UIDs, server flags, bodies or download state.
 
-The exact extension columns should follow the IMAP commands and state already used by `ImapThread`; do not treat a UID as globally unique or valid across UIDVALIDITY changes. Keep account identity explicit even if the current application account ID is used as its key.
+IMAP columns remain NULL for local-only folders/messages. Normal canonical object serialization preserves them during ordinary load/save; copies into local storage do not inherit server identities. Mod-sequences are decimal text so the full unsigned 64-bit range is retained. The typed mailbox/message structures are access views of these canonical rows, not separate persisted identities. Recovery snapshots stay separate because they must retain unmatched settings even after the original folder or message disappears.
+
+Further synchronization fields should follow the IMAP commands and state already used by `ImapThread`; do not treat a UID as globally unique or valid across UIDVALIDITY changes. Keep account identity explicit even if the current application account ID is used as its key.
 
 ### Ownership and data flow
 
-`LMail3Store` owns the SQLite connection, schema upgrades, transactions, canonical folder/mail objects and MIME BLOB streams. The IMAP adapter receives a reference to that store and maps protocol events to canonical mail records plus the IMAP extension rows. It must not open a second SQLite connection to the same database.
+`LMail3Store` owns the SQLite connection, schema upgrades, transactions, canonical folder/mail objects and MIME BLOB streams. The IMAP adapter receives a reference to that store and maps protocol events directly to canonical folder/mail rows and their IMAP fields. It must not open a second SQLite connection to the same database.
 
 The IMAP network worker continues to perform network I/O and post results to the store-owning thread. Database and canonical object mutations happen on the owning thread, consistent with `LMail3Store`'s existing thread affinity. Use existing store transactions for each local state transition. UI notifications are emitted only after the corresponding transaction commits.
 
@@ -50,19 +54,23 @@ Add an SQLite FTS index for searchable text from both Mail3 and IMAP mail, index
 
 ### Migration and rollout
 
-#### Current staging importer
+#### Current server-backed staging rebuild
 
-Start Scribe with `--imap-import-cache` and connect the persistent IMAP account to stage its cache in the already-loaded default Mail3 store. Import runs synchronously on the store-owning thread before that account's network worker starts. If no default Mail3 store is available, or import fails, the connection is refused with an error in the account log. Normal connections without the option and one-off IMAP connections are unchanged.
+Start Scribe with `--imap-rebuild-cache` and connect a persistent IMAP account to rebuild its SQLite metadata in the already-loaded default Mail3 store. The retired `--imap-import-cache` option reports an error rather than silently importing legacy identities. Normal connections without either option and one-off IMAP connections are unchanged.
 
-`LMail3Store::ImportImapCache(AccountId, CachePath)` creates an `IMAP cache (<AccountId>)` subtree, preserving nested folders, display columns, sort/expanded/threading settings, permissions, message metadata and cached content. Each account import uses one SQLite savepoint: a failure rolls back its folder, mail, segment and mapping writes without altering existing mail. Source files are never rewritten or removed. Newly staged folders are not attached to the already-loaded UI tree or announced through normal new-mail notifications; reload the default store to inspect the subtree.
+Before starting the worker, `ImportImapSettings` captures a per-mailbox recovery snapshot from legacy XML. It retains labels, colours, sort order, expanded/threaded state and display-column IDs/widths, but not unread counts, access permissions or other server state. It does not read cached message bodies or import folder/message membership. Recovery is atomic and existing snapshots are not overwritten on reconnect. Unsupported Protobuf indexes, unreadable sources and malformed XML cause explicit failure. A missing legacy cache is fine.
 
-Cached RFC822 images use Mail3's existing flat MIME-segment representation, including for unsigned messages. The importer reads the stored image back and compares its size and every byte before committing. This retains MIME boundaries, transfer encoding and attachment bytes rather than re-encoding the message. A missing indexed `.eml` creates a metadata-only message with `Downloaded=0`; re-running the importer after the file becomes available fills the same canonical mail row.
+The worker lists the server's folders and queues a full header refresh for each selectable mailbox, regardless of the legacy last UID. SELECT is forced before and after FETCH: UIDVALIDITY, UIDNEXT and EXISTS must remain unchanged, the returned message count must match EXISTS, and all messages must have valid unique UIDs and headers before anything is committed. Empty mailboxes are handled without issuing an invalid FETCH. Incomplete/changing listings are reported as failures; retry by reconnecting. No cached server identity is used to build the SQLite snapshot.
 
-Legacy XML does not contain UIDVALIDITY, and the current IMAP SELECT parser does not preserve it. Imported mailbox epochs therefore remain unset; staging message mappings use epoch zero, which the normal verified UID lookup/save API rejects. These UIDs must not drive server mutations or be treated as verified server identities. Import refuses to merge into a mailbox that already has a verified epoch. The next prerequisite for the live adapter is to retain SELECT's UIDVALIDITY/UIDNEXT and reconcile these provisional records against server state.
+`RebuildImapMailbox` creates the server-confirmed folder hierarchy under `IMAP (<AccountId>)`, applying recovered display settings when creating folders. A complete mailbox snapshot is committed on the Mail3 owning thread in one savepoint. It replaces stale identities, retains canonical IDs/content for surviving UIDs in the same epoch, removes obsolete membership and stores the verified SELECT epoch. New identities remain `ImapDownloaded=0`, with no fabricated MIME content. A changed UIDVALIDITY replaces old identities and cached bodies rather than reusing old UIDs. Accounts with operation-journal records are refused until those records are reconciled. A failed refresh rolls back without damaging the prior snapshot or unrelated local mail.
 
-Repeated imports retain the existing mail/folder IDs and do not duplicate completed content. They are resumable snapshots, not ongoing synchronization: already-imported metadata/content is not refreshed or removed to mirror subsequent cache changes. A corrupt RFC822 image, malformed or duplicate UID, unsupported Protobuf index, symbolic link, unindexed `.eml` (including a pending APPEND), unreadable source or database error aborts the account import explicitly. Recover unsupported/unindexed content before retrying; do not discard the old cache.
+Labels and colours are restored **only when Message-ID matches exactly (after trimming surrounding whitespace) and occurs once in both the source and the complete destination mailbox listing**. Matching is scoped to one account and mailbox; there is no UID, subject/date, cross-folder or cross-account fallback. Missing, duplicate and unmatched IDs are retained in the recovery snapshot and legacy cache, not guessed. Subsequent refreshes preserve local edits on surviving identities; current SQLite customizations are saved back into the recovery snapshot transactionally before obsolete identities are removed. This also preserves recoverable local edits across epoch resets and temporarily missing server messages, rather than reverting to the original cache's settings.
 
-Native fixture tests exercise the production importer, raw round trips, metadata-only upgrades, maximum unsigned UIDs, account/mailbox isolation, restart/idempotency and injected database failures. On Linux, from the repository root with the normal debug dependencies built:
+The recovery/rebuild methods never rewrite or delete the legacy cache, including pending uploads and unindexed files. The still-active legacy backend can continue its normal cache writes. Local-only uploads are not uploaded automatically by this staged rebuild and must be recovered before eventually retiring that backend. The older raw-cache import API remains available for existing recovery tests, but is no longer wired into account startup.
+
+Staged folders/messages do not replace the live IMAP UI objects or emit normal new-mail notifications. Reload the default store to inspect the resulting SQLite subtree after staging completes; do not edit that subtree concurrently with a rebuild. This step does not yet provide SQLite-backed on-demand body downloads, folder-removal reconciliation for the whole account, or a complete live storage cutover.
+
+Native fixtures exercise SELECT parsing, verified server identities, unique/ambiguous Message-ID recovery, folder settings, account/mailbox isolation, restart/idempotency, epoch resets, empty mailboxes and injected transaction failures, in addition to the older raw-message recovery tests. Canonical-schema fixtures also check local-only NULL fields, uniqueness, normal object serialization, clearing identities without losing content, and upgrading existing Mail3 folders/messages/bodies. On Linux, from the repository root with the normal debug dependencies built:
 
 ```sh
 GDK_BACKEND=x11 xvfb-run -a make -f unittests/Makefile.imap-storage -j2 imap-storage-test
@@ -70,9 +78,9 @@ GDK_BACKEND=x11 xvfb-run -a make -f unittests/Makefile.imap-storage -j2 imap-sto
 
 #### Remaining rollout
 
-1. Define schema versioning and add the IMAP extension tables through the existing Mail3 database upgrade path. Migration must be restartable and must not discard legacy cache files.
-2. Import each account's existing folder metadata and cached `.eml` files into canonical folders, mail rows and MIME storage. Preserve server UIDs, UIDVALIDITY-related state, flags, folder display settings and any not-yet-downloaded message metadata. Make the importer idempotent and report corrupt or missing cache data explicitly.
-3. Verify imported folder/message counts, UID mappings, representative MIME content and attachment streams against the old cache. Keep the old cache as a recoverable source until verification succeeds.
+1. Keep canonical IMAP fields and journal/recovery tables on the existing Mail3 database upgrade path. Complete rollout/recovery validation across supported platforms; never discard legacy cache files during an upgrade.
+2. Capture only local customizations from the old cache. Rebuild folder/message membership, UIDs, epochs, flags and metadata from the server; download bodies from the server on demand. Do not reconcile legacy UIDs or import old bodies as authoritative.
+3. Verify server-derived folder/message counts and identities, conservative customization restoration, restart and raw-message fidelity. Preserve the old cache as a recovery source for unmatched customizations and local-only uploads.
 4. Switch IMAP reads and writes to the shared database, with one authoritative write path. Avoid prolonged dual writes; they create two conflicting sources of truth.
 5. Add and validate FTS indexing/rebuild behavior independently from the storage cutover.
 6. Remove legacy XML/Protobuf folder indexes and `.eml` cache writes only after upgrade, restart, retry and rollback behavior has been exercised. Retain a deliberate recovery/backup policy for users upgrading from older versions.
@@ -80,7 +88,7 @@ GDK_BACKEND=x11 xvfb-run -a make -f unittests/Makefile.imap-storage -j2 imap-sto
 ### Invariants and acceptance checks
 
 - Every locally cached message has one canonical mail row and one parent folder; its MIME segments are not duplicated by a local move.
-- Every IMAP mapping references an existing mail row and the correct account/mailbox/UIDVALIDITY scope.
+- Every IMAP message stores its server identity on its canonical mail row, in the correct account/parent-folder/UIDVALIDITY scope.
 - A message that is not fully downloaded can retain its IMAP metadata without pretending that its RFC822 content is available locally.
 - Local database commits and UI notifications do not claim server success before the server operation has been confirmed.
 - Folder synchronization, reconnect, expunge, UIDVALIDITY reset and operation retry preserve or explicitly reconcile local/server state.
@@ -91,6 +99,6 @@ GDK_BACKEND=x11 xvfb-run -a make -f unittests/Makefile.imap-storage -j2 imap-sto
 
 - Confirm whether one `LMail3Store` instance/database is available to every IMAP account that should share the Mail3 store, and define how that instance is injected and kept alive.
 - Confirm SQLite thread/connection constraints and transaction ownership around IMAP callbacks.
-- Inventory the complete IMAP sync state currently stored in folder metadata and per-message XML/protobuf before finalizing the extension schema.
+- Inventory the complete IMAP sync state currently stored in folder metadata and per-message XML/protobuf before finalizing the shared schema.
 - Decide the user-visible failure policy for server-backed moves and deletes, including offline operation and retries.
 - Verify raw RFC822 fidelity and FTS availability across Linux, macOS, Windows and other supported builds.

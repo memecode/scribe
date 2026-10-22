@@ -81,6 +81,7 @@ enum ImapMsgType
 	IMAP_DELETE,
 	IMAP_UNDELETE,
 	IMAP_SET_FLAGS,
+	IMAP_REBUILD_MAILBOX,
 	
 	// Check
 	IMAP_MSG_MAX
@@ -100,6 +101,8 @@ struct ImapFolderInfo
 	uint32_t LastUid;
 	// Separator for IMAP path
 	char Sep;
+	int64 UidValidity = -1;
+	int64 UidNext = -1;
 	
 	ImapFolderInfo()
 	{
@@ -111,6 +114,10 @@ struct ImapFolderInfo
 	{
 		Local = i.Local;
 		Remote = i.Remote;
+		LastUid = i.LastUid;
+		Sep = i.Sep;
+		UidValidity = i.UidValidity;
+		UidNext = i.UidNext;
 		return *this;
 	}
 };
@@ -121,15 +128,15 @@ struct ImapMailInfo
 	// The email meta flags
 	ImapMailFlags Flags;
 	// The sequence number of the email
-	uint32_t Seq;
+	uint32_t Seq = 0;
 	// The server UID of the email
-	uint32_t Uid;
+	uint32_t Uid = 0;
 	// The initial headers
 	LString Headers;
 	// The local path to that .eml file
 	LString Local;
 	// The size of the email in bytes
-	int64 Size;
+	int64 Size = 0;
 	// The structure of the email
 	LString Structure;
 	// The internal date of the email
@@ -178,6 +185,7 @@ struct ImapMsg
 };
 
 extern char *TrimWhite(char *s);
+bool FetchImapRebuild(MailIMap &Imap, const ImapFolderInfo &Folder, ImapMsg &Response, LString &Error);
 
 class ImapFolder;
 class ImapThread;
@@ -234,6 +242,7 @@ public:
 
 	const char *GetClass() override { return "ImapStore"; }
 	LMail3Store *GetStorage() { return Storage; }
+	bool IsServerRebuild() const;
 	void PostStore(ImapMsg *m) { Callback->Post(this, m); }
 	bool PostThread(ImapMsg *m, bool UiPriority);
 
