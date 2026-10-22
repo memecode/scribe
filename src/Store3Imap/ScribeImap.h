@@ -163,7 +163,7 @@ struct ImapJournalResult
 {
 	int64 OperationId = -1, AccountId = -1;
 	int Attempt = 0;
-	bool Reconciliation = false;
+	LMail3ImapOperationState State = LMail3ImapOperationState::Executing;
 	ImapJournalOutcome Outcome = ImapJournalOutcome::NotExecuted;
 	int64 DestinationUidValidity = -1, DestinationUid = -1;
 	LString Error;
@@ -171,7 +171,7 @@ struct ImapJournalResult
 
 ImapJournalResult ExecuteImapJournalOperation(MailIMap &Imap, ImapJournalCommand &Command);
 bool PrepareImapJournalOperation(LMail3Store &Storage, int64 AccountId, int64 OperationId,
-	ImapJournalCommand &Command, bool Reconcile = false);
+	ImapJournalCommand &Command, LMail3ImapOperationState ClaimedState = LMail3ImapOperationState::Executing);
 bool ApplyImapJournalResult(LMail3Store &Storage, int64 AccountId, const ImapJournalResult &Result);
 
 struct ImapMsg
@@ -280,8 +280,9 @@ public:
 	LMail3Store *GetStorage() { return Storage; }
 	bool IsServerRebuild() const;
 	// Internal cutover bridge; legacy UI paths do not enqueue journal commands yet.
-	// Reconciliation only observes the server; it never repeats a mutation.
-	bool DispatchJournalOperation(int64 OperationId, bool Reconcile = false);
+	// Reconciling observes only; ContinuingMove can add \Deleted without repeating COPY.
+	bool DispatchJournalOperation(int64 OperationId,
+		LMail3ImapOperationState ClaimedState = LMail3ImapOperationState::Executing);
 	void PostStore(ImapMsg *m) { Callback->Post(this, m); }
 	bool PostThread(ImapMsg *m, bool UiPriority);
 

@@ -338,7 +338,13 @@ namespace
 		LostFetchReply,
 		DuplicateFetch,
 		FetchWithoutFlags,
-		EpochChangedDuringReconciliation
+		EpochChangedDuringReconciliation,
+		ConcurrentSourceFlag,
+		SourceEpochChangedBeforeStore,
+		DestinationMissingAfterStore,
+		DestinationEpochChangedAfterStore,
+		DestinationFlagsChangedAfterStore,
+		SourceExpungedAfterStore
 	};
 
 	class JournalSocket : public LSocket
@@ -358,6 +364,8 @@ namespace
 
 	public:
 		unsigned Copies = 0, Stores = 0, Appends = 0, Selects = 0;
+		bool SourceKeyword = false;
+		int GetSourceFlags() const { return SourceFlags.All; }
 		std::string Appended;
 		std::vector<std::string> Commands;
 		JournalSocket(JournalScript mode) : Mode(mode)
@@ -412,8 +420,10 @@ namespace
 				bool EpochChanged = Mode == JournalScript::EpochChangedDuringReconciliation && MailboxSelects > 1;
 				auto Epoch = Selected == "INBOX" ?
 					(Mode == JournalScript::WrongSourceEpoch || EpochChanged ||
+					 (Mode == JournalScript::SourceEpochChangedBeforeStore && SourceSelects > 1) ||
 					 (Mode == JournalScript::EpochChangedAfterStore && Stores) ? "101" : "100") :
-					(Mode == JournalScript::WrongDestinationEpoch || EpochChanged ? "200" : "4294967295");
+					(Mode == JournalScript::WrongDestinationEpoch || EpochChanged ||
+					 (Mode == JournalScript::DestinationEpochChangedAfterStore && Stores) ? "200" : "4294967295");
 				Reply("* 1 EXISTS\r\n* 0 RECENT\r\n* OK [UIDVALIDITY " + std::string(Epoch) +
 					"] epoch\r\n* OK [UIDNEXT 4294967295] next\r\n" + Tag + " OK [READ-WRITE] selected\r\n");
 			}
@@ -421,12 +431,17 @@ namespace
 			{
 				auto Uid = Selected == "INBOX" ? "4294967294" : "4294967295";
 				auto Current = Selected == "INBOX" ? SourceFlags : DestinationFlags;
+				if (Selected == "Archive" && Mode == JournalScript::DestinationFlagsChangedAfterStore && Stores)
+					Current.ImapFlagged = true;
 				auto FlagsText = Current.Get();
-				auto Listing = (Selected == "INBOX" && Mode == JournalScript::MissingSource) ||
-					(Selected == "Archive" && Mode == JournalScript::MissingDestination) ? "" :
+				auto Listing = (Selected == "INBOX" && (Mode == JournalScript::MissingSource ||
+					(Mode == JournalScript::SourceExpungedAfterStore && Stores))) ||
+					(Selected == "Archive" && (Mode == JournalScript::MissingDestination ||
+					(Mode == JournalScript::DestinationMissingAfterStore && Stores))) ? "" :
 					"* 1 FETCH (UID " + std::string(Uid) +
 						(Mode == JournalScript::FetchWithoutFlags ? ")\r\n" : " FLAGS (" +
-						std::string(FlagsText ? FlagsText.Get() : "") + "))\r\n");
+						std::string(FlagsText ? FlagsText.Get() : "") +
+						(Selected == "INBOX" && SourceKeyword ? " $Custom" : "") + "))\r\n");
 				if (Mode == JournalScript::DuplicateFetch)
 					Listing += Listing;
 				Reply(Mode == JournalScript::LostFetchReply ? "" : Listing + Tag + " OK fetched\r\n");
@@ -436,6 +451,7 @@ namespace
 				Require(Bytes.find("UID COPY 4294967294 ") != std::string::npos,
 					"COPY truncated an unsigned source UID");
 				Copies++;
+				DestinationFlags = SourceFlags;
 				DestinationFlags.ImapFlagged = Mode == JournalScript::CopyFlagsChanged;
 				std::string Code = Mode == JournalScript::MissingCopyUid ? "" :
 					Mode == JournalScript::WrongCopySource ? "[COPYUID 4294967295 20 4294967295] " :
@@ -451,11 +467,22 @@ namespace
 				Require(Bytes.find("UID STORE 4294967294 ") != std::string::npos,
 					"STORE truncated an unsigned source UID");
 				Stores++;
-				if (Mode != JournalScript::WrongFlags)
+				if (Mode == JournalScript::ConcurrentSourceFlag)
+					SourceFlags.ImapFlagged = true;
+				if (Mode != JournalScript::WrongFlags && Mode != JournalScript::StoreRejected &&
+					Mode != JournalScript::SourceDeleteFailed)
 				{
 					auto Start = Bytes.find('('), End = Bytes.find(')', Start);
 					Require(Start != std::string::npos && End != std::string::npos, "Malformed STORE command");
-					SourceFlags.Set(Bytes.substr(Start + 1, End - Start - 1).c_str());
+					ImapMailFlags Requested;
+					Requested.Set(Bytes.substr(Start + 1, End - Start - 1).c_str());
+					if (Bytes.find(" +FLAGS ") != std::string::npos)
+						SourceFlags.All |= Requested.All;
+					else
+					{
+						SourceFlags = Requested;
+						SourceKeyword = false;
+					}
 				}
 				Reply(Mode == JournalScript::LostStoreReply ? "" :
 					Tag + ((Mode == JournalScript::StoreRejected || Mode == JournalScript::SourceDeleteFailed) ?
@@ -575,6 +602,10 @@ namespace
 						"Unexpected COPY flags caused premature source deletion or lost COPYUID evidence");
 				if (Append && !BeforeFailure && Mode != JournalScript::AppendRejected)
 					Require(Imap.Script->Appended == Raw, "APPEND changed RFC822 bytes or lost partial literal writes");
+				for (auto &Wire: Imap.Script->Commands)
+					if (Wire.find(" UID STORE ") != std::string::npos)
+						Require(Wire.find(" FLAGS (") != std::string::npos && Wire.find(" +FLAGS ") == std::string::npos,
+							"Existing flag-replacement callers unexpectedly switched to additive STORE");
 			}
 		}
 		ImapJournalCommand Invalid;
@@ -657,7 +688,7 @@ namespace
 					Mode == JournalScript::LostFetchReply || Mode == JournalScript::DuplicateFetch ||
 					Mode == JournalScript::FetchWithoutFlags || Mode == JournalScript::EpochChangedDuringReconciliation;
 				Require((Result.Outcome == ImapJournalOutcome::Confirmed) == !Failure &&
-					(bool)Result.Error == Failure && Result.Reconciliation && Result.Attempt == 2,
+					(bool)Result.Error == Failure && Result.State == LMail3ImapOperationState::Reconciling && Result.Attempt == 2,
 					"Read-only reconciliation accepted incomplete evidence or lost attempt correlation");
 				Require(!Imap.Script->Copies && !Imap.Script->Stores && !Imap.Script->Appends,
 					"Reconciliation sent a server mutation");
@@ -725,7 +756,7 @@ namespace
 						"update Mail set Label='recovery label', MarkColour=1234", NULL, NULL, NULL), NULL),
 						"Cannot customize the reconciliation fixture");
 					ImapJournalCommand Command;
-					Require(!PrepareImapJournalOperation(Store, 42, Operation.Id, Command, true),
+					Require(!PrepareImapJournalOperation(Store, 42, Operation.Id, Command, LMail3ImapOperationState::Reconciling),
 						"A queued command was claimed for recovery");
 					Require(PrepareImapJournalOperation(Store, 42, Operation.Id, Command),
 						"Cannot claim the original command");
@@ -740,16 +771,16 @@ namespace
 				ImapJournalCommand Reconcile;
 				{
 					LMail3Store Store(Database.c_str(), NULL, false);
-					Require(!PrepareImapJournalOperation(Store, 43, Operation.Id, Reconcile, true) &&
+					Require(!PrepareImapJournalOperation(Store, 43, Operation.Id, Reconcile, LMail3ImapOperationState::Reconciling) &&
 						!PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile),
 						"An uncertain command was claimed by another account or redispatched");
 					Require(Store.Check(sqlite3_exec(Store.GetDb(), "begin", NULL, NULL, NULL), NULL),
 						"Cannot begin the reconciliation outer transaction");
-					Require(!PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile, true),
+					Require(!PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile, LMail3ImapOperationState::Reconciling),
 						"Reconciliation was claimed without a durable commit");
 					Require(Store.Check(sqlite3_exec(Store.GetDb(), "rollback", NULL, NULL, NULL), NULL),
 						"Cannot roll back the reconciliation outer transaction");
-					Require(PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile, true) &&
+					Require(PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile, LMail3ImapOperationState::Reconciling) &&
 						!Reconcile.Upload && Reconcile.Operation.Attempts == 2 &&
 						Scalar(Store, "select count(*) from ImapOperation where State=3") == 1,
 						"Reconciliation claim was not durable or unnecessarily detached an upload");
@@ -775,7 +806,7 @@ namespace
 				if (Scenario == 5)
 				{
 					Require(Store.RecoverImapOperations(42) &&
-						PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile, true),
+						PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile, LMail3ImapOperationState::Reconciling),
 						"Interrupted reconciliation could not be recovered");
 					Require(!ApplyImapJournalResult(Store, 42, Result) &&
 						Scalar(Store, "select Attempts from ImapOperation") == 3 &&
@@ -788,7 +819,7 @@ namespace
 				Require(!ApplyImapJournalResult(Store, 43, Result) && !ApplyImapJournalResult(Store, 42, Original),
 					"Recovery accepted another account or the original late mutation result");
 				auto WrongMode = Result;
-				WrongMode.Reconciliation = false;
+				WrongMode.State = LMail3ImapOperationState::Executing;
 				Require(!ApplyImapJournalResult(Store, 42, WrongMode),
 					"A mutation result completed a read-only reconciliation claim");
 				if ((Move || Append) && Scenario != 1)
@@ -840,7 +871,7 @@ namespace
 				if (Scenario == 4)
 				{
 					Require(Store.Check(sqlite3_exec(Store.GetDb(), "drop trigger FailReconciliation",
-						NULL, NULL, NULL), NULL) && PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile, true),
+						NULL, NULL, NULL), NULL) && PrepareImapJournalOperation(Store, 42, Operation.Id, Reconcile, LMail3ImapOperationState::Reconciling),
 						"Cannot retry read-only verification after a failed local commit");
 					JournalImap Retry(JournalScript::Normal);
 					Retry.Script->SeedFlags(SourceFlags, DestinationFlags);
@@ -848,6 +879,257 @@ namespace
 					Require(ApplyImapJournalResult(Store, 42, Retried) &&
 						Scalar(Store, "select count(*) from ImapOperation") == 0 &&
 						Export(Store, Operation.MailId) == Raw, "Recovery could not finish after a local commit failure");
+				}
+			}
+		}
+	}
+
+	void TestJournalMoveContinuationProtocol()
+	{
+		for (auto Mode: {JournalScript::Normal, JournalScript::ConcurrentSourceFlag,
+			JournalScript::WrongSourceEpoch, JournalScript::WrongDestinationEpoch,
+			JournalScript::MissingSource, JournalScript::MissingDestination,
+			JournalScript::LostFetchReply, JournalScript::DuplicateFetch, JournalScript::FetchWithoutFlags,
+			JournalScript::EpochChangedDuringReconciliation, JournalScript::SourceEpochChangedBeforeStore,
+			JournalScript::SourceFlagsChanged, JournalScript::CopyFlagsChanged,
+			JournalScript::LostStoreReply, JournalScript::StoreRejected, JournalScript::WrongFlags,
+			JournalScript::EpochChangedAfterStore, JournalScript::DestinationMissingAfterStore,
+			JournalScript::DestinationEpochChangedAfterStore, JournalScript::DestinationFlagsChangedAfterStore,
+			JournalScript::SourceExpungedAfterStore})
+		{
+			ImapJournalCommand Command;
+			auto &Operation = Command.Operation;
+			Operation.Id = 10;
+			Operation.AccountId = 42;
+			Operation.Attempts = 2;
+			Operation.State = LMail3ImapOperationState::ContinuingMove;
+			Operation.Type = LMail3ImapOperationType::Move;
+			Operation.SourceRemoteName = "/INBOX";
+			Operation.SourceUidValidity = 100;
+			Operation.SourceUid = UINT32_MAX - 1;
+			Operation.DestinationRemoteName = "/Archive";
+			Operation.DestinationUidValidity = Operation.DestinationUid = UINT32_MAX;
+			Operation.RemoteFlags = 32;
+			JournalImap Imap(Mode);
+			Imap.Script->SeedFlags(Mode == JournalScript::SourceFlagsChanged ? 40 : 32,
+				Mode == JournalScript::CopyFlagsChanged ? 40 : 32);
+			Imap.Script->SourceKeyword = true;
+			auto Result = ExecuteImapJournalOperation(Imap, Command);
+			bool Confirmed = Mode == JournalScript::Normal || Mode == JournalScript::ConcurrentSourceFlag;
+			bool Attempted = Confirmed || Mode == JournalScript::LostStoreReply ||
+				Mode == JournalScript::StoreRejected || Mode == JournalScript::WrongFlags ||
+				Mode == JournalScript::EpochChangedAfterStore || Mode == JournalScript::DestinationMissingAfterStore ||
+				Mode == JournalScript::DestinationEpochChangedAfterStore || Mode == JournalScript::DestinationFlagsChangedAfterStore ||
+				Mode == JournalScript::SourceExpungedAfterStore;
+			Require(Result.Outcome == (Confirmed ? ImapJournalOutcome::Confirmed :
+				Attempted ? ImapJournalOutcome::Uncertain : ImapJournalOutcome::NotExecuted) &&
+				(bool)Result.Error == !Confirmed && Result.State == LMail3ImapOperationState::ContinuingMove &&
+				Result.Attempt == 2 && Result.DestinationUid == UINT32_MAX && Result.DestinationUidValidity == UINT32_MAX,
+				"Move continuation misclassified a failure or lost claim/COPYUID evidence");
+			Require(!Imap.Script->Copies && !Imap.Script->Appends && Imap.Script->Stores == (Attempted ? 1u : 0u),
+				"Move continuation repeated COPY/APPEND or mutated an unverified source");
+			for (auto &Wire: Imap.Script->Commands)
+				if (Wire.find(" UID STORE ") != std::string::npos)
+					Require(Wire.find("UID STORE 4294967294 +FLAGS (\\Deleted)\r\n") != std::string::npos,
+						"Continuation replaced source flags instead of adding only Deleted");
+			if (Confirmed)
+				Require(Imap.Script->SourceKeyword && Imap.Script->GetSourceFlags() ==
+					(Mode == JournalScript::ConcurrentSourceFlag ? 42 : 34),
+					"Continuation lost a server keyword or concurrent source flag");
+
+			if (Mode == JournalScript::Normal)
+			{
+				JournalImap Deleted(JournalScript::Normal);
+				Deleted.Script->SeedFlags(42, 32);
+				auto AlreadyDeleted = ExecuteImapJournalOperation(Deleted, Command);
+				Require(AlreadyDeleted.Outcome == ImapJournalOutcome::Confirmed && !Deleted.Script->Stores &&
+					!Deleted.Script->Copies && !Deleted.Script->Appends,
+					"An already-deleted source was unnecessarily mutated");
+				for (auto Type: {LMail3ImapOperationType::Append, LMail3ImapOperationType::Delete,
+					LMail3ImapOperationType::SetFlags})
+				{
+					Operation.Type = Type;
+					JournalImap Invalid(JournalScript::Normal);
+					auto Rejected = ExecuteImapJournalOperation(Invalid, Command);
+					Require(Rejected.Outcome == ImapJournalOutcome::NotExecuted && Rejected.Error &&
+						Invalid.Script->Commands.empty(), "A non-move used a continuation claim");
+				}
+				Operation.Type = LMail3ImapOperationType::Move;
+				for (int64 Uid: {int64(-1), int64(0), int64(UINT32_MAX) + 1})
+				{
+					Operation.DestinationUid = Uid;
+					JournalImap Invalid(JournalScript::Normal);
+					auto Rejected = ExecuteImapJournalOperation(Invalid, Command);
+					Require(Rejected.Outcome == ImapJournalOutcome::NotExecuted && Rejected.Error &&
+						Invalid.Script->Commands.empty(), "Invalid COPYUID evidence was sent to the server");
+				}
+			}
+		}
+	}
+
+	void TestJournalMoveContinuationBridge()
+	{
+		for (int Scenario = 0; Scenario < 8; Scenario++)
+		{
+			Fixture Files;
+			auto Database = Files.Root / "move-continuation.mail3";
+			std::string Raw = "From: sender@example.test\r\nMessage-ID: <move-continuation>\r\n\r\nbody";
+			Raw.append("\0binary\xff", 8);
+			LMail3ImapMailbox Source, Destination;
+			LMail3ImapOperation Move, Later;
+			ImapJournalResult Original;
+			{
+				LMail3Store Store(Database.c_str(), NULL, true);
+				Require(Store.GetRoot() != NULL, "Cannot create the move continuation store");
+				Source.AccountId = Destination.AccountId = 42;
+				Source.RemoteName = "/INBOX";
+				Destination.RemoteName = "/Archive";
+				Source.UidValidity = 100;
+				Destination.UidValidity = UINT32_MAX;
+				Source.UidNext = Destination.UidNext = UINT32_MAX;
+				LArray<LMail3ImapServerMessage> Messages, Empty;
+				auto &Message = Messages.New();
+				Message.Uid = UINT32_MAX - 1;
+				Message.RemoteFlags = 32;
+				Message.Headers = Raw.substr(0, Raw.find("\r\n\r\n")).c_str();
+				Message.Size = Raw.size();
+				Require(Store.RebuildImapMailbox(Source, Messages) && Store.RebuildImapMailbox(Destination, Empty),
+					"Cannot establish continuation mailboxes");
+				LMail3ImapMessage Identity;
+				Require(Store.FindImapMessage(Source.Id, 100, UINT32_MAX - 1, Identity),
+					"Cannot find the continuation source");
+				LMemStream Body(Raw.data(), Raw.size());
+				Require(Store.StoreImapBody(42, Identity, Body), "Cannot store the continuation body");
+				Move.AccountId = 42;
+				Move.Type = LMail3ImapOperationType::Move;
+				Move.MailId = Identity.MailId;
+				Move.DestinationMailboxId = Destination.Id;
+				Require(Store.QueueImapOperation(Move) && Store.StageImapAppend(42, Destination.Id, 32, Body, Later),
+					"Cannot queue the continuation and its ordered successor");
+				Require(Store.Check(sqlite3_exec(Store.GetDb(),
+					"update Mail set Label='continuation label', MarkColour=4321; update Folder set Sort=17",
+					NULL, NULL, NULL), NULL), "Cannot customize continuation mail/folders");
+				ImapJournalCommand Command;
+				Require(!PrepareImapJournalOperation(Store, 42, Move.Id, Command, LMail3ImapOperationState::ContinuingMove) &&
+					PrepareImapJournalOperation(Store, 42, Move.Id, Command), "Cannot claim the original move");
+				JournalImap Imap(Scenario == 5 ? JournalScript::LostCopyReply : JournalScript::SourceDeleteFailed);
+				Imap.Script->SeedFlags(32, 0);
+				Original = ExecuteImapJournalOperation(Imap, Command);
+				Require(Original.Outcome == ImapJournalOutcome::Uncertain && Imap.Script->Copies == 1 &&
+					ApplyImapJournalResult(Store, 42, Original), "Cannot persist the original partial move");
+			}
+			ImapJournalCommand Command;
+			{
+				LMail3Store Store(Database.c_str(), NULL, false);
+				Require(!PrepareImapJournalOperation(Store, 43, Move.Id, Command, LMail3ImapOperationState::ContinuingMove) &&
+					!PrepareImapJournalOperation(Store, 42, Later.Id, Command) &&
+					!PrepareImapJournalOperation(Store, 42, Move.Id, Command, LMail3ImapOperationState::Queued),
+					"Continuation bypassed account ordering or accepted an invalid claim state");
+				LMail3ImapOperation Unchanged;
+				Require(!Store.BeginImapOperation(Later.Id, Unchanged, LMail3ImapOperationState::ContinuingMove),
+					"APPEND accepted a move continuation claim");
+				if (Scenario == 5)
+				{
+					Require(!PrepareImapJournalOperation(Store, 42, Move.Id, Command, LMail3ImapOperationState::ContinuingMove) &&
+						Scalar(Store, "select State from ImapOperation order by Id limit 1") == 2 &&
+						Scalar(Store, "select Attempts from ImapOperation order by Id limit 1") == 1 &&
+						Export(Store, Move.MailId) == Raw,
+						"A lost COPY reply acquired a continuation claim without destination evidence");
+					continue;
+				}
+				Require(Store.Check(sqlite3_exec(Store.GetDb(), "begin", NULL, NULL, NULL), NULL),
+					"Cannot start the continuation outer transaction");
+				Require(!PrepareImapJournalOperation(Store, 42, Move.Id, Command, LMail3ImapOperationState::ContinuingMove),
+					"Continuation was claimed without a durable commit");
+				Require(Store.Check(sqlite3_exec(Store.GetDb(), "rollback", NULL, NULL, NULL), NULL) &&
+					PrepareImapJournalOperation(Store, 42, Move.Id, Command, LMail3ImapOperationState::ContinuingMove) &&
+					!Command.Upload && Command.Operation.Attempts == 2 &&
+					Scalar(Store, "select State from ImapOperation order by Id limit 1") == 4,
+					"Continuation failed to commit its distinct active claim");
+			}
+			auto Mode = Scenario == 1 ? JournalScript::LostStoreReply :
+				Scenario == 2 ? JournalScript::StoreRejected : JournalScript::Normal;
+			JournalImap Imap(Mode);
+			Imap.Script->SeedFlags(Scenario == 6 ? 40 : Scenario == 7 ? 34 : 32, 32);
+			Imap.Script->SourceKeyword = true;
+			auto Result = ExecuteImapJournalOperation(Imap, Command);
+			Require(!Imap.Script->Copies && !Imap.Script->Appends &&
+				Imap.Script->Stores == (Scenario == 6 || Scenario == 7 ? 0u : 1u),
+				"Continuation duplicated the server copy or incorrectly deleted the source");
+			LMail3Store Store(Database.c_str(), NULL, false);
+			if (Scenario == 4)
+			{
+				Require(Store.RecoverImapOperations(43) &&
+					Scalar(Store, "select State from ImapOperation order by Id limit 1") == 4 &&
+					Store.RecoverImapOperations(42) &&
+					PrepareImapJournalOperation(Store, 42, Move.Id, Command, LMail3ImapOperationState::Reconciling) &&
+					Command.Operation.Attempts == 3 && !ApplyImapJournalResult(Store, 42, Result),
+					"A crashed continuation accepted its late result or lost recovery state");
+				JournalImap Retry(JournalScript::Normal);
+				Retry.Script->SeedFlags(34, 32);
+				Result = ExecuteImapJournalOperation(Retry, Command);
+				Require(Result.Outcome == ImapJournalOutcome::Confirmed && !Retry.Script->Stores &&
+					!Retry.Script->Copies, "Restarted continuation could not reconcile without another mutation");
+			}
+			Require(!ApplyImapJournalResult(Store, 43, Result) && !ApplyImapJournalResult(Store, 42, Original),
+				"Continuation accepted a cross-account or stale mutation result");
+			auto Wrong = Result;
+			Wrong.State = Result.State == LMail3ImapOperationState::Reconciling ?
+				LMail3ImapOperationState::ContinuingMove : LMail3ImapOperationState::Reconciling;
+			Require(!ApplyImapJournalResult(Store, 42, Wrong), "A result for another recovery mode completed the claim");
+			Wrong = Result;
+			Wrong.DestinationUid--;
+			Require(!ApplyImapJournalResult(Store, 42, Wrong) &&
+				!Store.CompleteImapOperation(Move.Id, UINT32_MAX, UINT32_MAX - 1),
+				"Continuation substituted a destination for the recorded COPYUID");
+			if (Scenario == 3)
+				Require(Store.Check(sqlite3_exec(Store.GetDb(),
+					"create trigger FailContinuation before update of ParentId on Mail "
+					"begin select raise(abort,'fixture continuation commit failure'); end",
+					NULL, NULL, NULL), NULL), "Cannot inject the continuation local commit failure");
+			Require(ApplyImapJournalResult(Store, 42, Result) == (Scenario != 3) &&
+				!ApplyImapJournalResult(Store, 42, Result), "Continuation misreported a local commit or accepted a duplicate result");
+			LMail3ImapMessage Identity;
+			LArray<LMail3ImapOperation> Remaining;
+			bool Finished = Scenario == 0 || Scenario == 4 || Scenario == 7;
+			Require(Store.LoadImapMessage(Move.MailId, Identity) && Store.LoadImapOperations(42, Remaining) &&
+				Identity.MailboxId == (Finished ? Destination.Id : Source.Id) &&
+				Identity.Uid == (Finished ? (int64)UINT32_MAX : (int64)UINT32_MAX - 1) &&
+				Identity.RemoteFlags == 32 && Export(Store, Move.MailId) == Raw &&
+				Scalar(Store, "select count(*) from Mail where Label='continuation label' and MarkColour=4321") == 2 &&
+				Scalar(Store, "select count(*) from Folder where ImapAccountId=42 and Sort=17 and ImapUidValidity is not null") == 2,
+				"Continuation changed canonical state prematurely or lost bodies/customizations");
+			Require(Remaining.Length() == (Finished ? 1u : 2u) &&
+				Remaining.Last().Id == Later.Id && Remaining.Last().State == LMail3ImapOperationState::Queued,
+				"Continuation discarded or dispatched its account's later work");
+			if (!Finished)
+			{
+				Require(Remaining[0].State == LMail3ImapOperationState::NeedsReconciliation &&
+					Remaining[0].DestinationUid == UINT32_MAX && Remaining[0].LastError,
+					"Failed continuation lost its durable COPYUID evidence or diagnostic");
+				if (Scenario == 3)
+					Require(Store.Check(sqlite3_exec(Store.GetDb(), "drop trigger FailContinuation",
+						NULL, NULL, NULL), NULL), "Cannot remove the local commit failure trigger");
+				Require(PrepareImapJournalOperation(Store, 42, Move.Id, Command, LMail3ImapOperationState::Reconciling),
+					"Failed continuation cannot be inspected read-only");
+				JournalImap Retry(JournalScript::Normal);
+				Retry.Script->SeedFlags(Imap.Script->GetSourceFlags(), 32);
+				auto Reconciled = ExecuteImapJournalOperation(Retry, Command);
+				Require((Reconciled.Outcome == ImapJournalOutcome::Confirmed) == (Scenario == 1 || Scenario == 3) &&
+					!Retry.Script->Stores && !Retry.Script->Copies && ApplyImapJournalResult(Store, 42, Reconciled),
+					"Continuation retry repeated a mutation or failed to reconcile a lost STORE/local commit");
+				if (Scenario == 2)
+				{
+					Require(PrepareImapJournalOperation(Store, 42, Move.Id, Command, LMail3ImapOperationState::ContinuingMove),
+						"A rejected source deletion could not be explicitly continued again");
+					JournalImap Continued(JournalScript::Normal);
+					Continued.Script->SeedFlags(32, 32);
+					auto Completed = ExecuteImapJournalOperation(Continued, Command);
+					Require(Completed.Outcome == ImapJournalOutcome::Confirmed && Continued.Script->Stores == 1 &&
+						!Continued.Script->Copies && !Continued.Script->Appends &&
+						ApplyImapJournalResult(Store, 42, Completed) && Export(Store, Move.MailId) == Raw &&
+						Scalar(Store, "select count(*) from ImapOperation") == 1,
+						"Explicit continuation after a rejected STORE duplicated COPY or failed to complete");
 				}
 			}
 		}
@@ -1057,6 +1339,11 @@ namespace
 					Remaining[0].LastError &&
 					Scalar(Store, "select count(*) from Mail where ImapUid is null") == 1,
 					"Uncertain or unexecuted APPEND was acknowledged, lost or left dispatchable");
+				LMail3ImapOperation Claimed;
+				Require(!Store.BeginImapOperation(Operation.Id, Claimed, LMail3ImapOperationState::ContinuingMove) &&
+					Scalar(Store, "select State from ImapOperation") == 2 &&
+					Scalar(Store, "select Attempts from ImapOperation") == 1,
+					"A quarantined APPEND acquired a move continuation claim");
 			}
 			Require(Export(Store, Operation.MailId) == Raw, "Worker journal handling damaged the recoverable upload");
 		}
@@ -1761,6 +2048,8 @@ int LgiMain(OsAppArguments &Arguments)
 		TestJournalMoveBridge();
 		TestJournalReconciliationProtocol();
 		TestJournalReconciliationBridge();
+		TestJournalMoveContinuationProtocol();
+		TestJournalMoveContinuationBridge();
 		TestServerRebuild();
 		FreeStrToDom();
 		printf("IMAP cache migration tests passed\n");

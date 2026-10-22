@@ -147,27 +147,28 @@ bool ImapStore::InterruptPendingJournal(const char *Reason)
 }
 
 bool PrepareImapJournalOperation(LMail3Store &Storage, int64 AccountId, int64 OperationId,
-	ImapJournalCommand &Command, bool Reconcile)
+	ImapJournalCommand &Command, LMail3ImapOperationState ClaimedState)
 {
+	bool Execute = ClaimedState == LMail3ImapOperationState::Executing;
 	LArray<LMail3ImapOperation> Operations;
 	if (!Storage.LoadImapOperations(AccountId, Operations))
 		return false;
 	if (!Operations.Length() || Operations[0].Id != OperationId ||
-		Operations[0].State != (Reconcile ? LMail3ImapOperationState::NeedsReconciliation : LMail3ImapOperationState::Queued))
+		Operations[0].State != (Execute ? LMail3ImapOperationState::Queued : LMail3ImapOperationState::NeedsReconciliation))
 	{
 		Storage.SetStr(FIELD_ERROR, "IMAP dispatch requires the account's first journal entry in the requested queued/recovery state.");
 		LgiTrace("%s\n", Storage.GetStr(FIELD_ERROR));
 		return false;
 	}
 	LAutoStreamI Upload;
-	if (!Reconcile && Operations[0].Type == LMail3ImapOperationType::Append)
+	if (Execute && Operations[0].Type == LMail3ImapOperationType::Append)
 	{
 		Upload = Storage.OpenImapUpload(AccountId, OperationId);
 		if (!Upload)
 			return false;
 	}
 	LMail3ImapOperation Claimed;
-	if (!Storage.BeginImapOperation(OperationId, Claimed, Reconcile))
+	if (!Storage.BeginImapOperation(OperationId, Claimed, ClaimedState))
 		return false;
 	Command.Operation = Claimed;
 	Command.Upload = Upload;
@@ -184,18 +185,22 @@ bool ApplyImapJournalResult(LMail3Store &Storage, int64 AccountId, const ImapJou
 	};
 	if (Result.AccountId != AccountId || Result.OperationId <= 0)
 		return Fail("IMAP journal result belongs to another account or has no operation ID.");
+	if (Result.State != LMail3ImapOperationState::Executing &&
+		Result.State != LMail3ImapOperationState::Reconciling &&
+		Result.State != LMail3ImapOperationState::ContinuingMove)
+		return Fail("IMAP journal result has no valid active claim state.");
 	LArray<LMail3ImapOperation> Operations;
 	if (!Storage.LoadImapOperations(AccountId, Operations))
 		return false;
 	if (!Operations.Length() || Operations[0].Id != Result.OperationId ||
-		Operations[0].State != (Result.Reconciliation ? LMail3ImapOperationState::Reconciling : LMail3ImapOperationState::Executing) ||
+		Operations[0].State != Result.State ||
 		Result.Attempt != Operations[0].Attempts)
 		return Fail("IMAP journal result does not match this account's executing command.");
-	if (Result.Reconciliation &&
+	if (Result.State != LMail3ImapOperationState::Executing &&
 		(Operations[0].Type == LMail3ImapOperationType::Move || Operations[0].Type == LMail3ImapOperationType::Append) &&
 		(Result.DestinationUid != Operations[0].DestinationUid ||
 		 Result.DestinationUidValidity != (Operations[0].DestinationUid == -1 ? -1 : Operations[0].DestinationUidValidity)))
-		return Fail("IMAP reconciliation result changed the recorded destination evidence.");
+		return Fail("IMAP recovery result changed the recorded destination evidence.");
 	if (Result.Outcome == ImapJournalOutcome::Confirmed)
 	{
 		if (Result.Error)
@@ -216,14 +221,14 @@ bool ApplyImapJournalResult(LMail3Store &Storage, int64 AccountId, const ImapJou
 		!Result.Error)
 		return Fail("An unsuccessful IMAP journal result requires an explicit diagnostic.");
 	auto Reason = LString::Fmt("%s: %s",
-		Result.Reconciliation ? "Reconciliation incomplete" :
+		Result.State == LMail3ImapOperationState::Reconciling ? "Reconciliation incomplete" :
 		Result.Outcome == ImapJournalOutcome::NotExecuted ? "Not executed" : "Server outcome uncertain",
 		Result.Error.Get());
 	return Storage.InterruptImapOperation(Result.OperationId, Reason,
 		Result.DestinationUidValidity, Result.DestinationUid);
 }
 
-bool ImapStore::DispatchJournalOperation(int64 OperationId, bool Reconcile)
+bool ImapStore::DispatchJournalOperation(int64 OperationId, LMail3ImapOperationState ClaimedState)
 {
 	auto Fail = [&](const char *Error)
 	{
@@ -238,7 +243,7 @@ bool ImapStore::DispatchJournalOperation(int64 OperationId, bool Reconcile)
 		return Fail("IMAP journal dispatch requires an online owning-thread store with no command in flight.");
 	LAutoPtr<ImapMsg> Message(new ImapMsg(IMAP_JOURNAL_OPERATION, _FL));
 	Message->Journal.Reset(new ImapJournalCommand);
-	if (!PrepareImapJournalOperation(*Storage, AccountId, OperationId, *Message->Journal, Reconcile))
+	if (!PrepareImapJournalOperation(*Storage, AccountId, OperationId, *Message->Journal, ClaimedState))
 		return Fail(Storage->GetStr(FIELD_ERROR));
 	PendingJournalId = OperationId;
 	PendingJournalAttempt = Message->Journal->Operation.Attempts;

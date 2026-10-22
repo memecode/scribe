@@ -91,7 +91,8 @@ enum class LMail3ImapOperationState
 	Queued = 0,
 	Executing = 1,
 	NeedsReconciliation = 2,
-	Reconciling = 3
+	Reconciling = 3,
+	ContinuingMove = 4
 };
 
 struct LMail3ImapOperation
@@ -458,7 +459,8 @@ public:
 		LMail3ImapOperation &Operation);
 	bool LoadImapOperations(int64 AccountId, LArray<LMail3ImapOperation> &Operations);
 	// Claim must commit before handing a command to the network worker.
-	bool BeginImapOperation(int64 Id, LMail3ImapOperation &Operation, bool Reconcile = false);
+	bool BeginImapOperation(int64 Id, LMail3ImapOperation &Operation,
+		LMail3ImapOperationState ClaimedState = LMail3ImapOperationState::Executing);
 	bool InterruptImapOperation(int64 Id, const char *Reason,
 		int64 DestinationUidValidity = -1, int64 DestinationUid = -1);
 	LAutoStreamI OpenImapUpload(int64 AccountId, int64 OperationId);
