@@ -5,7 +5,7 @@ include linux/Makefile.linux
 ImapTestObjects = $(filter-out $(BuildDir)/ScribeMain.o,$(Objects))
 ImapTestBinary = $(BuildDir)/imap-storage-test
 
-$(BuildDir)/ImapCacheMigration.o: unittests/ImapCacheMigration.cpp
+$(BuildDir)/ImapCacheMigration.o: unittests/ImapCacheMigration.cpp src/Store3Mail3/Mail3.h src/Store3Imap/ScribeImap.h ../../lgi/trunk/include/lgi/common/Mail.h
 	mkdir -p $(@D)
 	$(CPP) $(Inc) $(CppFlags) $(Defs) -c $< -o $@
 

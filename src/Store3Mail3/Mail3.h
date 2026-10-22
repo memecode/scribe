@@ -456,7 +456,8 @@ public:
 	LAutoStreamI OpenImapBody(int64 AccountId, const LMail3ImapMessage &Identity);
 	bool QueueImapOperation(LMail3ImapOperation &Operation);
 	bool StageImapAppend(int64 AccountId, int64 MailboxId, int RemoteFlags, LStreamI &Body,
-		LMail3ImapOperation &Operation);
+		LMail3ImapOperation &Operation, LDataPropI *Properties = NULL);
+	bool RecoverImapLocalMail(int64 AccountId, const char *CachePath);
 	bool LoadImapOperations(int64 AccountId, LArray<LMail3ImapOperation> &Operations);
 	// Claim must commit before handing a command to the network worker.
 	bool BeginImapOperation(int64 Id, LMail3ImapOperation &Operation,

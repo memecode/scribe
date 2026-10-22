@@ -84,6 +84,55 @@ static bool JournalMailbox(MailIMap &Imap, const LString &Name, int64 ExpectedEp
 	return Epoch.IsNumeric() && Epoch.Int() > 0 && Epoch.Int() <= UINT32_MAX && Epoch.Int() == ExpectedEpoch;
 }
 
+bool FetchImapBody(MailIMap &Imap, const LString &Folder, const ImapMailInfo &Request,
+	ImapMailInfo &Response, LString &Error)
+{
+	Response = Request;
+	Response.Body.Empty();
+	Error.Empty();
+	struct BodyState
+	{
+		uint32_t Uid;
+		unsigned Count = 0;
+		bool Invalid = false;
+		LString Body;
+	} State{Request.Uid};
+	auto Callback = [](MailIMap *, uint32_t, MailIMap::StrMap &Parts, void *Context)
+	{
+		auto &State = *static_cast<BodyState*>(Context);
+		auto Uid = Parts.Find("UID");
+		if (!Uid)
+			return true;
+		if (!Uid.IsNumeric() || Uid.Int() <= 0 || Uid.Int() > UINT32_MAX)
+		{
+			State.Invalid = true;
+			return false;
+		}
+		if (Uid.Int() != State.Uid)
+			return true;
+		auto Body = Parts.Find("BODY[]");
+		if (++State.Count != 1 || !Body)
+		{
+			State.Invalid = true;
+			return false;
+		}
+		State.Body = Body;
+		return true;
+	};
+	auto Range = LString::Fmt("%u", Request.Uid);
+	if (!Request.Uid || Request.MailId <= 0 || Request.MailboxId <= 0 || Request.Size <= 0 ||
+		!JournalMailbox(Imap, Folder, Request.UidValidity) ||
+		!Imap.Fetch(true, Range, BodyTag, Callback, &State, NULL, Request.Size) ||
+		State.Invalid || State.Count != 1 || (int64)State.Body.Length() != Request.Size ||
+		!JournalMailbox(Imap, Folder, Request.UidValidity))
+	{
+		Error = "The IMAP body UID, epoch, length or complete FETCH response could not be verified.";
+		return false;
+	}
+	Response.Body = State.Body;
+	return true;
+}
+
 // Answered, Deleted, Draft, Flagged, Seen; excludes server-only Recent and Expunged.
 static constexpr int JournalWritableFlags = 47;
 
@@ -499,6 +548,34 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 	// Do folder sync
 	void SyncFolders()
 	{
+		if (Store->IsLive())
+		{
+			LArray<MailImapFolder*> Folders;
+			if (!Imap->GetFolders(Folders))
+			{
+				Folders.DeleteObjects();
+				Error(_FL, "Cannot list the live IMAP account's mailboxes.");
+				Thread->PostStore(new ImapMsg(IMAP_ERROR, _FL));
+				return;
+			}
+			LAutoPtr<ImapMsg> Inventory(new ImapMsg(IMAP_FOLDER_LISTING, _FL));
+			Inventory->Last = true;
+			for (auto Folder: Folders)
+			{
+				if (!Sep[0])
+					Sep[0] = Folder->GetSep();
+				if (!Folder->NoSelect)
+				{
+					char Delimiter[] = {Folder->GetSep(), 0};
+					auto &Info = Inventory->Fld.New();
+					Info.Remote = LString("/") + LString("/").Join(LString(Folder->GetPath()).SplitDelimit(Delimiter));
+					Info.Sep = Folder->GetSep();
+				}
+			}
+			Folders.DeleteObjects();
+			Thread->PostStore(Inventory.Release());
+			return;
+		}
 		auto Root = CastFld(Store->GetRoot(false));
 		if (!Root)
 			return;
@@ -519,15 +596,6 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 			for (unsigned i=0; i<Folders.Length(); i++)
 			{
 				auto f = Folders[i];
-				if (Store->IsServerRebuild() && !f->NoSelect)
-				{
-					auto Rebuild = new ImapMsg(IMAP_REBUILD_MAILBOX, _FL);
-					auto &Folder = Rebuild->Fld.New();
-					char Delimiter[] = { f->GetSep(), 0 };
-					Folder.Remote = LString("/") + LString("/").Join(LString(f->GetPath()).SplitDelimit(Delimiter));
-					Folder.Sep = f->GetSep();
-					Thread->PostThread(Rebuild, false);
-				}
 				if (Sep[0] == 0)
 				{
 					Sep[0] = f->GetSep();
@@ -1259,6 +1327,7 @@ int ImapThread::Main()
 					for (auto &Folder: m->Fld)
 					{
 						LAutoPtr<ImapMsg> Response(new ImapMsg(IMAP_REBUILD_MAILBOX, _FL));
+						Response->Generation = m->Generation;
 						LString Error;
 						d->CurrentFolder.Empty();
 						if (!FetchImapRebuild(*d->Imap, Folder, *Response, Error))
@@ -1275,6 +1344,12 @@ int ImapThread::Main()
 				}
 				case IMAP_SELECT_FOLDER:
 				{
+					if (d->Store->IsLive())
+					{
+						m->Type = IMAP_REBUILD_MAILBOX;
+						PostThread(m.Release(), true);
+						break;
+					}
 					if (m->Fld.Length() == 1)
 					{
 						ImapFolderInfo &Inf = m->Fld[0];
@@ -1340,6 +1415,29 @@ int ImapThread::Main()
 				}
 				case IMAP_DOWNLOAD:
 				{
+					if (d->Store->IsLive())
+					{
+						d->CurrentFolder.Empty();
+						for (auto &Request: m->Mail)
+						{
+							LAutoPtr<ImapMsg> Response(new ImapMsg(IMAP_DOWNLOAD, _FL));
+							Response->Parent = m->Parent;
+							auto &Body = Response->Mail.New();
+							if (!FetchImapBody(*d->Imap, m->Parent, Request, Body, Response->Diagnostic))
+							{
+								d->Error(_FL, "%s", Response->Diagnostic.Get());
+								if (d->Lock(_FL))
+								{
+									d->Imap.Reset();
+									d->Unlock();
+								}
+								PostStore(Response.Release());
+								break;
+							}
+							PostStore(Response.Release());
+						}
+						break;
+					}
 					LAssert(m->Parent);
 					if (!d->SelectFolder(m->Parent))
 						break;

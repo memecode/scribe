@@ -260,6 +260,13 @@ uint64 LMail3Folder::Size()
 
 Store3Status LMail3Folder::Save(LDataI *Folder)
 {
+	auto Destination = dynamic_cast<LMail3Folder*>(Folder);
+	if (ImapAccountId >= 0 || (Destination && Destination->ImapAccountId >= 0))
+	{
+		Store->SetStr(FIELD_ERROR, "IMAP folders must be saved through their account's protocol adapter.");
+		LgiTrace("%s\n", Store->GetStr(FIELD_ERROR));
+		return Store3Error;
+	}
 	if (Id < 0)
 	{
 		LMail3Folder *Fld = dynamic_cast<LMail3Folder*>(Folder);
@@ -343,7 +350,7 @@ LDataIterator<LDataFolderI*> &LMail3Folder::SubFolders()
 		LAssert(Id != -1);
 
 		char Sql[256];
-		sprintf_s(Sql, sizeof(Sql), "select * from '%s' where ParentId=" LPrintfInt64, MAIL3_TBL_FOLDER, Id);
+		sprintf_s(Sql, sizeof(Sql), "select * from '%s' where ImapAccountId is null and ParentId=" LPrintfInt64, MAIL3_TBL_FOLDER, Id);
 		LMail3Store::LStatement s(Store, Sql);
 		if (s.IsOk())
 		{
@@ -502,6 +509,12 @@ Store3Status LMail3Folder::FreeChildren()
 
 Store3Status LMail3Folder::DeleteAllChildren()
 {
+	if (ImapAccountId >= 0)
+	{
+		Store->SetStr(FIELD_ERROR, "IMAP folders must be emptied through their account's protocol adapter.");
+		LgiTrace("%s\n", Store->GetStr(FIELD_ERROR));
+		return Store3Error;
+	}
 	CHECK_READONLY(Store3NoPermissions)
 
 	Store3Status Status = Store3Error;

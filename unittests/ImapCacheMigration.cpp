@@ -1349,6 +1349,279 @@ namespace
 		}
 	}
 
+	void TestLiveBodyFetch()
+	{
+		std::string Raw = "From: sender@example.test\r\nMessage-ID: <live-body>\r\n\r\nbody";
+		Raw.append("\0binary\xff", 8);
+		class BodySocket : public LSocket
+		{
+			std::string Raw, Response;
+			size_t Offset = 0;
+			int Mode;
+			unsigned Selects = 0;
+		public:
+			std::vector<std::string> Commands;
+			BodySocket(const std::string &Raw, int Mode) : Raw(Raw), Mode(Mode) {}
+			bool IsOpen() override { return true; }
+			ssize_t Write(const void *Data, ssize_t Size, int Flags = 0) override
+			{
+				std::string Command((const char*)Data, Size);
+				Commands.push_back(Command);
+				auto Tag = Command.substr(0, Command.find(' '));
+				Offset = 0;
+				if (Command.find(" SELECT ") != std::string::npos)
+				{
+					Selects++;
+					Response = "* 1 EXISTS\r\n* 0 RECENT\r\n* OK [UIDVALIDITY " +
+						std::string((Mode == 1 || (Mode == 2 && Selects > 1)) ? "101" : "100") +
+						"] epoch\r\n" + Tag + " OK selected\r\n";
+				}
+				else
+				{
+					Require(Command.find("UID FETCH 4294967295 (UID BODY.PEEK[])") != std::string::npos,
+						"Live body fetch lost its unsigned UID or used a non-PEEK request");
+					auto Literal = "* 1 FETCH (UID " + std::string(Mode == 3 ? "1" : "4294967295") +
+						" BODY[] {" + std::to_string(Raw.size()) + "}\r\n" + Raw + ")\r\n";
+					Response = Mode == 4 ? "" : Literal;
+					if (Mode == 5)
+						Response += Literal;
+					Response += Tag + " OK fetched\r\n";
+				}
+				return Size;
+			}
+			ssize_t Read(void *Data, ssize_t Size, int Flags = 0) override
+			{
+				auto Count = std::min<size_t>(std::min<ssize_t>(Size, 7), Response.size() - Offset);
+				memcpy(Data, Response.data() + Offset, Count);
+				Offset += Count;
+				return Count;
+			}
+		};
+		class BodyImap : public MailIMap
+		{
+		public:
+			BodySocket *Script;
+			BodyImap(const std::string &Raw, int Mode)
+			{
+				Script = new BodySocket(Raw, Mode);
+				Socket.Reset(Script);
+			}
+		};
+		for (int Mode = 0; Mode < 7; Mode++)
+		{
+			BodyImap Imap(Raw, Mode);
+			ImapMailInfo Request, Response;
+			Request.MailId = 10;
+			Request.MailboxId = 20;
+			Request.Uid = UINT32_MAX;
+			Request.UidValidity = 100;
+			Request.Size = Raw.size() + (Mode == 6 ? 1 : 0);
+			LString Error;
+			Require(FetchImapBody(Imap, "/INBOX", Request, Response, Error) == (Mode == 0) &&
+				(bool)Error == (Mode != 0), "Live body fetch accepted incomplete identity, epoch, count or size evidence");
+			if (!Mode)
+				Require(Response.Body.Length() == Raw.size() && !memcmp(Response.Body.Get(), Raw.data(), Raw.size()) &&
+					Response.MailId == 10 && Response.MailboxId == 20 && Response.UidValidity == 100,
+					"Live body fetch truncated binary content or lost canonical identity");
+			else
+				Require(!Response.Body, "A failed body fetch exposed unverified bytes");
+		}
+	}
+
+	void TestLocalUploadRecovery()
+	{
+		Fixture Files;
+		auto Cache = Files.Root / "legacy";
+		auto Database = Files.Root / "recovery.mail3";
+		std::string Raw = "From: sender@example.test\r\nMessage-ID: <recover-upload>\r\n\r\noriginal";
+		Raw.append("\0binary\xff", 8);
+		Files.Write(Cache / "INBOX" / "Folder.xml",
+			"<Folder><Emails><Mail Uid=\"42\">42.eml</Mail>"
+			"<Mail Uid=\"0\" Label=\"pending label\" Colour=\"1234\">pending.eml</Mail></Emails></Folder>");
+		Files.Write(Cache / "INBOX" / "42.eml", Raw);
+		Files.Write(Cache / "INBOX" / "pending.eml", Raw);
+		Files.Write(Cache / "INBOX" / "temp_123.eml", Raw);
+		{
+			LMail3Store Store(Database.c_str(), NULL, true);
+			auto Root = Store.GetRoot();
+			Root->SubFolders();
+			Require(Store.RecoverImapLocalMail(42, Cache.c_str()) &&
+				Scalar(Store, "select count(*) from ImapRecoveredFile") == 2 &&
+				Scalar(Store, "select count(*) from Mail") == 2 &&
+				Scalar(Store, "select count(*) from Mail where Label='pending label' and MarkColour=1234") == 1 &&
+				Scalar(Store, "select count(*) from Mail where ImapUid is null and ImapDownloaded is null") == 2 &&
+				Scalar(Store, "select count(*) from ImapOperation") == 0,
+				"Local recovery imported a server cache identity, missed pending mail or queued uploads");
+			auto Folder = dynamic_cast<LMail3Folder*>(Root->SubFolders()[0]);
+			Require(Folder && Folder->Parent == Root && Folder->Children().Length() == 2,
+				"New recovery folder was not attached to the already-loaded local tree");
+			LMail3Store::LStatement Query(&Store, "select Id from Mail order by Id");
+			while (Query.Row())
+				Require(Export(Store, Query.GetInt64(0)) == Raw, "Local recovery changed binary RFC822 bytes");
+		}
+		{
+			LMail3Store Store(Database.c_str(), NULL, false);
+			auto Folder = Store.GetRoot()->SubFolders()[0];
+			Require(Folder && Folder->Children().Length() == 2, "Cannot load recovered local mail after restart");
+			Require(Store.RecoverImapLocalMail(42, Cache.c_str()) &&
+				Scalar(Store, "select count(*) from Mail") == 2, "Local recovery duplicated unchanged uploads after restart");
+			Files.Write(Cache / "INBOX" / "temp_123.eml", Raw + " edited");
+			Require(Store.RecoverImapLocalMail(42, Cache.c_str()) &&
+				Scalar(Store, "select count(*) from Mail") == 3 &&
+				Folder->Children().Length() == 3 &&
+				Scalar(Store, "select count(*) from ImapRecoveredFile") == 2 &&
+				Store.RecoverImapLocalMail(43, Cache.c_str()) &&
+				Scalar(Store, "select count(*) from ImapRecoveredFile where AccountId=43") == 2,
+				"Changed uploads were lost or recovery records leaked across accounts");
+			Files.Write(Cache / "INBOX" / "later.eml", Raw);
+			Require(Store.Check(sqlite3_exec(Store.GetDb(),
+				"create trigger FailRecoveredMail before insert on Mail "
+				"begin select raise(abort,'fixture recovery failure'); end", NULL, NULL, NULL), NULL),
+				"Cannot inject local-mail recovery failure");
+			Require(!Store.RecoverImapLocalMail(42, Cache.c_str()) &&
+				Scalar(Store, "select count(*) from Mail") == 5 &&
+				Scalar(Store, "select count(*) from ImapRecoveredFile where AccountId=42") == 2,
+				"Failed local recovery did not roll back its body and ledger");
+			Require(Store.Check(sqlite3_exec(Store.GetDb(), "drop trigger FailRecoveredMail", NULL, NULL, NULL), NULL),
+				"Cannot clear recovery fixture failure");
+			std::filesystem::create_symlink(Cache / "INBOX" / "42.eml", Cache / "INBOX" / "unsafe.eml");
+			Require(!Store.RecoverImapLocalMail(42, Cache.c_str()), "Recovery followed a symbolic link");
+			Require(std::filesystem::exists(Cache / "INBOX" / "pending.eml") &&
+				std::filesystem::file_size(Cache / "INBOX" / "42.eml") == Raw.size() &&
+				Scalar(Store, "select count(*) from ImapOperation") == 0,
+				"Recovery changed legacy files or uploaded messages");
+		}
+	}
+
+	void TestLiveAdapters()
+	{
+		Fixture Files;
+		auto Database = Files.Root / "live.mail3";
+		std::string Raw = "From: sender@example.test\r\nTo: receiver@example.test\r\n"
+			"Subject: Live adapter\r\nMessage-ID: <live-adapter>\r\nContent-Type: text/plain\r\n\r\nbody";
+		LMail3ImapMailbox Source, Destination;
+		int64 MailId;
+		{
+			LMail3Store Storage(Database.c_str(), NULL, true);
+			Require(Storage.GetRoot() != NULL, "Cannot create the live canonical store");
+			Source.AccountId = Destination.AccountId = 42;
+			Source.RemoteName = "/INBOX";
+			Destination.RemoteName = "/Archive";
+			Source.UidValidity = 100;
+			Destination.UidValidity = UINT32_MAX;
+			Source.UidNext = Destination.UidNext = UINT32_MAX;
+			LArray<LMail3ImapServerMessage> Messages, Empty;
+			auto &Message = Messages.New();
+			Message.Uid = UINT32_MAX - 1;
+			Message.Size = Raw.size();
+			Message.Headers = Raw.substr(0, Raw.find("\r\n\r\n")).c_str();
+			Require(Storage.RebuildImapMailbox(Source, Messages) && Storage.RebuildImapMailbox(Destination, Empty),
+				"Cannot establish live adapter mailboxes");
+			ImapStore Live(Storage, 42);
+			auto Root = dynamic_cast<ImapFolder*>(Live.GetRoot(false));
+			auto Inbox = Root->Find(NULL, "/INBOX");
+			auto Archive = Root->Find(NULL, "/Archive");
+			Require(Inbox && Archive && Inbox->IsOnDisk() && !Inbox->Local && Root->Local.Length() == 0,
+				"Live account did not load canonical folders without filesystem paths");
+			auto Column = Archive->Fields()[0];
+			Require(Column && Column->SetInt(FIELD_WIDTH, 321) == Store3Success &&
+				Archive->ReloadCanonical(Destination.Id) && Archive->Fields()[0] == Column &&
+				Column->GetInt(FIELD_WIDTH) == 321,
+				"Display-column changes required loading mail or invalidated the UI column object");
+			auto Mail = dynamic_cast<ImapMail*>(Inbox->Children()[0]);
+			Require(Mail && Mail->Canonical && Mail->Uid == UINT32_MAX - 1,
+				"Live metadata view lost canonical identity");
+			Require(!Strcmp(Mail->GetStr(FIELD_SUBJECT), "Live adapter"), "Live metadata view lost its subject");
+			Require(Mail->GetObj(FIELD_PARENT) == Inbox && !Mail->Path,
+				"Live metadata view lost its parent or used a legacy path");
+			Require(!Mail->GetStream(_FL), "Live metadata view fabricated a downloaded body");
+			MailId = Mail->Canonical->Id;
+			Require(Mail->SetStr(FIELD_LABEL, "live label") == Store3Success &&
+				Mail->SetInt(FIELD_COLOUR, 1234) == Store3Success &&
+				Inbox->SetInt(FIELD_SORT, FIELD_SUBJECT) == Store3Success,
+				"Live customizations were not written to SQLite");
+			auto Download = new ImapMsg(IMAP_DOWNLOAD, _FL);
+			Download->Parent = "/INBOX";
+			auto &Body = Download->Mail.New();
+			Body.MailId = MailId;
+			Body.MailboxId = Source.Id;
+			Body.Uid = UINT32_MAX - 1;
+			Body.UidValidity = 100;
+			Body.Body.Set(Raw.data(), Raw.size());
+			Live.OnEvent(Download);
+			Require(Mail->GetInt(FIELD_LOADED) == Store3Loaded && Export(Storage, MailId) == Raw &&
+				!Strcmp(Mail->GetStr(FIELD_TEXT), "body"), "Live download did not commit, decode or expose its canonical body");
+			Require(Mail->SetInt(FIELD_FLAGS, MAIL_READ) == Store3Delayed &&
+				Scalar(Storage, "select count(*) from ImapOperation where State=0") == 1 &&
+				!(Mail->GetInt(FIELD_FLAGS) & MAIL_READ), "Live flag changes bypassed durable intent or reported premature success");
+			LArray<LMail3ImapOperation> Operations;
+			Require(Storage.LoadImapOperations(42, Operations) && Operations.Length() == 1, "Live flag intent is missing");
+			ImapJournalCommand Command;
+			Require(PrepareImapJournalOperation(Storage, 42, Operations[0].Id, Command), "Cannot claim live flags");
+			JournalImap FlagsServer(JournalScript::Normal);
+			auto FlagsResult = ExecuteImapJournalOperation(FlagsServer, Command);
+			Require(ApplyImapJournalResult(Storage, 42, FlagsResult) && Inbox->SyncLiveMail(true) &&
+				(Mail->GetInt(FIELD_FLAGS) & MAIL_READ), "Committed live flag result did not refresh the adapter");
+			auto Stale = new ImapMsg(IMAP_REBUILD_MAILBOX, _FL);
+			Stale->Last = true;
+			auto &OldFolder = Stale->Fld.New();
+			OldFolder.Remote = "/INBOX";
+			OldFolder.UidValidity = 100;
+			OldFolder.UidNext = UINT32_MAX;
+			OldFolder.LastUid = 0;
+			Live.OnEvent(Stale);
+			Require(Scalar(Storage, "select count(*) from Mail") == 1 && Export(Storage, MailId) == Raw,
+				"A pre-mutation snapshot replaced newer committed live state");
+			Require(Mail->SetInt(FIELD_ACCOUNT_ID, 43) == Store3Error &&
+				Mail->SetStr(FIELD_SUBJECT, "changed") == Store3Error &&
+				Mail->SetDate(FIELD_DATE_SENT, NULL) == Store3Error &&
+				!Strcmp(Mail->GetStr(FIELD_SUBJECT), "Live adapter"),
+				"Live metadata setters rewrote server identities or headers without APPEND");
+			LArray<LDataI*> Proxies{Mail->Canonical};
+			LVariant Seen(MAIL_READ);
+			Require(Storage.Change(Proxies, FIELD_FLAGS, Seen, OpMinusEquals) == Store3Error &&
+				Storage.Move(Storage.GetRoot(), Proxies) == Store3Error &&
+				Storage.Delete(Proxies, false) == Store3Error &&
+				Mail->Canonical->Save() == Store3Error && Inbox->Canonical->DeleteAllChildren() == Store3Error &&
+				Scalar(Storage, "select count(*) from Mail") == 1,
+				"A direct local Mail3 path bypassed IMAP journaling");
+			LArray<LDataI*> Items;
+			Items.Add(Mail);
+			Require(Archive->Move(Items) == Store3Delayed && Mail->Parent == Inbox &&
+				Storage.LoadImapOperations(42, Operations), "Live move changed membership before server confirmation");
+			Require(PrepareImapJournalOperation(Storage, 42, Operations[0].Id, Command), "Cannot claim the live move");
+			JournalImap MoveServer(JournalScript::Normal);
+			MoveServer.Script->SeedFlags(32, 0);
+			auto MoveResult = ExecuteImapJournalOperation(MoveServer, Command);
+			Require(ApplyImapJournalResult(Storage, 42, MoveResult) && Inbox->SyncLiveMail(true) &&
+				Archive->SyncLiveMail(true) && !Inbox->Children().Length(), "Committed move did not reconcile live membership");
+			auto Moved = dynamic_cast<ImapMail*>(Archive->Children()[0]);
+			Require(Moved && Moved->Canonical->Id == MailId && Moved->Uid == UINT32_MAX &&
+				!Strcmp(Moved->GetStr(FIELD_LABEL), "live label") && Moved->GetInt(FIELD_COLOUR) == 1234 &&
+				Export(Storage, MailId) == Raw, "Live move lost canonical ID, body or customizations");
+			Require(Storage.GetRoot()->SubFolders().Length() == 0, "Local Mail3 navigation exposed IMAP records outside their protocol adapter");
+		}
+		{
+			LMail3Store Storage(Database.c_str(), NULL, false);
+			ImapStore Live(Storage, 42);
+			auto Root = dynamic_cast<ImapFolder*>(Live.GetRoot(false));
+			auto Archive = Root->Find(NULL, "/Archive");
+			auto Mail = dynamic_cast<ImapMail*>(Archive->Children()[0]);
+			Require(Mail && Mail->Canonical->Id == MailId && Mail->IsOnDisk() &&
+				!Strcmp(Mail->GetStr(FIELD_LABEL), "live label") && Mail->GetInt(FIELD_COLOUR) == 1234 &&
+				Root->Find(NULL, "/INBOX")->GetInt(FIELD_SORT) == FIELD_SUBJECT &&
+				Archive->Fields()[0]->GetInt(FIELD_WIDTH) == 321 &&
+				!Strcmp(Mail->GetStr(FIELD_TEXT), "body"), "Restarted live adapters lost persisted body or display settings");
+			auto Upload = new ImapMail(&Live, _FL);
+			LMemStream Body(Raw.data(), Raw.size());
+			Require(Upload->SetRfc822(&Body) == Store3Success && Upload->SetStr(FIELD_LABEL, "uploaded label") == Store3Success &&
+				Upload->Save(Archive) == Store3Delayed && Upload->Canonical &&
+				Scalar(Storage, "select count(*) from ImapOperation where OperationType=4 and State=0") == 1 &&
+				Scalar(Storage, "select count(*) from Mail where ImapUid is null and Label='uploaded label'") == 1,
+				"Live APPEND did not atomically persist raw bytes, properties and journal intent");
+		}
+	}
+
 	void TestSelectEpoch()
 	{
 		class ScriptedSocket : public LSocket
@@ -2050,6 +2323,9 @@ int LgiMain(OsAppArguments &Arguments)
 		TestJournalReconciliationBridge();
 		TestJournalMoveContinuationProtocol();
 		TestJournalMoveContinuationBridge();
+		TestLocalUploadRecovery();
+		TestLiveBodyFetch();
+		TestLiveAdapters();
 		TestServerRebuild();
 		FreeStrToDom();
 		printf("IMAP cache migration tests passed\n");

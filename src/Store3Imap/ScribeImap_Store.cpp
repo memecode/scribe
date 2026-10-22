@@ -3,6 +3,7 @@
 #include "ScribeImap.h"
 #include "ScribeUtils.h"
 #include "../Store3Mail3/Mail3.h"
+#include <map>
 
 #if IMAP_PROTOBUF
 	#ifdef _DEBUG
@@ -68,6 +69,12 @@ char *TrimWhite(char *c)
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+ImapStore::ImapStore(LMail3Store &Storage, int AccountId) :
+	ImapStore(LString(), 0, LString(), LString(), 0, NULL, NULL, NULL, NULL,
+		AccountId, LAutoPtr<ProtocolSettingStore>(), &Storage)
+{
+}
+
 ImapStore::ImapStore(LString host,
 					int port,
 					LString user,
@@ -89,10 +96,15 @@ ImapStore::ImapStore(LString host,
 	ConnectFlags = flags;
 	Log = log;
 	Callback = callback;
-	ItemProgress = prog[0];
-	DataProgress = prog[1];
+	ItemProgress = prog ? prog[0] : NULL;
+	DataProgress = prog ? prog[1] : NULL;
 	SettingStore = store;
 	Storage = storage;
+	if (IsLive() && !Host)
+	{
+		GetRoot(false);
+		return;
+	}
 
 	LVariant v;
 	if (SettingStore && SettingStore->GetValue(OPT_ReceiveFilterIncoming, v))
@@ -100,10 +112,11 @@ ImapStore::ImapStore(LString host,
 		FilterIncoming = v.CastInt32() != 0;
 	}
 
-	if (IsServerRebuild())
+	if (IsLive())
 	{
 		auto CachePath = GetCache();
-		if (!CachePath || !Storage->ImportImapSettings(AccountId, CachePath))
+		if (!CachePath || !Storage->ImportImapSettings(AccountId, CachePath) ||
+			!Storage->RecoverImapLocalMail(AccountId, CachePath) || !Storage->RecoverImapOperations(AccountId))
 		{
 			ErrorMsg.Reset(NewStr(CachePath ? Storage->GetStr(FIELD_ERROR) : "Cannot locate the IMAP cache."));
 			if (Log)
@@ -112,6 +125,8 @@ ImapStore::ImapStore(LString host,
 		}
 	}
 
+	if (IsLive())
+		GetRoot(false);
 	Thread = new ImapThread(this, caps, log, SettingStore, AccountId);
 }
 
@@ -124,9 +139,225 @@ ImapStore::~ImapStore()
 	DeleteArray(Cache);
 }
 
-bool ImapStore::IsServerRebuild() const
+bool ImapStore::ReportError(const char *Error)
 {
-	return Storage && LAppInst->GetOption("imap-rebuild-cache");
+	ErrorMsg.Reset(NewStr(ValidStr(Error) ? Error : "An IMAP SQLite operation failed."));
+	LgiTrace("%s\n", ErrorMsg.Get());
+	if (Log)
+		Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
+	if (Callback)
+		Callback->OnPropChange(this, FIELD_ERROR, GV_STRING);
+	return false;
+}
+
+bool ImapStore::RefreshMailbox(const char *Remote, char Delimiter)
+{
+	if (!IsLive() || !Remote || !Strcmp(Remote, "/"))
+		return false;
+	LArray<LMail3ImapOperation> Pending;
+	if (!Storage->LoadImapOperations(AccountId, Pending))
+		return ReportError(Storage->GetStr(FIELD_ERROR));
+	if (Pending.Length())
+		return true; // Completion refreshes the account after the frozen operations have drained.
+	LAutoPtr<ImapMsg> Message(new ImapMsg(IMAP_REBUILD_MAILBOX, _FL));
+	Message->Generation = LiveGeneration;
+	auto &Folder = Message->Fld.New();
+	Folder.Remote = Remote;
+	Folder.Sep = Delimiter;
+	LArray<LMail3ImapMailbox> Mailboxes;
+	if (!Storage->LoadImapMailboxes(AccountId, Mailboxes))
+		return ReportError(Storage->GetStr(FIELD_ERROR));
+	for (auto &Mailbox: Mailboxes)
+		if (!Delimiter && Mailbox.RemoteName == Remote && Mailbox.Delimiter)
+			Folder.Sep = Mailbox.Delimiter[0];
+	return PostThread(Message.Release(), false);
+}
+
+bool ImapStore::SyncLiveFolders()
+{
+	if (!Root)
+		return false;
+	LArray<LMail3ImapMailbox> Mailboxes;
+	if (!Storage->LoadImapMailboxes(AccountId, Mailboxes))
+		return ReportError(Storage->GetStr(FIELD_ERROR));
+	std::map<std::string, ImapFolder*> Known;
+	std::function<void(ImapFolder*)> Collect = [&](ImapFolder *Folder)
+	{
+		Known[Folder->Remote.Get()] = Folder;
+		for (auto Child: Folder->Sub.a)
+			Collect(Child);
+	};
+	Collect(Root);
+	Root->Sub.State = Store3Loaded;
+	Mailboxes.Sort([](auto a, auto b) { return a->RemoteName.Length() < b->RemoteName.Length() ? -1 :
+		a->RemoteName.Length() > b->RemoteName.Length() ? 1 : Strcmp(a->RemoteName.Get(), b->RemoteName.Get()); });
+	for (auto &Mailbox: Mailboxes)
+	{
+		auto Existing = Known.find(Mailbox.RemoteName.Get());
+		if (Existing != Known.end())
+		{
+			if (!Existing->second->ReloadCanonical(Mailbox.Id))
+				return false;
+			Existing->second->Sub.State = Store3Loaded;
+			continue;
+		}
+		auto Name = Mailbox.RemoteName;
+		auto Slash = Name.RFind("/");
+		LString ParentName = Slash > 0 ? LString(Name.Get(), Slash) : LString("/");
+		auto Parent = Known.find(ParentName.Get());
+		if (Parent == Known.end())
+			return ReportError("A canonical IMAP folder has no account parent.");
+		LAutoPtr<ImapFolder> New(new ImapFolder(this, Mailbox.RemoteName));
+		if (!New->ReloadCanonical(Mailbox.Id))
+			return false;
+		New->Sub.State = Store3Loaded;
+		New->SetParent(Parent->second);
+		auto Folder = New.Release();
+		Known[Mailbox.RemoteName.Get()] = Folder;
+		LArray<LDataI*> Added;
+		Added.Add(Folder);
+		OnNew(_FL, Parent->second, Added, -1, false);
+	}
+	return true;
+}
+
+bool ImapStore::PumpJournal()
+{
+	if (!IsLive() || Online != STATUS_ONLINE || PendingJournalId > 0)
+		return true;
+	LArray<LMail3ImapOperation> Operations;
+	if (!Storage->LoadImapOperations(AccountId, Operations))
+		return ReportError(Storage->GetStr(FIELD_ERROR));
+	if (!Operations.Length())
+		return true;
+	if (Operations[0].State == LMail3ImapOperationState::NeedsReconciliation)
+	{
+		if (!ErrorMsg || Strcmp(ErrorMsg.Get(), Operations[0].LastError.Get()))
+			return ReportError(Operations[0].LastError);
+		return false;
+	}
+	return DispatchJournalOperation(Operations[0].Id);
+}
+
+void ImapStore::JournalQueued()
+{
+	++LiveGeneration;
+	PumpJournal();
+}
+
+Store3Status ImapStore::QueueMutation(ImapMail &Mail, LMail3ImapOperationType Type,
+	int Flags, ImapFolder *Destination)
+{
+	if (!Mail.Canonical || Mail.Store != this || (Destination && (Destination->Store != this || !Destination->Canonical)))
+	{
+		ReportError("IMAP mutation requires canonical objects on the same account.");
+		return Store3Error;
+	}
+	LMail3ImapOperation Operation;
+	Operation.AccountId = AccountId;
+	Operation.MailId = Mail.Canonical->Id;
+	Operation.Type = Type;
+	Operation.RemoteFlags = Flags;
+	if (Destination)
+		Operation.DestinationMailboxId = Destination->Canonical->Id;
+	if (!Storage->QueueImapOperation(Operation))
+	{
+		ReportError(Storage->GetStr(FIELD_ERROR));
+		return Store3Error;
+	}
+	Mail.SetState(Type == LMail3ImapOperationType::Move ? ImapMail::ImapMailMoving :
+		Type == LMail3ImapOperationType::Delete ? ImapMail::ImapMailDeleting : ImapMail::ImapMailIdle, _FL);
+	JournalQueued();
+	return Store3Delayed;
+}
+
+bool ImapStore::OnLiveEvent(ImapMsg &Message)
+{
+	if (Message.Type == IMAP_FOLDER_LISTING && Message.Last && !Message.Parent)
+	{
+		LiveFolders.Swap(Message.Fld);
+		for (auto &Folder: LiveFolders)
+			RefreshMailbox(Folder.Remote, Folder.Sep);
+		return true;
+	}
+	if (Message.Type == IMAP_REBUILD_MAILBOX)
+	{
+		if (Message.Generation != LiveGeneration)
+			return true;
+		LArray<LMail3ImapOperation> Pending;
+		if (!Storage->LoadImapOperations(AccountId, Pending))
+		{
+			ReportError(Storage->GetStr(FIELD_ERROR));
+			return true;
+		}
+		if (Pending.Length())
+			return true;
+		if (Message.Fld.Length() != 1 || !Message.Last || Message.Fld[0].LastUid != 0)
+		{
+			ReportError("A live IMAP refresh requires a complete verified server snapshot.");
+			return true;
+		}
+		auto &Info = Message.Fld[0];
+		LMail3ImapMailbox Mailbox;
+		Mailbox.AccountId = AccountId;
+		Mailbox.RemoteName = Info.Remote;
+		Mailbox.Delimiter = Info.Sep ? LString::Fmt("%c", Info.Sep) : LString();
+		Mailbox.UidValidity = Info.UidValidity;
+		Mailbox.UidNext = Info.UidNext;
+		LArray<LMail3ImapServerMessage> Messages;
+		for (auto &Info: Message.Mail)
+		{
+			auto &Mail = Messages.New();
+			Mail.Uid = Info.Uid;
+			Mail.RemoteFlags = Info.Flags.All;
+			Mail.Size = Info.Size;
+			Mail.Headers = Info.Headers;
+		}
+		if (!Storage->RebuildImapMailbox(Mailbox, Messages) || !SyncLiveFolders())
+			ReportError(Storage->GetStr(FIELD_ERROR));
+		else if (auto Folder = Root->Find(NULL, Info.Remote))
+			Folder->SyncLiveMail(true);
+		return true;
+	}
+	if (Message.Type == IMAP_DOWNLOAD)
+	{
+		for (auto &Info: Message.Mail)
+		{
+			auto Folder = Root->Find(NULL, Message.Parent);
+			auto Mail = Folder ? Folder->GetMail(Info.Uid) : NULL;
+			if (!Mail || !Mail->Canonical || Mail->Canonical->Id != Info.MailId)
+				continue;
+			Mail->SetState(ImapMail::ImapMailIdle, _FL);
+			Mail->Loaded = Store3Headers;
+			LMail3ImapMessage Identity;
+			Identity.MailId = Info.MailId;
+			Identity.MailboxId = Info.MailboxId;
+			Identity.UidValidity = Info.UidValidity;
+			Identity.Uid = Info.Uid;
+			LMemStream Body(Info.Body.Get(), Info.Body.Length());
+			if (Message.Diagnostic || !Storage->StoreImapBody(AccountId, Identity, Body))
+				ReportError(Message.Diagnostic ? Message.Diagnostic.Get() : Storage->GetStr(FIELD_ERROR));
+			else if (Mail->ReloadCanonical(Info.MailId))
+				Mail->ReadMime(NULL);
+			LArray<LDataI*> Changed;
+			Changed.Add(Mail);
+			OnChange(_FL, Changed, FIELD_LOADED);
+		}
+		return true;
+	}
+	switch (Message.Type)
+	{
+		case IMAP_ON_NEW:
+		case IMAP_ON_DEL:
+		case IMAP_SET_FLAGS:
+		case IMAP_EXPUNGE_FOLDER:
+		case IMAP_FOLDER_LISTING:
+			if (Message.Parent)
+				RefreshMailbox(Message.Parent);
+			return true;
+		default:
+			return false;
+	}
 }
 
 bool ImapStore::InterruptPendingJournal(const char *Reason)
@@ -261,6 +492,8 @@ bool ImapStore::DispatchJournalOperation(int64 OperationId, LMail3ImapOperationS
 
 bool ImapStore::OnIdle()
 {
+	if (IsLive())
+		PumpJournal();
 	if (Listing.Length() > 0)
 	{
 		LAutoPtr<ImapMsg> m(Listing[0]);
@@ -297,7 +530,7 @@ int64 ImapStore::GetInt(int id)
 	switch (id)
 	{
 		case FIELD_STATUS:
-			return Thread ? Store3Success : Store3Error;
+			return Thread || (IsLive() && !ErrorMsg) ? Store3Success : Store3Error;
 		case FIELD_STORE_TYPE:
 			return Store3Imap;
 		case FIELD_VERSION:
@@ -520,12 +753,14 @@ public:
 
 LDataFolderI *ImapStore::GetRoot(bool create)
 {
-    if (!GetCache())
+    if (!IsLive() && !GetCache())
         return NULL;
        
 	if (!Root)
 	{
 		Root = new ImapFolder(this, "/");
+		if (IsLive())
+			SyncLiveFolders();
 
 		#if 0
 		// Start a thread to load the folder tree..
@@ -547,6 +782,19 @@ ImapFolder *ImapStore::GetTrash()
 
 Store3Status ImapStore::Delete(LArray<LDataI*> &Items, bool ToTrash)
 {
+	if (IsLive())
+	{
+		auto Trash = ToTrash ? GetTrash() : NULL;
+		for (auto Item: Items)
+		{
+			auto Mail = dynamic_cast<ImapMail*>(Item);
+			if (!Mail || QueueMutation(*Mail, Trash && Mail->Parent != Trash ?
+				LMail3ImapOperationType::Move : LMail3ImapOperationType::Delete, 0,
+				Trash && Mail->Parent != Trash ? Trash : NULL) == Store3Error)
+				return Store3Error;
+		}
+		return Items.Length() ? Store3Delayed : Store3Error;
+	}
 	if (Items.Length() == 0)
 		return Store3Error;
 
@@ -635,6 +883,23 @@ Store3Status ImapStore::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 
 Store3Status ImapStore::Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator)
 {
+	if (IsLive())
+	{
+		if (PropId != FIELD_FLAGS || (Operator != OpPlusEquals && Operator != OpMinusEquals))
+		{
+			ReportError("Unsupported IMAP property change operation.");
+			return Store3Error;
+		}
+		for (auto Item: Items)
+		{
+			auto Mail = dynamic_cast<ImapMail*>(Item);
+			int Flags = Mail ? (int)Mail->GetInt(FIELD_FLAGS) : 0;
+			int Mask = Value.CastInt32();
+			if (!Mail || Mail->SetInt(FIELD_FLAGS, Operator == OpPlusEquals ? Flags | Mask : Flags & ~Mask) == Store3Error)
+				return Store3Error;
+		}
+		return Store3Delayed;
+	}
 	switch (PropId)
 	{
 		case FIELD_FLAGS:
@@ -806,6 +1071,11 @@ void ImapStore::OnEvent(void *Param)
 		int64 Start = LCurrentTime();
 		ImapMsg *m = Msgs[0];
 		Msgs.DeleteAt(0, true);
+		if (IsLive() && OnLiveEvent(*m))
+		{
+			delete m;
+			continue;
+		}
 
 		switch (m->Type)
 		{
@@ -820,6 +1090,33 @@ void ImapStore::OnEvent(void *Param)
 				{
 					PendingJournalId = -1;
 					PendingJournalAttempt = 0;
+				}
+				if (IsLive() && Applied && m->JournalResult.Outcome == ImapJournalOutcome::Confirmed)
+				{
+					std::function<void(ImapFolder*)> Reload = [&](ImapFolder *Folder)
+					{
+						if (Folder->Mail.State == Store3Loaded)
+							Folder->SyncLiveMail(true);
+						for (auto Child: Folder->Sub.a)
+							Reload(Child);
+					};
+					Reload(Root);
+					PumpJournal();
+					if (PendingJournalId <= 0)
+					{
+						if (LiveFolders.Length())
+						{
+							for (auto &Folder: LiveFolders)
+								RefreshMailbox(Folder.Remote, Folder.Sep);
+						}
+						else
+						{
+							LArray<LMail3ImapMailbox> Mailboxes;
+							if (Storage->LoadImapMailboxes(AccountId, Mailboxes))
+								for (auto &Mailbox: Mailboxes)
+									RefreshMailbox(Mailbox.RemoteName);
+						}
+					}
 				}
 				if (!Applied || m->JournalResult.Outcome != ImapJournalOutcome::Confirmed)
 				{
@@ -1161,50 +1458,7 @@ void ImapStore::OnEvent(void *Param)
 			}
 			case IMAP_REBUILD_MAILBOX:
 			{
-				if (m->Fld.Length() != 1)
-				{
-					ErrorMsg.Reset(NewStr("Invalid IMAP server rebuild response: expected one mailbox."));
-					LgiTrace("%s\n", ErrorMsg.Get());
-					if (Log)
-						Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
-					Online = STATUS_ERROR;
-					break;
-				}
-
-				if (IsServerRebuild())
-				{
-					auto &Folder = m->Fld[0];
-					LMail3ImapMailbox Mailbox;
-					Mailbox.AccountId = AccountId;
-					Mailbox.RemoteName = Folder.Remote;
-					Mailbox.Delimiter = LString::Fmt("%c", Folder.Sep);
-					Mailbox.UidValidity = Folder.UidValidity;
-					Mailbox.UidNext = Folder.UidNext;
-					LArray<LMail3ImapServerMessage> Messages;
-					for (auto &Info: m->Mail)
-					{
-						auto &Message = Messages.New();
-						Message.Uid = Info.Uid;
-						Message.RemoteFlags = Info.Flags.All;
-						Message.Size = Info.Size;
-						Message.Headers = Info.Headers;
-					}
-					const char *Error = NULL;
-					if (!m->Last || Folder.LastUid != 0)
-						Error = "The server rebuild requires a complete mailbox snapshot.";
-					else if (!Storage)
-						Error = "No shared Mail3 store for the server rebuild.";
-					else if (!Storage->RebuildImapMailbox(Mailbox, Messages))
-						Error = Storage->GetStr(FIELD_ERROR);
-					if (Error)
-					{
-						ErrorMsg.Reset(NewStr(Error));
-						if (Log && ErrorMsg)
-							Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
-						Online = STATUS_ERROR;
-						break;
-					}
-				}
+				ReportError("A server snapshot requires the shared SQLite IMAP backend.");
 				break;
 			}
 			case IMAP_FOLDER_LISTING:
@@ -1580,15 +1834,15 @@ LDataStoreI *OpenImapWithStorage(	LString Host,
 {
 	if (LAppInst->GetOption("imap-import-cache"))
 	{
-		const char *Error = "Legacy IMAP cache import has been replaced by --imap-rebuild-cache.";
+		const char *Error = "Legacy IMAP cache import is retired; persistent accounts now refresh SQLite from the server automatically.";
 		LgiTrace("%s\n", Error);
 		if (Log)
 			Log->Write(Error, strlen(Error), LSocketI::SocketMsgError);
 		return NULL;
 	}
-	if (!Storage && LAppInst->GetOption("imap-rebuild-cache"))
+	if (!Storage)
 	{
-		const char *Error = "IMAP server rebuild requires an already-loaded default Mail3 store.";
+		const char *Error = "Persistent IMAP accounts require the already-loaded default Mail3 store.";
 		LgiTrace("%s\n", Error);
 		if (Log)
 			Log->Write(Error, strlen(Error), LSocketI::SocketMsgError);

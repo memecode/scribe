@@ -44,6 +44,31 @@ LMail3Def TblImapLocalSettings[] =
 	{0, 0}
 };
 
+static LMail3Def TblImapRecoveredFile[] =
+{
+	{"AccountId", "INTEGER NOT NULL"},
+	{"SourcePath", "TEXT NOT NULL"},
+	{"MailId", "INTEGER NOT NULL"},
+	{0, 0}
+};
+
+static bool Mail3LocalMutation(LMail3Store &Store, LArray<LDataI*> &Items)
+{
+	for (auto Item: Items)
+	{
+		auto Mail = dynamic_cast<LMail3Mail*>(Item);
+		auto Folder = dynamic_cast<LMail3Folder*>(Item);
+		if ((Mail && (Mail->ImapDownloaded >= 0 || Mail->ImapUidValidity >= 0 || Mail->ImapUid >= 0)) ||
+			(Folder && Folder->ImapAccountId >= 0))
+		{
+			Store.SetStr(FIELD_ERROR, "IMAP records must be changed through their account's protocol adapter.");
+			LgiTrace("%s\n", Store.GetStr(FIELD_ERROR));
+			return false;
+		}
+	}
+	return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 LMail3Thing::~LMail3Thing()
 {
@@ -72,6 +97,9 @@ Store3Status LMail3Thing::Save(LDataI *Folder)
 	{
 		SetStore(Fld->Store);
 	}
+	LArray<LDataI*> Items{this, Fld};
+	if (!Mail3LocalMutation(*Store, Items))
+		return Store3Error;
 	
 	const char *Table = GetTable();
 	bool Create = false;
@@ -196,6 +224,7 @@ LMail3Store::LMail3Store(const char *Mail3Folder, LDataEventsI *callback, bool C
 	Fields.Add(MAIL3_TBL_CALENDAR_FILES, TblCalendarFiles);
 	Fields.Add(MAIL3_TBL_IMAP_OPERATION, TblImapOperation);
 	Fields.Add(MAIL3_TBL_IMAP_SETTINGS, TblImapLocalSettings);
+	Fields.Add("ImapRecoveredFile", TblImapRecoveredFile);
 
 	bool Exist = LDirExists(Mail3Folder);
 	if (!Create && !Exist)
@@ -373,7 +402,9 @@ bool LMail3Store::CreateIndexes()
 		{MAIL3_TBL_IMAP_SETTINGS, "create unique index if not exists ImapLocalSettingsAccountRemoteIdx "
 			"on " MAIL3_TBL_IMAP_SETTINGS "(AccountId, RemoteName)"},
 		{MAIL3_TBL_IMAP_OPERATION, "create unique index if not exists ImapOperationMailIdx "
-			"on " MAIL3_TBL_IMAP_OPERATION "(MailId)"}
+			"on " MAIL3_TBL_IMAP_OPERATION "(MailId)"},
+		{"ImapRecoveredFile", "create unique index if not exists ImapRecoveredFileAccountPathIdx "
+			"on ImapRecoveredFile(AccountId, SourcePath)"}
 	};
 	for (auto &Index: ImapUniqueIndexes)
 	{
@@ -651,6 +682,9 @@ LDataFolderI *LMail3Store::GetRoot(bool create)
 
 Store3Status LMail3Store::Move(LDataFolderI *NewFolder, LArray<LDataI*> &Items)
 {
+	LArray<LDataI*> Targets{NewFolder};
+	if (!Mail3LocalMutation(*this, Items) || !Mail3LocalMutation(*this, Targets))
+		return Store3Error;
 	Store3Status Status = Store3Error;
 
 	LMail3Folder *To = dynamic_cast<LMail3Folder*>(NewFolder);
@@ -784,6 +818,8 @@ PROF_MOVE("8");
 
 Store3Status LMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 {
+	if (!Mail3LocalMutation(*this, Items))
+		return Store3Error;
 	if (Items.Length() == 0)
 		return Store3Error;
 
@@ -918,6 +954,8 @@ Store3Status LMail3Store::Delete(LArray<LDataI*> &Items, bool ToTrash)
 
 Store3Status LMail3Store::Change(LArray<LDataI*> &Items, int PropId, LVariant &Value, LOperator Operator)
 {
+	if (!Mail3LocalMutation(*this, Items))
+		return Store3Error;
 	if (Items.Length() == 0)
 		return Store3Success;
 
@@ -2269,7 +2307,7 @@ bool LMail3Store::QueueImapOperation(LMail3ImapOperation &Result)
 }
 
 bool LMail3Store::StageImapAppend(int64 AccountId, int64 MailboxId, int RemoteFlags, LStreamI &Body,
-	LMail3ImapOperation &Result)
+	LMail3ImapOperation &Result, LDataPropI *Properties)
 {
 	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success || !sqlite3_get_autocommit(Db) ||
 		AccountId < 0 || AccountId > INT_MAX || Body.SetPos(0) != 0)
@@ -2289,6 +2327,20 @@ bool LMail3Store::StageImapAppend(int64 AccountId, int64 MailboxId, int RemoteFl
 	}
 	Mail.MailSize = Body.GetSize();
 	Mail.ImapDownloaded = 1;
+	if (Properties)
+	{
+		Mail.Label = Properties->GetStr(FIELD_LABEL);
+		Mail.MarkColour = (uint32_t)Properties->GetInt(FIELD_COLOUR);
+		Mail.Priority = (int)Properties->GetInt(FIELD_PRIORITY);
+		Mail.Flags = ((int)Properties->GetInt(FIELD_FLAGS) & ~MAIL_STORED_FLAT) | MAIL_STORED_FLAT;
+	}
+	ImapMailFlags Flags;
+	Flags.All = RemoteFlags;
+	if (Flags.ImapSeen) Mail.Flags |= MAIL_READ;
+	else Mail.Flags &= ~MAIL_READ;
+	if (Flags.ImapAnswered) Mail.Flags |= MAIL_REPLIED;
+	else Mail.Flags &= ~MAIL_REPLIED;
+	Mail.ImapLocalFlags = Mail.Flags & ~MAIL_STORED_FLAT;
 	if (!Mail.Write(MAIL3_TBL_MAIL, false))
 		return ImapFailure("stage APPEND", "Cannot save the staged canonical message.");
 	LMail3ImapOperation Operation;
@@ -2499,6 +2551,234 @@ bool LMail3Store::CompleteImapOperation(int64 Id, int64 DestinationUidValidity, 
 	if (!Delete.SetInt64(0, Id) || !Delete.Exec() || sqlite3_changes(Db) != 1)
 		return ImapFailure("complete operation", "Cannot retire the confirmed journal entry.");
 	return Transaction.Commit();
+}
+
+bool LMail3Store::RecoverImapLocalMail(int64 AccountId, const char *CachePath)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success ||
+		!sqlite3_get_autocommit(Db) || AccountId < 0 || AccountId > INT_MAX || !ValidStr(CachePath))
+		return ImapFailure("recover local mail", "An account, legacy cache path and idle owning-thread store are required.");
+	std::error_code Error;
+	auto Base = std::filesystem::u8path(CachePath);
+	auto Status = std::filesystem::symlink_status(Base, Error);
+	if (Error == std::errc::no_such_file_or_directory || (!Error && !std::filesystem::exists(Status)))
+		return true;
+	if (Error || !std::filesystem::is_directory(Status))
+		return ImapFailure("recover local mail", "The legacy cache must be a readable directory, not a symbolic link.");
+	std::vector<std::filesystem::path> Candidates;
+	struct LocalProperties
+	{
+		LString Label;
+		uint32_t Colour = 0;
+	};
+	std::map<std::string, LocalProperties> Properties;
+	std::function<bool(const std::filesystem::path&, unsigned)> Scan;
+	Scan = [&](const std::filesystem::path &Folder, unsigned Depth)
+	{
+		if (Depth > 64)
+			return ImapFailure("recover local mail", "The legacy cache tree is too deep.");
+		std::set<std::string> ServerFiles;
+		auto IndexPath = Folder / "Folder.xml";
+		auto IndexStatus = std::filesystem::symlink_status(IndexPath, Error);
+		if (Error && Error != std::errc::no_such_file_or_directory)
+			return ImapFailure("recover local mail", "Cannot inspect the legacy folder index.");
+		if (!Error && std::filesystem::exists(IndexStatus))
+		{
+			if (!std::filesystem::is_regular_file(IndexStatus))
+				return ImapFailure("recover local mail", "A legacy folder index is not a regular file.");
+			LFile Input;
+			ImapCacheIndex Index;
+			if (!Input.Open(IndexPath.u8string().c_str(), O_READ) || !Index.ReadIndex(Input))
+				return ImapFailure("recover local mail", "Cannot read the legacy folder index.");
+			if (auto Emails = Index.Root.GetChildTag("Emails"))
+				for (auto Entry: Emails->Children)
+				{
+					LString Uid = Entry->GetAttr("Uid");
+					LString File = LString(Entry->GetContent()).Strip();
+					if (File)
+					{
+						if (File.Find("/") >= 0 || File.Find("\\") >= 0 || File == "." || File == "..")
+							return ImapFailure("recover local mail", "A legacy cache index contains an unsafe filename.");
+						if (Uid.IsNumeric() && Uid.Int() > 0 && Uid.Int() <= UINT32_MAX)
+							ServerFiles.insert(File.Get());
+						else
+						{
+							auto &Values = Properties[(Folder / File.Get()).u8string()];
+							Values.Label = Entry->GetAttr("Label");
+							if (auto Text = Entry->GetAttr("Colour"))
+							{
+								char *End;
+								errno = 0;
+								auto Colour = strtoull(Text, &End, 10);
+								if (errno || End == Text || *End || Colour > UINT32_MAX)
+									return ImapFailure("recover local mail", "A pending message has an invalid recovery colour.");
+								Values.Colour = (uint32_t)Colour;
+							}
+						}
+					}
+				}
+		}
+		Error.clear();
+		std::filesystem::directory_iterator Iterator(Folder, Error), End;
+		if (Error)
+			return ImapFailure("recover local mail", "Cannot list a legacy cache directory.");
+		for (; Iterator != End; Iterator.increment(Error))
+		{
+			if (Error)
+				return ImapFailure("recover local mail", "Cannot enumerate a legacy cache directory.");
+			auto Entry = Iterator->path();
+			auto EntryStatus = Iterator->symlink_status(Error);
+			if (Error || std::filesystem::is_symlink(EntryStatus))
+				return ImapFailure("recover local mail", "Cannot recover a symbolic link or unreadable cache entry.");
+			if (std::filesystem::is_directory(EntryStatus))
+			{
+				if (!Scan(Entry, Depth + 1))
+					return false;
+			}
+			else if (Entry.extension() == ".eml" && !ServerFiles.count(Entry.filename().u8string()))
+			{
+				if (!std::filesystem::is_regular_file(EntryStatus))
+					return ImapFailure("recover local mail", "A recovery candidate is not a regular file.");
+				Candidates.push_back(Entry);
+			}
+		}
+		if (Error)
+			return ImapFailure("recover local mail", "Cannot finish enumerating the legacy cache.");
+		return true;
+	};
+	if (!Scan(Base, 0))
+		return false;
+	if (Candidates.empty())
+		return true;
+	ImapStorageTransaction Transaction(this);
+	if (!Transaction.IsOk())
+		return false;
+	int64 FolderId = -1, RootId = -1;
+	LString FolderName = LString::Fmt("Recovered IMAP uploads (%" PRIi64 ")", AccountId);
+	{
+		LStatement RootQuery(this, "select Id from Folder where ParentId is null");
+		if (!RootQuery.Row())
+			return ImapFailure("recover local mail", "The canonical store has no root folder.");
+		RootId = RootQuery.GetInt64(0);
+		LStatement Find(this, "select Id from Folder where ParentId=? and Name=? and ImapAccountId is null");
+		if (!Find.SetInt64(0, RootId) || !Find.SetStr(1, FolderName))
+			return ImapFailure("recover local mail", "Cannot find the local recovery folder.");
+		auto Result = sqlite3_step(Find);
+		if (Result == SQLITE_ROW)
+			FolderId = Find.GetInt64(0);
+		else if (Result != SQLITE_DONE)
+			return ImapFailure("recover local mail", "Cannot inspect the local recovery folder.");
+	}
+	bool CreatedFolder = false;
+	LArray<int64> Recovered;
+	for (auto &Path: Candidates)
+	{
+		LFile Input;
+		LString Source = Path.u8string().c_str();
+		if (!Input.Open(Source, O_READ) || Input.GetSize() <= 0)
+			return ImapFailure("recover local mail", "A local-only message is empty or unreadable; legacy files were not changed.");
+		LStatement Previous(this, "select MailId from ImapRecoveredFile where AccountId=? and SourcePath=?");
+		if (!Previous.SetInt64(0, AccountId) || !Previous.SetStr(1, Source))
+			return ImapFailure("recover local mail", "Cannot inspect previous local-mail recovery.");
+		auto Found = sqlite3_step(Previous);
+		if (Found == SQLITE_ROW)
+		{
+			LMail3Mail Existing(this);
+			LStatement Mail(this, "select * from Mail where Id=?");
+			if (!Mail.SetInt64(0, Previous.GetInt64(0)))
+				return false;
+			auto Result = sqlite3_step(Mail);
+			if (Result == SQLITE_ROW)
+			{
+				if (!Existing.Serialize(Mail, false))
+					return ImapFailure("recover local mail", "Cannot read a previously recovered message.");
+				auto Stored = Existing.GetStream(_FL);
+				if (!Stored)
+					return ImapFailure("recover local mail", "A previously recovered message has no stored body.");
+				if (ImapStreamsEqual(Input, *Stored))
+					continue;
+			}
+			else if (Result != SQLITE_DONE)
+				return ImapFailure("recover local mail", "Cannot inspect a previously recovered message.");
+		}
+		else if (Found != SQLITE_DONE)
+			return ImapFailure("recover local mail", "Cannot read previous local-mail recovery.");
+		if (FolderId < 0)
+		{
+			LMail3Folder Folder(this);
+			Folder.ParentId = RootId;
+			Folder.Name = FolderName;
+			if (!Folder.Write(MAIL3_TBL_FOLDER, true))
+				return ImapFailure("recover local mail", "Cannot create the local recovery folder.");
+			FolderId = Folder.Id;
+			CreatedFolder = true;
+		}
+		LMail3Mail Mail(this);
+		Mail.ParentId = FolderId;
+		Mail.AccountId = (int)AccountId;
+		if (Input.SetPos(0) != 0 || Mail.SetRfc822(&Input, true) != Store3Success || !Mail.ParseHeaders())
+			return ImapFailure("recover local mail", "Cannot preserve and parse a local-only RFC822 image.");
+		Mail.MailSize = Input.GetSize();
+		auto Values = Properties.find(Source.Get());
+		if (Values != Properties.end())
+		{
+			Mail.Label = Values->second.Label;
+			Mail.MarkColour = Values->second.Colour;
+		}
+		auto Stored = Mail.GetStream(_FL);
+		if (!Stored || !ImapStreamsEqual(Input, *Stored) || !Mail.Write(MAIL3_TBL_MAIL, false))
+			return ImapFailure("recover local mail", "The recovered RFC822 image failed durable byte-for-byte verification.");
+		LStatement Record(this, "insert or replace into ImapRecoveredFile (rowid,AccountId,SourcePath,MailId)"
+			" values ((select rowid from ImapRecoveredFile where AccountId=? and SourcePath=?),?,?,?)");
+		if (!Record.SetInt64(0, AccountId) || !Record.SetStr(1, Source) || !Record.SetInt64(2, AccountId) ||
+			!Record.SetStr(3, Source) || !Record.SetInt64(4, Mail.Id) || !Record.Exec())
+			return ImapFailure("recover local mail", "Cannot record completed local-mail recovery.");
+		Recovered.Add(Mail.Id);
+	}
+	if (!Transaction.Commit())
+		return false;
+	LMail3Folder *RecoveryFolder = NULL;
+	if (Root && Root->Sub.State == Store3Loaded)
+		for (auto Folder: Root->Sub.a)
+			if (Folder->Id == FolderId)
+				RecoveryFolder = Folder;
+	if (CreatedFolder && Root && Root->Sub.State == Store3Loaded && !RecoveryFolder)
+	{
+		auto Folder = new LMail3Folder(this);
+		LStatement Query(this, "select * from Folder where Id=?");
+		if (!Query.SetInt64(0, FolderId) || !Query.Row() || !Folder->Serialize(Query, false))
+		{
+			delete Folder;
+			return ImapFailure("recover local mail", "Recovery committed, but the local folder could not be displayed.");
+		}
+		Root->Sub.Insert(Folder, -1, true);
+		Folder->Parent = Root;
+		RecoveryFolder = Folder;
+		if (Callback)
+		{
+			LArray<LDataI*> Items;
+			Items.Add(Folder);
+			Callback->OnNew(Root, Items, -1, false, false);
+		}
+	}
+	if (RecoveryFolder && RecoveryFolder->Items.State == Store3Loaded && Recovered.Length())
+	{
+		LArray<LDataI*> Added;
+		for (auto Id: Recovered)
+		{
+			LAutoPtr<LMail3Mail> Mail(new LMail3Mail(this));
+			LStatement Query(this, "select * from Mail where Id=?");
+			if (!Query.SetInt64(0, Id) || !Query.Row() || !Mail->Serialize(Query, false))
+				return ImapFailure("recover local mail", "Recovery committed, but a local message could not be displayed.");
+			Mail->Parent = RecoveryFolder;
+			Added.Add(Mail);
+			RecoveryFolder->Items.Insert(Mail.Release(), -1, true);
+		}
+		OnNew(_FL, RecoveryFolder, Added, -1, false);
+	}
+	LgiTrace("IMAP recovered %i local-only messages for account %" PRIi64 "; no upload was queued.\n",
+		(int)Recovered.Length(), AccountId);
+	return true;
 }
 
 bool LMail3Store::ImportImapSettings(int64 AccountId, const char *CachePath)

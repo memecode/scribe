@@ -3,6 +3,7 @@
 #include "ScribeImap.h"
 #include "ScribeUtils.h"
 #include "DomType.h"
+#include <set>
 
 #if IMAP_PROTOBUF
 	#include <fstream> 
@@ -45,9 +46,12 @@ ImapFolder::ImapFolder(ImapStore *store, const char *path)
 			System = Store3SystemTrash;
 		}
 
-		char s[MAX_PATH_LEN] = "";
-		LMakePath(s, sizeof(s), Store->GetCache(), Remote);
-		Local = s;
+		if (!Store->IsLive())
+		{
+			char s[MAX_PATH_LEN] = "";
+			LMakePath(s, sizeof(s), Store->GetCache(), Remote);
+			Local = s;
+		}
 
 		char *Last = strrchr(Remote, '/');
 		if (Last++)
@@ -60,7 +64,8 @@ ImapFolder::ImapFolder(ImapStore *store, const char *path)
 				System = Store3SystemOutbox;
 		}
 
-		Serialize(false);
+		if (!Store->IsLive())
+			Serialize(false);
 	}
 }
 
@@ -97,7 +102,7 @@ void ImapFolder::SetParent(ImapFolder *p)
 void ImapFolder::SetDirty(bool b)
 {
 	Dirty = b;
-	if (Dirty && Mail.State == Store3Unloaded)
+	if (Dirty && !Store->IsLive() && Mail.State == Store3Unloaded)
 	{
 		LAssert(!"State needs to be loaded before we modify it.");
 	}
@@ -166,8 +171,123 @@ struct ImapFolderWriterThread : public LThread
 	}
 };
 
+bool ImapFolder::ReloadCanonical(int64 Id)
+{
+	if (Dirty && Canonical && !Serialize(true))
+		return false;
+	auto Storage = Store->GetStorage();
+	LAutoPtr<LMail3Folder> Loaded(new LMail3Folder(Storage));
+	LMail3Store::LStatement Query(Storage, "select * from Folder where Id=? and ImapAccountId=?");
+	if (!Query.SetInt64(0, Id) || !Query.SetInt64(1, Store->GetInt(FIELD_ACCOUNT_ID)) ||
+		!Query.Row() || !Loaded->Serialize(Query, false))
+		return Store->ReportError("Cannot load the canonical IMAP folder.");
+	Canonical = Loaded;
+	Remote = Canonical->ImapRemoteName;
+	if (Field.State != Store3Loaded)
+	{
+		for (auto Column: Canonical->Flds.a)
+			Field.Insert(new ImapFolderFld(Store, this, (int)Column->GetInt(FIELD_ID),
+				(int)Column->GetInt(FIELD_WIDTH)), -1, true);
+		if (!Field.Length() && !IsRoot())
+			for (auto Id: {FIELD_PRIORITY, FIELD_FLAGS, FIELD_FROM, FIELD_SUBJECT, FIELD_SIZE, FIELD_DATE_SENT})
+				Field.Insert(new ImapFolderFld(Store, this, Id,
+					Id == FIELD_SUBJECT ? 240 : Id == FIELD_FROM ? 120 : 80), -1, true);
+	}
+	Field.State = Store3Loaded;
+	return true;
+}
+
+bool ImapFolder::SyncLiveMail(bool Notify)
+{
+	if (!Canonical)
+	{
+		Mail.State = Store3Loaded;
+		return true;
+	}
+	auto Storage = Store->GetStorage();
+	LArray<int64> Ids;
+	{
+		LMail3Store::LStatement Query(Storage, "select Id from Mail where ParentId=? and AccountId=?"
+			" and (ImapRemoteFlags is null or (ImapRemoteFlags & 2)=0) order by Id");
+		if (!Query.SetInt64(0, Canonical->Id) || !Query.SetInt64(1, Store->GetInt(FIELD_ACCOUNT_ID)))
+			return Store->ReportError("Cannot load SQLite IMAP folder membership.");
+		int Result;
+		while ((Result = sqlite3_step(Query)) == SQLITE_ROW)
+			Ids.Add(Query.GetInt64(0));
+		if (!Storage->Check(Result, NULL))
+			return Store->ReportError(Storage->GetStr(FIELD_ERROR));
+	}
+	std::set<int64> Keep;
+	LArray<LDataI*> Added, Changed, Removed;
+	for (auto Id: Ids)
+	{
+		Keep.insert(Id);
+		ImapMail *Object = NULL;
+		for (auto Existing: Mail.a)
+			if (Existing->Canonical && Existing->Canonical->Id == Id)
+				Object = Existing;
+		if (Object)
+		{
+			if (!Object->ReloadCanonical(Id))
+				return false;
+			Changed.Add(Object);
+		}
+		else
+		{
+			LAutoPtr<ImapMail> New(new ImapMail(Store, _FL));
+			if (!New->ReloadCanonical(Id))
+				return false;
+			AddMail(New.Release(), &Added);
+		}
+	}
+	for (auto Existing: Mail.a)
+		if (Existing->Canonical && !Keep.count(Existing->Canonical->Id))
+			Removed.Add(Existing);
+	Mail.State = Store3Loaded;
+	if (Removed.Length())
+	{
+		if (Notify && Store->GetEvents() && !Store->OnDelete(_FL, this, Removed))
+			return Store->ReportError("The UI rejected a committed IMAP membership removal.");
+		for (auto Item: Removed)
+			delete Item;
+	}
+	Canonical->Unread = 0;
+	for (auto Item: Mail.a)
+		if (!(Item->LocalFlags & MAIL_READ))
+			Canonical->Unread++;
+	if (Notify)
+	{
+		if (Added.Length())
+			Store->OnNew(_FL, this, Added, -1, false);
+		if (Changed.Length())
+			Store->OnChange(_FL, Changed, 0);
+		LArray<LDataI*> Folder;
+		Folder.Add(this);
+		Store->OnChange(_FL, Folder, FIELD_STATUS);
+	}
+	for (auto &Callback: OnLoad)
+		Callback(Store3Success);
+	OnLoad.Empty();
+	return true;
+}
+
 bool ImapFolder::Serialize(bool Write)
 {
+	if (Store->IsLive())
+	{
+		if (!Canonical)
+			return Store->ReportError("The IMAP folder has no canonical SQLite record.");
+		if (!Write)
+			return ReloadCanonical(Canonical->Id);
+		Canonical->Flds.DeleteObjects();
+		for (auto Field: Field.a)
+			Canonical->Flds.Insert(new Store3Field(Store->GetStorage(),
+				(int)Field->GetInt(FIELD_ID), (int)Field->GetInt(FIELD_WIDTH)), -1, true);
+		if (!Canonical->Write(MAIL3_TBL_FOLDER, false))
+			return Store->ReportError(Store->GetStorage()->GetStr(FIELD_ERROR));
+		Dirty = false;
+		return true;
+	}
     bool Debug = false; // System == Store3SystemInbox;
 	if (!ValidStr(Local))
 	    return false;
@@ -533,6 +653,17 @@ bool ImapFolder::Serialize(bool Write)
 
 Store3Status ImapFolder::Move(LArray<LDataI*> &Items)
 {
+	if (Store->IsLive())
+	{
+		for (auto Item: Items)
+		{
+			auto Mail = dynamic_cast<ImapMail*>(Item);
+			if (!Mail || Mail->Store != Store || !Mail->Canonical ||
+				Store->QueueMutation(*Mail, LMail3ImapOperationType::Move, 0, this) == Store3Error)
+				return Store3Error;
+		}
+		return Items.Length() ? Store3Delayed : Store3Error;
+	}
 	Store3Status Status = Store3Error;
 
 	LHashTbl<IntKey<uint32_t>, bool> Has;
@@ -766,6 +897,12 @@ void ImapFolder::ScanFolder()
 
 void ImapFolder::LoadSub(bool All)
 {
+	if (Store->IsLive())
+	{
+		if (Sub.State != Store3Loaded)
+			Store->SyncLiveFolders();
+		return;
+	}
 	if (Sub.State == Store3Unloaded)
 	{
 		Sub.State = Store3Loading;
@@ -947,6 +1084,15 @@ struct ImapFolderLoadThread :
 
 void ImapFolder::LoadMail()
 {
+	if (Store->IsLive())
+	{
+		if (Mail.State == Store3Unloaded)
+		{
+			if (SyncLiveMail(false))
+				Store->RefreshMailbox(Remote);
+		}
+		return;
+	}
 	if (Mail.State != Store3Unloaded)
 		return;
 
@@ -1048,6 +1194,15 @@ Store3Status ImapFolder::WhenLoaded(std::function<void(Store3Status)> cb)
 
 Store3Status ImapFolder::Save(LDataI *Into)
 {
+	if (Store->IsLive())
+	{
+		if (Into)
+		{
+			Store->ReportError("Creating IMAP folders is not available until durable folder operations are connected.");
+			return Store3Error;
+		}
+		return Serialize(true) ? Store3Success : Store3Error;
+	}
 	if (!IsOnDisk() && Into)
 	{
 		if (!LeafName)
@@ -1112,6 +1267,11 @@ Store3Status ImapFolder::Save(LDataI *Into)
 
 Store3Status ImapFolder::Delete(bool ToTrash)
 {
+	if (Store->IsLive())
+	{
+		Store->ReportError("Deleting IMAP folders is not available until durable folder operations are connected.");
+		return Store3Error;
+	}
 	ImapMsg *m = new ImapMsg(IMAP_DELETE_FOLDER, _FL);
 	if (m)
 	{
@@ -1847,6 +2007,16 @@ int ImapFolder::GetLastUid()
 
 void ImapFolder::OnSelect(bool b)
 {
+	if (Store->IsLive())
+	{
+		IsOnline = b;
+		if (b)
+		{
+			LoadMail();
+			Store->RefreshMailbox(Remote);
+		}
+		return;
+	}
 	auto DoSelect = [this]()
 	{
 		ImapMsg *m = new ImapMsg(IMAP_SELECT_FOLDER, _FL);
@@ -1942,6 +2112,8 @@ const char *ImapFolder::GetStr(int id)
 				
 				return RootName;
 			}
+			if (Canonical)
+				return Canonical->GetStr(id);
 
 			char *d = strrchr(Local, DIR_CHAR);
 			return d ? d + 1 : (char*)"Error";
@@ -1958,6 +2130,11 @@ const char *ImapFolder::GetStr(int id)
 
 Store3Status ImapFolder::SetStr(int id, const char *str)
 {
+	if (Store->IsLive() && Canonical && id == FIELD_FOLDER_NAME)
+	{
+		Store->ReportError("Renaming IMAP folders is not available until durable folder operations are connected.");
+		return Store3Error;
+	}
 	switch (id)
 	{
 		case FIELD_FOLDER_NAME:
@@ -2011,6 +2188,9 @@ Store3Status ImapFolder::SetStr(int id, const char *str)
 
 int64 ImapFolder::GetInt(int id)
 {
+	if (Canonical && id != FIELD_SYSTEM_FOLDER && id != FIELD_IS_ONLINE &&
+		id != FIELD_STORE_TYPE && id != FIELD_LOADED && id != FIELD_ACCOUNT_ID)
+		return Canonical->GetInt(id);
 	switch (id)
 	{
 	    case FIELD_SYSTEM_FOLDER:
@@ -2080,6 +2260,13 @@ int64 ImapFolder::GetInt(int id)
 
 Store3Status ImapFolder::SetInt(int id, int64 i)
 {
+	if (Canonical && id != FIELD_LOADED)
+	{
+		auto Status = Canonical->SetInt(id, i);
+		if (Status != Store3Success)
+			return Status;
+		return Serialize(true) ? Store3Success : Store3Error;
+	}
 	switch (id)
 	{
 		case FIELD_FOLDER_THREAD:
@@ -2236,7 +2423,7 @@ Store3Status ImapFolder::FreeChildren()
 			if (t->UserData)
 				Lst.Add(t);
 		}
-		if (!Store->Callback->OnDelete(this, Lst))
+		if (Store->Callback && !Store->Callback->OnDelete(this, Lst))
 			return Store3Error;
 	}
 
@@ -2250,6 +2437,16 @@ Store3Status ImapFolder::FreeChildren()
 
 Store3Status ImapFolder::DeleteAllChildren()
 {
+	if (Store->IsLive())
+	{
+		LoadMail();
+		if (Mail.State != Store3Loaded)
+			return Store3Error;
+		LArray<LDataI*> Items;
+		for (auto Item: Mail.a)
+			Items.Add(Item);
+		return Items.Length() ? Store->Delete(Items, false) : Store3Success;
+	}
     // Delete cmd
 	LAutoPtr<ImapMsg> Msg(new ImapMsg(IMAP_DELETE, _FL));
 	Msg->Parent = Remote.Get();
@@ -2267,7 +2464,7 @@ Store3Status ImapFolder::DeleteAllChildren()
 
 ImapFolder *ImapFolder::Find(const char *local, const char *remote)
 {
-	if (Local.Equals(local) || Remote.Equals(remote))
+	if ((local && Local.Equals(local)) || (remote && Remote.Equals(remote)))
 		return this;
 
 	LoadSub();
@@ -2357,6 +2554,11 @@ ImapMail *ImapFolderData::GetMail(uint32_t Uid)
 
 bool ImapFolderData::DelMail(ImapMail *m)
 {
+	if (m && m->Store->IsLive())
+	{
+		Mail.Delete(m);
+		return true;
+	}
 	if (!m)
 	{
 		LAssert(!"Null ptr.");
@@ -2404,6 +2606,16 @@ bool ImapFolderData::DelMail(ImapMail *m)
 
 bool ImapFolderData::AddMail(ImapMail *m, LArray<LDataI*> *OnNew)
 {
+	if (m && m->Store->IsLive())
+	{
+		if (Mail.IndexOf(m, true) >= 0)
+			return false;
+		m->Parent = dynamic_cast<ImapFolder*>(this);
+		Mail.Insert(m, -1, true);
+		if (OnNew)
+			OnNew->Add(m);
+		return true;
+	}
 #if DEBUG_PROF_ADD_MAIL
 LProfile Prof("ImapFolder::AddMail", 1);
 #endif
@@ -2492,6 +2704,14 @@ void ImapFolder::OnPulse()
 
 void ImapFolder::OnCommand(const char *Name)
 {
+	if (Store->IsLive())
+	{
+		if (!Stricmp(Name, "Refresh"))
+			Store->RefreshMailbox(Remote);
+		else
+			Store->ReportError("This folder command is not available on the SQLite IMAP backend yet.");
+		return;
+	}
 	if (!Remote)
 		return;
 	
@@ -2652,4 +2872,3 @@ Store3Status ImapFolderFld::SetInt(int id, int64 i)
 		Parent->SetDirty();
 	return Store3Success;
 }
-

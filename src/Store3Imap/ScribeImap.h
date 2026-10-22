@@ -127,6 +127,8 @@ struct ImapFolderInfo
 /// MAPI mail info struct, all of these fields are optional
 struct ImapMailInfo
 {
+	int64 MailId = -1, MailboxId = -1, UidValidity = -1;
+	LString Body;
 	// The email meta flags
 	ImapMailFlags Flags;
 	// The sequence number of the email
@@ -198,6 +200,8 @@ struct ImapMsg
 	LError Error;
 	LAutoPtr<ImapJournalCommand> Journal;
 	ImapJournalResult JournalResult;
+	int64 Generation = 0;
+	LString Diagnostic;
 
 	ImapMsg(ImapMsgType t, const char *file, int line)
 	{
@@ -219,6 +223,8 @@ struct ImapMsg
 
 extern char *TrimWhite(char *s);
 bool FetchImapRebuild(MailIMap &Imap, const ImapFolderInfo &Folder, ImapMsg &Response, LString &Error);
+bool FetchImapBody(MailIMap &Imap, const LString &Folder, const ImapMailInfo &Request,
+	ImapMailInfo &Response, LString &Error);
 
 class ImapFolder;
 class ImapThread;
@@ -244,8 +250,10 @@ class ImapStore : public LDataStoreI
 	LMail3Store *Storage = NULL;
 	int64 PendingJournalId = -1;
 	int PendingJournalAttempt = 0;
+	int64 LiveGeneration = 0;
 	ScribeAccountletStatusIcon Online = STATUS_OFFLINE;
 	LArray<ImapMsg*> Listing;
+	LArray<ImapFolderInfo> LiveFolders;
 	int64 LastPulse = 0;
 	int64 SelectTime = 0;
 	int64 ListingTime = 0;
@@ -260,8 +268,12 @@ class ImapStore : public LDataStoreI
 	ImapFolder *GetTrash();
 	ImapFolder *GetSystemFolder(int Type);
 	bool InterruptPendingJournal(const char *Reason);
+	bool PumpJournal();
+	bool OnLiveEvent(ImapMsg &Message);
 
 public:
+	// Offline view of an already-loaded canonical account; never starts a network worker.
+	ImapStore(LMail3Store &Storage, int AccountId);
 	ImapStore(	LString host,
 				int port,
 				LString user,
@@ -278,8 +290,14 @@ public:
 
 	const char *GetClass() override { return "ImapStore"; }
 	LMail3Store *GetStorage() { return Storage; }
-	bool IsServerRebuild() const;
-	// Internal cutover bridge; legacy UI paths do not enqueue journal commands yet.
+	bool IsLive() const { return Storage != NULL; }
+	bool ReportError(const char *Error);
+	void JournalQueued();
+	bool RefreshMailbox(const char *Remote, char Delimiter = 0);
+	Store3Status QueueMutation(ImapMail &Mail, LMail3ImapOperationType Type,
+		int Flags = 0, ImapFolder *Destination = NULL);
+	bool SyncLiveFolders();
+	// Owning-thread bridge from durable intent to the network worker.
 	// Reconciling observes only; ContinuingMove can add \Deleted without repeating COPY.
 	bool DispatchJournalOperation(int64 OperationId,
 		LMail3ImapOperationState ClaimedState = LMail3ImapOperationState::Executing);
@@ -427,6 +445,8 @@ public:
 	
 	LAutoStreamI   Stream;
 	ImapAttachment *Seg = NULL;
+	LAutoPtr<LMail3Mail> Canonical;
+	bool ReloadCanonical(int64 Id);
 
 	ImapMail(ImapStore *store, const char *file = NULL, int line = 0, uint32_t uid = 0);
 	~ImapMail();
@@ -437,8 +457,8 @@ public:
 	void SetRemoteFlags(ImapMailFlags f);
 	bool IsOrphan() override { return Parent == 0; }
 	uint32_t Type() override { return MAGIC_MAIL; }
-	bool IsOnDisk() override { return Path.Get() != NULL; }
-	uint64 Size() override { return LFileSize(Path); }
+	bool IsOnDisk() override { return Canonical ? Canonical->Id > 0 : Path.Get() != NULL; }
+	uint64 Size() override { return Canonical ? Canonical->MailSize : LFileSize(Path); }
 	LDataStoreI *GetStore() override { return Store; }
 	void Serialize(IMeta m, bool Write);
 	IMeta GetMeta(bool AllowCreate = true);
@@ -580,6 +600,9 @@ public:
 	DIterator<LDataFolderI, ImapFolder, ImapStore> Sub;
 	/// The configured fields in the folder
 	DIterator<LDataPropI, ImapFolderFld, ImapStore> Field;
+	LAutoPtr<LMail3Folder> Canonical;
+	bool ReloadCanonical(int64 Id);
+	bool SyncLiveMail(bool Notify);
 
 	ImapFolder(ImapStore *store, const char *path = NULL);
 	~ImapFolder();
@@ -590,7 +613,7 @@ public:
 	bool IsOrphan() override { return _Parent == NULL; }
 	bool IsRoot() { return ItemType == MAGIC_NONE; }
 	uint32_t Type() override { return MAGIC_FOLDER; }
-	bool IsOnDisk() override { return Local && Remote; }
+	bool IsOnDisk() override { return Canonical ? Canonical->Id > 0 : Local && Remote; }
 	LDataStoreI *GetStore() override { return Store; }
 	ImapFolder *Find(const char *Local, const char *Remote);
 	int GetLastUid();

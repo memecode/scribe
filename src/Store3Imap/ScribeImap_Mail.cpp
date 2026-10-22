@@ -46,6 +46,51 @@ ImapMail::~ImapMail()
 	To.DeleteObjects();
 }
 
+bool ImapMail::ReloadCanonical(int64 Id)
+{
+	auto Storage = Store->GetStorage();
+	LAutoPtr<LMail3Mail> LoadedMail(new LMail3Mail(Storage));
+	LMail3Store::LStatement Query(Storage, "select * from Mail where Id=? and AccountId=?");
+	if (!Query.SetInt64(0, Id) || !Query.SetInt64(1, Store->GetInt(FIELD_ACCOUNT_ID)) ||
+		!Query.Row() || !LoadedMail->Serialize(Query, false))
+		return Store->ReportError("Cannot load the canonical IMAP message.");
+	bool ResetBody = !Canonical || Canonical->ImapUidValidity != LoadedMail->ImapUidValidity ||
+		Canonical->ImapUid != LoadedMail->ImapUid || Canonical->ImapDownloaded != LoadedMail->ImapDownloaded;
+	if (ResetBody)
+	{
+		DeleteObj(Seg);
+		Stream.Reset();
+		TextCache.Reset();
+		HtmlCache.Reset();
+		Loaded = Store3Headers;
+	}
+	Canonical = LoadedMail;
+	Uid = Canonical->ImapUid > 0 ? (uint32_t)Canonical->ImapUid : 0;
+	UidCache.Empty();
+	RemoteFlags.All = Canonical->ImapRemoteFlags < 0 ? 0 : Canonical->ImapRemoteFlags;
+	LocalFlags = Canonical->Flags & ~MAIL_STORED_FLAT;
+	DataSize = Canonical->MailSize;
+	HeaderCache = Canonical->GetStr(FIELD_INTERNET_HEADER);
+	ImapMailState Pending = !ResetBody && State == ImapMailGettingBody ? State : ImapMailIdle;
+	LMail3Store::LStatement Operation(Storage,
+		"select OperationType from ImapOperation where MailId=? and AccountId=?");
+	if (!Operation.SetInt64(0, Id) || !Operation.SetInt64(1, Store->GetInt(FIELD_ACCOUNT_ID)))
+		return Store->ReportError("Cannot load pending IMAP message state.");
+	auto Result = sqlite3_step(Operation);
+	if (Result == SQLITE_ROW)
+	{
+		auto Type = (LMail3ImapOperationType)Operation.GetInt(0);
+		if (Type == LMail3ImapOperationType::Move)
+			Pending = ImapMailMoving;
+		else if (Type == LMail3ImapOperationType::Delete)
+			Pending = ImapMailDeleting;
+	}
+	else if (!Storage->Check(Result, NULL))
+		return Store->ReportError(Storage->GetStr(FIELD_ERROR));
+	SetState(Pending, _FL);
+	return true;
+}
+
 void ImapMail::SetRemoteFlags(ImapMailFlags f)
 {
 	RemoteFlags = f;
@@ -223,6 +268,8 @@ void ImapMail::SetState(ImapMailState s, const char *file, int line)
 
 void ImapMail::Load()
 {
+	if (Store->IsLive())
+		return;
 	if (Loaded == Store3Unloaded)
 	{
 		LFile f;
@@ -264,6 +311,11 @@ void ImapMail::Load()
 
 Store3Status ImapMail::SetRfc822(LStreamI *m)
 {
+	if (Canonical)
+	{
+		Store->ReportError("Replacing a server-backed IMAP message requires a new APPEND.");
+		return Store3Error;
+	}
 	DeleteObj(Seg);
 	
 	if (!Stream.Reset(new LTempStream(ScribeTempPath())))
@@ -288,6 +340,42 @@ Store3Status ImapMail::SetRfc822(LStreamI *m)
 
 void ImapMail::ReadMime(IMeta MetaTag)
 {
+	if (Canonical)
+	{
+		if (Seg)
+			return;
+		if (Canonical->ImapDownloaded != 1)
+		{
+			if (State == ImapMailGettingBody)
+				return;
+			LAutoPtr<ImapMsg> Message(new ImapMsg(IMAP_DOWNLOAD, _FL));
+			Message->Parent = Parent->Remote;
+			auto &Info = Message->Mail.New();
+			Info.MailId = Canonical->Id;
+			Info.MailboxId = Canonical->ParentId;
+			Info.UidValidity = Canonical->ImapUidValidity;
+			Info.Uid = Uid;
+			Info.Size = Canonical->MailSize;
+			if (!Uid || !Store->PostThread(Message.Release(), true))
+			{
+				Store->ReportError("Cannot download the SQLite IMAP message while offline or without a verified UID.");
+				return;
+			}
+			State = ImapMailGettingBody;
+			Loaded = Store3Loading;
+			return;
+		}
+		auto Body = GetStream(_FL);
+		LAutoPtr<LMime> Mime(new LMime);
+		if (!Body || !Mime->Text.Decode.Pull(Body))
+		{
+			Store->ReportError("Cannot decode the canonical IMAP RFC822 body.");
+			return;
+		}
+		Seg = new ImapAttachment(Store, this, Mime.Release());
+		Loaded = Store3Loaded;
+		return;
+	}
 #if DEBUG_READ_MIME
 LProfile Prof("ReadMime");
 #endif
@@ -440,6 +528,19 @@ static auto DefaultCharset = "windows-1252";
 
 const char *ImapMail::GetStr(int id)
 {
+	if (Store->IsLive() && !Canonical && id == FIELD_LABEL)
+		return Label;
+	if (Canonical)
+	{
+		switch (id)
+		{
+			case FIELD_INTERNET_HEADER:
+			case FIELD_MESSAGE_ID:
+			case FIELD_SUBJECT:
+			case FIELD_LABEL:
+				return Canonical->GetStr(id);
+		}
+	}
 	if (State != ImapMailIdle &&
 		id != FIELD_INTERNET_HEADER &&
 		id != FIELD_MESSAGE_ID &&
@@ -767,6 +868,21 @@ void CopyImapSegs(ImapMail *Mail, LDataPropI *Dst, LDataPropI *Src)
 
 Store3CopyImpl(ImapMail)
 {
+	if (Store->IsLive())
+	{
+		auto Data = dynamic_cast<LDataI*>(&p);
+		auto Raw = Data ? Data->GetStream(_FL) : LAutoStreamI();
+		if (!Raw || Raw->SetPos(0) != 0 || SetRfc822(Raw) != Store3Success)
+			return Store->ReportError("Copying to IMAP requires the complete original RFC822 message.");
+		Priority = (int)p.GetInt(FIELD_PRIORITY);
+		Label = p.GetStr(FIELD_LABEL);
+		Colour.Set((uint32_t)p.GetInt(FIELD_COLOUR), 32);
+		LocalFlags = (int)p.GetInt(FIELD_FLAGS) & ~MAIL_STORED_FLAT;
+		RemoteFlags.All = 0;
+		RemoteFlags.ImapSeen = (LocalFlags & MAIL_READ) != 0;
+		RemoteFlags.ImapAnswered = (LocalFlags & MAIL_REPLIED) != 0;
+		return true;
+	}
 	Priority = (int)p.GetInt(FIELD_PRIORITY);
 	SetInt(FIELD_FLAGS, p.GetInt(FIELD_FLAGS));
 	SetStr(FIELD_LABEL, p.GetStr(FIELD_LABEL));
@@ -816,6 +932,24 @@ Store3CopyImpl(ImapMail)
 
 Store3Status ImapMail::SetStr(int id, const char *str)
 {
+	if (Canonical)
+	{
+		if (id != FIELD_LABEL)
+		{
+			Store->ReportError("Editing server-backed IMAP headers requires a new APPEND.");
+			return Store3Error;
+		}
+		auto Status = Canonical->SetStr(id, str);
+		if (Status != Store3Success)
+			return Status;
+		if (!Canonical->Write(MAIL3_TBL_MAIL, false))
+		{
+			Store->ReportError(Store->GetStorage()->GetStr(FIELD_ERROR));
+			ReloadCanonical(Canonical->Id);
+			return Store3Error;
+		}
+		return Store3Success;
+	}
 	Load();
 	switch (id)
 	{
@@ -920,6 +1054,10 @@ Store3Status ImapMail::SetStr(int id, const char *str)
 
 int64 ImapMail::GetInt(int id)
 {
+	if (Canonical && (id == FIELD_SIZE || id == FIELD_PRIORITY || id == FIELD_COLOUR))
+		return Canonical->GetInt(id);
+	if (Canonical && id == FIELD_ID)
+		return Canonical->Id;
 	switch (id)
 	{
 		case FIELD_STORE_TYPE:
@@ -982,6 +1120,35 @@ int64 ImapMail::GetInt(int id)
 
 Store3Status ImapMail::SetInt(int id, int64 i)
 {
+	if (Canonical && id != FIELD_LOADED)
+	{
+		if (id != FIELD_FLAGS && id != FIELD_PRIORITY && id != FIELD_COLOUR)
+		{
+			Store->ReportError("Only local flags, priority and colour can be edited on a canonical IMAP message.");
+			return Store3Error;
+		}
+		if (id == FIELD_FLAGS)
+		{
+			ImapMailFlags Desired = RemoteFlags;
+			Desired.ImapRecent = Desired.ImapExpunged = false;
+			Desired.ImapSeen = (i & MAIL_READ) != 0;
+			Desired.ImapAnswered = (i & MAIL_REPLIED) != 0;
+			if (Desired.All != (RemoteFlags.All & 47))
+				return Store->QueueMutation(*this, LMail3ImapOperationType::SetFlags, Desired.All);
+			Canonical->Flags = ((int)i & ~MAIL_STORED_FLAT) | (Canonical->Flags & MAIL_STORED_FLAT);
+			Canonical->ImapLocalFlags = (int)i & ~MAIL_STORED_FLAT;
+		}
+		else if (Canonical->SetInt(id, i) != Store3Success)
+			return Store3Error;
+		if (!Canonical->Write(MAIL3_TBL_MAIL, false))
+		{
+			Store->ReportError(Store->GetStorage()->GetStr(FIELD_ERROR));
+			ReloadCanonical(Canonical->Id);
+			return Store3Error;
+		}
+		LocalFlags = Canonical->Flags & ~MAIL_STORED_FLAT;
+		return Store3Success;
+	}
 	Load();
 	switch (id)
 	{
@@ -1086,6 +1253,8 @@ Store3Status ImapMail::SetInt(int id, int64 i)
 
 const LDateTime *ImapMail::GetDate(int id)
 {
+	if (Canonical)
+		return Canonical->GetDate(id);
 	if ((id == FIELD_DATE_RECEIVED && !DateReceived.Year())
 	    ||
 	    (id == FIELD_DATE_SENT && !DateSent.Year()))
@@ -1114,6 +1283,11 @@ const LDateTime *ImapMail::GetDate(int id)
 
 Store3Status ImapMail::SetDate(int id, const LDateTime *i)
 {
+	if (Canonical)
+	{
+		Store->ReportError("Editing server-backed IMAP timestamps requires a new APPEND.");
+		return Store3Error;
+	}
 	Load();
 	switch (id)
 	{
@@ -1177,6 +1351,8 @@ Store3Addr *ImapMail::ProcessAddress(Store3Addr &Addr, const char *FieldId, cons
 
 LDataPropI *ImapMail::GetObj(int id)
 {
+	if (Canonical && id != FIELD_PARENT && id != FIELD_MIME_SEG)
+		return Canonical->GetObj(id);
 	switch (id)
 	{
 		case FIELD_MIME_SEG:
@@ -1253,6 +1429,47 @@ LDataIt ImapMail::GetList(int id)
 
 Store3Status ImapMail::Save(LDataI *Folder)
 {
+	if (Store->IsLive())
+	{
+		auto Destination = dynamic_cast<ImapFolder*>(Folder);
+		if (Canonical)
+		{
+			if (Destination && Destination != Parent)
+				return Store->QueueMutation(*this, LMail3ImapOperationType::Move, 0, Destination);
+			if (!Canonical->Write(MAIL3_TBL_MAIL, false))
+			{
+				Store->ReportError(Store->GetStorage()->GetStr(FIELD_ERROR));
+				return Store3Error;
+			}
+			return Store3Success;
+		}
+		if (!Destination || Destination->Store != Store || !Destination->Canonical)
+		{
+			Store->ReportError("APPEND requires a canonical destination on this IMAP account.");
+			return Store3Error;
+		}
+		LAutoStreamI Body;
+		if (Stream)
+			Body.Reset(new LProxyStream(Stream));
+		else if (Seg)
+		{
+			Body.Reset(new LTempStream(ScribeTempPath()));
+			if (!Seg->GetSeg()->Text.Encode.Push(Body))
+				Body.Reset();
+		}
+		LMail3ImapOperation Operation;
+		if (!Body || !Store->GetStorage()->StageImapAppend(Store->GetInt(FIELD_ACCOUNT_ID),
+			Destination->Canonical->Id, RemoteFlags.All & 47, *Body, Operation, this))
+		{
+			Store->ReportError(Body ? Store->GetStorage()->GetStr(FIELD_ERROR) : "APPEND requires an RFC822 message.");
+			return Store3Error;
+		}
+		if (!ReloadCanonical(Operation.MailId))
+			return Store3Error;
+		Destination->AddMail(this, NULL);
+		Store->JournalQueued();
+		return Store3Delayed;
+	}
 	Store3Status Status = Store3Error;
 	ImapFolder *Fld = dynamic_cast<ImapFolder*>(Folder);
 
@@ -1378,6 +1595,12 @@ Store3Status ImapMail::Save(LDataI *Folder)
 
 Store3Status ImapMail::Delete(bool ToTrash)
 {
+	if (Store->IsLive())
+	{
+		LArray<LDataI*> Items;
+		Items.Add(this);
+		return Store->Delete(Items, ToTrash);
+	}
 	Store3Status Status = Store3Error;
 
 	LAutoPtr<ImapMsg> m(new ImapMsg(IMAP_DELETE, _FL));
@@ -1416,6 +1639,17 @@ bool ImapMail::OnDelete()
 
 LAutoStreamI ImapMail::GetStream(const char *file, int line)
 {
+	if (Canonical)
+	{
+		LMail3ImapMessage Identity;
+		Identity.MailId = Canonical->Id;
+		Identity.MailboxId = Canonical->ParentId;
+		Identity.UidValidity = Canonical->ImapUidValidity;
+		Identity.Uid = Canonical->ImapUid;
+		if (Uid)
+			return Store->GetStorage()->OpenImapBody(Store->GetInt(FIELD_ACCOUNT_ID), Identity);
+		return Canonical->GetStream(file, line);
+	}
 	LAutoStreamI Ret;
 	
 	if (Stream)
@@ -1437,6 +1671,10 @@ LAutoStreamI ImapMail::GetStream(const char *file, int line)
 
 bool ImapMail::SetStream(LAutoStreamI stream)
 {
+	if (Store->IsLive() && !Canonical)
+		return SetRfc822(stream) == Store3Success;
+	if (Canonical)
+		return Store->ReportError("Replacing a server-backed IMAP message body requires a new APPEND.");
 	if (!stream)
 		return false;
 
