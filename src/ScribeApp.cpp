@@ -3838,6 +3838,10 @@ LMessage::Result ScribeWnd::OnEvent(LMessage *Msg)
 				CmdSend.Enabled(true);
 				CmdReceive.Enabled(true);
 				CmdPreview.Enabled(true);
+				if (Tree)
+					for (auto Account: Accounts)
+						if (!Account->Receive.Disabled() && Account->Receive.IsPersistant())
+							Account->Receive.Connect(0, false);
 			}
 			
 			if (d->TrayIcon)

@@ -1195,8 +1195,9 @@ bool ScribeWnd::OnIdle()
 
 	bool Status = false;
 	
-	for (auto a : Accounts)
-		Status |= a->Receive.OnIdle();
+	if (ScribeState == ScribeRunning)
+		for (auto a : Accounts)
+			Status |= a->Receive.OnIdle();
 
 	Status |= OnTransfer();
 

@@ -34,6 +34,7 @@ const char *ImapMsgTypeNames[IMAP_MSG_MAX] =
 	"IMAP_EXPUNGE_FOLDER",
 	"IMAP_RENAME_FOLDER",
 	"IMAP_LOAD_FOLDER",
+	"IMAP_SYNC_FOLDER",
 
 	// Mail
 	"IMAP_FOLDER_SELECTED",
@@ -42,11 +43,11 @@ const char *ImapMsgTypeNames[IMAP_MSG_MAX] =
 	"IMAP_APPEND",
 	"IMAP_MOVE_EMAIL",
 
-	// General
 	"IMAP_DELETE",
 	"IMAP_UNDELETE",
 	"IMAP_SET_FLAGS",
-	"IMAP_REBUILD_MAILBOX",
+
+	// General
 	"IMAP_JOURNAL_OPERATION",
 };
 
@@ -150,27 +151,100 @@ bool ImapStore::ReportError(const char *Error)
 	return false;
 }
 
-bool ImapStore::RefreshMailbox(const char *Remote, char Delimiter)
+bool ImapStore::RefreshMailbox(const char *Remote, char Delimiter, bool ForceFull, bool ServerChanged)
 {
 	if (!IsLive() || !Remote || !Strcmp(Remote, "/"))
 		return false;
+	for (size_t Index = 0; Index < FailedRefresh.Length(); Index++)
+		if (FailedRefresh[Index] == Remote)
+		{
+			if (!ForceFull)
+				return true;
+			FailedRefresh.DeleteAt(Index);
+			break;
+		}
+	for (auto &Active: ActiveRefresh)
+		if (Active.Folder.Remote == Remote)
+		{
+			Active.Repeat = Active.Repeat || ServerChanged || (ForceFull && !Active.Folder.ForceFull);
+			if (ForceFull)
+				Active.Folder.ForceFull = true;
+			return true;
+		}
 	LArray<LMail3ImapOperation> Pending;
 	if (!Storage->LoadImapOperations(AccountId, Pending))
 		return ReportError(Storage->GetStr(FIELD_ERROR));
+
 	if (Pending.Length())
-		return true; // Completion refreshes the account after the frozen operations have drained.
-	LAutoPtr<ImapMsg> Message(new ImapMsg(IMAP_REBUILD_MAILBOX, _FL));
+	{
+		for (auto &Folder: DeferredRefresh)
+			if (Folder.Remote == Remote)
+			{
+				Folder.ForceFull = Folder.ForceFull || ForceFull;
+				return true;
+			}
+		auto &Folder = DeferredRefresh.New();
+		Folder.Remote = Remote;
+		Folder.Sep = Delimiter;
+		Folder.ForceFull = ForceFull;
+		return true;
+	}
+
+	LAutoPtr<ImapMsg> Message(new ImapMsg(IMAP_SYNC_FOLDER, _FL));
 	Message->Generation = LiveGeneration;
+
 	auto &Folder = Message->Fld.New();
 	Folder.Remote = Remote;
 	Folder.Sep = Delimiter;
+	Folder.ForceFull = ForceFull;
 	LArray<LMail3ImapMailbox> Mailboxes;
 	if (!Storage->LoadImapMailboxes(AccountId, Mailboxes))
 		return ReportError(Storage->GetStr(FIELD_ERROR));
+
+	LgiTrace("IMAP account %i requesting sync '%s'; generation=%" PRIi64 ", full=%i, server-change=%i.\n",
+		AccountId, Remote, LiveGeneration, (int)ForceFull, (int)ServerChanged);
+
 	for (auto &Mailbox: Mailboxes)
-		if (!Delimiter && Mailbox.RemoteName == Remote && Mailbox.Delimiter)
-			Folder.Sep = Mailbox.Delimiter[0];
-	return PostThread(Message.Release(), false);
+		if (Mailbox.RemoteName == Remote)
+		{
+			if (!Delimiter && Mailbox.Delimiter)
+				Folder.Sep = Mailbox.Delimiter[0];
+			Folder.UidValidity = Mailbox.UidValidity;
+			LMail3Store::LStatement Query(Storage,
+				"select ImapUid from Mail where ParentId=? and AccountId=? and ImapUidValidity=? and ImapUid is not null");
+			if (!Query.SetInt64(0, Mailbox.Id) || !Query.SetInt64(1, AccountId) ||
+				!Query.SetInt64(2, Mailbox.UidValidity))
+				return ReportError("Cannot prepare the cached IMAP UID inventory.");
+			int Result;
+			while ((Result = sqlite3_step(Query)) == SQLITE_ROW)
+			{
+				auto Uid = Query.GetInt64(0);
+				if (Uid <= 0 || Uid > UINT32_MAX)
+					return ReportError("The cached IMAP UID inventory contains an invalid UID.");
+				Folder.KnownUids.Add((uint32_t)Uid);
+			}
+			if (!Storage->Check(Result, NULL))
+				return ReportError(Storage->GetStr(FIELD_ERROR));
+			Folder.Incremental = !ForceFull && Folder.UidValidity > 0 && Folder.KnownUids.Length() > 0;
+			break;
+		}
+
+	auto &Active = ActiveRefresh.New();
+	Active.Folder.Remote = Remote;
+	Active.Folder.Sep = Folder.Sep;
+	Active.Folder.ForceFull = ForceFull;
+	if (PostThread(Message.Release(), false))
+	{
+		for (size_t Index = 0; Index < LiveFolders.Length(); Index++)
+			if (LiveFolders[Index].Remote == Remote)
+			{
+				LiveFolders.DeleteAt(Index, true);
+				break;
+			}
+		return true;
+	}
+	ActiveRefresh.DeleteAt(ActiveRefresh.Length() - 1);
+	return false;
 }
 
 bool ImapStore::SyncLiveFolders()
@@ -239,6 +313,25 @@ bool ImapStore::PumpJournal()
 	return DispatchJournalOperation(Operations[0].Id);
 }
 
+bool ImapStore::SyncLiveOperation(const LMail3ImapOperation &Operation)
+{
+	if (!IsLive() || !Root || Operation.AccountId != AccountId || Operation.MailId <= 0)
+		return ReportError("Cannot refresh a journal result without its canonical account and message.");
+	std::function<bool(ImapFolder*)> Sync = [&](ImapFolder *Folder)
+	{
+		if (Folder->Canonical && Folder->Mail.State == Store3Loaded &&
+			(Folder->Canonical->Id == Operation.SourceMailboxId ||
+			 Folder->Canonical->Id == Operation.DestinationMailboxId) &&
+			!Folder->SyncLiveMail(true, Operation.MailId))
+			return false;
+		for (auto Child: Folder->Sub.a)
+			if (!Sync(Child))
+				return false;
+		return true;
+	};
+	return Sync(Root);
+}
+
 void ImapStore::JournalQueued()
 {
 	++LiveGeneration;
@@ -253,6 +346,30 @@ Store3Status ImapStore::QueueMutation(ImapMail &Mail, LMail3ImapOperationType Ty
 		ReportError("IMAP mutation requires canonical objects on the same account.");
 		return Store3Error;
 	}
+	LArray<LMail3ImapOperation> Pending;
+	if (!Storage->LoadImapOperations(AccountId, Pending))
+	{
+		ReportError(Storage->GetStr(FIELD_ERROR));
+		return Store3Error;
+	}
+	for (auto &Existing: Pending)
+		if (Existing.MailId == Mail.Canonical->Id)
+		{
+			bool Same = Existing.Type == Type &&
+				Existing.SourceMailboxId == Mail.Canonical->ParentId &&
+				Existing.SourceUidValidity == Mail.Canonical->ImapUidValidity &&
+				Existing.SourceUid == Mail.Canonical->ImapUid &&
+				(Type != LMail3ImapOperationType::SetFlags || Existing.RemoteFlags == Flags) &&
+				(Type != LMail3ImapOperationType::Move ||
+					(Destination && Existing.DestinationMailboxId == Destination->Canonical->Id));
+			if (Same && (Existing.State == LMail3ImapOperationState::Queued ||
+				Existing.State == LMail3ImapOperationState::Executing))
+				return Store3Delayed;
+			ReportError(Existing.State == LMail3ImapOperationState::NeedsReconciliation ?
+				"This message has an unresolved server operation; reconcile it before requesting another change." :
+				"This message already has a different pending server operation.");
+			return Store3Error;
+		}
 	LMail3ImapOperation Operation;
 	Operation.AccountId = AccountId;
 	Operation.MailId = Mail.Canonical->Id;
@@ -275,48 +392,109 @@ bool ImapStore::OnLiveEvent(ImapMsg &Message)
 {
 	if (Message.Type == IMAP_FOLDER_LISTING && Message.Last && !Message.Parent)
 	{
+		LgiTrace("IMAP account %i received folder inventory: %zu mailboxes.\n",
+			AccountId, (size_t)Message.Fld.Length());
 		LiveFolders.Swap(Message.Fld);
-		for (auto &Folder: LiveFolders)
-			RefreshMailbox(Folder.Remote, Folder.Sep);
 		return true;
 	}
-	if (Message.Type == IMAP_REBUILD_MAILBOX)
+	if (Message.Type == IMAP_SYNC_FOLDER)
 	{
-		if (Message.Generation != LiveGeneration)
-			return true;
-		LArray<LMail3ImapOperation> Pending;
-		if (!Storage->LoadImapOperations(AccountId, Pending))
+		bool Repeat = false;
+		bool ForceFull = false;
+		auto Apply = [&]()
 		{
-			ReportError(Storage->GetStr(FIELD_ERROR));
-			return true;
-		}
-		if (Pending.Length())
-			return true;
-		if (Message.Fld.Length() != 1 || !Message.Last || Message.Fld[0].LastUid != 0)
+			if (Message.Diagnostic)
+			{
+				for (auto &Info: Message.Fld)
+				{
+					bool Found = false;
+					for (auto &Remote: FailedRefresh)
+						if (Remote == Info.Remote)
+							Found = true;
+					if (!Found)
+						FailedRefresh.Add(Info.Remote);
+					LgiTrace("IMAP account %i automatic sync suspended for '%s'; use folder Refresh to retry.\n",
+						AccountId, Info.Remote.Get());
+				}
+				ReportError(Message.Diagnostic);
+				return;
+			}
+			if (Message.Generation != LiveGeneration)
+			{
+				LgiTrace("IMAP account %i rescheduling snapshot: generation %" PRIi64 " != %" PRIi64 ".\n",
+					AccountId, Message.Generation, LiveGeneration);
+				Repeat = true;
+				return;
+			}
+			LArray<LMail3ImapOperation> Pending;
+			if (!Storage->LoadImapOperations(AccountId, Pending))
+			{
+				ReportError(Storage->GetStr(FIELD_ERROR));
+				return;
+			}
+			if (Pending.Length())
+			{
+				LgiTrace("IMAP account %i deferring snapshot: %zu pending journal operations.\n",
+					AccountId, (size_t)Pending.Length());
+				Repeat = true;
+				return;
+			}
+			if (Message.Fld.Length() != 1 || !Message.Last || Message.Fld[0].LastUid != 0)
+			{
+				ReportError("A live IMAP refresh requires a complete verified server snapshot.");
+				return;
+			}
+			auto &Info = Message.Fld[0];
+			LMail3ImapMailbox Mailbox;
+			Mailbox.AccountId = AccountId;
+			Mailbox.RemoteName = Info.Remote;
+			Mailbox.Delimiter = Info.Sep ? LString::Fmt("%c", Info.Sep) : LString();
+			Mailbox.UidValidity = Info.UidValidity;
+			Mailbox.UidNext = Info.UidNext;
+			LArray<LMail3ImapServerMessage> Messages;
+			for (auto &Info: Message.Mail)
+			{
+				auto &Mail = Messages.New();
+				Mail.Uid = Info.Uid;
+				Mail.RemoteFlags = Info.Flags.All;
+				Mail.Size = Info.Size;
+				Mail.Headers = Info.Headers;
+			}
+			LArray<int64> ChangedIds;
+			if (!Storage->SyncImapFolder(Mailbox, Messages, Info.Incremental, &ChangedIds))
+			{
+				ReportError(Storage->GetStr(FIELD_ERROR));
+				return;
+			}
+			auto Folder = Root->Find(NULL, Info.Remote);
+			if (!Folder)
+			{
+				if (!SyncLiveFolders())
+					return;
+				Folder = Root->Find(NULL, Info.Remote);
+			}
+			if (Folder && (ChangedIds.Length() || !Info.Incremental || Folder->Mail.State == Store3Unloaded))
+				Folder->SyncLiveMail(true, -1, &ChangedIds);
+		};
+		Apply();
+		for (auto &Info: Message.Fld)
 		{
-			ReportError("A live IMAP refresh requires a complete verified server snapshot.");
-			return true;
+			for (size_t Index = 0; Index < ActiveRefresh.Length(); Index++)
+				if (ActiveRefresh[Index].Folder.Remote == Info.Remote)
+				{
+					Repeat = Repeat || ActiveRefresh[Index].Repeat;
+					ForceFull = ForceFull || ActiveRefresh[Index].Folder.ForceFull;
+					ActiveRefresh.DeleteAt(Index);
+					break;
+				}
+			if (Repeat && !Message.Diagnostic)
+			{
+				LgiTrace("IMAP account %i scheduling follow-up sync '%s'; full=%i.\n",
+					AccountId, Info.Remote.Get(), (int)(ForceFull || Info.ForceFull));
+				RefreshMailbox(Info.Remote, Info.Sep, ForceFull || Info.ForceFull);
+			}
 		}
-		auto &Info = Message.Fld[0];
-		LMail3ImapMailbox Mailbox;
-		Mailbox.AccountId = AccountId;
-		Mailbox.RemoteName = Info.Remote;
-		Mailbox.Delimiter = Info.Sep ? LString::Fmt("%c", Info.Sep) : LString();
-		Mailbox.UidValidity = Info.UidValidity;
-		Mailbox.UidNext = Info.UidNext;
-		LArray<LMail3ImapServerMessage> Messages;
-		for (auto &Info: Message.Mail)
-		{
-			auto &Mail = Messages.New();
-			Mail.Uid = Info.Uid;
-			Mail.RemoteFlags = Info.Flags.All;
-			Mail.Size = Info.Size;
-			Mail.Headers = Info.Headers;
-		}
-		if (!Storage->RebuildImapMailbox(Mailbox, Messages) || !SyncLiveFolders())
-			ReportError(Storage->GetStr(FIELD_ERROR));
-		else if (auto Folder = Root->Find(NULL, Info.Remote))
-			Folder->SyncLiveMail(true);
+		NextFolderSync = LCurrentTime() + 100;
 		return true;
 	}
 	if (Message.Type == IMAP_DOWNLOAD)
@@ -353,7 +531,7 @@ bool ImapStore::OnLiveEvent(ImapMsg &Message)
 		case IMAP_EXPUNGE_FOLDER:
 		case IMAP_FOLDER_LISTING:
 			if (Message.Parent)
-				RefreshMailbox(Message.Parent);
+				RefreshMailbox(Message.Parent, 0, false, true);
 			return true;
 		default:
 			return false;
@@ -478,6 +656,7 @@ bool ImapStore::DispatchJournalOperation(int64 OperationId, LMail3ImapOperationS
 		return Fail(Storage->GetStr(FIELD_ERROR));
 	PendingJournalId = OperationId;
 	PendingJournalAttempt = Message->Journal->Operation.Attempts;
+	PendingJournalOperation = Message->Journal->Operation;
 	if (!PostThread(Message.Release(), false))
 	{
 		PendingJournalId = -1;
@@ -493,7 +672,19 @@ bool ImapStore::DispatchJournalOperation(int64 OperationId, LMail3ImapOperationS
 bool ImapStore::OnIdle()
 {
 	if (IsLive())
+	{
 		PumpJournal();
+		// Backpressure includes owning-thread snapshot application, not just network completion.
+		if (Online == STATUS_ONLINE && !ActiveRefresh.Length() && LiveFolders.Length() &&
+			LCurrentTime() >= NextFolderSync)
+		{
+			ImapFolderInfo Folder;
+			Folder = LiveFolders[0];
+			LiveFolders.DeleteAt(0, true);
+			NextFolderSync = LCurrentTime() + 100;
+			RefreshMailbox(Folder.Remote, Folder.Sep, Folder.ForceFull);
+		}
+	}
 	if (Listing.Length() > 0)
 	{
 		LAutoPtr<ImapMsg> m(Listing[0]);
@@ -555,6 +746,7 @@ Store3Status ImapStore::SetInt(int id, int64 val)
 	if (id == FIELD_IS_ONLINE && !val)
 	{
 		DeleteObj(Thread);
+		ActiveRefresh.Empty();
 		Online = STATUS_OFFLINE;
 		return InterruptPendingJournal("The account was taken offline before the journal result was committed.")
 			? Store3Success : Store3Error;
@@ -1093,30 +1285,23 @@ void ImapStore::OnEvent(void *Param)
 				}
 				if (IsLive() && Applied && m->JournalResult.Outcome == ImapJournalOutcome::Confirmed)
 				{
-					std::function<void(ImapFolder*)> Reload = [&](ImapFolder *Folder)
-					{
-						if (Folder->Mail.State == Store3Loaded)
-							Folder->SyncLiveMail(true);
-						for (auto Child: Folder->Sub.a)
-							Reload(Child);
-					};
-					Reload(Root);
+					auto Operation = PendingJournalOperation;
+					SyncLiveOperation(Operation);
+					LArray<ImapFolderInfo> Deferred;
+					Deferred.Swap(DeferredRefresh);
+					for (auto Name: {Operation.SourceRemoteName, Operation.DestinationRemoteName})
+						if (Name)
+						{
+							bool Found = false;
+							for (auto &Folder: Deferred)
+								if (Folder.Remote == Name)
+									Found = true;
+							if (!Found)
+								Deferred.New().Remote = Name;
+						}
 					PumpJournal();
-					if (PendingJournalId <= 0)
-					{
-						if (LiveFolders.Length())
-						{
-							for (auto &Folder: LiveFolders)
-								RefreshMailbox(Folder.Remote, Folder.Sep);
-						}
-						else
-						{
-							LArray<LMail3ImapMailbox> Mailboxes;
-							if (Storage->LoadImapMailboxes(AccountId, Mailboxes))
-								for (auto &Mailbox: Mailboxes)
-									RefreshMailbox(Mailbox.RemoteName);
-						}
-					}
+					for (auto &Folder: Deferred)
+						RefreshMailbox(Folder.Remote, Folder.Sep, Folder.ForceFull);
 				}
 				if (!Applied || m->JournalResult.Outcome != ImapJournalOutcome::Confirmed)
 				{
@@ -1167,7 +1352,7 @@ void ImapStore::OnEvent(void *Param)
 					// p.Add("Inbox");
 					// Select the INBOX and start loading it's mail
 					ImapFolder *Inbox = Root->Find(NULL, "/INBOX");
-					if (Inbox)
+					if (Inbox && !IsLive())
 					{
 						// p.Add("Inbox.Select");
 						Inbox->OnSelect(true);
@@ -1191,6 +1376,8 @@ void ImapStore::OnEvent(void *Param)
 			case IMAP_ERROR:
 			{
 				Online = STATUS_ERROR;
+				if (m->Diagnostic)
+					ReportError(m->Diagnostic);
 				break;
 			}
 			case IMAP_ON_NEW:
@@ -1456,7 +1643,7 @@ void ImapStore::OnEvent(void *Param)
 				// LgiTrace("Ending IMAP_ON_DEL\n");
 				break;
 			}
-			case IMAP_REBUILD_MAILBOX:
+			case IMAP_SYNC_FOLDER:
 			{
 				ReportError("A server snapshot requires the shared SQLite IMAP backend.");
 				break;

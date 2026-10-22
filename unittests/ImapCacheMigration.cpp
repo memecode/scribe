@@ -99,7 +99,7 @@ namespace
 			Server.Uid = UINT32_MAX - 1;
 			Server.Headers = Raw.substr(0, Raw.find("\r\n\r\n")).c_str();
 			Server.Size = Raw.size();
-			Require(Store.RebuildImapMailbox(Inbox, Messages) && Store.RebuildImapMailbox(Archive, Empty),
+			Require(Store.SyncImapFolder(Inbox, Messages) && Store.SyncImapFolder(Archive, Empty),
 				"Cannot create verified cutover mailboxes");
 			Require(Store.FindImapMessage(Inbox.Id, 100, Server.Uid, Identity),
 				"Cannot find the canonical cutover identity");
@@ -268,7 +268,7 @@ namespace
 			Other.RemoteName = "/INBOX";
 			Other.UidValidity = 123;
 			Other.UidNext = 10;
-			Require(Store.RebuildImapMailbox(Other, Empty) &&
+			Require(Store.SyncImapFolder(Other, Empty) &&
 				Store.StageImapAppend(43, Other.Id, 0, Body, Append) &&
 				Store.BeginImapOperation(Append.Id, Claimed), "Independent account work was unnecessarily blocked");
 			Require(Store.InterruptImapOperation(Append.Id, "Connection lost after APPEND") &&
@@ -307,7 +307,7 @@ namespace
 				"An uncertain command was retried or bypassed without reconciliation");
 			Require(Export(Store, StagedId) == Raw, "A queued APPEND lost its original bytes on restart");
 			LArray<LMail3ImapServerMessage> Empty;
-			Require(!Store.RebuildImapMailbox(Archive, Empty),
+			Require(!Store.SyncImapFolder(Archive, Empty),
 				"A snapshot bypassed outstanding journal work");
 		}
 	}
@@ -733,7 +733,7 @@ namespace
 					Message.Uid = UINT32_MAX - 1;
 					Message.Headers = Raw.substr(0, Raw.find("\r\n\r\n")).c_str();
 					Message.Size = Raw.size();
-					Require(Store.RebuildImapMailbox(Source, Messages) && Store.RebuildImapMailbox(Destination, Empty),
+					Require(Store.SyncImapFolder(Source, Messages) && Store.SyncImapFolder(Destination, Empty),
 						"Cannot establish reconciliation mailboxes");
 					LMemStream Body(Raw.data(), Raw.size());
 					if (Append)
@@ -993,7 +993,7 @@ namespace
 				Message.RemoteFlags = 32;
 				Message.Headers = Raw.substr(0, Raw.find("\r\n\r\n")).c_str();
 				Message.Size = Raw.size();
-				Require(Store.RebuildImapMailbox(Source, Messages) && Store.RebuildImapMailbox(Destination, Empty),
+				Require(Store.SyncImapFolder(Source, Messages) && Store.SyncImapFolder(Destination, Empty),
 					"Cannot establish continuation mailboxes");
 				LMail3ImapMessage Identity;
 				Require(Store.FindImapMessage(Source.Id, 100, UINT32_MAX - 1, Identity),
@@ -1216,7 +1216,7 @@ namespace
 				Message.Uid = UINT32_MAX - 1;
 				Message.Headers = Raw.substr(0, Raw.find("\r\n\r\n")).c_str();
 				Message.Size = Raw.size();
-				Require(Store.RebuildImapMailbox(Source, Messages) && Store.RebuildImapMailbox(Destination, Empty),
+				Require(Store.SyncImapFolder(Source, Messages) && Store.SyncImapFolder(Destination, Empty),
 					"Cannot create the move journal mailboxes");
 				LMail3ImapMessage Identity;
 				Require(Store.FindImapMessage(Source.Id, 100, UINT32_MAX - 1, Identity),
@@ -1290,7 +1290,7 @@ namespace
 				Mailbox.UidValidity = UINT32_MAX;
 				Mailbox.UidNext = 10;
 				LArray<LMail3ImapServerMessage> Empty;
-				Require(Store.RebuildImapMailbox(Mailbox, Empty), "Cannot establish the bridge mailbox identity");
+				Require(Store.SyncImapFolder(Mailbox, Empty), "Cannot establish the bridge mailbox identity");
 				LMemStream Body(Raw.data(), Raw.size());
 				Require(Store.StageImapAppend(42, Mailbox.Id, 32, Body, Operation), "Cannot stage the bridge APPEND");
 				Require(!PrepareImapJournalOperation(Store, 43, Operation.Id, Command) &&
@@ -1495,6 +1495,35 @@ namespace
 
 	void TestLiveAdapters()
 	{
+		class LiveEvents : public LDataEventsI
+		{
+		public:
+			unsigned FolderUpdates = 0, FolderReloads = 0;
+			unsigned Errors = 0;
+			void OnPropChange(LDataStoreI *, int Field, LVariantType) override
+			{
+				if (Field == FIELD_ERROR)
+					Errors++;
+			}
+			void OnNew(LDataFolderI *, LArray<LDataI*> &, int, bool, bool) override {}
+			bool OnDelete(LDataFolderI *, LArray<LDataI*> &) override { return true; }
+			bool OnMove(LDataFolderI *, LDataFolderI *, LArray<LDataI*> &) override { return true; }
+			bool OnChange(LArray<LDataI*> &Items, int Hint) override
+			{
+				for (auto Item: Items)
+					if (auto Folder = dynamic_cast<ImapFolder*>(Item))
+					{
+						FolderUpdates++;
+						if (Hint == FIELD_STATUS)
+						{
+							FolderReloads++;
+							Folder->Children();
+							Folder->OnSelect(true);
+						}
+					}
+				return true;
+			}
+		} Events;
 		Fixture Files;
 		auto Database = Files.Root / "live.mail3";
 		std::string Raw = "From: sender@example.test\r\nTo: receiver@example.test\r\n"
@@ -1515,9 +1544,10 @@ namespace
 			Message.Uid = UINT32_MAX - 1;
 			Message.Size = Raw.size();
 			Message.Headers = Raw.substr(0, Raw.find("\r\n\r\n")).c_str();
-			Require(Storage.RebuildImapMailbox(Source, Messages) && Storage.RebuildImapMailbox(Destination, Empty),
+			Require(Storage.SyncImapFolder(Source, Messages) && Storage.SyncImapFolder(Destination, Empty),
 				"Cannot establish live adapter mailboxes");
-			ImapStore Live(Storage, 42);
+			ImapStore Live(LString(), 0, LString(), LString(), 0, &Events, NULL, NULL, NULL,
+				42, LAutoPtr<ProtocolSettingStore>(), &Storage);
 			auto Root = dynamic_cast<ImapFolder*>(Live.GetRoot(false));
 			auto Inbox = Root->Find(NULL, "/INBOX");
 			auto Archive = Root->Find(NULL, "/Archive");
@@ -1556,13 +1586,28 @@ namespace
 				!(Mail->GetInt(FIELD_FLAGS) & MAIL_READ), "Live flag changes bypassed durable intent or reported premature success");
 			LArray<LMail3ImapOperation> Operations;
 			Require(Storage.LoadImapOperations(42, Operations) && Operations.Length() == 1, "Live flag intent is missing");
+			auto FlagsId = Operations[0].Id;
+			Require(Mail->SetInt(FIELD_FLAGS, MAIL_READ) == Store3Delayed &&
+				Storage.LoadImapOperations(42, Operations) && Operations.Length() == 1 &&
+				Operations[0].Id == FlagsId && Operations[0].Attempts == 0 &&
+				!Live.GetStr(FIELD_ERROR),
+				"Repeated queued read requests inserted duplicate intent or reported an error");
+			Require(Live.QueueMutation(*Mail, LMail3ImapOperationType::Delete) == Store3Error &&
+				Scalar(Storage, "select count(*) from ImapOperation") == 1,
+				"A conflicting request replaced a pending flag change");
 			ImapJournalCommand Command;
 			Require(PrepareImapJournalOperation(Storage, 42, Operations[0].Id, Command), "Cannot claim live flags");
+			Require(Mail->SetInt(FIELD_FLAGS, MAIL_READ) == Store3Delayed &&
+				Storage.LoadImapOperations(42, Operations) && Operations.Length() == 1 &&
+				Operations[0].Attempts == 1 && Operations[0].State == LMail3ImapOperationState::Executing,
+				"Repeated executing read requests changed the active claim");
 			JournalImap FlagsServer(JournalScript::Normal);
 			auto FlagsResult = ExecuteImapJournalOperation(FlagsServer, Command);
-			Require(ApplyImapJournalResult(Storage, 42, FlagsResult) && Inbox->SyncLiveMail(true) &&
+			Require(ApplyImapJournalResult(Storage, 42, FlagsResult) && Live.SyncLiveOperation(Command.Operation) &&
 				(Mail->GetInt(FIELD_FLAGS) & MAIL_READ), "Committed live flag result did not refresh the adapter");
-			auto Stale = new ImapMsg(IMAP_REBUILD_MAILBOX, _FL);
+			Require(Events.FolderUpdates > 0 && Events.FolderReloads == 0,
+				"Snapshot notifications requested delayed-load repopulation and another server refresh");
+			auto Stale = new ImapMsg(IMAP_SYNC_FOLDER, _FL);
 			Stale->Last = true;
 			auto &OldFolder = Stale->Fld.New();
 			OldFolder.Remote = "/INBOX";
@@ -1589,17 +1634,27 @@ namespace
 			Items.Add(Mail);
 			Require(Archive->Move(Items) == Store3Delayed && Mail->Parent == Inbox &&
 				Storage.LoadImapOperations(42, Operations), "Live move changed membership before server confirmation");
+			Require(Archive->Move(Items) == Store3Delayed &&
+				Storage.LoadImapOperations(42, Operations) && Operations.Length() == 1,
+				"Repeated same-destination moves queued duplicate intent");
 			Require(PrepareImapJournalOperation(Storage, 42, Operations[0].Id, Command), "Cannot claim the live move");
 			JournalImap MoveServer(JournalScript::Normal);
 			MoveServer.Script->SeedFlags(32, 0);
 			auto MoveResult = ExecuteImapJournalOperation(MoveServer, Command);
-			Require(ApplyImapJournalResult(Storage, 42, MoveResult) && Inbox->SyncLiveMail(true) &&
-				Archive->SyncLiveMail(true) && !Inbox->Children().Length(), "Committed move did not reconcile live membership");
+			Require(ApplyImapJournalResult(Storage, 42, MoveResult) && Live.SyncLiveOperation(Command.Operation) &&
+				!Inbox->Children().Length(), "Committed move did not reconcile live membership");
 			auto Moved = dynamic_cast<ImapMail*>(Archive->Children()[0]);
 			Require(Moved && Moved->Canonical->Id == MailId && Moved->Uid == UINT32_MAX &&
 				!Strcmp(Moved->GetStr(FIELD_LABEL), "live label") && Moved->GetInt(FIELD_COLOUR) == 1234 &&
 				Export(Storage, MailId) == Raw, "Live move lost canonical ID, body or customizations");
 			Require(Storage.GetRoot()->SubFolders().Length() == 0, "Local Mail3 navigation exposed IMAP records outside their protocol adapter");
+			auto Error = new ImapMsg(IMAP_ERROR, _FL);
+			Error->Diagnostic = "fixture snapshot rejected: missing headers";
+			auto Before = Events.Errors;
+			Live.OnEvent(Error);
+			Require(Events.Errors == Before + 1 &&
+				!Strcmp(Live.GetStr(FIELD_ERROR), "fixture snapshot rejected: missing headers"),
+				"Snapshot failure diagnostics did not reach the owning-thread error callback");
 		}
 		{
 			LMail3Store Storage(Database.c_str(), NULL, false);
@@ -1612,6 +1667,18 @@ namespace
 				Root->Find(NULL, "/INBOX")->GetInt(FIELD_SORT) == FIELD_SUBJECT &&
 				Archive->Fields()[0]->GetInt(FIELD_WIDTH) == 321 &&
 				!Strcmp(Mail->GetStr(FIELD_TEXT), "body"), "Restarted live adapters lost persisted body or display settings");
+			LArray<LMail3ImapOperation> Operations;
+			ImapJournalCommand Command;
+			Require(Live.QueueMutation(*Mail, LMail3ImapOperationType::Delete) == Store3Delayed &&
+				Live.QueueMutation(*Mail, LMail3ImapOperationType::Delete) == Store3Delayed &&
+				Storage.LoadImapOperations(42, Operations) && Operations.Length() == 1 &&
+				PrepareImapJournalOperation(Storage, 42, Operations[0].Id, Command) &&
+				Storage.InterruptImapOperation(Operations[0].Id, "fixture interrupted delete") &&
+				Live.QueueMutation(*Mail, LMail3ImapOperationType::Delete) == Store3Error &&
+				Storage.LoadImapOperations(42, Operations) && Operations.Length() == 1 &&
+				Operations[0].State == LMail3ImapOperationState::NeedsReconciliation &&
+				Operations[0].Attempts == 1,
+				"Duplicate deletes inserted intent or an unresolved operation was silently retried");
 			auto Upload = new ImapMail(&Live, _FL);
 			LMemStream Body(Raw.data(), Raw.size());
 			Require(Upload->SetRfc822(&Body) == Store3Success && Upload->SetStr(FIELD_LABEL, "uploaded label") == Store3Success &&
@@ -1619,6 +1686,511 @@ namespace
 				Scalar(Storage, "select count(*) from ImapOperation where OperationType=4 and State=0") == 1 &&
 				Scalar(Storage, "select count(*) from Mail where ImapUid is null and Label='uploaded label'") == 1,
 				"Live APPEND did not atomically persist raw bytes, properties and journal intent");
+		}
+	}
+
+	void TestLiveOperationScope()
+	{
+		Fixture Files;
+		auto Database = Files.Root / "scope.mail3";
+		LMail3Store Storage(Database.c_str(), NULL, true);
+		Require(Storage.GetRoot() != NULL, "Cannot create the operation-scope fixture");
+		LMail3ImapMailbox Inbox, Archive;
+		Inbox.AccountId = Archive.AccountId = 42;
+		Inbox.RemoteName = "/INBOX";
+		Archive.RemoteName = "/Archive";
+		Inbox.UidValidity = Archive.UidValidity = 100;
+		Inbox.UidNext = Archive.UidNext = 257;
+		LArray<LMail3ImapServerMessage> Messages;
+		for (int Index = 1; Index <= 256; Index++)
+		{
+			auto &Message = Messages.New();
+			Message.Uid = Index;
+			Message.Size = 100;
+			Message.Headers = LString::Fmt("From: sender@example.test\r\nSubject: Scope %i\r\n"
+				"Message-ID: <scope-%i>\r\n\r\n", Index, Index);
+		}
+		Require(Storage.SyncImapFolder(Inbox, Messages) && Storage.SyncImapFolder(Archive, Messages),
+			"Cannot establish operation-scope mailboxes");
+		ImapStore Live(Storage, 42);
+		auto Root = dynamic_cast<ImapFolder*>(Live.GetRoot(false));
+		auto Source = Root->Find(NULL, "/INBOX");
+		auto Destination = Root->Find(NULL, "/Archive");
+		auto Mail = dynamic_cast<ImapMail*>(Source->Children()[0]);
+		auto Unrelated = dynamic_cast<ImapMail*>(Destination->Children()[0]);
+		auto Unchanged = Unrelated->Canonical.Get();
+		LMail3ImapOperation Operation;
+		Operation.AccountId = 42;
+		Operation.MailId = Mail->Canonical->Id;
+		Operation.SourceMailboxId = Inbox.Id;
+		std::string Raw = "From: sender@example.test\r\nSubject: Scope 1\r\nMessage-ID: <scope-1>\r\n\r\n";
+		Raw.resize(100, 'x');
+		LMail3ImapMessage Identity;
+		LMemStream Body(Raw.data(), Raw.size());
+		Require(Storage.LoadImapMessage(Operation.MailId, Identity) &&
+			Storage.StoreImapBody(42, Identity, Body),
+			"Cannot store a downloaded body for scoped metadata reload");
+		struct Trace
+		{
+			unsigned MailLoads = 0, BodyLoads = 0;
+		} Counts;
+		auto Callback = [](unsigned, void *Context, void *Statement, void *) -> int
+		{
+			auto &Counts = *static_cast<Trace*>(Context);
+			std::string Sql = sqlite3_sql(static_cast<sqlite3_stmt*>(Statement));
+			if (Sql.find("select * from Mail where") != std::string::npos)
+				Counts.MailLoads++;
+			if (Sql.find("select * from 'MailSegs'") != std::string::npos ||
+				Sql.find("select * from MailSegs") != std::string::npos)
+				Counts.BodyLoads++;
+			return 0;
+		};
+		Require(sqlite3_trace_v2(Storage.GetDb(), SQLITE_TRACE_STMT, Callback, &Counts) == SQLITE_OK,
+			"Cannot trace focused operation reloads");
+		bool Synced = Live.SyncLiveOperation(Operation);
+		sqlite3_trace_v2(Storage.GetDb(), 0, NULL, NULL);
+		Require(Synced && Counts.MailLoads == 1 && Counts.BodyLoads == 0 &&
+			Source->Children().Length() == 256 && Destination->Children().Length() == 256 &&
+			Unrelated->Canonical.Get() == Unchanged &&
+			!Strcmp(Mail->GetStr(FIELD_INTERNET_HEADER), Raw.substr(0, Raw.find("\r\n\r\n")).c_str()) &&
+			Export(Storage, Operation.MailId) == Raw,
+			"Single-message completion reloaded unrelated messages, read MIME bodies or removed unrelated membership");
+		auto Snapshot = [&](bool Seen)
+		{
+			auto Result = new ImapMsg(IMAP_SYNC_FOLDER, _FL);
+			Result->Last = true;
+			auto &Folder = Result->Fld.New();
+			Folder.Remote = "/INBOX";
+			Folder.UidValidity = 100;
+			Folder.UidNext = 257;
+			Folder.LastUid = 0;
+			Folder.Incremental = true;
+			for (int Index = 1; Index <= 256; Index++)
+			{
+				auto &Message = Result->Mail.New();
+				Message.Uid = Index;
+				Message.Flags.ImapSeen = Seen && Index == 1;
+			}
+			return Result;
+		};
+		auto MailBefore = Mail->Canonical.Get();
+		Counts = {};
+		Require(sqlite3_trace_v2(Storage.GetDb(), SQLITE_TRACE_STMT, Callback, &Counts) == SQLITE_OK,
+			"Cannot trace unchanged synchronization");
+		Live.OnEvent(Snapshot(false));
+		sqlite3_trace_v2(Storage.GetDb(), 0, NULL, NULL);
+		Require(!Live.GetStr(FIELD_ERROR) && Counts.MailLoads == 0 && Counts.BodyLoads == 0 &&
+			Mail->Canonical.Get() == MailBefore && Unrelated->Canonical.Get() == Unchanged,
+			"Unchanged synchronization deserialized cached messages or reloaded adapters");
+		Counts = {};
+		Require(sqlite3_trace_v2(Storage.GetDb(), SQLITE_TRACE_STMT, Callback, &Counts) == SQLITE_OK,
+			"Cannot trace changed synchronization");
+		Live.OnEvent(Snapshot(true));
+		sqlite3_trace_v2(Storage.GetDb(), 0, NULL, NULL);
+		Require(!Live.GetStr(FIELD_ERROR) && Counts.MailLoads == 2 && Counts.BodyLoads == 0 &&
+			(Mail->GetInt(FIELD_FLAGS) & MAIL_READ) && Unrelated->Canonical.Get() == Unchanged &&
+			Export(Storage, Operation.MailId) == Raw,
+			"A one-message flag change reloaded unrelated cached messages or lost the body");
+		ImapStore Unopened(Storage, 42);
+		auto UnopenedFolder = dynamic_cast<ImapFolder*>(Unopened.GetRoot(false))->Find(NULL, "/INBOX");
+		Require(!UnopenedFolder->GetInt(FIELD_LOADED), "Fixture mailbox was already loaded");
+		Counts = {};
+		Require(sqlite3_trace_v2(Storage.GetDb(), SQLITE_TRACE_STMT, Callback, &Counts) == SQLITE_OK,
+			"Cannot trace unopened synchronization");
+		Unopened.OnEvent(Snapshot(false));
+		sqlite3_trace_v2(Storage.GetDb(), 0, NULL, NULL);
+		Require(!Unopened.GetStr(FIELD_ERROR) && !UnopenedFolder->GetInt(FIELD_LOADED) &&
+			Counts.MailLoads == 1 && Counts.BodyLoads == 0 &&
+			UnopenedFolder->GetInt(FIELD_UNREAD) == 256 && UnopenedFolder->Children().Length() == 256,
+			"Background synchronization eagerly loaded an unopened mailbox or lost its unread count");
+	}
+
+	void TestRefreshCoalescing()
+	{
+		class RefreshEvents : public LDataEventsI
+		{
+		public:
+			ImapStore *Store = NULL;
+			unsigned ReentrantRequests = 0;
+			void OnNew(LDataFolderI *, LArray<LDataI*> &, int, bool, bool) override {}
+			bool OnDelete(LDataFolderI *, LArray<LDataI*> &) override { return true; }
+			bool OnMove(LDataFolderI *, LDataFolderI *, LArray<LDataI*> &) override { return true; }
+			bool OnChange(LArray<LDataI*> &Items, int Hint) override
+			{
+				if (Store && Hint == FIELD_UNREAD)
+					for (auto Item: Items)
+						if (auto Folder = dynamic_cast<ImapFolder*>(Item))
+						{
+							ReentrantRequests++;
+							Store->RefreshMailbox(Folder->Remote);
+						}
+				return true;
+			}
+		} Events;
+		class QueuedStore : public ImapStore
+		{
+		public:
+			std::vector<ImapMsg*> Requests;
+			bool Reject = false;
+			QueuedStore(LMail3Store &Storage, LDataEventsI *Events) :
+				ImapStore(LString(), 0, LString(), LString(), 0, Events, NULL, NULL, NULL,
+					42, LAutoPtr<ProtocolSettingStore>(), &Storage) {}
+			~QueuedStore()
+			{
+				for (auto Request: Requests)
+					delete Request;
+			}
+			bool PostThread(ImapMsg *Message, bool) override
+			{
+				if (Reject)
+				{
+					delete Message;
+					return false;
+				}
+				Requests.push_back(Message);
+				return true;
+			}
+			void Complete(bool Failed = false)
+			{
+				Require(!Requests.empty(), "No queued refresh to complete");
+				auto Message = Requests.front();
+				Requests.erase(Requests.begin());
+				Message->Last = true;
+				Message->Fld[0].LastUid = 0;
+				Message->Fld[0].UidValidity = 100;
+				Message->Fld[0].UidNext = 1;
+				if (Failed)
+					Message->Diagnostic = "fixture rejected snapshot";
+				OnEvent(Message);
+			}
+		};
+		Fixture Files;
+		LMail3Store Storage((Files.Root / "coalescing.mail3").c_str(), NULL, true);
+		Require(Storage.GetRoot() != NULL, "Cannot create refresh coalescing fixture");
+		QueuedStore Live(Storage, &Events);
+		Events.Store = &Live;
+		Require(Live.RefreshMailbox("/INBOX") && Live.RefreshMailbox("/INBOX") &&
+			Live.RefreshMailbox("/Archive") && Live.Requests.size() == 2,
+			"Duplicate requests queued multiple snapshots or blocked a different folder");
+		Live.Complete();
+		Live.Complete();
+		Require(Live.Requests.empty() && Events.ReentrantRequests == 2 && Live.RefreshMailbox("/INBOX"),
+			"Snapshot application queued reentrant refreshes or prevented a later refresh");
+		Require(Live.RefreshMailbox("/INBOX", 0, true) && Live.RefreshMailbox("/INBOX", 0, true) &&
+			Live.Requests.size() == 1 && !Live.Requests[0]->Fld[0].ForceFull,
+			"Full-refresh upgrade duplicated or modified the in-flight request");
+		Live.Complete();
+		Require(Live.Requests.size() == 1 && Live.Requests[0]->Fld[0].ForceFull,
+			"Explicit full-refresh upgrade was lost");
+		Require(Live.RefreshMailbox("/INBOX", 0, true) && Live.Requests.size() == 1,
+			"An already-full snapshot queued another full refresh");
+		Live.Complete();
+		Require(Live.Requests.empty(), "Full refresh produced an endless follow-up");
+		Require(Live.RefreshMailbox("/INBOX") &&
+			Live.RefreshMailbox("/INBOX", 0, false, true) &&
+			Live.RefreshMailbox("/INBOX", 0, false, true) && Live.Requests.size() == 1,
+			"Server notifications bypassed in-flight coalescing");
+		Live.Complete();
+		Require(Live.Requests.size() == 1, "A server change during sync lost its follow-up");
+		Live.Complete();
+		Require(Live.Requests.empty(), "Server-change follow-up repeated without another change");
+		Live.OnEvent(new ImapMsg(IMAP_ONLINE, _FL));
+		Require(Live.GetInt(FIELD_IS_ONLINE) && Live.Requests.empty() && Live.RefreshMailbox("/INBOX"),
+			"Going online materialized the inbox or cannot queue a snapshot");
+		auto Status = Live.GetInt(FIELD_STORE_STATUS);
+		Live.Complete(true);
+		Require(Live.Requests.empty() && Live.GetStr(FIELD_ERROR) &&
+			Live.GetInt(FIELD_STORE_STATUS) == Status && Live.RefreshMailbox("/INBOX"),
+			"Rejected snapshot changed connection state or rejected a suspended automatic request");
+		Require(Live.Requests.empty() && Live.RefreshMailbox("/INBOX", 0, false, true) &&
+			Live.Requests.empty(), "A rejected mailbox retried automatically");
+		for (int Connection = 0; Connection < 3; Connection++)
+		{
+			auto Inventory = new ImapMsg(IMAP_FOLDER_LISTING, _FL);
+			Inventory->Last = true;
+			Inventory->Fld.New().Remote = "/INBOX";
+			Inventory->Fld.New().Remote = "/Archive";
+			Live.OnEvent(Inventory);
+			Require(Live.Requests.empty(), "Folder inventory flooded the worker queue");
+			LSleep(110);
+			Live.OnIdle();
+			LSleep(110);
+			Live.OnIdle();
+			Require(Live.Requests.size() == 1 && Live.Requests[0]->Fld[0].Remote == "/Archive",
+				"Reconnect retried the rejected mailbox or blocked a healthy mailbox");
+			Live.Complete();
+		}
+		Require(Live.RefreshMailbox("/INBOX", 0, true) && Live.Requests.size() == 1 &&
+			Live.Requests[0]->Fld[0].ForceFull, "Explicit Refresh did not retry the rejected mailbox");
+		Live.Complete(true);
+		Require(Live.RefreshMailbox("/INBOX") && Live.Requests.empty(),
+			"Another failure did not suspend the explicit retry");
+		Require(Live.RefreshMailbox("/INBOX", 0, true) && Live.Requests.size() == 1,
+			"Cannot retry a repeatedly rejected mailbox explicitly");
+		Live.Complete();
+		Require(Live.RefreshMailbox("/INBOX") && Live.Requests.size() == 1,
+			"Successful explicit Refresh did not restore automatic sync");
+		Live.JournalQueued();
+		Live.Complete();
+		Require(Live.Requests.size() == 1, "A stale-generation snapshot lost its replacement");
+		Live.Complete();
+		Live.Reject = true;
+		Require(!Live.RefreshMailbox("/INBOX"), "Rejected dispatch reported success");
+		Live.Reject = false;
+		Require(Live.RefreshMailbox("/INBOX") && Live.Requests.size() == 1,
+			"Rejected dispatch left the folder permanently in flight");
+		Live.Complete();
+		auto Inventory = new ImapMsg(IMAP_FOLDER_LISTING, _FL);
+		Inventory->Last = true;
+		for (int Index = 0; Index < 32; Index++)
+			Inventory->Fld.New().Remote = LString::Fmt("/Background-%i", Index);
+		Live.OnEvent(Inventory);
+		Require(Live.Requests.empty(), "Inventory synchronously scheduled background work");
+		LSleep(110);
+		Live.OnIdle();
+		Require(Live.Requests.size() == 1, "Idle did not schedule exactly one background mailbox");
+		for (int Index = 0; Index < 50; Index++)
+			Live.OnIdle();
+		Require(Live.Requests.size() == 1, "Idle bypassed snapshot backpressure");
+		Live.Complete();
+		Live.OnIdle();
+		Require(Live.Requests.empty(), "Snapshot completion did not yield before the next mailbox");
+		LSleep(110);
+		Live.OnIdle();
+		Require(Live.Requests.size() == 1, "Paced synchronization stopped before the next mailbox");
+		Live.Complete();
+	}
+
+	void TestIncrementalSync()
+	{
+		class SyncSocket : public LSocket
+		{
+			std::string Response;
+			size_t Offset = 0;
+			int Mode;
+			unsigned Selects = 0;
+		public:
+			unsigned Inventories = 0, Headers = 0, HeaderMessages = 0;
+			std::vector<std::string> HeaderRanges;
+			SyncSocket(int Mode) : Mode(Mode) {}
+			bool IsOpen() override { return true; }
+			ssize_t Write(const void *Data, ssize_t Size, int = 0) override
+			{
+				std::string Command((const char*)Data, Size);
+				auto Tag = Command.substr(0, Command.find(' '));
+				Response.clear();
+				Offset = 0;
+				if (Command.find(" SELECT ") != std::string::npos)
+				{
+					Selects++;
+					auto Count = Mode == 4 ? 0 : Mode == 14 ? 207 : 2;
+					if (Mode == 10 && Selects > 1)
+						Count++;
+					auto Epoch = Mode == 2 || (Mode == 9 && Selects > 1) ? 200 : 100;
+					Response = "* " + std::to_string(Count) + " EXISTS\r\n* 0 RECENT\r\n"
+						"* OK [UIDVALIDITY " + std::to_string(Epoch) + "] epoch\r\n"
+						"* OK [UIDNEXT " + std::string(Mode == 16 && Selects > 1 ? "301" : "300") +
+						"] next\r\n" + Tag + " OK selected\r\n";
+				}
+				else if (Command.find(" (UID FLAGS)") != std::string::npos)
+				{
+					Inventories++;
+					auto Count = Mode == 14 ? 207 : Mode == 12 ? 1 : 2;
+					for (int Index = 1; Index <= Count; Index++)
+					{
+						auto Uid = Index == 2 && Mode != 0 && Mode != 14 ? 3 : Index;
+						if (Mode == 5 && Index == 2)
+							Uid = 1;
+						Response += "* " + std::to_string(Index) + " FETCH (UID " + std::to_string(Uid) +
+							(Mode == 6 ? ")\r\n" : Index == 1 ? " FLAGS (\\Seen))\r\n" : " FLAGS ())\r\n");
+					}
+					Response += Tag + " OK inventory\r\n";
+				}
+				else if (Command.find("BODY.PEEK[HEADER]") != std::string::npos)
+				{
+					Headers++;
+					auto Begin = Command.find("UID FETCH ") + 10;
+					auto End = Command.find(' ', Begin);
+					auto Range = Command.substr(Begin, End - Begin);
+					HeaderRanges.push_back(Range);
+					std::vector<int> Uids;
+					if (Range == "1:*")
+						Uids = {1, 2};
+					else
+					{
+						auto Start = Range.c_str();
+						char *Next;
+						while (*Start)
+						{
+							Uids.push_back((int)strtol(Start, &Next, 10));
+							Start = *Next == ',' ? Next + 1 : Next;
+						}
+					}
+					for (auto Uid: Uids)
+					{
+						HeaderMessages++;
+						if (Mode == 7)
+							continue;
+						if (Mode == 8)
+							Uid = 99;
+						std::string Header = "From: sender@example.test\r\nSubject: Incremental\r\nMessage-ID: <sync-" +
+							std::to_string(Uid) + ">\r\n\r\n";
+						Response += "* 1 FETCH (UID " + std::to_string(Uid) +
+							(Uid == 1 || Mode == 11 ? " FLAGS (\\Seen)" : " FLAGS ()") +
+							" RFC822.SIZE 100 BODY[HEADER] {" + std::to_string(Header.size()) + "}\r\n" + Header + ")\r\n";
+					}
+					Response += Tag + " OK headers\r\n";
+				}
+				else
+					throw std::runtime_error("Unexpected command during incremental synchronization");
+				return Size;
+			}
+			ssize_t Read(void *Data, ssize_t Size, int = 0) override
+			{
+				auto Count = std::min<size_t>(std::min<ssize_t>(Size, 31), Response.size() - Offset);
+				memcpy(Data, Response.data() + Offset, Count);
+				Offset += Count;
+				return Count;
+			}
+		};
+		class SyncImap : public MailIMap
+		{
+		public:
+			SyncSocket *Script;
+			SyncImap(int Mode)
+			{
+				Script = new SyncSocket(Mode);
+				Socket.Reset(Script);
+			}
+		};
+		for (int Mode: {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16})
+		{
+			Fixture Files;
+			auto Database = Files.Root / "incremental.mail3";
+			LMail3ImapMailbox Mailbox;
+			Mailbox.AccountId = 42;
+			Mailbox.RemoteName = "/INBOX";
+			Mailbox.UidValidity = 100;
+			Mailbox.UidNext = 3;
+			int64 First;
+			std::string Raw = "From: sender@example.test\r\nSubject: Incremental\r\nMessage-ID: <sync-1>\r\n\r\n";
+			Raw.resize(100, 'x');
+			{
+				LMail3Store Store(Database.c_str(), NULL, true);
+				Require(Store.GetRoot() != NULL, "Cannot create incremental sync fixture");
+				LArray<LMail3ImapServerMessage> Seed;
+				for (int Uid = 1; Uid <= 2; Uid++)
+				{
+					auto &Message = Seed.New();
+					Message.Uid = Uid;
+					Message.Size = 100;
+					Message.Headers = LString::Fmt("From: sender@example.test\r\nSubject: Incremental\r\n"
+						"Message-ID: <sync-%i>\r\n\r\n", Uid);
+				}
+				Require(Store.SyncImapFolder(Mailbox, Seed), "Cannot seed incremental mailbox");
+				First = Scalar(Store, "select Id from Mail where ImapUid=1");
+				LMail3ImapMessage Identity;
+				LMemStream Body(Raw.data(), Raw.size());
+				Require(Store.LoadImapMessage(First, Identity) && Store.StoreImapBody(42, Identity, Body) &&
+					Store.Check(sqlite3_exec(Store.GetDb(),
+						"update Mail set Label='kept',MarkColour=1234 where ImapUid=1;"
+						"update Mail set Label='retired customization' where ImapUid=2", NULL, NULL, NULL), NULL),
+					"Cannot seed downloaded body and customizations");
+			}
+			LMail3Store Store(Database.c_str(), NULL, false);
+			SyncImap Server(Mode);
+			ImapFolderInfo Folder;
+			Folder.Remote = "/INBOX";
+			Folder.UidValidity = 100;
+			Folder.Incremental = Mode != 3;
+			Folder.ForceFull = Mode == 15;
+			Folder.KnownUids.Add(1);
+			Folder.KnownUids.Add(2);
+			LAutoPtr<ImapMsg> Response(new ImapMsg(IMAP_SYNC_FOLDER, _FL));
+			LString Error;
+			bool Ok = FetchImapRebuild(Server, Folder, *Response, Error);
+			bool Expected = Mode <= 4 || Mode == 14 || Mode == 15;
+			Require(Ok == Expected && (bool)Error != Expected,
+				"Incremental sync accepted invalid evidence or rejected a stable inventory");
+			if (!Ok)
+			{
+				Require(Scalar(Store, "select count(*) from Mail") == 2 && Export(Store, First) == Raw,
+					"Failed incremental fetch changed cached content");
+				continue;
+			}
+			Require(Response->Fld[0].Incremental == (Mode != 2 && Mode != 3 && Mode != 15),
+				"Changed epochs or uncached requests used headerless incremental results");
+			Require(Server.Script->Headers == (Mode == 0 || Mode == 4 ? 0 : Mode == 14 ? 3 : 1) &&
+				Server.Script->HeaderMessages == (Mode == 0 || Mode == 4 ? 0 : Mode == 14 ? 205 :
+					Mode == 2 || Mode == 3 || Mode == 15 ? 2 : 1),
+				"Steady-state synchronization refetched cached headers or failed to batch new UIDs");
+			if (Mode == 1)
+				Require(Server.Script->HeaderRanges[0] == "3", "Incremental sync fetched headers outside the new UID set");
+			LArray<LMail3ImapServerMessage> Verified;
+			for (auto &Message: Response->Mail)
+			{
+				auto &Row = Verified.New();
+				Row.Uid = Message.Uid;
+				Row.RemoteFlags = Message.Flags.All;
+				Row.Size = Message.Size;
+				Row.Headers = Message.Headers;
+			}
+			auto Updated = Mailbox;
+			Updated.UidValidity = Response->Fld[0].UidValidity;
+			Updated.UidNext = Response->Fld[0].UidNext;
+			if (Mode == 1)
+			{
+				Require(Store.Check(sqlite3_exec(Store.GetDb(),
+					"create trigger FailSyncRemoval before delete on Mail "
+					"begin select raise(abort,'fixture incremental removal failure'); end", NULL, NULL, NULL), NULL),
+					"Cannot inject incremental synchronization failure");
+				Require(!Store.SyncImapFolder(Updated, Verified, true) &&
+					Scalar(Store, "select count(*) from Mail where ImapUid in (1,2)") == 2 &&
+					Scalar(Store, "select count(*) from Mail where ImapUid=3") == 0 &&
+					!(Scalar(Store, "select Flags from Mail where ImapUid=1") & MAIL_READ) &&
+					Export(Store, First) == Raw,
+					"Failed incremental synchronization committed partial flags, insertions or deletions");
+				Require(Store.Check(sqlite3_exec(Store.GetDb(), "drop trigger FailSyncRemoval", NULL, NULL, NULL), NULL),
+					"Cannot clear incremental synchronization failure");
+			}
+			ImapStore Live(Store, 42);
+			Live.OnEvent(Response.Release());
+			Require(!Live.GetStr(FIELD_ERROR) &&
+				Scalar(Store, "select count(*) from Mail") == (Mode == 4 ? 0 : Mode == 14 ? 207 : 2),
+				"Live incremental synchronization did not reconcile committed membership");
+			if (Mode != 2 && Mode != 4)
+				Require(Scalar(Store, "select Id from Mail where ImapUid=1") == First &&
+					Scalar(Store, "select count(*) from Mail where ImapUid=1 and Label='kept' and MarkColour=1234"
+						" and Size=100") == 1 &&
+					(Scalar(Store, "select Flags from Mail where ImapUid=1") & MAIL_READ) &&
+					Export(Store, First) == Raw,
+					"Incremental synchronization lost the cached identity, body, size, flags or customizations");
+			if (Mode == 2)
+				Require(Scalar(Store, "select count(*) from Mail where ImapUidValidity=200 and ImapDownloaded=0") == 2,
+					"UIDVALIDITY reset reused cached server bodies");
+			if (Mode == 1 || Mode == 4)
+				Require(Scalar(Store, "select count(*) from ImapLocalSettings"
+					" where Settings like '%retired customization%'") == 1,
+					"Incremental expunges discarded recoverable local customizations");
+			if (Mode == 0)
+			{
+				Require(Store.Check(sqlite3_exec(Store.GetDb(),
+					"create trigger FailUnchangedMail before update on Mail "
+					"begin select raise(abort,'unchanged mail rewritten'); end;"
+					"create trigger FailUnchangedSettings before update on ImapLocalSettings "
+					"begin select raise(abort,'unchanged recovery settings rewritten'); end", NULL, NULL, NULL), NULL),
+					"Cannot guard unchanged incremental records");
+				Require(Store.SyncImapFolder(Updated, Verified, true) && Export(Store, First) == Raw,
+					"An unchanged incremental sync rewrote mail or recovery settings");
+				auto WrongEpoch = Updated;
+				WrongEpoch.UidValidity++;
+				Require(!Store.SyncImapFolder(WrongEpoch, Verified, true),
+					"Headerless incremental results crossed UIDVALIDITY epochs");
+				Verified[1].Uid = 99;
+				Require(!Store.SyncImapFolder(Updated, Verified, true) &&
+					Scalar(Store, "select count(*) from Mail") == 2,
+					"Incremental persistence invented metadata for a new headerless UID");
+			}
 		}
 	}
 
@@ -1660,13 +2232,24 @@ namespace
 				else if (Command.find("UID FETCH 1:*") != std::string::npos)
 				{
 					Fetches++;
+					Require(Command.find("(FLAGS UID RFC822.SIZE BODY.PEEK[HEADER])") != std::string::npos,
+						"Canonical snapshots fetched unused BODYSTRUCTURE metadata");
+					if (Mode == 9)
+						Response += "* 1 FETCH (UID 7 RFC822.SIZE 100 BODY[HEADER] {4}\r\nx:\r\n)\r\n";
+					if (Mode == 10)
+						Response += "* 1 FETCH (UID 0 FLAGS () RFC822.SIZE 100 BODY[HEADER] {4}\r\nx:\r\n)\r\n";
+					if (Mode == 11)
+						Response += "* 1 FETCH (FLAGS (\\Seen))\r\n";
+					if (Mode == 12)
+						Response += "* 1 FETCH (UID 7 FLAGS () RFC822.SIZE 100)\r\n";
 					for (int n = 1; n <= (Mode == 4 ? 1 : 2); n++)
 					{
 						std::string Header = "From: server@example.com\r\nSubject: Server\r\nMessage-ID: <" +
 							std::to_string(n) + ">\r\n\r\n";
 						Response += "* " + std::to_string(n) + " FETCH (UID " +
-							std::to_string(n == 1 ? 2147483649LL : 2LL) +
-							" FLAGS (\\Seen) RFC822.SIZE 100 BODY[HEADER] {" +
+							std::to_string(n == 1 || Mode == 13 ? 2147483649LL : 2LL) +
+							(Mode == 8 ? " FLAGS ()" : " FLAGS (\\Seen)") +
+							" RFC822.SIZE 100 BODY[HEADER] {" +
 							std::to_string(Header.size()) + "}\r\n" + Header + ")\r\n";
 					}
 					Response += Tag + " OK FETCH done\r\n";
@@ -1699,25 +2282,31 @@ namespace
 		Require(Values.Find("UIDVALIDITY").Int() == UINT32_MAX, "SELECT lost unsigned UIDVALIDITY");
 		Require(Values.Find("UIDNEXT").Int() == 3000000000LL, "SELECT lost UIDNEXT");
 		Require(Values.Find("Exists").Int() == 2, "SELECT changed existing EXISTS parsing");
-		for (int Mode = 0; Mode <= 7; Mode++)
+		for (int Mode = 0; Mode <= 13; Mode++)
 		{
 			ScriptedImap Server(Mode);
 			ImapFolderInfo Folder;
 			Folder.Remote = "/INBOX";
 			Folder.Sep = '/';
 			Folder.LastUid = UINT32_MAX;
-			ImapMsg Result(IMAP_REBUILD_MAILBOX, _FL);
+			ImapMsg Result(IMAP_SYNC_FOLDER, _FL);
 			Result.Last = true;
 			LString Error;
 			bool Ok = FetchImapRebuild(Server, Folder, Result, Error);
-			Require(Ok == (Mode <= 1), "Snapshot verification accepted a partial/changing server listing");
+			Require(Ok == (Mode <= 1 || Mode == 8 || Mode == 11),
+				"Snapshot verification rejected empty flags/unsolicited updates or accepted an invalid listing");
 			if (Ok)
 			{
 				Require(Result.Last && Result.Fld.Length() == 1 && Result.Fld[0].LastUid == 0 &&
 					Result.Fld[0].UidValidity == UINT32_MAX, "Snapshot did not establish fresh server identity");
-				if (Mode == 0)
+				if (Mode != 1)
+				{
 					Require(Result.Mail.Length() == 2 && Result.Mail[0].Uid == 2147483649U,
 						"Snapshot truncated server UIDs or respected a cached last UID");
+					if (Mode == 8)
+						Require(Result.Mail[0].Flags.All == 0 && Result.Mail[1].Flags.All == 0,
+							"Snapshot did not retain valid empty server flags");
+				}
 				else
 					Require(Result.Mail.Length() == 0 && Server.Script->Fetches == 0,
 						"Empty mailbox rebuild issued an invalid FETCH");
@@ -1976,7 +2565,7 @@ namespace
 				"Settings recovery must not import cached mail or folder membership");
 			Require(Scalar(Store, "select count(*) from ImapLocalSettings where Settings like '%Uid=%'") == 0,
 				"Settings recovery copied unverified UIDs");
-			Require(Store.RebuildImapMailbox(Inbox, Messages), "Server rebuild failed");
+			Require(Store.SyncImapFolder(Inbox, Messages), "Server rebuild failed");
 			Require(Scalar(Store, "select count(*) from Mail") == 5, "Rebuild imported cached membership");
 			Require(Scalar(Store, "select count(*) from MailSegs") == 0, "Rebuild imported cached bodies");
 			Require(Scalar(Store, "select count(*) from Mail where ImapUidValidity=4294967295 and ImapDownloaded=0") == 5,
@@ -2016,7 +2605,7 @@ namespace
 			Require(Store.Check(sqlite3_exec(Store.GetDb(),
 				"update Mail set Label='edited', MarkColour=123 where MessageID='<unique>'", NULL, NULL, NULL), NULL),
 				"Cannot edit the restored customization");
-			Require(Store.RebuildImapMailbox(Inbox, Messages), "Repeated server rebuild failed");
+			Require(Store.SyncImapFolder(Inbox, Messages), "Repeated server rebuild failed");
 			Require(Scalar(Store, "select Id from Mail where ImapUid=10") == OriginalId &&
 				Scalar(Store, "select count(*) from Mail where Label='edited' and MarkColour=123") == 1,
 				"Repeated refresh changed IDs or overwrote local edits");
@@ -2025,24 +2614,24 @@ namespace
 				"Same-epoch refresh discarded or changed downloaded content");
 			auto OriginalHeaders = Messages[0].Headers;
 			Messages[0].Headers = "From: server@example.com\r\nMessage-ID: <unexpected-reuse>\r\n";
-			Require(!Store.RebuildImapMailbox(Inbox, Messages), "Rebuild accepted contradictory UID identity");
+			Require(!Store.SyncImapFolder(Inbox, Messages), "Rebuild accepted contradictory UID identity");
 			Require(Export(Store, OriginalId) == Download, "Contradictory identity damaged downloaded content");
 			Messages[0].Headers = OriginalHeaders;
 			Require(Store.Check(sqlite3_exec(Store.GetDb(),
 				"insert into ImapOperation(AccountId,OperationType,State) values(42,0,0)", NULL, NULL, NULL), NULL),
 				"Cannot install the pending-operation fixture");
-			Require(!Store.RebuildImapMailbox(Inbox, Messages), "Rebuild must not bypass pending server operations");
+			Require(!Store.SyncImapFolder(Inbox, Messages), "Rebuild must not bypass pending server operations");
 			Require(Export(Store, OriginalId) == Download, "Refused rebuild damaged existing content");
 			Require(Store.Check(sqlite3_exec(Store.GetDb(), "delete from ImapOperation where AccountId=42",
 				NULL, NULL, NULL), NULL), "Cannot remove the pending-operation fixture");
 			auto Other = Inbox;
 			Other.AccountId = 43;
-			Require(Store.RebuildImapMailbox(Other, Messages), "Second account rebuild failed");
+			Require(Store.SyncImapFolder(Other, Messages), "Second account rebuild failed");
 			Require(Scalar(Store, "select count(*) from Mail where AccountId=43 and Label is not null and Label!=''") == 0,
 				"Labels leaked across accounts");
 			Other = Inbox;
 			Other.RemoteName = "/Other";
-			Require(Store.RebuildImapMailbox(Other, Messages), "Second mailbox rebuild failed");
+			Require(Store.SyncImapFolder(Other, Messages), "Second mailbox rebuild failed");
 			Require(Scalar(Store, "select count(*) from Mail where Label='edited'") == 1,
 				"Labels leaked across mailboxes");
 
@@ -2053,14 +2642,14 @@ namespace
 			Inbox.UidValidity = 200;
 			Messages[0].Uid = 20;
 			Messages[1].Uid = 25;
-			Require(!Store.RebuildImapMailbox(Inbox, Messages), "Server rebuild failure must abort");
+			Require(!Store.SyncImapFolder(Inbox, Messages), "Server rebuild failure must abort");
 			Require(Scalar(Store, "select count(*) from Mail where ImapUidValidity=200") == 0 &&
 				Scalar(Store, "select Id from Mail where ImapUid=10 order by Id limit 1") == OriginalId,
 				"Failed server rebuild invalidated the old snapshot");
 			Require(Export(Store, OriginalId) == Download, "Failed rebuild damaged downloaded content");
 			Require(Store.Check(sqlite3_exec(Store.GetDb(), "drop trigger FailServerRebuild", NULL, NULL, NULL), NULL),
 				"Cannot remove rebuild rollback fixture");
-			Require(Store.RebuildImapMailbox(Inbox, Messages), "UIDVALIDITY reset rebuild failed");
+			Require(Store.SyncImapFolder(Inbox, Messages), "UIDVALIDITY reset rebuild failed");
 			Require(Scalar(Store, "select count(*) from Mail where ParentId=(select Id from Folder "
 				"where ImapAccountId=42 and ImapRemoteName='/INBOX') and ImapUidValidity=200") == 5,
 				"Epoch reset retained old UID mappings");
@@ -2071,11 +2660,11 @@ namespace
 				"and ImapUid=20 and Label='edited' and MarkColour=123") == 1,
 				"Epoch reset lost uniquely matched current customizations");
 			Messages[1].Uid = 20;
-			Require(!Store.RebuildImapMailbox(Inbox, Messages), "Duplicate server UIDs must be rejected");
+			Require(!Store.SyncImapFolder(Inbox, Messages), "Duplicate server UIDs must be rejected");
 			Messages[1].Uid = 25;
 			auto Epoch = Inbox.UidValidity;
 			Inbox.UidValidity = 0;
-			Require(!Store.RebuildImapMailbox(Inbox, Messages), "Unknown server epochs must be rejected");
+			Require(!Store.SyncImapFolder(Inbox, Messages), "Unknown server epochs must be rejected");
 			Inbox.UidValidity = Epoch;
 			Require(sqlite3_get_autocommit(Store.GetDb()) && sqlite3_next_stmt(Store.GetDb(), NULL) == NULL,
 				"Rebuild leaked transactions or statements");
@@ -2084,15 +2673,15 @@ namespace
 			LMail3Store Store(Database.c_str(), NULL, false);
 			Files.Write(Cache / "INBOX" / "Folder.xml", "<Folder/>");
 			Require(Store.ImportImapSettings(42, Cache.c_str()), "Restarted settings import failed");
-			Require(Store.RebuildImapMailbox(Inbox, Messages), "Restarted server rebuild failed");
+			Require(Store.SyncImapFolder(Inbox, Messages), "Restarted server rebuild failed");
 			Require(Scalar(Store, "select count(*) from Mail where Label='edited'") == 1,
 				"Restart lost restored labels");
 			LArray<LMail3ImapServerMessage> Empty;
-			Require(Store.RebuildImapMailbox(Inbox, Empty), "Empty server mailbox rebuild failed");
+			Require(Store.SyncImapFolder(Inbox, Empty), "Empty server mailbox rebuild failed");
 			Require(Scalar(Store, "select count(*) from Mail where ParentId=(select Id from Folder "
 				"where ImapAccountId=42 and ImapRemoteName='/INBOX')") == 0, "Server deletions were not reflected");
 			Messages[0].Uid = 29;
-			Require(Store.RebuildImapMailbox(Inbox, Messages), "Restoring a returning server message failed");
+			Require(Store.SyncImapFolder(Inbox, Messages), "Restoring a returning server message failed");
 			Require(Scalar(Store, "select count(*) from Mail where Label='edited'") == 1,
 				"A server deletion discarded the latest recoverable local customization");
 		}
@@ -2326,6 +2915,9 @@ int LgiMain(OsAppArguments &Arguments)
 		TestLocalUploadRecovery();
 		TestLiveBodyFetch();
 		TestLiveAdapters();
+		TestLiveOperationScope();
+		TestRefreshCoalescing();
+		TestIncrementalSync();
 		TestServerRebuild();
 		FreeStrToDom();
 		printf("IMAP cache migration tests passed\n");

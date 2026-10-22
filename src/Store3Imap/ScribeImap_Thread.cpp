@@ -1,4 +1,6 @@
 #include <stdarg.h>
+#include <set>
+#include <map>
 
 #include "lgi/common/Lgi.h"
 #include "lgi/common/Mail.h"
@@ -29,21 +31,23 @@ size_t CurTestCmd = 0;
 
 static char BodyTag[]			= "UID BODY.PEEK[]"; // If you change this, check DownloadCallback as well
 static char MailListingParts[]	= "FLAGS UID RFC822.SIZE BODYSTRUCTURE BODY.PEEK[HEADER]";
+static char SnapshotParts[]		= "FLAGS UID RFC822.SIZE BODY.PEEK[HEADER]";
 static char OtherListingParts[]	= "FLAGS UID";
 
 bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void *UserData);
 
 bool FetchImapRebuild(MailIMap &Imap, const ImapFolderInfo &Folder, ImapMsg &Response, LString &Error)
 {
-	Response.SetType(IMAP_REBUILD_MAILBOX, _FL);
+	Response.SetType(IMAP_SYNC_FOLDER, _FL);
 	Response.Mail.Empty();
 	Response.Fld.Empty();
 	Response.Last = false;
+	Response.Diagnostic.Empty();
 	Error.Empty();
 	MailIMap::StrMap Before, After;
 	if (!Imap.SelectFolder(Folder.Remote, &Before))
 	{
-		Error = "Cannot SELECT the mailbox for the server rebuild.";
+		Error = "Cannot SELECT the mailbox for synchronization.";
 		return false;
 	}
 	auto Epoch = Before.Find("UIDVALIDITY");
@@ -61,15 +65,107 @@ bool FetchImapRebuild(MailIMap &Imap, const ImapFolderInfo &Folder, ImapMsg &Res
 	Selected.LastUid = 0;
 	Selected.UidValidity = Epoch.Int();
 	Selected.UidNext = Next.Int();
-	if ((Count.Int() > 0 && !Imap.Fetch(true, "1:*", MailListingParts, ListingCallback, &Response, NULL)) ||
+	Selected.ForceFull = Folder.ForceFull;
+	Selected.Incremental = !Folder.ForceFull && Folder.Incremental && Folder.UidValidity == Epoch.Int();
+	if (Selected.Incremental && Count.Int() > 0)
+	{
+		struct InventoryState
+		{
+			std::map<uint32_t, int> Flags;
+			bool Invalid = false;
+		} Inventory;
+		auto Callback = [](MailIMap *, uint32_t, MailIMap::StrMap &Parts, void *Context)
+		{
+			auto &State = *static_cast<InventoryState*>(Context);
+			auto Uid = Parts.Find("UID");
+			if (!Uid)
+				return true;
+			bool HasFlags = false;
+			for (auto Part: Parts)
+				if (!Stricmp(Part.key, "FLAGS"))
+					HasFlags = true;
+			ImapMailFlags Flags;
+			Flags.Set(Parts.Find("FLAGS"));
+			if (!Uid.IsNumeric() || Uid.Int() <= 0 || Uid.Int() > UINT32_MAX || !HasFlags ||
+				!State.Flags.emplace((uint32_t)Uid.Int(), Flags.All).second)
+			{
+				State.Invalid = true;
+				return false;
+			}
+			return true;
+		};
+		if (!Imap.Fetch(true, "1:*", "UID FLAGS", Callback, &Inventory, NULL) ||
+			Inventory.Invalid || (int64)Inventory.Flags.size() != Count.Int())
+		{
+			Error = "Incomplete or invalid UID/flags inventory; mailbox sync not committed.";
+			return false;
+		}
+		std::set<uint32_t> Known;
+		for (size_t Index = 0; Index < Folder.KnownUids.Length(); Index++)
+			Known.insert(Folder.KnownUids.ItemAt(Index));
+		LArray<uint32_t> NewUids;
+		for (auto &Entry: Inventory.Flags)
+			if (!Known.count(Entry.first))
+				NewUids.Add(Entry.first);
+		std::map<uint32_t, ImapMailInfo> NewMail;
+		for (size_t Start = 0; Start < NewUids.Length(); Start += 100)
+		{
+			LStringPipe Range;
+			for (size_t Index = Start; Index < NewUids.Length() && Index < Start + 100; Index++)
+				Range.Print("%s%u", Index == Start ? "" : ",", NewUids[Index]);
+			ImapMsg Headers(IMAP_SYNC_FOLDER, _FL);
+			Headers.Fld.New().LastUid = 0;
+			auto Requested = Range.NewLStr();
+			if (!Imap.Fetch(true, Requested, SnapshotParts, ListingCallback, &Headers, NULL) ||
+				Headers.Diagnostic || Headers.Mail.Length() != MIN((size_t)100, NewUids.Length() - Start))
+			{
+				Error = Headers.Diagnostic ? Headers.Diagnostic :
+					LString("Incomplete new-message headers; mailbox sync not committed.");
+				return false;
+			}
+			std::set<uint32_t> Batch;
+			for (size_t Index = Start; Index < NewUids.Length() && Index < Start + 100; Index++)
+				Batch.insert(NewUids[Index]);
+			for (auto &Message: Headers.Mail)
+				if (!Batch.count(Message.Uid) || !NewMail.emplace(Message.Uid, Message).second ||
+					Message.Flags.All != Inventory.Flags[Message.Uid])
+				{
+					Error = "Unexpected UID or changed flags in new-message headers; mailbox sync not committed.";
+					return false;
+				}
+		}
+		for (auto &Entry: Inventory.Flags)
+		{
+			auto &Message = Response.Mail.New();
+			auto New = NewMail.find(Entry.first);
+			if (New != NewMail.end())
+				Message = New->second;
+			else
+			{
+				Message.Uid = Entry.first;
+				Message.Flags.All = Entry.second;
+			}
+		}
+	}
+	if ((!Selected.Incremental && Count.Int() > 0 &&
+			!Imap.Fetch(true, "1:*", SnapshotParts, ListingCallback, &Response, NULL)) ||
+		Response.Diagnostic ||
 		!Imap.SelectFolder(Folder.Remote, &After) ||
 		After.Find("UIDVALIDITY") != Epoch || After.Find("UIDNEXT") != Next ||
 		After.Find("Exists") != Count ||
 		(int64)Response.Mail.Length() != Count.Int())
 	{
-		Error = "Incomplete or changing server snapshot; rebuild not committed.";
+		Error = Response.Diagnostic ? Response.Diagnostic :
+			LString("Incomplete or changing server snapshot; mailbox sync not committed.");
 		return false;
 	}
+	std::set<uint32_t> Uids;
+	for (auto &Message: Response.Mail)
+		if (!Uids.insert(Message.Uid).second)
+		{
+			Error = "Duplicate UID in the mailbox sync FETCH response.";
+			return false;
+		}
 	Response.Last = true;
 	return true;
 }
@@ -773,10 +869,24 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 	auto Rfc822Size		= Parts.Find("RFC822.SIZE");
 	auto BodyStructure	= Parts.Find("BODYSTRUCTURE");
 	auto Header			= Parts.Find("BODY[HEADER]");
-	if (m->Type == IMAP_REBUILD_MAILBOX &&
-		(!Flags || !Rfc822Size.IsNumeric() || Rfc822Size.Int() < 0 || !Header))
+	if (!Uid)
+		return true; // Unsolicited sequence-only FETCH notification.
+	bool HasFlags = false, HasHeader = false;
+	for (auto Part: Parts)
 	{
-		LgiTrace("Incomplete metadata in the server rebuild FETCH response.\n");
+		if (!Stricmp(Part.key, "FLAGS"))
+			HasFlags = true;
+		if (!Stricmp(Part.key, "BODY[HEADER]"))
+			HasHeader = true;
+	}
+	if (m->Type == IMAP_SYNC_FOLDER &&
+		(!HasFlags || !Rfc822Size.IsNumeric() || Rfc822Size.Int() < 0 || !Header))
+	{
+		m->Diagnostic = LString::Fmt("Incomplete server rebuild FETCH metadata (sequence %u, UID %" PRIi64 "): "
+			"FLAGS present=%i, numeric RFC822.SIZE=%i, header field present=%i, header bytes=%" PRIi64 ".",
+			Msg, Uid.Int(), (int)HasFlags, (int)(Rfc822Size.IsNumeric() && Rfc822Size.Int() >= 0),
+			(int)HasHeader, (int64)Header.Length());
+		LgiTrace("%s\n", m->Diagnostic.Get());
 		return false;
 	}
 
@@ -788,22 +898,17 @@ bool ListingCallback(MailIMap *Imap, uint32_t Msg, MailIMap::StrMap &Parts, void
 	}
 	#endif
 
-	if (!Uid)
-	{
-		// This happens when the server sends us FETCH lines outside of what we requested
-		// Ideally we'd handle them properly, but for the moment, lets just keep trucking.
-		return true;
-	}
-
 	auto Number = Uid.Int();
 	if (!Uid.IsNumeric() || Number <= 0 || Number > UINT32_MAX)
 	{
+		if (m->Type == IMAP_SYNC_FOLDER)
+			m->Diagnostic = "Invalid UID in the server rebuild FETCH response.";
 		LgiTrace("Invalid UID in the server FETCH response: '%s'.\n", Uid.Get());
 		return false;
 	}
 	uint32_t uid = (uint32_t)Number;
 	#ifdef _DEBUG
-	if (m->Type != IMAP_REBUILD_MAILBOX)
+	if (m->Type != IMAP_SYNC_FOLDER)
 		for (auto &Message: m->Mail)
 		{
 			if (Message.Uid == uid)
@@ -1084,6 +1189,9 @@ int ImapThread::Main()
 	int IdleCount = 0;
 	uint64 IdleStart = 0;
 	uint64 ErrorStart = 0;
+	unsigned Connection = 0;
+	ImapMsgType LastCommand = IMAP_NULL;
+	LString LastMailbox;
 
 	while (!d->IsCancelled())
 	{
@@ -1091,6 +1199,9 @@ int ImapThread::Main()
 			!d->Imap->IsOnline())
 		{
 			// Lost connection... delete and start again
+			LgiTrace("IMAP account %i connection %u lost after %s '%s'; idle=%i.\n",
+				d->AccountId, Connection, ImapMsgTypeNames[LastCommand],
+				LastMailbox.Get() ? LastMailbox.Get() : "", (int)InIdle);
 			if (d->Lock(_FL))
 			{
 				d->Imap.Reset();
@@ -1205,7 +1316,10 @@ int ImapThread::Main()
 									d->Store->ConnectFlags))
 				{
 					ErrorStart = 0;
+					Connection++;
 					d->CurrentFolder.Empty();
+					LgiTrace("IMAP account %i connection %u established; requesting folder inventory.\n",
+						d->AccountId, Connection);
 					if (d->Log)
 						d->Log->Print("Connected to %s:%i\n", u.sHost.Get(), u.Port);
 
@@ -1277,6 +1391,9 @@ int ImapThread::Main()
 			
 		if (m)
 		{
+			LastCommand = m->Type;
+			LastMailbox = m->Parent ? m->Parent :
+				m->Fld.Length() ? m->Fld[0].Remote : LString();
 			// This block skips the idle stop code if the folder select is the current folder,
 			// which in turn is a noop anyway.
 			if (m->Type == IMAP_SELECT_FOLDER &&
@@ -1315,6 +1432,8 @@ int ImapThread::Main()
 					m->Journal.Reset();
 					if (m->JournalResult.Outcome != ImapJournalOutcome::Confirmed && d->Lock(_FL))
 					{
+						LgiTrace("IMAP account %i closing connection %u: unconfirmed journal operation %" PRIi64 ": %s\n",
+							d->AccountId, Connection, m->JournalResult.OperationId, m->JournalResult.Error.Get());
 						// Even a failed preflight may leave an unconsumed transport reply.
 						d->Imap.Reset();
 						d->Unlock();
@@ -1322,18 +1441,25 @@ int ImapThread::Main()
 					PostStore(m.Release());
 					break;
 				}
-				case IMAP_REBUILD_MAILBOX:
+				case IMAP_SYNC_FOLDER:
 				{
 					for (auto &Folder: m->Fld)
 					{
-						LAutoPtr<ImapMsg> Response(new ImapMsg(IMAP_REBUILD_MAILBOX, _FL));
+						LAutoPtr<ImapMsg> Response(new ImapMsg(IMAP_SYNC_FOLDER, _FL));
 						Response->Generation = m->Generation;
 						LString Error;
 						d->CurrentFolder.Empty();
 						if (!FetchImapRebuild(*d->Imap, Folder, *Response, Error))
 						{
-							d->Error(_FL, "Server rebuild '%s': %s", Folder.Remote.Get(), Error.Get());
-							PostStore(new ImapMsg(IMAP_ERROR, _FL));
+							LgiTrace("IMAP account %i sync '%s' rejected on connection %u; transport online=%i.\n",
+								d->AccountId, Folder.Remote.Get(), Connection, (int)d->Imap->IsOnline());
+							d->Error(_FL, "Mailbox sync '%s': %s", Folder.Remote.Get(), Error.Get());
+							LAutoPtr<ImapMsg> Failure(new ImapMsg(IMAP_SYNC_FOLDER, _FL));
+							Failure->Generation = m->Generation;
+							Failure->Fld.New() = Folder;
+							Failure->Diagnostic = LString::Fmt("IMAP account %i snapshot '%s' rejected: %s",
+								d->AccountId, Folder.Remote.Get(), Error.Get());
+							PostStore(Failure.Release());
 							continue;
 						}
 						d->CurrentFolder = Folder.Remote;
@@ -1346,7 +1472,7 @@ int ImapThread::Main()
 				{
 					if (d->Store->IsLive())
 					{
-						m->Type = IMAP_REBUILD_MAILBOX;
+						m->Type = IMAP_SYNC_FOLDER;
 						PostThread(m.Release(), true);
 						break;
 					}
@@ -1425,6 +1551,8 @@ int ImapThread::Main()
 							auto &Body = Response->Mail.New();
 							if (!FetchImapBody(*d->Imap, m->Parent, Request, Body, Response->Diagnostic))
 							{
+								LgiTrace("IMAP account %i closing connection %u: body verification failed for '%s', UID %u: %s\n",
+									d->AccountId, Connection, m->Parent.Get(), Request.Uid, Response->Diagnostic.Get());
 								d->Error(_FL, "%s", Response->Diagnostic.Get());
 								if (d->Lock(_FL))
 								{
@@ -2000,6 +2128,8 @@ int ImapThread::Main()
 					{
 						// This can happen when the connection dies... so closing
 						// it will allow proper cleanup and re-connection.
+						LgiTrace("IMAP account %i closing connection %u: cannot start IDLE for '%s'.\n",
+							d->AccountId, Connection, d->CurrentFolder.Get());
 						if (d->Lock(_FL))
 						{
 							d->Imap->Close();

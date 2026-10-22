@@ -1359,15 +1359,6 @@ void ScribeWnd::LoadFolders(std::function<void(bool)> Callback)
 
 	LoadMailStores([this, PrevState, Callback](auto Status)
 	{
-		if (Tree)
-		{
-			for (auto a: Accounts)
-			{
-				if (!a->Receive.Disabled() && a->Receive.IsPersistant())
-					a->Receive.Connect(0, false);
-			}
-		}
-
 		using BoolFn = std::function<void(bool)>;
 		auto FinishLoad = new BoolFn
 		(

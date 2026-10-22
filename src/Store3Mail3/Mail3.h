@@ -451,7 +451,8 @@ public:
 	bool DeleteImapMessage(int64 MailId);
 	bool ImportImapCache(int64 AccountId, const char *CachePath);
 	bool ImportImapSettings(int64 AccountId, const char *CachePath);
-	bool RebuildImapMailbox(LMail3ImapMailbox &Mailbox, LArray<LMail3ImapServerMessage> &Messages);
+	bool SyncImapFolder(LMail3ImapMailbox &Mailbox, LArray<LMail3ImapServerMessage> &Messages,
+		bool Incremental = false, LArray<int64> *ChangedIds = NULL);
 	bool StoreImapBody(int64 AccountId, const LMail3ImapMessage &Identity, LStreamI &Body);
 	LAutoStreamI OpenImapBody(int64 AccountId, const LMail3ImapMessage &Identity);
 	bool QueueImapOperation(LMail3ImapOperation &Operation);

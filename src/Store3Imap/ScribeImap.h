@@ -49,6 +49,8 @@
 #define TIMEOUT_FOLDER_LOAD		100 // ms
 #define IMAP_BLOCK_SIZE			100 // chuck large processes into this many items
 
+/// Various IMAP messages:
+/// Note: If you change this, also update 'ImapMsgTypeNames'
 enum ImapMsgType
 {
 	IMAP_NULL,
@@ -70,6 +72,7 @@ enum ImapMsgType
 	IMAP_EXPUNGE_FOLDER,
 	IMAP_RENAME_FOLDER,
 	IMAP_LOAD_FOLDER,
+	IMAP_SYNC_FOLDER,
 
 	// Mail
 	IMAP_FOLDER_SELECTED,
@@ -77,12 +80,11 @@ enum ImapMsgType
 	IMAP_DOWNLOAD,
 	IMAP_APPEND,
 	IMAP_MOVE_EMAIL,
-
-	// General
 	IMAP_DELETE,
 	IMAP_UNDELETE,
 	IMAP_SET_FLAGS,
-	IMAP_REBUILD_MAILBOX,
+
+	// General
 	IMAP_JOURNAL_OPERATION,
 	
 	// Check
@@ -105,6 +107,9 @@ struct ImapFolderInfo
 	char Sep;
 	int64 UidValidity = -1;
 	int64 UidNext = -1;
+	bool Incremental = false;
+	bool ForceFull = false;
+	LArray<uint32_t> KnownUids;
 	
 	ImapFolderInfo()
 	{
@@ -120,6 +125,9 @@ struct ImapFolderInfo
 		Sep = i.Sep;
 		UidValidity = i.UidValidity;
 		UidNext = i.UidNext;
+		Incremental = i.Incremental;
+		ForceFull = i.ForceFull;
+		KnownUids = i.KnownUids;
 		return *this;
 	}
 };
@@ -250,10 +258,20 @@ class ImapStore : public LDataStoreI
 	LMail3Store *Storage = NULL;
 	int64 PendingJournalId = -1;
 	int PendingJournalAttempt = 0;
+	LMail3ImapOperation PendingJournalOperation;
 	int64 LiveGeneration = 0;
 	ScribeAccountletStatusIcon Online = STATUS_OFFLINE;
 	LArray<ImapMsg*> Listing;
 	LArray<ImapFolderInfo> LiveFolders;
+	uint64 NextFolderSync = 0;
+	LArray<ImapFolderInfo> DeferredRefresh;
+	struct MailboxRefresh
+	{
+		ImapFolderInfo Folder;
+		bool Repeat = false;
+	};
+	LArray<MailboxRefresh> ActiveRefresh;
+	LArray<LString> FailedRefresh;
 	int64 LastPulse = 0;
 	int64 SelectTime = 0;
 	int64 ListingTime = 0;
@@ -293,16 +311,18 @@ public:
 	bool IsLive() const { return Storage != NULL; }
 	bool ReportError(const char *Error);
 	void JournalQueued();
-	bool RefreshMailbox(const char *Remote, char Delimiter = 0);
+	bool RefreshMailbox(const char *Remote, char Delimiter = 0, bool ForceFull = false,
+		bool ServerChanged = false);
 	Store3Status QueueMutation(ImapMail &Mail, LMail3ImapOperationType Type,
 		int Flags = 0, ImapFolder *Destination = NULL);
 	bool SyncLiveFolders();
+	bool SyncLiveOperation(const LMail3ImapOperation &Operation);
 	// Owning-thread bridge from durable intent to the network worker.
 	// Reconciling observes only; ContinuingMove can add \Deleted without repeating COPY.
 	bool DispatchJournalOperation(int64 OperationId,
 		LMail3ImapOperationState ClaimedState = LMail3ImapOperationState::Executing);
 	void PostStore(ImapMsg *m) { Callback->Post(this, m); }
-	bool PostThread(ImapMsg *m, bool UiPriority);
+	virtual bool PostThread(ImapMsg *m, bool UiPriority);
 
 	void OnNew(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &new_items, int pos, bool is_new);
 	bool OnDelete(const char *File, int Line, LDataFolderI *parent, LArray<LDataI*> &del);
@@ -602,7 +622,7 @@ public:
 	DIterator<LDataPropI, ImapFolderFld, ImapStore> Field;
 	LAutoPtr<LMail3Folder> Canonical;
 	bool ReloadCanonical(int64 Id);
-	bool SyncLiveMail(bool Notify);
+	bool SyncLiveMail(bool Notify, int64 MailId = -1, const LArray<int64> *ChangedIds = NULL);
 
 	ImapFolder(ImapStore *store, const char *path = NULL);
 	~ImapFolder();

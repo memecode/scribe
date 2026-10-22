@@ -2897,44 +2897,82 @@ bool LMail3Store::ImportImapSettings(int64 AccountId, const char *CachePath)
 	return Transaction.Commit() || Fail("Cannot commit recovered settings.");
 }
 
-bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LMail3ImapServerMessage> &Messages)
+bool LMail3Store::SyncImapFolder(LMail3ImapMailbox &ResultMailbox,
+	LArray<LMail3ImapServerMessage> &Messages, bool Incremental, LArray<int64> *ChangedIds)
 {
+	if (ChangedIds)
+		ChangedIds->Empty();
+	LArray<int64> Changed;
 	auto Mailbox = ResultMailbox;
 	auto Fail = [&](const char *Reason)
 	{
-		ErrorMsg.Printf("IMAP server rebuild failed for '%s': %s",
+		ErrorMsg.Printf("IMAP mailbox sync failed for '%s': %s",
 			Mailbox.RemoteName ? Mailbox.RemoteName.Get() : "<missing mailbox>", Reason);
 		LgiTrace("%s\n", ErrorMsg.Get());
 		return false;
 	};
-	if (!IsOk() || !InThread() || GetInt(FIELD_STATUS) != Store3Success ||
-		!sqlite3_get_autocommit(Db) || Mailbox.AccountId < 0 || Mailbox.AccountId > INT_MAX ||
-		!Mailbox.RemoteName || Mailbox.RemoteName.Get()[0] != '/' ||
-		Mailbox.RemoteName == "/" || Mailbox.UidValidity <= 0 || Mailbox.UidValidity > UINT32_MAX ||
-		(Mailbox.UidNext != -1 && (Mailbox.UidNext <= 0 || Mailbox.UidNext > UINT32_MAX)))
+	if (!IsOk() ||
+		!InThread() ||
+		GetInt(FIELD_STATUS) != Store3Success ||
+		!sqlite3_get_autocommit(Db) ||
+		Mailbox.AccountId < 0 ||
+		Mailbox.AccountId > INT_MAX ||
+		!Mailbox.RemoteName ||
+		!Mailbox.RemoteName.StartsWith("/") ||
+		Mailbox.RemoteName == "/" ||
+		Mailbox.UidValidity <= 0 ||
+		Mailbox.UidValidity > UINT32_MAX ||
+		(
+			Mailbox.UidNext != -1 &&
+			(Mailbox.UidNext <= 0 || Mailbox.UidNext > UINT32_MAX)
+		)
+	)
 		return Fail("A complete server listing with a valid SELECT epoch is required.");
 
 	std::set<int64> Uids;
 	std::map<std::string, unsigned> ServerIds;
+	std::map<int64, LString> CachedIds;
+	if (Incremental)
+	{
+		LStatement Folder(this, "select Id from Folder where ImapAccountId=? and ImapRemoteName=? and ImapUidValidity=?");
+		if (!Folder.SetInt64(0, Mailbox.AccountId) || !Folder.SetStr(1, Mailbox.RemoteName) ||
+			!Folder.SetInt64(2, Mailbox.UidValidity) || !Folder.Row())
+			return Fail("Incremental synchronization requires the unchanged cached mailbox epoch.");
+		LStatement Cached(this, "select ImapUid, MessageID from Mail where ParentId=? and AccountId=?"
+			" and ImapUidValidity=? and ImapUid is not null");
+		if (!Cached.SetInt64(0, Folder.GetInt64(0)) || !Cached.SetInt64(1, Mailbox.AccountId) ||
+			!Cached.SetInt64(2, Mailbox.UidValidity))
+			return Fail("Cannot inspect cached synchronization identities.");
+		int Result;
+		while ((Result = sqlite3_step(Cached)) == SQLITE_ROW)
+			CachedIds[Cached.GetInt64(0)] = LString(Cached.GetStr(1)).Strip();
+		if (Result != SQLITE_DONE)
+			return Fail("Cannot read cached synchronization identities.");
+	}
 	for (auto &Message: Messages)
 	{
-		if (Message.Uid <= 0 || Message.Uid > UINT32_MAX || !Message.Headers || Message.Size < 0 ||
+		if (Message.Uid <= 0 || Message.Uid > UINT32_MAX ||
+			(!Message.Headers && (!Incremental || !CachedIds.count(Message.Uid))) || Message.Size < 0 ||
 			!Uids.insert(Message.Uid).second)
 			return Fail("The server listing contains missing headers or invalid/duplicate UIDs.");
-		auto Id = LGetHeaderField(Message.Headers, "Message-ID").Strip();
+		auto Id = Message.Headers ? LGetHeaderField(Message.Headers, "Message-ID").Strip() : CachedIds[Message.Uid];
 		if (Id)
 			ServerIds[Id.Get()]++;
 	}
+	bool PreserveSettings = !Incremental;
+	for (auto &Cached: CachedIds)
+		if (!Uids.count(Cached.first))
+			PreserveSettings = true;
 	ImapStorageTransaction Transaction(this);
 	if (!Transaction.IsOk())
-		return Fail("Cannot start the rebuild transaction.");
+		return Fail("Cannot start the mailbox sync transaction.");
 	{
 		LStatement Pending(this, "select 1 from " MAIL3_TBL_IMAP_OPERATION " where AccountId=? limit 1");
 		if (!Pending.SetInt64(0, Mailbox.AccountId))
 			return Fail("Cannot inspect pending server operations.");
 		auto Result = sqlite3_step(Pending);
 		if (Result != SQLITE_DONE)
-			return Fail("Resolve the account's operation journal before rebuilding.");
+			return Fail("Resolve the account's operation journal before synchronizing.");
 	}
 
 	LArray<LMail3ImapMailbox> Mailboxes;
@@ -3047,9 +3085,10 @@ bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LM
 			}
 		}
 	std::map<int64, int64> ExistingIds;
+	std::map<int64, int> ExistingFlags;
 	LXmlTag ExistingRecords("Emails");
 	{
-		LStatement Query(this, "select Id, MessageID, Label, MarkColour, ImapUid, ImapUidValidity from "
+		LStatement Query(this, "select Id, MessageID, Label, MarkColour, ImapUid, ImapUidValidity, ImapRemoteFlags from "
 			MAIL3_TBL_MAIL " where ParentId=? and ImapUid is not null");
 		if (!Query.SetInt64(0, Mailbox.Id))
 			return Fail("Cannot inspect existing mail.");
@@ -3064,21 +3103,28 @@ bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LM
 				Settings.Count++;
 				Settings.Label = Query.GetStr(2);
 				Settings.Colour = (uint32_t)Query.GetInt64(3);
-				auto Record = new LXmlTag("Mail");
-				Record->SetAttr("MsgId", Id);
-				Record->SetAttr("Label", Settings.Label);
-				Record->SetAttr("Colour", (int64)Settings.Colour);
-				ExistingRecords.InsertTag(Record);
+				if (PreserveSettings)
+				{
+					auto Record = new LXmlTag("Mail");
+					Record->SetAttr("MsgId", Id);
+					Record->SetAttr("Label", Settings.Label);
+					Record->SetAttr("Colour", (int64)Settings.Colour);
+					ExistingRecords.InsertTag(Record);
+				}
 			}
 			if (Query.GetInt64(5) == Mailbox.UidValidity)
+			{
 				ExistingIds[Query.GetInt64(4)] = Query.GetInt64(0);
+				ExistingFlags[Query.GetInt64(4)] =
+					sqlite3_column_type(Query, 6) == SQLITE_NULL ? -1 : Query.GetInt(6);
+			}
 		}
 		if (Result != SQLITE_DONE)
 			return Fail("Cannot read existing mail.");
 	}
 	for (auto &Entry: ExistingSettings)
 		Recovered[Entry.first] = Entry.second;
-	if (!ExistingSettings.empty())
+	if (PreserveSettings && !ExistingSettings.empty())
 	{
 		auto Emails = LocalSettings.Root.GetChildTag("Emails", true);
 		for (size_t Index = 0; Index < Emails->Children.Length(); )
@@ -3120,16 +3166,21 @@ bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LM
 	};
 	for (auto &Message: Messages)
 	{
-		ServerMail Mail(this, Message.Headers);
 		auto Existing = ExistingIds.find(Message.Uid);
 		bool NewIdentity = Existing == ExistingIds.end();
+		if (!Message.Headers && !NewIdentity && ExistingFlags[Message.Uid] == Message.RemoteFlags)
+		{
+			Keep.insert(Existing->second);
+			continue;
+		}
+		ServerMail Mail(this, Message.Headers);
 		if (!NewIdentity)
 		{
 			LStatement Query(this, "select * from " MAIL3_TBL_MAIL " where Id=?");
 			if (!Query.SetInt64(0, Existing->second) || !Query.Row() || !Mail.Serialize(Query, false))
 				return Fail("Cannot load an existing server message.");
 			LString PreviousId = Mail.MessageID.Str();
-			if (PreviousId.Strip() != LGetHeaderField(Message.Headers, "Message-ID").Strip())
+			if (Message.Headers && PreviousId.Strip() != LGetHeaderField(Message.Headers, "Message-ID").Strip())
 				return Fail("A server UID changed Message-ID without changing UIDVALIDITY.");
 		}
 		Mail.ParentId = Mailbox.Id;
@@ -3138,10 +3189,13 @@ bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LM
 		Flags.All = Message.RemoteFlags;
 		Mail.Flags = (Mail.Flags & ~(MAIL_READ | MAIL_REPLIED)) |
 			(Flags.ImapSeen ? MAIL_READ : 0) | (Flags.ImapAnswered ? MAIL_REPLIED : 0);
-		Mail.MailSize = Message.Size;
-		if (!Mail.ParseHeaders())
-			return Fail("Cannot parse server message headers.");
-		Mail.MessageID = LGetHeaderField(Message.Headers, "Message-ID").Strip();
+		if (Message.Headers)
+		{
+			Mail.MailSize = Message.Size;
+			if (!Mail.ParseHeaders())
+				return Fail("Cannot parse server message headers.");
+			Mail.MessageID = LGetHeaderField(Message.Headers, "Message-ID").Strip();
+		}
 		if (NewIdentity && ValidStr(Mail.MessageID.Str()))
 		{
 			auto Key = std::string(Mail.MessageID.Str());
@@ -3167,6 +3221,7 @@ bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LM
 		Mapping.LocalFlags = Mail.Flags & ~MAIL_STORED_FLAT;
 		if (!SaveImapMessage(Mapping))
 			return Fail("Cannot save the verified UID mapping.");
+		Changed.Add(Mail.Id);
 	}
 	std::vector<int64> Removed;
 	{
@@ -3182,6 +3237,7 @@ bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LM
 	}
 	for (auto Id: Removed)
 	{
+		Changed.Add(Id);
 		for (auto Sql: {
 			"delete from " MAIL3_TBL_MAILSEGS " where MailId=?",
 			"delete from " MAIL3_TBL_MAIL " where Id=?" })
@@ -3194,11 +3250,12 @@ bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LM
 	if (!SaveImapMailbox(Mailbox))
 		return Fail("Cannot save SELECT state.");
 	if (!Transaction.Commit())
-		return Fail("Cannot commit the server rebuild.");
+		return Fail("Cannot commit the mailbox sync.");
 	ResultMailbox = Mailbox;
-	LgiTrace("IMAP server rebuild '%s': %zu messages; %u uniquely matched customizations restored. "
-		"Unmatched customizations remain in the recovery settings and legacy cache.\n",
-		Mailbox.RemoteName.Get(), (size_t)Messages.Length(), Restored);
+	if (ChangedIds)
+		ChangedIds->Swap(Changed);
+	LgiTrace("IMAP mailbox sync '%s' (%s): %zu messages; %u uniquely matched customizations restored.\n",
+		Mailbox.RemoteName.Get(), Incremental ? "incremental" : "full", (size_t)Messages.Length(), Restored);
 	return true;
 }
 

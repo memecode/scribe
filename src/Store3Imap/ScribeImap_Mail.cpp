@@ -70,7 +70,16 @@ bool ImapMail::ReloadCanonical(int64 Id)
 	RemoteFlags.All = Canonical->ImapRemoteFlags < 0 ? 0 : Canonical->ImapRemoteFlags;
 	LocalFlags = Canonical->Flags & ~MAIL_STORED_FLAT;
 	DataSize = Canonical->MailSize;
-	HeaderCache = Canonical->GetStr(FIELD_INTERNET_HEADER);
+	LMail3Store::LStatement Headers(Storage,
+		"select Headers from MailSegs where MailId=? and (ParentId is null or ParentId<=0) order by Id limit 1");
+	if (!Headers.SetInt64(0, Id))
+		return Store->ReportError("Cannot load canonical IMAP message headers.");
+	auto HeaderResult = sqlite3_step(Headers);
+	if (HeaderResult != SQLITE_ROW && HeaderResult != SQLITE_DONE)
+		return Store->ReportError("Cannot read canonical IMAP message headers.");
+	if (HeaderResult == SQLITE_DONE && Canonical->ImapDownloaded == 1)
+		return Store->ReportError("The canonical IMAP message has no root headers.");
+	HeaderCache = HeaderResult == SQLITE_ROW ? Headers.GetStr(0) : NULL;
 	ImapMailState Pending = !ResetBody && State == ImapMailGettingBody ? State : ImapMailIdle;
 	LMail3Store::LStatement Operation(Storage,
 		"select OperationType from ImapOperation where MailId=? and AccountId=?");
@@ -535,6 +544,7 @@ const char *ImapMail::GetStr(int id)
 		switch (id)
 		{
 			case FIELD_INTERNET_HEADER:
+				return HeaderCache;
 			case FIELD_MESSAGE_ID:
 			case FIELD_SUBJECT:
 			case FIELD_LABEL:

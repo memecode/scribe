@@ -4,6 +4,7 @@
 #include "ScribeUtils.h"
 #include "DomType.h"
 #include <set>
+#include <map>
 
 #if IMAP_PROTOBUF
 	#include <fstream> 
@@ -197,7 +198,7 @@ bool ImapFolder::ReloadCanonical(int64 Id)
 	return true;
 }
 
-bool ImapFolder::SyncLiveMail(bool Notify)
+bool ImapFolder::SyncLiveMail(bool Notify, int64 MailId, const LArray<int64> *ChangedIds)
 {
 	if (!Canonical)
 	{
@@ -205,11 +206,32 @@ bool ImapFolder::SyncLiveMail(bool Notify)
 		return true;
 	}
 	auto Storage = Store->GetStorage();
+	if (ChangedIds && Mail.State == Store3Unloaded)
+	{
+		LMail3Store::LStatement Count(Storage, "select count(*) from Mail where ParentId=? and AccountId=?"
+			" and (ImapRemoteFlags is null or (ImapRemoteFlags & 2)=0) and (Flags & ?)=0");
+		if (!Count.SetInt64(0, Canonical->Id) || !Count.SetInt64(1, Store->GetInt(FIELD_ACCOUNT_ID)) ||
+			!Count.SetInt(2, MAIL_READ) || !Count.Row())
+			return Store->ReportError("Cannot refresh the cached IMAP unread count.");
+		Canonical->Unread = Count.GetInt(0);
+		if (Notify)
+		{
+			LArray<LDataI*> Folder;
+			Folder.Add(this);
+			Store->OnChange(_FL, Folder, FIELD_UNREAD);
+		}
+		return true;
+	}
+	std::set<int64> ChangedSet;
+	if (ChangedIds)
+		for (size_t Index = 0; Index < ChangedIds->Length(); Index++)
+			ChangedSet.insert(ChangedIds->ItemAt(Index));
 	LArray<int64> Ids;
 	{
 		LMail3Store::LStatement Query(Storage, "select Id from Mail where ParentId=? and AccountId=?"
-			" and (ImapRemoteFlags is null or (ImapRemoteFlags & 2)=0) order by Id");
-		if (!Query.SetInt64(0, Canonical->Id) || !Query.SetInt64(1, Store->GetInt(FIELD_ACCOUNT_ID)))
+			" and (ImapRemoteFlags is null or (ImapRemoteFlags & 2)=0) and (?=0 or Id=?) order by Id");
+		if (!Query.SetInt64(0, Canonical->Id) || !Query.SetInt64(1, Store->GetInt(FIELD_ACCOUNT_ID)) ||
+			!Query.SetInt(2, MailId > 0 ? 1 : 0) || !Query.SetInt64(3, MailId))
 			return Store->ReportError("Cannot load SQLite IMAP folder membership.");
 		int Result;
 		while ((Result = sqlite3_step(Query)) == SQLITE_ROW)
@@ -218,19 +240,24 @@ bool ImapFolder::SyncLiveMail(bool Notify)
 			return Store->ReportError(Storage->GetStr(FIELD_ERROR));
 	}
 	std::set<int64> Keep;
+	std::map<int64, ImapMail*> ExistingMail;
+	for (auto Existing: Mail.a)
+		if (Existing->Canonical)
+			ExistingMail[Existing->Canonical->Id] = Existing;
 	LArray<LDataI*> Added, Changed, Removed;
 	for (auto Id: Ids)
 	{
 		Keep.insert(Id);
-		ImapMail *Object = NULL;
-		for (auto Existing: Mail.a)
-			if (Existing->Canonical && Existing->Canonical->Id == Id)
-				Object = Existing;
+		auto Found = ExistingMail.find(Id);
+		ImapMail *Object = Found != ExistingMail.end() ? Found->second : NULL;
 		if (Object)
 		{
-			if (!Object->ReloadCanonical(Id))
-				return false;
-			Changed.Add(Object);
+			if (!ChangedIds || ChangedSet.count(Id))
+			{
+				if (!Object->ReloadCanonical(Id))
+					return false;
+				Changed.Add(Object);
+			}
 		}
 		else
 		{
@@ -241,7 +268,8 @@ bool ImapFolder::SyncLiveMail(bool Notify)
 		}
 	}
 	for (auto Existing: Mail.a)
-		if (Existing->Canonical && !Keep.count(Existing->Canonical->Id))
+		if (Existing->Canonical && (MailId < 0 || Existing->Canonical->Id == MailId) &&
+			!Keep.count(Existing->Canonical->Id))
 			Removed.Add(Existing);
 	Mail.State = Store3Loaded;
 	if (Removed.Length())
@@ -263,7 +291,7 @@ bool ImapFolder::SyncLiveMail(bool Notify)
 			Store->OnChange(_FL, Changed, 0);
 		LArray<LDataI*> Folder;
 		Folder.Add(this);
-		Store->OnChange(_FL, Folder, FIELD_STATUS);
+		Store->OnChange(_FL, Folder, FIELD_UNREAD);
 	}
 	for (auto &Callback: OnLoad)
 		Callback(Store3Success);
@@ -1087,10 +1115,7 @@ void ImapFolder::LoadMail()
 	if (Store->IsLive())
 	{
 		if (Mail.State == Store3Unloaded)
-		{
-			if (SyncLiveMail(false))
-				Store->RefreshMailbox(Remote);
-		}
+			SyncLiveMail(false);
 		return;
 	}
 	if (Mail.State != Store3Unloaded)
@@ -2009,8 +2034,9 @@ void ImapFolder::OnSelect(bool b)
 {
 	if (Store->IsLive())
 	{
+		bool Selected = b && !IsOnline;
 		IsOnline = b;
-		if (b)
+		if (Selected)
 		{
 			LoadMail();
 			Store->RefreshMailbox(Remote);
@@ -2707,7 +2733,7 @@ void ImapFolder::OnCommand(const char *Name)
 	if (Store->IsLive())
 	{
 		if (!Stricmp(Name, "Refresh"))
-			Store->RefreshMailbox(Remote);
+			Store->RefreshMailbox(Remote, 0, true);
 		else
 			Store->ReportError("This folder command is not available on the SQLite IMAP backend yet.");
 		return;
