@@ -2322,7 +2322,7 @@ bool LMail3Store::LoadImapOperations(int64 AccountId, LArray<LMail3ImapOperation
 	return true;
 }
 
-bool LMail3Store::BeginImapOperation(int64 Id, LMail3ImapOperation &Result)
+bool LMail3Store::BeginImapOperation(int64 Id, LMail3ImapOperation &Result, bool Reconcile)
 {
 	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success ||
 		!sqlite3_get_autocommit(Db) || Id <= 0)
@@ -2335,17 +2335,20 @@ bool LMail3Store::BeginImapOperation(int64 Id, LMail3ImapOperation &Result)
 			return ImapFailure("claim operation", "The journal entry is missing.");
 		ReadImapOperation(Query, Operation);
 	}
-	if (Operation.State != LMail3ImapOperationState::Queued || !CheckImapOperation(Operation, false))
-		return ImapFailure("claim operation", "Only an unchanged queued operation may be dispatched.");
-	LStatement Claim(this, "update " MAIL3_TBL_IMAP_OPERATION " set State=1,Attempts=Attempts+1,LastError=null"
-		" where Id=? and State=0 and not exists (select 1 from " MAIL3_TBL_IMAP_OPERATION
+	auto Expected = Reconcile ? LMail3ImapOperationState::NeedsReconciliation : LMail3ImapOperationState::Queued;
+	auto Claimed = Reconcile ? LMail3ImapOperationState::Reconciling : LMail3ImapOperationState::Executing;
+	if (Operation.State != Expected || !CheckImapOperation(Operation, false))
+		return ImapFailure("claim operation", "The operation is changed or is not in the required queued/recovery state.");
+	LStatement Claim(this, "update " MAIL3_TBL_IMAP_OPERATION " set State=?,Attempts=Attempts+1,LastError=null"
+		" where Id=? and State=? and not exists (select 1 from " MAIL3_TBL_IMAP_OPERATION
 		" Earlier where Earlier.AccountId=? and Earlier.Id<?)");
-	if (!Claim.SetInt64(0, Id) || !Claim.SetInt64(1, Operation.AccountId) ||
-		!Claim.SetInt64(2, Id) || !Claim.Exec() || sqlite3_changes(Db) != 1)
+	if (!Claim.SetInt(0, (int)Claimed) || !Claim.SetInt64(1, Id) || !Claim.SetInt(2, (int)Expected) ||
+		!Claim.SetInt64(3, Operation.AccountId) || !Claim.SetInt64(4, Id) ||
+		!Claim.Exec() || sqlite3_changes(Db) != 1)
 		return ImapFailure("claim operation", "An earlier operation must be completed or reconciled first.");
 	if (!Transaction.Commit())
 		return false;
-	Operation.State = LMail3ImapOperationState::Executing;
+	Operation.State = Claimed;
 	Operation.Attempts++;
 	Operation.LastError.Empty();
 	Result = Operation;
@@ -2412,12 +2415,14 @@ bool LMail3Store::InterruptImapOperation(int64 Id, const char *Reason,
 		DestinationUid <= 0 || DestinationUid > UINT32_MAX))
 		return ImapFailure("interrupt operation", "Invalid destination identity evidence.");
 	LStatement Update(this, "update " MAIL3_TBL_IMAP_OPERATION
-		" set State=2,LastError=?,DestinationUid=coalesce(?,DestinationUid) where Id=? and State=1"
-		" and (? is null or (OperationType in (3,4) and DestinationUidValidity=?))");
+		" set State=2,LastError=?,DestinationUid=coalesce(?,DestinationUid) where Id=? and State in (1,3)"
+		" and (? is null or (OperationType in (3,4) and DestinationUidValidity=?))"
+		" and (DestinationUid is null or ? is null or DestinationUid=?)");
 	if (!Update.SetStr(0, Reason) || !Update.SetInt64(1, DestinationUid) || !Update.SetInt64(2, Id) ||
 		!Update.SetInt64(3, DestinationUidValidity) || !Update.SetInt64(4, DestinationUidValidity) ||
+		!Update.SetInt64(5, DestinationUid) || !Update.SetInt64(6, DestinationUid) ||
 		!Update.Exec() || sqlite3_changes(Db) != 1)
-		return ImapFailure("interrupt operation", "The operation is not executing.");
+		return ImapFailure("interrupt operation", "The operation is not active or its recorded destination evidence conflicts.");
 	return true;
 }
 
@@ -2428,7 +2433,7 @@ bool LMail3Store::RecoverImapOperations(int64 AccountId)
 		return ImapFailure("recover journal", "An account and idle owning-thread store are required.");
 	LStatement Update(this, "update " MAIL3_TBL_IMAP_OPERATION
 		" set State=2,LastError='Interrupted command: reconcile server state before retrying.'"
-		" where AccountId=? and State=1");
+		" where AccountId=? and State in (1,3)");
 	if (!Update.SetInt64(0, AccountId) || !Update.Exec())
 		return ImapFailure("recover journal", "Cannot quarantine interrupted server commands.");
 	return true;
@@ -2447,12 +2452,16 @@ bool LMail3Store::CompleteImapOperation(int64 Id, int64 DestinationUidValidity, 
 			return ImapFailure("complete operation", "The journal entry is missing.");
 		ReadImapOperation(Query, Operation);
 	}
-	if (Operation.State != LMail3ImapOperationState::Executing || !CheckImapOperation(Operation, false))
+	if ((Operation.State != LMail3ImapOperationState::Executing &&
+		Operation.State != LMail3ImapOperationState::Reconciling) || !CheckImapOperation(Operation, false))
 		return ImapFailure("complete operation", "The executing command no longer matches the canonical identity.");
 	bool Destination = Operation.Type == LMail3ImapOperationType::Move || Operation.Type == LMail3ImapOperationType::Append;
 	if (Destination && (DestinationUidValidity != Operation.DestinationUidValidity ||
 		DestinationUid <= 0 || DestinationUid > UINT32_MAX))
 		return ImapFailure("complete operation", "COPY/APPEND requires a verified destination epoch and UID.");
+	if (Destination && Operation.State == LMail3ImapOperationState::Reconciling &&
+		DestinationUid != Operation.DestinationUid)
+		return ImapFailure("complete operation", "Reconciliation requires the previously recorded UIDPLUS evidence.");
 	if (!Destination && (DestinationUidValidity != -1 || DestinationUid != -1))
 		return ImapFailure("complete operation", "This command has no destination identity.");
 	LMail3Mail Mail(this);
@@ -2478,7 +2487,7 @@ bool LMail3Store::CompleteImapOperation(int64 Id, int64 DestinationUidValidity, 
 	}
 	if (!Mail.Write(MAIL3_TBL_MAIL, false))
 		return ImapFailure("complete operation", "Cannot commit the server-confirmed message state.");
-	LStatement Delete(this, "delete from " MAIL3_TBL_IMAP_OPERATION " where Id=? and State=1");
+	LStatement Delete(this, "delete from " MAIL3_TBL_IMAP_OPERATION " where Id=? and State in (1,3)");
 	if (!Delete.SetInt64(0, Id) || !Delete.Exec() || sqlite3_changes(Db) != 1)
 		return ImapFailure("complete operation", "Cannot retire the confirmed journal entry.");
 	return Transaction.Commit();

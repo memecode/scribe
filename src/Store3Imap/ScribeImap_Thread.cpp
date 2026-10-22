@@ -139,6 +139,13 @@ ImapJournalResult ExecuteImapJournalOperation(MailIMap &Imap, ImapJournalCommand
 	ImapJournalResult Result;
 	Result.OperationId = Operation.Id;
 	Result.AccountId = Operation.AccountId;
+	Result.Attempt = Operation.Attempts;
+	Result.Reconciliation = Operation.State == LMail3ImapOperationState::Reconciling;
+	if (Result.Reconciliation && Operation.DestinationUid != -1)
+	{
+		Result.DestinationUidValidity = Operation.DestinationUidValidity;
+		Result.DestinationUid = Operation.DestinationUid;
+	}
 	auto Fail = [&](const char *Error)
 	{
 		Result.Error = Error;
@@ -148,7 +155,7 @@ ImapJournalResult ExecuteImapJournalOperation(MailIMap &Imap, ImapJournalCommand
 	bool Append = Operation.Type == LMail3ImapOperationType::Append;
 	bool Move = Operation.Type == LMail3ImapOperationType::Move;
 	if (Operation.Id <= 0 || Operation.AccountId < 0 ||
-		Operation.State != LMail3ImapOperationState::Executing ||
+		(Operation.State != LMail3ImapOperationState::Executing && !Result.Reconciliation) ||
 		(Operation.Type != LMail3ImapOperationType::SetFlags &&
 		 Operation.Type != LMail3ImapOperationType::Delete && !Append && !Move))
 		return Fail("The worker requires a claimed, supported journal operation.");
@@ -162,10 +169,41 @@ ImapJournalResult ExecuteImapJournalOperation(MailIMap &Imap, ImapJournalCommand
 		((Append || Move) && !ValidMailbox(Operation.DestinationRemoteName, Operation.DestinationUidValidity)) ||
 		Operation.RemoteFlags < 0 || (Operation.RemoteFlags & ~JournalWritableFlags))
 		return Fail("Invalid frozen mailbox identity, UID or writable flags.");
-	if (Append && (!Command.Upload || Command.Upload->GetSize() <= 0 || Command.Upload->SetPos(0) != 0))
+	if (Append && !Result.Reconciliation &&
+		(!Command.Upload || Command.Upload->GetSize() <= 0 || Command.Upload->SetPos(0) != 0))
 		return Fail("APPEND requires an owned, seekable original RFC822 image.");
 	if (Move && Operation.SourceRemoteName == Operation.DestinationRemoteName)
 		return Fail("A move requires a different destination mailbox.");
+	if (Result.Reconciliation)
+	{
+		// Observe only: missing UIDPLUS evidence cannot be replaced with a guessed identity.
+		if (Append || Move)
+		{
+			if (Operation.DestinationUid <= 0 || Operation.DestinationUid > UINT32_MAX)
+				return Fail("No recorded UIDPLUS destination; APPEND/COPY must not be repeated or guessed.");
+			ImapMailFlags DestinationFlags;
+			if (!JournalMailbox(Imap, Operation.DestinationRemoteName, Operation.DestinationUidValidity) ||
+				!JournalFetch(Imap, Operation.DestinationUid, DestinationFlags) ||
+				!JournalMailbox(Imap, Operation.DestinationRemoteName, Operation.DestinationUidValidity) ||
+				(DestinationFlags.All & JournalWritableFlags) != Operation.RemoteFlags)
+				return Fail("The recorded destination UID, epoch or flags could not be reconciled.");
+		}
+		if (!Append)
+		{
+			ImapMailFlags SourceFlags;
+			if (!JournalMailbox(Imap, Operation.SourceRemoteName, Operation.SourceUidValidity) ||
+				!JournalFetch(Imap, Operation.SourceUid, SourceFlags) ||
+				!JournalMailbox(Imap, Operation.SourceRemoteName, Operation.SourceUidValidity))
+				return Fail("The source UID or epoch could not be reconciled; no mutation was sent.");
+			if (Move ? !SourceFlags.ImapDeleted :
+				(SourceFlags.All & JournalWritableFlags) != Operation.RemoteFlags)
+				return Fail("The source has not reached the requested state; reconciliation will not repeat a mutation.");
+		}
+		if (Move && !JournalMailbox(Imap, Operation.DestinationRemoteName, Operation.DestinationUidValidity))
+			return Fail("The destination epoch changed while reconciling the source.");
+		Result.Outcome = ImapJournalOutcome::Confirmed;
+		return Result;
+	}
 	ImapMailFlags SourceFlags;
 	if ((Append || Move) && !JournalMailbox(Imap, Operation.DestinationRemoteName, Operation.DestinationUidValidity))
 		return Fail("The destination SELECT failed or UIDVALIDITY changed; no mutation was sent.");

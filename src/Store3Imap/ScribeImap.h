@@ -162,13 +162,16 @@ enum class ImapJournalOutcome
 struct ImapJournalResult
 {
 	int64 OperationId = -1, AccountId = -1;
+	int Attempt = 0;
+	bool Reconciliation = false;
 	ImapJournalOutcome Outcome = ImapJournalOutcome::NotExecuted;
 	int64 DestinationUidValidity = -1, DestinationUid = -1;
 	LString Error;
 };
 
 ImapJournalResult ExecuteImapJournalOperation(MailIMap &Imap, ImapJournalCommand &Command);
-bool PrepareImapJournalOperation(LMail3Store &Storage, int64 AccountId, int64 OperationId, ImapJournalCommand &Command);
+bool PrepareImapJournalOperation(LMail3Store &Storage, int64 AccountId, int64 OperationId,
+	ImapJournalCommand &Command, bool Reconcile = false);
 bool ApplyImapJournalResult(LMail3Store &Storage, int64 AccountId, const ImapJournalResult &Result);
 
 struct ImapMsg
@@ -240,6 +243,7 @@ class ImapStore : public LDataStoreI
 	LStream *Log;
 	LMail3Store *Storage = NULL;
 	int64 PendingJournalId = -1;
+	int PendingJournalAttempt = 0;
 	ScribeAccountletStatusIcon Online = STATUS_OFFLINE;
 	LArray<ImapMsg*> Listing;
 	int64 LastPulse = 0;
@@ -276,7 +280,8 @@ public:
 	LMail3Store *GetStorage() { return Storage; }
 	bool IsServerRebuild() const;
 	// Internal cutover bridge; legacy UI paths do not enqueue journal commands yet.
-	bool DispatchJournalOperation(int64 OperationId);
+	// Reconciliation only observes the server; it never repeats a mutation.
+	bool DispatchJournalOperation(int64 OperationId, bool Reconcile = false);
 	void PostStore(ImapMsg *m) { Callback->Post(this, m); }
 	bool PostThread(ImapMsg *m, bool UiPriority);
 
