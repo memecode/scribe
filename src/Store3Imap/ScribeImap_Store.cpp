@@ -46,6 +46,7 @@ const char *ImapMsgTypeNames[IMAP_MSG_MAX] =
 	"IMAP_UNDELETE",
 	"IMAP_SET_FLAGS",
 	"IMAP_REBUILD_MAILBOX",
+	"IMAP_JOURNAL_OPERATION",
 };
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -118,6 +119,7 @@ ImapStore::~ImapStore()
 {
 	FolderLoader.Reset();
 	DeleteObj(Thread);
+	InterruptPendingJournal("The IMAP worker stopped before its journal result was committed.");
 	DeleteObj(Root);
 	DeleteArray(Cache);
 }
@@ -125,6 +127,120 @@ ImapStore::~ImapStore()
 bool ImapStore::IsServerRebuild() const
 {
 	return Storage && LAppInst->GetOption("imap-rebuild-cache");
+}
+
+bool ImapStore::InterruptPendingJournal(const char *Reason)
+{
+	if (PendingJournalId <= 0)
+		return true;
+	if (!Storage || !Storage->InterruptImapOperation(PendingJournalId, Reason))
+	{
+		ErrorMsg.Reset(NewStr(Storage ? Storage->GetStr(FIELD_ERROR) : "No shared store for the pending IMAP command."));
+		LgiTrace("%s\n", ErrorMsg.Get());
+		if (Log)
+			Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
+		return false;
+	}
+	PendingJournalId = -1;
+	return true;
+}
+
+bool PrepareImapJournalOperation(LMail3Store &Storage, int64 AccountId, int64 OperationId, ImapJournalCommand &Command)
+{
+	LArray<LMail3ImapOperation> Operations;
+	if (!Storage.LoadImapOperations(AccountId, Operations))
+		return false;
+	if (!Operations.Length() || Operations[0].Id != OperationId ||
+		Operations[0].State != LMail3ImapOperationState::Queued)
+	{
+		Storage.SetStr(FIELD_ERROR, "IMAP dispatch requires the account's first queued journal entry.");
+		LgiTrace("%s\n", Storage.GetStr(FIELD_ERROR));
+		return false;
+	}
+	LAutoStreamI Upload;
+	if (Operations[0].Type == LMail3ImapOperationType::Append)
+	{
+		Upload = Storage.OpenImapUpload(AccountId, OperationId);
+		if (!Upload)
+			return false;
+	}
+	LMail3ImapOperation Claimed;
+	if (!Storage.BeginImapOperation(OperationId, Claimed))
+		return false;
+	Command.Operation = Claimed;
+	Command.Upload = Upload;
+	return true;
+}
+
+bool ApplyImapJournalResult(LMail3Store &Storage, int64 AccountId, const ImapJournalResult &Result)
+{
+	auto Fail = [&](const char *Error)
+	{
+		Storage.SetStr(FIELD_ERROR, Error);
+		LgiTrace("%s\n", Error);
+		return false;
+	};
+	if (Result.AccountId != AccountId || Result.OperationId <= 0)
+		return Fail("IMAP journal result belongs to another account or has no operation ID.");
+	LArray<LMail3ImapOperation> Operations;
+	if (!Storage.LoadImapOperations(AccountId, Operations))
+		return false;
+	if (!Operations.Length() || Operations[0].Id != Result.OperationId ||
+		Operations[0].State != LMail3ImapOperationState::Executing)
+		return Fail("IMAP journal result does not match this account's executing command.");
+	if (Result.Outcome == ImapJournalOutcome::Confirmed)
+	{
+		if (Result.Error)
+			return Fail("A confirmed IMAP journal result cannot contain an error.");
+		if (Storage.CompleteImapOperation(Result.OperationId, Result.DestinationUidValidity, Result.DestinationUid))
+			return true;
+		LString Error = Storage.GetStr(FIELD_ERROR);
+		LString Reason = LString::Fmt("Server confirmed the command, but the local commit failed: %s",
+			Error ? Error.Get() : "unknown storage error");
+		// Keep evidence if the local commit failed after the server already acted.
+		if (!Storage.InterruptImapOperation(Result.OperationId, Reason,
+			Result.DestinationUidValidity, Result.DestinationUid))
+			return false;
+		Storage.SetStr(FIELD_ERROR, Reason);
+		return false;
+	}
+	if ((Result.Outcome != ImapJournalOutcome::NotExecuted && Result.Outcome != ImapJournalOutcome::Uncertain) ||
+		!Result.Error)
+		return Fail("An unsuccessful IMAP journal result requires an explicit diagnostic.");
+	auto Reason = LString::Fmt("%s: %s",
+		Result.Outcome == ImapJournalOutcome::NotExecuted ? "Not executed" : "Server outcome uncertain",
+		Result.Error.Get());
+	return Storage.InterruptImapOperation(Result.OperationId, Reason,
+		Result.DestinationUidValidity, Result.DestinationUid);
+}
+
+bool ImapStore::DispatchJournalOperation(int64 OperationId)
+{
+	auto Fail = [&](const char *Error)
+	{
+		ErrorMsg.Reset(NewStr(Error));
+		LgiTrace("%s\n", ErrorMsg.Get());
+		if (Log)
+			Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
+		return false;
+	};
+	if (!Storage || !Storage->InThread() || !Thread || !Callback || Online != STATUS_ONLINE ||
+		PendingJournalId > 0 || OperationId <= 0)
+		return Fail("IMAP journal dispatch requires an online owning-thread store with no command in flight.");
+	LAutoPtr<ImapMsg> Message(new ImapMsg(IMAP_JOURNAL_OPERATION, _FL));
+	Message->Journal.Reset(new ImapJournalCommand);
+	if (!PrepareImapJournalOperation(*Storage, AccountId, OperationId, *Message->Journal))
+		return Fail(Storage->GetStr(FIELD_ERROR));
+	PendingJournalId = OperationId;
+	if (!PostThread(Message.Release(), false))
+	{
+		PendingJournalId = -1;
+		const char *Reason = "The journal command could not be handed to the worker; reconcile before retrying.";
+		if (!Storage->InterruptImapOperation(OperationId, Reason))
+			return Fail(Storage->GetStr(FIELD_ERROR));
+		return Fail(Reason);
+	}
+	return true;
 }
 
 bool ImapStore::OnIdle()
@@ -191,7 +307,8 @@ Store3Status ImapStore::SetInt(int id, int64 val)
 	{
 		DeleteObj(Thread);
 		Online = STATUS_OFFLINE;
-		return Store3Success;
+		return InterruptPendingJournal("The account was taken offline before the journal result was committed.")
+			? Store3Success : Store3Error;
 	}
 
 	return Store3Error;
@@ -663,7 +780,7 @@ static bool _in_download = false;
 
 void ImapStore::OnEvent(void *Param)
 {
-	if (!Root)
+	if (!Root && static_cast<ImapMsg*>(Param)->Type != IMAP_JOURNAL_OPERATION)
 		return;
 
 	Msgs.Add((ImapMsg*)Param);
@@ -678,6 +795,26 @@ void ImapStore::OnEvent(void *Param)
 		{
 			default:
 				break;
+			case IMAP_JOURNAL_OPERATION:
+			{
+				bool Matched = Storage && m->JournalResult.OperationId == PendingJournalId &&
+					m->JournalResult.AccountId == AccountId;
+				bool Applied = Matched && ApplyImapJournalResult(*Storage, AccountId, m->JournalResult);
+				if (Matched)
+					PendingJournalId = -1;
+				if (!Applied || m->JournalResult.Outcome != ImapJournalOutcome::Confirmed)
+				{
+					const char *Error = !Matched ? "Unexpected IMAP journal worker response." :
+						!Applied ? Storage->GetStr(FIELD_ERROR) : m->JournalResult.Error.Get();
+					ErrorMsg.Reset(NewStr(Error));
+					LgiTrace("%s\n", ErrorMsg.Get());
+					if (Log)
+						Log->Write(ErrorMsg.Get(), strlen(ErrorMsg.Get()), LSocketI::SocketMsgError);
+					Online = STATUS_ERROR;
+				}
+				// Canonical UI notifications are wired with the live adapters, not the legacy cache.
+				break;
+			}
 			case IMAP_ONLINE:
 			{
 				Online = STATUS_ONLINE;

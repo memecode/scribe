@@ -78,6 +78,37 @@ struct LMail3ImapServerMessage
 	LString Headers;
 };
 
+enum class LMail3ImapOperationType
+{
+	SetFlags = 1,
+	Delete = 2,
+	Move = 3,
+	Append = 4
+};
+
+enum class LMail3ImapOperationState
+{
+	Queued = 0,
+	Executing = 1,
+	NeedsReconciliation = 2
+};
+
+struct LMail3ImapOperation
+{
+	int64 Id = -1;
+	int64 AccountId = -1;
+	LMail3ImapOperationType Type = LMail3ImapOperationType::SetFlags;
+	LMail3ImapOperationState State = LMail3ImapOperationState::Queued;
+	int64 MailId = -1;
+	int64 SourceMailboxId = -1, DestinationMailboxId = -1;
+	int64 SourceUidValidity = -1, SourceUid = -1;
+	int64 DestinationUidValidity = -1, DestinationUid = -1;
+	LString SourceRemoteName, DestinationRemoteName;
+	int RemoteFlags = 0;
+	int Attempts = 0;
+	LString LastError;
+};
+
 class Mail3BlobStream : public LStream
 {
 	LMail3Store *Store;
@@ -272,6 +303,10 @@ class LMail3Store : public LDataStoreI
 	bool OpenDb();
 	bool CreateIndexes();
 	bool CloseDb();
+	bool ImapFailure(const char *Action, const char *Reason);
+	bool CheckImapOperation(LMail3ImapOperation &Operation, bool Snapshot);
+	bool InsertImapOperation(LMail3ImapOperation &Operation);
+	bool LoadImapBodyMail(int64 AccountId, const LMail3ImapMessage &Identity, LMail3Mail &Mail);
 	LMail3Folder *GetSystemFolder(int Type);
 
 public:
@@ -415,6 +450,20 @@ public:
 	bool ImportImapCache(int64 AccountId, const char *CachePath);
 	bool ImportImapSettings(int64 AccountId, const char *CachePath);
 	bool RebuildImapMailbox(LMail3ImapMailbox &Mailbox, LArray<LMail3ImapServerMessage> &Messages);
+	bool StoreImapBody(int64 AccountId, const LMail3ImapMessage &Identity, LStreamI &Body);
+	LAutoStreamI OpenImapBody(int64 AccountId, const LMail3ImapMessage &Identity);
+	bool QueueImapOperation(LMail3ImapOperation &Operation);
+	bool StageImapAppend(int64 AccountId, int64 MailboxId, int RemoteFlags, LStreamI &Body,
+		LMail3ImapOperation &Operation);
+	bool LoadImapOperations(int64 AccountId, LArray<LMail3ImapOperation> &Operations);
+	// Claim must commit before handing a command to the network worker.
+	bool BeginImapOperation(int64 Id, LMail3ImapOperation &Operation);
+	bool InterruptImapOperation(int64 Id, const char *Reason,
+		int64 DestinationUidValidity = -1, int64 DestinationUid = -1);
+	LAutoStreamI OpenImapUpload(int64 AccountId, int64 OperationId);
+	bool RecoverImapOperations(int64 AccountId);
+	// Only call after server confirmation; COPY/APPEND need a verified destination identity.
+	bool CompleteImapOperation(int64 Id, int64 DestinationUidValidity = -1, int64 DestinationUid = -1);
 	int64 GetInt(int id) override;
 	Store3Status SetInt(int id, int64 i) override;
 	const char *GetStr(int id) override;

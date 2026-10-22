@@ -30,6 +30,9 @@ LMail3Def TblImapOperation[] =
 	{"Created",					"TEXT"},
 	{"Attempts",				"INTEGER"},
 	{"LastError",				"TEXT"},
+	{"SourceRemoteName",			"TEXT"},
+	{"DestinationRemoteName",	"TEXT"},
+	{"RemoteFlags",				"INTEGER"},
 	{0, 0}
 };
 
@@ -368,7 +371,9 @@ bool LMail3Store::CreateIndexes()
 		{MAIL3_TBL_MAIL, "create unique index if not exists MailImapFolderUidIdx "
 			"on " MAIL3_TBL_MAIL "(ParentId, ImapUidValidity, ImapUid)"},
 		{MAIL3_TBL_IMAP_SETTINGS, "create unique index if not exists ImapLocalSettingsAccountRemoteIdx "
-			"on " MAIL3_TBL_IMAP_SETTINGS "(AccountId, RemoteName)"}
+			"on " MAIL3_TBL_IMAP_SETTINGS "(AccountId, RemoteName)"},
+		{MAIL3_TBL_IMAP_OPERATION, "create unique index if not exists ImapOperationMailIdx "
+			"on " MAIL3_TBL_IMAP_OPERATION "(MailId)"}
 	};
 	for (auto &Index: ImapUniqueIndexes)
 	{
@@ -1964,35 +1969,520 @@ public:
 	}
 };
 
-class ImapRebuildTransaction
+class ImapStorageTransaction
 {
 	LMail3Store *Store;
 	bool Active;
 
 public:
-	ImapRebuildTransaction(LMail3Store *store) : Store(store)
+	ImapStorageTransaction(LMail3Store *store) : Store(store)
 	{
 		Active = Store->Check(sqlite3_exec(Store->GetDb(),
-			"savepoint ImapServerRebuild", NULL, NULL, NULL), NULL);
+			"savepoint ImapStorage", NULL, NULL, NULL), NULL);
 	}
-	~ImapRebuildTransaction()
+	~ImapStorageTransaction()
 	{
 		if (Active)
 		{
-			Store->Check(sqlite3_exec(Store->GetDb(), "rollback to ImapServerRebuild", NULL, NULL, NULL), NULL);
-			Store->Check(sqlite3_exec(Store->GetDb(), "release ImapServerRebuild", NULL, NULL, NULL), NULL);
+			Store->Check(sqlite3_exec(Store->GetDb(), "rollback to ImapStorage", NULL, NULL, NULL), NULL);
+			Store->Check(sqlite3_exec(Store->GetDb(), "release ImapStorage", NULL, NULL, NULL), NULL);
 		}
 	}
 	bool IsOk() const { return Active; }
 	bool Commit()
 	{
 		if (!Active || !Store->Check(sqlite3_exec(Store->GetDb(),
-			"release ImapServerRebuild", NULL, NULL, NULL), NULL))
+			"release ImapStorage", NULL, NULL, NULL), NULL))
 			return false;
 		Active = false;
 		return true;
 	}
 };
+
+bool LMail3Store::ImapFailure(const char *Action, const char *Reason)
+{
+	ErrorMsg.Printf("IMAP %s: %s", Action, Reason);
+	LgiTrace("%s\n", ErrorMsg.Get());
+	return false;
+}
+
+static bool ImapStreamsEqual(LStreamI &First, LStreamI &Second)
+{
+	if (First.GetSize() < 0 || First.GetSize() != Second.GetSize() ||
+		First.SetPos(0) != 0 || Second.SetPos(0) != 0)
+		return false;
+	char A[8192], B[8192];
+	for (int64 Remaining = First.GetSize(); Remaining > 0; )
+	{
+		auto Size = (ssize_t)MIN(Remaining, (int64)sizeof(A));
+		for (auto Stream: {&First, &Second})
+		{
+			auto Buffer = Stream == &First ? A : B;
+			ssize_t Offset = 0;
+			while (Offset < Size)
+			{
+				auto Read = Stream->Read(Buffer + Offset, Size - Offset);
+				if (Read <= 0 || Read > Size - Offset)
+					return false;
+				Offset += Read;
+			}
+		}
+		if (memcmp(A, B, Size))
+			return false;
+		Remaining -= Size;
+	}
+	return true;
+}
+
+bool LMail3Store::LoadImapBodyMail(int64 AccountId, const LMail3ImapMessage &Identity, LMail3Mail &Mail)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success ||
+		AccountId < 0 || AccountId > INT_MAX || Identity.MailId <= 0 || Identity.MailboxId <= 0 ||
+		Identity.UidValidity <= 0 || Identity.UidValidity > UINT32_MAX ||
+		Identity.Uid <= 0 || Identity.Uid > UINT32_MAX)
+		return ImapFailure("body access", "A verified canonical identity on the owning thread is required.");
+	LStatement Query(this, "select M.* from " MAIL3_TBL_MAIL " M join " MAIL3_TBL_FOLDER " F"
+		" on F.Id=M.ParentId where M.Id=? and M.AccountId=? and M.ParentId=?"
+		" and M.ImapUidValidity=? and M.ImapUid=? and F.ImapAccountId=M.AccountId"
+		" and F.ImapUidValidity=M.ImapUidValidity and F.ImapRemoteName is not null");
+	if (!Query.SetInt64(0, Identity.MailId) || !Query.SetInt64(1, AccountId) ||
+		!Query.SetInt64(2, Identity.MailboxId) || !Query.SetInt64(3, Identity.UidValidity) ||
+		!Query.SetInt64(4, Identity.Uid) || !Query.Row() || !Mail.Serialize(Query, false))
+		return ImapFailure("body access", "The message, parent folder, account or UIDVALIDITY has changed.");
+	return true;
+}
+
+bool LMail3Store::StoreImapBody(int64 AccountId, const LMail3ImapMessage &Identity, LStreamI &Body)
+{
+	if (!InThread() || !IsOk() || !sqlite3_get_autocommit(Db))
+		return ImapFailure("body download", "An idle store on its owning thread is required.");
+	ImapStorageTransaction Transaction(this);
+	LMail3Mail Mail(this);
+	if (!Transaction.IsOk() || !LoadImapBodyMail(AccountId, Identity, Mail))
+		return false;
+	if (Body.GetSize() < 0 || (Mail.MailSize > 0 && Body.GetSize() != Mail.MailSize) ||
+		Body.SetPos(0) != 0)
+		return ImapFailure("body download", "The RFC822 size does not match the server metadata.");
+	LString Headers = HeadersFromStream(&Body);
+	if (!Headers || LGetHeaderField(Headers, "Message-ID").Strip() != LString(Mail.MessageID.Str()).Strip() ||
+		Body.SetPos(0) != 0)
+		return ImapFailure("body download", "The downloaded Message-ID does not match the canonical message.");
+	if (Mail.SetRfc822(&Body, true) != Store3Success)
+		return ImapFailure("body download", "Cannot store the original RFC822 image.");
+	{
+		auto Stored = Mail.GetStream(_FL);
+		if (!Stored || !ImapStreamsEqual(Body, *Stored))
+			return ImapFailure("body download", "The stored RFC822 image failed byte-for-byte verification.");
+	}
+	Mail.MailSize = Body.GetSize();
+	Mail.ImapDownloaded = 1;
+	if (!Mail.Write(MAIL3_TBL_MAIL, false))
+		return ImapFailure("body download", "Cannot mark the canonical message downloaded.");
+	return Transaction.Commit();
+}
+
+LAutoStreamI LMail3Store::OpenImapBody(int64 AccountId, const LMail3ImapMessage &Identity)
+{
+	LAutoStreamI Result;
+	LMail3Mail Mail(this);
+	if (!LoadImapBodyMail(AccountId, Identity, Mail))
+		return Result;
+	if (Mail.ImapDownloaded != 1)
+	{
+		ImapFailure("body access", "The message body has not been downloaded.");
+		return Result;
+	}
+	if (!(Mail.Flags & MAIL_STORED_FLAT))
+	{
+		ImapFailure("body access", "The canonical IMAP body is not stored as an original RFC822 image.");
+		return Result;
+	}
+	Result = Mail.GetStream(_FL);
+	if (!Result)
+		ImapFailure("body access", "The downloaded message has no readable MIME content.");
+	else if (Result->SetPos(0) != 0)
+	{
+		ImapFailure("body access", "Cannot seek the downloaded message.");
+		Result.Reset();
+	}
+	return Result;
+}
+
+bool LMail3Store::CheckImapOperation(LMail3ImapOperation &Operation, bool Snapshot)
+{
+	switch (Operation.Type)
+	{
+		case LMail3ImapOperationType::SetFlags:
+		case LMail3ImapOperationType::Delete:
+		case LMail3ImapOperationType::Move:
+		case LMail3ImapOperationType::Append:
+			break;
+		default:
+			return ImapFailure("operation", "Unknown operation type.");
+	}
+	if (Operation.AccountId < 0 || Operation.AccountId > INT_MAX || Operation.MailId <= 0)
+		return ImapFailure("operation", "A canonical mail row and account are required.");
+	bool Append = Operation.Type == LMail3ImapOperationType::Append;
+	bool Destination = Append || Operation.Type == LMail3ImapOperationType::Move;
+	ImapMailFlags Flags;
+	Flags.All = Operation.RemoteFlags;
+	if (Operation.RemoteFlags < 0 || Operation.RemoteFlags > UINT16_MAX ||
+		Flags.ImapRecent || Flags.ImapExpunged || (Operation.RemoteFlags & ~63))
+		return ImapFailure("operation", "Only writable IMAP system flags may be queued.");
+	LStatement Mail(this, "select ParentId, ImapUidValidity, ImapUid, ImapRemoteFlags, ImapDownloaded, Flags"
+		" from " MAIL3_TBL_MAIL " where Id=? and AccountId=?");
+	if (!Mail.SetInt64(0, Operation.MailId) || !Mail.SetInt64(1, Operation.AccountId) || !Mail.Row())
+		return ImapFailure("operation", "The canonical mail row does not belong to this account.");
+	auto ParentId = Mail.GetInt64(0);
+	if (Append)
+	{
+		if (Snapshot)
+		{
+			Operation.SourceMailboxId = -1;
+			Operation.SourceUidValidity = Operation.SourceUid = -1;
+			Operation.SourceRemoteName.Empty();
+		}
+		if (Mail.GetInt64(1) != -1 || Mail.GetInt64(2) != -1 ||
+			Mail.GetInt(4) != 1 || !(Mail.GetInt(5) & MAIL_STORED_FLAT) ||
+			ParentId != Operation.DestinationMailboxId)
+			return ImapFailure("operation", "APPEND requires an unassigned staged message with a stored body.");
+		LStatement Content(this, "select 1 from " MAIL3_TBL_MAILSEGS " where MailId=?");
+		if (!Content.SetInt64(0, Operation.MailId) || !Content.Row())
+			return ImapFailure("operation", "The staged APPEND body is missing.");
+	}
+	else
+	{
+		if (Snapshot)
+		{
+			Operation.SourceMailboxId = ParentId;
+			Operation.SourceUidValidity = Mail.GetInt64(1);
+			Operation.SourceUid = Mail.GetInt64(2);
+			if (Operation.Type == LMail3ImapOperationType::Move)
+			{
+				Flags.All = Mail.GetInt(3);
+				Flags.ImapRecent = Flags.ImapExpunged = false;
+				Operation.RemoteFlags = Flags.All;
+			}
+			if (Operation.Type == LMail3ImapOperationType::Delete)
+			{
+				Flags.All = Mail.GetInt(3);
+				Flags.ImapDeleted = true;
+				Flags.ImapRecent = false;
+				Flags.ImapExpunged = false;
+				Operation.RemoteFlags = Flags.All;
+			}
+		}
+		if (ParentId != Operation.SourceMailboxId || Mail.GetInt64(1) != Operation.SourceUidValidity ||
+			Mail.GetInt64(2) != Operation.SourceUid || Operation.SourceUidValidity <= 0 ||
+			Operation.SourceUidValidity > UINT32_MAX || Operation.SourceUid <= 0 || Operation.SourceUid > UINT32_MAX)
+			return ImapFailure("operation", "The source message identity has changed or is unverified.");
+	}
+	auto CheckFolder = [&](int64 Id, LString &Name, int64 &Epoch)
+	{
+		LStatement Folder(this, "select ImapRemoteName, ImapUidValidity from " MAIL3_TBL_FOLDER
+			" where Id=? and ImapAccountId=?");
+		if (!Folder.SetInt64(0, Id) || !Folder.SetInt64(1, Operation.AccountId) || !Folder.Row())
+			return ImapFailure("operation", "A mailbox is missing or belongs to another account.");
+		LString Remote = Folder.GetStr(0);
+		auto UidValidity = Folder.GetInt64(1);
+		if (!Remote || Remote.Find("\r") >= 0 || Remote.Find("\n") >= 0 ||
+			UidValidity <= 0 || UidValidity > UINT32_MAX)
+			return ImapFailure("operation", "A mailbox has no verified server identity.");
+		if (Snapshot)
+			Name = Remote;
+		if (Snapshot && Destination && Id == Operation.DestinationMailboxId)
+			Epoch = UidValidity;
+		if (Name != Remote || Epoch != UidValidity)
+			return ImapFailure("operation", "A mailbox name or UIDVALIDITY has changed since enqueueing.");
+		return true;
+	};
+	if (!Append && !CheckFolder(Operation.SourceMailboxId, Operation.SourceRemoteName, Operation.SourceUidValidity))
+		return false;
+	if (Destination)
+	{
+		if (!Append && Operation.SourceMailboxId == Operation.DestinationMailboxId)
+			return ImapFailure("operation", "A move requires a different destination mailbox.");
+		if (!CheckFolder(Operation.DestinationMailboxId, Operation.DestinationRemoteName, Operation.DestinationUidValidity))
+			return false;
+	}
+	else if (Operation.DestinationMailboxId != -1)
+		return ImapFailure("operation", "This operation has no destination mailbox.");
+	return true;
+}
+
+static void ReadImapOperation(LMail3Store::LStatement &Query, LMail3ImapOperation &Operation)
+{
+	Operation.Id = Query.GetInt64(0);
+	Operation.AccountId = Query.GetInt64(1);
+	Operation.Type = (LMail3ImapOperationType)Query.GetInt(2);
+	Operation.State = (LMail3ImapOperationState)Query.GetInt(3);
+	Operation.MailId = Query.GetInt64(4);
+	Operation.SourceMailboxId = Query.GetInt64(5);
+	Operation.DestinationMailboxId = Query.GetInt64(6);
+	Operation.SourceUidValidity = Query.GetInt64(7);
+	Operation.SourceUid = Query.GetInt64(8);
+	Operation.DestinationUidValidity = Query.GetInt64(9);
+	Operation.DestinationUid = Query.GetInt64(10);
+	Operation.Attempts = Query.GetInt(12);
+	Operation.LastError = Query.GetStr(13);
+	Operation.SourceRemoteName = Query.GetStr(14);
+	Operation.DestinationRemoteName = Query.GetStr(15);
+	Operation.RemoteFlags = Query.GetInt(16);
+}
+
+bool LMail3Store::InsertImapOperation(LMail3ImapOperation &Operation)
+{
+	if (!CheckImapOperation(Operation, true))
+		return false;
+	LStatement Insert(this, "insert into " MAIL3_TBL_IMAP_OPERATION
+		" (AccountId,OperationType,State,MailId,SourceMailboxId,DestinationMailboxId,SourceUidValidity,"
+		"SourceUid,DestinationUidValidity,Created,Attempts,SourceRemoteName,DestinationRemoteName,RemoteFlags)"
+		" values (?,?,0,?,?,?,?,?,?,strftime('%Y-%m-%dT%H:%M:%fZ','now'),0,?,?,?)");
+	if (!Insert.SetInt64(0, Operation.AccountId) || !Insert.SetInt(1, (int)Operation.Type) ||
+		!Insert.SetInt64(2, Operation.MailId) || !Insert.SetInt64(3, Operation.SourceMailboxId) ||
+		!Insert.SetInt64(4, Operation.DestinationMailboxId) || !Insert.SetInt64(5, Operation.SourceUidValidity) ||
+		!Insert.SetInt64(6, Operation.SourceUid) || !Insert.SetInt64(7, Operation.DestinationUidValidity) ||
+		!Insert.SetStr(8, Operation.SourceRemoteName) || !Insert.SetStr(9, Operation.DestinationRemoteName) ||
+		!Insert.SetInt(10, Operation.RemoteFlags) || !Insert.Exec())
+		return ImapFailure("enqueue", "Cannot save the operation; another operation may already own this message.");
+	Operation.Id = Insert.LastInsertId();
+	Operation.Attempts = 0;
+	Operation.LastError.Empty();
+	Operation.DestinationUid = -1;
+	return true;
+}
+
+bool LMail3Store::QueueImapOperation(LMail3ImapOperation &Result)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success || !sqlite3_get_autocommit(Db))
+		return ImapFailure("enqueue", "An idle store on its owning thread is required.");
+	auto Operation = Result;
+	if (Operation.Id != -1 || Operation.State != LMail3ImapOperationState::Queued)
+		return ImapFailure("enqueue", "Only a new queued operation can be inserted.");
+	ImapStorageTransaction Transaction(this);
+	if (!Transaction.IsOk() || !InsertImapOperation(Operation))
+		return false;
+	if (!Transaction.Commit())
+		return false;
+	Result = Operation;
+	return true;
+}
+
+bool LMail3Store::StageImapAppend(int64 AccountId, int64 MailboxId, int RemoteFlags, LStreamI &Body,
+	LMail3ImapOperation &Result)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success || !sqlite3_get_autocommit(Db) ||
+		AccountId < 0 || AccountId > INT_MAX || Body.SetPos(0) != 0)
+		return ImapFailure("stage APPEND", "An idle owning-thread store and seekable RFC822 image are required.");
+	ImapStorageTransaction Transaction(this);
+	if (!Transaction.IsOk())
+		return false;
+	LMail3Mail Mail(this);
+	Mail.ParentId = MailboxId;
+	Mail.AccountId = (int)AccountId;
+	if (Mail.SetRfc822(&Body, true) != Store3Success || !Mail.ParseHeaders())
+		return ImapFailure("stage APPEND", "Cannot store and parse the original RFC822 image.");
+	{
+		auto Stored = Mail.GetStream(_FL);
+		if (!Stored || !ImapStreamsEqual(Body, *Stored))
+			return ImapFailure("stage APPEND", "The stored RFC822 image failed byte-for-byte verification.");
+	}
+	Mail.MailSize = Body.GetSize();
+	Mail.ImapDownloaded = 1;
+	if (!Mail.Write(MAIL3_TBL_MAIL, false))
+		return ImapFailure("stage APPEND", "Cannot save the staged canonical message.");
+	LMail3ImapOperation Operation;
+	Operation.AccountId = AccountId;
+	Operation.Type = LMail3ImapOperationType::Append;
+	Operation.MailId = Mail.Id;
+	Operation.DestinationMailboxId = MailboxId;
+	Operation.RemoteFlags = RemoteFlags;
+	if (!InsertImapOperation(Operation))
+		return ImapFailure("stage APPEND", "Cannot durably queue the staged APPEND.");
+	if (!Transaction.Commit())
+		return false;
+	Result = Operation;
+	return true;
+}
+
+bool LMail3Store::LoadImapOperations(int64 AccountId, LArray<LMail3ImapOperation> &Operations)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success || AccountId < 0)
+		return ImapFailure("load journal", "An account and owning-thread store are required.");
+	LArray<LMail3ImapOperation> Loaded;
+	LStatement Query(this, "select * from " MAIL3_TBL_IMAP_OPERATION " where AccountId=? order by Id");
+	if (!Query.SetInt64(0, AccountId))
+		return false;
+	int Result;
+	while ((Result = sqlite3_step(Query)) == SQLITE_ROW)
+		ReadImapOperation(Query, Loaded.New());
+	if (!Check(Result, NULL))
+		return false;
+	Operations.Swap(Loaded);
+	return true;
+}
+
+bool LMail3Store::BeginImapOperation(int64 Id, LMail3ImapOperation &Result)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success ||
+		!sqlite3_get_autocommit(Db) || Id <= 0)
+		return ImapFailure("claim operation", "An idle owning-thread store and operation ID are required.");
+	ImapStorageTransaction Transaction(this);
+	LMail3ImapOperation Operation;
+	{
+		LStatement Query(this, "select * from " MAIL3_TBL_IMAP_OPERATION " where Id=?");
+		if (!Transaction.IsOk() || !Query.SetInt64(0, Id) || !Query.Row())
+			return ImapFailure("claim operation", "The journal entry is missing.");
+		ReadImapOperation(Query, Operation);
+	}
+	if (Operation.State != LMail3ImapOperationState::Queued || !CheckImapOperation(Operation, false))
+		return ImapFailure("claim operation", "Only an unchanged queued operation may be dispatched.");
+	LStatement Claim(this, "update " MAIL3_TBL_IMAP_OPERATION " set State=1,Attempts=Attempts+1,LastError=null"
+		" where Id=? and State=0 and not exists (select 1 from " MAIL3_TBL_IMAP_OPERATION
+		" Earlier where Earlier.AccountId=? and Earlier.Id<?)");
+	if (!Claim.SetInt64(0, Id) || !Claim.SetInt64(1, Operation.AccountId) ||
+		!Claim.SetInt64(2, Id) || !Claim.Exec() || sqlite3_changes(Db) != 1)
+		return ImapFailure("claim operation", "An earlier operation must be completed or reconciled first.");
+	if (!Transaction.Commit())
+		return false;
+	Operation.State = LMail3ImapOperationState::Executing;
+	Operation.Attempts++;
+	Operation.LastError.Empty();
+	Result = Operation;
+	return true;
+}
+
+LAutoStreamI LMail3Store::OpenImapUpload(int64 AccountId, int64 OperationId)
+{
+	LAutoStreamI Result;
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success ||
+		!sqlite3_get_autocommit(Db) || AccountId < 0 || OperationId <= 0)
+	{
+		ImapFailure("upload access", "An account, operation ID and idle owning-thread store are required.");
+		return Result;
+	}
+	LMail3ImapOperation Operation;
+	{
+		LStatement Query(this, "select * from " MAIL3_TBL_IMAP_OPERATION " where Id=? and AccountId=?");
+		if (!Query.SetInt64(0, OperationId) || !Query.SetInt64(1, AccountId) || !Query.Row())
+		{
+			ImapFailure("upload access", "The APPEND journal entry is missing.");
+			return Result;
+		}
+		ReadImapOperation(Query, Operation);
+	}
+	if (Operation.Type != LMail3ImapOperationType::Append ||
+		(Operation.State != LMail3ImapOperationState::Queued && Operation.State != LMail3ImapOperationState::Executing) ||
+		!CheckImapOperation(Operation, false))
+	{
+		ImapFailure("upload access", "Only an unchanged queued or executing APPEND can supply upload bytes.");
+		return Result;
+	}
+	LMail3Mail Mail(this);
+	{
+		LStatement Query(this, "select * from " MAIL3_TBL_MAIL " where Id=?");
+		if (!Query.SetInt64(0, Operation.MailId) || !Query.Row() || !Mail.Serialize(Query, false))
+		{
+			ImapFailure("upload access", "Cannot load the staged canonical message.");
+			return Result;
+		}
+	}
+	auto Stored = Mail.GetStream(_FL);
+	// Never hand a SQLite BLOB handle to the network worker.
+	Result.Reset(new LTempStream(GetStr(FIELD_TEMP_PATH)));
+	LCopyStreamer Copy;
+	if (!Stored || Stored->GetSize() != Mail.MailSize || Stored->SetPos(0) != 0 ||
+		!Result || !Copy.Copy(Stored, Result) || !ImapStreamsEqual(*Stored, *Result) ||
+		Result->SetPos(0) != 0)
+	{
+		ImapFailure("upload access", "Cannot detach and verify the original APPEND image.");
+		Result.Reset();
+	}
+	return Result;
+}
+
+bool LMail3Store::InterruptImapOperation(int64 Id, const char *Reason,
+	int64 DestinationUidValidity, int64 DestinationUid)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success ||
+		!sqlite3_get_autocommit(Db) || Id <= 0 || !ValidStr(Reason))
+		return ImapFailure("interrupt operation", "An idle owning-thread store, operation ID and reason are required.");
+	bool HasDestination = DestinationUidValidity != -1 || DestinationUid != -1;
+	if (HasDestination && (DestinationUidValidity <= 0 || DestinationUidValidity > UINT32_MAX ||
+		DestinationUid <= 0 || DestinationUid > UINT32_MAX))
+		return ImapFailure("interrupt operation", "Invalid destination identity evidence.");
+	LStatement Update(this, "update " MAIL3_TBL_IMAP_OPERATION
+		" set State=2,LastError=?,DestinationUid=coalesce(?,DestinationUid) where Id=? and State=1"
+		" and (? is null or (OperationType in (3,4) and DestinationUidValidity=?))");
+	if (!Update.SetStr(0, Reason) || !Update.SetInt64(1, DestinationUid) || !Update.SetInt64(2, Id) ||
+		!Update.SetInt64(3, DestinationUidValidity) || !Update.SetInt64(4, DestinationUidValidity) ||
+		!Update.Exec() || sqlite3_changes(Db) != 1)
+		return ImapFailure("interrupt operation", "The operation is not executing.");
+	return true;
+}
+
+bool LMail3Store::RecoverImapOperations(int64 AccountId)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success ||
+		!sqlite3_get_autocommit(Db) || AccountId < 0)
+		return ImapFailure("recover journal", "An account and idle owning-thread store are required.");
+	LStatement Update(this, "update " MAIL3_TBL_IMAP_OPERATION
+		" set State=2,LastError='Interrupted command: reconcile server state before retrying.'"
+		" where AccountId=? and State=1");
+	if (!Update.SetInt64(0, AccountId) || !Update.Exec())
+		return ImapFailure("recover journal", "Cannot quarantine interrupted server commands.");
+	return true;
+}
+
+bool LMail3Store::CompleteImapOperation(int64 Id, int64 DestinationUidValidity, int64 DestinationUid)
+{
+	if (!InThread() || !IsOk() || GetInt(FIELD_STATUS) != Store3Success ||
+		!sqlite3_get_autocommit(Db) || Id <= 0)
+		return ImapFailure("complete operation", "An idle owning-thread store and operation ID are required.");
+	ImapStorageTransaction Transaction(this);
+	LMail3ImapOperation Operation;
+	{
+		LStatement Query(this, "select * from " MAIL3_TBL_IMAP_OPERATION " where Id=?");
+		if (!Transaction.IsOk() || !Query.SetInt64(0, Id) || !Query.Row())
+			return ImapFailure("complete operation", "The journal entry is missing.");
+		ReadImapOperation(Query, Operation);
+	}
+	if (Operation.State != LMail3ImapOperationState::Executing || !CheckImapOperation(Operation, false))
+		return ImapFailure("complete operation", "The executing command no longer matches the canonical identity.");
+	bool Destination = Operation.Type == LMail3ImapOperationType::Move || Operation.Type == LMail3ImapOperationType::Append;
+	if (Destination && (DestinationUidValidity != Operation.DestinationUidValidity ||
+		DestinationUid <= 0 || DestinationUid > UINT32_MAX))
+		return ImapFailure("complete operation", "COPY/APPEND requires a verified destination epoch and UID.");
+	if (!Destination && (DestinationUidValidity != -1 || DestinationUid != -1))
+		return ImapFailure("complete operation", "This command has no destination identity.");
+	LMail3Mail Mail(this);
+	{
+		LStatement Query(this, "select * from " MAIL3_TBL_MAIL " where Id=?");
+		if (!Query.SetInt64(0, Operation.MailId) || !Query.Row() || !Mail.Serialize(Query, false))
+			return ImapFailure("complete operation", "Cannot load the canonical message.");
+	}
+	if (Destination)
+	{
+		Mail.ParentId = Operation.DestinationMailboxId;
+		Mail.ImapUidValidity = DestinationUidValidity;
+		Mail.ImapUid = DestinationUid;
+	}
+	if (Operation.Type != LMail3ImapOperationType::Move)
+	{
+		Mail.ImapRemoteFlags = Operation.RemoteFlags;
+		ImapMailFlags Flags;
+		Flags.All = Operation.RemoteFlags;
+		Mail.Flags = (Mail.Flags & ~(MAIL_READ | MAIL_REPLIED)) |
+			(Flags.ImapSeen ? MAIL_READ : 0) | (Flags.ImapAnswered ? MAIL_REPLIED : 0);
+		Mail.ImapLocalFlags = Mail.Flags & ~MAIL_STORED_FLAT;
+	}
+	if (!Mail.Write(MAIL3_TBL_MAIL, false))
+		return ImapFailure("complete operation", "Cannot commit the server-confirmed message state.");
+	LStatement Delete(this, "delete from " MAIL3_TBL_IMAP_OPERATION " where Id=? and State=1");
+	if (!Delete.SetInt64(0, Id) || !Delete.Exec() || sqlite3_changes(Db) != 1)
+		return ImapFailure("complete operation", "Cannot retire the confirmed journal entry.");
+	return Transaction.Commit();
+}
 
 bool LMail3Store::ImportImapSettings(int64 AccountId, const char *CachePath)
 {
@@ -2006,7 +2496,7 @@ bool LMail3Store::ImportImapSettings(int64 AccountId, const char *CachePath)
 	if (!IsOk() || !InThread() || AccountId < 0 || AccountId > INT_MAX || !ValidStr(CachePath) ||
 		GetInt(FIELD_STATUS) != Store3Success || !sqlite3_get_autocommit(Db))
 		return Fail("An open, idle Mail3 store on its owning thread is required.");
-	ImapRebuildTransaction Transaction(this);
+	ImapStorageTransaction Transaction(this);
 	if (!Transaction.IsOk())
 		return Fail("Cannot start the settings transaction.");
 
@@ -2138,7 +2628,7 @@ bool LMail3Store::RebuildImapMailbox(LMail3ImapMailbox &ResultMailbox, LArray<LM
 		if (Id)
 			ServerIds[Id.Get()]++;
 	}
-	ImapRebuildTransaction Transaction(this);
+	ImapStorageTransaction Transaction(this);
 	if (!Transaction.IsOk())
 		return Fail("Cannot start the rebuild transaction.");
 	{
@@ -2653,26 +3143,8 @@ bool LMail3Store::ImportImapCache(int64 AccountId, const char *CachePath)
 						return Fail("Cannot parse the cached message headers.");
 					Mail.MailSize = Input.GetSize();
 					auto Stored = Mail.GetStream(_FL);
-					if (!Stored || Stored->GetSize() != Input.GetSize())
-						return Fail("The stored RFC822 image has a different size.");
-					Input.SetPos(0);
-					Stored->SetPos(0);
-					char Original[8192], Copy[8192];
-					for (int64 Remaining = Input.GetSize(); Remaining > 0; )
-					{
-						auto Size = (ssize_t)MIN(Remaining, (int64)sizeof(Original));
-						ssize_t Copied = 0;
-						while (Copied < Size)
-						{
-							auto Read = Stored->Read(Copy + Copied, Size - Copied);
-							if (Read <= 0)
-								return Fail("Cannot read back the stored RFC822 image.");
-							Copied += Read;
-						}
-						if (Input.Read(Original, Size) != Size || memcmp(Original, Copy, Size))
-							return Fail("The stored RFC822 image differs from the cache.");
-						Remaining -= Size;
-					}
+					if (!Stored || !ImapStreamsEqual(Input, *Stored))
+						return Fail("The stored RFC822 image failed byte-for-byte verification.");
 					Downloaded = true;
 				}
 				Mail.ImapUidValidity = 0;
@@ -3051,15 +3523,21 @@ LProfile Prof("LMail3Obj::Write");
 				{
 					LAssert(!"No ID returned.");
 					LgiTrace("%s:%i - No ID from statement.\n", _FL);
+					return false;
 				}
 			}
 		}
 		else
 		{
 			LgiTrace("%s:%i - Exec failed.\n", _FL);
+			return false;
 		}
 	}
-	else LAssert(!"No statement");
+	else
+	{
+		LAssert(!"No statement");
+		return false;
+	}
 
 	return Id >= 0;
 }

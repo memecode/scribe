@@ -74,6 +74,174 @@ bool FetchImapRebuild(MailIMap &Imap, const ImapFolderInfo &Folder, ImapMsg &Res
 	return true;
 }
 
+static bool JournalMailbox(MailIMap &Imap, const LString &Name, int64 ExpectedEpoch)
+{
+	MailIMap::StrMap Values;
+	// Always SELECT: the worker cache alone cannot establish UIDVALIDITY.
+	if (!Imap.SelectFolder(Name, &Values))
+		return false;
+	auto Epoch = Values.Find("UIDVALIDITY");
+	return Epoch.IsNumeric() && Epoch.Int() > 0 && Epoch.Int() <= UINT32_MAX && Epoch.Int() == ExpectedEpoch;
+}
+
+// Answered, Deleted, Draft, Flagged, Seen; excludes server-only Recent and Expunged.
+static constexpr int JournalWritableFlags = 47;
+
+struct JournalMessage
+{
+	uint32_t Uid;
+	unsigned Count = 0;
+	ImapMailFlags Flags;
+	bool Invalid = false;
+};
+
+static bool JournalMessageCallback(MailIMap *, uint32_t, MailIMap::StrMap &Parts, void *Context)
+{
+	auto &Message = *static_cast<JournalMessage*>(Context);
+	auto Uid = Parts.Find("UID");
+	auto Flags = Parts.Find("FLAGS");
+	if (!Uid)
+		return true; // Unsolicited sequence-only FETCH notification.
+	if (!Uid.IsNumeric() || Uid.Int() <= 0 || Uid.Int() > UINT32_MAX)
+	{
+		Message.Invalid = true;
+		return false;
+	}
+	if (Uid.Int() != Message.Uid)
+		return true;
+	bool HasFlags = false; // FLAGS () is valid even when its parsed value is empty.
+	for (auto Part: Parts)
+		if (!Stricmp(Part.key, "FLAGS"))
+			HasFlags = true;
+	if (!HasFlags || ++Message.Count != 1)
+	{
+		Message.Invalid = true;
+		return false;
+	}
+	Message.Flags.Set(Flags);
+	return true;
+}
+
+static bool JournalFetch(MailIMap &Imap, int64 Uid, ImapMailFlags &Flags)
+{
+	JournalMessage Message{(uint32_t)Uid};
+	auto Range = LString::Fmt("%u", Message.Uid);
+	if (!Imap.Fetch(true, Range, "UID FLAGS", JournalMessageCallback, &Message, NULL) ||
+		Message.Invalid || Message.Count != 1)
+		return false;
+	Flags = Message.Flags;
+	return true;
+}
+
+ImapJournalResult ExecuteImapJournalOperation(MailIMap &Imap, ImapJournalCommand &Command)
+{
+	auto &Operation = Command.Operation;
+	ImapJournalResult Result;
+	Result.OperationId = Operation.Id;
+	Result.AccountId = Operation.AccountId;
+	auto Fail = [&](const char *Error)
+	{
+		Result.Error = Error;
+		LgiTrace("IMAP journal %" PRIi64 ": %s\n", Operation.Id, Error);
+		return Result;
+	};
+	bool Append = Operation.Type == LMail3ImapOperationType::Append;
+	bool Move = Operation.Type == LMail3ImapOperationType::Move;
+	if (Operation.Id <= 0 || Operation.AccountId < 0 ||
+		Operation.State != LMail3ImapOperationState::Executing ||
+		(Operation.Type != LMail3ImapOperationType::SetFlags &&
+		 Operation.Type != LMail3ImapOperationType::Delete && !Append && !Move))
+		return Fail("The worker requires a claimed, supported journal operation.");
+	auto ValidMailbox = [](const LString &Name, int64 Epoch)
+	{
+		return Name && strlen(Name.Get()) == Name.Length() && Name.Length() < MAX_PATH_LEN &&
+			!strpbrk(Name, "\r\n\"\\") && Epoch > 0 && Epoch <= UINT32_MAX;
+	};
+	if ((!Append && (!ValidMailbox(Operation.SourceRemoteName, Operation.SourceUidValidity) ||
+		 Operation.SourceUid <= 0 || Operation.SourceUid > UINT32_MAX)) ||
+		((Append || Move) && !ValidMailbox(Operation.DestinationRemoteName, Operation.DestinationUidValidity)) ||
+		Operation.RemoteFlags < 0 || (Operation.RemoteFlags & ~JournalWritableFlags))
+		return Fail("Invalid frozen mailbox identity, UID or writable flags.");
+	if (Append && (!Command.Upload || Command.Upload->GetSize() <= 0 || Command.Upload->SetPos(0) != 0))
+		return Fail("APPEND requires an owned, seekable original RFC822 image.");
+	if (Move && Operation.SourceRemoteName == Operation.DestinationRemoteName)
+		return Fail("A move requires a different destination mailbox.");
+	ImapMailFlags SourceFlags;
+	if ((Append || Move) && !JournalMailbox(Imap, Operation.DestinationRemoteName, Operation.DestinationUidValidity))
+		return Fail("The destination SELECT failed or UIDVALIDITY changed; no mutation was sent.");
+	if (!Append)
+	{
+		if (!JournalMailbox(Imap, Operation.SourceRemoteName, Operation.SourceUidValidity))
+			return Fail("The source SELECT failed or UIDVALIDITY changed; no mutation was sent.");
+		if (!JournalFetch(Imap, Operation.SourceUid, SourceFlags))
+			return Fail("The source UID could not be fetched; no mutation was sent.");
+		if (Move && (SourceFlags.All & JournalWritableFlags) != Operation.RemoteFlags)
+			return Fail("The source flags changed since the move was queued; no mutation was sent.");
+		if (!JournalMailbox(Imap, Operation.SourceRemoteName, Operation.SourceUidValidity))
+			return Fail("The source epoch changed during verification; no mutation was sent.");
+	}
+	ImapMailFlags Flags;
+	Flags.All = Operation.RemoteFlags;
+	// Beyond this point a failed reply may conceal a successful server mutation.
+	Result.Outcome = ImapJournalOutcome::Uncertain;
+	if (Append || Move)
+	{
+		MailIMap::UidPlusResult Mapping;
+		LArray<uint32_t> SourceUids;
+		if (Move)
+			SourceUids.Add((uint32_t)Operation.SourceUid);
+		bool Accepted = Append
+			? Imap.AppendLiteral(Operation.DestinationRemoteName, Flags, *Command.Upload, Mapping)
+			: Imap.CopyByUid(SourceUids, Operation.DestinationRemoteName, &Mapping);
+		if (!Accepted)
+			return Fail("APPEND/COPY did not return confirmed success; reconcile before retrying.");
+		if (Mapping.UidValidity != Operation.DestinationUidValidity || !Mapping.DestinationUid ||
+			(Move && Mapping.SourceUid != Operation.SourceUid))
+			return Fail("APPEND/COPY succeeded without a valid single-message UIDPLUS mapping; do not repeat it.");
+		Result.DestinationUidValidity = Mapping.UidValidity;
+		Result.DestinationUid = Mapping.DestinationUid;
+		ImapMailFlags DestinationFlags;
+		if (!JournalMailbox(Imap, Operation.DestinationRemoteName, Operation.DestinationUidValidity) ||
+			!JournalFetch(Imap, Mapping.DestinationUid, DestinationFlags) ||
+			!JournalMailbox(Imap, Operation.DestinationRemoteName, Operation.DestinationUidValidity))
+			return Fail("The APPEND/COPY destination could not be verified after success.");
+		if (Move)
+		{
+			if ((DestinationFlags.All & JournalWritableFlags) != Operation.RemoteFlags)
+				return Fail("COPY succeeded but destination flags changed; retain the COPYUID evidence.");
+			// Never mark the source deleted until the COPY identity is known.
+			if (!JournalMailbox(Imap, Operation.SourceRemoteName, Operation.SourceUidValidity) ||
+				!JournalFetch(Imap, Operation.SourceUid, SourceFlags) ||
+				!JournalMailbox(Imap, Operation.SourceRemoteName, Operation.SourceUidValidity))
+				return Fail("COPY succeeded but the source changed before deletion; retain the COPYUID evidence.");
+			Flags = SourceFlags;
+			Flags.ImapRecent = Flags.ImapExpunged = false;
+			Flags.ImapDeleted = true;
+		}
+		else
+		{
+			if ((DestinationFlags.All & JournalWritableFlags) != Flags.All)
+				return Fail("APPEND succeeded but its destination flags do not match the requested flags.");
+			Result.Outcome = ImapJournalOutcome::Confirmed;
+			return Result;
+		}
+	}
+	LArray<uint32_t> Uids;
+	Uids.Add((uint32_t)Operation.SourceUid);
+	if (!Imap.SetFlagsByUid(Uids, Flags.Get()))
+		return Fail("UID STORE did not return confirmed success; reconcile before retrying.");
+	ImapMailFlags Verified;
+	if (!JournalMailbox(Imap, Operation.SourceRemoteName, Operation.SourceUidValidity) ||
+		!JournalFetch(Imap, Operation.SourceUid, Verified) ||
+		!JournalMailbox(Imap, Operation.SourceRemoteName, Operation.SourceUidValidity) ||
+		(Verified.All & JournalWritableFlags) != Flags.All)
+		return Fail("The source UID, epoch or flags could not be verified after UID STORE.");
+	if (Move && !JournalMailbox(Imap, Operation.DestinationRemoteName, Operation.DestinationUidValidity))
+		return Fail("The destination epoch changed after COPY/source deletion.");
+	Result.Outcome = ImapJournalOutcome::Confirmed;
+	return Result;
+}
+
 int FldCmp(MailImapFolder **a, MailImapFolder **b)
 {
 	char *sa = (*a)->GetPath();
@@ -999,6 +1167,27 @@ int ImapThread::Main()
 			switch (m->Type)
 			{
 				default: break;
+				case IMAP_JOURNAL_OPERATION:
+				{
+					if (!m->Journal)
+					{
+						d->Error(_FL, "Missing journal command payload.");
+						PostStore(new ImapMsg(IMAP_ERROR, _FL));
+						break;
+					}
+					// The dispatcher forces its own SELECTs; invalidate the legacy shortcut.
+					d->CurrentFolder.Empty();
+					m->JournalResult = ExecuteImapJournalOperation(*d->Imap, *m->Journal);
+					m->Journal.Reset();
+					if (m->JournalResult.Outcome != ImapJournalOutcome::Confirmed && d->Lock(_FL))
+					{
+						// Even a failed preflight may leave an unconsumed transport reply.
+						d->Imap.Reset();
+						d->Unlock();
+					}
+					PostStore(m.Release());
+					break;
+				}
 				case IMAP_REBUILD_MAILBOX:
 				{
 					for (auto &Folder: m->Fld)

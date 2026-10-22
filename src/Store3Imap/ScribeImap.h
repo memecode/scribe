@@ -14,6 +14,7 @@
 #include "lgi/common/Mail.h"
 #include "Store3Common.h"
 #include "ScribeUtils.h"
+#include "../Store3Mail3/Mail3.h"
 
 #define CastFld(obj) (dynamic_cast<ImapFolder*>(obj))
 #define CastMail(obj) (dynamic_cast<ImapMail*>(obj))
@@ -82,6 +83,7 @@ enum ImapMsgType
 	IMAP_UNDELETE,
 	IMAP_SET_FLAGS,
 	IMAP_REBUILD_MAILBOX,
+	IMAP_JOURNAL_OPERATION,
 	
 	// Check
 	IMAP_MSG_MAX
@@ -143,6 +145,32 @@ struct ImapMailInfo
 	LString Date;
 };
 
+struct ImapJournalCommand
+{
+	LMail3ImapOperation Operation;
+	// Owned, detached from SQLite before transfer to the network thread.
+	LAutoStreamI Upload;
+};
+
+enum class ImapJournalOutcome
+{
+	NotExecuted,
+	Uncertain,
+	Confirmed
+};
+
+struct ImapJournalResult
+{
+	int64 OperationId = -1, AccountId = -1;
+	ImapJournalOutcome Outcome = ImapJournalOutcome::NotExecuted;
+	int64 DestinationUidValidity = -1, DestinationUid = -1;
+	LString Error;
+};
+
+ImapJournalResult ExecuteImapJournalOperation(MailIMap &Imap, ImapJournalCommand &Command);
+bool PrepareImapJournalOperation(LMail3Store &Storage, int64 AccountId, int64 OperationId, ImapJournalCommand &Command);
+bool ApplyImapJournalResult(LMail3Store &Storage, int64 AccountId, const ImapJournalResult &Result);
+
 struct ImapMsg
 {
 	ImapMsgType Type;
@@ -165,6 +193,8 @@ struct ImapMsg
 	int Line;
 	int IntParam;
 	LError Error;
+	LAutoPtr<ImapJournalCommand> Journal;
+	ImapJournalResult JournalResult;
 
 	ImapMsg(ImapMsgType t, const char *file, int line)
 	{
@@ -209,6 +239,7 @@ class ImapStore : public LDataStoreI
 	ImapThread *Thread = NULL;
 	LStream *Log;
 	LMail3Store *Storage = NULL;
+	int64 PendingJournalId = -1;
 	ScribeAccountletStatusIcon Online = STATUS_OFFLINE;
 	LArray<ImapMsg*> Listing;
 	int64 LastPulse = 0;
@@ -224,6 +255,7 @@ class ImapStore : public LDataStoreI
 	ImapFolder *GetParent(char *Local, char *Remote);
 	ImapFolder *GetTrash();
 	ImapFolder *GetSystemFolder(int Type);
+	bool InterruptPendingJournal(const char *Reason);
 
 public:
 	ImapStore(	LString host,
@@ -243,6 +275,8 @@ public:
 	const char *GetClass() override { return "ImapStore"; }
 	LMail3Store *GetStorage() { return Storage; }
 	bool IsServerRebuild() const;
+	// Internal cutover bridge; legacy UI paths do not enqueue journal commands yet.
+	bool DispatchJournalOperation(int64 OperationId);
 	void PostStore(ImapMsg *m) { Callback->Post(this, m); }
 	bool PostThread(ImapMsg *m, bool UiPriority);
 
