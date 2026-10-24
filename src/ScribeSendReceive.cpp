@@ -220,7 +220,7 @@ bool Accountlet::WaitForTransfers(List<MailTransferEvent> &Files)
 	}
 	while (Counts[MailReceivedWaiting] > 0);
 	
-	return true;
+	return Counts[MailReceivedError] == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1986,7 +1986,7 @@ if (DebugTrace) LgiTrace("Receive(%i) connected, time=%i\n", Account->GetIndex()
 		// Get all the messages..
 		Thread->SetState(ThreadTransfer);
 		auto Msgs = Source->GetMessages();
-		if (Msgs)
+		if (Msgs > 0)
 		{
 			bool LeaveOnServer = Receive->LeaveOnServer() != 0;
 			bool DeleteAfter = Receive->DeleteAfter() != 0;
@@ -2076,23 +2076,41 @@ if (DebugTrace) LgiTrace("Receive(%i) got %i actions, time=%i\n", Account->GetIn
 			{
 if (DebugTrace) LgiTrace("Receive(%i) getting UID's, time=%i\n", Account->GetIndex(), TimeDelta());
 				LString::Array UidLst;
-				Source->GetUidList(UidLst);
-				for (auto u: UidLst)
-					Uids.Add(u, true);
+				bool ValidUids = Source->GetUidList(UidLst) && UidLst.Length() == Msgs;
+				if (ValidUids)
+				{
+					for (auto u: UidLst)
+					{
+						if (!u || !u.Length())
+						{
+							ValidUids = false;
+							break;
+						}
+						Uids.Add(u, true);
+					}
+				}
+				if (!ValidUids)
+				{
+					err.Set(LErrorIoFailed, "Failed to obtain a complete message UID list; mail check stopped.");
+					LgiTrace("%s:%i - %s\n", _FL, err.GetMsg().Get());
+					Thread->SetState(ThreadError);
+					for (auto t: Thread->Files)
+						DeleteObj(t->Msg);
+					Thread->Files.DeleteObjects();
+					Group.Empty();
+					Actions.Length(0);
+					Source->Close();
+					DeleteObj(Source);
+					return;
+				}
 
 				// Assign all the ID strings to the transfer events
 				LDateTime Now;
 				Now.SetNow();
 				for (auto t: Thread->Files)
 				{
-					auto k = UidLst[0];
-					if (k)
-					{
-						UidLst.DeleteAt(0, true);
-						t->Uid = k;
+					t->Uid = UidLst[t->Index];
 if (DebugTrace) LgiTrace("\tUid[%i]='%s' (time=%i)\n", t->Index, t->Uid.Get(), TimeDelta());
-					}
-					else break;
 
 					if (!t->Explicit && DeleteAfter)
 					{
@@ -2309,6 +2327,9 @@ if (DebugTrace) LgiTrace("Receive(%i) Waiting for main thread, time=%i\n", Accou
 			if (Error)
 			{
 				LgiTrace("%s:%i - Error receiving mail.\n", _FL);
+				if (!err)
+					err.Set(LErrorIoFailed, "Error receiving or saving mail.");
+				Thread->SetState(ThreadError);
 			}
 			else
 			{
@@ -2354,9 +2375,15 @@ if (DebugTrace) LgiTrace("Receive(%i) Delete(%i) Deleting, time=%i\n", Account->
 			Thread->Files.DeleteObjects();
 			Group.Empty();
 		}
-		else
+		else if (Msgs == 0)
 		{
 			Receive->RemoveAllMsgs();
+		}
+		else
+		{
+			err.Set(LErrorIoFailed, "Failed to obtain the server message count.");
+			LgiTrace("%s:%i - Failed to obtain the server message count.\n", _FL);
+			Thread->SetState(ThreadError);
 		}
 
 		// Clear out the UID's
@@ -2479,15 +2506,24 @@ bool ReceiveAccountlet::HasMsg(const char *Id)
 	return Status;
 }
 
-void ReceiveAccountlet::AddMsg(const char *Id)
+bool ReceiveAccountlet::AddMsg(const char *Id)
 {
-	if (!Msgs || !Lock())
-		return;
+	if (!Id || !*Id || !Msgs || !Lock())
+	{
+		err.Set(LErrorIoFailed, "Unable to record downloaded message UID.");
+		LgiTrace("%s:%i - Unable to record downloaded message UID.\n", _FL);
+		return false;
+	}
 
-	if (!Msgs->Find(Id))
-		Msgs->Add(Id);
+	bool Status = Msgs->Find(Id) || Msgs->Add(Id);
+	if (!Status)
+	{
+		err.Set(LErrorIoFailed, "Unable to record downloaded message UID.");
+		LgiTrace("%s:%i - Unable to record downloaded message UID '%s'.\n", _FL, Id);
+	}
 
 	Unlock();
+	return Status;
 }
 
 void ReceiveAccountlet::RemoveMsg(const char *Id)
@@ -2580,9 +2616,8 @@ bool MsgList::Load()
 			postDelete.DeleteObjects();
 
 			Opts->Unlock();
+			Loaded = true;
 		}
-
-		Loaded = true;
 	}
 
 	return Loaded;
@@ -2616,6 +2651,9 @@ void MsgList::Unlock()
 
 bool MsgList::Add(const char *id)
 {
+	if (!id || !*id || !Load())
+		return false;
+
 	bool Status = false;
 	
 	LXmlTag *r = Opts->LockTag(Tag, _FL);
@@ -2632,11 +2670,14 @@ bool MsgList::Add(const char *id)
 				Now.SetNow();
 				Now.Get(n, sizeof(n));
 
-				t->SetContent(id);
-				t->SetAttr(OPT_MsgDate, n);				
-				r->InsertTag(t);
-
-				Status = Parent::Add(id, t);
+				if (t->SetContent(id) && t->SetAttr(OPT_MsgDate, n) &&
+					Parent::Add(id, t))
+				{
+					r->InsertTag(t);
+					Status = true;
+				}
+				else
+					delete t;
 			}
 		}
 

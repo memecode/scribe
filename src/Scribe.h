@@ -2000,7 +2000,7 @@ public:
 
 	// Message list
 	bool HasMsg(const char *Id);
-	void AddMsg(const char *Id);
+	bool AddMsg(const char *Id);
 	void RemoveMsg(const char *Id);
 	void RemoveAllMsgs();
 	int GetMsgs();

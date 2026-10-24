@@ -1073,7 +1073,8 @@ bool ScribeWnd::OnTransfer()
 									// actually mark it as downloaded.
 									if (Transfer->Uid)
 									{
-										Receive->AddMsg(Transfer->Uid);
+										if (!Receive->AddMsg(Transfer->Uid))
+											NewStatus = MailReceivedError;
 									}
 								}
 								else LgiTrace("%s:%i - Error: Couldn't save mail to folders.\n", _FL);
@@ -1332,4 +1333,3 @@ ScribeWndPrivate::~ScribeWndPrivate()
 	DeleteObj(LScribeScript::Inst);
 	DeleteObj(htmlStatic);
 }
-
