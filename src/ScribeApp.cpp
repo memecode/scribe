@@ -3197,7 +3197,7 @@ bool ScribeWnd::LinuxMigrate()
 			{
 				case 3: // Don't ask
 				{
-					LFile f(DontMigratePath, O_WRITE);
+					LFile f(DontMigratePath.c_str(), O_WRITE);
 					f.SetSize(0);
 					f.Write("user asked not to migrate");
 					break;
@@ -3209,7 +3209,7 @@ bool ScribeWnd::LinuxMigrate()
 					LDirectory inDir;
 					int errors = 0;
 					LStringPipe errLog;
-					for (auto b=inDir.First(LFile::Path(OldPath).Absolute()); b; b=inDir.Next())
+					for (auto b=inDir.First(LFile::Path(OldPath).Absolute().c_str()); b; b=inDir.Next())
 					{
 						LString outDir;
 						auto name = inDir.GetName();
@@ -3261,7 +3261,7 @@ bool ScribeWnd::LinuxMigrate()
 								// delete the dest...
 								if (outPath.IsFolder())
 								{
-									if (!FileDev->RemoveFolder(outPath, true, &err))
+									if (!FileDev->RemoveFolder(outPath.c_str(), true, &err))
 									{
 										errLog.Print("Can't remove dir '%s': %s\n", outPath.GetFull().Get(), err.ToString().Get());
 										errors++;
@@ -3269,7 +3269,7 @@ bool ScribeWnd::LinuxMigrate()
 								}
 								else
 								{
-									if (!FileDev->Delete(outPath, &err))
+									if (!FileDev->Delete(outPath.c_str(), &err))
 									{
 										errLog.Print("Can't delete file '%s': %s\n", outPath.GetFull().Get(), err.ToString().Get());
 										errors++;
@@ -3277,7 +3277,7 @@ bool ScribeWnd::LinuxMigrate()
 								}
 							}
 
-							if (!FileDev->Move(inDir.FullPath(), outPath, &err))
+							if (!FileDev->Move(inDir.FullPath(), outPath.c_str(), &err))
 							{
 								errLog.Print("Can't move '%s' to '%s': %s\n",
 									inDir.FullPath(),
