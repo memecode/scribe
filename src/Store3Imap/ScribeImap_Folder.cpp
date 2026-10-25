@@ -437,7 +437,7 @@ bool ImapFolder::Serialize(bool Write)
 				LgiTrace("%s:%i - Buf has %s.\n", _FL, LFormatSize(Buf.GetSize()).Get());
 
 			auto Xml = Buf.NewLStr();
-			if (WriteThread.Reset(new ImapFolderWriterThread(XmlPath, Xml)))
+			if (WriteThread.Reset(new ImapFolderWriterThread(XmlPath.c_str(), Xml)))
 			{
 				if (e)
 					e->Children.Empty();
@@ -454,10 +454,10 @@ bool ImapFolder::Serialize(bool Write)
 		{
 			Field.DeleteObjects();
 		
-			if (LFileExists(XmlPath))
+			if (XmlPath.Exists())
 			{
 				LFile f;
-				if (f.Open(XmlPath, O_READ) &&
+				if (f.Open(XmlPath.c_str(), O_READ) &&
 					t.Read(&Meta, &f, 0))
 				{
 					if (Debug)

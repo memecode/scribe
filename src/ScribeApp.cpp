@@ -867,7 +867,7 @@ void ScribeWnd::Construct2()
 				Inst += Theme.Str();
 				if (Inst.Exists())
 				{
-					CurRes->SetThemeFolder(Inst);
+					CurRes->SetThemeFolder(Inst.c_str());
 					d->htmlStatic->Static->OnSystemColourChange();
 					break;
 				}
@@ -1029,7 +1029,7 @@ void ScribeWnd::Construct3()
 			{
 				bool ErrorDsp = false;
 				LDirectory Dir;
-				for (int b = Dir.First(s); b; b = Dir.Next())
+				for (int b = Dir.First(s.c_str()); b; b = Dir.Next())
 				{
 					if (Dir.IsDir())
 						continue;
@@ -1053,7 +1053,7 @@ void ScribeWnd::Construct3()
 							if (c.Compile(	Cur->Code,
 											d->Engine->GetSystemContext(),
 											LScribeScript::Inst,
-											s,
+											s.c_str(),
 											Source,
 											NULL))
 							{
@@ -3043,7 +3043,7 @@ bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, const char *Base
 	LgiTrace("%s:%i - Root='%s'\n", _FL, Root.Get());
 	#endif
 
-	for (int b = Dir.First(Root); b; b = Dir.Next())
+	for (int b = Dir.First(Root.c_str()); b; b = Dir.Next())
 	{
 		if
 		(
@@ -3101,11 +3101,11 @@ bool ScribeWnd::ScanForOptionsFiles(LArray<OptionsInfo> &Files, const char *Base
 					// Lets rename this baby back to the real filename
 					LString Xml = OptionsFileName;
 					Xml += ".xml";
-					LFile::Path Normal(Root, Xml);
-					if (LFileExists(Normal))
-						FileDev->Delete(Normal);
+					LFile::Path Normal(Root.c_str(), Xml);
+					if (Normal.Exists())
+						FileDev->Delete(Normal.c_str());
 					
-					d->Options->SetFile(Normal);
+					d->Options->SetFile(Normal.c_str());
 					d->Options->SerializeFile(true); // sets to clean after changing filename.
 				}
 			}

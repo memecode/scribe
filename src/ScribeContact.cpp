@@ -1168,7 +1168,7 @@ bool Contact::GetVariant(const char *Name, LVariant &Value, const char *Array)
 								p += leaf;
 
 								LFile f;
-								if (f.Open(p, O_WRITE))
+								if (f.Open(p.c_str(), O_WRITE))
 								{
 									if (Png->WriteImage(&f, d->Image))
 									{

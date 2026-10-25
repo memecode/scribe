@@ -437,7 +437,7 @@ void Import_MozillaAddressBook(ScribeWnd *App)
 	Ext.Add("abook.mab");
 	Ext.Add("abook.sqlite");
 	LgiTrace("Searching '%s' for thunderbird address book files.\n", Str.GetFull().Get());
-	LRecursiveFileSearch(Str, &Ext, &FindFiles);
+	LRecursiveFileSearch(Str.c_str(), &Ext, &FindFiles);
 
 	// Get default path..
 	char DefaultFolder[256] = "/Contacts";

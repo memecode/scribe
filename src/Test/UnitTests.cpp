@@ -104,7 +104,7 @@ struct LoadMailStore1 : public ScribeUnitTest
 			s->UnLoadFolders();
 
 			LFile::Path p = folderPath;
-			FileDev->RemoveFolder(p / "..", true);
+			FileDev->RemoveFolder((p / "..").c_str(), true);
 		}
 		LAssert(GotCallback);
 	}
@@ -296,7 +296,7 @@ struct LibraryTest : public ScribeUnitTest, public LDom
 		Zlib zlib;
 		LZlibFile zFile(&zlib);
 		LString compressedFile = (testFolder / "type_check.z").GetFull();
-		auto inputData = LReadFile(testFolder / "type_check.py");
+		auto inputData = LReadFile((testFolder / "type_check.py").c_str());
 		if (!zFile.Open(compressedFile, O_WRITE ))
 			UnitTestFail();
 		auto wr = zFile.Write(inputData.Get(), inputData.Length());
@@ -607,10 +607,10 @@ LDataStoreI *UnitTestState::CreateTestMail3()
 	LFile::Path p(ScribeTempPath());
 	p += "UnitTesting";
 	if (!p.Exists())
-		FileDev->CreateFolder(p);
+		FileDev->CreateFolder(p.c_str());
 	p += "Folders.mail3";
 
-	return App->CreateDataStore(p, true);
+	return App->CreateDataStore(p.c_str(), true);
 }
 
 void ScribeWnd::UnitTests(std::function<void(bool)> Callback)

@@ -1231,8 +1231,8 @@ void CalendarView::OnPaint(LSurface *pDC)
 		client = PrintMargin;
 		auto ScreenDpi = LScreenDpi();
 		auto DcDpi = pDC->GetDpi();
-		scale.x = (double)DcDpi.x / ScreenDpi.x;
-		scale.y = (double)DcDpi.y / ScreenDpi.y;
+		scale.x = (float)DcDpi.x / ScreenDpi.x;
+		scale.y = (float)DcDpi.y / ScreenDpi.y;
 	}
 	
 	Layout = client;
@@ -2975,7 +2975,7 @@ void LMonthView::OnPaint(LSurface *pDC)
 		
 	auto cellX = LView::X() / MonthView::X();
 	auto cellY = LView::Y() / (MonthView::Y() + 1/*titlerow*/);
-	Cell = std::min(cellX, cellY);
+	Cell = (std::min)(cellX, cellY);
 	LSysFont->Colour(L_TEXT, L_WORKSPACE);
 	LSysFont->Transparent(false);
 		

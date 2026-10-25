@@ -1439,7 +1439,7 @@ bool FilterAction::Do(Filter *F, ScribeWnd *App, Mail *&m, LStream *Log, LStream
 			p += LGetLeaf(Fn);
 			
 			LAutoPtr<LFile> out(new LFile);
-			if (!out->Open(p, O_WRITE))
+			if (!out->Open(p.c_str(), O_WRITE))
 			{
 				if (Log)
 					Log->Print("\tACTION_EXPORT(%s) failed: couldn't open file: %s.\n", Arg1.Get(), p.GetFull().Get());

@@ -58,9 +58,6 @@
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Gdc2\Font\EmojiFont.cpp">
       <Filter>Emoji</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\BlockCursor.cpp">
-      <Filter>RichTextEdit</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ColourSelect.cpp">
       <Filter>Controls/UI</Filter>
     </ClCompile>
@@ -88,9 +85,6 @@
     <ClCompile Include="..\..\libs\Btree\hashtable.c">
       <Filter>BTree</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\HorzRuleBlock.cpp">
-      <Filter>RichTextEdit</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\Mime.cpp">
       <Filter>Lgi</Filter>
     </ClCompile>
@@ -99,9 +93,6 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\Btree\offsetlist.c">
       <Filter>BTree</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\ImageBlock.cpp">
-      <Filter>RichTextEdit</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Lgi\LgiMain.cpp">
       <Filter>Lgi</Filter>
@@ -117,12 +108,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Net\OAuth2.cpp">
       <Filter>Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEdit.cpp">
-      <Filter>RichTextEdit</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.cpp">
-      <Filter>RichTextEdit</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Storage\3\Store3.cpp">
       <Filter>Store3</Filter>
@@ -171,9 +156,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\win\Lgi\SpellCheckWindows.cpp">
       <Filter>SpellCheck</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\TextBlock.cpp">
-      <Filter>RichTextEdit</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextConvert.cpp">
       <Filter>Mail</Filter>
@@ -331,10 +313,18 @@
     <ClCompile Include="..\src\ScribeApp.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ScribeAppAccounts.cpp"><Filter>Application</Filter></ClCompile>
-    <ClCompile Include="..\src\ScribeAppUi.cpp"><Filter>Application</Filter></ClCompile>
-    <ClCompile Include="..\src\ScribeAppMail.cpp"><Filter>Application</Filter></ClCompile>
-    <ClCompile Include="..\src\ScribeAppEvents.cpp"><Filter>Application</Filter></ClCompile>
+    <ClCompile Include="..\src\ScribeAppAccounts.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAppUi.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAppMail.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScribeAppEvents.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\RemoteCalendarSource.cpp">
       <Filter>Calendar</Filter>
     </ClCompile>
@@ -428,9 +418,6 @@
     <ClCompile Include="..\src\ScribeListAddr.cpp">
       <Filter>User Interface</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Sqlite\v3.41.2\sqlite3.c">
-      <Filter>Store3\Mail3</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Store3Common.cpp">
       <Filter>Store3</Filter>
     </ClCompile>
@@ -505,6 +492,45 @@
     </ClCompile>
     <ClCompile Include="..\..\..\lgi\trunk\src\common\LiteHtml\LiteHtmlView.cpp">
       <Filter>Controls/UI\Html\LiteHtml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\BlockCursor1.cpp">
+      <Filter>Controls/UI\Rte1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\HorzRuleBlock1.cpp">
+      <Filter>Controls/UI\Rte1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\ImageBlock1.cpp">
+      <Filter>Controls/UI\Rte1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\RichTextEdit1.cpp">
+      <Filter>Controls/UI\Rte1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\RichTextEditPriv1.cpp">
+      <Filter>Controls/UI\Rte1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\TextBlock1.cpp">
+      <Filter>Controls/UI\Rte1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\BlockCursor.cpp">
+      <Filter>Controls/UI\Rte2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\HorzRuleBlock.cpp">
+      <Filter>Controls/UI\Rte2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\ImageBlock.cpp">
+      <Filter>Controls/UI\Rte2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\ListBlock.cpp">
+      <Filter>Controls/UI\Rte2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEdit.cpp">
+      <Filter>Controls/UI\Rte2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEditPriv.cpp">
+      <Filter>Controls/UI\Rte2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\TextBlock.cpp">
+      <Filter>Controls/UI\Rte2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -603,12 +629,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OAuth2.h">
       <Filter>Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\RichTextEdit.h">
-      <Filter>RichTextEdit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.h">
-      <Filter>RichTextEdit</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Scripting.h">
       <Filter>Scripting</Filter>
@@ -775,12 +795,6 @@
     <ClInclude Include="..\src\ScribeListAddr.h">
       <Filter>User Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3.h">
-      <Filter>Store3\Mail3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3ext.h">
-      <Filter>Store3\Mail3</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ScribeStatusPanel.h">
       <Filter>User Interface</Filter>
     </ClInclude>
@@ -822,6 +836,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\lgi\trunk\include\lgi\common\LiteHtmlView.h">
       <Filter>Controls/UI\Html\LiteHtml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\RichTextEditPriv1.h">
+      <Filter>Controls/UI\Rte1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEditPriv.h">
+      <Filter>Controls/UI\Rte2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1026,9 +1046,6 @@
     <Filter Include="Filtering">
       <UniqueIdentifier>{1d79521d-1efc-4656-bec1-13973241c432}</UniqueIdentifier>
     </Filter>
-    <Filter Include="RichTextEdit">
-      <UniqueIdentifier>{90145701-794d-4956-af76-5cc116600a6e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Import/Export">
       <UniqueIdentifier>{963cf563-311f-4292-8aef-947945b63c15}</UniqueIdentifier>
     </Filter>
@@ -1094,6 +1111,12 @@
     </Filter>
     <Filter Include="Controls/UI\Html\LiteHtml">
       <UniqueIdentifier>{b20ca692-bc22-4959-9c4b-c2b305d82b42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI\Rte1">
+      <UniqueIdentifier>{90145701-794d-4956-af76-5cc116600a6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls/UI\Rte2">
+      <UniqueIdentifier>{b4dad155-96e2-4e12-975a-3dc29775fbbe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

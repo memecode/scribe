@@ -306,7 +306,7 @@ private:
 		return Keys.Length() > 0;
 	}
 	
-	bool Save(const char *Path, LString s)
+	bool Save(LString Path, LString s)
 	{
 		LFile f;
 		if (!f.Open(Path, O_WRITE))
@@ -315,7 +315,7 @@ private:
 		return f.Write(s, s.Length()) == s.Length();
 	}
 
-	bool Save(const char *Path, LStreamI *s)
+	bool Save(LString Path, LStreamI *s)
 	{
 		LFile f;
 		if (!f.Open(Path, O_WRITE))
@@ -600,7 +600,7 @@ private:
 				}
 				else if
 				(
-					!Resp->Data.Reset(f = new LTempFile(OutPath)) ||
+					!Resp->Data.Reset(f = new LTempFile(OutPath.c_str())) ||
 					!f->IsOpen())
 				{
 					Resp->Data.Reset();
@@ -615,9 +615,9 @@ private:
 		
 		// Clean up input file (encrypted)
 		// The output file will be deleted by the M_GNUPG_DECRYPT handler.
-		if (LFileExists(InPath))
+		if (InPath.Exists())
 		{
-			FileDev->Delete(InPath, NULL, false);
+			FileDev->Delete(InPath.c_str(), NULL, false);
 		}
 		
 		PostObject(j->OwnerId, M_GNUPG_DECRYPT, Resp);
@@ -1340,7 +1340,7 @@ void MailUiGpg::Decrypt(std::function<void(int)> callback)
 
 void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, std::function<void(int err)> callback)
 {
-	LFile log(LFile::Path(ScribeTempPath()) / "gpg.log", O_WRITE);
+	LFile log((LFile::Path(ScribeTempPath()) / "gpg.log").c_str(), O_WRITE);
 
 	// Save the message normally
 	Mail *m = d->Ui->GetItem();
@@ -1432,7 +1432,7 @@ void MailUiGpg::SignEncrypt(bool uSign, bool uEncrypt, bool uAttachPublicKey, st
 	LFile::Path p = ScribeTempPath();
 	p += BaseName;
 	LFile f;
-	if (!f.Open(p, O_READWRITE))
+	if (!f.Open(p.c_str(), O_READWRITE))
 	{
 		d->SetError(LLoadString(IDS_GNUPG_ERR_TEMP_WRITE));
 		DecryptStatus(1);

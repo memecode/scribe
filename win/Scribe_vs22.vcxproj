@@ -98,7 +98,7 @@
       </Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64d.lib;..\litehtml\Debug\litehtml.lib;..\litehtml\src\gumbo\Debug\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64d.lib;sqlite3.lib;..\litehtml\Debug\litehtml.lib;..\litehtml\src\gumbo\Debug\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -138,7 +138,7 @@ rc Resource.rc
 copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;..\litehtml\Release\litehtml.lib;..\litehtml\src\gumbo\Release\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;libchardet\Release\chardet19x64.lib;sqlite3.lib;..\litehtml\Release\litehtml.lib;..\litehtml\src\gumbo\Release\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -179,7 +179,7 @@ rc Resource.rc
 copy Resource.res ..\win\$(OutDir)</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64.lib;..\litehtml\Release\litehtml.lib;..\litehtml\src\gumbo\Release\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;Ws2_32.lib;chardetx64.lib;sqlite3.lib;..\litehtml\Release\litehtml.lib;..\litehtml\src\gumbo\Release\gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <AdditionalLibraryDirectories>..\..\libs\build-x64\lib;..\..\..\Lgi\trunk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -236,17 +236,24 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\RtfHtml.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\TextConvert.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Text\vCard-vCal.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\BlockCursor.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEdit.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\HorzRuleBlock.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\ImageBlock.cpp" />
-    <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\TextBlock.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ColourSelect.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ControlTree.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\DatePopup.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\FilterUi.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\Graph.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\BlockCursor1.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\HorzRuleBlock1.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\ImageBlock1.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\RichTextEdit1.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\RichTextEditPriv1.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\TextBlock1.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\BlockCursor.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\HorzRuleBlock.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\ImageBlock.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\ListBlock.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEdit.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEditPriv.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\TextBlock.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\TimePopup.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\ZoomView.cpp" />
     <ClCompile Include="..\..\..\Lgi\trunk\src\common\Widgets\MonthView.cpp" />
@@ -336,7 +343,6 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\src\ScribeUtils.cpp" />
     <ClCompile Include="..\src\Scripting.cpp" />
     <ClCompile Include="..\src\SecurityDlg.cpp" />
-    <ClCompile Include="..\src\Sqlite\v3.41.2\sqlite3.c" />
     <ClCompile Include="..\src\Store3Common.cpp" />
     <ClCompile Include="..\src\Store3Imap\ScribeImap_Attachment.cpp" />
     <ClCompile Include="..\src\Store3Imap\ScribeImap_Folder.cpp" />
@@ -397,7 +403,6 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Mime.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OAuth2.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\OpenSSLSocket.h" />
-    <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\RichTextEdit.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\Scripting.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SegmentTree.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\include\lgi\common\SharedMemory.h" />
@@ -415,7 +420,8 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\..\..\Lgi\trunk\src\common\Coding\Instructions.h" />
     <ClInclude Include="..\..\..\Lgi\trunk\src\common\Coding\ScriptingPriv.h" />
     <ClInclude Include="..\..\..\lgi\trunk\src\common\Text\HtmlPriv2.h" />
-    <ClInclude Include="..\..\..\Lgi\trunk\src\common\Widgets\Editor\RichTextEditPriv.h" />
+    <ClInclude Include="..\..\..\lgi\trunk\src\common\Widgets\richText1\RichTextEditPriv1.h" />
+    <ClInclude Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEditPriv.h" />
     <ClInclude Include="..\..\libs\Btree\btree.h" />
     <ClInclude Include="..\..\libs\Btree\btree_header.h" />
     <ClInclude Include="..\..\libs\Btree\btree_lock.h" />
@@ -464,8 +470,6 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClInclude Include="..\src\ScribeStatusPanel.h" />
     <ClInclude Include="..\src\ScribeUtils.h" />
     <ClInclude Include="..\src\ScribeWndPrivate.h" />
-    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3.h" />
-    <ClInclude Include="..\src\Sqlite\v3.41.2\sqlite3ext.h" />
     <ClInclude Include="..\src\Store3Imap\include\Scribe.pb.h" />
     <ClInclude Include="..\src\Store3Imap\ScribeImap.h" />
     <ClInclude Include="..\src\Store3Mail3\Mail3.h" />
