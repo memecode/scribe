@@ -1476,18 +1476,14 @@ bool ScribeFolder::UnloadThings()
 	#define PROFILE(str)
 #endif
 
-void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Status)> Callback, bool waitForResults)
+void ScribeFolder::ContinueLoading(std::function<void(Store3Status)> Callback, bool waitForResults)
 {
 	auto FldObj = GetFldObj();
 
 	WhenLoaded(_FL,
-		[this, OldUnread, Callback, FldObj](auto loadStatus)
+		[this, Callback, FldObj](auto loadStatus)
 		{
 			// This is called when all the Store3 objects are loaded
-			int Unread = OldUnread;
-			if (Unread < 0)
-				Unread = GetUnRead();
-
 			if (loadStatus == Store3Success)
 			{
 				auto &Children = GetFldObj()->Children();
@@ -1539,6 +1535,7 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 				t->SetFieldArray(FieldArray);
 			}
 
+			int Unread = GetUnRead();
 			if (Unread != NewUnRead)
 				OnUpdateUnRead(NewUnRead - Unread, false);
 
@@ -1576,8 +1573,6 @@ void ScribeFolder::ContinueLoading(int OldUnread, std::function<void(Store3Statu
 
 Store3Status ScribeFolder::LoadThings(LViewI *Parent, TStatusCb Callback, bool waitForResults)
 {
-	int OldUnRead = GetUnRead();
-
 	auto FldObj = GetFldObj();
 	if (!FldObj)
 	{
@@ -1603,10 +1598,10 @@ Store3Status ScribeFolder::LoadThings(LViewI *Parent, TStatusCb Callback, bool w
 		Parent,
 		GetReadAccess(),
 		Path,
-		[this, OldUnRead, Callback, waitForResults](auto access)
+		[this, Callback, waitForResults](auto access)
 		{
 			if (access)
-				ContinueLoading(OldUnRead, Callback, waitForResults);
+				ContinueLoading(Callback, waitForResults);
 			else if (Callback)
 				Callback(Store3NoPermissions);
 		});

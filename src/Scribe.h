@@ -1233,7 +1233,7 @@ protected:
 	void EmptyFieldList();
 	void SetLoadFolder(Thing *t) { if (t) t->SetParentFolder(this); }
 	bool HasFieldId(int Id);
-	void ContinueLoading(int OldUnread, std::function<void(Store3Status)> Callback, bool waitForResults);
+	void ContinueLoading(std::function<void(Store3Status)> Callback, bool waitForResults);
 
 	// Tree item stuff
 	void _PourText(LPoint &Size) override;

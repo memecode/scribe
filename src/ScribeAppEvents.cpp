@@ -473,7 +473,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 
 	bool UpdateSelection = false;
 	List<Mail> NewMail;
-	ScribeFolder *Parent = 0;
+	LArray<ScribeFolder*> Parents;
 
 	// LOG_STORE("OnChange(%i, %i)\n", (int)items.Length(), FieldHint);
 	LAssert(d->CtxFile != NULL);
@@ -533,14 +533,18 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 					!TestFlag(StoreFlags, MAIL_NEW))
 				{
 					Mail::NewMailLst.Delete(m);
-					Parent = m->GetFolder();
+					auto Parent = m->GetFolder();
+					if (Parent && !Parents.HasItem(Parent))
+						Parents.Add(Parent);
 				}
 					
 				if (m->FlagsCache != StoreFlags)
 				{
 					// LgiTrace("%s:%i - OnChange mail flags changed.\n", _FL);
 					m->SetFlagsCache(StoreFlags, false, false);
-					Parent = m->GetFolder();
+					auto Parent = m->GetFolder();
+					if (Parent && !Parents.HasItem(Parent))
+						Parents.Add(Parent);
 				}
 
 				if (m->NewEmail == Mail::NewEmailLoading)
@@ -608,7 +612,7 @@ bool ScribeWnd::OnChange(LArray<LDataI*> &items, int FieldHint)
 		}
 	}
 
-	if (Parent)
+	for (auto Parent: Parents)
 		Parent->OnUpdateUnRead(0, true);
 
 	if (NewMail.Length())
