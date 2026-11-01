@@ -174,7 +174,6 @@ add_executable(scribe ${APP_TYPE}
     src/SecurityDlg.cpp
     src/StrToDom.cpp
     src/ScribeIpc.cpp
-    src/Sqlite/v3.50.1/sqlite3.c
     src/Store3Common.cpp
     src/Store3Imap/ScribeImap_Attachment.cpp
     src/Store3Imap/ScribeImap_Folder.cpp
