@@ -3,6 +3,12 @@
 
 #include "mapi.h"
 
+#ifdef WIN_NOEXCEPT_PFN
+#define SCRIBE_MAPI_NOEXCEPT WIN_NOEXCEPT_PFN
+#else
+#define SCRIBE_MAPI_NOEXCEPT
+#endif
+
 #include "../../src/Scribe.h"
 #include "../../src/ScribeListAddr.h"
 
@@ -351,7 +357,7 @@ ULONG WINAPI MAPISendMailW(	LHANDLE lhSession,
 							lpMapiMessageW Msg,
 							FLAGS flFlags,
 							ULONG ulReserved
-)
+ ) SCRIBE_MAPI_NOEXCEPT
 {
 	ULONG Status = MAPI_E_FAILURE;
 
@@ -515,7 +521,7 @@ ULONG FAR PASCAL MAPISendMail
 	lpMapiMessage	Msg,
 	FLAGS			flFlags,
 	ULONG			ulReserved
-)
+) SCRIBE_MAPI_NOEXCEPT
 {
 	ULONG Status = MAPI_E_FAILURE;
 

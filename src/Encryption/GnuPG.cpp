@@ -534,8 +534,8 @@ private:
 					SigPath.GetFull().Get());
 			#else
 				// Clean up temporary files...
-				FileDev->Delete(TextPath, NULL, false);
-				FileDev->Delete(SigPath, NULL, false);
+				FileDev->Delete(TextPath.c_str(), NULL, false);
+				FileDev->Delete(SigPath.c_str(), NULL, false);
 			#endif
 		}
 		else

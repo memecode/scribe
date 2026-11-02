@@ -7,12 +7,28 @@ if (APPLE)
 
 	set(CMAKE_OSX_ARCHITECTURES "x86_64;ARM64")
 	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version")
+
 elseif (UNIX)
+
     set(LINUX TRUE)
+
 elseif (WIN32)
+
+    if (MSVC)
+        add_compile_options($<$<COMPILE_LANGUAGE:C,CXX>:/FS>)
+    endif()
+
     # Turn on symbols for release build, before we include other targets
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
+
+    option(NO_OPT "Use reduced optimization for Windows Release crash traces" OFF)
+    if (NO_OPT)
+        string(APPEND CMAKE_C_FLAGS_RELEASE " /O1 /Ob1 /Zi")
+        string(APPEND CMAKE_CXX_FLAGS_RELEASE " /O1 /Ob1")
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE OFF)
+    endif()
+
 endif()
 
 # Get all the libs we need:
@@ -33,7 +49,7 @@ if (NOT EXISTS ${ASPELL_DIR})
 endif()
 
 if (WIN32)
-    add_subdirectory(ScribeMapi)
+    add_subdirectory(mapi)
 endif()
 
 # Platform settings
@@ -64,7 +80,6 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/General/SegmentTree.cpp
     ${LGI_DIR}/src/common/General/SharedMemory.cpp
     ${LGI_DIR}/src/common/General/SoftwareUpdate.cpp
-    ${LGI_DIR}/src/common/General/TimeZone.cpp
     ${LGI_DIR}/src/common/General/Tnef.cpp
     ${LGI_DIR}/src/common/Net/Mime.cpp
     ${LGI_DIR}/src/common/Net/HttpTools.cpp
@@ -93,12 +108,22 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Text/TextConvert.cpp
     ${LGI_DIR}/src/common/Text/vCard-vCal.cpp
     ${LGI_DIR}/src/common/Text/SpellCheckAspell.cpp
+    
     ${LGI_DIR}/src/common/Widgets/richText1/BlockCursor1.cpp
     ${LGI_DIR}/src/common/Widgets/richText1/RichTextEdit1.cpp
     ${LGI_DIR}/src/common/Widgets/richText1/RichTextEditPriv1.cpp
     ${LGI_DIR}/src/common/Widgets/richText1/HorzRuleBlock1.cpp
     ${LGI_DIR}/src/common/Widgets/richText1/ImageBlock1.cpp
     ${LGI_DIR}/src/common/Widgets/richText1/TextBlock1.cpp
+    
+    ${LGI_DIR}/src/common/Widgets/richText2/BlockCursor.cpp
+    ${LGI_DIR}/src/common/Widgets/richText2/RichTextEdit.cpp
+    ${LGI_DIR}/src/common/Widgets/richText2/RichTextEditPriv.cpp
+    ${LGI_DIR}/src/common/Widgets/richText2/HorzRuleBlock.cpp
+    ${LGI_DIR}/src/common/Widgets/richText2/ImageBlock.cpp
+    ${LGI_DIR}/src/common/Widgets/richText2/TextBlock.cpp
+    ${LGI_DIR}/src/common/Widgets/richText2/ListBlock.cpp
+
     ${LGI_DIR}/src/common/Widgets/ColourSelect.cpp
     ${LGI_DIR}/src/common/Widgets/ControlTree.cpp
     ${LGI_DIR}/src/common/Widgets/DatePopup.cpp
@@ -108,7 +133,9 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Widgets/ZoomView.cpp
     ${LGI_DIR}/src/common/Widgets/MonthView.cpp
     ${LGI_DIR}/src/common/Widgets/YearView.cpp
+    
     ${SPELL_CHECK}
+    
     src/AddressSelect.cpp
     src/BayesDlg.cpp
     src/BayesianFilter.cpp
@@ -174,12 +201,16 @@ add_executable(scribe ${APP_TYPE}
     src/SecurityDlg.cpp
     src/StrToDom.cpp
     src/ScribeIpc.cpp
+    src/TitlePage.cpp
+    utils/Tables/MailFlags.c
+
     src/Store3Common.cpp
     src/Store3Imap/ScribeImap_Attachment.cpp
     src/Store3Imap/ScribeImap_Folder.cpp
     src/Store3Imap/ScribeImap_Mail.cpp
     src/Store3Imap/ScribeImap_Store.cpp
     src/Store3Imap/ScribeImap_Thread.cpp
+
     src/Store3Mail3/Mail3Attachment.cpp
     src/Store3Mail3/Mail3Calendar.cpp
     src/Store3Mail3/Mail3Contact.cpp
@@ -188,14 +219,12 @@ add_executable(scribe ${APP_TYPE}
     src/Store3Mail3/Mail3Group.cpp
     src/Store3Mail3/Mail3Mail.cpp
     src/Store3Mail3/Mail3Store.cpp
+
     src/Store3Webdav/WebdavCalendar.cpp
     src/Store3Webdav/WebdavContact.cpp
     src/Store3Webdav/WebdavFolder.cpp
     src/Store3Webdav/WebdavStore.cpp
-    src/Store3Webdav/WebdavThread.cpp
-    src/TitlePage.cpp
-    utils/Tables/MailFlags.c
-    )
+    src/Store3Webdav/WebdavThread.cpp)
 
 if (WIN32)
 
@@ -207,10 +236,11 @@ if (WIN32)
         src/Store3Mapi/ScribeMapi_Mail.cpp
         src/Store3Mapi/ScribeMapi_Store.cpp
         src/Store3Mapi/ScribeMapi_Thing.cpp
+        
         src/ImpExp_Outlook.cpp
         src/Resource.rc
-        ${LGI_DIR}/src/common/Coding/ExternCall.asm
-        )
+        
+        ${LGI_DIR}/src/common/Coding/ExternCall.asm)
 
     target_compile_options(scribe PRIVATE
         $<IF:$<CONFIG:Release>,/Zi,>
@@ -227,9 +257,16 @@ target_include_directories(scribe
         src/Sqlite
         resources
         utils/Tables
+        ${LGI_DEPS_BUILD}/include
         ${LGI_DIR}/private/common
         ${ASPELL_DIR}/interfaces/cc
         ${OPENSSL_INCLUDE_DIR})
+
+if (WIN32)
+    set(NTLM_LIBRARY "${LGI_DEPS_BUILD}/lib/libntlm.lib")
+else()
+    set(NTLM_LIBRARY ntlm)
+endif()
 
 target_link_libraries(scribe
     PRIVATE
@@ -237,8 +274,13 @@ target_link_libraries(scribe
         chardet
         bzip2
         btree
-        ntlm
+        sqlite3
+        ${NTLM_LIBRARY}
         litehtml)
+
+target_link_directories(scribe
+    PRIVATE
+        ${LGI_DEPS_BUILD}/libs)
 
 target_compile_definitions(scribe
     PRIVATE
@@ -387,7 +429,12 @@ elseif (WIN32)
 
     target_include_directories(scribe
         PRIVATE
-            ../libs/mapi)
+            ${SCRIBE_LIBS}/build-x64/include
+            ${SCRIBE_LIBS}/mapi)
+
+    target_link_directories(scribe
+        PRIVATE
+            ${SCRIBE_LIBS}/build-x64/lib)
 
     if (FALSE)
         get_cmake_property(_variableNames VARIABLES)
@@ -413,6 +460,23 @@ elseif (WIN32)
         file(COPY ${CMAKE_CURRENT_LIST_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR})
         file(COPY ${CMAKE_CURRENT_LIST_DIR}/scripts DESTINATION ${CMAKE_BINARY_DIR})
         file(COPY ${CMAKE_CURRENT_LIST_DIR}/help DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${LGI_DIR}/docs/scripting DESTINATION ${CMAKE_BINARY_DIR}/help)
+
+        set(LGI_RUNTIME_DLLS
+            jpeg62.dll
+            libpng16.dll
+            libz.dll
+            libiconv.dll
+            libntlm.dll
+            lunasvg.dll
+            plutovg.dll)
+        foreach (LGI_RUNTIME_DLL IN LISTS LGI_RUNTIME_DLLS)
+            set(LGI_RUNTIME_DLL_PATH "${LGI_DEPS_BUILD}/bin/${LGI_RUNTIME_DLL}")
+            if (NOT EXISTS "${LGI_RUNTIME_DLL_PATH}")
+                message(FATAL_ERROR "Missing Lgi runtime DLL: ${LGI_RUNTIME_DLL_PATH}")
+            endif()
+            file(COPY "${LGI_RUNTIME_DLL_PATH}" DESTINATION ${CMAKE_BINARY_DIR})
+        endforeach()
         
         # Generate the installer:
         set(NSI_IN "${CMAKE_CURRENT_LIST_DIR}/win/Installer-64bit.nsi.in")
@@ -435,8 +499,10 @@ if (NOT APPLE)
 
     add_custom_command(TARGET scribe POST_BUILD
         COMMENT "Copy resource files."
-        COMMAND cp -R "${CMAKE_CURRENT_LIST_DIR}/resources" "${CMAKE_CURRENT_BINARY_DIR}"
-        COMMAND cp -R "${CMAKE_CURRENT_LIST_DIR}/scripts" "${CMAKE_CURRENT_BINARY_DIR}"
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${CMAKE_CURRENT_LIST_DIR}/resources" "${CMAKE_CURRENT_BINARY_DIR}/resources"
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${CMAKE_CURRENT_LIST_DIR}/scripts" "${CMAKE_CURRENT_BINARY_DIR}/scripts"
         )
 
 endif()

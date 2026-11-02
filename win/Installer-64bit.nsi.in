@@ -2,7 +2,8 @@
 !include LogicLib.nsh
 ; !include WinVer.nsh
 
-!system '"C:\Program Files\Python311\python.exe" Utils\Store\check-build.py' = 0
+!system "cmd /c echo NSIS working directory: %CD%" = 0
+!system "python utils\Store\check-build.py" = 0
 
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"
@@ -12,24 +13,29 @@
 
 !system "copy $<SHELL_PATH:$<TARGET_FILE:aspell>> scribe-setup" = 0
 
-!system "copy $<SHELL_PATH:$<TARGET_FILE:libjpeg9a>> scribe-setup" = 0
-!system "copy $<SHELL_PATH:$<TARGET_FILE:libpng16>> scribe-setup" = 0
-!system "copy $<SHELL_PATH:$<TARGET_FILE:zlib>> scribe-setup" = 0
+!system "copy jpeg62.dll scribe-setup" = 0
+!system "copy libpng16.dll scribe-setup" = 0
+!system "copy libz.dll scribe-setup" = 0
 !system "copy $<SHELL_PATH:$<TARGET_FILE:chardet>> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:btree>> scribe-setup" = 0
+!system "copy $<SHELL_PATH:$<TARGET_FILE:bzip2>> scribe-setup" = 0
 
 !system "copy $<SHELL_PATH:$<TARGET_FILE:lgi>> scribe-setup" = 0
-!system "copy $<SHELL_PATH:$<TARGET_FILE:ntlm>> scribe-setup" = 0
+!system "copy libiconv.dll scribe-setup" = 0
+!system "copy libntlm.dll scribe-setup" = 0
+!system "copy lunasvg.dll scribe-setup" = 0
+!system "copy plutovg.dll scribe-setup" = 0
 !system "copy $<SHELL_PATH:$<TARGET_FILE:Updater>> scribe-setup" = 0
 
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.exe'
 ;system '"c:\Program Files\Upx\upx.exe" -9 .\scribe-setup\*.dll'
 
 ; Generate the DOM documentation
-!system "py src\Py\DomScan.py > scribe-setup\Dom.txt"
+!system "python ..\src\Py\DomScan.py ..\src ..\..\..\lgi\trunk > scribe-setup\Dom.txt" = 0
 
-!system "python Utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:scribe>>\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
-!system "python Utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:ScribeMapi>>\*.pdb Mapi ${__DATE__} ${__TIME__}" = 0
-!system "python Utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:lgi>>\*.pdb Lgi ${__DATE__} ${__TIME__}" = 0
+!system "python ..\utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:scribe>>\*.pdb Scribe ${__DATE__} ${__TIME__}" = 0
+!system "python ..\utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:ScribeMapi>>\*.pdb Mapi ${__DATE__} ${__TIME__}" = 0
+!system "python ..\utils\Store\store.py $<SHELL_PATH:$<TARGET_FILE_DIR:lgi>>\*.pdb Lgi ${__DATE__} ${__TIME__}" = 0
 
 ;--------------------------------
 SetCompressor lzma
@@ -84,6 +90,7 @@ Section ""
 	File Resources\NoFace*.png
 	File Resources\EmojiMap.png
 	File Resources\Preview*.html
+	File Resources\sign_in_with_google.png
 
 	CreateDirectory $INSTDIR\Resources\Themes
 	SetOutPath $INSTDIR\Resources\Themes
@@ -122,8 +129,8 @@ Section ""
 	File Help\*.css
 	CreateDirectory $INSTDIR\Help\scripting
 	SetOutPath $INSTDIR\Help\scripting
-	File ..\..\Lgi\trunk\docs\scripting\*.html
-	File ..\..\Lgi\trunk\docs\scripting\*.css
+	File Help\scripting\*.html
+	File Help\scripting\*.css
   
 	; Do CRT check
 	ExecWait '"$INSTDIR\Scribe.exe" -crtcheck' $0
@@ -220,4 +227,4 @@ SectionEnd
 
 ; !system "del /Q .\scribe-setup"
 ; !system "rmdir .\scribe-setup"
-!finalize "python Utils\Store\store.py ${OUTFILE} . ${__DATE__} ${__TIME__}"
+!finalize "python ..\utils\Store\store.py ${OUTFILE} . ${__DATE__} ${__TIME__}"

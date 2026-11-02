@@ -6,6 +6,8 @@ import re
 src = []
 scriptDir = os.path.abspath(os.path.join(os.path.realpath(__file__), ".."))
 roots = ["..", "../../../../lgi/trunk"]
+if len(sys.argv) > 1:
+	roots = [os.path.abspath(root) for root in sys.argv[1:]]
 	
 def scan(path):
 	global src
@@ -26,7 +28,8 @@ def scan(path):
 				src.append(full)
 
 for root in roots:
-	root = os.path.abspath(os.path.join(scriptDir, root.replace("/", os.sep)))
+	if len(sys.argv) <= 1:
+		root = os.path.abspath(os.path.join(scriptDir, root.replace("/", os.sep)))
 	scan(root)
 
 def ObjectNameFromLine(parts):

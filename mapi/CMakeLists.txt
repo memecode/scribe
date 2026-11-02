@@ -21,6 +21,7 @@ target_link_libraries(ScribeMapi
 
 target_include_directories(ScribeMapi
     PRIVATE
+        ${OPENSSL_INCLUDE_DIR}
         )
 
 target_compile_definitions(ScribeMapi

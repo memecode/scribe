@@ -13,6 +13,11 @@ if isCmake:
 else:
 	codeDir = os.path.abspath(os.path.join(rootDir, "src"))
 
+# print("scriptDir:", scriptDir)
+# print("rootDir:", rootDir)
+# print("isCmake:", isCmake)
+# print("codeDir:", codeDir)
+
 if len(sys.argv) != 6:
 	print("Incorrect args:", len(sys.argv))
 	print(sys.argv)
