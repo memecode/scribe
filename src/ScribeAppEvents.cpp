@@ -243,7 +243,11 @@ void ScribeWnd::OnNew
 						read, IsNew);
 					#endif
 
-					if (IsNew && FilterIncoming)
+					bool FilterNewMail = FilterIncoming;
+					if (auto Account = GetAccountById(m->GetAccountId()))
+						FilterNewMail &= Account->Receive.FilterIncoming() != 0;
+
+					if (IsNew && FilterNewMail)
 					{
 						LAssert(!NewMail.HasItem(m));
 						NewMail.Insert(m);
