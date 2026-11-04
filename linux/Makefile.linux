@@ -483,7 +483,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Gdc2/Surface.cpp \
 	../../lgi/trunk/src/common/Gdc2/Tools/ColourReduce.cpp \
 	../../lgi/trunk/src/common/Gdc2/Tools/GdcTools.cpp \
-	../../lgi/trunk/src/common/Gdc2/Vector.cpp \
+	../../lgi/trunk/src/common/Gdc2/vectorSurface.cpp \
 	../../lgi/trunk/src/common/General/Containers.cpp \
 	../../lgi/trunk/src/common/General/DateTime.cpp \
 	../../lgi/trunk/src/common/General/ExeCheck.cpp \
