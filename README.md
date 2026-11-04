@@ -70,6 +70,9 @@ Where $GENERATOR is:
 - Mac: "Xcode"
 - Windows: "Visual Studio 17 2022" -A x64
 
+On windows you can run this to make the installer:
+`cmake --build . --config Release --target dist-win`
+
 ## Links:
 
 - [Homepage](https://memecode.com/scribe)
