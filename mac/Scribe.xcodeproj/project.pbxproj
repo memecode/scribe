@@ -210,7 +210,6 @@
 		34F32185305AC82E0073C5E7 /* Html2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34F32183305AC82E0073C5E7 /* Html2.cpp */; };
 		34FB966F237D07740039423C /* WebdavStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB9661237D07740039423C /* WebdavStore.cpp */; };
 		34FB968A23835BB40039423C /* WebDav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB968923835BB40039423C /* WebDav.cpp */; };
-		34FF00000000000000000001 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34FF00000000000000000002 /* libsqlite3.tbd */; };
 		350000000000000000000001 /* BlockCursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000101 /* BlockCursor.cpp */; };
 		350000000000000000000002 /* HorzRuleBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000102 /* HorzRuleBlock.cpp */; };
 		350000000000000000000003 /* ImageBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000103 /* ImageBlock.cpp */; };
@@ -565,7 +564,6 @@
 		34FB9661237D07740039423C /* WebdavStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavStore.cpp; path = ../../src/Store3Webdav/WebdavStore.cpp; sourceTree = "<group>"; };
 		34FB968923835BB40039423C /* WebDav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebDav.cpp; path = ../../../../lgi/trunk/src/common/Net/WebDav.cpp; sourceTree = "<group>"; };
 		34FB968B23835BE70039423C /* WebDav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDav.h; path = ../../../../lgi/trunk/include/lgi/common/WebDav.h; sourceTree = "<group>"; };
-		34FF00000000000000000002 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		350000000000000000000101 /* BlockCursor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = BlockCursor.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/BlockCursor.cpp; sourceTree = SOURCE_ROOT; };
 		350000000000000000000102 /* HorzRuleBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = HorzRuleBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/HorzRuleBlock.cpp; sourceTree = SOURCE_ROOT; };
 		350000000000000000000103 /* ImageBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ImageBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/ImageBlock.cpp; sourceTree = SOURCE_ROOT; };
@@ -581,7 +579,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3499BB013068EBC500ADBE3E /* libffi.tbd in Frameworks */,
-				34FF00000000000000000001 /* libsqlite3.tbd in Frameworks */,
 				34C819D92FE0B0A700B39646 /* LgiCocoa.framework in Frameworks */,
 				34F32181305AC7020073C5E7 /* libgumbo.a in Frameworks */,
 				34F32182305AC7020073C5E7 /* liblitehtml.a in Frameworks */,
@@ -1097,7 +1094,6 @@
 		34CD61D3309C743C00354B9E /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				34FF00000000000000000002 /* libsqlite3.tbd */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -1646,6 +1642,8 @@
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
+					"../../libs/build-debug/lib",
+					"../../libs/build-release/lib",
 					"$(inherited)",
 					/opt/local/libexec/openssl3/lib,
 				);
@@ -1659,7 +1657,7 @@
 					"-D_DEBUG",
 					"-Wno-c++11-narrowing",
 				);
-				OTHER_LDFLAGS = "-L../../libs/build-release/lib";
+				OTHER_LDFLAGS = "-lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.memecode.scribe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1696,6 +1694,7 @@
 				INFOPLIST_FILE = Scribe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
+					"../../libs/build-release/lib",
 					"$(inherited)",
 					/opt/local/libexec/openssl3/lib,
 				);
@@ -1708,7 +1707,7 @@
 					"-DPOSIX",
 					"-Wno-c++11-narrowing",
 				);
-				OTHER_LDFLAGS = "-L../../libs/build-release/lib";
+				OTHER_LDFLAGS = "-lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.memecode.scribe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
