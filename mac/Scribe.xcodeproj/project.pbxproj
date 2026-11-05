@@ -26,7 +26,7 @@
 		34364F8924CCE9FF00272F13 /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 34364F8824CCE9FF00272F13 /* Themes */; };
 		34417D89205FB69E00D2E80C /* MailFlags.c in Sources */ = {isa = PBXBuildFile; fileRef = 34417D87205FB69E00D2E80C /* MailFlags.c */; };
 		34417D8E205FD4A500D2E80C /* Ftp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34417D8D205FD4A500D2E80C /* Ftp.cpp */; };
-		34417DBE205FD5B800D2E80C /* HorzRuleBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34417DBD205FD5B800D2E80C /* HorzRuleBlock.cpp */; };
+		34417DBE205FD5B800D2E80C /* HorzRuleBlock1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34417DBD205FD5B800D2E80C /* HorzRuleBlock1.cpp */; };
 		34452C8B2AD4A23D00AE820D /* libbzip2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34452C8A2AD4A23C00AE820D /* libbzip2.dylib */; };
 		34452C8D2AD4A25500AE820D /* libaspell-dist-0.60.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */; };
 		34452C8F2AD4A26B00AE820D /* libchardet.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 34452C8E2AD4A26B00AE820D /* libchardet.dylib */; };
@@ -37,11 +37,11 @@
 		3445E5751F1F413200D0A824 /* EmojiMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5741F1F413200D0A824 /* EmojiMap.cpp */; };
 		3445E5771F1F416500D0A824 /* SpellCheckMac.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5761F1F416500D0A824 /* SpellCheckMac.mm */; };
 		3445E57B1F1F41AF00D0A824 /* GnuPG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5791F1F41AF00D0A824 /* GnuPG.cpp */; };
-		3445E5841F1F428400D0A824 /* BlockCursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E57E1F1F428400D0A824 /* BlockCursor.cpp */; };
-		3445E5851F1F428400D0A824 /* RichTextEdit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E57F1F1F428400D0A824 /* RichTextEdit.cpp */; };
-		3445E5861F1F428400D0A824 /* RichTextEditPriv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5801F1F428400D0A824 /* RichTextEditPriv.cpp */; };
-		3445E5871F1F428400D0A824 /* ImageBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5821F1F428400D0A824 /* ImageBlock.cpp */; };
-		3445E5881F1F428400D0A824 /* TextBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5831F1F428400D0A824 /* TextBlock.cpp */; };
+		3445E5841F1F428400D0A824 /* BlockCursor1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E57E1F1F428400D0A824 /* BlockCursor1.cpp */; };
+		3445E5851F1F428400D0A824 /* RichTextEdit1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E57F1F1F428400D0A824 /* RichTextEdit1.cpp */; };
+		3445E5861F1F428400D0A824 /* RichTextEditPriv1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5801F1F428400D0A824 /* RichTextEditPriv1.cpp */; };
+		3445E5871F1F428400D0A824 /* ImageBlock1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5821F1F428400D0A824 /* ImageBlock1.cpp */; };
+		3445E5881F1F428400D0A824 /* TextBlock1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5831F1F428400D0A824 /* TextBlock1.cpp */; };
 		3445E58A1F1F42BA00D0A824 /* ObjectInspector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3445E5891F1F42BA00D0A824 /* ObjectInspector.cpp */; };
 		345F31461CC7A3B400656B8B /* Icons-16.png in Resources */ = {isa = PBXBuildFile; fileRef = 345F31451CC7A3B400656B8B /* Icons-16.png */; };
 		345F314C1CC7A46B00656B8B /* xgate-icons-32.png in Resources */ = {isa = PBXBuildFile; fileRef = 345F314B1CC7A46B00656B8B /* xgate-icons-32.png */; };
@@ -162,7 +162,6 @@
 		3477C5231CC315FC0028B84B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3477C5221CC315FC0028B84B /* Cocoa.framework */; };
 		347CF82723F64FD00028F610 /* flags.png in Resources */ = {isa = PBXBuildFile; fileRef = 347CF82623F64FD00028F610 /* flags.png */; };
 		3486E9E22A86E8CA009BDA7E /* UnitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */; };
-		348EBFEF2E07670300BFEBE0 /* libsqlite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 348EBFEC2E0766E400BFEBE0 /* libsqlite.a */; };
 		34918095222F1C6F00944FC4 /* OAuth2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34918094222F1C6F00944FC4 /* OAuth2.cpp */; };
 		3497D54F2399D288009FCC14 /* Add Senders To Contacts.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5482399D260009FCC14 /* Add Senders To Contacts.script */; };
 		3497D5502399D288009FCC14 /* Delete Attachments.script in Copy Files */ = {isa = PBXBuildFile; fileRef = 3497D5472399D260009FCC14 /* Delete Attachments.script */; };
@@ -211,6 +210,14 @@
 		34F32185305AC82E0073C5E7 /* Html2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34F32183305AC82E0073C5E7 /* Html2.cpp */; };
 		34FB966F237D07740039423C /* WebdavStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB9661237D07740039423C /* WebdavStore.cpp */; };
 		34FB968A23835BB40039423C /* WebDav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB968923835BB40039423C /* WebDav.cpp */; };
+		34FF00000000000000000001 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34FF00000000000000000002 /* libsqlite3.tbd */; };
+		350000000000000000000001 /* BlockCursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000101 /* BlockCursor.cpp */; };
+		350000000000000000000002 /* HorzRuleBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000102 /* HorzRuleBlock.cpp */; };
+		350000000000000000000003 /* ImageBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000103 /* ImageBlock.cpp */; };
+		350000000000000000000004 /* ListBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000104 /* ListBlock.cpp */; };
+		350000000000000000000005 /* RichTextEdit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000105 /* RichTextEdit.cpp */; };
+		350000000000000000000006 /* RichTextEditPriv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000106 /* RichTextEditPriv.cpp */; };
+		350000000000000000000007 /* TextBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000107 /* TextBlock.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -227,20 +234,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 3477C4A71CC2792F0028B84B;
 			remoteInfo = Btree;
-		};
-		348EBFEB2E0766E400BFEBE0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3477C4FC1CC3021B0028B84B;
-			remoteInfo = sqlite;
-		};
-		348EBFED2E0766F600BFEBE0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 3477C4FB1CC3021B0028B84B;
-			remoteInfo = sqlite;
 		};
 		34C6DFBC2FE0AF9F008FC0C2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -346,7 +339,7 @@
 		34417D87205FB69E00D2E80C /* MailFlags.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MailFlags.c; path = ../../utils/Tables/MailFlags.c; sourceTree = "<group>"; };
 		34417D88205FB69E00D2E80C /* Tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tables.h; path = ../../utils/Tables/Tables.h; sourceTree = "<group>"; };
 		34417D8D205FD4A500D2E80C /* Ftp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Ftp.cpp; path = ../../../../lgi/trunk/src/common/Net/Ftp.cpp; sourceTree = "<group>"; };
-		34417DBD205FD5B800D2E80C /* HorzRuleBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HorzRuleBlock.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/HorzRuleBlock.cpp; sourceTree = "<group>"; };
+		34417DBD205FD5B800D2E80C /* HorzRuleBlock1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HorzRuleBlock1.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText1/HorzRuleBlock1.cpp; sourceTree = SOURCE_ROOT; };
 		34452C8A2AD4A23C00AE820D /* libbzip2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbzip2.dylib; path = "../../libs/build-release/lib/libbzip2.dylib"; sourceTree = SOURCE_ROOT; };
 		34452C8C2AD4A25500AE820D /* libaspell-dist-0.60.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libaspell-dist-0.60.dylib"; path = "../../libs/build-release/lib/libaspell-dist-0.60.dylib"; sourceTree = SOURCE_ROOT; };
 		34452C8E2AD4A26B00AE820D /* libchardet.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libchardet.dylib; path = "../../libs/build-release/lib/libchardet.dylib"; sourceTree = SOURCE_ROOT; };
@@ -355,12 +348,12 @@
 		3445E5761F1F416500D0A824 /* SpellCheckMac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SpellCheckMac.mm; path = ../../../../lgi/trunk/src/mac/cocoa/SpellCheckMac.mm; sourceTree = "<group>"; };
 		3445E5791F1F41AF00D0A824 /* GnuPG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GnuPG.cpp; path = ../../src/Encryption/GnuPG.cpp; sourceTree = "<group>"; };
 		3445E57A1F1F41AF00D0A824 /* GnuPG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GnuPG.h; path = ../../src/Encryption/GnuPG.h; sourceTree = "<group>"; };
-		3445E57E1F1F428400D0A824 /* BlockCursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlockCursor.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/BlockCursor.cpp; sourceTree = "<group>"; };
-		3445E57F1F1F428400D0A824 /* RichTextEdit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEdit.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/RichTextEdit.cpp; sourceTree = "<group>"; };
-		3445E5801F1F428400D0A824 /* RichTextEditPriv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEditPriv.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.cpp; sourceTree = "<group>"; };
-		3445E5811F1F428400D0A824 /* RichTextEditPriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RichTextEditPriv.h; path = ../../../../lgi/trunk/src/common/Widgets/Editor/RichTextEditPriv.h; sourceTree = "<group>"; };
-		3445E5821F1F428400D0A824 /* ImageBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ImageBlock.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/ImageBlock.cpp; sourceTree = "<group>"; };
-		3445E5831F1F428400D0A824 /* TextBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextBlock.cpp; path = ../../../../lgi/trunk/src/common/Widgets/Editor/TextBlock.cpp; sourceTree = "<group>"; };
+		3445E57E1F1F428400D0A824 /* BlockCursor1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlockCursor1.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText1/BlockCursor1.cpp; sourceTree = SOURCE_ROOT; };
+		3445E57F1F1F428400D0A824 /* RichTextEdit1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEdit1.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText1/RichTextEdit1.cpp; sourceTree = SOURCE_ROOT; };
+		3445E5801F1F428400D0A824 /* RichTextEditPriv1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEditPriv1.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText1/RichTextEditPriv1.cpp; sourceTree = SOURCE_ROOT; };
+		3445E5811F1F428400D0A824 /* RichTextEditPriv1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RichTextEditPriv1.h; path = ../../../lgi/trunk/src/common/Widgets/richText1/RichTextEditPriv1.h; sourceTree = SOURCE_ROOT; };
+		3445E5821F1F428400D0A824 /* ImageBlock1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ImageBlock1.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText1/ImageBlock1.cpp; sourceTree = SOURCE_ROOT; };
+		3445E5831F1F428400D0A824 /* TextBlock1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextBlock1.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText1/TextBlock1.cpp; sourceTree = SOURCE_ROOT; };
 		3445E5891F1F42BA00D0A824 /* ObjectInspector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ObjectInspector.cpp; path = ../../src/ObjectInspector.cpp; sourceTree = "<group>"; };
 		345921031F2565D100098DFD /* BayesianFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BayesianFilter.h; path = ../../src/BayesianFilter.h; sourceTree = "<group>"; };
 		345921041F2565D100098DFD /* Calendar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Calendar.h; path = ../../src/Calendar.h; sourceTree = "<group>"; };
@@ -521,7 +514,6 @@
 		347CF82623F64FD00028F610 /* flags.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = flags.png; path = ../../resources/Flags.png; sourceTree = "<group>"; };
 		3481AAAA25DC8C820032ACB7 /* FileTransferProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileTransferProgress.h; path = ../../../../lgi/trunk/include/lgi/common/FileTransferProgress.h; sourceTree = "<group>"; };
 		3486E9E12A86E8CA009BDA7E /* UnitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UnitTests.cpp; path = ../../src/Test/UnitTests.cpp; sourceTree = "<group>"; };
-		348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = sqlite.xcodeproj; path = ../src/Sqlite/v3.50.1/sqlite.xcodeproj; sourceTree = "<group>"; };
 		34918093222F1C5F00944FC4 /* OAuth2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OAuth2.h; path = ../../../../lgi/trunk/include/lgi/common/OAuth2.h; sourceTree = "<group>"; };
 		34918094222F1C6F00944FC4 /* OAuth2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OAuth2.cpp; path = ../../../../lgi/trunk/src/common/Net/OAuth2.cpp; sourceTree = "<group>"; };
 		3497D5462399D260009FCC14 /* Mail Filters Menu.script */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Mail Filters Menu.script"; path = "../../scripts/Mail Filters Menu.script"; sourceTree = "<group>"; };
@@ -573,6 +565,14 @@
 		34FB9661237D07740039423C /* WebdavStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavStore.cpp; path = ../../src/Store3Webdav/WebdavStore.cpp; sourceTree = "<group>"; };
 		34FB968923835BB40039423C /* WebDav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebDav.cpp; path = ../../../../lgi/trunk/src/common/Net/WebDav.cpp; sourceTree = "<group>"; };
 		34FB968B23835BE70039423C /* WebDav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDav.h; path = ../../../../lgi/trunk/include/lgi/common/WebDav.h; sourceTree = "<group>"; };
+		34FF00000000000000000002 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		350000000000000000000101 /* BlockCursor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = BlockCursor.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/BlockCursor.cpp; sourceTree = SOURCE_ROOT; };
+		350000000000000000000102 /* HorzRuleBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = HorzRuleBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/HorzRuleBlock.cpp; sourceTree = SOURCE_ROOT; };
+		350000000000000000000103 /* ImageBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ImageBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/ImageBlock.cpp; sourceTree = SOURCE_ROOT; };
+		350000000000000000000104 /* ListBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ListBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/ListBlock.cpp; sourceTree = SOURCE_ROOT; };
+		350000000000000000000105 /* RichTextEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEdit.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/RichTextEdit.cpp; sourceTree = SOURCE_ROOT; };
+		350000000000000000000106 /* RichTextEditPriv.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEditPriv.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/RichTextEditPriv.cpp; sourceTree = SOURCE_ROOT; };
+		350000000000000000000107 /* TextBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = TextBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/TextBlock.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -581,8 +581,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3499BB013068EBC500ADBE3E /* libffi.tbd in Frameworks */,
+				34FF00000000000000000001 /* libsqlite3.tbd in Frameworks */,
 				34C819D92FE0B0A700B39646 /* LgiCocoa.framework in Frameworks */,
-				348EBFEF2E07670300BFEBE0 /* libsqlite.a in Frameworks */,
 				34F32181305AC7020073C5E7 /* libgumbo.a in Frameworks */,
 				34F32182305AC7020073C5E7 /* liblitehtml.a in Frameworks */,
 				34A891E12B0C178000D2930B /* libssl.3.dylib in Frameworks */,
@@ -630,28 +630,29 @@
 		3445E57C1F1F426300D0A824 /* Controls */ = {
 			isa = PBXGroup;
 			children = (
-				34F32170305AC5CE0073C5E7 /* HtmlLite */,
-				34F3216F305AC5C20073C5E7 /* Html2 */,
 				34EE8BB42748A6EC00F12915 /* Homoglyphs.cpp */,
 				34EE8BB32748A6EC00F12915 /* HomoglyphsTable.cpp */,
 				349AB0BC217B393100573982 /* Html */,
-				3445E57D1F1F426B00D0A824 /* RichEdit */,
+				34F3216F305AC5C20073C5E7 /* Html2 */,
+				34F32170305AC5CE0073C5E7 /* HtmlLite */,
+				3445E57D1F1F426B00D0A824 /* Rte1 */,
+				34CD61D4309C74CD00354B9E /* Rte2 */,
 			);
 			name = Controls;
 			sourceTree = "<group>";
 		};
-		3445E57D1F1F426B00D0A824 /* RichEdit */ = {
+		3445E57D1F1F426B00D0A824 /* Rte1 */ = {
 			isa = PBXGroup;
 			children = (
-				34417DBD205FD5B800D2E80C /* HorzRuleBlock.cpp */,
-				3445E57E1F1F428400D0A824 /* BlockCursor.cpp */,
-				3445E57F1F1F428400D0A824 /* RichTextEdit.cpp */,
-				3445E5801F1F428400D0A824 /* RichTextEditPriv.cpp */,
-				3445E5811F1F428400D0A824 /* RichTextEditPriv.h */,
-				3445E5821F1F428400D0A824 /* ImageBlock.cpp */,
-				3445E5831F1F428400D0A824 /* TextBlock.cpp */,
+				34417DBD205FD5B800D2E80C /* HorzRuleBlock1.cpp */,
+				3445E57E1F1F428400D0A824 /* BlockCursor1.cpp */,
+				3445E57F1F1F428400D0A824 /* RichTextEdit1.cpp */,
+				3445E5801F1F428400D0A824 /* RichTextEditPriv1.cpp */,
+				3445E5811F1F428400D0A824 /* RichTextEditPriv1.h */,
+				3445E5821F1F428400D0A824 /* ImageBlock1.cpp */,
+				3445E5831F1F428400D0A824 /* TextBlock1.cpp */,
 			);
-			name = RichEdit;
+			name = Rte1;
 			sourceTree = "<group>";
 		};
 		345027F527405C87007F5F2A /* Ui */ = {
@@ -855,6 +856,7 @@
 				3477C5211CC315EB0028B84B /* Link */,
 				3477C21F1CBEFD940028B84B /* Products */,
 				34DED72923AC319E0049E01F /* Frameworks */,
+				34CD61D3309C743C00354B9E /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -886,18 +888,24 @@
 				3477C3FB1CC22E690028B84B /* Base64.cpp */,
 				3477C4E81CC27D870028B84B /* Browser.cpp */,
 				3477C44F1CC262670028B84B /* ColourSelect.cpp */,
+				3445E57C1F1F426300D0A824 /* Controls */,
+				34EE8BA02748A0F100F12915 /* ControlTree.h */,
 				3477C44D1CC2624B0028B84B /* ControlTree.cpp */,
 				341A787F2699058600872FEB /* DatePopup.cpp */,
 				3477C4331CC233CF0028B84B /* Db-Csv.cpp */,
 				3477C4661CC26BF30028B84B /* DrawListSurface.cpp */,
+				3445E56E1F1F40CF00D0A824 /* Emoji */,
+				34F6152127E55CA700FE5B0C /* EventTargetThread.h */,
 				3477C4031CC22F680028B84B /* ExeCheck.cpp */,
 				3477C4411CC235490028B84B /* FilterUi.cpp */,
+				349AB0BB217B391200573982 /* Graphics */,
 				3477C4601CC26AE00028B84B /* Growl.cpp */,
 				3477C4351CC234200028B84B /* Http.cpp */,
 				3477C4641CC26BBF0028B84B /* HttpTools.cpp */,
 				3477C3571CC1149F0028B84B /* LgiMain.cpp */,
 				3477C45C1CC26AAB0028B84B /* Mime.cpp */,
 				3477C3FD1CC22EF60028B84B /* MonthView.cpp */,
+				34EE8BAE2748A26800F12915 /* OpenSSLSocket.h */,
 				3477C4101CC231470028B84B /* OpenSSLSocket.cpp */,
 				3477C44B1CC235C60028B84B /* OptionsFile.cpp */,
 				3477C4EA1CC27DC90028B84B /* Password.cpp */,
@@ -908,12 +916,6 @@
 				34063DA42DCBF8C8007CB2C2 /* Tnef.cpp */,
 				3477C43F1CC234E60028B84B /* XmlTreeUi.cpp */,
 				3477C3FE1CC22EF60028B84B /* YearView.cpp */,
-				34EE8BA02748A0F100F12915 /* ControlTree.h */,
-				34F6152127E55CA700FE5B0C /* EventTargetThread.h */,
-				34EE8BAE2748A26800F12915 /* OpenSSLSocket.h */,
-				3445E57C1F1F426300D0A824 /* Controls */,
-				3445E56E1F1F40CF00D0A824 /* Emoji */,
-				349AB0BB217B391200573982 /* Graphics */,
 			);
 			name = Lgi;
 			sourceTree = "<group>";
@@ -1016,14 +1018,6 @@
 			name = Tests;
 			sourceTree = "<group>";
 		};
-		348EBFE82E0766E400BFEBE0 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				348EBFEC2E0766E400BFEBE0 /* libsqlite.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		3497D5382399D246009FCC14 /* Scripts */ = {
 			isa = PBXGroup;
 			children = (
@@ -1100,11 +1094,32 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		34CD61D3309C743C00354B9E /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				34FF00000000000000000002 /* libsqlite3.tbd */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		34CD61D4309C74CD00354B9E /* Rte2 */ = {
+			isa = PBXGroup;
+			children = (
+				350000000000000000000101 /* BlockCursor.cpp */,
+				350000000000000000000102 /* HorzRuleBlock.cpp */,
+				350000000000000000000103 /* ImageBlock.cpp */,
+				350000000000000000000104 /* ListBlock.cpp */,
+				350000000000000000000105 /* RichTextEdit.cpp */,
+				350000000000000000000106 /* RichTextEditPriv.cpp */,
+				350000000000000000000107 /* TextBlock.cpp */,
+			);
+			name = Rte2;
+			sourceTree = "<group>";
+		};
 		34DED72923AC319E0049E01F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				3499BB003068EBC500ADBE3E /* libffi.tbd */,
-				348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */,
 				34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */,
 				3477C4DF1CC27C9F0028B84B /* Btree.xcodeproj */,
 			);
@@ -1163,7 +1178,6 @@
 			);
 			dependencies = (
 				34C819DB2FE0B0AE00B39646 /* PBXTargetDependency */,
-				348EBFEE2E0766F600BFEBE0 /* PBXTargetDependency */,
 				3474FC5C226DE08D0064E0AD /* PBXTargetDependency */,
 			);
 			name = Scribe;
@@ -1215,10 +1229,6 @@
 					ProductGroup = 34C6DFB92FE0AF9E008FC0C2 /* Products */;
 					ProjectRef = 34749B3F278B042500C8197E /* LgiCocoa.xcodeproj */;
 				},
-				{
-					ProductGroup = 348EBFE82E0766E400BFEBE0 /* Products */;
-					ProjectRef = 348EBFE72E0766E400BFEBE0 /* sqlite.xcodeproj */;
-				},
 			);
 			projectRoot = "";
 			targets = (
@@ -1233,13 +1243,6 @@
 			fileType = "compiled.mach-o.dylib";
 			path = libBtree.a;
 			remoteRef = 3474FC4D226DCCDD0064E0AD /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		348EBFEC2E0766E400BFEBE0 /* libsqlite.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libsqlite.a;
-			remoteRef = 348EBFEB2E0766E400BFEBE0 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		34C6DFBD2FE0AF9F008FC0C2 /* LgiCocoa.framework */ = {
@@ -1307,7 +1310,14 @@
 				3477C3C31CC227ED0028B84B /* Imp_Eudora.cpp in Sources */,
 				3477C3CE1CC227ED0028B84B /* OptionsDlg.cpp in Sources */,
 				3477C3E91CC227ED0028B84B /* ScribePageSetup.cpp in Sources */,
-				3445E5851F1F428400D0A824 /* RichTextEdit.cpp in Sources */,
+				3445E5851F1F428400D0A824 /* RichTextEdit1.cpp in Sources */,
+				350000000000000000000001 /* BlockCursor.cpp in Sources */,
+				350000000000000000000002 /* HorzRuleBlock.cpp in Sources */,
+				350000000000000000000003 /* ImageBlock.cpp in Sources */,
+				350000000000000000000004 /* ListBlock.cpp in Sources */,
+				350000000000000000000005 /* RichTextEdit.cpp in Sources */,
+				350000000000000000000006 /* RichTextEditPriv.cpp in Sources */,
+				350000000000000000000007 /* TextBlock.cpp in Sources */,
 				3477C4111CC231470028B84B /* OpenSSLSocket.cpp in Sources */,
 				3477C3C01CC227ED0028B84B /* HtmlToText.cpp in Sources */,
 				3477C4631CC26AE00028B84B /* SoftwareUpdate.cpp in Sources */,
@@ -1329,7 +1339,7 @@
 				3477C3D11CC227ED0028B84B /* PrintPreview.cpp in Sources */,
 				3477C3E21CC227ED0028B84B /* ScribeFolderTree.cpp in Sources */,
 				3477C3E71CC227ED0028B84B /* ScribeMail.cpp in Sources */,
-				34417DBE205FD5B800D2E80C /* HorzRuleBlock.cpp in Sources */,
+				34417DBE205FD5B800D2E80C /* HorzRuleBlock1.cpp in Sources */,
 				3445E5731F1F40DF00D0A824 /* EmojiTools.cpp in Sources */,
 				3477C45B1CC263560028B84B /* SharedMemory.cpp in Sources */,
 				34FB968A23835BB40039423C /* WebDav.cpp in Sources */,
@@ -1390,7 +1400,7 @@
 				340FAAEA23888A570017BC62 /* WebdavContact.cpp in Sources */,
 				3477C3F41CC227ED0028B84B /* Scripting.cpp in Sources */,
 				3477C3EA1CC227ED0028B84B /* ScribePassword.cpp in Sources */,
-				3445E5871F1F428400D0A824 /* ImageBlock.cpp in Sources */,
+				3445E5871F1F428400D0A824 /* ImageBlock1.cpp in Sources */,
 				34723EB72A8EE5D200EC80E8 /* ScribeIpc.cpp in Sources */,
 				3477C3F01CC227ED0028B84B /* ScribeThing.cpp in Sources */,
 				341A78802699058600872FEB /* DatePopup.cpp in Sources */,
@@ -1413,7 +1423,7 @@
 				34A32EAE30107AF1000939B2 /* StrToDom.cpp in Sources */,
 				3477C4581CC262AF0028B84B /* ScriptLibrary.cpp in Sources */,
 				3477C3B21CC227ED0028B84B /* BayesianFilter.cpp in Sources */,
-				3445E5881F1F428400D0A824 /* TextBlock.cpp in Sources */,
+				3445E5881F1F428400D0A824 /* TextBlock1.cpp in Sources */,
 				3477C3CD1CC227ED0028B84B /* MContainer.cpp in Sources */,
 				3477C3581CC1149F0028B84B /* LgiMain.cpp in Sources */,
 				3445E58A1F1F42BA00D0A824 /* ObjectInspector.cpp in Sources */,
@@ -1437,8 +1447,8 @@
 				3477C4041CC22F680028B84B /* ExeCheck.cpp in Sources */,
 				34EE8BB52748A6EC00F12915 /* HomoglyphsTable.cpp in Sources */,
 				3477C3BE1CC227ED0028B84B /* NewMailDlg.cpp in Sources */,
-				3445E5841F1F428400D0A824 /* BlockCursor.cpp in Sources */,
-				3445E5861F1F428400D0A824 /* RichTextEditPriv.cpp in Sources */,
+				3445E5841F1F428400D0A824 /* BlockCursor1.cpp in Sources */,
+				3445E5861F1F428400D0A824 /* RichTextEditPriv1.cpp in Sources */,
 				3477C3C21CC227ED0028B84B /* Imp_Eml.cpp in Sources */,
 				3416149B238484F800A65477 /* WebdavCalendar.cpp in Sources */,
 				3477C40F1CC231190028B84B /* Imp_OutlookExpress.cpp in Sources */,
@@ -1454,11 +1464,6 @@
 			isa = PBXTargetDependency;
 			name = Btree;
 			targetProxy = 3474FC5B226DE08D0064E0AD /* PBXContainerItemProxy */;
-		};
-		348EBFEE2E0766F600BFEBE0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = sqlite;
-			targetProxy = 348EBFED2E0766F600BFEBE0 /* PBXContainerItemProxy */;
 		};
 		34C819DB2FE0B0AE00B39646 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1652,6 +1657,7 @@
 					"-DSCRIBE_APP",
 					"-DPOSIX",
 					"-D_DEBUG",
+					"-Wno-c++11-narrowing",
 				);
 				OTHER_LDFLAGS = "-L../../libs/build-release/lib";
 				PRODUCT_BUNDLE_IDENTIFIER = com.memecode.scribe;
@@ -1700,6 +1706,7 @@
 					"-DMAC",
 					"-DSCRIBE_APP",
 					"-DPOSIX",
+					"-Wno-c++11-narrowing",
 				);
 				OTHER_LDFLAGS = "-L../../libs/build-release/lib";
 				PRODUCT_BUNDLE_IDENTIFIER = com.memecode.scribe;
