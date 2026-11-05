@@ -1655,7 +1655,6 @@
 					"-DSCRIBE_APP",
 					"-DPOSIX",
 					"-D_DEBUG",
-					"-Wno-c++11-narrowing",
 				);
 				OTHER_LDFLAGS = "-lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.memecode.scribe;
@@ -1705,7 +1704,6 @@
 					"-DMAC",
 					"-DSCRIBE_APP",
 					"-DPOSIX",
-					"-Wno-c++11-narrowing",
 				);
 				OTHER_LDFLAGS = "-lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.memecode.scribe;
