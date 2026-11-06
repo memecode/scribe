@@ -31,7 +31,7 @@
 #include "lgi/common/ClipBoard.h"
 #include "lgi/common/TableLayout.h"
 #include "lgi/common/DisplayString.h"
-#include "lgi/common/ThreadEvent.h"
+#include "lgi/common/Base64.h"
 #include "lgi/common/GdcTools.h"
 #include "lgi/common/Charset.h"
 #include "lgi/common/DropFiles.h"
@@ -41,7 +41,7 @@
 #include "lgi/common/LgiRes.h"
 #include "lgi/common/Printer.h"
 #include "lgi/common/SubProcess.h"
-#include "lgi/common/Base64.h"
+#include "lgi/common/DisplayString.h"
 
 #include "../src/common/Coding/ScriptingPriv.h"
 #include "PrintPreview.h"
@@ -1082,6 +1082,152 @@ BuildMarkMenu(	LSubMenu *MarkMenu,
 
 	return MarkMenu;
 }
+
+class ColourSelectItem : public LView
+{
+	LString label;
+	LAutoPtr<LDisplayString> ds, none;
+	uint64_t colour;
+	int baseMenuId = 0;
+	LRect noneRc;
+	LFont smallerFnt;
+
+	struct Cell 
+	{
+		LRect rect;
+		uint64_t colour;
+	};
+	LArray<Cell> cells;
+
+public:
+	constexpr static int padPx = 2;
+	constexpr static int cellPx = 16;
+
+	ColourSelectItem(const char *Label, uint64_t Colour, int BaseMenuId)
+	{
+		label = LString(Label) + ":";
+		colour = Colour;
+		baseMenuId = BaseMenuId;
+
+		LFontType type;
+		type.GetSystemFont("Small");
+		smallerFnt.Create(&type);
+
+		SetId(0);
+	}
+
+	bool OnLayout(LViewLayoutInfo &Inf) override
+	{
+		auto fnt = GetFont();
+		if (!ds)
+			ds.Reset(new LDisplayString(fnt, label));
+		if (!none)
+			none.Reset(new LDisplayString(&smallerFnt, LLoadString(IDS_NONE)));
+
+		int cellSz = cellPx + padPx * 2;
+		int cells = CountOf(MarkColours32);
+		if (Inf.Width.Min == 0)
+		{
+			LCss::Len padLeft("1.8em");
+			int indent = padLeft.ToPx(0, fnt) + 6;
+			int x = indent + MAX(ds->X() + cellSz + none->X(), cellSz * cells);
+			Inf.Width.Min = x;
+			Inf.Width.Max = x;
+		}
+		else
+		{
+			int y = ds->Y() + 4 + cellSz;
+			Inf.Height.Min = y;
+			Inf.Height.Max = y;
+		}
+		
+		return true;
+	
+	}
+
+	void PaintBtn(LSurface *pDC, LRect &r, LAutoPtr<LDisplayString> &txt, bool down)
+	{
+		if (LApp::SkinEngine)
+		{
+			LApp::SkinEngine->DrawBtn(pDC, r, LColour(L_HIGH), down, Enabled());
+		}
+
+		if (txt)
+		{
+			auto fnt = txt->GetFont();
+			fnt->Colour(L_TEXT, L_HIGH);
+			fnt->Transparent(true);
+			txt->Draw(pDC, r.x1 + (r.X() - txt->X()) / 2, r.y1 + (r.Y() - txt->Y()) / 2 + 1);
+		}
+	}
+
+	void OnPaint(LSurface *pDC) override
+	{
+		pDC->Colour(L_MENU_BACKGROUND);
+		pDC->Rectangle();
+
+		auto fnt = GetFont();
+		fnt->Colour(L_MENU_TEXT, L_MENU_BACKGROUND);
+		fnt->Transparent(false);
+
+		LCss::Len padLeft("1.8em");
+		int x = padLeft.ToPx(X(), fnt);
+		int y = padPx;
+		ds->Draw(pDC, x, y);
+
+		int cellsX = x + 6; // indent the colours a little
+		int lastCellX2 = cellsX + (CountOf(MarkColours32) - 1) * (cellPx + padPx * 2) + cellPx - 1;
+		noneRc.ZOff(none->X() + 7, none->Y());
+		noneRc.Offset(lastCellX2 - noneRc.X() + 1, y);
+
+		PaintBtn(pDC, noneRc, none, false);
+		
+		y += padPx + ds->Y();		
+
+		x = cellsX;
+		LRect r(x, y, x + cellPx - 1, y + cellPx - 1);
+		cells.Length(0);
+		for (int i=0; i<CountOf(MarkColours32); i++)
+		{
+			auto &c = cells.New();
+			c.rect = r;
+			c.colour = MarkColours32[i];
+
+			pDC->Colour(MarkColours32[i], 32);
+			pDC->Rectangle(&c.rect);
+
+			auto isSel = c.colour == colour;
+			if (isSel)
+			{
+				LRect sel = c.rect;
+				sel.Inset(-2, -2);
+				pDC->Colour(L_LOW);
+				pDC->Box(&sel);
+			}
+
+			r.Offset(cellPx + padPx * 2, 0);			
+		}
+	}
+
+	void OnMouseClick(LMouse &m) override
+	{
+		// The menu reads our Id on mouse up: a cell's menu id activates it, 0 keeps the menu open.
+		SetId(0);
+		for (int i=0; i<cells.Length(); i++)
+		{
+			auto &c = cells[i];
+			if (c.rect.Overlap(m))
+			{
+				colour = c.colour;
+				SetId(baseMenuId + i);
+				break;
+			}
+		}
+
+		if (noneRc.Overlap(m))
+			SetId(IDM_UNMARK);
+	}
+};
 
 //////////////////////////////////////////////////////////////////////////////
 char *WrapLines(char *Str, int Len, int WrapColumn)
@@ -6792,13 +6938,17 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 	Prof->Add("Mark");
 	#endif
 
+	#if 1
+	s.Sub->AppendCustom(new ColourSelectItem(LLoadString(IDS_MARK), GetMarkColour(), IDM_MARK_BASE));
+	#else
 	auto MarkMenu = s.Sub->AppendSub(AddAmp(LLoadString(IDS_MARK), 'm'));
 	if (MarkMenu)
 	{
 		BuildMarkMenu(MarkMenu, MarkState, (uint32_t)GetMarkColour(), true);
 	}
+	#endif
 
-	MarkMenu = s.Sub->AppendSub(AddAmp(LLoadString(IDS_SELECT_MARKED), 's'));
+	auto MarkMenu = s.Sub->AppendSub(AddAmp(LLoadString(IDS_SELECT_MARKED), 's'));
 	if (MarkMenu)
 	{
 		BuildMarkMenu(MarkMenu, MS_Multiple, 0, true, true, true);

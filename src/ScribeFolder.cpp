@@ -2838,13 +2838,6 @@ void ScribeFolder::OnUpdateUnRead(int Offset, bool ScanItems)
 
 		if (OldUnRead != GetUnRead())
 		{
-			for (auto i = GetParent(); i; i = i->GetParent())
-			{
-				ScribeFolder *tc = dynamic_cast<ScribeFolder*>(i);
-				if (tc && tc->GetParent())
-					tc->OnUpdateUnRead(0, false);
-			}
-
 			SetDirty();
 			if (d->IsInbox > 0)
 				UpdateOsUnread();
@@ -2852,6 +2845,9 @@ void ScribeFolder::OnUpdateUnRead(int Offset, bool ScanItems)
 	
 		ChildUnRead = Expanded() ? 0 : _UnreadChildren();
 		Update();
+
+		if (auto Parent = dynamic_cast<ScribeFolder*>(GetParent()))
+			Parent->OnUpdateUnRead(0, false);
 
 		d->InUpdateUnread = false;
 	}
