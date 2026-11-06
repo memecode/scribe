@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.18)
 project(scribe)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
+set(LGI_LIB_ONLY TRUE)
 
 if (APPLE)
 
@@ -15,6 +16,7 @@ elseif (UNIX)
 elseif (WIN32)
 
     if (MSVC)
+        enable_language(ASM_MASM)
         add_compile_options($<$<COMPILE_LANGUAGE:C,CXX>:/FS>)
     endif()
 
@@ -33,6 +35,7 @@ endif()
 
 # Get all the libs we need:
 add_subdirectory(../../lgi/trunk lgi)
+add_subdirectory(${LGI_DIR}/utils/Updater updater)
 add_subdirectory(../libs libs)
 find_package(OpenSSL)
 if (NOT DEFINED OPENSSL_INCLUDE_DIR)
@@ -202,6 +205,7 @@ add_executable(scribe ${APP_TYPE}
     src/StrToDom.cpp
     src/ScribeIpc.cpp
     src/TitlePage.cpp
+    src/Test/UnitTests.cpp
     utils/Tables/MailFlags.c
 
     src/Store3Common.cpp
@@ -243,7 +247,8 @@ if (WIN32)
         ${LGI_DIR}/src/common/Coding/ExternCall.asm)
 
     target_compile_options(scribe PRIVATE
-        $<IF:$<CONFIG:Release>,/Zi,>
+        $<$<AND:$<COMPILE_LANGUAGE:C,CXX>,$<CONFIG:Release>>:/Zi>
+        $<$<COMPILE_LANGUAGE:C,CXX>:/MP>
         )
 
     target_link_options(scribe PRIVATE
