@@ -6938,7 +6938,7 @@ void Mail::DoContextMenu(LMouse &m, LView *p)
 	Prof->Add("Mark");
 	#endif
 
-	#if defined(__GTK_H__)
+	#if defined(__GTK_H__) || WINDOWS
 	s.Sub->AppendCustom(new ColourSelectItem(LLoadString(IDS_MARK), GetMarkColour(), IDM_MARK_BASE));
 	#else
 	auto MarkActions = s.Sub->AppendSub(AddAmp(LLoadString(IDS_MARK), 'm'));
