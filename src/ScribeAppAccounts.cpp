@@ -1931,12 +1931,14 @@ void ScribeWnd::SetLayout(LayoutMode Mode)
 					d->SubSplit->SetVertical(true);
 					Splitter->SetViewAt(1, d->SubSplit);
 					d->SubSplit->SetViewAt(0, SearchView);
-					d->SubSplit->SetViewAt(1, Content);
+					if (d->SubSplit->SetViewAt(1, Content))
+						ListPane.Release();
 				}
 				else
 				{
 					d->SubSplit->Detach();
-					Splitter->SetViewAt(1, Content);
+					if (Splitter->SetViewAt(1, Content))
+						ListPane.Release();
 				}
 				
 				Splitter->SetViewAt(2, PreviewPanel);
