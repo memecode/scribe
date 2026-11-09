@@ -2191,6 +2191,8 @@ bool MailUi::OnViewKey(LView *v, LKey &k)
 					if (HtmlView)
 						HtmlView->DoFind(NULL);
 				}
+				else return false;
+
 				return true;
 			}
 			case 'r':
