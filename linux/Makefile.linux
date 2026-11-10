@@ -55,7 +55,6 @@ ifeq ($(Build),Debug)
 		-I../libs/build-x64-debug/include \
 		-I./resources \
 		-I./src \
-		-I./src/Sqlite \
 		-I./src/Store3Webdav \
 		-I./utils/Tables \
 		`pkg-config --cflags gtk+-3.0`
@@ -94,7 +93,6 @@ else
 		-I../libs/build-x64-release/include \
 		-I./resources \
 		-I./src \
-		-I./src/Sqlite \
 		-I./src/Store3Webdav \
 		-I./utils/Tables \
 		`pkg-config --cflags gtk+-3.0`
@@ -533,7 +531,7 @@ $(Target) : ../../lgi/trunk/$(BuildDir)/liblgi-gtk3$(Tag).so $(Objects)
 	../../lgi/trunk/src/common/Net/Uri.cpp \
 	../../lgi/trunk/src/common/Resource/LgiRes.cpp \
 	../../lgi/trunk/src/common/Resource/Res.cpp \
-	../../lgi/trunk/src/common/Skins/plutovg/plutoVg.cpp \
+	../../lgi/trunk/src/common/Skins/vector/vectorUi.cpp \
 	../../lgi/trunk/src/common/Text/DocView.cpp \
 	../../lgi/trunk/src/common/Text/String.cpp \
 	../../lgi/trunk/src/common/Text/TextConvert.cpp \
