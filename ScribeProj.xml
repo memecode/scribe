@@ -65,6 +65,7 @@
 		<Node File="./help/print.html" Type="3" Platforms="7" />
 		<Node File="./help/scripting.html" Type="7" Platforms="15" />
 		<Node File="./help/ui.html" Type="3" Platforms="7" />
+		<Node File="./help/webdav.html" Type="3" Platforms="7" />
 	</Node>
 	<Node Name="INet" Type="1" Open="0" Platforms="7" Id="8">
 		<Node File="../../lgi/trunk/src/common/Net/Http.cpp" Type="2" Platforms="15" />

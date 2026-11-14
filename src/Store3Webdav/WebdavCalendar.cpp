@@ -22,6 +22,17 @@ WebdavCalendar::WebdavCalendar(WebdavStore *store, WebdavEvent *e) : WebdavObj(s
 	Converted = convert.Import(this, &m);
 }
 
+bool WebdavCalendar::SetData(const char *Data)
+{
+	vCal = Data;
+
+	LMemStream m(vCal.Get(), vCal.Length(), false);
+	VCal convert;
+	Converted = convert.Import(this, &m);
+
+	return Converted;
+}
+
 void WebdavCalendar::FireOnChange(int Fld)
 {
 	LArray<LDataI*> a;

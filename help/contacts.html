@@ -103,6 +103,16 @@
 			<a href='plugins.html#ldapclient'>LDAP Client</a> plugin loaded then you
 			will have an extra tab on the "Add Contact" window displaying all the contacts
 			stored on the server.
+			<p/>
+
+		<div class=helpheading><a name="webdav">Contacts on a WebDAV server</a></div>
+			Contacts can also be held on a WebDAV/CardDAV server instead of in the local mail store.
+			Scribe shows that collection as a Contacts folder in the folder tree, and sends changes
+			back to the server when a contact is saved or deleted. The folder is read from the server
+			when the store is loaded, and only the contacts that changed since the last read are
+			requested again. See the <a href='webdav.html'>WebDAV Folders</a> page for setting this
+			up.
+			<p/>
 
 		<br>
 		<center>&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a></center>

@@ -58,6 +58,10 @@ class WebdavThread : public LThread, public LCancel, public LMutex
 	// Lock before access...
 	LArray<WebdavEvent> Cmds;
 
+	bool IsItem(const LWebdav::FileProps &f);
+	const char *Multiget();
+	static bool Unchanged(LArray<LWebdav::FileProps> &Known, const LWebdav::FileProps &f);
+
 public:
 	// Lock before access...
 	LArray<LWebdav::FileProps> Files;

@@ -98,6 +98,7 @@ public:
 	const char *GetHref() { return Href; }
 	virtual void FireOnChange(int Fld) {}
 	virtual bool ConvertToText() { return false; }
+	virtual bool SetData(const char *Data) { return false; }
 
 	// LDataI impl
 	uint32_t Type() override { return MAGIC_NONE; }
@@ -245,7 +246,7 @@ class WebdavCalendar : public WebdavObj
 {
 	friend class WebdavCalendarFile;
 
-	LString vCal, Href;
+	LString vCal;
 
 	#define _(f,v) LDateTime v;
 	WebdavCalendarDates()
@@ -266,6 +267,7 @@ public:
 
 	void FireOnChange(int Fld) override;
 	bool ConvertToText() override;
+	bool SetData(const char *Data) override;
 
 	// Stubs
 	uint32_t Type() override { return MAGIC_CALENDAR; }
@@ -357,6 +359,7 @@ public:
 
 	void FireOnChange(int Fld) override;
 	bool ConvertToText() override;
+	bool SetData(const char *Data) override;
 
 	// Stubs
 	uint32_t Type() override { return MAGIC_CONTACT; }

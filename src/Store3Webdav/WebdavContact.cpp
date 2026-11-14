@@ -20,6 +20,17 @@ WebdavContact::WebdavContact(WebdavStore *store, WebdavEvent *e) : WebdavObj(sto
 	Converted = convert.Import(this, &m);
 }
 
+bool WebdavContact::SetData(const char *Data)
+{
+	vCard = Data;
+
+	LMemStream m(vCard.Get(), vCard.Length(), false);
+	VCard convert;
+	Converted = convert.Import(this, &m);
+
+	return Converted;
+}
+
 void WebdavContact::FireOnChange(int Fld)
 {
 	LArray<LDataI*> a;

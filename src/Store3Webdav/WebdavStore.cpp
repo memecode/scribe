@@ -220,7 +220,25 @@ void WebdavStore::OnEvent(void *Param)
 	{
 		case CmdFile:
 		{
+			// The item may already be here if the content changed...
 			WebdavObj *o = NULL;
+			for (auto i: e->Folder->Items.a)
+			{
+				if (e->Href.Equals(i->GetHref()))
+				{
+					o = i;
+					break;
+				}
+			}
+
+			if (o)
+			{
+				if (o->SetData(e->Data.Get()))
+					o->FireOnChange(FIELD_STATUS);
+
+				break;
+			}
+
 			switch (e->Folder->ItemType)
 			{
 				case MAGIC_CONTACT:

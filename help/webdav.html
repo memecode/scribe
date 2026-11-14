@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Scribe Help</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<div style="position: fixed; height: 100%; width: 190px;">
+		<iframe style='width: 190px' src="menu.html">
+			No iframe support.
+		</iframe>
+	</div>
+
+	<div class=content>
+		<center><h2>WebDAV Remote Folders</h2></center>
+
+		<div class=helpheading><a name="webdav">WebDAV Folders</a></div>
+			A WebDAV store keeps contacts and calendar entries on a remote server instead of in a
+			local mail store file. Scribe lists the collection on the server and shows it as a
+			Contacts folder and/or a Calendar folder in the folder tree, using the same views as a
+			local store, and saves changes back to the server.<br>
+			<br>
+
+		<div class=helpheading><a name="setup">Setting up a WebDAV store</a></div>
+			<ul>
+				<li> Open File → Manage Mail Stores.
+				<li> Click "Create Mail Store" and choose <b>Webdav Remote Folder</b>.
+				<li> Fill in the Webdav Account dialog:
+				<ul>
+					<li> <b>Store name:</b> the name shown for the store in the folder tree.
+					<li> <b>Contacts URL:</b> the address of the CardDAV collection, for example
+						https://server/dav/contacts/
+					<li> <b>Calendar URL:</b> the address of the CalDAV collection, for example
+						https://server/dav/calendar/
+					<li> <b>User name:</b> and <b>Password:</b> the login for the server.
+				</ul>
+				<li> Click Ok, then click Ok on the Manage Mail Stores dialog. Scribe saves the
+					settings, reloads the mail stores, and the remote folders appear in the tree.
+			</ul>
+			<p/>
+			Both URLs are optional. With only a Contacts URL you get a Contacts folder, with only a
+			Calendar URL you get a Calendar folder.<br>
+			<br>
+			To change the settings later, select the store in the list and double click it, or right
+			click it and choose Edit. To stop using the store, select it and click Close, then Ok.<br>
+			<br>
+
+		<div class=helpheading><a name="fetch">How the content is fetched</a></div>
+			When the store is loaded Scribe reads the listing of the collection once, then asks the
+			server for the content of the items it does not already have.<br>
+			<br>
+			On a server that supports the WebDAV REPORT method, and reports it in its OPTIONS
+			response, those requests are combined into a single bulk request for a batch of files
+			instead of one request per item. This is what makes a collection with hundreds of
+			contacts or appointments load in seconds rather than minutes.<br>
+			<br>
+			Scribe remembers the server tag (etag) reported for each item. When the store is read
+			again only the items whose tag changed, or that were not fetched successfully last time,
+			are requested; items the server no longer lists are removed from the folder. If the
+			server does not support REPORT, Scribe falls back to requesting each file individually.<br>
+			<br>
+
+		<div class=helpheading><a name="notes">Notes</a></div>
+			<ul>
+				<li> The URLs must point at the collection itself, not at a single .vcf or .ics
+					file, and the server must allow PROPFIND on it.
+				<li> Items are recognised by the content type the server reports for them, or by the
+					.vcf/.ics extension when it does not report one.
+				<li> A WebDAV store does not keep a copy of the items on disk, so the folder is
+					re-read from the server each time the store is loaded.
+				<li> The folder is refreshed when Scribe reloads the store, such as at startup or
+					after the Manage Mail Stores dialog is closed. Items are not downloaded again when
+					nothing has changed on the server.
+				<li> The password is saved in Scribe's settings file, so use a store login on a
+					trusted machine, or a client-specific password if the server offers one.
+			</ul>
+			<p/>
+
+		<br>
+		<center>&copy; <a href="mailto:fret@memecode.com">Matthew Allen</a></center>
+	</div>
+
+</body>
+</html>
