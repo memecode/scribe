@@ -25,13 +25,13 @@ public:
 	};
 
 protected:
-	ScribeWnd *App;
+	ScribeWnd *App = nullptr;
 	LRemote Remote;
-	LDataEventsI *Callback;
+	LDataEventsI *Callback = nullptr;
 	LArray<WebdavEvent*> Events;
 
 	LString ContactUrl, CalUrl;
-	WebdavFolder *Root = NULL, *ContactFolder = NULL, *CalFolder = NULL;
+	WebdavFolder *Root = nullptr, *ContactFolder = nullptr, *CalFolder = nullptr;
 
 	LXmlTag *LockSettings(const char *File, int Line);
 	void UnlockSettings();
@@ -41,16 +41,6 @@ public:
 	~WebdavStore();
 	
 	const char *GetClass() override { return "WebdavStore"; }
-
-	// Actions
-	/*
-	bool Read();
-	bool Write();
-	bool Delete();
-	Calendar *NewEvent();
-	bool Match(char *Email);
-	bool GetEvents(LDateTime &Start, LDateTime &End, LArray<TimePeriod> &Events);
-	*/
 
 	// Events
 	void OnChanged();

@@ -3,6 +3,7 @@
 #include "lgi/common/Base64.h"
 #include "lgi/common/XmlTree.h"
 #include "lgi/common/vCard-vCal.h"
+
 #include "WebdavStore.h"
 #include "WebdavStorePriv.h"
 

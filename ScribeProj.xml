@@ -367,6 +367,7 @@
 		<Node Name="Webdav" Type="1" Platforms="15" Id="49">
 			<Node File="./src/FolderCalendarSource.cpp" Type="2" Platforms="15" />
 			<Node File="../../lgi/trunk/src/common/Net/WebDav.cpp" Type="2" Platforms="15" />
+			<Node File="../../lgi/trunk/include/lgi/common/WebDav.h" Type="3" Platforms="15" />
 			<Node File="./src/Store3Webdav/WebdavCalendar.cpp" Type="2" Platforms="15" />
 			<Node File="./src/Store3Webdav/WebdavContact.cpp" Type="2" Platforms="15" />
 			<Node File="./src/Store3Webdav/WebdavFolder.cpp" Type="2" Platforms="15" />

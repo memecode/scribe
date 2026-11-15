@@ -6,6 +6,12 @@
 #include "WebdavStore.h"
 #include "WebdavStorePriv.h"
 
+#if 1
+#define LOG(...) 	LgiTrace(__VA_ARGS__)
+#else
+#define LOG(...)
+#endif
+
 //////////////////////////////////////////////////////////////////////
 WebdavThread::WebdavThread(WebdavStore *src, WebdavFolder *fld, LString Url) :
 	LThread("RemoteCal.Th"),
@@ -42,7 +48,10 @@ Store3Status WebdavThread::Save(LString Href, LString Data)
 	}
 
 	if (!Lock(_FL))
+	{
+		LOG("%s:%i - failed to lock.\n", _FL);
 		return Store3Error;
+	}
 		
 	WebdavEvent c;
 	c.Type = CmdSave;
@@ -59,7 +68,10 @@ Store3Status WebdavThread::Save(LString Href, LString Data)
 Store3Status WebdavThread::Delete(LString Href)
 {
 	if (!Lock(_FL))
+	{
+		LOG("%s:%i - failed to lock.\n", _FL);
 		return Store3Error;
+	}
 		
 	auto &c = Cmds.New();
 	c.Type = CmdDelete;
@@ -72,7 +84,11 @@ Store3Status WebdavThread::Delete(LString Href)
 void WebdavThread::Refresh()
 {
 	if (!Lock(_FL))
-		return;		
+	{
+		LOG("%s:%i - failed to lock.\n", _FL);
+		return;
+	}
+	
 	auto &c = Cmds.New();
 	c.Type = CmdRefresh;
 	Unlock();
@@ -109,12 +125,22 @@ bool WebdavThread::Unchanged(LArray<LWebdav::FileProps> &Known, const LWebdav::F
 void WebdavThread::ReadDirectory(LWebdav &Wd)
 {
 	LArray<LWebdav::FileProps> Local;
+
+	LOG("%s:%i - ReadDirectory PropFind.\n", _FL);
 	if (!Wd.PropFind(Local, "/"))
+	{
+		LOG("%s:%i - no slash.\n", _FL);
 		return;
+	}
+
+	LOG("%s:%i - PropFind done, local=%i\n", _FL, (int)Local.Length());
 
 	LArray<LWebdav::FileProps> Known;
 	if (!Lock(_FL))
+	{
+		LOG("%s:%i - failed to lock.\n", _FL);
 		return;
+	}
 
 	for (auto &k: Files)
 		Known.New() = k.Copy();
@@ -129,7 +155,7 @@ void WebdavThread::ReadDirectory(LWebdav &Wd)
 	{
 		if (!IsItem(f))
 		{
-			LgiTrace("%s:%i - Unknown mime '%s'\n", _FL, f.GetContentType().Get());
+			LOG("%s:%i - Unknown mime '%s'\n", _FL, f.GetContentType().Get());
 			continue;
 		}
 
@@ -158,7 +184,7 @@ void WebdavThread::ReadDirectory(LWebdav &Wd)
 	LArray<LWebdav::FileProps> Bulk;
 	if (Hrefs.Length() && Wd.SupportsReport("/"))
 		if (!Wd.Report(Bulk, "/", Multiget(), Hrefs))
-			LgiTrace("%s:%i - Bulk fetch returned no content.\n", _FL);
+			LOG("%s:%i - Bulk fetch returned no content.\n", _FL);
 
 	for (auto idx: Need)
 	{
@@ -176,7 +202,7 @@ void WebdavThread::ReadDirectory(LWebdav &Wd)
 
 		// The server can not bulk fetch, so get this file on its own...
 		if (!e.Data && !Wd.Get(e.Href, e.Data))
-			LgiTrace("%s:%i - Failed to load '%s'\n", _FL, e.Href.Get());
+			LOG("%s:%i - Failed to load '%s'\n", _FL, e.Href.Get());
 	}
 
 	// Anything the server no longer has...
@@ -231,6 +257,8 @@ void WebdavThread::ReadDirectory(LWebdav &Wd)
 int WebdavThread::Main()
 {
 	LWebdav Wd(Remote.Url, Remote.User, Remote.Pass, this);
+
+	LOG("%s:%i - WebdavThread starting...\n", _FL);
 		
 	ReadDirectory(Wd);
 	
@@ -242,6 +270,10 @@ int WebdavThread::Main()
 			Process.Swap(Cmds);
 			Unlock();
 		}
+
+		if (Process.Length())
+			LOG("%s:%i - got %i cmds.\n", _FL, (int)Process.Length());
+			
 		for (auto &c: Process)
 		{
 			int Status = -1;
