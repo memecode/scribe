@@ -153,6 +153,12 @@ void WebdavThread::ReadDirectory(LWebdav &Wd)
 
 	for (auto &f: Local)
 	{
+		if (f.Collection || f.Href.EndsWith("/"))
+		{
+			LOG("%s:%i - Collection '%s'\n", _FL, f.Href.Get());
+			continue;
+		}
+
 		if (!IsItem(f))
 		{
 			LOG("%s:%i - Unknown mime '%s'\n", _FL, f.GetContentType().Get());
