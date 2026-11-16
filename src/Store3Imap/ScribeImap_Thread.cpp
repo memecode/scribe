@@ -1,4 +1,7 @@
 #include <stdarg.h>
+#include <map>
+#include <set>
+#include <string>
 
 #include "lgi/common/Lgi.h"
 #include "lgi/common/Mail.h"
@@ -98,6 +101,29 @@ struct ImapThreadPrivate : public LMutex, public LCancel
 	int Listings = 0;
 	int Exists = -1;
 	int FetchSeq = 1;
+
+	// Per remote folder: UIDs the server failed to send, excluded from listings.
+	std::map<std::string, std::set<uint32_t>> BadUids;
+
+	// Build a UID set from 'first' to '*' that excludes any known bad UIDs.
+	LString ListingRange(const char *Folder, uint32_t first)
+	{
+		LString::Array parts;
+		auto it = BadUids.find(Folder);
+		if (it != BadUids.end())
+		{
+			for (auto bad: it->second)
+			{
+				if (bad < first)
+					continue;
+				if (bad > first)
+					parts.New().Printf("%u:%u", first, bad - 1);
+				first = bad + 1;
+			}
+		}
+		parts.New().Printf("%u:*", first);
+		return LString(",").Join(parts);
+	}
 
 	ImapThreadPrivate(	ImapThread *thread,
 						ImapStore *s,
@@ -680,7 +706,12 @@ public:
 			Prog->Value += size;
 
 		if (File)
-			File->Write(ptr, size);
+		{
+			if (flags & LSocketI::WriteSensitive)
+				File->Write("********\r\n", 10);
+			else
+				File->Write(ptr, size);
+		}
 		
 		return T::Write(ptr, size, flags);
 	}
@@ -968,7 +999,6 @@ int ImapThread::Main()
 
 						if (d->SelectFolder(Inf.Remote))
 						{
-							char UidRange[32];
 							char *ListingParts = GetListingParts(Inf.Remote);
 
 							LAutoPtr<LStreamI> Raw(d->NewFetch("All", ListingParts));
@@ -976,18 +1006,39 @@ int ImapThread::Main()
 							ImapFolderInfo &r = Resp->Fld.New();
 							r.LastUid = Inf.LastUid;
 
-                            sprintf_s(UidRange, sizeof(UidRange), "%i:*", Inf.LastUid > 0 ? Inf.LastUid + 1 : 1);
+							auto UidRange = d->ListingRange(Inf.Remote, Inf.LastUid > 0 ? Inf.LastUid + 1 : 1);
 								
 							#if !RUN_TEST_CMDS
 							LError fetchErr;
-							if (d->Imap->Fetch(	true,
-												UidRange,
-												ListingParts,
-												ListingCallback,
-												Resp,
-												Raw,
-												-1,
-												&fetchErr))
+							auto fetchStatus = d->Imap->Fetch(	true,
+																UidRange,
+																ListingParts,
+																ListingCallback,
+																Resp,
+																Raw,
+																-1,
+																&fetchErr);
+							if (fetchStatus && fetchErr)
+							{
+								// The listing was cut short: drop entries the server couldn't fully
+								// send, skip them next time, and don't let the store delete local
+								// mail that simply wasn't listed.
+								if (ListingParts == MailListingParts)
+								{
+									for (ssize_t n = (ssize_t)Resp->Mail.Length() - 1; n >= 0; n--)
+									{
+										auto &mi = Resp->Mail[n];
+										if (mi.Headers)
+											continue;
+										d->Error(_FL, "Skipping UID %u in '%s': server failed to send it.", mi.Uid, Inf.Remote.Get());
+										d->BadUids[Inf.Remote.Get()].insert(mi.Uid);
+										Resp->Mail.DeleteAt(n, true);
+									}
+								}
+								r.LastUid = UINT32_MAX;
+							}
+
+							if (fetchStatus)
 							{
 								r.Local = Inf.Local;
 								r.Remote = Inf.Remote;
