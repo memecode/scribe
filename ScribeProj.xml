@@ -125,6 +125,7 @@
 			</Node>
 			<Node Name="2" Type="1" Platforms="15" Id="18">
 				<Node File="../../lgi/trunk/src/common/Widgets/richText2/BlockCursor.cpp" Type="2" Platforms="15" />
+				<Node File="../../lgi/trunk/src/common/Widgets/richText2/DivBlock.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/src/common/Widgets/richText2/HorzRuleBlock.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/src/common/Widgets/richText2/ImageBlock.cpp" Type="2" Platforms="15" />
 				<Node File="../../lgi/trunk/src/common/Widgets/richText2/ListBlock.cpp" Type="2" Platforms="15" />

@@ -149,6 +149,7 @@ Source =	../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			../../lgi/trunk/src/common/Widgets/richText1/RichTextEditPriv1.cpp \
 			../../lgi/trunk/src/common/Widgets/richText1/TextBlock1.cpp \
 			../../lgi/trunk/src/common/Widgets/richText2/BlockCursor.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/DivBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/richText2/HorzRuleBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/richText2/ImageBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/richText2/ListBlock.cpp \
