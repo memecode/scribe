@@ -74,9 +74,9 @@ extern char sMimeMessage[];
 extern char sMimeXml[];
 
 // Default templates
-extern const char DefaultTextReplyTemplate[];
-extern const char DefaultHtmlReplyTemplate[];
-extern const char DefaultHtmlFormatTemplate[];
+extern const char TextReplyTemplate[];
+extern const char HtmlBodyAsTextTemplate[];
+extern const char HtmlBodyAsHtmlTemplate[];
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Functions

@@ -66,7 +66,7 @@ static char ScribeReplyStyles[] =	"margin-left: 0.5em;\n"
 									"padding-left: 0.5em;\n"
 									"border-left: 1px solid #ccc;";
 
-const char DefaultTextReplyTemplate[] =
+const char TextReplyTemplate[] =
 {
 	"\n"
 	"---------- Original Message ----------\n"
@@ -80,7 +80,7 @@ const char DefaultTextReplyTemplate[] =
 	"<mail.sig>\n"
 };
 
-const char DefaultHtmlReplyTemplate[] =
+const char HtmlBodyAsTextTemplate[] =
 {
 	"<html>\n"
 	"<head>\n"
@@ -94,7 +94,7 @@ const char DefaultHtmlReplyTemplate[] =
 	"	.Style3 {\n"
 	"		color: #ae0000;\n"
 	"	}\n"
-	"	</style>\n"
+	"</style>\n"
 	"</head>\n"
 	"<body>\n"
 	"	<br>\n"
@@ -111,22 +111,28 @@ const char DefaultHtmlReplyTemplate[] =
 	"</html>\n"
 };
 
-const char DefaultHtmlFormatTemplate[] =
+const char HtmlBodyAsHtmlTemplate[] =
 {
 	"<html>\n"
 	"<head>\n"
-	"&lt;?mail.htmlheadfields?&gt;\n"
+	"<style>\n"
+	"	blockquote.original {\n"
+	"		border-left: 1px solid #ccc;\n"
+	"	}\n"
+	"</style>\n"
 	"</head>\n"
 	"<body>\n"
-	"<p>\n"
+	"	&lt;?cursor?&gt;<br>\n"
+	"	<br>\n"
+	"	<p><span class='Style1'>---------- Original Message ----------</span><br>\n"
 	"	<b>To:</b> &lt;?mail.tohtml?&gt;<br>\n"
 	"	<b>From:</b> &lt;?mail.fromhtml?&gt;<br>\n"
 	"	<b>Subject:</b> &lt;?mail.subject?&gt;<br>\n"
 	"	<b>Date:</b> &lt;?mail.datesent?&gt;<br>\n"
-	"	<br>\n"
-	"	&lt;?mail.bodyashtml?&gt;\n"
-	"	&lt;?cursor?&gt;<br>\n"
-	"	&lt;?mail.sig[html]?&gt;</p>\n"
+	"	<blockquote class='original'>\n"
+	"		&lt;?mail.bodyashtml?&gt;\n"
+	"	</blockquote>\n"
+	"	&lt;?mail.sig[html]?&gt;\n"
 	"</body>\n"
 	"</html>\n"
 };
@@ -291,7 +297,7 @@ bool ExtractHtmlContent(LString &OutHtml,
 		else if (c->IsTag("/head"))
 		{
 			InHead = false;
-			c->Parent = nullptr;
+			c->Parent = NULL;
 			r.Children.Delete(It);
 			DeleteObj(c);
 		}
@@ -300,13 +306,13 @@ bool ExtractHtmlContent(LString &OutHtml,
 			// We remove this tag, but KEEP the content... if any
 			if (ValidStr(c->GetContent()))
 			{
-				c->SetTag(nullptr);
+				c->SetTag(NULL);
 				It++;
 			}
 			else
 			{
 				// No content, remove entirely.
-				c->Parent = nullptr;
+				c->Parent = NULL;
 				r.Children.Delete(It);
 				DeleteObj(c);
 			}
@@ -317,7 +323,7 @@ bool ExtractHtmlContent(LString &OutHtml,
 				c->IsTag("/body") ||
 				c->IsTag("/style"))
 		{
-			c->Parent = nullptr;
+			c->Parent = NULL;
 			r.Children.Delete(It);
 			DeleteObj(c);
 		}

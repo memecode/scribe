@@ -894,13 +894,13 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 				LVariant v;
 				if (res == 1)
 				{
-					App->GetOptions()->SetValue(OPT_TextReplyFormat, v = DefaultTextReplyTemplate);
-					App->GetOptions()->SetValue(OPT_HtmlReplyFormat, v = DefaultHtmlReplyTemplate);
+					App->GetOptions()->SetValue(OPT_TextReplyFormat, v = TextReplyTemplate);
+					App->GetOptions()->SetValue(OPT_HtmlReplyFormat, v = HtmlBodyAsTextTemplate);
 				}
 				else
 				{
-					App->GetOptions()->SetValue(OPT_TextReplyFormat, v = DefaultTextReplyTemplate);
-					App->GetOptions()->SetValue(OPT_HtmlReplyFormat, v = DefaultHtmlFormatTemplate);
+					App->GetOptions()->SetValue(OPT_TextReplyFormat, v = TextReplyTemplate);
+					App->GetOptions()->SetValue(OPT_HtmlReplyFormat, v = HtmlBodyAsHtmlTemplate);
 				}
 			}
 			break;
@@ -927,13 +927,13 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 				LVariant v;
 				if (res == 1)
 				{
-					App->GetOptions()->SetValue(OPT_TextForwardFormat, v = DefaultTextReplyTemplate);
-					App->GetOptions()->SetValue(OPT_HtmlForwardFormat, v = DefaultHtmlReplyTemplate);
+					App->GetOptions()->SetValue(OPT_TextForwardFormat, v = TextReplyTemplate);
+					App->GetOptions()->SetValue(OPT_HtmlForwardFormat, v = HtmlBodyAsTextTemplate);
 				}
 				else
 				{
-					App->GetOptions()->SetValue(OPT_TextForwardFormat, v = DefaultTextReplyTemplate);
-					App->GetOptions()->SetValue(OPT_HtmlForwardFormat, v = DefaultHtmlFormatTemplate);
+					App->GetOptions()->SetValue(OPT_TextForwardFormat, v = TextReplyTemplate);
+					App->GetOptions()->SetValue(OPT_HtmlForwardFormat, v = HtmlBodyAsHtmlTemplate);
 				}
 			}
 			break;
