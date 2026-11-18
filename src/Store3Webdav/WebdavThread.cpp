@@ -6,7 +6,7 @@
 #include "WebdavStore.h"
 #include "WebdavStorePriv.h"
 
-#if 1
+#if 0
 #define LOG(...) 	LgiTrace(__VA_ARGS__)
 #else
 #define LOG(...)

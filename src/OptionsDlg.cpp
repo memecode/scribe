@@ -883,9 +883,26 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		}
 		case IDC_RESET_REPLY:
 		{
-			LVariant v;
-			App->GetOptions()->SetValue(OPT_TextReplyFormat, v = DefaultTextReplyTemplate);
-			App->GetOptions()->SetValue(OPT_HtmlReplyFormat, v = DefaultHtmlReplyTemplate);
+			LPoint pt(0, Ctrl->GetPos().Y());
+			Ctrl->PointToScreen(pt);
+			LSubMenu sub;
+			sub.AppendItem(LLoadString(IDS_TEXT), 1, true);
+			sub.AppendItem(LLoadString(IDS_HTML), 2, true);
+			int res = sub.Float(Ctrl->GetWindow(), pt.x, pt.y, LSubMenu::BtnLeft);
+			if (res)
+			{
+				LVariant v;
+				if (res == 1)
+				{
+					App->GetOptions()->SetValue(OPT_TextReplyFormat, v = DefaultTextReplyTemplate);
+					App->GetOptions()->SetValue(OPT_HtmlReplyFormat, v = DefaultHtmlReplyTemplate);
+				}
+				else
+				{
+					App->GetOptions()->SetValue(OPT_TextReplyFormat, v = DefaultTextReplyTemplate);
+					App->GetOptions()->SetValue(OPT_HtmlReplyFormat, v = DefaultHtmlFormatTemplate);
+				}
+			}
 			break;
 		}
 		case IDC_EDIT_FORWARD:
@@ -899,9 +916,26 @@ int OptionsDlg::OnNotify(LViewI *Ctrl, const LNotification &n)
 		}
 		case IDC_RESET_FORWARD:
 		{
-			LVariant v;
-			App->GetOptions()->SetValue(OPT_TextForwardFormat, v = DefaultTextReplyTemplate);
-			App->GetOptions()->SetValue(OPT_HtmlForwardFormat, v = DefaultHtmlReplyTemplate);
+			LPoint pt(0, Ctrl->GetPos().Y());
+			Ctrl->PointToScreen(pt);
+			LSubMenu sub;
+			sub.AppendItem(LLoadString(IDS_TEXT), 1, true);
+			sub.AppendItem(LLoadString(IDS_HTML), 2, true);
+			int res = sub.Float(Ctrl->GetWindow(), pt.x, pt.y, LSubMenu::BtnLeft);
+			if (res)
+			{
+				LVariant v;
+				if (res == 1)
+				{
+					App->GetOptions()->SetValue(OPT_TextForwardFormat, v = DefaultTextReplyTemplate);
+					App->GetOptions()->SetValue(OPT_HtmlForwardFormat, v = DefaultHtmlReplyTemplate);
+				}
+				else
+				{
+					App->GetOptions()->SetValue(OPT_TextForwardFormat, v = DefaultTextReplyTemplate);
+					App->GetOptions()->SetValue(OPT_HtmlForwardFormat, v = DefaultHtmlFormatTemplate);
+				}
+			}
 			break;
 		}
 		case IDC_ACCOUNTS:

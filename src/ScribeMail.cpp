@@ -111,6 +111,26 @@ const char DefaultHtmlReplyTemplate[] =
 	"</html>\n"
 };
 
+const char DefaultHtmlFormatTemplate[] =
+{
+	"<html>\n"
+	"<head>\n"
+	"&lt;?mail.htmlheadfields?&gt;\n"
+	"</head>\n"
+	"<body>\n"
+	"<p>\n"
+	"	<b>To:</b> &lt;?mail.tohtml?&gt;<br>\n"
+	"	<b>From:</b> &lt;?mail.fromhtml?&gt;<br>\n"
+	"	<b>Subject:</b> &lt;?mail.subject?&gt;<br>\n"
+	"	<b>Date:</b> &lt;?mail.datesent?&gt;<br>\n"
+	"	<br>\n"
+	"	&lt;?mail.bodyashtml?&gt;\n"
+	"	&lt;?cursor?&gt;<br>\n"
+	"	&lt;?mail.sig[html]?&gt;</p>\n"
+	"</body>\n"
+	"</html>\n"
+};
+
 class DepthCheck
 {
 	int &i;
@@ -271,7 +291,7 @@ bool ExtractHtmlContent(LString &OutHtml,
 		else if (c->IsTag("/head"))
 		{
 			InHead = false;
-			c->Parent = NULL;
+			c->Parent = nullptr;
 			r.Children.Delete(It);
 			DeleteObj(c);
 		}
@@ -280,13 +300,13 @@ bool ExtractHtmlContent(LString &OutHtml,
 			// We remove this tag, but KEEP the content... if any
 			if (ValidStr(c->GetContent()))
 			{
-				c->SetTag(NULL);
+				c->SetTag(nullptr);
 				It++;
 			}
 			else
 			{
 				// No content, remove entirely.
-				c->Parent = NULL;
+				c->Parent = nullptr;
 				r.Children.Delete(It);
 				DeleteObj(c);
 			}
@@ -297,7 +317,7 @@ bool ExtractHtmlContent(LString &OutHtml,
 				c->IsTag("/body") ||
 				c->IsTag("/style"))
 		{
-			c->Parent = NULL;
+			c->Parent = nullptr;
 			r.Children.Delete(It);
 			DeleteObj(c);
 		}

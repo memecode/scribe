@@ -705,6 +705,7 @@
 #define IDC_SUSPECT_FOLDER						897
 #define IDM_SET_UNREAD							898
 #define IDS_HTML_TAGS							899
+#define IDS_HTML									1440
 #define IDC_PROGRESS_TBL						900
 #define IDS_DELETE								901
 #define IDC_SET_SUSPECT_FOLDER					902
