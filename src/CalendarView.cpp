@@ -2844,7 +2844,9 @@ bool CalendarView::GetFormats(LDragFormats &Formats)
 }
 
 
-class CalendarViewPrint : public LPrinter::Context, public LCssBox
+class CalendarViewPrint :
+	public LPrinter::Context,
+	public LCssBox<LRectF>
 {
 	ScribeWnd *app = nullptr;
 	CalendarView *cv = nullptr;
