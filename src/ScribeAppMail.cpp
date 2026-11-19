@@ -596,8 +596,7 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 					LVariant v;
 					if (Tag->GetTag() && Dom.GetValue(Tag->GetTag(), v))
 					{
-						char *s = v.Str();
-						if (s)
+						if (auto s = v.Str())
 						{
 							const char *Quote;
 							if ((Quote = Tag->GetAttr("quote")))
@@ -659,7 +658,13 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 		}
 	}
 
-	return p.NewLStr();
+	auto resp = p.NewLStr();
+	
+	LFile out("/home/matthew/code/example-reply.html", O_WRITE);
+	out.SetSize(0);
+	out.Write(resp);
+	
+	return resp;
 }
 
 LString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
@@ -672,13 +677,20 @@ LString	ScribeWnd::ProcessSig(Mail *m, char *Xml, const char *MimeType)
 		return LString();
 	
 	if (MimeType && !_stricmp(MimeType, sTextHtml))
-		p.Write(Xml, strlen(Xml));
+	{
+		LString Html, Charset, Styles;
+		if (!ExtractHtmlContent(Html, Charset, Styles, Xml))
+			return LString();
+		LString Sig = BuildSigFragment(Html, Styles);
+		p.Write(Sig.Get(), Sig.Length());
+	}
 	else
 	{
 		LMemStream mem(Xml, strlen(Xml));
 		LXmlTag x;
 		LXmlTree t(GXT_KEEP_WHITESPACE|GXT_NO_DOM);
-		if (t.Read(&x, &mem, 0))
+		bool Read = t.Read(&x, &mem, 0);
+		if (Read)
 		{
 			for (auto Tag: x.Children)
 			{

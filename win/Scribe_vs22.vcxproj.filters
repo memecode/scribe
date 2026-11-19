@@ -523,6 +523,9 @@
     <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\ListBlock.cpp">
       <Filter>Controls/UI\Rte2</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\DivBlock.cpp">
+      <Filter>Controls/UI\Rte2</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEdit.cpp">
       <Filter>Controls/UI\Rte2</Filter>
     </ClCompile>

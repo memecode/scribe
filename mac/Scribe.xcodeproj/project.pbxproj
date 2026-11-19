@@ -217,6 +217,7 @@
 		350000000000000000000005 /* RichTextEdit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000105 /* RichTextEdit.cpp */; };
 		350000000000000000000006 /* RichTextEditPriv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000106 /* RichTextEditPriv.cpp */; };
 		350000000000000000000007 /* TextBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000107 /* TextBlock.cpp */; };
+		350000000000000000000008 /* DivBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000108 /* DivBlock.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -571,6 +572,7 @@
 		350000000000000000000105 /* RichTextEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEdit.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/RichTextEdit.cpp; sourceTree = SOURCE_ROOT; };
 		350000000000000000000106 /* RichTextEditPriv.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RichTextEditPriv.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/RichTextEditPriv.cpp; sourceTree = SOURCE_ROOT; };
 		350000000000000000000107 /* TextBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = TextBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/TextBlock.cpp; sourceTree = SOURCE_ROOT; };
+		350000000000000000000108 /* DivBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DivBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/DivBlock.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1108,6 +1110,7 @@
 				350000000000000000000105 /* RichTextEdit.cpp */,
 				350000000000000000000106 /* RichTextEditPriv.cpp */,
 				350000000000000000000107 /* TextBlock.cpp */,
+				350000000000000000000108 /* DivBlock.cpp */,
 			);
 			name = Rte2;
 			sourceTree = "<group>";
@@ -1314,6 +1317,7 @@
 				350000000000000000000005 /* RichTextEdit.cpp in Sources */,
 				350000000000000000000006 /* RichTextEditPriv.cpp in Sources */,
 				350000000000000000000007 /* TextBlock.cpp in Sources */,
+				350000000000000000000008 /* DivBlock.cpp in Sources */,
 				3477C4111CC231470028B84B /* OpenSSLSocket.cpp in Sources */,
 				3477C3C01CC227ED0028B84B /* HtmlToText.cpp in Sources */,
 				3477C4631CC26AE00028B84B /* SoftwareUpdate.cpp in Sources */,

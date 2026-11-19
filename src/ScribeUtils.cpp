@@ -1444,12 +1444,17 @@ void Mailto::Apply(Mail *m)
 					Sig = Acc->Identity.HtmlSig();
 					if (Sig.Str())
 					{
-						char *s = Sig.Str();
-						char *e = stristr(s, "<body>");
-						if (e)
-							Content.Printf("%.*s\n%s\n%s", e - s, s, Body, e + 6);
+						LString Html, Charset, Styles;
+						if (ExtractHtmlContent(Html, Charset, Styles, Sig.Str()))
+						{
+							LStringPipe Frag;
+							if (ValidStr(Styles))
+								Frag.Print("<style>\n%s</style>\n", Styles.Get());
+							Frag.Print("%s", Html.Get());
+							Content.Printf("%s\n%s", Body, Frag.NewLStr().Get());
+						}
 						else
-							Content.Printf("%s\n%s", Body, s);
+							Content = Body;
 					}
 					else
 						Content = Body;

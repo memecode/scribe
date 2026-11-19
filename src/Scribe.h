@@ -934,6 +934,8 @@ public:
 extern int GetFolderVersion(const char *Path);
 extern bool CreateMailHeaders(ScribeWnd *App, LStream &Out, LDataI *Mail, MailProtocol *Protocol);
 extern void Base36(char *Out, uint64 In);
+extern bool ExtractHtmlContent(LString &OutHtml, LString &Charset, LString &Styles, const char *InHtml);
+extern LString BuildSigFragment(const LString &Html, const LString &Styles);
 
 ////////////////////////////////////////////////////////////
 // Thing sorting

@@ -62,6 +62,7 @@
 
 static char MsgIdEncodeChars[] = "%/";
 static char ScribeReplyClass[] = "scribe_reply";
+static char ScribeSigClass[] = "scribe_sig";
 static char ScribeReplyStyles[] =	"margin-left: 0.5em;\n"
 									"padding-left: 0.5em;\n"
 									"border-left: 1px solid #ccc;";
@@ -118,6 +119,8 @@ const char HtmlBodyAsHtmlTemplate[] =
 	"<style>\n"
 	"	blockquote.original {\n"
 	"		border-left: 1px solid #ccc;\n"
+	"		margin-left: 0.5em;\n"
+	"		padding-left: 0.5em;\n"
 	"	}\n"
 	"</style>\n"
 	"</head>\n"
@@ -265,6 +268,148 @@ public:
 	}
 };
 
+// Writes the source document's style rules, with 'body' rewritten to
+// 'div.scribe_reply'. Otherwise the source document's styles spill over
+// into the edit section of the reply.
+static void ScopeStylesToReply(LStringPipe &Out, const char *Styles)
+{
+	if (!ValidStr(Styles))
+		return;
+
+	LCss::Store Store;
+	if (!Store.Parse(Styles))
+		return;
+
+	LCss::SelArray *Body = Store.TypeMap.Find("body");
+	if (Body)
+	{
+		for (unsigned i=0; i<Body->Length(); i++)
+		{
+			LCss::Selector *Sel = (*Body)[i];
+			if (Sel)
+			{
+				for (unsigned p=0; p<Sel->Parts.Length(); p++)
+				{
+					LCss::Selector::Part &Part = Sel->Parts[p];
+					const char *sBody = "body";
+					if (Part.Type == LCss::Selector::SelType &&
+						Part.Value &&
+						!_stricmp(Part.Value, sBody))
+					{
+						Part.Value.Reset(NewStr("div"));
+
+						LCss::Selector::Part cls;
+						cls.Type = LCss::Selector::SelClass;
+						cls.Value.Reset(NewStr(ScribeReplyClass));
+						Sel->Parts.AddAt(p + 1, cls);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	Store.ToString(Out);
+}
+
+// Returns the signature fragment with its style rules prefixed by
+// '.scribe_sig' so they only match inside the signature. Rules that don't
+// parse are dropped rather than left unscoped.
+LString BuildSigFragment(const LString &Html, const LString &Styles)
+{
+	LStringPipe p;
+
+	if (ValidStr(Styles))
+	{
+		LCss::Store Store;
+		const char *StylesText = Styles.Get();
+		if (Store.Parse(StylesText))
+		{
+			auto Scope = [](LCss::Selector *Sel)
+			{
+				if (!Sel)
+					return;
+
+				LCss::Selector::Part cls;
+				cls.Type = LCss::Selector::SelClass;
+				cls.Value.Reset(NewStr(ScribeSigClass));
+				LCss::Selector::Part desc;
+				desc.Type = LCss::Selector::CombDesc;
+				Sel->Parts.AddAt(0, desc);
+				Sel->Parts.AddAt(0, cls);
+			};
+			auto ScopeArray = [&Scope](LCss::SelArray *Array)
+			{
+				if (Array)
+					for (unsigned i=0; i<Array->Length(); i++)
+						Scope((*Array)[i]);
+			};
+
+			// Each selector lives in exactly one of these containers
+			for (auto &it: Store.TypeMap)
+				ScopeArray(it.value);
+			for (auto &it: Store.ClassMap)
+				ScopeArray(it.value);
+			for (auto &it: Store.IdMap)
+				ScopeArray(it.value);
+			ScopeArray(&Store.Other);
+
+			LStringPipe Scoped;
+			Store.ToString(Scoped);
+			LString ScopedStyles = Scoped.NewLStr();
+			if (ValidStr(ScopedStyles))
+				p.Print("<style>\n%s</style>\n", ScopedStyles.Get());
+		}
+	}
+
+	p.Print("<div class='%s'>\n", ScribeSigClass);
+	p.Write(Html.Get(), Html.Length());
+	p.Print("\n</div>\n");
+	return p.NewLStr();
+}
+
+// Word adds mso-* style declarations and Mso*/WordSection* classes that only
+// have meaning with Word's own stylesheet, which we don't keep.
+static void StripWordAttributes(LXmlTag *Tag)
+{
+	if (char *Style = Tag->GetAttr("style"))
+	{
+		LStringPipe Kept;
+		int Count = 0;
+		for (auto &Decl: LString(Style).Split(";"))
+		{
+			LString d = Decl.Strip();
+			if (d.Length() == 0 || !_strnicmp(d.Get(), "mso-", 4))
+				continue;
+			Kept.Print("%s%s", Count++ ? ";" : "", d.Get());
+		}
+		LString Value = Kept.NewLStr();
+		if (Value.Length())
+			Tag->SetAttr("style", Value.Get());
+		else
+			Tag->DelAttr("style");
+	}
+
+	if (char *Class = Tag->GetAttr("class"))
+	{
+		LStringPipe Kept;
+		int Count = 0;
+		for (auto &Name: LString(Class).SplitDelimit(" \t\r\n"))
+		{
+			if (Name.Length() == 0 ||
+				!_strnicmp(Name.Get(), "Mso", 3) ||
+				!_strnicmp(Name.Get(), "WordSection", 11))
+				continue;
+			Kept.Print("%s%s", Count++ ? " " : "", Name.Get());
+		}
+		LString Value = Kept.NewLStr();
+		if (Value.Length())
+			Tag->SetAttr("class", Value.Get());
+		else
+			Tag->DelAttr("class");
+	}
+}
+
 bool ExtractHtmlContent(LString &OutHtml,
 						LString &Charset,
 						LString &Styles,
@@ -327,6 +472,28 @@ bool ExtractHtmlContent(LString &OutHtml,
 			r.Children.Delete(It);
 			DeleteObj(c);
 		}
+		else if (c->IsTag("/o:p"))
+		{
+			// Word's paragraph markers, no meaning in HTML
+			c->Parent = NULL;
+			r.Children.Delete(It);
+			DeleteObj(c);
+		}
+		else if (c->IsTag("o:p"))
+		{
+			// Word's paragraph markers. Keep any content, drop the tag.
+			if (ValidStr(c->GetContent()))
+			{
+				c->SetTag(NULL);
+				It++;
+			}
+			else
+			{
+				c->Parent = NULL;
+				r.Children.Delete(It);
+				DeleteObj(c);
+			}
+		}
 		else if (c->IsTag("head"))
 		{
 			InHead = true;
@@ -335,7 +502,10 @@ bool ExtractHtmlContent(LString &OutHtml,
 			DeleteObj(c);
 		}
 		else
+		{
+			StripWordAttributes(c);
 			It++;
+		}
 	}
 
 	LStringPipe p;
@@ -5869,14 +6039,19 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 		{
 			// int MaxSize = ValidStr(Array) ? atoi(Array) : -1;
 
-			MailPrivate::HtmlBody *b = d->GetBody();
+			auto b = d->GetBody();
 			if (!b)
 				return false;
 			
 			LStringPipe p;
+			if (ValidStr(b->Styles))
+			{
+				p.Print("<style>\n");
+				ScopeStylesToReply(p, b->Styles);
+				p.Print("</style>\n");
+			}
 			p.Print("<div class='%s'>\n%s\n</div>\n", ScribeReplyClass, b->Html.Get());
-			Value.OwnStr(p.NewStr());
-			LgiTrace("Value=%s\n", Value.Str());
+			Value = p.NewLStr();
 			break;
 		}
 		case SdHtmlHeadFields: // Type: String
@@ -5890,48 +6065,7 @@ bool Mail::GetVariant(const char *Name, LVariant &Value, const char *Array)
 				p.Print("\t<meta charset=\"%s\">\n", b->Charset.Get());
 
 			p.Print("\t<style>\n");
-			if (ValidStr(b->Styles))
-			{
-				// rewrite the style rules to change 'body' to 'div.scribe_reply'.
-				// Otherwise the source document's styles spill over into the edit
-				// section of the reply
-				const char *s = b->Styles;
-				LCss::Store Store;
-				if (Store.Parse(s))
-				{
-					LCss::SelArray *Body = Store.TypeMap.Find("body");
-					if (Body)
-					{
-						for (unsigned i=0; i<Body->Length(); i++)
-						{
-							LCss::Selector *Sel = (*Body)[i];
-							if (Sel)
-							{
-								for (unsigned p=0; p<Sel->Parts.Length(); p++)
-								{
-									LCss::Selector::Part &Part = Sel->Parts[p];
-									const char *sBody = "body";
-									if (Part.Type == LCss::Selector::SelType &&
-										Part.Value &&
-										!_stricmp(Part.Value, sBody))
-									{
-										Part.Value.Reset(NewStr("div"));
-										
-										LCss::Selector::Part cls;
-										cls.Type = LCss::Selector::SelClass;
-										cls.Value.Reset(NewStr(ScribeReplyClass));
-										Sel->Parts.AddAt(p + 1, cls);
-										break;
-									}
-								}
-							}
-						}
-					}
-					
-					// Output modified styles to the string buffer
-					Store.ToString(p);
-				}
-			}
+			ScopeStylesToReply(p, b->Styles);
 			
 			// Add our own styles at the end, overwriting source doc styles...
 			p.Print("\tdiv.%s { %s }\n",
@@ -9193,11 +9327,16 @@ void Mail::ProcessTextForResponse(Mail *From, LOptionsFile *Options, ScribeAccou
 ScribeAccount *Mail::GetAccountSentTo()
 {
 	ScribeAccount *Account = App->GetAccountById(GetAccountId());
+	if (Account && Account->Identity.Disabled())
+		Account = NULL;
 	if (!Account)
 	{
 		// Older style lookup based on to address...
 		for (auto a : *App->GetAccounts())
 		{
+			if (a->Identity.Disabled())
+				continue;
+
 			LVariant e = a->Identity.Email();
 			if (ValidStr(e.Str()))
 			{
@@ -9214,6 +9353,10 @@ ScribeAccount *Mail::GetAccountSentTo()
 					}
 				}
 			}
+
+			// Take the first matching account, later duplicates shouldn't override it
+			if (Account)
+				break;
 		}
 	}
 	return Account;
@@ -9372,6 +9515,10 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 	if (MatchedAccount &&
 		MatchedAccount->Identity.Email().Str())
 	{
+		// Record the account so the signature lookup in GetSig finds it,
+		// as the reply's To address is the original sender.
+		SetAccountId(MatchedAccount->Receive.Id());
+
 		GetFrom()->SetStr(FIELD_NAME, MatchedAccount->Identity.Name().Str());
 		GetFrom()->SetStr(FIELD_EMAIL, MatchedAccount->Identity.Email().Str());
 		
@@ -9511,6 +9658,10 @@ bool Mail::OnForward(Mail *m, bool MarkOriginal, int WithAttachments)
 	if (MatchedAccount &&
 		MatchedAccount->Identity.Email().Str())
 	{
+		// Record the account so the signature lookup in GetSig finds it,
+		// as the forward's To address is the new recipient.
+		SetAccountId(MatchedAccount->Receive.Id());
+
 		GetFrom()->SetStr(FIELD_NAME, MatchedAccount->Identity.Name().Str());
 		GetFrom()->SetStr(FIELD_EMAIL, MatchedAccount->Identity.Email().Str());
 		

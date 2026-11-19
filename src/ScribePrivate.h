@@ -125,11 +125,6 @@ extern int MakeOpenFlags(ScribeAccount *a, bool Send);
 extern bool HasEmoji(char *Txt);
 extern bool HasEmoji(uint32_t *Txt);
 extern LAutoWString TextToEmoji(uint32_t *Txt, bool IsHtml);
-
-extern bool ExtractHtmlContent(	LString &OutHtml,
-								LString &Charset,
-								LString &Styles,
-								const char *InHtml);
 // Scripting
 extern bool OnFilterScript(Filter *f, Mail *m, const char *script);
 extern bool OnToolScript(ScribeWnd *App, const char *File);

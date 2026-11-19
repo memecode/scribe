@@ -254,6 +254,7 @@ copy Resource.res ..\win\$(OutDir)</Command>
     <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\HorzRuleBlock.cpp" />
     <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\ImageBlock.cpp" />
     <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\ListBlock.cpp" />
+    <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\DivBlock.cpp" />
     <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEdit.cpp" />
     <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\RichTextEditPriv.cpp" />
     <ClCompile Include="..\..\..\lgi\trunk\src\common\Widgets\richText2\TextBlock.cpp" />
