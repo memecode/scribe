@@ -655,6 +655,7 @@ public:
 };
 
 #include "lgi/common/RichTextEdit1.h"
+#include "lgi/common/RichTextEdit2.h"
 #include "../../src/common/Widgets/richText1/RichTextEditPriv1.h"
 
 class MailRendererScript : public LThread, public LCancel, public LDom
@@ -2695,14 +2696,10 @@ bool MailUi::IsWorking(int Set)
 	}
 	
 	// Check rich text control as well...
-	auto Rte = dynamic_cast<Rte1::LRichTextEdit*>(HtmlView);
-	if (Rte)
-	{
-		if (Rte->IsBusy())
-		{
-			return true;
-		}
-	}
+	if (auto Rte = dynamic_cast<Rte1::LRichTextEdit*>(HtmlView))
+		return Rte->IsBusy();
+	if (auto Rte = dynamic_cast<Rte2::LRichTextEdit*>(HtmlView))
+		return Rte->IsBusy();
 
 	return false;
 }
@@ -2731,6 +2728,7 @@ void MailUi::SetCmdAfterResize(int Cmd)
 	if (CmdAfterResize == 0)
 	{
 		CmdAfterResize = Cmd;
+		SetPulse(200);
 		if (!WorkingDlg)
 		{
 			WorkingDlg = new BusyPanel;
@@ -3637,6 +3635,7 @@ int MailUi::HandleCmd(int Cmd)
 			break;
 		}
 		case IDM_SAVE_CLOSE:
+		case IDM_CLOSE:
 		{
 			bool Working = IsWorking();
 			if (Working)
@@ -3645,12 +3644,11 @@ int MailUi::HandleCmd(int Cmd)
 				break;
 			}
 
-			OnDataEntered();
-			SetDirty(false, NoUi);
-			// fall thru
-		}
-		case IDM_CLOSE:
-		{
+			if (Cmd == IDM_SAVE_CLOSE)
+			{
+				OnDataEntered();
+				SetDirty(false, NoUi);
+			}
 			Quit();
 			return 0;
 		}
@@ -4094,6 +4092,8 @@ int MailUi::OnNotify(LViewI *Col, const LNotification &n)
 			{
 				int Cmd = CmdAfterResize;
 				CmdAfterResize = 0;
+				DeleteObj(WorkingDlg);
+				SetPulse(IsDirty() ? AutoSaveTimeout : -1);
 				IsWorking(false);		
 				
 				OnCommand(Cmd, 0, NULL);
@@ -4199,6 +4199,17 @@ void MailUi::OnPulse()
 {
 	THREAD_UNSAFE();
 
+	if (CmdAfterResize)
+	{
+		if (!IsWorking() && PostEvent(M_COMMAND, CmdAfterResize))
+		{
+			CmdAfterResize = 0;
+			DeleteObj(WorkingDlg);
+			SetPulse(IsDirty() ? AutoSaveTimeout : -1);
+		}
+		return;
+	}
+
 	if (IsDirty() && TextView && GetItem())
 	{
 		auto now = LCurrentTime();
@@ -4226,6 +4237,9 @@ void MailUi::OnDirty(bool Dirty)
 	SetCtrlEnabled(IDM_SAVE, Dirty);
 	SetCtrlEnabled(IDM_SAVE_CLOSE, Dirty);
 	
+	if (CmdAfterResize)
+		return;
+
 	if (Dirty)
 	{
 		SetPulse(AutoSaveTimeout); // every minute
@@ -4354,16 +4368,6 @@ LMessage::Result MailUi::OnEvent(LMessage *Msg)
 							Match = NULL;
 						}
 						
-						if (CmdAfterResize)
-						{
-							bool Working = IsWorking();
-							if (!Working)
-							{
-								// All resizing work is done...
-								OnCommand(CmdAfterResize, 0, NULL);
-								return 0;
-							}
-						}
 					}
 					else LAssert(!"No matching attachment image to store resized image in.");
 				}
