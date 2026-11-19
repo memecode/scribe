@@ -289,7 +289,7 @@ int AccountDlg::OnNotify(LViewI *c, const LNotification &n)
 					strcat_s(Page, sizeof(Page), "#acc_receive");
 					break;
 				case 3:
-					strcat_s(Page, sizeof(Page), "#acc_connect");
+					strcat_s(Page, sizeof(Page), "#connect");
 					break;
 			}
 			App->LaunchHelp(Page);
