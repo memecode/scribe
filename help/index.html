@@ -12,6 +12,7 @@
 	</div>
 
 	<div class=content>
+		<p><a href="menu.html">Help Index</a> | <a href="intro.html">Introduction</a></p>
 		<table>
 			<tr valign=top>
 			<td>
@@ -20,11 +21,8 @@
 				<!-- intro -->
 				
 				<font style="font-size: larger;">S</font>cribe is a lightweight, fast, cross platform email program.
-				It features an easy to use interface, split view of folders and items, has an address book and calendar, 
-				and handles attachments, signatures, and drag and drop.
-				It can be installer as a Desktop client or used in a portable USB install. Settings and libraries can be 
-				stored with the executable. It supports bayesian spam filtering and includes lots of tools for 
-				importing and exporting data in standard and popular formats.
+				See the <a href="intro.html">introduction</a> for the full overview and the links below for
+				related Scribe pages.
 		</table>
 		<p/>
 
@@ -34,6 +32,18 @@
 			<li> The <a target=_top href='http://www.memecode.com/scribe/faq.php'>FAQ</a></li>
 			<li> <a target=_top href='http://www.memecode.com/images/scribe/tour'>Screenshots</a></li>
 			<li> Scribe <a target=_top href='http://memecode.com/xyz/forum.php?id=2'>Forum</a></li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/aspell.php'>Spell Check</a> plugin</li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/autozip.php'>AutoZip</a> plugin</li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/extras.php'>Extra Libraries</a> for PNG/JPEG and international charset support</li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/gnupg.php'>GnuPG</a> plugins for encryption/signing support</li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/server.php'>Groupware</a> server for sharing mail folders and calendars</li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/ie-html.php'>IE HTML</a> plugin for using IE to view HTML mail</li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/ldap-client.php'>LDAP client</a> plugin</li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/ldap-server.php'>LDAP server</a> plugin (share your contacts)</li>
+			<li> <a target=_top href='http://www.memecode.com/scribe/ssl.php'>SSL</a> plugin</li>
+			<li> Information on <a target=_top href='http://www.memecode.com/scribe/debug.php'>Debug Builds</a></li>
+			<li> Customizing Scribe: <a target=_top href='http://www.memecode.com/lgi-conf.php'>lgi-conf</a> file format</li>
+			<li> Scribe <a target=_top href='http://www.memecode.com/scribe/roadmap.php'>roadmap</a>, where it's headed</li>
 			<li> <a target=_top href='http://www.memecode.com/scribe/scripting.php'>Scripting and Forms</a> support</li>
 			<li> Information on <a target=_top href='http://www.memecode.com/scribe/tutorials/crash-report'>reporting crashes</a>.</li>
 			<li> <a target=_top href='http://www.memecode.com/scribe/dom.php'>DOM</a> documentation</li>
@@ -70,36 +80,74 @@
 				<ul>
 					<li> File </li>
 					<ul>
-						<li> <a href='install.html#config'>Open/Create/Compact Folders</a> </li>
+						<li> <a href='install.html#config'>Manage Mail Stores</a> </li>
+						<li> <a href='install.html#config'>Replicate Mail Stores</a> </li>
+						<li> <a href='install.html#config'>Upgrade Mail Stores</a> </li>
 						<li> <a href='install.html#id'>Options</a> </li>
-						<li> <a href='plugins.html'>Plugins</a> </li>
-						<li> <a href='print.html'>Print/Settings/Page Setup</a> </li>
+						<li> Work Offline </li>
+						<li> Security Settings </li>
+						<li> Logout </li>
+						<li> <a href='print.html'>Print</a> </li>
+						<li> <a href='print.html#setup'>Print Setup</a> </li>
+						<li> <a href='print.html#setup'>Page Setup</a> </li>
+						<li> Exit </li>
 					</ul>
 					<li> Edit </li>
-					<li> <div>Identity - Choose your current identity</div> </li>
+					<ul>
+						<li> Cut, Copy, Paste, Delete, Refresh </li>
+						<li> <a href='features.html'>Find</a> </li>
+						<li> <a href='features.html'>Text editor</a> </li>
+						<li> <a href='features.html'>HTML editor</a> </li>
+					</ul>
+					<li> View </li>
+					<ul>
+						<li> <a href='plugins.html#html'>Html1, Html2, LiteHtml</a> (which HTML renderer to use) </li>
+					</ul>
+					<li> Identity - Choose your current identity </li>
 					<li> Mail </li>
 					<ul>
-						<li> <a href='email.html#compose'>New [from Template]</a> </li>
+						<li> <a href='email.html#compose'>New Message [from Template]</a> </li>
+						<li> Set Read, Set Unread </li>
 						<li> <a href='email.html#reply'>Reply [All]/Forward</a> </li>
-						<li> <a href='email.html#sendreceive'>Send/Receive</a> </li>
-						<li> <a href='email.html#preview'>Preview</a> </li>
+						<li> <a href='email.html#bounce'>Bounce</a> </li>
+						<li> <a href='email.html#sendreceive'>Send Mail</a> </li>
 					</ul>
 					<li> Contacts </li>
 					<ul>
-						<li> <a href='contacts.html'>New Contact</a> </li>
+						<li> <a href='contacts.html#create'>New Contact</a> </li>
 						<li> <a href='contacts.html#groups'>New Group</a> </li>
 					</ul>
 					<li> Filters </li>
 					<ul>
 						<li> <a href='filters.html'>New Filter</a> </li>
 						<li> <a href='filters.html#manage'>Filter the Current Folder</a> </li>
-						<li> <a href='filters.html#bayes'>Bayesian Filtering</a> </li>
+						<li> <a href='filters.html#manage'>Filter Selected Mail</a> </li>
+						<li> <a href='filters.html#manage'>Log Filter Activity</a> </li>
+						<li> <a href='filters.html#manage'>Disable filtering incoming mail</a> </li>
+						<li> <a href='filters.html#bayes'>Bayesian Filtering Options</a> </li>
+						<li> <a href='filters.html#bayes'>Analyze Selected Mail</a> </li>
+						<li> Advanced (Bayes: Rebuild Word Lists, Stats, Check Folders) </li>
 					</ul>
 					<li> Tools </li>
 					<ul>
-						<li> <a href='import.html'>Import/Export</a> </li>
+						<li> <a href='import.html'>Import</a> </li>
+						<li> <a href='import.html#scribe'>Export</a> </li>
+						<li> Check for Software Update </li>
+						<li> Show Console </li>
+						<li> Clear Registry Settings (Windows) </li>
+						<li> Layout (Folders On Left, Preview On Bottom, Just Folders And List, 3 Columns) </li>
+						<li> Debug </li>
 					</ul>
 					<li> Help </li>
+					<ul>
+						<li> <a href='index.html'>Help</a> </li>
+						<li> <a target=_top href='http://www.memecode.com/scribe.php'>Homepage</a> </li>
+						<li> <a target=_top href='http://www.memecode.com/scribe/faq.php'>FAQ</a> </li>
+						<li> <a target=_top href='http://www.memecode.com/scribe/version.php'>Version History</a> </li>
+						<li> <a target=_top href='http://www.memecode.com/scribe/tutorials'>Web Tutorials</a> </li>
+						<li> <a href="mailto:fret@memecode.com">Email feedback to author</a> </li>
+						<li> About </li>
+					</ul>
 				</ul>
 			</ul>
 		</ul>
@@ -115,7 +163,9 @@
 
 		<div class=helpheading><a name="requirements">Requirements</a></div>
 			<ul>
-				<li> Windows XP/Vista/7/8/10, MacOSX >= 10.6, Ubuntu Linux + Gtk 2.24.
+				<li> Linux (GTK3), Windows (Win32), macOS (Cocoa). The Haiku/BeAPI port builds but is not functional.
+				<li> 1-2 MB Hard Disk + email
+				<li> 6 MB RAM footprint (with an average size folder loaded)
 			</ul>
 
 		<br>
