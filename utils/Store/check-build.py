@@ -2,10 +2,13 @@ import os
 import sys
 import win32api
 import re
+import argparse
 
-wordsize = 64
-if len(sys.argv) > 1 and sys.argv[1] == "32":
-	wordsize = 32
+parser = argparse.ArgumentParser()
+parser.add_argument("wordsize", nargs="?", default="64", choices=("32", "64"))
+parser.add_argument("--exe", help="Executable being packaged")
+args = parser.parse_args()
+wordsize = int(args.wordsize)
 
 build_folder = "x64ReleaseNoOptimize22"
 	
@@ -19,6 +22,8 @@ if is_cmake:
 else:
 	exe = os.path.join(basepath, "win", build_folder, "Scribe.exe")
 	hdr = os.path.join(basepath, "src\\scribeinc.h")
+if args.exe:
+	exe = os.path.abspath(args.exe)
 print("exe:", exe)
 
 print("basepath:", basepath)

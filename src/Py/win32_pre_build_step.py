@@ -100,6 +100,12 @@ res = ReplaceValue(res, "ProductName", ProductName)
 res = ReplaceValue(res, "FileVersion", FullWithHash)
 res = ReplaceValue(res, "ProductVersion", FullWithHash)
 
-if (1):
-	rc = open("../Resource.rc", "w+b")
-	rc.write(res.encode("windows-1252"))
+output_path = sys.argv[1] if len(sys.argv) > 1 else "../Resource.rc"
+output = res.encode("windows-1252")
+if os.path.exists(output_path):
+	with open(output_path, "rb") as existing:
+		if existing.read() == output:
+			sys.exit(0)
+
+with open(output_path, "wb") as rc:
+	rc.write(output)

@@ -233,6 +233,18 @@ add_executable(scribe ${APP_TYPE}
 
 if (WIN32)
 
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    set(SCRIBE_VERSION_RESOURCE "${CMAKE_CURRENT_BINARY_DIR}/Resource.rc")
+    add_custom_target(scribe-version
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/Py/win32_pre_build_step.py"
+            "${SCRIBE_VERSION_RESOURCE}"
+        BYPRODUCTS "${SCRIBE_VERSION_RESOURCE}"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/Py"
+        COMMENT "Updating Scribe version resource."
+        VERBATIM)
+    add_dependencies(scribe scribe-version)
+
     target_sources(scribe PRIVATE
         src/Store3Mapi/ScribeMapi_Attachment.cpp
         src/Store3Mapi/ScribeMapi_Calendar.cpp
@@ -243,7 +255,7 @@ if (WIN32)
         src/Store3Mapi/ScribeMapi_Thing.cpp
         
         src/ImpExp_Outlook.cpp
-        src/Resource.rc
+        "${SCRIBE_VERSION_RESOURCE}"
         
         ${LGI_DIR}/src/common/Coding/ExternCall.asm)
 

@@ -3,7 +3,7 @@
 ; !include WinVer.nsh
 
 !system "cmd /c echo NSIS working directory: %CD%" = 0
-!system "python utils\Store\check-build.py" = 0
+!system 'python utils\Store\check-build.py --exe "$<SHELL_PATH:$<TARGET_FILE:scribe>>"' = 0
 
 !system "mkdir scribe-setup"
 !system "del /Q scribe-setup\*.*"
@@ -50,7 +50,6 @@ OutFile ${OUTFILE}
 ; The default installation directory
 InstallDir $PROGRAMFILES64\Memecode\Scribe
 InstallDirRegKey HKCU "Software\Memecode\Scribe" Install
-SetRegView 64
 
 ; Only remove an extension mapping when it still points at a Scribe ProgID.
 !macro CleanAssoc base prog ext
@@ -213,6 +212,8 @@ Section ""
 SectionEnd ; end the section
 
 Section "Desktop Install (Non-portable)"
+
+	SetRegView 64
 
 	; Install location into registry
 	WriteRegStr HKCU "Software\Memecode\Scribe" Install $INSTDIR

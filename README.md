@@ -73,6 +73,10 @@ Where $GENERATOR is:
 On windows you can run this to make the installer:
 `cmake --build . --config Release --target dist-win`
 
+The Windows CMake build generates the version resource from `ScribeVer` and the
+current Git revision/hash without modifying `src/Resource.rc`. The installer
+checks and packages the executable for the selected configuration, including Debug.
+
 ## Links:
 
 - [Homepage](https://memecode.com/scribe)

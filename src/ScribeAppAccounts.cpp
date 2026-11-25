@@ -28,6 +28,10 @@
 
 #include "Scribe.h"
 
+#if WINNATIVE
+#include <shobjidl.h>
+#endif
+
 #include "lgi/common/StoreConvert1To2.h"
 #include "lgi/common/ProgressDlg.h"
 #include "lgi/common/TextLabel.h"
@@ -3033,10 +3037,6 @@ struct DefaultClient
 	static constexpr const char *sUserHive   = "HKCU";
 	static constexpr const char *sSystemHive = "HKLM";
 
-	// Hash validated since Windows 8.1: this can be read to see who owns the mailto handler,
-	// but writing it is the Settings app's job.
-	static constexpr const char *sUserChoice = "HKCU\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\mailto\\UserChoice";
-
 	// Vendor qualified ProgIDs are the standard for new applications, so Scribe's classes do
 	// not collide with another mail client's.
 	static constexpr const char *sProgIdPrefix = "Memecode.Scribe";
@@ -3062,23 +3062,31 @@ struct DefaultClient
 		LMakePath(DllPath, sizeof(DllPath), Exe, "../ScribeMapi.dll");
 	}
 
-	bool IsDefault()
+	bool IsDefault(bool &IsDef)
 	{
-		LString v;
-		// The hash protected UserChoice entry is what Shell actually uses to resolve mailto.
-		if (GetAssociation(v))
-			return Stricmp(v.Get(), sMailtoProgId) == 0;
-
-		// Clients that only implement Simple MAPI still look at the 'Clients\Mail' value.
-		const char *bases[] = { sUserHive, sSystemHive };
-		for (int i=0; i<CountOf(bases); i++)
+		IApplicationAssociationRegistration *registration = nullptr;
+		auto hr = CoCreateInstance(__uuidof(ApplicationAssociationRegistration), nullptr,
+			CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&registration));
+		if (FAILED(hr))
 		{
-			LRegKey mail(false, "%s\\Software\\Clients\\Mail", bases[i]);
-			if (mail.IsOk() && mail.GetStr(NULL, v))
-				return Stricmp(v.Get(), AppName) == 0;
+			LgiTrace("%s:%i - Failed to create association registration: 0x%08lx\n", _FL, (unsigned long)hr);
+			return false;
 		}
 
-		return false;
+		LPWSTR progId = nullptr;
+		hr = registration->QueryCurrentDefault(L"mailto", AT_URLPROTOCOL, AL_EFFECTIVE, &progId);
+		registration->Release();
+		if (FAILED(hr) || !progId)
+		{
+			LgiTrace("%s:%i - Failed to query the mailto association: 0x%08lx\n", _FL, (unsigned long)hr);
+			CoTaskMemFree(progId);
+			return false;
+		}
+
+		LString association(progId);
+		CoTaskMemFree(progId);
+		IsDef = association && Stricmp(association.Get(), sMailtoProgId) == 0;
+		return true;
 	}
 
 	// Simple MAPI's 'send using' default is a plain per-user string, so it can still be set
@@ -3097,24 +3105,6 @@ struct DefaultClient
 	bool OpenDefaultAppSettings()
 	{
 		return LExecute("ms-settings:defaultapps", NULL, NULL, NULL);
-	}
-
-	// Read the current mailto handler, per-user first then machine wide.
-	bool GetAssociation(LString &ProgId)
-	{
-		LRegKey choice(false, sUserChoice);
-		if (choice.IsOk() && choice.GetStr("ProgId", ProgId))
-			return true;
-
-		const char *bases[] = { sUserHive, sSystemHive };
-		for (int i=0; i<CountOf(bases); i++)
-		{
-			LRegKey mailto(false, "%s\\Software\\Classes\\mailto", bases[i]);
-			if (mailto.IsOk() && mailto.GetStr(NULL, ProgId))
-				return true;
-		}
-
-		return false;
 	}
 
 	// ProgID registration. Each ProgID carries the description, icon and open command, and the
@@ -3176,7 +3166,7 @@ struct DefaultClient
 	LAutoPtr<LRegKey> CheckKey(bool Write, const char *Key, ...) const
 	{
 		if (!Key)
-			return NULL;
+			return LAutoPtr<LRegKey>();
 
 		char Buffer[512];
 		va_list Arg;
@@ -5965,11 +5955,13 @@ void ScribeWnd::SetDefaultHandler()
 	GetOptions()->GetValue(OPT_CheckDefaultEmail, n);
 	if (n.CastInt32())
 	{
-		// HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\mailto\UserChoice
-
 		LRegKey::AssertOnError = false;
-		bool IsDef = Def.IsDefault();
-		if (!IsDef)
+		bool IsDef = false;
+		if (!Def.IsDefault(IsDef))
+		{
+			OnSetDefaultHandler(false, OldAssert);
+		}
+		else if (!IsDef)
 		{
 			// Ask the user...
 			auto Dlg = new DefaultClientDlg(this);
@@ -5980,7 +5972,8 @@ void ScribeWnd::SetDefaultHandler()
 					// The Simple MAPI 'send using' default is still writable, but the app
 					// association is validated by Shell, so Settings is the supported route.
 					bool Error = !Def.SetDefault();
-					if (!Def.IsDefault())
+					bool IsDef = false;
+					if (Def.IsDefault(IsDef) && !IsDef)
 						Def.OpenDefaultAppSettings();
 
 					LVariant v;
