@@ -50,6 +50,72 @@ OutFile ${OUTFILE}
 ; The default installation directory
 InstallDir $PROGRAMFILES64\Memecode\Scribe
 InstallDirRegKey HKCU "Software\Memecode\Scribe" Install
+SetRegView 64
+
+; Only remove an extension mapping when it still points at a Scribe ProgID.
+!macro CleanAssoc base prog ext
+	ReadRegStr $0 ${base} "Software\Classes\${ext}" ""
+	${If} $0 == "${prog}"
+		DeleteRegKey ${base} "Software\Classes\${ext}"
+	${EndIf}
+!macroend
+
+!macro CleanProg base prog
+	DeleteRegValue ${base} "Software\Classes\${prog}" ""
+	DeleteRegValue ${base} "Software\Classes\${prog}" "FriendlyTypeName"
+	DeleteRegValue ${base} "Software\Classes\${prog}" "InfoTip"
+	DeleteRegValue ${base} "Software\Classes\${prog}" "URL Protocol"
+
+	DeleteRegValue ${base} "Software\Classes\${prog}\shell\open\command" ""
+	DeleteRegKey ${base} "Software\Classes\${prog}\shell\open\command"
+	DeleteRegKey ${base} "Software\Classes\${prog}\shell\open"
+	DeleteRegKey ${base} "Software\Classes\${prog}\shell"
+
+	DeleteRegValue ${base} "Software\Classes\${prog}\DefaultIcon" ""
+	DeleteRegKey ${base} "Software\Classes\${prog}\DefaultIcon"
+
+	DeleteRegKey ${base} "Software\Classes\${prog}"
+!macroend
+
+!macro CleanClient base
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe" ""
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe" "DllPath"
+
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\shell\open\command" ""
+	DeleteRegKey ${base} "Software\Clients\Mail\Scribe\shell\open\command"
+	DeleteRegKey ${base} "Software\Clients\Mail\Scribe\shell\open"
+	DeleteRegKey ${base} "Software\Clients\Mail\Scribe\shell"
+
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\DefaultIcon" ""
+	DeleteRegKey ${base} "Software\Clients\Mail\Scribe\DefaultIcon"
+
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities" "ApplicationDescription"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities" "ApplicationName"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities" "ApplicationIcon"
+
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations" ".eml"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations" ".msg"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations" ".mbox"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations" ".mbx"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations" ".ics"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations" ".vcs"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations" ".vcf"
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations" ".mail3"
+	DeleteRegKey ${base} "Software\Clients\Mail\Scribe\Capabilities\FileAssociations"
+
+	DeleteRegValue ${base} "Software\Clients\Mail\Scribe\Capabilities\UrlAssociations" "mailto"
+	DeleteRegKey ${base} "Software\Clients\Mail\Scribe\Capabilities\UrlAssociations"
+
+	DeleteRegKey ${base} "Software\Clients\Mail\Scribe\Capabilities"
+	DeleteRegKey ${base} "Software\Clients\Mail\Scribe"
+!macroend
+
+!macro CleanMailDefault base
+	ReadRegStr $0 ${base} "Software\Clients\Mail" ""
+	${If} $0 == "Scribe"
+		DeleteRegValue ${base} "Software\Clients\Mail" ""
+	${EndIf}
+!macroend
 
 ;--------------------------------
 
@@ -135,7 +201,7 @@ Section ""
 	; Do CRT check
 	ExecWait '"$INSTDIR\Scribe.exe" -crtcheck' $0
 	${If} $0 != 0
-		inetc::get /caption "Visual Studio 2019 Redistributable" /popup "" "http://memecode.com/scribe/data/vcredist_vs2019x64.exe" "$INSTDIR\vcredist_vs2019x64.exe" /end
+		inetc::get /caption "Visual Studio 2019 Redistributable" /popup "" "https://memecode.com/scribe/data/vcredist_vs2019x64.exe" "$INSTDIR\vcredist_vs2019x64.exe" /end
 		Pop $0 # return value = exit code, "OK" means OK
 		DetailPrint "Download: $0"
 		${If} $0 == "OK"
@@ -151,7 +217,8 @@ Section "Desktop Install (Non-portable)"
 	; Install location into registry
 	WriteRegStr HKCU "Software\Memecode\Scribe" Install $INSTDIR
 
-	; Uninstaller
+	; Uninstaller. The key is product based rather than version based, so an upgrade updates
+	; the same entry instead of leaving a stale one behind.
 	WriteUninstaller $INSTDIR\uninstall.exe
 
 	GetDllVersionLocal ".\scribe-setup\Scribe.exe" $R0 $R1
@@ -159,20 +226,22 @@ Section "Desktop Install (Non-portable)"
 	IntOp $R3 $R0 & 0x0000FFFF
 	IntOp $R4 $R1 / 0x00010000
 	IntOp $R5 $R1 & 0x0000FFFF
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "DisplayVersion" "$R2.$R3.$R4.$R5"
 
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "DisplayName" "Scribe"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "InstallLocation" "$INSTDIR"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "DisplayIcon" "$INSTDIR\Scribe.exe"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "URLInfoAbout" "http://www.memecode.com/"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "URLUpdateInfo" "http://www.memecode.com/scribe.php"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "Publisher" "Memecode"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+	!define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Memecode_Scribe"
+	WriteRegStr HKLM "${UNINSTKEY}" "DisplayVersion" "$R2.$R3.$R4.$R5"
+	WriteRegStr HKLM "${UNINSTKEY}" "DisplayName" "Memecode Scribe"
+	WriteRegStr HKLM "${UNINSTKEY}" "Publisher" "Memecode"
+	WriteRegStr HKLM "${UNINSTKEY}" "InstallLocation" "$INSTDIR"
+	WriteRegStr HKLM "${UNINSTKEY}" "InstallSource" "$EXEDIR"
+	WriteRegStr HKLM "${UNINSTKEY}" "DisplayIcon" "$INSTDIR\Scribe.exe"
+	WriteRegStr HKLM "${UNINSTKEY}" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+	WriteRegStr HKLM "${UNINSTKEY}" "URLInfoAbout" "https://www.memecode.com/"
+	WriteRegStr HKLM "${UNINSTKEY}" "URLUpdateInfo" "https://www.memecode.com/scribe"
 
 	; Start menu items
 	CreateDirectory "$SMPROGRAMS\Memecode Scribe"
 	CreateShortCut "$SMPROGRAMS\Memecode Scribe\Scribe.lnk" "$INSTDIR\Scribe.exe" "" "$INSTDIR\Scribe.exe" 0
-	CreateShortCut "$SMPROGRAMS\Memecode Scribe\Help.lnk" "$INSTDIR\Help\index.html" "" "$WINDIR\WINHLP32.EXE" 1
+	CreateShortCut "$SMPROGRAMS\Memecode Scribe\Help.lnk" "$INSTDIR\Help\index.html"
 	CreateShortCut "$SMPROGRAMS\Memecode Scribe\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 
 SectionEnd
@@ -210,10 +279,59 @@ Section "un.Program and Start Menu Items"
 
 	RMDir /r "$SMPROGRAMS\Memecode Scribe"
 
-	DeleteRegKey HKCU SOFTWARE\Memecode\Scribe
-	DeleteRegKey HKCU SOFTWARE\Clients\Mail\Scribe
-	DeleteRegKey HKLM SOFTWARE\Clients\Mail\Scribe
-	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4"
+	SetRegView 64
+
+	; Scribe registers ProgIDs per-user first, and machine-wide when elevated. Extension
+	; mappings are only cleared when they still point at Scribe.
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.Email .eml
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.Email .msg
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.Folder .mbox
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.Folder .mbx
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.Calendar .ics
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.Calendar .vcs
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.Contact .vcf
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.MailStore .mail3
+	!insertmacro CleanAssoc HKCU Memecode.Scribe.Mailto mailto
+
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.Email .eml
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.Email .msg
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.Folder .mbox
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.Folder .mbx
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.Calendar .ics
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.Calendar .vcs
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.Contact .vcf
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.MailStore .mail3
+	!insertmacro CleanAssoc HKLM Memecode.Scribe.Mailto mailto
+
+	!insertmacro CleanProg HKCU Memecode.Scribe.Email
+	!insertmacro CleanProg HKCU Memecode.Scribe.Folder
+	!insertmacro CleanProg HKCU Memecode.Scribe.Calendar
+	!insertmacro CleanProg HKCU Memecode.Scribe.Contact
+	!insertmacro CleanProg HKCU Memecode.Scribe.MailStore
+	!insertmacro CleanProg HKCU Memecode.Scribe.Mailto
+
+	!insertmacro CleanProg HKLM Memecode.Scribe.Email
+	!insertmacro CleanProg HKLM Memecode.Scribe.Folder
+	!insertmacro CleanProg HKLM Memecode.Scribe.Calendar
+	!insertmacro CleanProg HKLM Memecode.Scribe.Contact
+	!insertmacro CleanProg HKLM Memecode.Scribe.MailStore
+	!insertmacro CleanProg HKLM Memecode.Scribe.Mailto
+
+	!insertmacro CleanMailDefault HKCU
+	!insertmacro CleanMailDefault HKLM
+	!insertmacro CleanClient HKCU
+	!insertmacro CleanClient HKLM
+
+	; Settings owns the mailto UserChoice hash, so it is left alone.
+	DeleteRegValue HKCU "Software\RegisteredApplications" "Scribe"
+	DeleteRegValue HKLM "Software\RegisteredApplications" "Scribe"
+
+	DeleteRegKey HKCU "SOFTWARE\Memecode\Scribe"
+	DeleteRegKey HKLM "${UNINSTKEY}"
+
+	; Left over from the version based uninstall key used by older installs.
+	!define OLDUNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4"
+	DeleteRegKey HKLM "${OLDUNINSTKEY}"
 
 	SetAutoClose true
 

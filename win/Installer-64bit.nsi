@@ -166,7 +166,7 @@ Section "Desktop Install (Non-portable)"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "InstallLocation" "$INSTDIR"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "DisplayIcon" "$INSTDIR\Scribe.exe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "URLInfoAbout" "http://www.memecode.com/"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "URLUpdateInfo" "http://www.memecode.com/scribe.php"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "URLUpdateInfo" "http://www.memecode.com/scribe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "Publisher" "Memecode"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scribe_v2.4" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
 

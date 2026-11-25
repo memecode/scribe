@@ -82,23 +82,28 @@ DllMain(HINSTANCE hInst, DWORD Reason, LPVOID Reserved)
 			LMakePath(ExePath, sizeof(ExePath), LogPath, "..\\Scribe.exe");
 			if (!LFileExists(ExePath))
 			{
-				LRegKey s(false, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail\\Scribe\\shell\\open\\command");
-				if (s.IsOk())
+				// The per-user entry is what Windows reads first, so check it before the
+				// machine wide one.
+				const char *roots[] = { "HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE" };
+				for (int i=0; i<2; i++)
 				{
+					LRegKey s(false, "%s\\SOFTWARE\\Clients\\Mail\\Scribe\\shell\\open\\command", roots[i]);
+					if (!s.IsOk())
+						continue;
+
 					const char *CmdPath = s.GetStr();
-					if (CmdPath)
+					if (!CmdPath)
+						continue;
+
+					LAutoString Scribe(LTokStr(CmdPath));
+					if (LFileExists(Scribe))
 					{
-						LAutoString Scribe(LTokStr(CmdPath));
-						if (LFileExists(Scribe))
-						{
-							strcpy_s(ExePath, sizeof(ExePath), Scribe);
-						}
-						else
-						{
-							Log("%s:%i - Can't find Scribe executable.\n", _FL);
-							return false;
-						}
+						strcpy_s(ExePath, sizeof(ExePath), Scribe);
+						break;
 					}
+
+					Log("%s:%i - Can't find Scribe executable.\n", _FL);
+					return false;
 				}
 			}
 		}

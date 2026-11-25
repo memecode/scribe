@@ -34,6 +34,8 @@ typedef HRESULT (STDAPICALLTYPE *pWrapCompressedRTFStream)(LPSTREAM lpCompressed
 #define PR_ATTACH_CONTENT_ID		0x3712001E
 #endif
 
+// Windows resolves the mail client per-user first, so both trees are checked in that order.
+static const char *regUserClientsEmail = "HKEY_CURRENT_USER\\SOFTWARE\\Clients\\Mail";
 static const char *regClientsEmail = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\Mail";
 
 // Helper classes/functions
@@ -866,26 +868,60 @@ public:
 
 	void InitSrcClients()
 	{
-		LRegKey Email(false, regClientsEmail);
 		LCombo *SrcClient;
-		if (Email.GetKeyNames(Clients) && GetViewById(IDC_CLIENT, SrcClient))
-		{
-			Clients.Sort([](auto a, auto b)
-				{
-					return Strcmp(a, b);
-				});
+		if (!GetViewById(IDC_CLIENT, SrcClient))
+			return;
 
-			DefClient = NewStr(Email.GetStr());
-			int i = 0;
-			for (auto c: Clients)
+		// Per-user names come first because that is the order Windows resolves them in, and the
+		// default is taken from the first tree that has one.
+		const char *bases[] = { regUserClientsEmail, regClientsEmail };
+
+		for (int b=0; b<2; b++)
+		{
+			LRegKey Email(false, bases[b]);
+			if (!Email.IsOk())
+				continue;
+
+			if (!DefClient)
+				DefClient = NewStr(Email.GetStr());
+
+			List<char> names;
+			if (!Email.GetKeyNames(names))
+				continue;
+
+			for (auto n : names)
 			{
-				SrcClient->Insert(c);
-				if (DefClient && _stricmp(DefClient, c) == 0)
+				bool Has = false;
+				for (auto c : Clients)
 				{
-					SrcClient->Value(i);
+					if (c && n && _stricmp(c, n) == 0)
+					{
+						Has = true;
+						break;
+					}
 				}
-				i++;
+
+				if (!Has)
+					Clients.Add(NewStr(n));
 			}
+
+			names.DeleteArrays();
+		}
+
+		Clients.Sort([](auto a, auto b)
+			{
+				return Strcmp(a, b);
+			});
+
+		int i = 0;
+		for (auto c : Clients)
+		{
+			SrcClient->Insert(c);
+			if (DefClient && _stricmp(DefClient, c) == 0)
+			{
+				SrcClient->Value(i);
+			}
+			i++;
 		}
 	}
 

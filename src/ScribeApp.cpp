@@ -416,7 +416,7 @@ const char OptionsFileName[] = "ScribeOptions";
 
 const char AuthorEmailAddr[] = "fret@memecode.com";
 const char AuthorHomepage[] = "http://www.memecode.com";
-const char ApplicationHomepage[] = "http://www.memecode.com/scribe.php";
+const char ApplicationHomepage[] = "http://www.memecode.com/scribe";
 const char FaqHomepage[] = "http://www.memecode.com/scribe/faq.php";
 
 const char *DefaultFolderNames[16];

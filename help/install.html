@@ -237,7 +237,9 @@
 					<td class="fld_win">Check default email client on startup
 					<td class="win">Windows: supports a default email client for mailto: URL's. If this option is set
 						then Scribe will monitor that setting on startup and prompt you if it doesn't 
-						point to Scribe.
+						point to Scribe. Since Windows validates the mailto association itself, accepting
+						the prompt sets the Simple MAPI default and opens Settings → Apps → Default apps
+						so you can pick Scribe there.
 							
 				<tr>
 					<td class="fld">Confirm item delete
@@ -439,7 +441,7 @@
 
 				<tr>
 					<td class="fld">Use Growl
-					<td>Turns on support for <a href="http://growl.info/">Growl</a> notifications.
+					<td>Turns on support for <a href="https://growl.info/">Growl</a> notifications.
 
 				<tr>
 					<td class="fld">Resize image attachments
@@ -552,7 +554,7 @@
 							on the server. And full IMAP which is for managing your mail on the server, while being able
 							to read it locally via caching.
 							The "Calendar" protocol is a deprecated method of connecting to the MemeCode
-							<a href='http://www.memecode.com/scribe/server.php'>Groupware Server</a>. For users
+							<a href='https://www.memecode.com/scribe/server.php'>Groupware Server</a>. For users
 							stuck behind a HTTP only firewall there is a protocol for accessing
 							POP over HTTP. On windows you can also fetch mail from
 							a MAPI source. There is no support for MAPI on non-Windows platforms (complain to
@@ -641,17 +643,22 @@
 				are put into system directories. If you want to keep your folders and email then don't 
 				delete the folders.mail file in Scribe's directory.
 				<p>
-				The registry settings left behind are:
+				The uninstaller removes Scribe's entries from
 				<ul>
 					<li> HKEY_CURRENT_USER\SOFTWARE\Memecode\Scribe
-					<li> HKEY_CURRENT_USER\SOFTWARE\Clients\Mail\Scribe (IE intergration)
-					<li> HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Mail\Scribe (IE intergration)
-					<li> HKEY_CLASSES_ROOT\mailto (If you have selected Scribe as the default client)
+					<li> HKEY_CURRENT_USER\SOFTWARE\Clients\Mail, default value if it points to Scribe
+					<li> HKEY_CURRENT_USER\SOFTWARE\Clients\Mail\Scribe, plus the machine wide copy if it was written
+					<li> HKEY_CURRENT_USER\SOFTWARE\RegisteredApplications, value "Scribe"
+					<li> HKEY_CURRENT_USER\SOFTWARE\Classes\Memecode.Scribe.*, plus the machine wide copies if they were written
+					<li> Extension mappings that still point at a Scribe ProgID
 				</ul>
 				<br>
-				These are unavoidable for system intergration and don't impact system performance 
-				after you remove Scribe. HKEY_CLASSES_ROOT\mailto can be set to something else by
-				changing Control Panel → Internet Options → Programs → Email.
+				It cannot remove
+				<ul>
+					<li> HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\mailto\UserChoice
+				</ul>
+				<br>
+				That entry is owned by Windows and can be changed from Settings → Apps → Default apps.
 			</div>
 			<div class="mac specific">
 				If you installed Scribe to /Applications you can just delete that.<br>
