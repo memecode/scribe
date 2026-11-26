@@ -125,6 +125,7 @@ add_executable(scribe ${APP_TYPE}
     ${LGI_DIR}/src/common/Widgets/richText2/RichTextEditPriv.cpp
     ${LGI_DIR}/src/common/Widgets/richText2/HorzRuleBlock.cpp
     ${LGI_DIR}/src/common/Widgets/richText2/ImageBlock.cpp
+    ${LGI_DIR}/src/common/Widgets/richText2/TableBlock.cpp
     ${LGI_DIR}/src/common/Widgets/richText2/TextBlock.cpp
     ${LGI_DIR}/src/common/Widgets/richText2/ListBlock.cpp
 

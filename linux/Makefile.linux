@@ -155,6 +155,7 @@ Source =	../../lgi/trunk/src/common/Coding/LexCpp.cpp \
 			../../lgi/trunk/src/common/Widgets/richText2/ListBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/richText2/RichTextEdit.cpp \
 			../../lgi/trunk/src/common/Widgets/richText2/RichTextEditPriv.cpp \
+			../../lgi/trunk/src/common/Widgets/richText2/TableBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/richText2/TextBlock.cpp \
 			../../lgi/trunk/src/common/Widgets/TimePopup.cpp \
 			../../lgi/trunk/src/common/Widgets/YearView.cpp \
