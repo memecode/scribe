@@ -503,8 +503,8 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 					
 					for (const char *c = Tag->GetContent(); c; )
 					{
-						const char *s = strstr(c, "<?");
-						const char *e = s ? strstr(s + 2, "?>") : NULL;
+						auto s = strstr(c, "<?");
+						auto e = s ? strstr(s + 2, "?>") : NULL;
 						if (s && e)
 						{
 							if (s > c)
@@ -513,18 +513,18 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 							}
 							s += 2;
 							
-							LString Var = LString(s, e - s).Strip();
+							auto Var = LString(s, e - s).Strip();
 							LVariant v;
 							if (Var)
 							{
-								LString::Array parts = Var.SplitDelimit(" ");
+								auto parts = Var.SplitDelimit(" ");
 								if (parts.Length() > 0)
 								{
 									if (Dom.GetValue(parts[0], v))
 									{
 										for (unsigned mod = 1; mod < parts.Length(); mod++)
 										{
-											LString::Array m = parts[mod].SplitDelimit("=", 1);
+											auto m = parts[mod].SplitDelimit("=", 1);
 											if (m.Length() == 2)
 											{
 												if (m[0].Equals("quote"))
@@ -660,10 +660,12 @@ LString ScribeWnd::ProcessReplyForwardTemplate(Mail *m, Mail *r, char *Xml, int 
 
 	auto resp = p.NewLStr();
 	
+	#ifdef _DEBUG
 	LFile out("/home/matthew/code/example-reply.html", O_WRITE);
 	out.SetSize(0);
 	out.Write(resp);
-	
+	#endif
+
 	return resp;
 }
 

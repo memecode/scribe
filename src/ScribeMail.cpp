@@ -9457,7 +9457,7 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 	// this email is ready to send
 	SetFlags(GetFlags() | MAIL_READ | MAIL_CREATED);
 
-	LDataPropI *ToAddr = GetTo()->Create(GetObject()->GetStore());
+	auto ToAddr = GetTo()->Create(GetObject()->GetStore());
 	if (ToAddr)
 	{
 		bool CopyStatus;
@@ -9476,8 +9476,7 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 
 	LVariant UserName, EmailAddr, ReplyTo;
 
-	ScribeAccount *a = App->GetCurrentAccount();
-	if (a)
+	if (auto a = App->GetCurrentAccount())
 	{
 		UserName = a->Identity.Name();
 		EmailAddr = a->Identity.Email();
@@ -9487,12 +9486,12 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 
 	if (All)
 	{
-		for (LDataPropI *a = m->GetTo()->First(); a; a = m->GetTo()->Next())
+		for (auto a = m->GetTo()->First(); a; a = m->GetTo()->Next())
 		{
 			bool Same = App->IsMyEmail(a->GetStr(FIELD_EMAIL));
 			
 			bool AlreadyThere = false;
-			for (LDataPropI *r = GetTo()->First(); r; r=GetTo()->Next())
+			for (auto r = GetTo()->First(); r; r=GetTo()->Next())
 			{
 				if (_stricmp(r->GetStr(FIELD_EMAIL), a->GetStr(FIELD_EMAIL)) == 0)
 				{
@@ -9503,8 +9502,7 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 
 			if (!Same && !AlreadyThere)
 			{
-				LDataPropI *New = GetTo()->Create(GetObject()->GetStore());
-				if (New)
+				if (auto New = GetTo()->Create(GetObject()->GetStore()))
 				{
 					New->SetInt(FIELD_CC, ReplyAllSetting.CastInt32());
 					New->SetStr(FIELD_EMAIL, a->GetStr(FIELD_EMAIL));
@@ -9515,7 +9513,7 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 		}
 	}
 
-	ScribeAccount *MatchedAccount = m->GetAccountSentTo();
+	auto MatchedAccount = m->GetAccountSentTo();
 	if (MatchedAccount &&
 		MatchedAccount->Identity.Email().Str())
 	{
@@ -9545,17 +9543,16 @@ void Mail::OnReply(Mail *m, bool All, bool MarkOriginal)
 		}
 	}
 
-	char Re[32];
-	sprintf_s(Re, sizeof(Re), "%s:", LLoadString(IDS_REPLY_PREFIX));
+	auto Re = LString::Fmt("%s:", LLoadString(IDS_REPLY_PREFIX));
 
 	auto SrcSubject = (m->GetSubject()) ? m->GetSubject() : "";
-	if (_strnicmp(SrcSubject, Re, strlen(Re)) != 0)
+	if (_strnicmp(SrcSubject, Re, Re.Length()) != 0)
 	{
-		size_t Len = strlen(SrcSubject) + strlen(Re) + 2;
-		char *s = new char[Len];
+		auto Len = strlen(SrcSubject) + Re.Length() + 2;
+		auto s = new char[Len];
 		if (s)
 		{
-			sprintf_s(s, Len, "%s %s", Re, SrcSubject);
+			sprintf_s(s, Len, "%s %s", Re.Get(), SrcSubject);
 			SetSubject(s);
 			DeleteArray(s);
 		}
