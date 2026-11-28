@@ -208,6 +208,7 @@
 		34F32181305AC7020073C5E7 /* libgumbo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F3217F305AC7020073C5E7 /* libgumbo.a */; };
 		34F32182305AC7020073C5E7 /* liblitehtml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F32180305AC7020073C5E7 /* liblitehtml.a */; };
 		34F32185305AC82E0073C5E7 /* Html2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34F32183305AC82E0073C5E7 /* Html2.cpp */; };
+		34F9325730BA812000E9C331 /* TableBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34F9325630BA812000E9C331 /* TableBlock.cpp */; };
 		34FB966F237D07740039423C /* WebdavStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB9661237D07740039423C /* WebdavStore.cpp */; };
 		34FB968A23835BB40039423C /* WebDav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34FB968923835BB40039423C /* WebDav.cpp */; };
 		350000000000000000000001 /* BlockCursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 350000000000000000000101 /* BlockCursor.cpp */; };
@@ -562,6 +563,8 @@
 		34F32183305AC82E0073C5E7 /* Html2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Html2.cpp; path = ../../../lgi/trunk/src/common/Text/Html2.cpp; sourceTree = SOURCE_ROOT; };
 		34F32184305AC82E0073C5E7 /* HtmlPriv2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HtmlPriv2.h; path = ../../../lgi/trunk/src/common/Text/HtmlPriv2.h; sourceTree = SOURCE_ROOT; };
 		34F6152127E55CA700FE5B0C /* EventTargetThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EventTargetThread.h; path = ../../../../lgi/trunk/include/lgi/common/EventTargetThread.h; sourceTree = "<group>"; };
+		34F9325530BA812000E9C331 /* RichTextEditPriv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RichTextEditPriv.h; path = ../../../lgi/trunk/src/common/Widgets/richText2/RichTextEditPriv.h; sourceTree = SOURCE_ROOT; };
+		34F9325630BA812000E9C331 /* TableBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = TableBlock.cpp; path = ../../../lgi/trunk/src/common/Widgets/richText2/TableBlock.cpp; sourceTree = SOURCE_ROOT; };
 		34FB9661237D07740039423C /* WebdavStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebdavStore.cpp; path = ../../src/Store3Webdav/WebdavStore.cpp; sourceTree = "<group>"; };
 		34FB968923835BB40039423C /* WebDav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebDav.cpp; path = ../../../../lgi/trunk/src/common/Net/WebDav.cpp; sourceTree = "<group>"; };
 		34FB968B23835BE70039423C /* WebDav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDav.h; path = ../../../../lgi/trunk/include/lgi/common/WebDav.h; sourceTree = "<group>"; };
@@ -1103,6 +1106,8 @@
 		34CD61D4309C74CD00354B9E /* Rte2 */ = {
 			isa = PBXGroup;
 			children = (
+				34F9325530BA812000E9C331 /* RichTextEditPriv.h */,
+				34F9325630BA812000E9C331 /* TableBlock.cpp */,
 				350000000000000000000101 /* BlockCursor.cpp */,
 				350000000000000000000102 /* HorzRuleBlock.cpp */,
 				350000000000000000000103 /* ImageBlock.cpp */,
@@ -1304,6 +1309,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34F9325730BA812000E9C331 /* TableBlock.cpp in Sources */,
 				3445E5751F1F413200D0A824 /* EmojiMap.cpp in Sources */,
 				3477C3EF1CC227ED0028B84B /* ScribeStatusPanel.cpp in Sources */,
 				3477C3C31CC227ED0028B84B /* Imp_Eudora.cpp in Sources */,
