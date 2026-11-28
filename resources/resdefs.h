@@ -705,7 +705,6 @@
 #define IDC_SUSPECT_FOLDER						897
 #define IDM_SET_UNREAD							898
 #define IDS_HTML_TAGS							899
-#define IDS_HTML									1440
 #define IDC_PROGRESS_TBL						900
 #define IDS_DELETE								901
 #define IDC_SET_SUSPECT_FOLDER					902
@@ -950,7 +949,6 @@
 #define IDS_ERROR								1141
 #define IDS_ENTER_KEY							1142
 #define IDM_SCRIPT_DEBUG						1143
-#define IDC_UPDATE								1144
 #define IDC_1145								1145
 #define IDS_CONTAINS							1146
 #define IDS_STARTS_WITH							1147
@@ -1117,6 +1115,7 @@
 #define IDS_ERROR_IMPORT						1374
 #define IDS_ERROR_REPLICATION_FAILED			1375
 #define IDS_ERROR_IMPORT_COUNT					1388
+#define IDS_HTML								1440
 #define IDS_GNUPG_ERR_NOT_INSTALLED				1458
 #define IDC_1459								1459
 #define IDD_FOLDER_SELECT						1469
@@ -1146,8 +1145,6 @@
 #define IDS_SSL_DEBUG							1528
 #define IDS_CONSOLE								1529
 #define IDC_SPELL_LANG							1531
-#define IDC_WIDTH								1535
-#define IDC_SLIDE								1537
 #define IDC_BAYES_DELETE_ON_SERVER				1541
 #define IDC_BAYES_DELETE_ATTACHMENTS			1543
 #define IDC_TENTATIVE							1548

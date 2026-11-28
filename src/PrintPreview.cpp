@@ -1,34 +1,36 @@
 #include "Scribe.h"
 #include "PrintPreview.h"
+#include "PrintContext.h"
 #include "resdefs.h"
 #include "lgi/common/ZoomView.h"
 #include "lgi/common/TableLayout.h"
-#include "lgi/common/Slider.h"
 #include "lgi/common/FileSelect.h"
+#include "lgi/common/Html2.h"
 
 #include "DynamicHtml.h"
 
-#define DEFAULT_PAGE_SIZE			1000
+#define DEFAULT_PREVIEW_WIDTH		1000
+#define MIN_PREVIEW_DPI				300
 
 struct PrintPreviewPriv
 {
-	ScribeWnd *App = NULL;
-	LPrintDC *PrintDC = NULL;
-	Mail *m = NULL;
-	PrintPreview *Wnd = NULL;
-	LZoomView *Zoom = NULL;
-	LAutoPtr<LMemDC> Mem;
-	LAutoPtr<Html1::LHtml> Ctrl;
+	ScribeWnd *App = nullptr;
+	LPrintDC *PrintDC = nullptr;
+	ScribePrintContext *Context = nullptr;
+	Mail *m = nullptr;
+	PrintPreview *Wnd = nullptr;
+	LZoomView *Zoom = nullptr;
+	LAutoPtr<LMemDC> LayoutImage;
+	LAutoPtr<Html2::LHtml> Ctrl;
+	bool PrintSurfaceReady = false;
 	bool IsLoaded = false;
 	int HeaderContentHeight = 0;
-	LSlider *Slider = NULL;
-	bool InUpdate = false;
 	LString Ranges;
 	
 	PrintPreviewPriv(PrintPreview *w)
 	{
 		Wnd = w;
-		if (Ctrl.Reset(new Html1::LHtml(IDC_HTML_IMAGES, 0, 0, DEFAULT_PAGE_SIZE, 4000)))
+		if (Ctrl.Reset(new Html2::LHtml(IDC_HTML_IMAGES, 0, 0, DEFAULT_PREVIEW_WIDTH, 4000)))
 		{
 			Ctrl->SetMaxPaintTime(5000);
 			Ctrl->SetLoadImages(true);
@@ -46,53 +48,76 @@ struct PrintPreviewPriv
 			return false;
 		}
 
-		// Set width		
-		int Width = (int)Wnd->GetCtrlValue(IDC_WIDTH);
-		LRect p(0, 0, Width-1, 100000);
+		if (!PrintSurfaceReady || !PrintDC || PrintDC->X() <= 0)
+			return false;
+
+		int LayoutWidth = Context->MarginPx.X();
+		LRect p(0, 0, LayoutWidth-1, 100000);
 		Ctrl->SetPos(p);
 
 		// Get the size of the HTML layout
-		LPoint Size = Ctrl->Layout();
-		if (Size.x <= 0 || Size.y <= 0)
+		LPoint Size;
+		if (!Context->LayoutHtml(Ctrl, Size))
 		{
 			LgiTrace("%s:%i - No content to print.\n", _FL);
 			return false;
 		}
 		
-		// Create a memory context big enough for all the content
-		if (!Mem || Mem->X() < Width || Mem->Y() < Size.y)
-		{
-			Zoom->SetSurface(NULL, true);
-			if (!Mem.Reset(new LMemDC(_FL, Width, Size.y, System24BitColourSpace)))
+		#if defined(__GTK_H__)
+			auto Dpi = PrintDC->GetDpi();
+			if (Dpi.x <= 0 || Dpi.y <= 0)
 			{
-				LgiTrace("%s:%i - Can't create memory bitmap context (%ix%i).\n", _FL, Width, Size.y);
+				LgiTrace("%s:%i - Invalid printer DPI for HTML preview (%i,%i).\n", _FL, Dpi.x, Dpi.y);
 				return false;
 			}
-		}
-		
-		// Clear the page to white
-		Mem->Colour(LColour::White);
-		Mem->Rectangle();
-
-		// Ask the HTML control to paint itself into the memory context
-		Ctrl->OnPaint(Mem);
+			LPoint PreviewDpi(MAX(Dpi.x, MIN_PREVIEW_DPI), MAX(Dpi.y, MIN_PREVIEW_DPI));
+			Zoom->SetSurface(nullptr, false);
+			LayoutImage.Reset();
+			LAutoPtr<LMemDC> Image(PrintDC->RenderPageToBitmap(PreviewDpi, [this](LPrintDC *PreviewDC)
+			{
+				return Context->PaintPage(PreviewDC, 0, Ctrl);
+			}));
+			if (!Image)
+				return false;
+			LayoutImage.Reset(Image.Release());
+		#else
+			int PreviewWidth = LayoutWidth;
+			int PreviewHeight = Size.y;
+			if (!LayoutImage || LayoutImage->X() != PreviewWidth || LayoutImage->Y() != PreviewHeight)
+			{
+				Zoom->SetSurface(nullptr, false);
+				if (!LayoutImage.Reset(new LMemDC(_FL, PreviewWidth, PreviewHeight, System24BitColourSpace)))
+				{
+					LgiTrace("%s:%i - Can't create print-layout bitmap (%ix%i).\n", _FL, PreviewWidth, PreviewHeight);
+					return false;
+				}
+			}
+			LayoutImage->Colour(LColour::White);
+			LayoutImage->Rectangle();
+			Ctrl->OnPaint(LayoutImage);
+		#endif
 		if (Ctrl->GetMaxPaintTimeout())
 		{
 			LAssert(!"Max paint time reached.");
 		}
+
 		Zoom->SetDefaultZoomMode(LZoomView::ZoomFitX);
-		Zoom->SetSurface(Mem, false);
+		Zoom->SetSurface(LayoutImage, false);
 		
 		return true;		
 	}	
 };
 
-PrintPreview::PrintPreview(ScribeWnd *App, Mail *m, LPrintDC *PrintDC)
+PrintPreview::PrintPreview(ScribeWnd *App, Mail *m, ScribePrintContext *context)
 {
 	d = new PrintPreviewPriv(this);
 	d->App = App;
 	d->m = m;
-	d->PrintDC = PrintDC;
+	d->Context = context;
+	d->PrintDC = context->PrintDC;
+	d->PrintSurfaceReady = d->Ctrl && d->Ctrl->SetFontSurface(d->PrintDC);
+	if (!d->PrintSurfaceReady)
+		LgiTrace("%s:%i - Failed to create print fonts for HTML preview.\n", _FL);
 	
 	if (!LoadFromResource(IDD_PRINT_PREVIEW))
 	{
@@ -103,12 +128,9 @@ PrintPreview::PrintPreview(ScribeWnd *App, Mail *m, LPrintDC *PrintDC)
 	ThingUi *Ui = m->GetUI();
 	MoveSameScreen(Ui ? (LWindow*)Ui : App);
 		
-	SetCtrlValue(IDC_WIDTH, DEFAULT_PAGE_SIZE);
-	SetCtrlValue(IDC_SLIDE, DEFAULT_PAGE_SIZE);
 	SetCtrlName(IDC_STATUS, LLoadString(IDS_LOADING));
 	SetCtrlValue(IDC_PAGE_ALL, true);
-	if (GetViewById(IDC_SLIDE, d->Slider))
-		d->Slider->SetRange(LRange(500, 1500));
+	SetCtrlEnabled(IDOK, false);
 
 	// Give it the HTML to parse
 	d->Ctrl->SetNotify(this);
@@ -126,6 +148,8 @@ PrintPreview::PrintPreview(ScribeWnd *App, Mail *m, LPrintDC *PrintDC)
 
 PrintPreview::~PrintPreview()
 {
+	if (d->Zoom)
+		d->Zoom->SetSurface(nullptr, false);
 	delete d;
 }
 
@@ -143,12 +167,22 @@ void PrintPreview::OnPulse()
 
 LSurface *PrintPreview::GetImage()
 {
-	return d->Mem;
+	return d->LayoutImage;
 }
 
 LAutoPtr<LMemDC> PrintPreview::ReleaseImage()
 {
-	return d->Mem;
+	if (d->Zoom)
+		d->Zoom->SetSurface(nullptr, false);
+	return d->LayoutImage;
+}
+
+Html2::LHtml *PrintPreview::ReleaseHtml()
+{
+	if (!d->Ctrl || !d->Ctrl->Detach())
+		return nullptr;
+	d->Ctrl->SetNotify(nullptr);
+	return d->Ctrl.Release();
 }
 
 LString PrintPreview::GetPageRanges()
@@ -179,39 +213,9 @@ int PrintPreview::OnNotify(LViewI *Ctrl, const LNotification &n)
 			SetCtrlValue(IDC_PAGE_ALL, !HasContent);
 			break;
 		}
-		case IDC_SLIDE:
-		{
-			if (!d->InUpdate)
-			{
-				d->InUpdate = true;
-				SetCtrlValue(IDC_WIDTH, Ctrl->Value());
-				d->InUpdate = false;
-			}
-			break;
-		}
-		case IDC_WIDTH:
-		{
-			if (!d->InUpdate)
-			{			
-				d->InUpdate = true;
-				SetCtrlValue(IDC_SLIDE, Ctrl->Value());
-				d->InUpdate = false;
-			}
-			break;
-		}
-		case IDC_UPDATE:
-		{
-			d->Zoom->SetSurface(NULL, false);
-			d->Mem.Reset();
-			
-			SetCtrlName(IDC_STATUS, LLoadString(IDS_LOADING));
-			d->Render();
-			SetCtrlName(IDC_STATUS, LLoadString(IDS_PREVIEW));
-			break;
-		}
 		case IDC_SAVE_IMG:
 		{
-			if (d->Mem)
+			if (d->LayoutImage)
 			{
 				auto s = new LFileSelect(this);
 				s->Type("JPEG", "*.jpg");
@@ -224,7 +228,7 @@ int PrintPreview::OnNotify(LViewI *Ctrl, const LNotification &n)
 				s->Save([this](auto s, auto ok)
 				{
 					if (ok)
-						GdcD->Save(s->Name(), d->Mem);
+						GdcD->Save(s->Name(), d->LayoutImage);
 				});
 			}
 			else LgiMsg(this, "No image to save.", LLoadString(IDS_ERROR));
@@ -248,9 +252,17 @@ int PrintPreview::OnNotify(LViewI *Ctrl, const LNotification &n)
 			{
 				// Html control finished loading...
 				d->IsLoaded = true;
-				d->Render();
-				SetCtrlEnabled(IDOK, true);
-				SetCtrlName(IDC_STATUS, LLoadString(IDS_PREVIEW));
+				if (d->Render())
+				{
+					SetCtrlEnabled(IDOK, true);
+					SetCtrlName(IDC_STATUS, LLoadString(IDS_PREVIEW));
+				}
+				else
+				{
+					SetCtrlEnabled(IDOK, false);
+					SetCtrlName(IDC_STATUS, LLoadString(IDS_ERROR));
+					LgiMsg(this, "Failed to render the print preview.", LLoadString(IDS_ERROR));
+				}
 			}
 			break;			
 		}

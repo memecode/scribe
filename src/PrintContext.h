@@ -3,6 +3,7 @@
 
 #include "lgi/common/Printer.h"
 #include "lgi/common/DrawListSurface.h"
+#include "lgi/common/Html2.h"
 
 struct ScribePrintContext : public LCss, public LPrinter::Context
 {
@@ -18,8 +19,14 @@ public:
 	int CurrentY = 0;
 	LColour Fore = LColour::Black;
 	LArray<LDrawListSurface*> Pages;
-	LAutoPtr<LMemDC> HtmlImg;
+	LAutoPtr<Html2::LHtml> HtmlPrint;
 	LAutoPtr<LPrintPageRanges> PageRanges;
+	int HtmlStartPage = 0;
+	int HtmlStartY = 0;
+	int HtmlLineHeight = 0;
+	int HtmlFirstPageStep = 0;
+	int HtmlPageStep = 0;
+	double HtmlScale = 1.0;
 
 	ScribePrintContext(ScribeWnd *app, Thing *object);
 	~ScribePrintContext();
@@ -27,6 +34,8 @@ public:
 	// Api
 	LDrawListSurface *NewPage();
     LDisplayString *Text(const char *str, int x = -1);
+	bool PaintPage(LPrintDC *pdc, int pageIndex, Html2::LHtml *html);
+	bool LayoutHtml(Html2::LHtml *html, LPoint &size);
 
 	// LPrintEvents impl	
 	void OnBeginPrint(LPrintDC *pdc, std::function<void(int)> callback);
